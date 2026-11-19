@@ -1,0 +1,5273 @@
+{
+  "families": [
+    {
+      "lang": "H",
+      "lemma": "כֹּל",
+      "occurrences": 5412,
+      "original_strong": "3605",
+      "reason": "unattested_indexed_headword",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 5412
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010010210071",
+          "reference": "GEN 1:21!7"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010010210161",
+          "reference": "GEN 1:21!16"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010010250111",
+          "reference": "GEN 1:25!11"
+        }
+      ],
+      "state": "excluded_from_ubs_0_9_4_scope_only",
+      "ubs_candidate_entries": []
+    },
+    {
+      "lang": "H",
+      "lemma": "אַל",
+      "occurrences": 726,
+      "original_strong": "0408",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adv": 726
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010130080051",
+          "reference": "GEN 13:8!5"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010150010111",
+          "reference": "GEN 15:1!11"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010180030081",
+          "reference": "GEN 18:3!8"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000381000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "כֹּה",
+      "occurrences": 577,
+      "original_strong": "3541",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adv": 577
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010150050161",
+          "reference": "GEN 15:5!16"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010220050141",
+          "reference": "GEN 22:5!14"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010240300161",
+          "reference": "GEN 24:30!16"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003248000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "עוֹד",
+      "occurrences": 488,
+      "original_strong": "5750",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adv": 488
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010040250031",
+          "reference": "GEN 4:25!3"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010070040031",
+          "reference": "GEN 7:4!3"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010080100021",
+          "reference": "GEN 8:10!2"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "005287000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מְאֹד",
+      "occurrences": 300,
+      "original_strong": "3966",
+      "reason": "unattested_indexed_headword",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adv": 298,
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010010310091",
+          "reference": "GEN 1:31!9"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010040050091",
+          "reference": "GEN 4:5!9"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010070180041",
+          "reference": "GEN 7:18!4"
+        }
+      ],
+      "state": "excluded_from_ubs_0_9_4_scope_only",
+      "ubs_candidate_entries": []
+    },
+    {
+      "lang": "H",
+      "lemma": "יֵשׁ",
+      "occurrences": 138,
+      "original_strong": "3426",
+      "reason": "unattested_indexed_headword",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adv": 137,
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010180240021",
+          "reference": "GEN 18:24!2"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010230080051",
+          "reference": "GEN 23:8!5"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010240230082",
+          "reference": "GEN 24:23!8"
+        }
+      ],
+      "state": "excluded_from_ubs_0_9_4_scope_only",
+      "ubs_candidate_entries": []
+    },
+    {
+      "lang": "A",
+      "lemma": "כֹּל",
+      "occurrences": 82,
+      "original_strong": "3606",
+      "reason": "unattested_indexed_headword",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 82
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o150040200072",
+          "reference": "EZR 4:20!7"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o150050070101",
+          "reference": "EZR 5:7!10"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o150060110051",
+          "reference": "EZR 6:11!5"
+        }
+      ],
+      "state": "excluded_from_ubs_0_9_4_scope_only",
+      "ubs_candidate_entries": []
+    },
+    {
+      "lang": "H",
+      "lemma": "קׇרְבָּן",
+      "occurrences": 80,
+      "original_strong": "7133",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 80
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o030010020111",
+          "reference": "LEV 1:2!11"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o030010020211",
+          "reference": "LEV 1:2!21"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o030010030031",
+          "reference": "LEV 1:3!3"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006568000000000",
+        "006569000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "אֲמַר",
+      "occurrences": 71,
+      "original_strong": "0560",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 71
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000512001001000",
+          "original_word_id": "o150050030131",
+          "reference": "EZR 5:3!13"
+        },
+        {
+          "original_sdbh": "000512001001000",
+          "original_word_id": "o150050040031",
+          "reference": "EZR 5:4!3"
+        },
+        {
+          "original_sdbh": "000512001001000",
+          "original_word_id": "o150050090061",
+          "reference": "EZR 5:9!6"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000511000000000",
+        "000512000000000",
+        "000513000000000",
+        "000514000000000",
+        "000515000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "הוה",
+      "occurrences": 71,
+      "original_strong": "1934",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 71
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o150040120021",
+          "reference": "EZR 4:12!2"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o150040130031",
+          "reference": "EZR 4:13!3"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o150040200031",
+          "reference": "EZR 4:20!3"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "001785000000000",
+        "001786000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "זָנָה",
+      "occurrences": 60,
+      "original_strong": "2181",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 60
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002011001001000",
+          "original_word_id": "o010380240071",
+          "reference": "GEN 38:24!7"
+        },
+        {
+          "original_sdbh": "002011001003000",
+          "original_word_id": "o020340150062",
+          "reference": "EXO 34:15!6"
+        },
+        {
+          "original_sdbh": "002011001003000",
+          "original_word_id": "o020340160042",
+          "reference": "EXO 34:16!4"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002014000000000",
+        "002015000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "דָּנִיֵּאל",
+      "occurrences": 52,
+      "original_strong": "1841",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 52
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001695001004000",
+          "original_word_id": "o270020130061",
+          "reference": "DAN 2:13!6"
+        },
+        {
+          "original_sdbh": "001695001004000",
+          "original_word_id": "o270020140021",
+          "reference": "DAN 2:14!2"
+        },
+        {
+          "original_sdbh": "001695001004000",
+          "original_word_id": "o270020150182",
+          "reference": "DAN 2:15!18"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "001695000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "תֹּולַעַת",
+      "occurrences": 38,
+      "original_strong": "8438",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 38
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "007746002001000",
+          "original_word_id": "o020250040032",
+          "reference": "EXO 25:4!3"
+        },
+        {
+          "original_sdbh": "007746002001000",
+          "original_word_id": "o020260010102",
+          "reference": "EXO 26:1!10"
+        },
+        {
+          "original_sdbh": "007746002001000",
+          "original_word_id": "o020260310052",
+          "reference": "EXO 26:31!5"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007750000000000",
+        "007751000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "קֳבֵל",
+      "occurrences": 29,
+      "original_strong": "6903",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 29
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o150040140031",
+          "reference": "EZR 4:14!3"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o150040160112",
+          "reference": "EZR 4:16!11"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o150060130092",
+          "reference": "EZR 6:13!9"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "006360000000000",
+        "006361000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "אֱנָשׁ",
+      "occurrences": 25,
+      "original_strong": "0606",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 25
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000554001001000",
+          "original_word_id": "o150040110111",
+          "reference": "EZR 4:11!11"
+        },
+        {
+          "original_sdbh": "000554001001000",
+          "original_word_id": "o150060110061",
+          "reference": "EZR 6:11!6"
+        },
+        {
+          "original_sdbh": "000554001001000",
+          "original_word_id": "o270020100091",
+          "reference": "DAN 2:10!9"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000553000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "שָׁכַר",
+      "occurrences": 18,
+      "original_strong": "7937",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 18
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "007362001001000",
+          "original_word_id": "o010090210042",
+          "reference": "GEN 9:21!4"
+        },
+        {
+          "original_sdbh": "007362001001000",
+          "original_word_id": "o010430340142",
+          "reference": "GEN 43:34!14"
+        },
+        {
+          "original_sdbh": "007362001003000",
+          "original_word_id": "o050320420011",
+          "reference": "DEU 32:42!1"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007366000000000",
+        "007368000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "יוֹם",
+      "occurrences": 16,
+      "original_strong": "3118",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 16
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002854001008000",
+          "original_word_id": "o150040150231",
+          "reference": "EZR 4:15!23"
+        },
+        {
+          "original_sdbh": "002854001008000",
+          "original_word_id": "o150040190101",
+          "reference": "EZR 4:19!10"
+        },
+        {
+          "original_sdbh": "002854001002000",
+          "original_word_id": "o150060090211",
+          "reference": "EZR 6:9!21"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "002858000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "סָכַךְ",
+      "occurrences": 14,
+      "original_strong": "5526",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 14
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o020250200061",
+          "reference": "EXO 25:20!6"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o020370090061",
+          "reference": "EXO 37:9!6"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o020400030062",
+          "reference": "EXO 40:3!6"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "005073000000000",
+        "005074000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הִנֹּם",
+      "occurrences": 13,
+      "original_strong": "1516a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 13
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001045001001000 001391001001000",
+          "original_word_id": "o060150080051",
+          "reference": "JOS 15:8!5"
+        },
+        {
+          "original_sdbh": "001391001001000 001852001001000",
+          "original_word_id": "o060150080211",
+          "reference": "JOS 15:8!21"
+        },
+        {
+          "original_sdbh": "001045001001000 001391001001000",
+          "original_word_id": "o060180160111",
+          "reference": "JOS 18:16!11"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "לְ",
+      "occurrences": 11,
+      "original_strong": "3820b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 11
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o040130210091",
+          "reference": "NUM 13:21!9"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o040340080041",
+          "reference": "NUM 34:8!4"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o060130050131",
+          "reference": "JOS 13:5!13"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003499000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "בֶּן הִנֹּם",
+      "occurrences": 9,
+      "original_strong": "1516a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 9
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001045001001000 001391001001000",
+          "original_word_id": "o060150080041",
+          "reference": "JOS 15:8!4"
+        },
+        {
+          "original_sdbh": "001045001001000 001391001001000",
+          "original_word_id": "o060180160101",
+          "reference": "JOS 18:16!10"
+        },
+        {
+          "original_sdbh": "001045001001000 001391001001000",
+          "original_word_id": "o140280030041",
+          "reference": "2CH 28:3!4"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "רִמּוֹן",
+      "occurrences": 9,
+      "original_strong": "7417a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 9
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "005389003002000",
+          "original_word_id": "o060150320042",
+          "reference": "JOS 15:32!4"
+        },
+        {
+          "original_sdbh": "006818002001000",
+          "original_word_id": "o060190070021",
+          "reference": "JOS 19:7!2"
+        },
+        {
+          "original_sdbh": "006818002002000",
+          "original_word_id": "o060190130101",
+          "reference": "JOS 19:13!10"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006826000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "יִשְׂרָאֵל",
+      "occurrences": 8,
+      "original_strong": "3479",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 8
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003188001001000",
+          "original_word_id": "o150050010171",
+          "reference": "EZR 5:1!17"
+        },
+        {
+          "original_sdbh": "003188001001000",
+          "original_word_id": "o150050110222",
+          "reference": "EZR 5:11!22"
+        },
+        {
+          "original_sdbh": "003188001001000",
+          "original_word_id": "o150060140171",
+          "reference": "EZR 6:14!17"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003192000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "כּוֹרֶשׁ",
+      "occurrences": 8,
+      "original_strong": "3567",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 8
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003268001001000",
+          "original_word_id": "o150050130042",
+          "reference": "EZR 5:13!4"
+        },
+        {
+          "original_sdbh": "003268001001000",
+          "original_word_id": "o150050130081",
+          "reference": "EZR 5:13!8"
+        },
+        {
+          "original_sdbh": "003268001001000",
+          "original_word_id": "o150050140231",
+          "reference": "EZR 5:14!23"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003271000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מֹוסֵרָה",
+      "occurrences": 8,
+      "original_strong": "4147a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 8
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003789001001000",
+          "original_word_id": "o180390050052",
+          "reference": "JOB 39:5!5"
+        },
+        {
+          "original_sdbh": "003788001001000 003789001001000",
+          "original_word_id": "o190020030031",
+          "reference": "PSA 2:3!3"
+        },
+        {
+          "original_sdbh": "003789001001000",
+          "original_word_id": "o191070140042",
+          "reference": "PSA 107:14!4"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003792000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "בֵּלְשַׁאצַּר",
+      "occurrences": 7,
+      "original_strong": "1113",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 7
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001033001001000",
+          "original_word_id": "o270050010011",
+          "reference": "DAN 5:1!1"
+        },
+        {
+          "original_sdbh": "001033001001000",
+          "original_word_id": "o270050020011",
+          "reference": "DAN 5:2!1"
+        },
+        {
+          "original_sdbh": "001033001001000",
+          "original_word_id": "o270050090031",
+          "reference": "DAN 5:9!3"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "001033000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "יְהוּד",
+      "occurrences": 7,
+      "original_strong": "3061",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 7
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002818001002000",
+          "original_word_id": "o150050010132",
+          "reference": "EZR 5:1!13"
+        },
+        {
+          "original_sdbh": "002818001002000",
+          "original_word_id": "o150050080062",
+          "reference": "EZR 5:8!6"
+        },
+        {
+          "original_sdbh": "002818001002000",
+          "original_word_id": "o150070140121",
+          "reference": "EZR 7:14!12"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "002822000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "תּוֹר",
+      "occurrences": 7,
+      "original_strong": "8450",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 7
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "007754005001000",
+          "original_word_id": "o150060090041",
+          "reference": "EZR 6:9!4"
+        },
+        {
+          "original_sdbh": "007754005001000",
+          "original_word_id": "o150060170061",
+          "reference": "EZR 6:17!6"
+        },
+        {
+          "original_sdbh": "007754005001000",
+          "original_word_id": "o150070170081",
+          "reference": "EZR 7:17!8"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "007759000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "זַעֲוָה",
+      "occurrences": 7,
+      "original_strong": "2189",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 7
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001952001001000",
+          "original_word_id": "o050280250152",
+          "reference": "DEU 28:25!15"
+        },
+        {
+          "original_sdbh": "001952001001000",
+          "original_word_id": "o140290080092",
+          "reference": "2CH 29:8!9"
+        },
+        {
+          "original_sdbh": "001952001001000",
+          "original_word_id": "o240150040032",
+          "reference": "JER 15:4!3"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "001954000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "אַרְתַּחְשַׁשְׂתְּא",
+      "occurrences": 6,
+      "original_strong": "0783a",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 6
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000722001001000",
+          "original_word_id": "o150040080112",
+          "reference": "EZR 4:8!11"
+        },
+        {
+          "original_sdbh": "000722001001000",
+          "original_word_id": "o150040110081",
+          "reference": "EZR 4:11!8"
+        },
+        {
+          "original_sdbh": "000722001001000",
+          "original_word_id": "o150040230081",
+          "reference": "EZR 4:23!8"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000721000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "מָדַי",
+      "occurrences": 6,
+      "original_strong": "4076",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 6
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003727001002000",
+          "original_word_id": "o150060020052",
+          "reference": "EZR 6:2!5"
+        },
+        {
+          "original_sdbh": "003727001002000",
+          "original_word_id": "o270050280052",
+          "reference": "DAN 5:28!5"
+        },
+        {
+          "original_sdbh": "003727001002000",
+          "original_word_id": "o270060010021",
+          "reference": "DAN 6:1!2"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003731000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "עַל",
+      "occurrences": 6,
+      "original_strong": "5920",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 6
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010270390132",
+          "reference": "GEN 27:39!13"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010490250092",
+          "reference": "GEN 49:25!9"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o100230010121",
+          "reference": "2SA 23:1!12"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "005444000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "קָלָה",
+      "occurrences": 6,
+      "original_strong": "7034",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 6
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006473002001000",
+          "original_word_id": "o050250030122",
+          "reference": "DEU 25:3!12"
+        },
+        {
+          "original_sdbh": "006473002002000",
+          "original_word_id": "o050270160021",
+          "reference": "DEU 27:16!2"
+        },
+        {
+          "original_sdbh": "006473002001000",
+          "original_word_id": "o090180230182",
+          "reference": "1SA 18:23!18"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "006479000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "שָׁתַן",
+      "occurrences": 6,
+      "original_strong": "8366a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 6
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "007329001001000",
+          "original_word_id": "o090250220151",
+          "reference": "1SA 25:22!15"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090250340231",
+          "reference": "1SA 25:34!23"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o110140100101",
+          "reference": "1KI 14:10!10"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007333000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "אֲרְיוֹךְ",
+      "occurrences": 5,
+      "original_strong": "0746a",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 5
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000683001002000",
+          "original_word_id": "o270020140062",
+          "reference": "DAN 2:14!6"
+        },
+        {
+          "original_sdbh": "000683001002000",
+          "original_word_id": "o270020150032",
+          "reference": "DAN 2:15!3"
+        },
+        {
+          "original_sdbh": "000683001002000",
+          "original_word_id": "o270020150171",
+          "reference": "DAN 2:15!17"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000682000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "מְלַל",
+      "occurrences": 5,
+      "original_strong": "4449",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 5
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004067002002000",
+          "original_word_id": "o270060220051",
+          "reference": "DAN 6:22!5"
+        },
+        {
+          "original_sdbh": "004067002002000",
+          "original_word_id": "o270070080271",
+          "reference": "DAN 7:8!27"
+        },
+        {
+          "original_sdbh": "004067002002000",
+          "original_word_id": "o270070110101",
+          "reference": "DAN 7:11!10"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "004070000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "עֲשַׂב",
+      "occurrences": 5,
+      "original_strong": "6212a",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 5
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270040120192",
+          "reference": "DAN 4:12!19"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270040220102",
+          "reference": "DAN 4:22!10"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270040290091",
+          "reference": "DAN 4:29!9"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "005704000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הָוָה",
+      "occurrences": 5,
+      "original_strong": "1933a",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 5
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010270290071",
+          "reference": "GEN 27:29!7"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o160060060171",
+          "reference": "NEH 6:6!17"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o210020220031",
+          "reference": "ECC 2:22!3"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "001785000000000",
+        "001786000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "שׁיח",
+      "occurrences": 5,
+      "original_strong": "7817a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 5
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o190420060021",
+          "reference": "PSA 42:6!2"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o190420070041",
+          "reference": "PSA 42:7!4"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o190420120021",
+          "reference": "PSA 42:12!2"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007289000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "אַל",
+      "occurrences": 4,
+      "original_strong": "0409",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adv": 4
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270020240201",
+          "reference": "DAN 2:24!20"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270040160171",
+          "reference": "DAN 4:16!17"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270050100161",
+          "reference": "DAN 5:10!16"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000381000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "רְחוּם",
+      "occurrences": 4,
+      "original_strong": "7348a",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 4
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006752001005000",
+          "original_word_id": "o150040080011",
+          "reference": "EZR 4:8!1"
+        },
+        {
+          "original_sdbh": "006752001005000",
+          "original_word_id": "o150040090021",
+          "reference": "EZR 4:9!2"
+        },
+        {
+          "original_sdbh": "006752001005000",
+          "original_word_id": "o150040170051",
+          "reference": "EZR 4:17!5"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "006757000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "אָשֵׁד",
+      "occurrences": 4,
+      "original_strong": "0798",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 4
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000732001001000",
+          "original_word_id": "o050030170111",
+          "reference": "DEU 3:17!11"
+        },
+        {
+          "original_sdbh": "000732001001000",
+          "original_word_id": "o050040490101",
+          "reference": "DEU 4:49!10"
+        },
+        {
+          "original_sdbh": "000732001001000",
+          "original_word_id": "o060120030171",
+          "reference": "JOS 12:3!17"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000731000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "לַיִשׁ",
+      "occurrences": 4,
+      "original_strong": "3919a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 4
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003585002001000",
+          "original_word_id": "o070180070051",
+          "reference": "JDG 18:7!5"
+        },
+        {
+          "original_sdbh": "003585002001000",
+          "original_word_id": "o070180140081",
+          "reference": "JDG 18:14!8"
+        },
+        {
+          "original_sdbh": "003585002001000",
+          "original_word_id": "o070180270141",
+          "reference": "JDG 18:27!14"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003590000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "רָפָה",
+      "occurrences": 4,
+      "original_strong": "7498b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 4
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006892001001000",
+          "original_word_id": "o100210160062",
+          "reference": "2SA 21:16!6"
+        },
+        {
+          "original_sdbh": "006892001001000",
+          "original_word_id": "o100210180182",
+          "reference": "2SA 21:18!18"
+        },
+        {
+          "original_sdbh": "006892001001000",
+          "original_word_id": "o100210200213",
+          "reference": "2SA 21:20!21"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006889000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "אֱסוּר",
+      "occurrences": 3,
+      "original_strong": "0613",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 3
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000560001002000",
+          "original_word_id": "o150070260253",
+          "reference": "EZR 7:26!25"
+        },
+        {
+          "original_sdbh": "000560001001000",
+          "original_word_id": "o270040120063",
+          "reference": "DAN 4:12!6"
+        },
+        {
+          "original_sdbh": "000560001001000",
+          "original_word_id": "o270040200183",
+          "reference": "DAN 4:20!18"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000559000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "אֲמַן",
+      "occurrences": 3,
+      "original_strong": "0540",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 3
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000496001008000",
+          "original_word_id": "o270020450292",
+          "reference": "DAN 2:45!29"
+        },
+        {
+          "original_sdbh": "000496001007000",
+          "original_word_id": "o270060050201",
+          "reference": "DAN 6:5!20"
+        },
+        {
+          "original_sdbh": "000496001006000",
+          "original_word_id": "o270060240211",
+          "reference": "DAN 6:24!21"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000484000000000",
+        "000495000000000",
+        "000496000000000",
+        "000497000000000",
+        "000498000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "אִמַּר",
+      "occurrences": 3,
+      "original_strong": "0563",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 3
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000514001001000",
+          "original_word_id": "o150060090062",
+          "reference": "EZR 6:9!6"
+        },
+        {
+          "original_sdbh": "000514001001000",
+          "original_word_id": "o150060170101",
+          "reference": "EZR 6:17!10"
+        },
+        {
+          "original_sdbh": "000514001001000",
+          "original_word_id": "o150070170101",
+          "reference": "EZR 7:17!10"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000513000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "גּוֹי",
+      "occurrences": 3,
+      "original_strong": "2800a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 3
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002574001001000",
+          "original_word_id": "o070040020161",
+          "reference": "JDG 4:2!16"
+        },
+        {
+          "original_sdbh": "002574001001000",
+          "original_word_id": "o070040130161",
+          "reference": "JDG 4:13!16"
+        },
+        {
+          "original_sdbh": "002574001001000",
+          "original_word_id": "o070040160091",
+          "reference": "JDG 4:16!9"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002577000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "occurrences": 3,
+      "original_strong": "0425b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 3
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090170020071",
+          "reference": "1SA 17:2!7"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090170190071",
+          "reference": "1SA 17:19!7"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090210100091",
+          "reference": "1SA 21:10!9"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000392000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "כָּאָה",
+      "occurrences": 3,
+      "original_strong": "3512",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 3
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003218001001000",
+          "original_word_id": "o191090160112",
+          "reference": "PSA 109:16!11"
+        },
+        {
+          "original_sdbh": "003218001002000",
+          "original_word_id": "o260130220021",
+          "reference": "EZK 13:22!2"
+        },
+        {
+          "original_sdbh": "003218001001000",
+          "original_word_id": "o270110300052",
+          "reference": "DAN 11:30!5"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003221000000000",
+        "003222000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "נֵרִיָהוּ",
+      "occurrences": 3,
+      "original_strong": "5374a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 3
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004922001001000",
+          "original_word_id": "o240360140271",
+          "reference": "JER 36:14!27"
+        },
+        {
+          "original_sdbh": "004922001001000",
+          "original_word_id": "o240360320091",
+          "reference": "JER 36:32!9"
+        },
+        {
+          "original_sdbh": "004922001001000",
+          "original_word_id": "o240430060301",
+          "reference": "JER 43:6!30"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "004928000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "עֵמֶק",
+      "occurrences": 3,
+      "original_strong": "0425b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 3
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090170020062",
+          "reference": "1SA 17:2!6"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090170190062",
+          "reference": "1SA 17:19!6"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090210100082",
+          "reference": "1SA 21:10!8"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000392000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "רִמּוֹן",
+      "occurrences": 3,
+      "original_strong": "7417b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 3
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006818002005000",
+          "original_word_id": "o120050180091",
+          "reference": "2KI 5:18!9"
+        },
+        {
+          "original_sdbh": "006818002005000",
+          "original_word_id": "o120050180181",
+          "reference": "2KI 5:18!18"
+        },
+        {
+          "original_sdbh": "006818002005000",
+          "original_word_id": "o120050180211",
+          "reference": "2KI 5:18!21"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006826000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "רָעַע",
+      "occurrences": 3,
+      "original_strong": "7451",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adj": 3
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006879001004000",
+          "original_word_id": "o040110100161",
+          "reference": "NUM 11:10!16"
+        },
+        {
+          "original_sdbh": "006879001004000",
+          "original_word_id": "o040220340171",
+          "reference": "NUM 22:34!17"
+        },
+        {
+          "original_sdbh": "006879001004000",
+          "original_word_id": "o240400040221",
+          "reference": "JER 40:4!22"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006851000000000",
+        "006863000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "רעע",
+      "occurrences": 3,
+      "original_strong": "7451",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adj": 3
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006879001004000",
+          "original_word_id": "o020210080021",
+          "reference": "EXO 21:8!2"
+        },
+        {
+          "original_sdbh": "006879001004000",
+          "original_word_id": "o060240150021",
+          "reference": "JOS 24:15!2"
+        },
+        {
+          "original_sdbh": "006879001008000",
+          "original_word_id": "o240020190081",
+          "reference": "JER 2:19!8"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006851000000000",
+        "006863000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "שְׁכֶם",
+      "occurrences": 3,
+      "original_strong": "4026b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 3
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "007354002002000",
+          "original_word_id": "o070090460051",
+          "reference": "JDG 9:46!5"
+        },
+        {
+          "original_sdbh": "007354002002000",
+          "original_word_id": "o070090470081",
+          "reference": "JDG 9:47!8"
+        },
+        {
+          "original_sdbh": "007354002002000",
+          "original_word_id": "o070090490231",
+          "reference": "JDG 9:49!23"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003689000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "זְכַרְיָה",
+      "occurrences": 2,
+      "original_strong": "2148a",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001985001006000",
+          "original_word_id": "o150050010052",
+          "reference": "EZR 5:1!5"
+        },
+        {
+          "original_sdbh": "001985001006000",
+          "original_word_id": "o150060140092",
+          "reference": "EZR 6:14!9"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "001988000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "חֲנַן",
+      "occurrences": 2,
+      "original_strong": "2604",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002398001001000",
+          "original_word_id": "o270040240122",
+          "reference": "DAN 4:24!12"
+        },
+        {
+          "original_sdbh": "002398001002000",
+          "original_word_id": "o270060120082",
+          "reference": "DAN 6:12!8"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "002401000000000",
+        "002402000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "חַגַּי",
+      "occurrences": 2,
+      "original_strong": "2292a",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002121001001000",
+          "original_word_id": "o150050010021",
+          "reference": "EZR 5:1!2"
+        },
+        {
+          "original_sdbh": "002121001001000",
+          "original_word_id": "o150060140061",
+          "reference": "EZR 6:14!6"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "002124000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "מִדָּה",
+      "occurrences": 2,
+      "original_strong": "4061",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003715002001000",
+          "original_word_id": "o150040200102",
+          "reference": "EZR 4:20!10"
+        },
+        {
+          "original_sdbh": "003715002001000",
+          "original_word_id": "o150060080181",
+          "reference": "EZR 6:8!18"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003719000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "מִדָּה",
+      "occurrences": 2,
+      "original_strong": "4061a",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003715002001000",
+          "original_word_id": "o150040130121",
+          "reference": "EZR 4:13!12"
+        },
+        {
+          "original_sdbh": "003715002001000",
+          "original_word_id": "o150070240141",
+          "reference": "EZR 7:24!14"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003719000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "מָזוֹן",
+      "occurrences": 2,
+      "original_strong": "4203",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003833001001000",
+          "original_word_id": "o270040090052",
+          "reference": "DAN 4:9!5"
+        },
+        {
+          "original_sdbh": "003833001001000",
+          "original_word_id": "o270040180052",
+          "reference": "DAN 4:18!5"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003837000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "עִדֹּוא",
+      "occurrences": 2,
+      "original_strong": "5714b",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "005243001004000",
+          "original_word_id": "o150050010071",
+          "reference": "EZR 5:1!7"
+        },
+        {
+          "original_sdbh": "005243001004000",
+          "original_word_id": "o150060140111",
+          "reference": "EZR 6:14!11"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "005250000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "אֶל",
+      "occurrences": 2,
+      "original_strong": "0413",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adv": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o070190230181",
+          "reference": "JDG 19:23!18"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o240470060091",
+          "reference": "JER 47:6!9"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000381000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "אַלְמָנָה",
+      "occurrences": 2,
+      "original_strong": "0488a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000455001001000",
+          "original_word_id": "o230130220032",
+          "reference": "ISA 13:22!3"
+        },
+        {
+          "original_sdbh": "000455001001000",
+          "original_word_id": "o260190070021",
+          "reference": "EZK 19:7!2"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000453000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "אָב",
+      "occurrences": 2,
+      "original_strong": "2361a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o140020120081",
+          "reference": "2CH 2:12!8"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o140040160121",
+          "reference": "2CH 4:16!12"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002180000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "בְּ",
+      "occurrences": 2,
+      "original_strong": "1226a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006321001001000",
+          "original_word_id": "o190090100071",
+          "reference": "PSA 9:10!7"
+        },
+        {
+          "original_sdbh": "006321001001000",
+          "original_word_id": "o190100010071",
+          "reference": "PSA 10:1!7"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001133000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "בָּמוֹת",
+      "occurrences": 2,
+      "original_strong": "1181a",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001039001001000",
+          "original_word_id": "o040220410091",
+          "reference": "NUM 22:41!9"
+        },
+        {
+          "original_sdbh": "001039001001000",
+          "original_word_id": "o060130170081",
+          "reference": "JOS 13:17!8"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "001038000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "בּוֹא",
+      "occurrences": 2,
+      "original_strong": "3820b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o130050090042",
+          "reference": "1CH 5:9!4"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o140260080082",
+          "reference": "2CH 26:8!8"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003499000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "occurrences": 2,
+      "original_strong": "0329b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000309002001000",
+          "original_word_id": "o010500100041",
+          "reference": "GEN 50:10!4"
+        },
+        {
+          "original_sdbh": "000309002001000",
+          "original_word_id": "o010500110081",
+          "reference": "GEN 50:11!8"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000308000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "occurrences": 2,
+      "original_strong": "1516c",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004036001002000",
+          "original_word_id": "o130180120081",
+          "reference": "1CH 18:12!8"
+        },
+        {
+          "original_sdbh": "004036001002000",
+          "original_word_id": "o140250110081",
+          "reference": "2CH 25:11!8"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "occurrences": 2,
+      "original_strong": "3466a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003174001003000",
+          "original_word_id": "o160030060031",
+          "reference": "NEH 3:6!3"
+        },
+        {
+          "original_sdbh": "003174001003000",
+          "original_word_id": "o160120390061",
+          "reference": "NEH 12:39!6"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003179000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "occurrences": 2,
+      "original_strong": "3873a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003542001001000",
+          "original_word_id": "o160030120061",
+          "reference": "NEH 3:12!6"
+        },
+        {
+          "original_sdbh": "003542001001000",
+          "original_word_id": "o160100250011",
+          "reference": "NEH 10:25!1"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003546000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "חַטָּאָה",
+      "occurrences": 2,
+      "original_strong": "2402",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002217001001000",
+          "original_word_id": "o020340070072",
+          "reference": "EXO 34:7!7"
+        },
+        {
+          "original_sdbh": "002217001001000",
+          "original_word_id": "o230050180081",
+          "reference": "ISA 5:18!8"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "002220000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "יִפְתַּח אֵל",
+      "occurrences": 2,
+      "original_strong": "1516e",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003034001001000",
+          "original_word_id": "o060190140091",
+          "reference": "JOS 19:14!9"
+        },
+        {
+          "original_sdbh": "003034001001000",
+          "original_word_id": "o060190270091",
+          "reference": "JOS 19:27!9"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "יִפְתַּחאֵל",
+      "occurrences": 2,
+      "original_strong": "1516e",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003034001001000",
+          "original_word_id": "o060190140101",
+          "reference": "JOS 19:14!10"
+        },
+        {
+          "original_sdbh": "003034001001000",
+          "original_word_id": "o060190270101",
+          "reference": "JOS 19:27!10"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "לְ",
+      "occurrences": 2,
+      "original_strong": "5892b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "005411001001000",
+          "original_word_id": "o120190130071",
+          "reference": "2KI 19:13!7"
+        },
+        {
+          "original_sdbh": "005411001001000",
+          "original_word_id": "o230370130071",
+          "reference": "ISA 37:13!7"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "005418000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "נֶגֶד",
+      "occurrences": 2,
+      "original_strong": "5048",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010020180122",
+          "reference": "GEN 2:18!12"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o010020200152",
+          "reference": "GEN 2:20!15"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "004632000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "נַחֲלָה",
+      "occurrences": 2,
+      "original_strong": "5158a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004730002001000",
+          "original_word_id": "o260470190091",
+          "reference": "EZK 47:19!9"
+        },
+        {
+          "original_sdbh": "004730002001000",
+          "original_word_id": "o260480280141",
+          "reference": "EZK 48:28!14"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "004735000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "נָבַב",
+      "occurrences": 2,
+      "original_strong": "5014a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adj": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004598001002000",
+          "original_word_id": "o180110120021",
+          "reference": "JOB 11:12!2"
+        },
+        {
+          "original_sdbh": "004598001001000",
+          "original_word_id": "o240520210171",
+          "reference": "JER 52:21!17"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "004604000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "עֶגְלַת שְׁלִשִׁיָּה",
+      "occurrences": 2,
+      "original_strong": "5697a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "005233001001000",
+          "original_word_id": "o230150050071",
+          "reference": "ISA 15:5!7"
+        },
+        {
+          "original_sdbh": "005233001001000",
+          "original_word_id": "o240480340121",
+          "reference": "JER 48:34!12"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "005238000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "עֹוד",
+      "occurrences": 2,
+      "original_strong": "5750",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adv": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o190390020092",
+          "reference": "PSA 39:2!9"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o230070080083",
+          "reference": "ISA 7:8!8"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "005287000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "צַר",
+      "occurrences": 2,
+      "original_strong": "6887",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006315001001000",
+          "original_word_id": "o120060010141",
+          "reference": "2KI 6:1!14"
+        },
+        {
+          "original_sdbh": "006315001001000",
+          "original_word_id": "o230490200061",
+          "reference": "ISA 49:20!6"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006346000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "צֹר",
+      "occurrences": 2,
+      "original_strong": "6697a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006316001002000",
+          "original_word_id": "o060050020101",
+          "reference": "JOS 5:2!10"
+        },
+        {
+          "original_sdbh": "006316001002000",
+          "original_word_id": "o060050030051",
+          "reference": "JOS 5:3!5"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006168000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "קְוֵא",
+      "occurrences": 2,
+      "original_strong": "6961a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006408001001000",
+          "original_word_id": "o140010160063",
+          "reference": "2CH 1:16!6"
+        },
+        {
+          "original_sdbh": "006408001001000",
+          "original_word_id": "o140010160092",
+          "reference": "2CH 1:16!9"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006411000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "קֹוֶה",
+      "occurrences": 2,
+      "original_strong": "6961a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006408001001000",
+          "original_word_id": "o110100280063",
+          "reference": "1KI 10:28!6"
+        },
+        {
+          "original_sdbh": "006408001001000",
+          "original_word_id": "o110100280102",
+          "reference": "1KI 10:28!10"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006411000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "שְׁלִישִׁי",
+      "occurrences": 2,
+      "original_strong": "5697a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "005233001001000",
+          "original_word_id": "o230150050081",
+          "reference": "ISA 15:5!8"
+        },
+        {
+          "original_sdbh": "005233001001000",
+          "original_word_id": "o240480340131",
+          "reference": "JER 48:34!13"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "005238000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "שַׁעַר",
+      "occurrences": 2,
+      "original_strong": "3466a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "007551001012000",
+          "original_word_id": "o160030060021",
+          "reference": "NEH 3:6!2"
+        },
+        {
+          "original_sdbh": "007551001012000",
+          "original_word_id": "o160120390051",
+          "reference": "NEH 12:39!5"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003179000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "שָׁפָל",
+      "occurrences": 2,
+      "original_strong": "8213",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o200160190021",
+          "reference": "PRO 16:19!2"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o210120040042",
+          "reference": "ECC 12:4!4"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007583000000000",
+        "007586000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "שֹׁוקֵק",
+      "occurrences": 2,
+      "original_strong": "8264a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 2
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "007621002001000",
+          "original_word_id": "o191070090041",
+          "reference": "PSA 107:9!4"
+        },
+        {
+          "original_sdbh": "007621002001000",
+          "original_word_id": "o230290080191",
+          "reference": "ISA 29:8!19"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007625000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "אַחְמְתָא",
+      "occurrences": 1,
+      "original_strong": "0307",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000291001001000",
+          "original_word_id": "o150060020022",
+          "reference": "EZR 6:2!2"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000290000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "בִּינָה",
+      "occurrences": 1,
+      "original_strong": "0999",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000926001001000",
+          "original_word_id": "o270020210141",
+          "reference": "DAN 2:21!14"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000926000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "חֲנַנְיָה",
+      "occurrences": 1,
+      "original_strong": "2608a",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002402001010000",
+          "original_word_id": "o270020170053",
+          "reference": "DAN 2:17!5"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "002405000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "חַטָּאָה",
+      "occurrences": 1,
+      "original_strong": "2409",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002217001002000",
+          "original_word_id": "o150060170162",
+          "reference": "EZR 6:17!16"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "002220000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "טְלַל",
+      "occurrences": 1,
+      "original_strong": "2927",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002694001001000",
+          "original_word_id": "o270040090091",
+          "reference": "DAN 4:9!9"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "002698000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "יְגַר",
+      "occurrences": 1,
+      "original_strong": "3026",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002785001001000",
+          "original_word_id": "o010310470041",
+          "reference": "GEN 31:47!4"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "002789000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "יֵשׁוּעַ",
+      "occurrences": 1,
+      "original_strong": "3443",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003151001005000",
+          "original_word_id": "o150050020062",
+          "reference": "EZR 5:2!6"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003155000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "יוֹצָדָק",
+      "occurrences": 1,
+      "original_strong": "3136a",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002836001001000",
+          "original_word_id": "o150050020081",
+          "reference": "EZR 5:2!8"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "002840000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "יצא",
+      "occurrences": 1,
+      "original_strong": "3319",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003035001012000",
+          "original_word_id": "o150060150012",
+          "reference": "EZR 6:15!1"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003039000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "כֹּר",
+      "occurrences": 1,
+      "original_strong": "3734a",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003418001001000",
+          "original_word_id": "o150070220071",
+          "reference": "EZR 7:22!7"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003422000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "מְלֵךְ",
+      "occurrences": 1,
+      "original_strong": "4431",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004047001001000",
+          "original_word_id": "o270040240031",
+          "reference": "DAN 4:24!3"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "004049000000000",
+        "004050000000000",
+        "004051000000000",
+        "004052000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "מֹשֶׁה",
+      "occurrences": 1,
+      "original_strong": "4873",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004460001001000",
+          "original_word_id": "o150060180131",
+          "reference": "EZR 6:18!13"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "004466000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "עוֹד",
+      "occurrences": 1,
+      "original_strong": "5751",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adv": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270040280011",
+          "reference": "DAN 4:28!1"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "005287000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "פְּרַס",
+      "occurrences": 1,
+      "original_strong": "6537",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270050280021",
+          "reference": "DAN 5:28!2"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006020000000000",
+        "006021000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "צִדְקָה",
+      "occurrences": 1,
+      "original_strong": "6665",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006131001001000",
+          "original_word_id": "o270040240092",
+          "reference": "DAN 4:24!9"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "006138000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "שָׂהֲדוּ",
+      "occurrences": 1,
+      "original_strong": "3026",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006990001001000",
+          "original_word_id": "o010310470051",
+          "reference": "GEN 31:47!5"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "006994000000000"
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma": "תְּקַל",
+      "occurrences": 1,
+      "original_strong": "8625",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270050270021",
+          "reference": "DAN 5:27!2"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007923000000000",
+        "007924000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "אֲרוּמָה",
+      "occurrences": 1,
+      "original_strong": "1886a|0725",
+      "reason": "source_strong_unreadable",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000668001001000",
+          "original_word_id": "o070090410032",
+          "reference": "JDG 9:41!3"
+        }
+      ],
+      "state": "source_annotation_review",
+      "ubs_candidate_entries": []
+    },
+    {
+      "lang": "H",
+      "lemma": "אֶל",
+      "occurrences": 1,
+      "original_strong": "0352a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000331003001000",
+          "original_word_id": "o260310140181",
+          "reference": "EZK 31:14!18"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000330000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "אֶל",
+      "occurrences": 1,
+      "original_strong": "0408",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adv": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o240510030092",
+          "reference": "JER 51:3!9"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "000381000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "אָדַשׁ",
+      "occurrences": 1,
+      "original_strong": "1759",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001615001001000",
+          "original_word_id": "o230280280061",
+          "reference": "ISA 28:28!6"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "001615000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "אָשׁוּר",
+      "occurrences": 1,
+      "original_strong": "8391a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "007697001001000",
+          "original_word_id": "o260270060091",
+          "reference": "EZK 27:6!9"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007701000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "אלה",
+      "occurrences": 1,
+      "original_strong": "2974a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000391003001000",
+          "original_word_id": "o090170390072",
+          "reference": "1SA 17:39!7"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002740000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "בֵּית הַגָּן",
+      "occurrences": 1,
+      "original_strong": "1019a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000946001001000",
+          "original_word_id": "o120090270071",
+          "reference": "2KI 9:27!7"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000945000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "בֵּית רְחֹוב",
+      "occurrences": 1,
+      "original_strong": "0758a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000696001001000 000975001001000",
+          "original_word_id": "o100100060131",
+          "reference": "2SA 10:6!13"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000694000000000",
+        "000695000000000",
+        "000696000000000",
+        "000697000000000",
+        "005799000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "בֵּיתרְחוֹב",
+      "occurrences": 1,
+      "original_strong": "0758a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000696001001000 000975001001000",
+          "original_word_id": "o100100060141",
+          "reference": "2SA 10:6!14"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000694000000000",
+        "000695000000000",
+        "000696000000000",
+        "000697000000000",
+        "005799000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "בֵּן",
+      "occurrences": 1,
+      "original_strong": "1516a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o120230100071",
+          "reference": "2KI 23:10!7"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "בּוֹר",
+      "occurrences": 1,
+      "original_strong": "5626a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000883001001000 000884001001000",
+          "original_word_id": "o100030260112",
+          "reference": "2SA 3:26!11"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000883000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "גֵּישָׁן",
+      "occurrences": 1,
+      "original_strong": "1529",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o130020470052",
+          "reference": "1CH 2:47!5"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "001404000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "גַּן",
+      "occurrences": 1,
+      "original_strong": "1019a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000946001001000",
+          "original_word_id": "o120090270081",
+          "reference": "2KI 9:27!8"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000945000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "גָּדֹול",
+      "occurrences": 1,
+      "original_strong": "1896b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adj": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001299001006000 001301001001000",
+          "original_word_id": "o160110140112",
+          "reference": "NEH 11:14!11"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001746000000000",
+        "001750000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "גדל",
+      "occurrences": 1,
+      "original_strong": "1419",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adj": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o140020080101",
+          "reference": "2CH 2:8!10"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001299000000000",
+        "001301000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הֲנָפָה",
+      "occurrences": 1,
+      "original_strong": "5130b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004702001003000",
+          "original_word_id": "o230300280072",
+          "reference": "ISA 30:28!7"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "004708000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "occurrences": 1,
+      "original_strong": "1516b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002569001003000",
+          "original_word_id": "o160110350041",
+          "reference": "NEH 11:35!4"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "occurrences": 1,
+      "original_strong": "1516d",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006116001002000",
+          "original_word_id": "o090130180151",
+          "reference": "1SA 13:18!15"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "occurrences": 1,
+      "original_strong": "5626a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000884001001000 000884001001000",
+          "original_word_id": "o100030260121",
+          "reference": "2SA 3:26!12"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000883000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "occurrences": 1,
+      "original_strong": "6762a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000469003001000",
+          "original_word_id": "o060180280021",
+          "reference": "JOS 18:28!2"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006222000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הַר",
+      "occurrences": 1,
+      "original_strong": "7311",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o190750070071",
+          "reference": "PSA 75:7!7"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006727000000000",
+        "006833000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הָרֹאֶה",
+      "occurrences": 1,
+      "original_strong": "1886a|7204a",
+      "reason": "source_strong_unreadable",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001871001001000",
+          "original_word_id": "o130020520071",
+          "reference": "1CH 2:52!7"
+        }
+      ],
+      "state": "source_annotation_review",
+      "ubs_candidate_entries": []
+    },
+    {
+      "lang": "H",
+      "lemma": "הוּא",
+      "occurrences": 1,
+      "original_strong": "5993",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o220060120062",
+          "reference": "SNG 6:12!6"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "001778000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "הוה",
+      "occurrences": 1,
+      "original_strong": "1933",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o180370060041",
+          "reference": "JOB 37:6!4"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "001785000000000",
+        "001786000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "זרה",
+      "occurrences": 1,
+      "original_strong": "2114",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001953002001000",
+          "original_word_id": "o190580040011",
+          "reference": "PSA 58:4!1"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001955000000000",
+        "002044000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "חֲמֻדֹות",
+      "occurrences": 1,
+      "original_strong": "2530a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270110380163",
+          "reference": "DAN 11:38!16"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002332000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "חֲפֹר",
+      "occurrences": 1,
+      "original_strong": "2661a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o230020200152",
+          "reference": "ISA 2:20!15"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002457000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "חֶטְאָה",
+      "occurrences": 1,
+      "original_strong": "2400a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002216001001000",
+          "original_word_id": "o040150280062",
+          "reference": "NUM 15:28!6"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002217000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "חֶסֶד",
+      "occurrences": 1,
+      "original_strong": "2618",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001050001001000",
+          "original_word_id": "o110040100021",
+          "reference": "1KI 4:10!2"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "002414000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "חָלָה",
+      "occurrences": 1,
+      "original_strong": "2490a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002299003002000",
+          "original_word_id": "o190770110021",
+          "reference": "PSA 77:11!2"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002302000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "חָרָשׁ",
+      "occurrences": 1,
+      "original_strong": "1516b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002569001003000",
+          "original_word_id": "o130040140111",
+          "reference": "1CH 4:14!11"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "טַפְחָה",
+      "occurrences": 1,
+      "original_strong": "2948a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002713001001000",
+          "original_word_id": "o190390060021",
+          "reference": "PSA 39:6!2"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002716000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "טַפְחָה",
+      "occurrences": 1,
+      "original_strong": "2948b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002713002001000",
+          "original_word_id": "o110070090132",
+          "reference": "1KI 7:9!13"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002716000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "טָבְאֵל",
+      "occurrences": 1,
+      "original_strong": "2870",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004573001002000",
+          "original_word_id": "o150040070061",
+          "reference": "EZR 4:7!6"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002645000000000",
+        "002646000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "טֹחֲנֹות",
+      "occurrences": 1,
+      "original_strong": "2912a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002682001001000",
+          "original_word_id": "o210120030092",
+          "reference": "ECC 12:3!9"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002686000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "יַעְרָה",
+      "occurrences": 1,
+      "original_strong": "3295a",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003012002001000",
+          "original_word_id": "o090140270162",
+          "reference": "1SA 14:27!16"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003017000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "יַעֲרָה",
+      "occurrences": 1,
+      "original_strong": "3295",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003012001001000",
+          "original_word_id": "o190290090061",
+          "reference": "PSA 29:9!6"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003016000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "יָמַר",
+      "occurrences": 1,
+      "original_strong": "0559a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000512001005000 002959001001000",
+          "original_word_id": "o230610060131",
+          "reference": "ISA 61:6!13"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000511000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "יָצַת",
+      "occurrences": 1,
+      "original_strong": "5327a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003052001001000 004885002001000",
+          "original_word_id": "o240020150111",
+          "reference": "JER 2:15!11"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "004891000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "יָשַׁב",
+      "occurrences": 1,
+      "original_strong": "7628",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "007161001002000",
+          "original_word_id": "o230520020041",
+          "reference": "ISA 52:2!4"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007166000000000",
+        "007167000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "ירה",
+      "occurrences": 1,
+      "original_strong": "7297a",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003093004001000",
+          "original_word_id": "o230440080041",
+          "reference": "ISA 44:8!4"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "003097000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "כִּי",
+      "occurrences": 1,
+      "original_strong": "3587",
+      "reason": "unattested_indexed_headword",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o230030240171",
+          "reference": "ISA 3:24!17"
+        }
+      ],
+      "state": "excluded_from_ubs_0_9_4_scope_only",
+      "ubs_candidate_entries": []
+    },
+    {
+      "lang": "H",
+      "lemma": "כִּנְעָנִי",
+      "occurrences": 1,
+      "original_strong": "3667b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003357001002000",
+          "original_word_id": "o230230080101",
+          "reference": "ISA 23:8!10"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003359000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "כַּלְנֹו",
+      "occurrences": 1,
+      "original_strong": "3641a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003335001001000",
+          "original_word_id": "o230100090031",
+          "reference": "ISA 10:9!3"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003338000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "כָּאֶה",
+      "occurrences": 1,
+      "original_strong": "2489a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adj": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003219001001000",
+          "original_word_id": "o190100100081",
+          "reference": "PSA 10:10!8"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002301000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "לְהָטִים",
+      "occurrences": 1,
+      "original_strong": "3858a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003529001001000",
+          "original_word_id": "o020070110112",
+          "reference": "EXO 7:11!11"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003532000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "לָבֵשׁ",
+      "occurrences": 1,
+      "original_strong": "3830a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adj": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003516001002000",
+          "original_word_id": "o090170050081",
+          "reference": "1SA 17:5!8"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003509000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מְנוּחָה",
+      "occurrences": 1,
+      "original_strong": "2680a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004111003001000 004119001001000",
+          "original_word_id": "o130020520092",
+          "reference": "1CH 2:52!9"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002472000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מְקַטְּרֹות",
+      "occurrences": 1,
+      "original_strong": "4729b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004330001001000",
+          "original_word_id": "o140300140092",
+          "reference": "2CH 30:14!9"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "004334000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מִן",
+      "occurrences": 1,
+      "original_strong": "4675a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006101001004000",
+          "original_word_id": "o380090080031",
+          "reference": "ZEC 9:8!3"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "004291000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מִשְׁחַת",
+      "occurrences": 1,
+      "original_strong": "4893",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004478001001000",
+          "original_word_id": "o230520140061",
+          "reference": "ISA 52:14!6"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "004484000000000",
+        "004486000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מֶלַח",
+      "occurrences": 1,
+      "original_strong": "1516c",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004036001002000",
+          "original_word_id": "o120140070071",
+          "reference": "2KI 14:7!7"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מַד",
+      "occurrences": 1,
+      "original_strong": "4060",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003711001001000",
+          "original_word_id": "o191330020131",
+          "reference": "PSA 133:2!13"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003719000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מַעֲכָה",
+      "occurrences": 1,
+      "original_strong": "0758d",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "000698001001000",
+          "original_word_id": "o130190060221",
+          "reference": "1CH 19:6!22"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "000694000000000",
+        "000695000000000",
+        "000696000000000",
+        "000697000000000",
+        "005799000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מַעֲנִית",
+      "occurrences": 1,
+      "original_strong": "4618a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004231001001000",
+          "original_word_id": "o191290030072",
+          "reference": "PSA 129:3!7"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "004236000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מָדוֹן",
+      "occurrences": 1,
+      "original_strong": "4060",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003720002001000",
+          "original_word_id": "o100210200081",
+          "reference": "2SA 21:20!8"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003719000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מָנַחְתִּי",
+      "occurrences": 1,
+      "original_strong": "2680a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004122001001000",
+          "original_word_id": "o130020540102",
+          "reference": "1CH 2:54!10"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002472000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "מוֹרָה",
+      "occurrences": 1,
+      "original_strong": "4172",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "003809001001000",
+          "original_word_id": "o190090210031",
+          "reference": "PSA 9:21!3"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003813000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "נָא",
+      "occurrences": 1,
+      "original_strong": "4995",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adj": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o020120090041",
+          "reference": "EXO 12:9!4"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "004585000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "נָגִיד",
+      "occurrences": 1,
+      "original_strong": "5048",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004634001002000",
+          "original_word_id": "o200080060031",
+          "reference": "PRO 8:6!3"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "004640000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "נָדִיב",
+      "occurrences": 1,
+      "original_strong": "5993",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004658001002000",
+          "original_word_id": "o220060120071",
+          "reference": "SNG 6:12!7"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "004664000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "סָגַר",
+      "occurrences": 1,
+      "original_strong": "5462a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "005004001001000",
+          "original_word_id": "o190350030032",
+          "reference": "PSA 35:3!3"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "005006000000000",
+        "005010000000000",
+        "005011000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "סָכַר",
+      "occurrences": 1,
+      "original_strong": "7936a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o150040050012",
+          "reference": "EZR 4:5!1"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007045000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "סָלֵק",
+      "occurrences": 1,
+      "original_strong": "5559a",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "005100001003000",
+          "original_word_id": "o191390080021",
+          "reference": "PSA 139:8!2"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "005107000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "סֹבֶא",
+      "occurrences": 1,
+      "original_strong": "5433",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004976001001000",
+          "original_word_id": "o050210200132",
+          "reference": "DEU 21:20!13"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "004982000000000",
+        "004984000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "עִדֹּוא",
+      "occurrences": 1,
+      "original_strong": "5714d",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "005238001001000",
+          "original_word_id": "o110040140031",
+          "reference": "1KI 4:14!3"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "005245000000000",
+        "005250000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "עִיר",
+      "occurrences": 1,
+      "original_strong": "7344a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006750001001000",
+          "original_word_id": "o010100110111",
+          "reference": "GEN 10:11!11"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006751000000000",
+        "006755000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "עֵמֶק",
+      "occurrences": 1,
+      "original_strong": "7104a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "005519001001000",
+          "original_word_id": "o060180210102",
+          "reference": "JOS 18:21!10"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "005526000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "עַל",
+      "occurrences": 1,
+      "original_strong": "5921",
+      "reason": "different_strong_same_consonants",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090020100061",
+          "reference": "1SA 2:10!6"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "005444000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "עַם",
+      "occurrences": 1,
+      "original_strong": "5993",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o220060120061",
+          "reference": "SNG 6:12!6"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "005490000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "עָנָה",
+      "occurrences": 1,
+      "original_strong": "3939a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "005536001003000",
+          "original_word_id": "o190880010082",
+          "reference": "PSA 88:1!8"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003611000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "פֵּרֹות",
+      "occurrences": 1,
+      "original_strong": "2661a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "002454001001000",
+          "original_word_id": "o230020200161",
+          "reference": "ISA 2:20!16"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "002457000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "צְפַתָה",
+      "occurrences": 1,
+      "original_strong": "1516f",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006311001001000",
+          "original_word_id": "o140140090071",
+          "reference": "2CH 14:9!7"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "צָיַר",
+      "occurrences": 1,
+      "original_strong": "6718b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o060090040062",
+          "reference": "JOS 9:4!6"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006189000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "צָרַר",
+      "occurrences": 1,
+      "original_strong": "6862",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "adj": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006315001003000 006340001008000",
+          "original_word_id": "o250010200041",
+          "reference": "LAM 1:20!4"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006321000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "צוּר",
+      "occurrences": 1,
+      "original_strong": "6864",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006161003001000 006316001003000",
+          "original_word_id": "o190890440031",
+          "reference": "PSA 89:44!3"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006321000000000",
+        "006322000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "צפה",
+      "occurrences": 1,
+      "original_strong": "7436",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006835001001000",
+          "original_word_id": "o090010010061",
+          "reference": "1SA 1:1!6"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "006285000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "צרר",
+      "occurrences": 1,
+      "original_strong": "6696a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006340001009000",
+          "original_word_id": "o020230220132",
+          "reference": "EXO 23:22!13"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006167000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "קִרְיַתסֵפֶר",
+      "occurrences": 1,
+      "original_strong": "7158",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006587001001000",
+          "original_word_id": "o060150490031",
+          "reference": "JOS 15:49!3"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006592000000000",
+        "006593000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "קָטָן",
+      "occurrences": 1,
+      "original_strong": "6997a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "001867001001000 006433001005000",
+          "original_word_id": "o150080120052",
+          "reference": "EZR 8:12!5"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "001868000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "קום",
+      "occurrences": 1,
+      "original_strong": "3820a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o240510010111",
+          "reference": "JER 51:1!11"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "003499000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "קוץ",
+      "occurrences": 1,
+      "original_strong": "6974a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006457001001000",
+          "original_word_id": "o180140120091",
+          "reference": "JOB 14:12!9"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006463000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "קטר",
+      "occurrences": 1,
+      "original_strong": "4729a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "004329001001000 006437001001000",
+          "original_word_id": "o390010110111",
+          "reference": "MAL 1:11!11"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "004334000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "רָאמֹות",
+      "occurrences": 1,
+      "original_strong": "7311",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o200240070011",
+          "reference": "PRO 24:7!1"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006727000000000",
+        "006833000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "רָמָה",
+      "occurrences": 1,
+      "original_strong": "7436",
+      "reason": "different_strong_exact_attested_lemma",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090010010052",
+          "reference": "1SA 1:1!5"
+        }
+      ],
+      "state": "editorial_identity_review",
+      "ubs_candidate_entries": [
+        "006823000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "רָמֹות",
+      "occurrences": 1,
+      "original_strong": "7414a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o150100290092",
+          "reference": "EZR 10:29!9"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006823000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "רָפָה",
+      "occurrences": 1,
+      "original_strong": "7498a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "006892001002000",
+          "original_word_id": "o130080370051",
+          "reference": "1CH 8:37!5"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006889000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "רֹעָה",
+      "occurrences": 1,
+      "original_strong": "7489a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o200250190021",
+          "reference": "PRO 25:19!2"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006883000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "רעה",
+      "occurrences": 1,
+      "original_strong": "7489a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o230240190011",
+          "reference": "ISA 24:19!1"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "006883000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "שְׁאָלָה",
+      "occurrences": 1,
+      "original_strong": "7585a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o230070110081",
+          "reference": "ISA 7:11!8"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007130000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "שֵׂפֶק",
+      "occurrences": 1,
+      "original_strong": "8230b",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "007081001001000",
+          "original_word_id": "o180200220021",
+          "reference": "JOB 20:22!2"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007598000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "שַׁחֲטָה",
+      "occurrences": 1,
+      "original_strong": "7821a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o280050020012",
+          "reference": "HOS 5:2!1"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007292000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "שָׂכַךְ",
+      "occurrences": 1,
+      "original_strong": "5526",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "verb": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o020330220072",
+          "reference": "EXO 33:22!7"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "005073000000000",
+        "005074000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "תַּנִּין",
+      "occurrences": 1,
+      "original_strong": "5886a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "005394001001000",
+          "original_word_id": "o160020130081",
+          "reference": "NEH 2:13!8"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "005401000000000"
+      ]
+    },
+    {
+      "lang": "H",
+      "lemma": "תָּקְהַת",
+      "occurrences": 1,
+      "original_strong": "8616a",
+      "reason": "same_strong_family_unresolved",
+      "review_decision": "not_editorially_validated",
+      "source_classes": {
+        "noun": 1
+      },
+      "source_witnesses": [
+        {
+          "original_sdbh": "007908001001000",
+          "original_word_id": "o140340220121",
+          "reference": "2CH 34:22!12"
+        }
+      ],
+      "state": "homograph_or_spelling_review",
+      "ubs_candidate_entries": [
+        "007915000000000"
+      ]
+    }
+  ],
+  "format": "bsi-ubs-hebrew-lexical-family-register",
+  "policy": {
+    "confidence_caveat": "candidate_headwords_are_unverified; same_lemma_or_consonants_does_not_prove_lexical_identity",
+    "family_key": [
+      "lang",
+      "NFC(lemma)",
+      "original_strong_full_code"
+    ],
+    "no_implicit_links": true,
+    "scope": "selected_MACULA_source_classes_noun_verb_adj_adv_num",
+    "unattested_meaning": "no_matching_UBS_0_9_4_indexed_Strong_family_or_main_or_alternate_lemma_under_checked_spelling_rules",
+    "verification": "algorithmic_triage_not_editorial_validation"
+  },
+  "schema_version": 1,
+  "source_editions": {
+    "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
+  },
+  "summary": {
+    "families_by_reason": {
+      "different_strong_exact_attested_lemma": 46,
+      "different_strong_same_consonants": 27,
+      "same_strong_family_unresolved": 122,
+      "source_strong_unreadable": 2,
+      "unattested_indexed_headword": 5
+    },
+    "families_with_editorial_decision": 0,
+    "inside_scope_unresolved_occurrences": 2649,
+    "lexical_source_occurrences": 248680,
+    "linked_occurrences": 240098,
+    "occurrences_by_reason": {
+      "different_strong_exact_attested_lemma": 205,
+      "different_strong_same_consonants": 2015,
+      "same_strong_family_unresolved": 427,
+      "source_strong_unreadable": 2,
+      "unattested_indexed_headword": 5933
+    },
+    "outside_scope_occurrences": 5933,
+    "unresolved_families": 202,
+    "unresolved_occurrences": 8582
+  }
+}
