@@ -49,6 +49,7 @@ jobs:
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_xiphos_dual_reader.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_xiphos_heading_probe.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_private_sword_bundle.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_promote_sword_preview.py' -v
       - name: Install stock libSWORD compiler and native reader headers
         shell: bash
         run: |
@@ -1674,6 +1675,129 @@ jobs:
           print("Final unpublished zCom4 ZIP/reinstall integrity (metadata only):",
                 json.dumps(receipt,sort_keys=True))
           print("Private ZIP deleted; no module bytes or authorial text uploaded")
+          PY
+      - name: Privately prove final MHC identity, metadata and entire binary corpus (no release)
+        shell: bash
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from hashlib import sha256
+          from pathlib import Path
+          from zipfile import ZipFile
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from private_sword_bundle import (
+              _zip_private_module,_extract_into_isolated_sword_home
+          )
+          from promote_sword_preview import promote
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          from pilot_subprocess import query,present_key
+          root=Path(os.environ["RUNNER_TEMP"])
+          preview=root/"mhc-chapter-intro-private-sword"
+          provisional="MHCIntroPreview"
+          final="MHC"
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          plan=json.loads(Path("config/release-plans/mhc-0.1.0-DRAFT.json").read_text())
+          rights=manifest["rights"]
+          if (plan["status"]!="private_candidate_only_not_authorized_for_publication"
+                  or plan["sword_id"]!=final or plan["module_driver"]!="zCom4"
+                  or plan["upstream_module"]["original_authoring_osis_sha256"]!=
+                     manifest["commentary_source"]["original_authoring_osis"]["authoring_osis_sha256"]
+                  or rights["status"]!="project_distribution_rights_approved_from_crosswire_public_domain"
+                  or rights.get("owner_publication_approved") is not False
+                  or plan["publication"]["owner_publication_authorization"]):
+              raise SystemExit("Final private MHC identity/rights metadata not source-attested")
+          title=plan["title"]
+          if "\n" in title or "\r" in title or len(title)>180:
+              raise SystemExit("Unreviewed private final title")
+          source_zip=root/"mhc-preview-identity-temporary.zip"
+          candidate_zip=root/"mhc-private-final-identity-temporary.zip"
+          conf=root/"mhc-final-identity-temp.conf"
+          staged=root/"mhc-final-identity-isolated-sword"
+          staged.mkdir(mode=0o700)
+          conf.write_text(
+              "[MHC]\n"
+              "DataPath=./modules/comments/zcom4/mhc/\n"
+              "ModDrv=zCom4\nBlockType=CHAPTER\nCompressType=ZIP\n"
+              "Encoding=UTF-8\nSourceType=OSIS\nLang=en\nVersification=KJV\n"
+              "Version="+plan["proposed_bible_resources_version"]+"\n"
+              "DistributionLicense=Public Domain\n"
+              "Description="+title+"\n"
+              "About=Source CrossWire MHC 2.2; editorial preparation CCEL and Logos; Bible Resources source-preserving technical edition\n",
+              encoding="utf-8"
+          )
+          source_hashes={}
+          def digest(root_path,identifier):
+              proc=subprocess.Popen(
+                  [str(root/"commentary-native-raw"),identifier],
+                  env=dict(os.environ,SWORD_PATH=str(root_path)),
+                  stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+              try:
+                  meta,numbered,intros,tops=parse_native_raw_corpus(proc.stdout)
+                  if proc.wait(timeout=50):
+                      raise SystemExit("Independent final-ID native reader failed")
+              finally:
+                  if proc.stdout:proc.stdout.close()
+                  if proc.poll() is None:proc.kill()
+                  proc.wait()
+              if not (len(numbered)==31098 and len(intros)==1255 and len(tops)==2):
+                  raise SystemExit("Final-ID SWORD native coverage changed")
+              return meta["all_native_raw_entries_ordered_sha256"],numbered
+          try:
+              src=_zip_private_module(preview,provisional,source_zip)
+              promoted=promote(
+                  source_zip,candidate_zip,
+                  expected_source_sha256=src["zip_sha256"],
+                  source_id=provisional,destination_id=final,config=conf,
+                  driver="zCom4",versification="KJV"
+              )
+              if (not promoted["data_byte_equal"] or promoted["published"]
+                      or len(promoted["per_file_sha256"])!=6):
+                  raise SystemExit("Final identity packaging rewrote authorial source data")
+              with ZipFile(candidate_zip) as archive:
+                  source_hashes={
+                      name:sha256(archive.read(name)).hexdigest()
+                      for name in archive.namelist()
+                  }
+                  if (len(source_hashes)!=7
+                          or "mods.d/mhc.conf" not in source_hashes):
+                      raise SystemExit("Invalid MHC final-ID ZIP native inventory")
+              _extract_into_isolated_sword_home(candidate_zip,staged,source_hashes)
+              before,original_keys=digest(preview,provisional)
+              after,final_keys=digest(staged,final)
+              if before!=after or original_keys!=final_keys:
+                  raise SystemExit("Final module identity promotion changed native authorial corpus")
+              sample=("2Chr 1:1","Rom 4:17","Prov 31:1","Matt 28:1")
+              for reference in sample:
+                  result_code,selection=query(final,reference,fmt="plain",
+                                              root=staged,timeout=30,
+                                              limit=256*1024)
+                  if not present_key(reference,selection,result_code):
+                      raise SystemExit("Final MHC module failed independent installed reader")
+              print("Private MHC final-ID metadata/payload proof:",
+                    json.dumps({
+                      "final_sword_id":final,
+                      "private_edition_version":plan["proposed_bible_resources_version"],
+                      "rights_metadata":plan["rights"]["distribution_license"],
+                      "package_member_count":len(source_hashes),
+                      "entire_native_raw_corpus_sha256_equal":before==after,
+                      "complete_numbered_entries":len(final_keys),
+                      "whole_native_index_and_introductions_preserved":True,
+                      "independent_final_ID_reader_passages":len(sample),
+                      "source_zip_sha256":src["zip_sha256"],
+                      "candidate_zip_sha256":promoted["release_zip_sha256"],
+                      "candidate_zip_size_bytes":promoted["release_zip_bytes"],
+                      "source_binary_data_member_sha256_equal":True,
+                      "module_published":False,
+                      "release_authorized":False,
+                    },sort_keys=True))
+          finally:
+              source_zip.unlink(missing_ok=True)
+              candidate_zip.unlink(missing_ok=True)
+              conf.unlink(missing_ok=True)
+          print("Private final-MHC zip deleted after full identity reinstallation; no public artifact")
           PY
       - name: Install real Xiphos GUI dependencies in disposable runner
         if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-mhc-final-gui]'))
