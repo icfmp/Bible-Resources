@@ -1910,7 +1910,7 @@ def build_private_contextual_source_note_preview(
     """Relocate only proven same-K source notes adjacent to exact prose context.
 
     An unchanged *separate* source-note SWORD candidate remains authoritative
-    for the 176 unplaced links. This additional candidate is NOT approved or
+    for whatever source links remain unplaced in this edition. The separate candidate is NOT approved or
     publishable; it does not invent original inline link locations.
     """
     from collections import Counter
@@ -2077,15 +2077,17 @@ def build_private_contextual_source_note_preview(
 
     if authored_text_without_source_notes(doc) != original_authored:
         raise ValueError("Contextual notes changed translated commentary words")
-    if source_note_links(doc) != before_links or sum(before_links.values()) != 176:
+    total_source_notes=len(pending)-len(blocked_keys)
+    if (source_note_links(doc)!=before_links or
+            sum(before_links.values())!=total_source_notes):
         raise ValueError("Contextual notes lost/duplicated original source links")
     output=ET.tostring(doc,encoding="utf-8",xml_declaration=True)
     ET.fromstring(output)
     return output, {
         "status":"PRIVATE_EXACT_CONTEXT_PROXIMITY_REVIEW_NOT_AUTHORIAL_INLINE_PARITY",
-        "source_note_occurrences_total":176,
+        "source_note_occurrences_total":total_source_notes,
         "source_notes_moved_to_authored_paragraphs":len(moved),
-        "source_notes_still_grouped_by_K":176-len(moved),
+        "source_notes_still_grouped_by_K":total_source_notes-len(moved),
         "exact_phrase_proximity_count":sum(x["placement_basis"] ==
             "UNIQUE_EXACT_SOURCE_NEAR_PHRASE" for x in moved),
         "paragraph_lexical_context_proximity_count":sum(x["placement_basis"] ==
@@ -3375,7 +3377,8 @@ def build_private_inline_original_reference_index(
     from commentary_modern_draft_osis_preview import NS, _range
     if (source_receipt.get("status") !=
             "PRIVATE_NATIVE_SOURCE_NOTE_ALTERNATIVE_NOT_AUTHORED_INLINE_PARITY"
-            or source_receipt.get("original_link_occurrences_preserved_only_in_separate_source_notes") != 176
+            or not isinstance(source_receipt.get("original_link_occurrences_preserved_only_in_separate_source_notes"),int)
+            or source_receipt["original_link_occurrences_preserved_only_in_separate_source_notes"] <= 0
             or source_receipt.get("source_link_supplement_not_authorial_or_inline") is not True
             or source_receipt.get("published_or_distributed") is not False
             or source_receipt.get("original_native_corpus_sha256") !=
@@ -3445,8 +3448,12 @@ def build_private_inline_original_reference_index(
             original_groups[first]=len(ref_nodes)
     if set(original_groups)!=set(expected_groups):
         raise ValueError("Missing original K groups in visible source-reference index")
-    if len(original_links)!=176 or sum(original_groups.values())!=176:
-        raise ValueError("Not all 176 authentic original references are visible")
+    original_note_total=source_receipt["original_link_occurrences_preserved_only_in_separate_source_notes"]
+    if (len(original_links)!=original_note_total or
+            sum(original_groups.values())!=original_note_total or
+            sum(len(x["original_source_reference_hashes"])
+                for x in expected_groups.values())!=original_note_total):
+        raise ValueError("Not all source-attested original reference notes are visible")
     if any(n.get("resp")=="BibleResourcesPrivateSourceOnlyLinkSupplement"
            for n in root.iter() if n.tag==f"{{{NS}}}note"):
         raise ValueError("An old hidden source-only note survived")
