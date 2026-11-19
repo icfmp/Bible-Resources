@@ -23,7 +23,7 @@ def fixture():
             "match_type": "editorially_reviewed_original_wlc_headword_only",
             "lemma": "שָׁלוֹם", "strong": "7965", "lang": "H",
             "reference": "GEN 1:1!1", "original_sdbh": "000001001001000"
-        } for i in range(273)
+        } for i in range(275)
     }
     index = {
         "format": "bsi-ubs-hebrew-lexical-crosswalk",
@@ -36,12 +36,12 @@ def fixture():
         "by_macula_word": links,
         "coverage_scope": {
             "original_lexical_source_occurrences": 248680,
-            "linked_occurrences": 240371, "indexable_denominator": 242747,
-            "indexable_unresolved": 2376, "coverage_pct": 99.021,
+            "linked_occurrences": 240373, "indexable_denominator": 242747,
+            "indexable_unresolved": 2374, "coverage_pct": 99.022,
         },
         "coverage_with_word_ids": {
-            "additional_entry_only_links": 273,
-            "word_aware_entry_links": 268704,
+            "additional_entry_only_links": 275,
+            "word_aware_entry_links": 268706,
             "sense_links": 30492,
         },
         "editorial_candidate": {
@@ -53,7 +53,9 @@ def fixture():
             "original_index_sha256": "a" * 64,
             "original_index_left_unchanged": True,
             "source_corpus_left_unchanged": True,
-            "new_headword_only_wlc_word_ids": 273,
+            "new_headword_only_wlc_word_ids": 275,
+            "additional_final_source_specific_approvals": 2,
+            "remaining_source_specific_unlinked_words": 24,
             "inferred_contextual_sense_ids": 0,
         },
     }
@@ -69,7 +71,10 @@ def fixture():
         "candidate_index_sha256": MOD["sha256"](raw),
         "original_index_and_source_unchanged": True,
         "original_source_linked_lexical_occurrences": 240098,
-        "new_entry_only_word_links": 273,
+        "new_entry_only_word_links": 275,
+        "final_original_source_word_approvals": 2,
+        "remaining_last_original_word_abstentions": 24,
+        "previous_candidate_index_sha256": "7c2e386a07d0dede3bcb836f64db66a5779b7e4c9d8f6d20ec76e06d156c1b35",
         "original_source_words_left_unlinked_by_review": 1,
         "contextual_sense_ids_inferred": 0,
     }
