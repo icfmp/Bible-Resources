@@ -2139,5 +2139,72 @@ class OriginalFirstKOutlineVerseRecoveryTests(unittest.TestCase):
                 source_osis=args[0],ledger=args[1],original=args[2],
                 native=args[3],errata=args[4])
 
+
+class MixedChapterCitationRecoveryTests(unittest.TestCase):
+    @staticmethod
+    def setup_one_source_link(target, label):
+        from commentary_modern_draft_osis_preview import NS
+        xml,ledger,source,native,errata=(
+            PrivateCompactOriginalCrossReferenceTests().fixture())
+        root=ET.fromstring(xml)
+        first=source["1Cor.13.8"]
+        first[0]=(target,label)
+        ledger["pending"][0]["original_osisRef_sha256"]=hashlib.sha256(
+            target.encode()).hexdigest()
+        ledger["pending"][0]["original_visible_label_sha256"]=hashlib.sha256(
+            label.encode()).hexdigest()
+        p=next(n for n in root.iter() if n.tag==f"{{{NS}}}p")
+        return root,p,ledger,source,native,errata
+
+    def test_psalms_multiple_abbreviated_chapters_across_existing_source_link(self):
+        from commentary_modern_draft_osis_preview import NS
+        doc,p,ledger,source,native,errata=self.setup_one_source_link(
+            "Ps.136.13","136:13")
+        p.text="Israel sang (Psalms "
+        older=ET.SubElement(p,f"{{{NS}}}reference",{"osisRef":"Ps.114.3"})
+        older.text="114:3"
+        older.tail="; 106:9; 136:13)."
+        before="".join(doc.itertext())
+        output,remaining,receipt=build_private_compact_original_crossrefs(
+            linked_osis=ET.tostring(doc),ledger=ledger,original=source,
+            native=native,errata=errata)
+        fixed=ET.fromstring(output)
+        refs=[x for x in fixed.iter() if x.tag==f"{{{NS}}}reference"]
+        self.assertEqual([(x.text,x.get("osisRef")) for x in refs],
+                         [("114:3","Ps.114.3"),("13","Ps.136.13")])
+        self.assertEqual("".join(fixed.itertext()),before)
+        self.assertEqual(receipt["original_exact_compact_verse_links_restored"],1)
+        self.assertEqual(len(remaining["pending"]),5)
+
+    def test_job_original_range_end_is_linked_without_changing_existing_start(self):
+        from commentary_modern_draft_osis_preview import NS
+        doc,p,ledger,source,native,errata=self.setup_one_source_link(
+            "Job.31.14","14")
+        p.text="Job asked this (Job "
+        older=ET.SubElement(p,f"{{{NS}}}reference",{"osisRef":"Job.31.13"})
+        older.text="31:13"
+        older.tail="–14)."
+        before="".join(doc.itertext())
+        output,_,receipt=build_private_compact_original_crossrefs(
+            linked_osis=ET.tostring(doc),ledger=ledger,original=source,
+            native=native,errata=errata)
+        fixed=ET.fromstring(output)
+        refs=[x for x in fixed.iter() if x.tag==f"{{{NS}}}reference"]
+        self.assertEqual([(x.text,x.get("osisRef")) for x in refs],
+                         [("31:13","Job.31.13"),("14","Job.31.14")])
+        self.assertEqual("".join(fixed.itertext()),before)
+        self.assertEqual(receipt["original_exact_compact_verse_links_restored"],1)
+
+    def test_unprinted_middle_verse_of_broad_range_cannot_be_automatically_linked(self):
+        from commentary_modern_draft_osis_preview import NS
+        doc,p,ledger,source,native,errata=self.setup_one_source_link(
+            "Job.31.14","14")
+        p.text="Job considered these (Job 31:13–16)."
+        _,remaining,receipt=build_private_compact_original_crossrefs(
+            linked_osis=ET.tostring(doc),ledger=ledger,original=source,
+            native=native,errata=errata)
+        self.assertEqual(receipt["original_exact_compact_verse_links_restored"],0)
+        self.assertEqual(len(remaining["pending"]),6)
+
 if __name__=="__main__":
     unittest.main()
