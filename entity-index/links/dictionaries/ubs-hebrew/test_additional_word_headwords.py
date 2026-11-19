@@ -38,6 +38,7 @@ def fixtures():
         } for p in decision["reviewed_families"]
     ]
     index = BUILD["build"](en, en)
+    index["by_macula_word"] = {}
     return decision, report, ledger, preview, index, en
 
 
