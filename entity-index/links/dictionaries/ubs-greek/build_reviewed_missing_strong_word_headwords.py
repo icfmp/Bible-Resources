@@ -85,6 +85,8 @@ def build(candidate, ledger, residual, english, french):
     fr = {x["MainId"]: x for x in french}
     if len(en) != len(english) or len(fr) != len(french) or set(en) != set(fr):
         raise ValueError("Greek UBS original English/French lexical inventory changed")
+    for (_lemma, _mid), _decision in selected.items():
+        print("ORIGINAL_UBS_GREEK_BILINGUAL_POS_EVIDENCE", json.dumps({"lemma": _lemma, "main_id": _mid, "en": sorted(source_pos(en[_mid])), "fr": sorted(source_pos(fr[_mid]))}, ensure_ascii=False, sort_keys=True))
     chosen, declined = set(), set()
     output = copy.deepcopy(candidate)
     for family in residual["families"]:
