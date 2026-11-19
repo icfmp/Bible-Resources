@@ -704,3 +704,53 @@ families / 2,512 of 2,649 original occurrences**. The **94 remaining
 families / 137 occurrences** still require their own source review
 before the explicit v1.0 approval gate. Source corpus and generated
 index coverage are unchanged.
+
+### Third source-verified lexical batch: source-English and UBS meaning corroboration
+
+A further **22 original lexical families / 30 WLC occurrences** are accepted
+as UBS **headword-only** identities using independently retrieved, immutable
+original MACULA WLC word witnesses (original verse, source English where
+recorded, NFC lemma, complete Strong, SDBH) and a **verbatim published UBS
+lexical gloss** under the exact candidate headword.
+
+Examples include:
+
+- Hebrew קָלָה H7034 (6 original words): original Deut 25:3 **degraded**,
+  UBS published gloss *to be degraded* in its second verb form — not a
+  conjectural connection to the separate *roast/burn* meaning.
+- Hebrew נַחֲלָה H5158a (2): source Wadi of Egypt at Ezek 47:19,
+  UBS *wadi*; Hebrew צֹר H6697a (2): source *flint* in Josh 5:2,
+  UBS *rock* / *blade* within the same headword.
+- Hebrew שֹׁוקֵק H8264a (2): the *longing* soul of Ps 107:9,
+  UBS *to be thirsty*.
+- Hebrew handbreadth (2 source families), forest, furrow, terror,
+  awakening, slaughter, merchants and Calno/Calneh, together with
+  *broken* in Prov 25:19 and Isa 24:19.
+- Aramaic Ecbatana, discernment, sin-offering, finding shade, the
+  kor capacity measure and righteousness.
+
+Each positive record remains **a judgment about a UBS headword**, never a
+word-to-contextual-sense assignment. The UBS entry can contain several
+English glosses or senses: a matching gloss confirms the documented lexical
+review rationale but does not assign its source \`LEXID\` to every WLC word.
+
+The existing [source-verified positive ledger](
+v1_reviewed_headword_dispositions.json) and generic
+[read-only source verifier](verify_reviewed_headwords.py) now check
+**56 headword decisions / 248 source occurrences / 113 WLC word-ID
+witnesses**. The new witness-English field, where actually present in
+the pinned original lowfat chapter, is checked against the independent
+original MACULA TSV in CI. A missing or changed UBS published gloss also
+fails source validation.
+
+This does **not** modify original MACULA/UBS text, original word IDs,
+Strong/SDBH, generated index links, nor contextual sense inventories.
+Full-source linked lexical coverage remains **240,098/248,680**
+and the edition-attested-headword metric remains **98.909%** until
+a separate verified link-generation step.
+
+With previous source-reviewed dispositions, this batch brings the tracked
+in-scope total to **125/197 lexical families / 2,542 of 2,649 original
+occurrences**. **72 families / 107 occurrences** still need resolution,
+including two preserved composite Strong annotations tracked as source
+syntax cases. The UBS v1.0 release remains explicitly unapproved.
