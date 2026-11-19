@@ -15,9 +15,9 @@ REGISTER = json.loads((HERE / "family_register.json").read_text(encoding="utf-8"
 class ReviewedHeadwordTests(unittest.TestCase):
     def test_all_pinned_source_reviewed_families(self):
         result = CHECK["verify_register"](LEDGER, REGISTER)
-        self.assertEqual(result["families"], 34)
-        self.assertEqual(result["occurrences"], 218)
-        self.assertEqual(len(result["word_witnesses"]), 86)
+        self.assertEqual(result["families"], 56)
+        self.assertEqual(result["occurrences"], 248)
+        self.assertEqual(len(result["word_witnesses"]), 113)
         self.assertTrue(all(not d["contextual_sense_id_approved"]
                             and not d["index_word_links_applied"]
                             for d in LEDGER["decisions"]))
@@ -88,6 +88,26 @@ class ReviewedHeadwordTests(unittest.TestCase):
         entry["StrongCodes"] = ["H9999"]
         with self.assertRaisesRegex(ValueError, "numeric Strong family changed"):
             CHECK["verify_dictionary"]({"decisions": [same]}, [entry])
+
+    def test_original_english_witness_drift_rejected(self):
+        import tempfile
+        d = next(x for x in LEDGER["decisions"]
+                 if x["evidence"].get("original_word_english"))
+        w = d["original_word_witnesses"][0]
+        header = "\t".join((
+            "xml:id", "lang", "lemma", "strongnumberx", "class",
+            "ref", "sdbh", "english",
+        )) + "\n"
+        fields = [w["original_word_id"], d["lang"], d["lemma"],
+                  d["original_strong"], next(iter(d["original_source_classes"])),
+                  w["reference"], w["original_sdbh"], "changed"]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "witness.tsv"
+            path.write_text(header + "\t".join(fields) + "\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "English witness changed"):
+                CHECK["verify_macula"]({"word_witnesses": {
+                    w["original_word_id"]: (d, w)
+                }}, path)
 
     def test_original_dictionary_entry_and_cross_strong_invariant(self):
         d = LEDGER["decisions"][0]

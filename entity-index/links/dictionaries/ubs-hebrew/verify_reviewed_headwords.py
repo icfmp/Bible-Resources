@@ -145,6 +145,12 @@ def verify_macula(review, macula):
             if pair is None:
                 continue
             d, w = pair
+            # Optional independently transcribed source English is checked
+            # only for the first pinned word witness of a reviewed family.
+            if (row["xml:id"] == d["original_word_witnesses"][0]["original_word_id"]
+                    and "original_word_english" in d["evidence"]
+                    and row["english"] != d["evidence"]["original_word_english"]):
+                raise ValueError("Original MACULA English witness changed: " + row["xml:id"])
             if (
                 row["lang"] != d["lang"]
                 or norm(row["lemma"]) != norm(d["lemma"])
@@ -177,7 +183,7 @@ def main():
         json.loads(args.english.read_text(encoding="utf-8")),
         args.macula,
     )
-    if result != {"families": 34, "occurrences": 218, "word_witnesses": 86}:
+    if result != {"families": 56, "occurrences": 248, "word_witnesses": 113}:
         raise ValueError("Pinned editorial review counts unexpectedly changed")
     print("UBS_PINNED_REVIEWED_HEADWORDS", json.dumps(result, sort_keys=True))
 
