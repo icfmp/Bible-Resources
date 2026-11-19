@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "source_editions": {
+    "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
+  },
+  "policy": "Five independently interpreted UBS Hebrew v0.9.4 headword identities: source-word-specific family approvals for entry-level crosswalk candidates only. Do not treat Strong spelling, H/A prefix, or old SDBH equality alone as equivalence; do not infer contextual sense IDs. These are editorial dispositions, not generated index links. External dictionary web display corroborates sense/context but the pinned original UBS/MACULA metadata is verified by CI.",
+  "decisions": [
+    {
+      "lang": "A",
+      "lemma": "דָּנִיֵּאל",
+      "original_strong": "1841",
+      "original_occurrences": 52,
+      "original_source_classes": {
+        "noun": 52
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "001695001004000",
+          "original_word_id": "o270020130061",
+          "reference": "DAN 2:13!6"
+        },
+        {
+          "original_sdbh": "001695001004000",
+          "original_word_id": "o270020140021",
+          "reference": "DAN 2:14!2"
+        },
+        {
+          "original_sdbh": "001695001004000",
+          "original_word_id": "o270020150182",
+          "reference": "DAN 2:15!18"
+        }
+      ],
+      "ubs_candidate_main_id": "001695000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Daniel, the protagonist of the book of Daniel",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/%D7%93%D6%BC%D6%B8%D7%A0%D6%B4%D7%99%D6%BC%D6%B5%D7%90%D7%9C.htm",
+        "ubs_cited_passage": "DAN 2:13–20"
+      },
+      "rationale": "UBS headword explicitly has a distinct Daniel-the-book protagonist meaning (Form 1, sense 4) and lists Dan 2:13–20. Source Dan 2:13 refers to that same named figure. The headword can be identified while its contextual sense ID remains unassigned; the headword also records other men named Daniel."
+    },
+    {
+      "lang": "A",
+      "lemma": "אֱנָשׁ",
+      "original_strong": "0606",
+      "original_occurrences": 25,
+      "original_source_classes": {
+        "noun": 25
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "000554001001000",
+          "original_word_id": "o150040110111",
+          "reference": "EZR 4:11!11"
+        },
+        {
+          "original_sdbh": "000554001001000",
+          "original_word_id": "o150060110061",
+          "reference": "EZR 6:11!6"
+        },
+        {
+          "original_sdbh": "000554001001000",
+          "original_word_id": "o270020100091",
+          "reference": "DAN 2:10!9"
+        }
+      ],
+      "ubs_candidate_main_id": "000553000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "human, human being, man",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/%D7%90%D6%B1%D7%A0%D6%B8%D7%A9%D7%81.htm",
+        "ubs_cited_passage": "EZR 4:11"
+      },
+      "rationale": "UBS expressly treats this form as human/person and cites Ezra 4:11 and 6:11 alongside Dan 2:10. The original Aramaic word denotes a human, not an unrelated equal-spelling Hebrew homograph."
+    },
+    {
+      "lang": "A",
+      "lemma": "יוֹם",
+      "original_strong": "3118",
+      "original_occurrences": 16,
+      "original_source_classes": {
+        "noun": 16
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002854001008000",
+          "original_word_id": "o150040150231",
+          "reference": "EZR 4:15!23"
+        },
+        {
+          "original_sdbh": "002854001008000",
+          "original_word_id": "o150040190101",
+          "reference": "EZR 4:19!10"
+        },
+        {
+          "original_sdbh": "002854001002000",
+          "original_word_id": "o150060090211",
+          "reference": "EZR 6:9!21"
+        }
+      ],
+      "ubs_candidate_main_id": "002858000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "day, time; days of old",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/%D7%99%D7%95%D6%B9%D7%9D.htm",
+        "ubs_cited_passage": "EZR 4:15"
+      },
+      "rationale": "The UBS entry covers day/time and specifically documents the Aramaic phrase 'day of old' at Ezra 4:15 and 4:19 (sense 8). The exact original word family corresponds to that headword. Do not infer which sense applies to each of the 16 tokens."
+    },
+    {
+      "lang": "A",
+      "lemma": "בֵּלְשַׁאצַּר",
+      "original_strong": "1113",
+      "original_occurrences": 7,
+      "original_source_classes": {
+        "noun": 7
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "001033001001000",
+          "original_word_id": "o270050010011",
+          "reference": "DAN 5:1!1"
+        },
+        {
+          "original_sdbh": "001033001001000",
+          "original_word_id": "o270050020011",
+          "reference": "DAN 5:2!1"
+        },
+        {
+          "original_sdbh": "001033001001000",
+          "original_word_id": "o270050090031",
+          "reference": "DAN 5:9!3"
+        }
+      ],
+      "ubs_candidate_main_id": "001033000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Belshazzar, king of Babylon",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/%D7%91%D6%BC%D6%B5%D7%9C%D6%B0%D7%A9%D7%81%D6%B7%D7%90%D7%A6%D6%BC%D6%B7%D7%A8.htm",
+        "ubs_cited_passage": "DAN 5:1"
+      },
+      "rationale": "UBS explicitly identifies the Babylonian king Belshazzar and cites Daniel 5:1–2. The source original token at Daniel 5:1 names that ruler, not Belteshazzar/Daniel."
+    },
+    {
+      "lang": "A",
+      "lemma": "תּוֹר",
+      "original_strong": "8450",
+      "original_occurrences": 7,
+      "original_source_classes": {
+        "noun": 7
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "007754005001000",
+          "original_word_id": "o150060090041",
+          "reference": "EZR 6:9!4"
+        },
+        {
+          "original_sdbh": "007754005001000",
+          "original_word_id": "o150060170061",
+          "reference": "EZR 6:17!6"
+        },
+        {
+          "original_sdbh": "007754005001000",
+          "original_word_id": "o150070170081",
+          "reference": "EZR 7:17!8"
+        }
+      ],
+      "ubs_candidate_main_id": "007759000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "head of cattle, bull",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/%D7%AA%D6%BC%D7%95%D6%B9%D7%A8.htm",
+        "ubs_cited_passage": "EZR 6:9"
+      },
+      "rationale": "The UBS combined headword explicitly distinguishes Form 5 'head of cattle' with citations Ezra 6:9, 6:17, 7:17 and Daniel 4:25. The original Aramaic source uses the cattle noun. Approve only the containing headword, never automatically choose the unrelated Form 1 'dove' or fabricate a contextual sense."
+    }
+  ]
+}
