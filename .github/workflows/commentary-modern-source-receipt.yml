@@ -3921,8 +3921,126 @@ jobs:
                               accessibility=candidate
                   except (OSError,subprocess.TimeoutExpired,ValueError):
                       pass
+              # A genuine X11 mouse-activation attempt may be made only on an
+              # independently source- and actual-HTML-attested valid anchor.
+              # The post-click Bible destination needs separate visible text
+              # proof: mere dispatch must never be reported as navigation PASS.
+              click_proof={"status":"REAL_GUI_CLICK_NOT_ATTEMPTED"}
+              if (accessibility.get("accessible_link_roles",0)>0 and win):
+                  try:
+                      from commentary_xiphos_dual_reader import (
+                          _REFERENCE_WITH_ATTRIBUTES,_OSIS_REF_ATTRIBUTE,
+                          _BoundedMarkupScanner,_optional_real_rich_xiphos_selection,
+                          _commentary_pane_focus_points,_seed_x11_clipboard)
+                      from html import unescape
+                      from urllib.parse import unquote
+                      import hashlib
+                      original_internal=comparisons["Gen 12:6"]["commentary_internal"]
+                      if isinstance(original_internal,bytes):
+                          original_internal=original_internal.decode("utf-8",errors="replace")
+                      valid_labels=[]
+                      for attrs,markup_label in _REFERENCE_WITH_ATTRIBUTES.findall(original_internal):
+                          m=_OSIS_REF_ATTRIBUTE.search(attrs)
+                          if not m or unescape(m.group(2)).strip()!="Heb.11.8":
+                              continue
+                          parser=_BoundedMarkupScanner()
+                          parser.feed(unescape(markup_label))
+                          label=" ".join("".join(parser.text_chunks).split())
+                          if label:
+                              valid_labels.append(label)
+                      if len(valid_labels)!=1:
+                          raise ValueError("Source valid Hebrews 11:8 label ambiguous")
+                      points=_commentary_pane_focus_points(env,win)
+                      px,py=points[0]
+                      _x11(["xdotool","mousemove",str(px),str(py),"click","1"],env)
+                      _seed_x11_clipboard(env)
+                      _x11(["xdotool","key","--clearmodifiers","ctrl+a"],env)
+                      _x11(["xdotool","key","--clearmodifiers","ctrl+c"],env)
+                      time.sleep(.6)
+                      html=_optional_real_rich_xiphos_selection(env)
+                      parser=_BoundedMarkupScanner()
+                      parser.feed(html.decode("utf-8",errors="replace") if html else "")
+                      matching=[(label,href) for label,href in parser.anchor_destinations
+                          if label==valid_labels[0] and
+                          "heb.11.8" in unquote(unescape(href)).casefold()]
+                      if len(matching)!=1:
+                          raise ValueError("Exact valid source target not uniquely seen in GUI HTML")
+                      label_sha=hashlib.sha256(
+                          " ".join(valid_labels[0].split()).casefold().encode()).hexdigest()
+                      # AT-SPI link extents originate in the genuine Xiphos UI.
+                      # A subprocess drives the real X11 pointer only when there
+                      # is one visible matching link in the commentary half.
+                      script=textwrap.dedent("""
+                          import hashlib,json,subprocess,sys
+                          import pyatspi
+                          digest=sys.argv[1]
+                          out={"status":"REAL_GUI_ATSPI_SOURCE_LABEL_SEARCH",
+                               "matching_showing_link_count":0,
+                               "x11_actual_click_dispatched":False}
+                          todo=[pyatspi.Registry.getDesktop(0)]
+                          matches=[]
+                          seen=0
+                          while todo and seen<2500:
+                              item=todo.pop();seen+=1
+                              try:
+                                  if item.getRoleName().lower()=="link":
+                                      label=" ".join((item.name or "").split()).casefold()
+                                      if hashlib.sha256(label.encode()).hexdigest()==digest:
+                                          ext=item.queryComponent().getExtents(pyatspi.DESKTOP_COORDS)
+                                          if ext.width>0 and ext.height>0:
+                                              x=ext.x+ext.width//2
+                                              y=ext.y+ext.height//2
+                                              if 660<x<1280 and 0<y<800:
+                                                  matches.append((x,y))
+                                  todo.extend(item[i] for i in range(min(item.childCount,100)))
+                              except (LookupError,RuntimeError,AttributeError):
+                                  continue
+                          out["matching_showing_link_count"]=len(matches)
+                          if len(matches)==1:
+                              x,y=matches[0]
+                              click=subprocess.run(["xdotool","mousemove",str(x),str(y),
+                                  "click","1"],timeout=7,capture_output=True)
+                              out["x11_actual_click_dispatched"]=click.returncode==0
+                          print(json.dumps(out,sort_keys=True))
+                      """)
+                      attempt=subprocess.run(["/usr/bin/python3","-c",script,label_sha],
+                          env=probe_env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
+                          text=True,timeout=18,check=False)
+                      if attempt.returncode!=0 or len(attempt.stdout)>4096:
+                          raise ValueError("Real AT-SPI link activation unavailable")
+                      click_proof=json.loads(attempt.stdout)
+                      if click_proof.get("x11_actual_click_dispatched") is True:
+                          # Real post-click Bible-side copy is independently
+                          # compared against exact compiled target Scripture;
+                          # exclude a match to the starting Gen 12 verse.
+                          time.sleep(1)
+                          geom=_x11(["xdotool","getwindowgeometry","--shell",win],env).decode()
+                          numbers=dict(re.findall(
+                              r"^(X|Y|WIDTH|HEIGHT)=(-?\d+)$",geom,re.M))
+                          bx=int(numbers["X"])+int(numbers["WIDTH"])*30//100
+                          by=int(numbers["Y"])+int(numbers["HEIGHT"])*52//100
+                          _x11(["xdotool","mousemove",str(bx),str(by),"click","1"],env)
+                          _seed_x11_clipboard(env)
+                          _x11(["xdotool","key","--clearmodifiers","ctrl+a"],env)
+                          _x11(["xdotool","key","--clearmodifiers","ctrl+c"],env)
+                          time.sleep(.5)
+                          copied=_x11(["xclip","-selection","clipboard","-o"],env)
+                          code,target=query("BRLSG1910","Hebrews 11:8",
+                              fmt="plain",root=root,exe="diatheke",
+                              limit=256*1024,timeout=25)
+                          match=(code==0 and present_key("Hebrews 11:8",target,code)
+                              and _long_commentary_excerpt_is_on_gui_clipboard(
+                                  target,comparisons["Gen 12:6"]["bible"],copied))
+                          click_proof["post_click_independent_bible_excerpt_match"]=bool(match)
+                          click_proof["status"]=(
+                              "REAL_XIPHOS_CLICK_AND_POSTCLICK_BIBLE_TEXT_MATCH"
+                              if match else "REAL_XIPHOS_CLICK_DISPATCHED_DESTINATION_NOT_PROVEN")
+                      click_proof["exact_original_valid_link_GUI_HTML_attested"]=True
+                  except (ValueError,PilotError,OSError,subprocess.TimeoutExpired,KeyError):
+                      click_proof={"status":"REAL_GUI_VALID_ANCHOR_CLICK_PROBE_INCONCLUSIVE"}
               return {"book_preface_I_menu_GUI_observations":proofs,
-                      "real_accessibility_link_inventory":accessibility}
+                      "real_accessibility_link_inventory":accessibility,
+                      "real_valid_source_anchor_click_observation":click_proof}
           # Enable real GTK accessibility on the Xiphos child before startup.
           os.environ["NO_AT_BRIDGE"]="0"
           os.environ["GTK_A11Y"]="1"
@@ -4003,6 +4121,8 @@ jobs:
               "per_compiled_book_I_native_heading_menu_GUI_class":menu_classes,
               "per_compiled_book_I_normal_GUI_class":ordinary_intro_classes,
               "real_accessibility_link_inventory":result.get("real_accessibility_link_inventory",{}),
+              "real_valid_source_anchor_click_observation":
+                  result.get("real_valid_source_anchor_click_observation",{}),
               "all_book_prefaces_in_GUI_approved":False,
               "sampled_original_wrong_target_link_GUI_markup_observations":link_gui,
               "source_strict_eleven_wrong_target_non_navigable_links_proven_natively":True,
@@ -4025,6 +4145,8 @@ jobs:
                 str(sum(intro_matches.values()))+"/"+str(len(intro_expected))+
                 " compiled native I-entry prefatory texts matched in GUI; "
                 "a non-match remains inconclusive, never missing source text")
+          print("PRIVATE REAL XIPHOS REAL SOURCE-LINK CLICK OBSERVATION: "+
+                str(result.get("real_valid_source_anchor_click_observation",{})))
           print("PRIVATE REAL XIPHOS AT-SPI LINK INVENTORY (SHA only, NO CLICK): "+
                 str(result.get("real_accessibility_link_inventory",{})))
           print("PRIVATE REAL XIPHOS BOOK-I HEADING MENU OUTCOMES (no text): "+
