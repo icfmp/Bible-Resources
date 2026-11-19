@@ -48,7 +48,7 @@ Prosperity and suffering do not alternate with the regularity of day and night o
 
 They come under God's wise direction.
 
-We must not attribute suffering to **blind fortune**, for it is governed by God.
+We must not attribute our afflictions to **blind fortune**, for **they are from God**.
 
 Nor should we attribute our sins to **fate**, since they arise from ourselves.
 
@@ -137,6 +137,8 @@ Blessed Savior, how precious it is to look to you, the **Author and Perfecter of
 ---
 
 ## Editorial review — Job 5
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** The 6–16 modern statement weakened the original's **“afflictions are from God”** to the more general *governed by God*. Restored its active source attribution from [CCEL Job 5](https://ccel.org/ccel/henry/mhcc.xix.v.html), maintaining the adjacent distinct claim that sin is our responsibility. Exact original SWORD and independent editorial validation pending.
 
 **Whole original-English secondary witness directly checked:** [CCEL, Job 5](https://ccel.org/ccel/henry/mhcc.xix.v.html). Published SHA-pinned **MHCC 0.1.1** remains primary; exact native SWORD units, references and independent acceptance pending.
 
