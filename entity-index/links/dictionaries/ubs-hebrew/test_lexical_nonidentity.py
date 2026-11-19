@@ -94,9 +94,9 @@ class VerifyNonidentityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             p = Path(temp) / "macula.tsv"
             p.write_text(
-                "xml:id\\tlang\\tlemma\\tstrongnumberx\\tref\\tsdbh\\tclass\\n"
-                "word-one\\tH\\tרִמּוֹן\\t7417b\\t2KI 5:18!9\\t"
-                "006818002005000\\tnoun\\n",
+                "xml:id\tlang\tlemma\tstrongnumberx\tref\tsdbh\tclass\n"
+                "word-one\tH\tרִמּוֹן\t7417b\t2KI 5:18!9\t"
+                "006818002005000\tnoun\n",
                 encoding="utf-8"
             )
             self.assertEqual(verify["verify"](ledger, report, entries, p),
