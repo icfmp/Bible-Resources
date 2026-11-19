@@ -54,7 +54,7 @@ class TemporalGreekLexicalHeadwordTests(unittest.TestCase):
                           ("original_strong","3699"),("original_class","adv")):
             evidence_changed=evidence()
             evidence_changed[key]=value
-            with self.assertRaisesRegex(ValueError,"source evidence incomplete|source word"):
+            with self.assertRaisesRegex(ValueError,"source evidence incomplete|source word|temporal word ID"):
                 MOD["ledger_approval"](LEDGER,evidence_changed)
 
     def test_bilingual_original_greek_canonical_headword(self):
