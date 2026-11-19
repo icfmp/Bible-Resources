@@ -46,7 +46,7 @@ The description of the **warhorse** pictures presumptuous sinners.
 
 As a horse rushes into battle, so people fully committed to evil hurry along the way their desires and passions have chosen.
 
-They may refuse to fear divine judgment, however clearly their sinful habits lead toward ruin.
+They may refuse to fear **the wrath of God** and the fatal consequences of sin, however recklessly their desires drive them.
 
 Some sinners believe themselves secure in their sin, like **an eagle nesting high among inaccessible rocks**.
 
@@ -59,6 +59,8 @@ Job's failure to recognize how completely divine wisdom is present in God's work
 ---
 
 ## Editorial review — Job 39
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** The continuous original exposition explicitly says the warhorse-like sinner cannot be brought to fear *the wrath of God*. The modern text replaced this with generic divine judgment; restored the original referent without changing the source's disputed “unicorn” label or its single-section structure. Checked [CCEL Job 39](https://ccel.org/ccel/henry/mhcc.xix.xxxix.html), not the exact compiled native source.
 
 **Complete brief source directly inspected:** [CCEL, Job 39](https://ccel.org/ccel/henry/mhcc.xix.xxxix.html). Exact published `MHCC 0.1.1` remains authoritative, pending source-native entries, independent review and compiled SWORD readback.
 
