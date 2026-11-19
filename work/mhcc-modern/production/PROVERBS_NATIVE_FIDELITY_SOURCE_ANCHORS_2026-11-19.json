@@ -4,7 +4,7 @@
   "native_module_id": "MHCC",
   "source_zip_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
   "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
-  "purpose": "Original published K-body lexical probes for focused Proverbs 2, 3 and 5 fidelity draft restorations; not independent semantic translation approval.",
+  "purpose": "Original published K-body lexical probes for Proverbs 2, 3, 5, 16 editorial fidelity claims. Probe presence and K identity only; not independent full semantic acceptance.",
   "source_group_hash_policy": "manifest_exact",
   "source_group_probes": [
     {
@@ -52,6 +52,38 @@
         {
           "id": "body_soul",
           "words": "the destruction of body and soul"
+        }
+      ]
+    },
+    {
+      "chapter": "Prov.16",
+      "first": "Prov.16.4",
+      "last": "Prov.16.4",
+      "sha": "0bab952d1e298c9e0dc6691b588ea2116590e53fc1b022e18857ada707ed9e6e",
+      "anchors": [
+        {
+          "id": "vengeance",
+          "words": "God makes use of the wicked to execute righteous vengeance on each other"
+        },
+        {
+          "id": "destruction",
+          "words": "he will be glorified by their destruction at last"
+        }
+      ]
+    },
+    {
+      "chapter": "Prov.16",
+      "first": "Prov.16.9",
+      "last": "Prov.16.9",
+      "sha": "5d4ea8f0ec6b0cb2a7419787fee77cf5b140a1c4bef01cd5b3c85f1456101ef0",
+      "anchors": [
+        {
+          "id": "guided",
+          "words": "If men make God's glory their end and his will their rule"
+        },
+        {
+          "id": "rulers",
+          "words": "Let kings and judges of the earth be just and rule in the fear of God"
         }
       ]
     }
