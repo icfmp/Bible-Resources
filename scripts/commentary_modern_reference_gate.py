@@ -2200,10 +2200,13 @@ def build_private_compact_original_crossrefs(
         # may be authored as "Jude 15", not "Jude 1:15".
         single_chapter={"Obad","Phlm","2John","3John","Jude"}
         aliases="|".join(re.escape(x) for x in sorted(names,key=len,reverse=True))
+        # A semicolon separates *chapters* in abbreviated multichapter
+        # citations; it MUST NOT be greedily mistaken for a verse comma.
+        # Allow an isolated chapter with a visible 13–14 span as well.
         full=re.compile(
             r"(?<![A-Za-z0-9])(?:"+aliases+r")\s+"
-            r"\d+\s*:\s*\d+(?:\s*[,;–-]\s*\d+)*"
-            r"(?:\s*;\s*\d+\s*:\s*\d+(?:\s*[,;–-]\s*\d+)*)+",
+            r"\d+\s*:\s*\d+(?:\s*[,\u2013\u2014-]\s*\d+)*"
+            r"(?:\s*;\s*\d+\s*:\s*\d+(?:\s*[,\u2013\u2014-]\s*\d+)*)*",
             flags=re.IGNORECASE)
         solitary=(re.compile(r"(?<![A-Za-z0-9])(?:"+aliases+
                              r")\s+("+re.escape(verse)+r")(?![\d:])",
@@ -2214,14 +2217,29 @@ def build_private_compact_original_crossrefs(
             projected,chunks=projected_slots(paragraph)
             for hit in full.finditer(projected):
                 excerpt=hit.group()
-                for candidate in re.finditer(r"(?<!\d)(\d+)\s*:\s*(\d+)",excerpt):
-                    if candidate[1]!=chapter or candidate[2]!=verse:
+                # Chapter numbers and verse numbers have distinct scope:
+                # Psalms 114:3; 106:9; 136:13 and Job 31:13–14 both
+                # retain an exact written chapter and an explicit target
+                # verse digit. We link ONLY that printed digit, never an
+                # unprinted intervening verse in a numerical range.
+                for candidate in re.finditer(
+                        r"(?<!\d)(\d+)\s*:\s*(\d+)"
+                        r"((?:\s*[,\u2013\u2014-]\s*\d+)*)",excerpt):
+                    if candidate[1]!=chapter:
                         continue
-                    start=hit.start()+candidate.start(2)
-                    end=hit.start()+candidate.end(2)
-                    out.extend((node,attr,value,start-a,end-a)
-                               for a,b,node,attr,linked,value in chunks
-                               if not linked and a<=start and end<=b)
+                    numbers=[(candidate[2],candidate.start(2),
+                              candidate.end(2))]
+                    trailer=candidate[3]
+                    numbers.extend((m.group(),candidate.start(3)+m.start(),
+                                    candidate.start(3)+m.end())
+                                   for m in re.finditer(r"\d+",trailer))
+                    for printed,a0,b0 in numbers:
+                        if printed!=verse:
+                            continue
+                        start,end=hit.start()+a0,hit.start()+b0
+                        out.extend((node,attr,value,start-a,end-a)
+                            for a,b,node,attr,linked,value in chunks
+                            if not linked and a<=start and end<=b)
             if solitary is not None:
                 for hit in solitary.finditer(projected):
                     start,end=hit.start(1),hit.end(1)
