@@ -2,8 +2,10 @@ name: Rebuild MHC from pinned original OSIS (private technical phase 1)
 
 on:
   pull_request:
-    # A deliberately one-off GUI check may be requested by editing the PR
-    # description with the exact marker below. Ordinary pushes run native-only.
+    # Explicit GUI marker in the PR description is evaluated on synchronize
+    # as well as edited events. On GitHub, PR "edited" often does not satisfy
+    # a paths-filtered workflow and must never silently skip the GUI. Remove
+    # the marker from the PR after the one-off GUI run.
     types: [opened, synchronize, reopened, edited]
     paths:
       - "scripts/rebuild_osis_commentary.py"
@@ -1612,7 +1614,7 @@ jobs:
           print("REAL_OSIS_CHAPTER_INTRO_PROOF_PASS; only verified generated pvN pair renumbering outside 2Chr 1; candidate private and unpublished")
           PY
       - name: Install real Xiphos GUI dependencies in disposable runner
-        if: github.event_name == 'workflow_dispatch' || (github.event.action == 'edited' && contains(github.event.pull_request.body, '[run-mhc-final-gui]'))
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-mhc-final-gui]'))
         id: install_corrected_xiphos
         shell: bash
         continue-on-error: true
@@ -1666,7 +1668,7 @@ jobs:
             }
           done
       - name: Observe real Xiphos with final private 25-link and chapter-intro MHC (not hyperlink approval)
-        if: (github.event_name == 'workflow_dispatch' || (github.event.action == 'edited' && contains(github.event.pull_request.body, '[run-mhc-final-gui]'))) && steps.install_corrected_xiphos.outcome == 'success'
+        if: (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-mhc-final-gui]'))) && steps.install_corrected_xiphos.outcome == 'success'
         id: observe_corrected_xiphos
         shell: bash
         continue-on-error: true
@@ -1842,7 +1844,7 @@ jobs:
               raise SystemExit("INCONCLUSIVE_REAL_GUI_SELECTION: real commentary excerpts not verified")
           PY
       - name: Report corrected-MHC GUI status independently from native-source integrity
-        if: always() && (github.event_name == 'workflow_dispatch' || (github.event.action == 'edited' && contains(github.event.pull_request.body, '[run-mhc-final-gui]')))
+        if: always() && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-mhc-final-gui]')))
         shell: bash
         env:
           GUI_DEPS: ${{ steps.install_corrected_xiphos.outcome }}
