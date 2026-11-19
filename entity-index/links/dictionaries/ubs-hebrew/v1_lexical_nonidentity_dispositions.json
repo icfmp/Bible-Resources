@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "policy": "Reject only the listed UBS 0.9.4 orthographic candidate, never infer a new link or change original WLC words, Strong, refs or textual identity",
+  "policy": "Reject only explicitly source-reviewed UBS 0.9.4 sole candidate lexical nonidentity. Supports distinct same-consonant/different-Strong and same-Strong shared compound-name/lexical-component errors. Preserve all original WLC words, Strong, SDBH, references and original surface syntax; never infer a different link or contextual sense from a rejection. Re-evaluate every decision on source revisions.",
   "source_editions": {
     "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
     "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c"
@@ -34,7 +34,8 @@
           "dem.pron"
         ]
       },
-      "rationale": "Original H0408 is the prohibitive negative particle ('not'); the sole consonant-only UBS candidate is אֵל, a divine-being/common-noun and pronoun entry with unrelated Strong codes. Identical bare consonants do not establish lexical identity."
+      "rationale": "Original H0408 is the prohibitive negative particle ('not'); the sole consonant-only UBS candidate is אֵל, a divine-being/common-noun and pronoun entry with unrelated Strong codes. Identical bare consonants do not establish lexical identity.",
+      "candidate_relation": "different_strong_same_consonants"
     },
     {
       "lang": "H",
@@ -59,7 +60,8 @@
           "adv"
         ]
       },
-      "rationale": "Original Hebrew H3541 כֹּה means 'thus/so' in Genesis 15:5; the sole indexed same-consonant UBS candidate is Aramaic A3542 כָּה ('here'). Language, lemma and lexical meaning disagree; do not link them."
+      "rationale": "Original Hebrew H3541 כֹּה means 'thus/so' in Genesis 15:5; the sole indexed same-consonant UBS candidate is Aramaic A3542 כָּה ('here'). Language, lemma and lexical meaning disagree; do not link them.",
+      "candidate_relation": "different_strong_same_consonants"
     },
     {
       "lang": "H",
@@ -84,7 +86,8 @@
           "verb"
         ]
       },
-      "rationale": "Original H5750 עוֹד is a temporal adverb ('again/still'); UBS candidate H5749 עוד is a verb ('testify/warn'), a distinct lexeme sharing unvocalized consonants. Do not map the adverb to that verb."
+      "rationale": "Original H5750 עוֹד is a temporal adverb ('again/still'); UBS candidate H5749 עוד is a verb ('testify/warn'), a distinct lexeme sharing unvocalized consonants. Do not map the adverb to that verb.",
+      "candidate_relation": "different_strong_same_consonants"
     },
     {
       "lang": "H",
@@ -109,7 +112,8 @@
           "noun m"
         ]
       },
-      "rationale": "The source means 'above' in Gen 27:39, not an ox-yoke or figurative burden; UBS עֹל H5923 is the latter noun."
+      "rationale": "The source means 'above' in Gen 27:39, not an ox-yoke or figurative burden; UBS עֹל H5923 is the latter noun.",
+      "candidate_relation": "different_strong_same_consonants"
     },
     {
       "lang": "A",
@@ -139,7 +143,8 @@
           "dem.pron"
         ]
       },
-      "rationale": "Aramaic prohibitive 'not' (Dan 2:24) is not UBS divine noun/pronoun אֵל."
+      "rationale": "Aramaic prohibitive 'not' (Dan 2:24) is not UBS divine noun/pronoun אֵל.",
+      "candidate_relation": "different_strong_same_consonants"
     },
     {
       "lang": "H",
@@ -165,7 +170,8 @@
           "verb"
         ]
       },
-      "rationale": "Hebrew spatial relation ('before/opposite', Gen 2:18) is not the UBS verb נגד meaning 'to report/tell/flow'."
+      "rationale": "Hebrew spatial relation ('before/opposite', Gen 2:18) is not the UBS verb נגד meaning 'to report/tell/flow'.",
+      "candidate_relation": "different_strong_same_consonants"
     },
     {
       "lang": "H",
@@ -190,7 +196,8 @@
           "verb"
         ]
       },
-      "rationale": "The source temporal adverb ('still', Ps 39:2) does not denote UBS H5749 verbal acts of testifying, warning, surrounding, or restoring."
+      "rationale": "The source temporal adverb ('still', Ps 39:2) does not denote UBS H5749 verbal acts of testifying, warning, surrounding, or restoring.",
+      "candidate_relation": "different_strong_same_consonants"
     },
     {
       "lang": "A",
@@ -215,7 +222,8 @@
           "verb"
         ]
       },
-      "rationale": "The Aramaic temporal adverb ('still', Dan 4:28) is not the UBS Hebrew verb H5749."
+      "rationale": "The Aramaic temporal adverb ('still', Dan 4:28) is not the UBS Hebrew verb H5749.",
+      "candidate_relation": "different_strong_same_consonants"
     },
     {
       "lang": "H",
@@ -245,7 +253,8 @@
           "dem.pron"
         ]
       },
-      "rationale": "Source prohibited/negative 'not' (Jer 51:3) is not UBS אֵל divine noun/demonstrative pronoun."
+      "rationale": "Source prohibited/negative 'not' (Jer 51:3) is not UBS אֵל divine noun/demonstrative pronoun.",
+      "candidate_relation": "different_strong_same_consonants"
     },
     {
       "lang": "H",
@@ -270,7 +279,8 @@
           "name"
         ]
       },
-      "rationale": "Hebrew uncooked/raw food in Exod 12:9 is not the UBS proper place-name נֹא/Thebes H4996."
+      "rationale": "Hebrew uncooked/raw food in Exod 12:9 is not the UBS proper place-name נֹא/Thebes H4996.",
+      "candidate_relation": "different_strong_same_consonants"
     },
     {
       "lang": "H",
@@ -295,7 +305,145 @@
           "noun m"
         ]
       },
-      "rationale": "The source preposition ('against', 1 Sam 2:10) is not UBS עֹל 'yoke' H5923."
+      "rationale": "The source preposition ('against', 1 Sam 2:10) is not UBS עֹל 'yoke' H5923.",
+      "candidate_relation": "different_strong_same_consonants"
+    },
+    {
+      "lang": "H",
+      "lemma": "רִמּוֹן",
+      "original_strong": "7417b",
+      "occurrences": 3,
+      "candidate_relation": "same_strong_family_unresolved",
+      "source_witness": {
+        "word_id": "o120050180091",
+        "reference": "2KI 5:18!9",
+        "original_sdbh": "006818002005000"
+      },
+      "source_classes": {
+        "noun": 3
+      },
+      "decision": "candidate_lexical_nonidentity",
+      "ubs_candidate": {
+        "main_id": "006826000000000",
+        "lemma": "רִמּוֹנוֹ",
+        "strong_codes": [
+          "H7417"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "rationale": "The original three witnesses in 2 Kings 5:18 name Rimmon, the Syrian deity worshipped in a temple by Naaman's master. The unique UBS Strong-family headword רִמּוֹנוֹ identifies a Levitical town of Zebulun, not this deity. Reject the sole town headword as a lexical referent for this source family. This says nothing about the other Rimmon 7417a family, which mixes place instances."
+    },
+    {
+      "lang": "H",
+      "lemma": "לַיִשׁ",
+      "original_strong": "3919a",
+      "occurrences": 4,
+      "candidate_relation": "same_strong_family_unresolved",
+      "source_witness": {
+        "word_id": "o070180070051",
+        "reference": "JDG 18:7!5",
+        "original_sdbh": "003585002001000"
+      },
+      "source_classes": {
+        "noun": 4
+      },
+      "decision": "candidate_lexical_nonidentity",
+      "ubs_candidate": {
+        "main_id": "003590000000000",
+        "lemma": "לַיְשָׁה",
+        "strong_codes": [
+          "H3919"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "rationale": "The original Judges 18 witnesses name Laish, the northern city captured and renamed Dan. The UBS candidate לַיְשָׁה 'Laishah' is explicitly a different Benjaminite location, not the northern city. A common Strong numeric family does not erase these distinct places."
+    },
+    {
+      "lang": "H",
+      "lemma": "שְׁכֶם",
+      "original_strong": "4026b",
+      "occurrences": 3,
+      "candidate_relation": "same_strong_family_unresolved",
+      "source_witness": {
+        "word_id": "o070090460051",
+        "reference": "JDG 9:46!5",
+        "original_sdbh": "007354002002000"
+      },
+      "source_classes": {
+        "noun": 3
+      },
+      "decision": "candidate_lexical_nonidentity",
+      "ubs_candidate": {
+        "main_id": "003689000000000",
+        "lemma": "מִגְדָּל",
+        "strong_codes": [
+          "H4026"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "rationale": "The original Judges 9:46, 9:47 and 9:49 words are Shechem, the second component of the place phrase 'tower of Shechem' (מִגְדַּל־שְׁכֶם). The UBS candidate מִגְדָּל H4026 means 'tower' or its whole named tower. Do not equate the Shechem component itself with the word tower; preserve original composition."
+    },
+    {
+      "lang": "H",
+      "lemma": "גּוֹי",
+      "original_strong": "2800a",
+      "occurrences": 3,
+      "candidate_relation": "same_strong_family_unresolved",
+      "source_witness": {
+        "word_id": "o070040020161",
+        "reference": "JDG 4:2!16",
+        "original_sdbh": "002574001001000"
+      },
+      "source_classes": {
+        "noun": 3
+      },
+      "decision": "candidate_lexical_nonidentity",
+      "ubs_candidate": {
+        "main_id": "002577000000000",
+        "lemma": "חֲרֹשֶׁת הַגּוֹיִם",
+        "strong_codes": [
+          "H2800"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "rationale": "The source at Judges 4:2, 4:13 and 4:16 is the plural 'nations/peoples' component of חֲרֹשֶׁת הַגּוֹיִם, whereas the single UBS headword identifies the full geographical name Harosheth-Haggoyim. The source component is not the whole proper-name headword; preserve both without conflation."
+    },
+    {
+      "lang": "H",
+      "lemma": "עֵמֶק",
+      "original_strong": "0425b",
+      "occurrences": 3,
+      "candidate_relation": "same_strong_family_unresolved",
+      "source_witness": {
+        "word_id": "o090170020062",
+        "reference": "1SA 17:2!6",
+        "original_sdbh": ""
+      },
+      "source_classes": {
+        "noun": 3
+      },
+      "decision": "candidate_lexical_nonidentity",
+      "ubs_candidate": {
+        "main_id": "000392000000000",
+        "lemma": "אֵלָה",
+        "strong_codes": [
+          "H0424",
+          "H0425"
+        ],
+        "parts_of_speech": [
+          "noun f",
+          "name"
+        ]
+      },
+      "rationale": "The source noun עֵמֶק means 'valley' in the original Valley of Elah phrase (1 Samuel 17:2, 17:19). The UBS candidate אֵלָה is the Elah location/tree/name entry, not the common-noun valley component. Do not treat the shared inherited name Strong as lexical equivalence."
     }
   ]
 }
