@@ -158,8 +158,8 @@ def build(candidate, ledger, residual, english, french):
         **candidate["word_aware_coverage"],
         "editorially_reviewed_original_word_headwords": 9186,
         "other_unapproved_word_headword_candidates": 1,
-        "word_aware_entry_candidate_words": 137311,
-        "remaining_no_ubs_headword_candidate_original_words": 430,
+        "word_aware_entry_candidate_words": candidate["word_aware_coverage"]["word_aware_entry_candidate_words"],
+        "remaining_no_ubs_headword_candidate_original_words": candidate["word_aware_coverage"]["remaining_no_ubs_headword_candidate_original_words"],
         "new_inferred_contextual_lexical_sense_ids": 0,
     }
     return output
