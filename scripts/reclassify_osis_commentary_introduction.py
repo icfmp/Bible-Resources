@@ -131,15 +131,24 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
     direct_preverse = list(book)[
         list(book).index(chapter_starts[0])+1:list(book).index(leading_p)]
     if title_plan is not None:
-        if (not isinstance(title_plan, dict)
-                or set(title_plan) != {"original_line","old_type","new_type"}
-                or type(title_plan["original_line"]) is not int
-                or not 1 <= title_plan["original_line"] <= 1000000
-                or not isinstance(title_plan["old_type"],str)
-                or not re.fullmatch(r"x-[a-z0-9-]{1,32}",title_plan["old_type"])
-                or title_plan["new_type"] != "chapter"
-                or len(direct_preverse) != 1):
-            raise IntroRepairError("Unattested chapter-heading classification plan")
+        # Separate schema validation from the source-shape check: never
+        # assume the plan is a dict when building a failure diagnostic.
+        if not isinstance(title_plan,dict):
+            raise IntroRepairError("Malformed chapter-heading plan object")
+        checks={
+            "keys": set(title_plan)=={"original_line","old_type","new_type"},
+            "line_type": type(title_plan.get("original_line")) is int,
+            "line_range": type(title_plan.get("original_line")) is int
+                          and 1 <= title_plan["original_line"] <= 1000000,
+            "old_type": isinstance(title_plan.get("old_type"),str)
+                        and re.fullmatch(r"x-[a-z0-9-]{1,32}",title_plan["old_type"]) is not None,
+            "new_type": title_plan.get("new_type")=="chapter",
+            "one_direct_preverse_title": len(direct_preverse)==1,
+        }
+        if not all(checks.values()):
+            # Fixed category names only; no original text or attribute values.
+            failed=",".join(sorted(k for k,v in checks.items() if not v))
+            raise IntroRepairError("Unattested chapter-heading classification plan ("+failed+")")
         title_node = direct_preverse[0]
         if (not isinstance(title_node.tag,str) or _local(title_node)!="title"
                 or title_node.getparent() is not book
