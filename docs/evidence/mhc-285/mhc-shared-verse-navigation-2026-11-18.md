@@ -1,5 +1,25 @@
 # MHC 2.2 — recover authentic dual commentary scopes without repeating source prose
 
+> **Superseded navigation checkpoint — 2026-11-19.** This document retains the
+> original experimental **7 → 2** multi-owner retrieval evidence for audit
+> reproducibility. It is **not** the final first-candidate navigation policy.
+> The owner subsequently approved whole-verse indexing **Romans 4:9–16 /
+> 4:17–22**, preserving both complete authored word streams but deliberately
+> not providing two verse-17 owner entries. The remaining distinct
+> **2 Chronicles 1 preface** has been moved into a genuine OSIS chapter
+> introduction (SWORD `2Chr.1.0`), with the separate 1:1–12 commentary
+> retained. The real private source→SWORD recompilation and native readback
+> [#44346559230](https://github.com/icfmp/Bible-Resources/actions/runs/44346559230)
+> passed this introduction classification without changing source prose,
+> punctuation, notes or references. Thus the corrected first candidate
+> does **not** require a reader-side proprietary dual-commentary sidecar.
+> The `1` remaining reader multiowner key in the intermediate
+> `mhc-shared-scope-review-private.json` plan is **pre-introduction-stage**
+> metadata, not the final compiled navigation result. No GUI or publication
+> acceptance is inferred. See the
+> [updated first-candidate decision record](mhc-first-candidate-decisions-2026-11-18.md).
+
+
 **Status (2026-11-18): private technical prototype on draft
 [PR #286](https://github.com/icfmp/Bible-Resources/pull/286), not
 a published index or a reader feature.**
