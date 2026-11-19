@@ -42,6 +42,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_composite_strong_original_words.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_composite_strong_headwords.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_word_coverage_invariants.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_hopote_headword.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -673,6 +674,43 @@ jobs:
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --output /tmp/bsi-ubs-greek-hopote-original-word-evidence.json
+      - name: Source-review original Greek temporal headword without changing conj or ADV annotations
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_hopote_headword.py \
+            --candidate /tmp/bsi-ubs-greek-reviewed-five-composite-private.json \
+            --residual /tmp/bsi-ubs-greek-173-original-word-evidence.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --evidence /tmp/bsi-ubs-greek-hopote-original-word-evidence.json \
+            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_hopote_temporal_headword.json \
+            --output /tmp/bsi-ubs-greek-reviewed-hopote-private.json
+          python3 -I entity-index/links/dictionaries/ubs-greek/validate_word_coverage_invariants.py \
+            --baseline entity-index/links/dictionaries/ubs-greek/index.json \
+            --candidate /tmp/bsi-ubs-greek-reviewed-hopote-private.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/bsi-ubs-greek-reviewed-hopote-private.json').read_text())
+          b=json.loads(Path('entity-index/links/dictionaries/ubs-greek/index.json').read_text())
+          assert all(x[k]==v for k,v in b.items())
+          assert len(x['by_macula_word'])==9195
+          assert len(x['by_macula_ambiguous_word'])==220
+          assert x['editorial_candidate']['reviewed_original_headword_words_total']==9195
+          assert x['editorial_candidate']['other_original_words_still_unapproved']==0
+          assert x['word_aware_coverage']['word_aware_entry_candidate_words']==137285
+          assert x['word_aware_coverage']['remaining_no_ubs_headword_candidate_original_words']==456
+          assert x['editorial_candidate']['publication_approved'] is False
+          assert x['editorial_candidate']['new_inferred_contextual_lexical_sense_ids']==0
+          assert all('sense_id' not in row for row in x['by_macula_word'].values())
+          print('GREEK_ALL_SOURCE_ATTESTED_HEADWORDS_REVIEWED_456_UBS_V1_0_MISSING_KEPT_UNLINKED')
+          PY
+      - name: Upload private Greek temporal word lexical headword review (NOT published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-hopote-temporal-word-headword-reviewed-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-reviewed-hopote-private.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload original Greek ὁπότε source grammatical evidence (PRIVATE)
         uses: actions/upload-artifact@v4
         with:
