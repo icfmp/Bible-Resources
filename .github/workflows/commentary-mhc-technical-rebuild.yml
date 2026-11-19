@@ -1680,11 +1680,13 @@ jobs:
       - name: Privately prove final MHC identity, metadata and entire binary corpus (no release)
         shell: bash
         timeout-minutes: 5
+        env:
+          MHC_STAGE_PRIVATE_ARTIFACT: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'release/mhc-0.1.0-staging-20261119' && contains(github.event.pull_request.body, '[stage-mhc-0.1.0]' ) }}
         run: |
           set -euo pipefail
           umask 077
           python - <<'PY'
-          import json,os,subprocess,sys
+          import json,os,shutil,subprocess,sys
           from hashlib import sha256
           from pathlib import Path
           from zipfile import ZipFile
@@ -1796,6 +1798,25 @@ jobs:
                       "module_published":False,
                       "release_authorized":False,
                     },sort_keys=True))
+              if os.environ.get("MHC_STAGE_PRIVATE_ARTIFACT")=="true":
+                  raw=root/"mhc-chapter-intro-private.osis.xml"
+                  if (promoted["release_zip_sha256"] !=
+                          "c8d70166dd569674e936874cd9a94809bceb9642a76af7220ef86f2b71af93b2"
+                          or promoted["release_zip_bytes"]!=16404517
+                          or sha256(raw.read_bytes()).hexdigest()!=
+                          "c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4"):
+                      raise SystemExit("MHC reviewed source or release ZIP digest drift")
+                  private=root/"mhc-owner-review-artifact"
+                  private.mkdir(mode=0o700)
+                  archive=private/"MHC-0.1.0.zip"
+                  source=private/"MHC-0.1.0.osis.xml"
+                  shutil.copyfile(candidate_zip,archive)
+                  shutil.copyfile(raw,source)
+                  (private/"SHA256SUMS.txt").write_text(
+                      sha256(archive.read_bytes()).hexdigest()+"  "+archive.name+"\n"
+                      +sha256(source.read_bytes()).hexdigest()+"  "+source.name+"\n",
+                      encoding="ascii")
+                  print("Pinned final MHC ZIP and source OSIS retained only for private review artifact")
           finally:
               source_zip.unlink(missing_ok=True)
               candidate_zip.unlink(missing_ok=True)
@@ -2272,6 +2293,14 @@ jobs:
           print("Research-only source endpoint and overlap candidate was"
                 " independently checked; original is still immutable")
           PY
+      - name: Retain owner-approved exact MHC release candidate as a private review artifact
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'release/mhc-0.1.0-staging-20261119' && contains(github.event.pull_request.body, '[stage-mhc-0.1.0]' ) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: MHC-0.1.0-release-review
+          path: ${{ runner.temp }}/mhc-owner-review-artifact/
+          if-no-files-found: error
+          retention-days: 7
       - name: No distribution or editorial phase in this workflow
         if: always()
         shell: bash
