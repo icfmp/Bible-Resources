@@ -86,7 +86,7 @@ But God does **not** treat us according to what our sins deserve.
 
 Job's complaint arose from a gloomy view of his circumstances.
 
-If God examined every part of our lives strictly for judgment, both body and soul would face his righteous sentence.
+If God strictly examined our steps and paths in judgment, **both body and soul would feel his righteous vengeance**.
 
 That will be the dreadful condition of unbelievers.
 
@@ -95,6 +95,8 @@ But **salvation has been planned, provided and revealed in Christ**.
 ---
 
 ## Editorial review — Job 13
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** The modern Job 13:23–28 weakened the original's *righteous vengeance* affecting **body and soul** into a general *righteous sentence*. Restored Henry's explicit language against [CCEL Job 13](https://ccel.org/ccel/henry/mhcc.xix.xiii.html), preserving the original's subsequent contrast with salvation in Christ. Exact native-text check and independent semantic acceptance pending.
 
 **Complete original-English secondary source directly checked:** [CCEL, Job 13](https://ccel.org/ccel/henry/mhcc.xix.xiii.html). Published pinned **MHCC 0.1.1** is still the source authority, requiring exact native SWORD/independent validation.
 
