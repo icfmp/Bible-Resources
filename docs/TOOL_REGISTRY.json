@@ -2815,9 +2815,6 @@
       "stage_hint": "not determined",
       "static_reference_count": 12,
       "static_references": [
-        ".github/workflows/commentary-modern-source-receipt.yml",
-        ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
-        ".github/workflows/commentary-xiphos-dual-reader.yml",
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_android_text_witness.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
@@ -2826,6 +2823,9 @@
         "scripts/commentary_source_erratum_compiled_probe.py",
         "scripts/commentary_stock_andbible_android.py",
         "scripts/commentary_xiphos_heading_probe.py",
+        ".github/workflows/commentary-modern-source-receipt.yml",
+        ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
+        ".github/workflows/commentary-xiphos-dual-reader.yml",
         "tests/test_commentary_xiphos_dual_reader.py"
       ]
     },
@@ -3944,8 +3944,6 @@
       "stage_hint": "not determined",
       "static_reference_count": 14,
       "static_references": [
-        ".github/workflows/commentary-modern-source-receipt.yml",
-        ".github/workflows/lsg-fidelity.yml",
         "scripts/audit_real_pilot.py",
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
@@ -3957,6 +3955,8 @@
         "scripts/pilot_runtime.py",
         "scripts/private_sword_bundle.py",
         "scripts/probe_lsg_v11n.py",
+        ".github/workflows/commentary-modern-source-receipt.yml",
+        ".github/workflows/lsg-fidelity.yml",
         "tests/test_pilot_subprocess.py"
       ]
     },
