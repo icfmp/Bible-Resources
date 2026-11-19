@@ -85,7 +85,13 @@ def review_ledger(ledger, source_report, english, french):
         # Absence is not evidence of a different grammatical class. If the
         # original headword DOES label it, reject a contradictory category;
         # verify the original MACULA source word is a pronoun separately.
-        if parts and not any("pron" in part for part in parts):
+        # The original UBS Greek edition uses lexicographic POS abbreviations:
+        # pprs. (personal pronoun), pdem. (demonstrative pronoun). Never
+        # mistake these source abbreviations for unclassified or non-pronouns.
+        if parts and not any(
+            "pron" in part or part.rstrip(".") in ("pprs", "pdem")
+            for part in parts
+        ):
             raise ValueError(
                 "Original UBS entry POS classification differs from pronoun expectation: " + mid + " " + repr(sorted(parts))
             )
