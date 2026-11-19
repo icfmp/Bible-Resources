@@ -1112,3 +1112,27 @@ application is required to consume it. Subsequent work should review the
 remaining words individually, then explicitly apply only verified original
 word-ID anchored links to a new generated index with full-regeneration
 tests. No global Strong alias or original source correction is licensed.
+
+### Exact WLC census for every positive editorial headword family
+
+The [pinned original-word evidence report](positive_family_pending_original_words.json)
+enumerates **all 274 original WLC lexical occurrences** across the 81
+independently reviewed UBS headword families. It separates the **139 exact
+word IDs** already in the nonpublished entry-only preview from **135 further
+original source words** needing individual lexical review. Those 135 words
+occur in just 20 families, principally Daniel (49), Aramaic human/person
+(22) and day/time (13).
+
+Every pending occurrence retains its **exact original WLC Unicode lemma**,
+full Strong, original SDBH, word ID, verse/position, MACULA English, POS,
+morphology and source lexical class. A [read-only generator](
+audit_positive_family_unwitnessed.py) checks all family cardinalities and
+previously witnessed word IDs against the pinned original MACULA TSV. The
+existing UBS CI verifies the entire committed report is reproduced exactly,
+and synthetic tests reject missing/modified WLC words and existing links.
+
+This report **does not approve** any of the 135 pending words, does not
+infer UBS contextual senses, and does not alter the immutable crosswalk
+or original corpus. Any additional entries require independent word-specific
+editorial evidence; a family-wide positive decision is not a licence to
+assume all contexts mean the same thing.
