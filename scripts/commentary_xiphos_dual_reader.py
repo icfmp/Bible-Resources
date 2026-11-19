@@ -609,6 +609,39 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
     }
 
 
+def _observe_real_xiphos_with_bounded_retries(
+    env: dict, comparisons: dict[str, dict]
+) -> dict:
+    """Retry real passage selection, never substitute process startup for GUI text.
+
+    GTK/WebKit can show an already-visible Xiphos window before its text pane
+    accepts real X11 actions. Keep each attempt independent: the clipboard
+    is reseeded and every accepted excerpt must match real SWORD text.
+    """
+    best = None
+    counts = []
+    for attempt in range(3):
+        if attempt:
+            time.sleep(1.5)
+            _dismiss_transient_xiphos_notice(env)
+        observed = attempt_real_xiphos_passage_copy(env, comparisons)
+        count = observed["independent_gui_commentary_excerpt_match_count"]
+        counts.append(count)
+        if (best is None
+                or count > best["independent_gui_commentary_excerpt_match_count"]
+                or (count == best["independent_gui_commentary_excerpt_match_count"]
+                    and observed["actual_passage_commands_accepted"]
+                    and not best["actual_passage_commands_accepted"])):
+            best = observed
+        if count == len(comparisons) and observed["actual_passage_commands_accepted"]:
+            break
+    return {
+        **best,
+        "bounded_real_gui_selection_attempts": len(counts),
+        "independent_excerpt_match_counts_by_real_attempt": counts,
+    }
+
+
 def _await_xiphos_visible_window(app, display, env: dict, *, seconds: int) -> None:
     """Bounded real X11 readiness, never substitute process survival for GUI.
 
@@ -707,7 +740,7 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
         # before accepting real, passage-specific Xiphos clipboard evidence.
         time.sleep(1)
         _dismiss_transient_xiphos_notice(env)
-        inspection = attempt_real_xiphos_passage_copy(env, comparisons)
+        inspection = _observe_real_xiphos_with_bounded_retries(env, comparisons)
         after = on_gui_ready(env) if on_gui_ready is not None else {}
         if not isinstance(after, dict):
             raise PilotError("Invalid private real-Xiphos post-readback observation")
