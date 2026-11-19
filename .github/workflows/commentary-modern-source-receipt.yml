@@ -4553,6 +4553,9 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-proposed-link-correction-dispositions.json
             ${{ runner.temp }}/mhcc-modern-complete-bounded-linked-osis-structure.json
             ${{ runner.temp }}/mhcc-modern-private-preface-original-crossref-receipt.json
+            ${{ runner.temp }}/mhcc-modern-private-release-candidate-preflight.json
+            ${{ runner.temp }}/mhcc-modern-private-rc-metadata-only.json
+            ${{ runner.temp }}/mhcc-modern-strict-primary-only-receipt.json
             ${{ runner.temp }}/mhcc-modern-compiled-body-text-parity-diagnostic.json
             ${{ runner.temp }}/mhcc-modern-source-matched-links-native-SWORD-readback.json
             ${{ runner.temp }}/mhcc-modern-complete-unlinked-osis-structure.json
