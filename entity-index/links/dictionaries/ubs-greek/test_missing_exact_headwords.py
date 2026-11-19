@@ -15,7 +15,7 @@ class GreekMissingUBSHeadwordsTests(unittest.TestCase):
                "BaseForms": [{"LEXMeanings": [{"LEXEntryCode": "1.89"}]}]}]
         fr = copy.deepcopy(en)
         result = MOD["entries_with_codes"](en, fr)
-        self.assertEqual(result[2]["πόλις"], {"00001"})
+        self.assertEqual(result[2][MOD["nfc"]("πόλις").casefold()], {"00001"})
         self.assertEqual(result[3]["G4172"], {"00001"})
         self.assertEqual(result[4]["1.89"], {"00001"})
 
