@@ -72,7 +72,7 @@ def review_ledger(ledger, report, english, french):
         pos = {str(p).lower().rstrip(".") for form in e.get("BaseForms") or []
                for p in form.get("PartsOfSpeech") or []}
         if "verb" not in pos:
-            raise ValueError("Original UBS Greek lexical POS not attested as verb")
+            raise ValueError("Original UBS Greek lexical POS not attested as verb: " + repr(sorted(pos)))
     return review, mid, disposition
 
 
