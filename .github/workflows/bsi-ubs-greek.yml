@@ -665,6 +665,21 @@ jobs:
               --baseline entity-index/links/dictionaries/ubs-greek/index.json \
               --candidate "$path"
           done
+      - name: Independently audit exact Greek ὁπότε source word and original UBS bilingual POS
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_hopote_original_word.py \
+            --candidate /tmp/bsi-ubs-greek-reviewed-five-composite-private.json \
+            --residual /tmp/bsi-ubs-greek-173-original-word-evidence.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-hopote-original-word-evidence.json
+      - name: Upload original Greek ὁπότε source grammatical evidence (PRIVATE)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-hopote-original-word-POS-evidence-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-hopote-original-word-evidence.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload reviewed Greek composite Strong word heads (PRIVATE, NOT published)
         uses: actions/upload-artifact@v4
         with:
