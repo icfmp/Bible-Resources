@@ -47,6 +47,7 @@ jobs:
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_shared_key_retrieval.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_reclassify_osis_commentary_introduction.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_xiphos_dual_reader.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_xiphos_heading_probe.py' -v
       - name: Install stock libSWORD compiler and native reader headers
         shell: bash
         run: |
@@ -1694,6 +1695,9 @@ jobs:
           from commentary_xiphos_dual_reader import (
               _run_real_gui, verify_and_install_reviewed_bible
           )
+          from commentary_xiphos_heading_probe import (
+              probe_real_xiphos_commentary_heading_menu
+          )
           from pilot_subprocess import query,present_key
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           root=Path(os.environ["RUNNER_TEMP"])
@@ -1801,8 +1805,23 @@ jobs:
               "commentary_internal":intro_native_samples["following_verse"],
               "intro_expected":intro_expected,
           }
+          def inspect_real_chapter_intro_context(gui_env):
+              # Source-authenticated native chapter-introduction I frame;
+              # never infer an introduction from ordinary verse K content.
+              observed=probe_real_xiphos_commentary_heading_menu(
+                  gui_env,
+                  {"chapter": {
+                      "raw":intro_native_samples["chapter_intro"],
+                      "reference":"2Chr 1:1",
+                      "ordinary_first_verse":
+                          intro_native_samples["following_verse"],
+                  }},
+                  ordinary_first_verse=intro_native_samples["following_verse"],
+              )
+              return {"private_2Chr_chapter_heading_menu_witness":observed}
           result=_run_real_gui(work,comparisons,seconds=12,
-                               commentary_module_id=module)
+                               commentary_module_id=module,
+                               on_gui_ready=inspect_real_chapter_intro_context)
           matches=sum(result["commentary_clipboard_match_by_passage"].get(p,False)
                       for p in source_line_by_passage)
           if not 0<=matches<=3:
@@ -1862,6 +1881,13 @@ jobs:
               "chapter_intro_prose_found_in_real_GUI_clipboard":
                   bool(result["chapter_intro_prose_clipboard_match_by_passage"].get(
                       intro_passage,False)),
+              "2Chr_chapter_heading_real_GUI_observation":
+                  result["private_2Chr_chapter_heading_menu_witness"][
+                      "book_and_chapter_menu_observations"].get(
+                          "chapter",{}),
+              "chapter_intro_found_in_normal_chapter_GUI":
+                  result["private_2Chr_chapter_heading_menu_witness"][
+                      "original_intro_in_normal_chapter_GUI_verified"],
               "following_2Chr_1_1_exposition_gui_excerpt_matched":
                   bool(result["commentary_clipboard_match_by_passage"].get(
                       intro_passage,False)),
