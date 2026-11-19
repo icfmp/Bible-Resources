@@ -45,7 +45,7 @@ Job found some comfort, though little.
 
 He expected death to end his trials.
 
-God might permit him to die under suffering, but his soul would be **safe and happy in the world of spirits**.
+**God's wrath might bring him to death**, but his soul would be **safe and happy in the world of spirits**.
 
 Even if no human being pities us, God both **corrects and pities his children**, as a father does.
 
@@ -56,6 +56,8 @@ There the believer's mourning will end and be replaced by joyful praise for **re
 ---
 
 ## Editorial review — Job 30
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** Verses 15–31 formerly softened Henry's explicit possibility that **God's wrath might bring Job to death** to the weaker formulation that God might *permit* death amid suffering. Restored Henry's precise divine-agency language without denying the separate affirmation that Job's soul would be safe. Compared with [CCEL Job 30](https://ccel.org/ccel/henry/mhcc.xix.xxx.html). Original native K wording and independent semantic approval pending; no source, scope or reference modification.
 
 **Whole secondary source directly read:** [CCEL, Job 30](https://ccel.org/ccel/henry/mhcc.xix.xxx.html). Exact published **MHCC 0.1.1** remains original; native SWORD and independent sign-off pending.
 
