@@ -87,7 +87,7 @@ def review_ledger(ledger, source_report, english, french):
         # verify the original MACULA source word is a pronoun separately.
         if parts and not any("pron" in part for part in parts):
             raise ValueError(
-                "Original UBS entry contradicts the source pronoun class: " + mid
+                "Original UBS entry POS classification differs from pronoun expectation: " + mid + " " + repr(sorted(parts))
             )
         verified_ln = {
             item.get("LEXEntryCode")
