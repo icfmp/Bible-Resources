@@ -1447,6 +1447,42 @@ jobs:
           remote=[(kind,key) for kind,key in changed_keys+removed_keys
                   if not (kind=="I" and key in {"2Chr.1", "2Chr.1.0"})
                   and not (kind=="K" and key.startswith("2Chr.1."))]
+          from collections import Counter
+          by_kind=Counter(kind for kind,_ in remote)
+          by_book=Counter(key.split(".")[0] for _,key in remote)
+          by_presence=Counter()
+          by_markup=Counter()
+          parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                                 no_network=True,recover=False,huge_tree=True)
+          for kind,key in remote:
+              pre=old.get((kind,key))
+              post=new.get((kind,key))
+              if pre is None or post is None:
+                  by_presence["changed_presence"]+=1
+                  continue
+              try:
+                  old_xml=etree.fromstring(b"<fragment>"+pre+b"</fragment>",parser)
+                  new_xml=etree.fromstring(b"<fragment>"+post+b"</fragment>",parser)
+              except etree.XMLSyntaxError:
+                  by_markup["fragment_not_comparable"]+=1
+                  continue
+              if "".join(old_xml.itertext()) == "".join(new_xml.itertext()):
+                  by_markup["exact_unicode_text_identical"]+=1
+              else:
+                  by_markup["text_changed"]+=1
+              if ([(x.tag,dict(x.attrib)) for x in old_xml.iter() if isinstance(x.tag,str)] ==
+                  [(x.tag,dict(x.attrib)) for x in new_xml.iter() if isinstance(x.tag,str)]):
+                  by_markup["xml_tags_attributes_identical"]+=1
+              else:
+                  by_markup["xml_tag_or_attribute_changed"]+=1
+          # Original prose never appears in this evidence: only the native
+          # OSIS address, counts, and structure/text EQUALITY flags.
+          print("2Chr title source→native unexpected remote key diagnosis:",
+                json.dumps({"kinds":dict(by_kind),"books":dict(sorted(by_book.items())),
+                            "presence":dict(by_presence),
+                            "semantic_flags":dict(by_markup),
+                            "first_native_addresses":sorted(remote)[:24],
+                            "remote_count":len(remote)},sort_keys=True))
           print("Actual private compiled 2Chr 1 intro placement (metadata only):",
                 {"before_intro_entries":old_counts["actual_occupied_intro_entry_count"],
                  "after_intro_entries":new_counts["actual_occupied_intro_entry_count"],
