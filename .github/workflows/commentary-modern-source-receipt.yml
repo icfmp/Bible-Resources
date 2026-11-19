@@ -2603,6 +2603,56 @@ jobs:
                   or not receipt["no_original_inline_placement_claim"]
                   or receipt["publication_authorized"]):
               raise ValueError("Authored intro/source-K linked reference coverage is incomplete")
+          # All outstanding original source K/ordinal occurrences must be
+          # explicitly documented source-link anomalies. Never publish
+          # silently incorrect digital targets or invent exact inline
+          # locations in the modern commentary to make a counter pass.
+          anomalies=json.loads(Path(
+              "work/mhcc-modern/production/ADDITIONAL_ORIGINAL_LINK_TARGET_ERRATA_2026-11-18.json"
+              ).read_text(encoding="utf-8"))
+          if (anomalies["status"] !=
+                  "ORIGINAL_DIGITAL_SOURCE_LINK_DISCREPANCIES_REVIEW_ONLY_NOT_APPLIED"
+              or anomalies["original_corpus_sha256"]!=
+                  native["original_compiled_corpus_sha256"]
+              or anomalies["proposed_navigation_approved"] is not False):
+              raise ValueError("Unapproved source-native digital-link errata manifest changed")
+          to_review=set()
+          for x in anomalies["cases"]:
+              if x.get("approval") is not False:
+                  raise ValueError("Original erroneous source target was implicitly approved")
+              key=(x["source_first_key"],x["source_reference_ordinal"],
+                   x["original_target_sha256"])
+              if key in to_review:
+                  raise ValueError("Duplicate source K/ordinal errata case")
+              to_review.add(key)
+          still_source_notes={
+              (group["source_first_key"],x["source_reference_ordinal"],
+               x["source_original_literal_target_sha256"])
+              for group in receipt["remaining_notes_by_original_first_K"]
+              for x in group["source_note_reference_hashes"]}
+          if not to_review or still_source_notes!=to_review:
+              raise ValueError("Unreviewed missing original link or proposed error applied without approval")
+          source_ledger=reports["source_original_link_review_ledger"]
+          compact=reports["private_exact_compact_reference_recovery"]
+          headings=reports["private_source_owned_heading_range_recovery"]
+          local=reports["private_implicit_original_K_verse_mentions"]
+          outline=reports["private_first_K_outline_verse_navigation"]
+          carried=(source_ledger["source_link_occurrences_verified_in_derived_osis"]+
+                   compact["original_exact_compact_verse_links_restored"]+
+                   headings["source_original_links_restored_to_matching_modern_K_headings"]+
+                   headings["source_original_partial_ranges_restored_in_K_exposition"]+
+                   local["local_verse_references_recovered_in_authored_modern_prose"]+
+                   outline["source_first_K_outline_verse_links_recovered"]+
+                   receipt["original_source_link_occurrences_moved_to_modern_book_intro"])
+          if (carried+len(to_review)+
+                 source_ledger["source_spurious_link_occurrences_explicitly_omitted"]+
+                 4!=source_ledger["original_native_reference_elements"]):
+              raise ValueError("Original native 1,204 hyperlink inventory not fully accounted for")
+          print("PRIVATE COMPLETE ORIGINAL LINK DISPOSITION: "+str(carried)+
+                " source-authenticated navigable placements; "+str(len(to_review))+
+                " original digital/printed citation anomalies pending editor approval; "+
+                "9 source spurious and 4 separately withheld source errors; "+
+                "no unverified missing-link remainder, no publication")
           (base/"mhcc-modern-private-prefaces-plus-recovered-original-crossrefs.osis.xml").write_bytes(linked)
           (base/"mhcc-modern-private-preface-original-crossref-receipt.json").write_text(
               json.dumps(receipt,sort_keys=True,indent=2)+"\n",encoding="utf-8")
