@@ -41,7 +41,7 @@ COUNTS = {
     "no_nfc_identical_ubs_lemma": 459,
     "multiple_nfc_identical_ubs_headwords_unresolved": 0,
     "unsupported_original_compound_strong": 5,
-    "original_missing_families": 246,
+    "original_missing_families": 238,
 }
 
 
