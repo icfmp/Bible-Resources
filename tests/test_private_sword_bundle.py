@@ -71,12 +71,12 @@ class PrivateSwordBundleTests(unittest.TestCase):
         # This is the ordinary source-based osis2mod -s 4 output shape;
         # do not add a module-specific exception just to pass packaging.
         self.conf.write_text(
-            "[PrivateExample]\\n"
-            "DataPath=./modules/comments/zcom4/privateexample\\n"
-            "ModDrv=zCom4\\n"
-            "BlockType=CHAPTER\\n"
-            "SourceType=OSIS\\n"
-            "Lang=en\\n",
+            "[PrivateExample]\n"
+            "DataPath=./modules/comments/zcom4/privateexample\n"
+            "ModDrv=zCom4\n"
+            "BlockType=CHAPTER\n"
+            "SourceType=OSIS\n"
+            "Lang=en\n",
             encoding="utf-8")
         for existing in self.data.iterdir():
             existing.unlink()
@@ -101,8 +101,8 @@ class PrivateSwordBundleTests(unittest.TestCase):
                     "/modules/comments/zcom4/privateexample"):
             with self.subTest(path=bad):
                 self.conf.write_text(
-                    "[PrivateExample]\\nDataPath="+bad+
-                    "\\nModDrv=zCom4\\n", encoding="utf-8")
+                    "[PrivateExample]\nDataPath="+bad+
+                    "\nModDrv=zCom4\n", encoding="utf-8")
                 with self.assertRaises(PilotError):
                     _validate_package_files(self.root,self.id)
 
