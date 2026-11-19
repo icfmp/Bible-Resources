@@ -18,7 +18,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 - HISTORICAL/ARCHIVE: 9
 - KEEP_GENERIC: 26
 - MERGE: 10
-- UNDECIDED: 118
+- UNDECIDED: 119
 
 ## All tracked tools
 
@@ -148,6 +148,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/repair_osis_source_bytes.py`](../scripts/repair_osis_source_bytes.py) | UNDECIDED | named test | 10 | not determined |
 | [`scripts/repair_osis_unlinked_reference_labels.py`](../scripts/repair_osis_unlinked_reference_labels.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 12 | publication/release |
+| [`scripts/reviewed_osis_commentary_rebuild.py`](../scripts/reviewed_osis_commentary_rebuild.py) | UNDECIDED | not established | 1 | publication/release |
 | [`scripts/select_sources.py`](../scripts/select_sources.py) | UNDECIDED | not established | 5 | not determined |
 | [`scripts/smoke.py`](../scripts/smoke.py) | UNDECIDED | named test | 10 | not determined |
 | [`scripts/source_native_division_markers.py`](../scripts/source_native_division_markers.py) | UNDECIDED | named test | 4 | not determined |
