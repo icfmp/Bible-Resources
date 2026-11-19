@@ -98,20 +98,35 @@
       "private_zip_destroyed": true,
       "published": false
     },
-    "final_MHC_id_metadata_only_promotion_status": "awaiting_separate_full_native_identity_proof"
+    "final_MHC_id_metadata_only_promotion_status": "passed_exact_full_native_and_binary_identity",
+    "final_MHC_private_id_proof": {
+      "run": "https://github.com/icfmp/Bible-Resources/actions/runs/44544830593",
+      "module_id": "MHC",
+      "edition_version": "0.1.0",
+      "distribution_license": "Public Domain",
+      "standard_zip_members": 7,
+      "private_zip_sha256": "c8d70166dd569674e936874cd9a94809bceb9642a76af7220ef86f2b71af93b2",
+      "private_zip_size_bytes": 16404517,
+      "all_32355_native_entries_identical": true,
+      "compressed_source_binary_data_members_identical": true,
+      "independent_installed_reader_passages_passed": 4,
+      "zip_destroyed_in_ephemeral_runner": true,
+      "published": false
+    }
   },
   "release_gate": {
     "status": "awaiting_final_reader_and_publication_authorization",
     "blocking_requirements": [
       "owner/editorial publication authorization",
       "clicked link navigation, representative title/note/paragraph GUI presentation, or explicitly documented partial-reader acceptance",
-      "fresh final release candidate integrity and metadata check"
+      "reconcile draft branch with latest main and revalidate final production package before release"
     ],
     "prohibited_actions_before_release": [
       "upload MHC full OSIS or SWORD archive",
       "merge release PR",
       "publish or add to downloadable catalog"
-    ]
+    ],
+    "technical_package_candidate_verified": true
   },
   "notes": "Technical evidence is bound to each listed historic successful workflow and the exact pinned source. This is a metadata-only release-readiness receipt, not a downloadable build, checksum of a final production package, or legal determination."
 }
