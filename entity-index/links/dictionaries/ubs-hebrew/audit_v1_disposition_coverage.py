@@ -125,7 +125,15 @@ def collect(register, scope, ledgers, index=None):
                     "preserve_composite_source_code_pending_original_annotation_review"
                     or "|" not in f["original_strong"]):
                 raise ValueError(f"{source}: composite Strong was altered")
-        if decision.get("source_data_modified") is not False:
+        # The original negative-candidate ledger predates the explicit
+        # no-mutation flag. Its read-only source verifier independently
+        # validates original MACULA words. Missing legacy flag means no
+        # mutation was requested, never permission to modify originals.
+        if source == "lexical_nonidentity_rejections":
+            changed = decision.get("source_data_modified", False)
+        else:
+            changed = decision.get("source_data_modified")
+        if changed is not False:
             raise ValueError(f"{source}: source modification was not forbidden")
         seen[key] = source
         counted[source + "_families"] += 1
