@@ -589,12 +589,20 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                         item.get("commentary_internal", b""), b"", None
                     ) for key, item in comparisons.items()
                 },
+                "chapter_intro_prose_clipboard_match_by_passage": {
+                    key: False for key, item in comparisons.items()
+                    if item.get("intro_expected")
+                },
                 "independent_gui_commentary_excerpt_match_count": 0}
     result = {}
     failures = {}
     copied_sizes = {}
     focus_attempts = {}
     markup_by_passage = {}
+    intro_matches = {
+        key: False for key, item in comparisons.items()
+        if item.get("intro_expected")
+    }
     accepted = True
     try:
         right_side_points = _commentary_pane_focus_points(env, window)
@@ -652,7 +660,18 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                     originals.get("commentary_internal", b""),
                     selected, _optional_real_rich_xiphos_selection(env),
                 )
-                if result[ref]:
+                if ref in intro_matches:
+                    # The expected chapter preface must originate from the
+                    # independently read SWORD introduction entry. This
+                    # observer never creates or reconstructs authorial prose.
+                    intro_matches[ref] = (
+                        intro_matches[ref] or
+                        _long_commentary_excerpt_is_on_gui_clipboard(
+                            originals["intro_expected"], originals["bible"],
+                            selected,
+                        )
+                    )
+                if result[ref] and (ref not in intro_matches or intro_matches[ref]):
                     break
         except PilotError:
             accepted = False
@@ -671,6 +690,7 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
         "copied_gui_clipboard_byte_count_by_passage": copied_sizes,
         "bounded_right_commentary_pane_focus_attempts_by_passage": focus_attempts,
         "real_markup_rendering_observation_by_passage": markup_by_passage,
+        "chapter_intro_prose_clipboard_match_by_passage": intro_matches,
         "independent_gui_commentary_excerpt_match_count": sum(result.values()),
     }
 
