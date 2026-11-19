@@ -1,5 +1,14 @@
 # MHC 2.2: prepared rights clarification requests (NOT SENT)
 
+> **Archived, not actionable (owner decision 2026-11-19).** The project
+> owner has accepted CrossWire's official MHC 2.2 “Public Domain — Copy
+> Freely” declaration as the distribution and technical-correction rights
+> basis. These letters were prepared earlier as a contingency and remain
+> **UNSENT**. **Do not send them as a prerequisite or block MHC delivery
+> pending a CCEL response.** Historical draft text is retained solely for
+> provenance of the prior review.
+>
+
 **Status: UNSENT / no permission received.** Prepared for repository owner review before contacting third parties; no source XML, binary or protected text attached. Do not infer rights approval from this document.
 
 ## 1. CrossWire module maintainers
