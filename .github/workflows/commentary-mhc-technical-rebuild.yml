@@ -1705,7 +1705,9 @@ jobs:
                   or plan["sword_id"]!=final or plan["module_driver"]!="zCom4"
                   or plan["upstream_module"]["original_authoring_osis_sha256"]!=
                      manifest["commentary_source"]["original_authoring_osis"]["authoring_osis_sha256"]
-                  or rights["status"]!="project_distribution_rights_approved_from_crosswire_public_domain"
+                  or rights["status"]!="research_only"
+                  or rights["owner_approved"] is not False
+                  or "CrossWire MHC 2.2" not in rights.get("rights_review_decision","")
                   or rights.get("owner_publication_approved") is not False
                   or plan["publication"]["owner_publication_authorization"]):
               raise SystemExit("Final private MHC identity/rights metadata not source-attested")
