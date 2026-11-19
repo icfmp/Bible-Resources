@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/commentary-mhc-private-jsword.yml'
       - 'tests/java/org/icfmp/research/CommentaryPrivateAliasJSwordProbeTest.java'
+      - 'scripts/commentary_osis_mixed_transport_probe.py'
+      - 'tests/test_commentary_osis_mixed_transport_probe.py'
   workflow_dispatch:
 
 permissions:
@@ -33,6 +35,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install -r requirements.txt
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_osis_mixed_transport_probe.py' -v
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
           timeout 150s sudo apt-get -o Acquire::Retries=0 \
@@ -81,6 +84,14 @@ jobs:
           report=json.loads((root/"mhc-complete-private-jsword-evidence.json").read_text())
           full=report["private_complete_original_index_alias_rebuild"]
           engine=full["private_pinned_andbible_jsword_alias_probe"]
+          diagnosis={
+              "engine_verified": engine.get("independent_engine_verified"),
+              "gradle_failure_category": engine.get("gradle_failure_category"),
+              "gradle_exit_code": engine.get("gradle_exit_code"),
+              "junit_report_present": engine.get("junit_report_present"),
+          }
+          print("Independent private JSword execution (fixed metadata only):",
+                json.dumps(diagnosis,sort_keys=True))
           assert full["readback_completed"] is True
           assert full["source_numbered_K_coverage"]["source_keys_present"] == 31098
           assert full["source_intro_I_coverage"]["source_keys_present"] == 1255
