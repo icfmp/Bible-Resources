@@ -487,3 +487,39 @@ candidate is not a new UBS headword.
 meaning with the UBS `קלה` H7033 source entry, which includes a sense
 'be degraded'. Similar Strong differences alone do not justify a negative
 judgment. This remains for positive-identity review rather than a guessed link.
+
+### Deliberate abstentions where one original Strong family has multiple UBS headwords
+
+For the pinned UBS Hebrew 0.9.4 / MACULA WLC source pair, the
+[v1 multiple-headword abstention ledger](v1_multi_headword_abstentions.json)
+records **40 original lexical families / 275 source occurrences** where
+**at least two distinct UBS headwords** occur in the *same* original-language
+numeric Strong family. The ten largest families account for 241 occurrences,
+including `קׇרְבָּן` H7133 (80), `זָנָה` H2181 (60), and
+`תֹּולַעַת` H8438 (38).
+
+The editorial *choice for this frozen v1 review* is to **retain these families
+unlinked** instead of picking a first headword, conflating the distinct
+dictionary records, or guessing contextual sense equivalence. This is a
+documented **abstention**, not a declaration of lexical nonidentity, dictionary
+absence, or a source correction. Future positive mappings must independently
+review actual word context, candidate meaning and source edition identity.
+Some families might be resolvable with sufficient evidence; the mere
+presence of multiple candidates does not prove permanent ambiguity.
+
+The [independent read-only verifier](verify_multi_headword_abstentions.py)
+checks the exact 40 family keys, original occurrence counts, source word-ID /
+reference / SDBH witnesses, candidate sets, original dictionary Strong
+metadata, and pinned MACULA words. CI rejects source revision drift and any
+attempt to convert an abstention into an approved entry or sense mapping.
+The generated lexical family register remains an **algorithmic** baseline,
+without falsely marking automatic triage as manual validation.
+
+Together with 11 independently rejected false-homograph candidates (1,809
+occurrences), this establishes **51 explicitly recorded conservative v1
+dispositions / 2,084 in-scope source occurrences**. The **remaining
+146 families / 565 occurrences** need their own evidence-based editorial
+dispositions. All **240,098 / 248,680** verified original lexical source
+links and the **98.909%** edition-attested headword coverage remain unchanged.
+Do not label v1.0 as released without the separate approval gate in [#366](
+https://github.com/icfmp/Bible-Resources/issues/366).
