@@ -670,12 +670,35 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
         time.sleep(1.5)
         if display.poll() is not None:
             raise PilotError("Actual virtual Xiphos display did not start")
-        app = subprocess.Popen(
-            ["dbus-run-session", "--", "xiphos"], env=env,
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-            start_new_session=True,
-        )
-        _await_xiphos_visible_window(app, display, env, seconds=seconds)
+        # Keep GUI startup diagnostics private to the disposable runner home.
+        # A missing window is not evidence of defective commentary content.
+        startup_log = home / "xiphos-startup.stderr"
+        with startup_log.open("wb") as errors:
+            app = subprocess.Popen(
+                ["dbus-run-session", "--", "xiphos"], env=env,
+                stdout=subprocess.DEVNULL, stderr=errors,
+                start_new_session=True,
+            )
+            try:
+                _await_xiphos_visible_window(app, display, env, seconds=seconds)
+            except PilotError as exc:
+                # Report only diagnostic classes, never raw text or Bible content.
+                diagnostic = startup_log.read_text(
+                    encoding="utf-8", errors="replace"
+                ).casefold()
+                categories = [
+                    label for label, pattern in (
+                        ("gtk", "gtk"), ("webkit", "webkit"),
+                        ("display", "cannot open display"),
+                        ("dbus", "dbus"), ("segfault", "segmentation fault"),
+                        ("sword", "sword"), ("missing-library", "shared libraries"),
+                    ) if pattern in diagnostic
+                ]
+                raise PilotError(
+                    "Xiphos GUI not visible; launcher_exit=" +
+                    str(app.poll()) + "; startup_diagnostic_categories=" +
+                    (",".join(categories) if categories else "none")
+                ) from exc
         # Allow the already-visible GTK main window to finish initial layout
         # before accepting real, passage-specific Xiphos clipboard evidence.
         time.sleep(1)
