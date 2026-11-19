@@ -22,7 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Offline regression tests
-        run: python3 -I entity-index/links/dictionaries/ubs-greek/test_index.py
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_index.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_source_gaps.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -64,3 +66,17 @@ jobs:
           assert actual["coverage"]["with_corresponding_sense_candidates"]==118272
           print("BSI_UBS_GREEK_INDEX_VERIFIED",actual["statistics"],actual["coverage"])
           PY
+      - name: Census all 9,651 original unlinked Greek words and NFC/UBS-LN witnesses
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_source_gaps.py \
+            --index entity-index/links/dictionaries/ubs-greek/index.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output /tmp/bsi-ubs-greek-original-gap-review.json
+      - name: Upload original-source Greek lexical evidence (private review, NOT published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-unapproved-5938-source-word-preview
+          path: /tmp/bsi-ubs-greek-original-gap-review.json
+          retention-days: 14
