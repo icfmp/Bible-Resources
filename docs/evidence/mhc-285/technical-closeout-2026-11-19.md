@@ -23,6 +23,18 @@
 6. Pinned AndBible release JSword source built and read real private index aliases successfully. This is an **index/parser test**, not an Android app GUI test. [Run #44528218903](https://github.com/icfmp/Bible-Resources/actions/runs/44528218903).
 7. Source text, compiled binary and 48 MB original OSIS were **not committed/published/uploaded as Actions artifacts**. Compiled comparison candidates live only in the ephemeral GitHub Actions runner. A safe metadata-only [candidate receipt](private-release-readiness-2026-11-19.json) captures provenance and gate status.
 
+## Final private SWORD identity and packaging independently proven (2026-11-19)
+
+The full [run #44544830593](https://github.com/icfmp/Bible-Resources/actions/runs/44544830593) **passed**, including both generic zCom4 SWORD packager unit tests and the *private final-ID candidate* stage. This proof is more specific than the earlier preview module evidence.
+
+- The ordinary `MHCIntroPreview` chapter-source candidate was packaged as a standard SWORD seven-member zCom4 ZIP and reinstalled into a separate SWORD_PATH, with 7/7 independent reader text readbacks identical (earlier run [#44543474861](https://github.com/icfmp/Bible-Resources/actions/runs/44543474861)).
+- The same compiled **six binary data files** were then promoted **without recompilation or byte modification** to the intended `MHC` SWORD identity, with private metadata `Version=0.1.0` and `DistributionLicense=Public Domain`.
+- The newly packaged private `MHC` was installed separately and independently read in native SWORD: **all 32,355 native frames and their full SHA-256 stream equal the verified source preview**, with **31,098 occupied verse locations, 1,255 introduction frames and two TOP frames**. Four additional independent `diatheke` passages were readable under the final `MHC` identity.
+- Metadata-only receipt of that unexported test ZIP: **7 members**, **16,404,517 bytes**, SHA-256 **`c8d70166dd569674e936874cd9a94809bceb9642a76af7220ef86f2b71af93b2`**. The preview source ZIP SHA was `a0fad2c049b650eaf42fbaee37b887f573906d749dc00b2a282163d5be2f227d`; it is a distinct identity/package and must not be substituted.
+- Both archives were deleted from ephemeral CI storage. **No final MHC archive has been published**; reproducing these bytes after code reconciliation and final publication authorization remains the actual delivery action.
+
+The project's licensing decision is settled on CrossWire's **Public Domain — Copy Freely** declaration; no CCEL permission request is required by the owner. The remaining project release decision is **explicit owner publication/merge approval**, a controlled `main` reconciliation/revalidation, and any desired additional third-party-reader click/formatting acceptance. Xiphos click navigation was not verified and must not be claimed, while the genuine chapter 1 preface is confirmed accessible through Xiphos's introduction context menu.
+
 ## Reader presentation: precise acceptance boundaries
 
 The following checks are **not** claimed passed and are not conditions that justify changing the original commentary:
