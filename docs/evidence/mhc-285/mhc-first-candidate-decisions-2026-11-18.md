@@ -25,22 +25,27 @@ material. Do not import them or silently rewrite CrossWire's text.
 | Keep exact pinned authoring source, all 4,256 distinct commentary bodies | 7,073,234 source word tokens | Full source-group→native verification and same 31,098 K / 1,255 I / 2 TOP occupied records | Faithful edition baseline |
 | Remove 11 **empty** source superscript leaves | Zero authored words; original byte spans locally guarded | Full text hash and independent recompiled native comparison | Mechanical-only; reversible |
 | Repair 3 source OSIS verse-range endpoints | 17 out-of-KJV machine addresses, no invented verses | Real KJV native registry and paired source milestones | Source-address-only research preview; exact old/new values retained |
-| Shorten 6 **earlier** OSIS machine ranges at shared boundary verses | Exactly 24 existing milestone attributes; 14/14 distinct group bodies recovered | Complete word sequences and 70/70 independent source snippets confirmed in related native keys | **Release decision still required**: narrows earlier group's machine scope by one boundary verse, preserves every word |
-| Preserve two original 2 Chronicles 1:1-covering divisions | Both `2Chr.1.1` and `2Chr.1.1-12` are genuine source blocks | Both complete source word streams located in compiled native K readback | **Do not delete or silently merge prose**; exact visual/section separation not proven |
+| Shorten 6 **earlier** OSIS machine ranges at shared boundary verses | Exactly 24 existing milestone attributes; 14/14 distinct group bodies recovered | Complete word sequences and 70/70 independent source snippets confirmed in related native keys | **Approved for whole-verse navigation only**: the first Romans 4 section stops at 4:16 and the second starts at 4:17. Both full source bodies remain; this is not release authorization |
+| Reclassify the original 2 Chronicles 1 preface as a genuine chapter introduction | Remove only the misleading preface verse milestones, move existing OSIS `div type="introduction"` boundaries; retain the original separate 1:1–12 exposition | [Real private SWORD compile/readback #44346559230](https://github.com/icfmp/Bible-Resources/actions/runs/44346559230) **PASS** (introduction in `2Chr.1.0`, source prose intact, no unexpected other-book changes) | **Approved for structural navigation only**; GUI rendering still needs review |
 | Correct all 25 anomalous inline machine Scripture targets | Original visible labels and exposition unchanged | 25/25 source SHA/line/label-attested, actual rebuilt 197 affected native K/I frames, no other XML/text modifications | Private reversible technical acceptance; user-visible link click still independent |
 
-**Important:** the 2 Chronicles 1:1 source overlap is not an authorial-text
-omission. Both prose bodies are present in the compiled result. The
-independent complete commentary witnesses present chapter introductory
-prose followed by the 1–12 exposition; they do **not** justify deleting the
-separate source block or assigning its words to an invented numbered verse:
-- [CCEL / independent Matthew Henry text: 2 Chronicles 1](https://www.christianstudy.com/data/sermons/matthewhenry/2chronicles1.htm).
-- [BibleGateway full commentary: chapter introduction](https://www.biblegateway.com/resources/matthew-henry/2Chr.1.1-2Chr.1.17) and [verses 1–12](https://www.biblegateway.com/resources/matthew-henry/2Chr.1.1-2Chr.1.12).
-- [Original source-overlap experiment and complete body preservation](../../../sources/cleaned/mhc/CLEANUP_STATUS.md).
+**2 Chronicles 1 is no longer an unresolved source-index collision.** The
+original authoring file separates the first preface and the 1:1–12 exposition.
+The reviewed [private chapter-introduction plan](../../../config/commentary-osis-repair-plans/mhc-chapter-introduction-private.json)
+moves the *existing* OSIS introduction boundaries to enclose all preface
+paragraphs and removes the misleading standalone `2Chr.1.1` milestone pair.
+The full separate 1:1–12 verse exposition remains in place. This does not
+invent a verse zero; `2Chr.1.0` is SWORD's existing chapter-introduction
+navigation key.
 
-This is a **reader/section-presentation** acceptance question, not a
-reason to invent a textual correction. If a reader cannot display distinct
-source sections, record that exact limitation against the application.
+The source-SHA-gated transformation preserves the entire original visible
+Unicode text stream, punctuation, whitespace, note text, titles and citation
+markup. The full [private build and native readback #44346559230](https://github.com/icfmp/Bible-Resources/actions/runs/44346559230)
+passed the independent chapter-introduction and separate-exposition checks.
+The source, corrected candidate and compiled zCom4 are not committed or
+released. A real GUI still needs to prove that the newly indexed introduction
+is presented separately and legibly. This treatment follows CrossWire's
+[documented osis2mod chapter introduction semantics](https://wiki.crosswire.org/Osis2mod).
 
 ## Reader proof and deliberate stop condition
 
@@ -56,12 +61,15 @@ source sections, record that exact limitation against the application.
   capture. Actual clicked hyperlinks and the precise Psalm 60 superscription
   landing were **not tested**.
 
-**Stop repeatedly invoking Xiphos on every source commit.** Its optional
-real GUI steps are explicitly manual-only (workflow_dispatch) as of
-[`c39c8b7`](https://github.com/icfmp/Bible-Resources/commit/c39c8b7508de091442c7939dc573a7061ddce54e).
-The source/OSIS/native integrity tests remain mandatory on relevant PR
-changes. Do not continue micro-tuning the headless GUI harness unless an
-actual source edit or new reader defect justifies it.
+**Stop repeatedly invoking Xiphos on every source commit.** Optional corrected-candidate
+GUI steps use `workflow_dispatch`; source/OSIS/native integrity remains mandatory.
+At the latest tested PR head, [the source-first private build #44346559230](https://github.com/icfmp/Bible-Resources/actions/runs/44346559230)
+passed including the chapter-introduction readback, while the separate
+[original-alias Xiphos run #44346559060](https://github.com/icfmp/Bible-Resources/actions/runs/44346559060)
+failed at dependency installation *before* any reader probe. This is an
+infrastructure failure, **not** a negative judgment on the corrected source
+and **not** a GUI pass. Do not continue micro-tuning the headless GUI harness
+without an actual source edit or new reader-acceptance need.
 
 ## Independent editorial boundaries for the six overlapping source ranges
 
@@ -81,16 +89,14 @@ whole-verse SWORD key to one of the two source groups.
 | `2Pet.2.1-3` / `2Pet.2.3-6` | **1–2 / 3–6** ([2 Peter index](https://www.biblegateway.com/resources/matthew-henry/2Peter)) | **Matches** authored whole-verse scope |
 | `Rev.4.1-8` / `Rev.4.8-11` | **1–7 / 8–11** ([Revelation index](https://www.biblegateway.com/resources/matthew-henry/Revelation)) | **Matches** authored whole-verse scope |
 
-**Result:** five source-range endings can be supported by a distinct
-published full-commentary indexing witness in addition to the original
-word-preservation and native-key tests. Do **not** mark a blind six-for-six
-editorial signoff. Romans 4:17 is a **real intra-verse dual-section
-ownership** which demands either a proven generic multi-commentary
-representation at one verse or an explicit documented first-edition
-reader limitation. All **1,720+ source word tokens in the two affected
-Romans 4 original sections** remain preserved in the private SWORD;
-this paragraph does not assert two simultaneously accessible comments
-when a reader selects verse 17.
+**Decision already recorded:** five boundary trims agree with independent
+published complete-commentary whole-verse sectioning. For Romans 4, the owner
+selected **4:9–16 / 4:17–22** as the practical first-edition whole-verse
+indexing policy, *despite* the independent edition's 17a/17b subdivision.
+The original **1,720+ words in both affected Romans 4 sections** remain in
+the private SWORD. This is deliberate navigation simplification, **not**
+a claim that the first section's 17a subject matter ceased to exist or
+that a reader selecting verse 17 can show both sections.
 
 The independent sources establish boundaries, not exact line-by-line
 historical text/punctuation equivalence. The CrossWire original source
@@ -100,11 +106,11 @@ it or to create a Romans-specific hack.
 
 ## Remaining *decision* gates (not more broad research by default)
 
-1. **Editorial accept / revise:** five of the six shared-verse endpoint trims now
-   match an independent complete Henry section index; **Romans 4:17a/17b**
-   requires an explicit honest half-verse handling policy. Keep both distinct
-   authored 2Chr 1:1-covering bodies. A published version must state its
-   addressing and reader policy.
+1. **Editorial and source review:** the practical six-overlap verse navigation
+   and 2 Chronicles 1 chapter-introduction remapping are now explicitly
+   recorded and privately validated. Preserve the historical 17a/17b nuance
+   in release notes. Independent whole-edition textual/editorial acceptance
+   remains distinct from these bounded indexing decisions.
 2. **Legal/source accept / reject:** CrossWire's **MHC 2.2** public-domain
    distribution claim, contribution/provenance context and any actual
    derivative digital/editorial restrictions. The six CCEL volumes are not
