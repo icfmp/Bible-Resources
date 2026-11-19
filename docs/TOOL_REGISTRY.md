@@ -94,7 +94,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_unmarked_division_coverage.py`](../scripts/commentary_unmarked_division_coverage.py) | UNDECIDED | named test | 1 | not determined |
 | [`scripts/commentary_unresolved_lexical_triage.py`](../scripts/commentary_unresolved_lexical_triage.py) | MERGE | named test | 6 | not determined |
 | [`scripts/commentary_witness.py`](../scripts/commentary_witness.py) | UNDECIDED | not established | 2 | source/native audit |
-| [`scripts/commentary_xiphos_dual_reader.py`](../scripts/commentary_xiphos_dual_reader.py) | GENERALIZE | named test | 11 | not determined |
+| [`scripts/commentary_xiphos_dual_reader.py`](../scripts/commentary_xiphos_dual_reader.py) | GENERALIZE | named test | 12 | not determined |
 | [`scripts/commentary_xiphos_heading_probe.py`](../scripts/commentary_xiphos_heading_probe.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/commentary_xml_witness.py`](../scripts/commentary_xml_witness.py) | UNDECIDED | named test | 12 | source/native audit |
 | [`scripts/compiled_stock_commentary_proof.py`](../scripts/compiled_stock_commentary_proof.py) | KEEP_GENERIC | named test | 6 | not determined |
@@ -120,7 +120,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/pilot_fetch.py`](../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 23 | not determined |
 | [`scripts/pilot_preflight.py`](../scripts/pilot_preflight.py) | KEEP_GENERIC | named test | 92 | not determined |
 | [`scripts/pilot_runtime.py`](../scripts/pilot_runtime.py) | UNDECIDED | named test | 4 | not determined |
-| [`scripts/pilot_subprocess.py`](../scripts/pilot_subprocess.py) | UNDECIDED | named test | 13 | not determined |
+| [`scripts/pilot_subprocess.py`](../scripts/pilot_subprocess.py) | UNDECIDED | named test | 14 | not determined |
 | [`scripts/prepare_darby_011_private_release_candidate.py`](../scripts/prepare_darby_011_private_release_candidate.py) | HISTORICAL/ARCHIVE | named test | 3 | publication/release |
 | [`scripts/prepare_place_manifest.py`](../scripts/prepare_place_manifest.py) | UNDECIDED | not established | 1 | not determined |
 | [`scripts/private_sword_bundle.py`](../scripts/private_sword_bundle.py) | UNDECIDED | named test | 3 | not determined |
