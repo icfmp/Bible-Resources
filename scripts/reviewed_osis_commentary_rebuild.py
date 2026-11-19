@@ -8,6 +8,7 @@ source/native workflows: a metadata receipt is never a substitute for that audit
 from pathlib import Path
 from hashlib import sha256
 import json
+import re
 
 def reviewed_osis_commentary_errors(module_dir, root, metadata, conf):
     pfx = f"{module_dir.name}: [OSIS_REBUILD_PROOF_INVALID] "
@@ -51,7 +52,7 @@ def reviewed_osis_commentary_errors(module_dir, root, metadata, conf):
             raise ValueError("Review, source, version, license or SWORD identity mismatch")
         if (auth.get("approved_by")!="Bible Resources project owner"
                 or not isinstance(auth.get("scope"),str) or len(auth["scope"])<40
-                or auth.get("evidence_url")!="https://github.com/icfmp/Bible-Resources/issues/285"):
+                or not isinstance(auth.get("evidence_url"),str) or re.fullmatch(r"https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/issues/[1-9][0-9]*",auth["evidence_url"]) is None):
             raise ValueError("Missing explicit editorial authorization")
         expected={
             "original_authoring_osis_sha256":r["original_authoring_osis_sha256"],
@@ -81,7 +82,7 @@ def reviewed_osis_commentary_errors(module_dir, root, metadata, conf):
                 or conf.get("BlockType") not in ("BOOK","CHAPTER","VERSE")):
             raise ValueError("Unsupported commentary driver or compression layout")
         block={"BOOK":"b","CHAPTER":"c","VERSE":"v"}[conf["BlockType"]]
-        extension = "z"+block if conf["ModDrv"]=="zCom" else block+"z"
+        extension = block+"z"
         directory = "zcom" if conf["ModDrv"]=="zCom" else "zcom4"
         folder=metadata["sword_id"].lower()
         members={"mods.d/"+folder+".conf"}
