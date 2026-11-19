@@ -251,6 +251,19 @@ jobs:
           path: /tmp/bsi-ubs-greek-reviewed-family-batch2-private.json
           if-no-files-found: error
           retention-days: 14
+      - name: Classify remaining 328 strict original Greek lexical witnesses
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_remaining_328.py \
+            --evidence /tmp/bsi-ubs-greek-905-unapproved-family-evidence.json \
+            --batch2 entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch2.json \
+            --output /tmp/bsi-ubs-greek-328-original-family-evidence.json
+      - name: Upload 328 Greek family witnesses (PRIVATE, NOT approved)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-328-source-family-witnesses-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-328-original-family-evidence.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload remaining Greek word witnesses (PRIVATE, NOT approved)
         uses: actions/upload-artifact@v4
         with:
