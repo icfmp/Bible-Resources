@@ -19,13 +19,13 @@
     "original_unresolved_occurrences": 8582,
     "edition_scope_excluded_occurrences": 5933,
     "in_scope_unresolved_occurrences_at_baseline": 2649,
-    "in_scope_lexically_dispositioned_occurrences": 2606,
+    "in_scope_lexically_dispositioned_occurrences": 2613,
     "composite_source_syntax_preserved_occurrences": 2,
-    "in_scope_occurrences_with_any_disposition": 2608,
-    "in_scope_families_with_any_disposition": 166,
-    "in_scope_lexical_family_dispositions": 164,
-    "not_yet_dispositioned_original_families": 31,
-    "not_yet_dispositioned_original_occurrences": 41,
+    "in_scope_occurrences_with_any_disposition": 2615,
+    "in_scope_families_with_any_disposition": 173,
+    "in_scope_lexical_family_dispositions": 171,
+    "not_yet_dispositioned_original_families": 24,
+    "not_yet_dispositioned_original_occurrences": 34,
     "edition_headword_scope_exclusions": {
       "families": 5,
       "occurrences": 5933
@@ -35,8 +35,8 @@
       "occurrences": 2
     },
     "lexical_nonidentity_rejections": {
-      "families": 35,
-      "occurrences": 1857
+      "families": 38,
+      "occurrences": 1860
     },
     "multiple_headword_abstentions": {
       "families": 48,
@@ -47,8 +47,8 @@
       "occurrences": 27
     },
     "positive_headword_only_reviews": {
-      "families": 71,
-      "occurrences": 264
+      "families": 75,
+      "occurrences": 268
     }
   },
   "pending_families": [
@@ -110,21 +110,6 @@
       },
       "ubs_candidate_entries": [
         "002789000000000"
-      ]
-    },
-    {
-      "lang": "A",
-      "lemma": "יצא",
-      "original_strong": "3319",
-      "original_occurrences": 1,
-      "classification": "different_strong_exact_attested_lemma",
-      "original_word_witness": {
-        "original_sdbh": "003035001012000",
-        "original_word_id": "o150060150012",
-        "reference": "EZR 6:15!1"
-      },
-      "ubs_candidate_entries": [
-        "003039000000000"
       ]
     },
     {
@@ -204,21 +189,6 @@
     },
     {
       "lang": "H",
-      "lemma": "הוּא",
-      "original_strong": "5993",
-      "original_occurrences": 1,
-      "classification": "different_strong_exact_attested_lemma",
-      "original_word_witness": {
-        "original_sdbh": "",
-        "original_word_id": "o220060120062",
-        "reference": "SNG 6:12!6"
-      },
-      "ubs_candidate_entries": [
-        "001778000000000"
-      ]
-    },
-    {
-      "lang": "H",
       "lemma": "חֲמֻדֹות",
       "original_strong": "2530a",
       "original_occurrences": 1,
@@ -230,21 +200,6 @@
       },
       "ubs_candidate_entries": [
         "002332000000000"
-      ]
-    },
-    {
-      "lang": "H",
-      "lemma": "חֲפֹר",
-      "original_strong": "2661a",
-      "original_occurrences": 1,
-      "classification": "same_strong_family_unresolved",
-      "original_word_witness": {
-        "original_sdbh": "",
-        "original_word_id": "o230020200152",
-        "reference": "ISA 2:20!15"
-      },
-      "ubs_candidate_entries": [
-        "002457000000000"
       ]
     },
     {
@@ -294,36 +249,6 @@
     },
     {
       "lang": "H",
-      "lemma": "יָמַר",
-      "original_strong": "0559a",
-      "original_occurrences": 1,
-      "classification": "same_strong_family_unresolved",
-      "original_word_witness": {
-        "original_sdbh": "000512001005000 002959001001000",
-        "original_word_id": "o230610060131",
-        "reference": "ISA 61:6!13"
-      },
-      "ubs_candidate_entries": [
-        "000511000000000"
-      ]
-    },
-    {
-      "lang": "H",
-      "lemma": "יָצַת",
-      "original_strong": "5327a",
-      "original_occurrences": 1,
-      "classification": "same_strong_family_unresolved",
-      "original_word_witness": {
-        "original_sdbh": "003052001001000 004885002001000",
-        "original_word_id": "o240020150111",
-        "reference": "JER 2:15!11"
-      },
-      "ubs_candidate_entries": [
-        "004891000000000"
-      ]
-    },
-    {
-      "lang": "H",
       "lemma": "ירה",
       "original_strong": "7297a",
       "original_occurrences": 1,
@@ -354,21 +279,6 @@
     },
     {
       "lang": "H",
-      "lemma": "לְהָטִים",
-      "original_strong": "3858a",
-      "original_occurrences": 1,
-      "classification": "same_strong_family_unresolved",
-      "original_word_witness": {
-        "original_sdbh": "003529001001000",
-        "original_word_id": "o020070110112",
-        "reference": "EXO 7:11!11"
-      },
-      "ubs_candidate_entries": [
-        "003532000000000"
-      ]
-    },
-    {
-      "lang": "H",
       "lemma": "לָבֵשׁ",
       "original_strong": "3830a",
       "original_occurrences": 1,
@@ -395,21 +305,6 @@
       },
       "ubs_candidate_entries": [
         "004334000000000"
-      ]
-    },
-    {
-      "lang": "H",
-      "lemma": "מָדוֹן",
-      "original_strong": "4060",
-      "original_occurrences": 1,
-      "classification": "same_strong_family_unresolved",
-      "original_word_witness": {
-        "original_sdbh": "003720002001000",
-        "original_word_id": "o100210200081",
-        "reference": "2SA 21:20!8"
-      },
-      "ubs_candidate_entries": [
-        "003719000000000"
       ]
     },
     {
