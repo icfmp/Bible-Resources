@@ -1,3 +1,24 @@
+> **Later verification supersedes some early technical observations (2026-11-19).**
+> This is an immutable-dated 2026-11-18 decision record, not the current final
+> acceptance checklist. The first successful private introduction remapping
+> used a preliminary layout. A subsequent stricter readback exposed that the
+> original preverse `<title type="x-ms">` had to be reviewed and reclassified
+> to standard `type="chapter"` to prevent `osis2mod` from placing the original
+> preface in `2Chr.1.1`. The now-pinned source-SHA/line-guarded transform
+> preserves all authorial text and original markup content; the verified
+> native introduction is separately indexed, and the following exposition
+> remains in the verse. This reclassification generates only 330 harmless,
+> consistently paired `pvN` SWORD milestone renumberings outside the chapter;
+> these are independently verified with fail-closed equivalence rules.
+> [Strict native pass](https://github.com/icfmp/Bible-Resources/actions/runs/44501242523);
+> [real Xiphos four-sample investigation](https://github.com/icfmp/Bible-Resources/actions/runs/44528250861):
+> 3/3 original excerpts plus the separate 2Chr 1:1 verse exposition are
+> observed, **but the chapter preface is not observed in the copied Xiphos
+> verse-pane clipboard**. That presentation remains pending and is not loss
+> of the native I frame. The [metadata-only readiness receipt](private-release-readiness-2026-11-19.json)
+> and [rights review](rights-review-2026-11-19.md) are authoritative for
+> outstanding gates; no corrected source/binary is published.
+>
 # MHC 2.2 — first private candidate: decisions, not another research loop
 
 **Checkpoint:** 2026-11-18, [import #285](https://github.com/icfmp/Bible-Resources/issues/285), [draft PR #286](https://github.com/icfmp/Bible-Resources/pull/286).
