@@ -25,7 +25,8 @@ concurrency:
   cancel-in-progress: true
 jobs:
   source_metadata:
-    runs-on: ubuntu-latest
+    # Pin a GUI-tested Ubuntu image: existing genuine Xiphos workflows use 24.04.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -3439,7 +3440,7 @@ jobs:
                       or len(commentary)<=100 or len(bible_text)<=64):
                   raise ValueError("Xiphos sample not backed by two substantial real SWORD texts: "+ref)
               comparisons[ref]={"commentary":commentary,"bible":bible_text}
-          result=_run_real_gui(root,comparisons,seconds=18,
+          result=_run_real_gui(root,comparisons,seconds=25,
                                commentary_module_id="MHCCMODRC")
           matches=result.get("commentary_clipboard_match_by_passage",{})
           if set(matches)!=set(samples):
