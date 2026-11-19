@@ -1,0 +1,34 @@
+{
+  "status": "PRIVATE_PRIMARY_PUBLISHED_MHCC_0_1_1_ONLY_PREVIEW_NOT_RELEASE",
+  "source_module": "MHCC 0.1.1",
+  "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "source_original_changed": false,
+  "modern_manuscripts_changed": false,
+  "ccel_only_additions_redistribution_approved": false,
+  "public_release_authorized": false,
+  "policy": "Preserve authored chapter outlines, native indexed K scopes and original/source-derived crossreferences. In a separate, unpublished source-strict derivative preview, quarantine exactly the two modern leaf sections that are absent from the authenticated published source but separately attested in CCEL. Do not delete them from drafts or infer editorial/copyright approval.",
+  "cases": [
+    {
+      "chapter": "1Sam.25",
+      "original_source_first_K": "1Sam.25.32",
+      "original_source_last_K": "1Sam.25.44",
+      "original_source_K_raw_sha256": "a7219b836582c17e1032af2733abd881e6d37e23a22c04d3b6d11ba7d1a6c272",
+      "keep_original_source_matched_heading": "David is restrained; Nabal dies (verses 32–39)",
+      "quarantined_ccel_only_heading": "David marries Abigail (verses 39–44)",
+      "whole_secondary_english_section_words": 78,
+      "ordered_words_matched_in_original_source": 18,
+      "witness": "https://ccel.org/ccel/henry/mhcc.x.xxv.html"
+    },
+    {
+      "chapter": "Ps.95",
+      "original_source_first_K": "Ps.95.1",
+      "original_source_last_K": "Ps.95.11",
+      "original_source_K_raw_sha256": "8fd73ec5b07b5f38a39677d632196db2ee35061ecb33dd5d2511758f229dca8c",
+      "keep_original_source_matched_heading": "Worshiping the Lord and our Shepherd (verses 1–7)",
+      "quarantined_ccel_only_heading": "Hearing Christ's voice today (verses 7–11)",
+      "whole_secondary_english_section_words": 204,
+      "ordered_words_matched_in_original_source": 36,
+      "witness": "https://ccel.org/ccel/henry/mhcc.xx.xcv.html"
+    }
+  ]
+}
