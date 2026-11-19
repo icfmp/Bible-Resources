@@ -43,9 +43,19 @@
     "full_reader_title_paragraph_note_acceptance": "pending",
     "private_zip_reinstall_and_readback": "passed_seven_of_seven_private_preview",
     "private_zip_evidence_url": "https://github.com/icfmp/Bible-Resources/actions/runs/44543474861",
-    "private_final_MHC_id_package_and_full_native_corpus": "pending_current_workflow",
+    "private_final_MHC_id_package_and_full_native_corpus": "passed",
     "private_preview_zip_sha256": "a0fad2c049b650eaf42fbaee37b887f573906d749dc00b2a282163d5be2f227d",
-    "private_preview_zip_published": false
+    "private_preview_zip_published": false,
+    "private_final_id_proof_url": "https://github.com/icfmp/Bible-Resources/actions/runs/44544830593",
+    "private_final_MHC_zip_sha256": "c8d70166dd569674e936874cd9a94809bceb9642a76af7220ef86f2b71af93b2",
+    "private_final_MHC_zip_bytes": 16404517,
+    "private_final_MHC_zip_member_count": 7,
+    "private_final_MHC_sword_id": "MHC",
+    "private_final_MHC_version": "0.1.0",
+    "private_final_MHC_distributon_license": "Public Domain",
+    "private_final_MHC_full_raw_corpus_equal_to_preview": true,
+    "private_final_MHC_reinstalled_reader_samples_passed": 4,
+    "private_final_MHC_archive_destroyed_without_publication": true
   },
   "publication": {
     "owner_publication_authorization": false,
