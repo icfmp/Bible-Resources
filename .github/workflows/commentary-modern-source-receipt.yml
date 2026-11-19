@@ -2003,15 +2003,17 @@ jobs:
               "SHA_PINNED_NATIVE_SECONDARY_ANCHOR_PROBE_ONLY_NOT_EDITORIAL_APPROVAL"
           )
           assert report["exact_original_raw_corpus_sha256_matched"] is True
-          assert report["probed_source_groups"] == 17
-          assert report["probed_chapters"] == 15
+          manifest = json.loads(Path("work/mhcc-modern/production/JOB_NATIVE_FIDELITY_SOURCE_ANCHORS_2026-11-19.json").read_text())
+          assert report["probed_source_groups"] == len(manifest["source_group_probes"])
+          assert report["probed_chapters"] == len({x["chapter"] for x in manifest["source_group_probes"]})
           for group in report["groups"]:
               if not group["all_witness_anchors_found"]:
                   print("JOB_ORIGINAL_SOURCE_DIFFERENCE " +
                         group["chapter"] + "@" + group["original_first_key"])
           if not report["all_anchor_probes_found"]:
               raise ValueError("Original 0.1.1 differs from candidate CCEL anchors; investigate before accepting proposed wording")
-          print("JOB_NATIVE_SOURCE_ANCHORS_PASS groups=17 chapters=15; "
+          print(f"JOB_NATIVE_SOURCE_ANCHORS_PASS groups={report['probed_source_groups']} "
+                f"chapters={report['probed_chapters']}; "
                 "no full-text semantic or independent editorial approval")
           PY
       - name: Compare five original-source witnesses with immutable MHCC 0.1.0 stock-preserving release
