@@ -3401,6 +3401,205 @@ jobs:
                 "deterministic local-only ZIP metadata, "+str(len(observed))+
                 " real diatheke passage readbacks; NO binary upload or public release")
           PY
+      - name: Build independently verified owner-approved editorial overlay (private only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import copy,hashlib,json,os,sys
+          from collections import Counter
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from commentary_modern_draft_osis_preview import NS
+          from commentary_modern_reference_gate import _allowed_source_link_target
+          base=Path(os.environ["RUNNER_TEMP"])
+          files=Path("work/mhcc-modern/production")
+          decision=json.loads((files/"OWNER_EDITORIAL_DECISIONS_2026-11-19.json").read_text())
+          manifest11=json.loads((files/"ADDITIONAL_ORIGINAL_LINK_TARGET_ERRATA_2026-11-18.json").read_text())
+          manifest4=json.loads((files/"FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json").read_text())
+          native=json.loads((base/"mhcc-modern-whole-canon-native-receipt.json").read_text())
+          original=ET.fromstring((base/"mhcc-modern-private-prefaces-plus-recovered-original-crossrefs.osis.xml").read_bytes())
+          root=ET.fromstring((base/"mhcc-modern-private-release-candidate.osis.xml").read_bytes())
+          if (decision["status"]!="OWNER_EDITORIAL_CORRECTIONS_APPROVED_IMPLEMENTATION_PENDING"
+              or decision["approved_for_publication"] is not False
+              or decision["source_native_corpus_sha256"]!=native["original_compiled_corpus_sha256"]
+              or manifest11["original_corpus_sha256"]!=decision["source_native_corpus_sha256"]
+              or manifest4["original_native_corpus_sha256"]!=decision["source_native_corpus_sha256"]
+              or len(decision["link_cases"])!=15
+              or len(decision["ccel_only_sections"])!=2):
+              raise ValueError("Approved editorial overlay has unverifiable source or release status")
+          def chapter_map(document):
+              return {n.get("osisID"):n for n in document.iter() if n.tag==f"{{{NS}}}chapter"}
+          source_chapters=chapter_map(original)
+          chapters=chapter_map(root)
+          if len(chapters)!=1189 or set(chapters)!=set(source_chapters):
+              raise ValueError("Editorial overlay changes canonical chapter topology")
+          def owner(first,source_sha):
+              chapter=first.rsplit(".",1)[0]
+              originals=native["chapters"][chapter]["original_units"]
+              positions=[i for i,u in enumerate(originals)
+                         if u["first_key"]==first and u["source_unit_sha256"]==source_sha]
+              if len(positions)!=1:
+                  raise ValueError("Approved original K fingerprint not found")
+              parts=chapters[chapter].findall(f"./{{{NS}}}div[@annotateType='commentary']")
+              originals_parts=source_chapters[chapter].findall(f"./{{{NS}}}div[@annotateType='commentary']")
+              if len(parts)!=len(originals) or len(originals_parts)!=len(originals):
+                  raise ValueError("Approved original K topology drift")
+              return parts[positions[0]],originals_parts[positions[0]]
+          orig_11={(c["source_first_key"],c["source_reference_ordinal"]):c
+                   for c in manifest11["cases"]}
+          orig_4={(c["source_first_key"],c["original_reference_ordinal"]):c
+                  for c in manifest4["cases"]}
+          if len(orig_11)!=11 or len(orig_4)!=4:
+              raise ValueError("Source errata manifests contain duplicate identities")
+          observed=set()
+          expected_targets=Counter()
+          for case in decision["link_cases"]:
+              key=(case["source_first_key"],case["source_reference_ordinal"])
+              if key in observed:
+                  raise ValueError("Duplicate approved editorial correction")
+              observed.add(key)
+              source=orig_11.get(key) or orig_4.get(key)
+              if source is None:
+                  raise ValueError("Missing immutable original error identity")
+              label_digest=source.get("original_label_sha256",source.get("original_visible_label_sha256"))
+              target_digest=source.get("original_target_sha256")
+              if (case["original_native_unit_sha256"]!=source["original_native_unit_sha256"]
+                  or case["original_target_sha256"]!=target_digest
+                  or case["original_label_sha256"]!=label_digest
+                  or not isinstance(case["approved_derived_destinations"],list)):
+                  raise ValueError("Approved correction diverged from original source hashes")
+              allowed=source.get("proposed_destinations",source.get("proposed_navigation_targets_for_unpublished_review"))
+              targets=case["approved_derived_destinations"]
+              if targets!=allowed or not targets or len(targets)!=len(set(targets)) or any(
+                  not _allowed_source_link_target(v) for v in targets):
+                  raise ValueError("Approved correction has unreviewed targets")
+              target_section,_=owner(key[0],case["original_native_unit_sha256"])
+              note=ET.SubElement(target_section,f"{{{NS}}}note",{
+                  "type":"crossReference",
+                  "resp":"BibleResourcesApprovedDerivativeEditorialCorrection",
+                  "n":str(key[1]),
+              })
+              note.text=("Corrected printed citation (original preserved in source audit): "
+                         if case["mode"]=="visible_printed_citation_erratum"
+                         else "Section reference (editorially corrected): "
+                         if case["mode"]=="section_navigation"
+                         else "Verified editorial cross-reference: ")
+              for i,target in enumerate(targets):
+                  ref=ET.SubElement(note,f"{{{NS}}}reference",{"osisRef":target})
+                  ref.text=target
+                  ref.tail="; " if i<len(targets)-1 else "."
+                  expected_targets[(key[0],target)]+=1
+          if observed!=set(orig_11)|set(orig_4):
+              raise ValueError("The 15 original reference identities were not all handled")
+          restored=[]
+          for case in decision["ccel_only_sections"]:
+              chapter=case["chapter"]
+              target,source=owner(case["original_source_first_K"],case["original_source_K_raw_sha256"])
+              source_children=list(source)
+              headings=[i for i,c in enumerate(source_children)
+                        if c.tag==f"{{{NS}}}title" and c.get("type")=="sub"]
+              if (len(headings)!=2
+                  or source_children[headings[0]].text!=case["original_matched_heading"]
+                  or source_children[headings[1]].text!=case["approved_additional_authored_heading"]
+                  or any(c.tag==f"{{{NS}}}title" and
+                         c.text==case["approved_additional_authored_heading"] for c in target)):
+                  raise ValueError("CCEL-only section is missing, changed or duplicated")
+              additions=[copy.deepcopy(c) for c in source_children[headings[1]:]
+                         if not (c.tag==f"{{{NS}}}note" and
+                             (c.get("resp") or "").startswith("BibleResources"))]
+              if len(additions)<2:
+                  raise ValueError("Authenticated secondary-witness section has no prose")
+              marker=ET.Element(f"{{{NS}}}note",{"type":"study",
+                  "resp":"BibleResourcesSecondaryConciseWitnessProvenance"})
+              marker.text=("Editorially restored separate Concise exposition; absent from "
+                           "the pinned MHCC 0.1.1 compiled K body. See source provenance ledger.")
+              insertion=next((i for i,c in enumerate(target) if
+                  c.tag==f"{{{NS}}}note" and
+                  (c.get("resp") or "").startswith("BibleResources")),len(target))
+              for offset,addition in enumerate([marker,*additions]):
+                  target.insert(insertion+offset,addition)
+              restored.append(chapter)
+          if set(restored)!={"1Sam.25","Ps.95"}:
+              raise ValueError("Secondary-source restoration incomplete")
+          osis=root.find(f"./{{{NS}}}osisText")
+          header=osis.find(f"./{{{NS}}}header")
+          work=header.find(f"./{{{NS}}}work")
+          if osis.get("osisIDWork")!="MHCCMODRC" or work.get("osisWork")!="MHCCMODRC":
+              raise ValueError("Not an original pinned private compiled candidate")
+          osis.set("osisIDWork","MHCCMODAP")
+          work.set("osisWork","MHCCMODAP")
+          work.find(f"./{{{NS}}}identifier").text="MHCCMODAP"
+          work.find(f"./{{{NS}}}title").text="Henry's Modern Concise Commentary (editorial approval preview)"
+          work.find(f"./{{{NS}}}description").text=(
+              "Private unpublished editorial review candidate; 15 source-linked corrections "
+              "and two secondary-witness expositions; reader and distribution rights pending.")
+          output=ET.tostring(root,encoding="utf-8",xml_declaration=True)
+          verified=ET.fromstring(output)
+          found=Counter()
+          for chapter,node in chapter_map(verified).items():
+              for note in node.iter(f"{{{NS}}}note"):
+                  if note.get("resp")!="BibleResourcesApprovedDerivativeEditorialCorrection":
+                      continue
+                  for ref in note.iter(f"{{{NS}}}reference"):
+                      found[(chapter,ref.get("osisRef"))]+=1
+          # K source-first keys resolve to the same chapter in the compiled document.
+          expected_by_chapter=Counter((first.rsplit(".",1)[0],ref) for (first,ref),n
+                                      in expected_targets.items() for _ in range(n))
+          if found!=expected_by_chapter:
+              raise ValueError("Approved editorial refs disappeared in OSIS serialization")
+          out=base/"mhcc-modern-approved-editorial-DO-NOT-PUBLISH.osis.xml"
+          out.write_bytes(output)
+          receipt={
+              "status":"OWNER_APPROVED_PRIVATE_EDITORIAL_OSIS_OVERLAY_NOT_RELEASE",
+              "source_corpus_sha256":decision["source_native_corpus_sha256"],
+              "approved_original_link_cases":15,
+              "individually_pinned_restored_target_occurrences":sum(found.values()),
+              "distinct_secondary_witness_sections_restored":len(restored),
+              "canonical_chapters":len(chapters),
+              "original_primary_source_changed":False,
+              "modern_manuscripts_changed":False,
+              "rights_or_publication_approved":False,
+              "private_osis_sha256":hashlib.sha256(output).hexdigest(),
+          }
+          (base/"mhcc-modern-approved-editorial-receipt.json").write_text(
+              json.dumps(receipt,sort_keys=True,indent=2)+"\n")
+          print("PRIVATE OWNER-APPROVED EDITORIAL OVERLAY PASS: 15 SHA-bound corrections, "+
+                str(sum(found.values()))+" derivative target links, two distinctly attributed "+
+                "secondary-witness sections, 1189 chapters; NO SOURCE OR RELEASE CHANGES")
+          PY
+          mkdir -p "$RUNNER_TEMP/mhcc-modern-approved-private-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-modern-approved-private-root/modules/comments/zcom/mhccmodap"
+          timeout 240s osis2mod             "$RUNNER_TEMP/mhcc-modern-approved-private-root/modules/comments/zcom/mhccmodap"             "$RUNNER_TEMP/mhcc-modern-approved-editorial-DO-NOT-PUBLISH.osis.xml"             -z z -b 3 > "$RUNNER_TEMP/mhcc-modern-approved-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-modern-approved-private-root/mods.d/mhccmodap.conf" <<'EOF'
+          [MHCCMODAP]
+          Description=Private owner-approved editorial corrections, not released
+          DataPath=./modules/comments/zcom/mhccmodap/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          SWORD_PATH="$RUNNER_TEMP/mhcc-modern-approved-private-root" \
+            timeout 35s diatheke -b MHCCMODAP -f OSIS -k "Psalms 95:11" \
+            > "$RUNNER_TEMP/mhcc-modern-approved-ps95-readback.xml"
+          SWORD_PATH="$RUNNER_TEMP/mhcc-modern-approved-private-root" \
+            timeout 35s diatheke -b MHCCMODAP -f OSIS -k "1 Samuel 25:39" \
+            > "$RUNNER_TEMP/mhcc-modern-approved-sam25-readback.xml"
+          python - <<'PY'
+          from pathlib import Path
+          import os
+          base=Path(os.environ["RUNNER_TEMP"])
+          for f in ("mhcc-modern-approved-ps95-readback.xml",
+                    "mhcc-modern-approved-sam25-readback.xml"):
+              if len((base/f).read_bytes())<120:
+                  raise ValueError("Private editorial SWORD real-reader sample absent")
+          print("PRIVATE EDITORIAL SWORD READBACK PASS: Psalm 95, 1 Samuel 25")
+          PY
       - name: Install real Xiphos GUI in an isolated virtual display for HMCC Modern
         id: xiphos_deps
         timeout-minutes: 14
