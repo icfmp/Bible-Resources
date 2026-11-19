@@ -448,17 +448,17 @@ jobs:
       - name: Verify reproducible, attributed UBS v1.0 technical RC package (NOT a release)
         run: |
           python3 -I entity-index/links/dictionaries/ubs-hebrew/package_reviewed_v1_candidate.py \
-            --index /tmp/bsi-ubs-v1-private-reviewed-candidate.json \
-            --release_manifest entity-index/links/dictionaries/ubs-hebrew/v1_private_candidate_manifest.json \
-            --output /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc1.zip
+            --index /tmp/bsi-ubs-v1-final-275-word-candidate.json \
+            --release_manifest entity-index/links/dictionaries/ubs-hebrew/v1_final_candidate_manifest.json \
+            --output /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc2.zip
           cd /tmp
-          sha256sum -c BSI-UBSHebrew-0.9.4-v1.0-rc1.zip.sha256
+          sha256sum -c BSI-UBSHebrew-0.9.4-v1.0-rc2.zip.sha256
           python3 - <<'PY'
           import hashlib, json, zipfile
           from pathlib import Path
-          archive=Path("/tmp/BSI-UBSHebrew-0.9.4-v1.0-rc1.zip")
+          archive=Path("/tmp/BSI-UBSHebrew-0.9.4-v1.0-rc2.zip")
           with zipfile.ZipFile(archive) as z:
-              root="BSI-UBSHebrew-0.9.4-v1.0-rc1/"
+              root="BSI-UBSHebrew-0.9.4-v1.0-rc2/"
               readme=z.read(root+"README.md").decode("utf-8")
               att=z.read(root+"ATTRIBUTION.md").decode("utf-8")
               license=z.read(root+"LICENSE.txt").decode("utf-8")
@@ -469,17 +469,19 @@ jobs:
               assert "CC BY-SA 4.0" in license
               assert manifest["publication_authorized"] is False
               assert manifest["files"]["index.json"]["sha256"] == hashlib.sha256(payload).hexdigest()
-              assert manifest["reviewed_word_specific_entry_only_links"] == 273
+              assert manifest["reviewed_word_specific_entry_only_links"] == 275
+              assert manifest["last_word_specific_additional_approvals"] == 2
+              assert manifest["retained_unlinked_original_final_word_reviews"] == 24
               assert manifest["inferred_contextual_ubs_sense_ids"] == 0
           print("UBS_V1_RC_BYTE_AND_RIGHTS_GATES_PASSED_NOT_PUBLISHED")
           PY
       - name: Upload NONPUBLISHED UBS 0.9.4 v1.0 technical RC package
         uses: actions/upload-artifact@v4
         with:
-          name: bsi-ubs-hebrew-v1-technical-rc-NOT-PUBLISHED
+          name: bsi-ubs-hebrew-v1-rc2-technical-NOT-PUBLISHED
           path: |
-            /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc1.zip
-            /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc1.zip.sha256
+            /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc2.zip
+            /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc2.zip.sha256
           retention-days: 14
       - name: Upload private UBS 0.9.4 v1 word-level index candidate (NOT released)
         uses: actions/upload-artifact@v4
