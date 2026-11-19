@@ -39,6 +39,8 @@ def verify_metadata(ledger, register, entries):
         raise ValueError("Unsupported editorial ledger format")
     families = {key(f): f for f in register["families"]}
     by_id = {e["MainId"]: e for e in entries}
+    if len(by_id) != len(entries):
+        raise ValueError("Duplicate original UBS headword ID")
     checked = set()
     total = 0
     ids = set()
@@ -48,17 +50,25 @@ def verify_metadata(ledger, register, entries):
             raise ValueError("Duplicate editorial family decision")
         checked.add(k)
         f = families.get(k)
-        if not f or f["reason"] != "different_strong_same_consonants":
-            raise ValueError("Decision does not concern an unresolved same-consonant family")
+        if (not f or f["reason"] not in (
+                "different_strong_same_consonants", "same_strong_family_unresolved")
+                or d.get("candidate_relation") != f["reason"]):
+            raise ValueError("Decision does not concern a supported unresolved family")
         if f["occurrences"] != d["occurrences"]:
             raise ValueError("Original family occurrence count changed")
         if d.get("decision") != "candidate_lexical_nonidentity" or not d.get("rationale"):
             raise ValueError("Unexplained or unsupported editorial conclusion")
         w = d["source_witness"]
-        if (w["word_id"], w["reference"]) not in [
-            (x["original_word_id"], x["reference"]) for x in f["source_witnesses"]
-        ]:
+        if not any(
+            w["word_id"] == x["original_word_id"]
+            and w["reference"] == x["reference"]
+            and (w.get("original_sdbh") is None
+                 or w["original_sdbh"] == x["original_sdbh"])
+            for x in f["source_witnesses"]
+        ):
             raise ValueError("Witness not in pinned unresolved family")
+        if d.get("source_classes") is not None and d["source_classes"] != f["source_classes"]:
+            raise ValueError("Original source-class counts changed")
         candidate = d["ubs_candidate"]
         mid = candidate["main_id"]
         if f["ubs_candidate_entries"] != [mid]:
@@ -72,8 +82,22 @@ def verify_metadata(ledger, register, entries):
             raise ValueError("UBS original candidate Strong metadata changed")
         if parts(entry) != candidate["parts_of_speech"]:
             raise ValueError("UBS original candidate POS metadata changed")
-        if d["lang"] + d["original_strong"] in entry["StrongCodes"]:
-            raise ValueError("Original Strong unexpectedly matches UBS candidate")
+        if d["candidate_relation"] == "different_strong_same_consonants":
+            if d["lang"] + d["original_strong"] in entry["StrongCodes"]:
+                raise ValueError("Original Strong unexpectedly matches UBS candidate")
+        elif d["candidate_relation"] == "same_strong_family_unresolved":
+            # The code can be inherited from a compound name even when its
+            # individual source component has different lexical identity.
+            # Preserve the source Strong and never infer a word link from it.
+            import re
+            number = int(re.match(r"^[0-9]+", d["original_strong"]).group(0))
+            codes = entry["StrongCodes"]
+            if not any(
+                (m := re.fullmatch(r"([HA])0*([0-9]+)[a-z]?", str(code)))
+                and m.group(1) == d["lang"] and int(m.group(2)) == number
+                for code in codes
+            ):
+                raise ValueError("Original candidate Strong family no longer matches")
         total += d["occurrences"]
         ids.add(w["word_id"])
     return {"families": len(checked), "occurrences": total, "word_ids": ids}
@@ -93,10 +117,18 @@ def verify_witness_words(ledger, macula):
                 "lemma": d["lemma"],
                 "strongnumberx": d["original_strong"],
                 "ref": w["reference"],
-                "english": w["english"],
-                "pos": w["pos"],
-                "class": w["class"],
             }
+            # Older decisions also pin exact original English/POS/class.
+            # New family decisions pin original sdbh and all class counts
+            # from the generated family register; never guess TSV glosses.
+            for col in ("english", "pos", "class"):
+                if col in w:
+                    expected[col] = w[col]
+            if "original_sdbh" in w:
+                expected["sdbh"] = w["original_sdbh"]
+            if d.get("source_classes") is not None:
+                if row["class"] not in d["source_classes"]:
+                    raise ValueError(f"Original MACULA class changed: {source_id}")
             for col, wanted in expected.items():
                 actual = row[col]
                 if (norm(actual) if col == "lemma" else actual) != (
