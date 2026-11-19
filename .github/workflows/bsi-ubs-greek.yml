@@ -120,7 +120,23 @@ jobs:
           assert all(index[k]==v for k,v in old.items())
           assert index["editorial_candidate"]["publication_approved"] is False
           assert index["word_aware_coverage"]["new_inferred_contextual_lexical_sense_ids"] == 0
-          assert index["editorial_candidate"]["source_pronoun_headword_approvals"] > 0
+          assert index["editorial_candidate"]["source_pronoun_headword_approvals"] == 5033
+          assert index["editorial_candidate"]["source_specific_approved_headwords"] == {
+              "οὗτος": 906, "σύ": 1971, "ἐγώ": 2156}
+          assert index["editorial_candidate"]["other_original_words_still_unapproved"] == 905
+          assert index["word_aware_coverage"]["original_sblgnt_word_records"] == 137741
+          assert index["word_aware_coverage"]["word_aware_entry_candidate_words"] == 134028
+          import hashlib
+          assert hashlib.sha256(p.read_bytes()).hexdigest() == (
+              "867d69186e718939ee55ef91403755240972a1e4c31ddc091e4974d1a524fda0")
+          assert len(index["by_macula_word"]) == 5938
+          from collections import Counter
+          kinds=Counter(w["match_type"] for w in index["by_macula_word"].values())
+          assert kinds == {
+              "source_reviewed_original_greek_pronoun_headword_only": 5033,
+              "nfc_canonically_identical_lemma_and_original_ln_unapproved_word_candidate": 905,
+          }
+          assert all("sense_id" not in item for item in index["by_macula_word"].values())
           print("UBS_GREEK_PRONOUN_SOURCE_REVIEW_PRIVATELY_VERIFIED")
           PY
       - name: Upload private source-reviewed Greek pronouns (NO public release)
