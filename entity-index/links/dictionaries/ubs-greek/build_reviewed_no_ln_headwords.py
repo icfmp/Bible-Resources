@@ -153,6 +153,14 @@ def review(original, baseline, report, english, french, ledger, macula):
         **original["word_aware_coverage"],
         "editorially_reviewed_original_word_headwords": 7641,
         "existing_strong_entry_candidate_words_unchanged": 128090,
+        "word_aware_entry_candidate_words": 136059,
+        "remaining_no_ubs_headword_candidate_original_words": 1682,
+        "new_source_original_word_entry_only_without_ln": 2031,
+        "original_gap_classes_still_unlinked": {
+            "nfc_lemma_only_no_attested_ubs_ln": 1218,
+            "no_nfc_identical_ubs_lemma": 459,
+            "unsupported_original_compound_strong": 5,
+        },
         "new_inferred_contextual_lexical_sense_ids": 0,
     }
     return output
