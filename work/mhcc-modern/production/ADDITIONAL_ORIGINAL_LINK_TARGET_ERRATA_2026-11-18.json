@@ -6,7 +6,7 @@
   "modern_chapter_prose_modified": false,
   "proposed_navigation_approved": false,
   "publication_authorized": false,
-  "provenance": "Ten original digital source-link inconsistencies are hash pinned for editorial review, separate from four earlier blocked links. Source K, ordinal, target and label remain unchanged; proposed navigation is not approved or applied.",
+  "provenance": "Eleven explicitly source-attested original digital or printed-reference anomalies are individually hash pinned and review-only; separate from four earlier blocked malformed targets. Printed-source errors are distinguished from digital-link-only mismatches, and no corrections are approved.",
   "cases": [
     {
       "source_first_key": "Deut.9.1",
@@ -150,6 +150,21 @@
         "Song.1.11"
       ],
       "finding": "Source prints Song 1:10–11 within Song commentary and modern translation likewise refers to Song 1:10–11, but original digital hyperlink wrongly targets 1 Corinthians 10:11. Exact alternative link representation requires editorial approval.",
+      "approval": false
+    },
+    {
+      "source_first_key": "Num.29.1",
+      "source_reference_ordinal": 1,
+      "original_osisRef": "Lev.22.24",
+      "original_target_sha256": "60720e6d23a473a6e6a9c8534f475d93804ae3e22f5efbc91be61886b1625943",
+      "original_link_label": "Le 22:24",
+      "original_label_sha256": "e75d871e0b87a3f6e309e201854cf196a81df4c1231d68bb3ab77b18e5971086",
+      "printed_antecedent": "The blowing of the trumpets was appointed, Le 22:24",
+      "proposed_destinations": [
+        "Lev.23.24"
+      ],
+      "finding_type": "SUSPECT_ORIGINAL_PRINTED_CITATION_AND_LINK_TARGET",
+      "finding": "Both the original printed link and digital osisRef point to Leviticus 22:24 (blemished animals), whereas the described annual blowing of trumpets is commanded in Leviticus 23:24. Source witness and modern Numbers 29 audit already document the apparent printed citation problem. No silent change of the original printed text or hyperlink.",
       "approval": false
     }
   ]
