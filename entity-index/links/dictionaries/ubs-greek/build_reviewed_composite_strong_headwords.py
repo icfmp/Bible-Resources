@@ -146,7 +146,7 @@ def review(candidate, raw_source, report, ledger, english, french):
                 or word["original_class"]!=decision["original_macula_class"]
                 or not word["original_morph"] or not word["original_reference"]
                 or decision["source_original_ln_code"] not in shared):
-                raise ValueError("Original Greek compound Strong word-ID, lemma, morphology or LN drift: "+wid)
+                raise ValueError("Original Greek compound Strong word-ID, lemma, morphology or LN drift: "+repr({"wid":wid,"lemma":word["original_lemma"],"strong":word["original_strong"],"class":word["original_class"],"ln":word["original_ln"],"shared":shared,"expected_ln":decision["source_original_ln_code"],"already_indexed":wid in candidate["by_macula_word"],"already_ambiguous":wid in candidate.get("by_macula_ambiguous_word",{})}))
             new_ids.add(wid)
             out["by_macula_word"][wid]={
                 "entry_id":mid,
