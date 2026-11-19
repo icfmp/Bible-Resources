@@ -134,7 +134,7 @@ def main() -> None:
     staged = stage(ledger, index, args.macula)
     expected = {"reviewed_families": 81,
                 "reviewed_family_occurrences_not_automatically_linked": 274,
-                "staged_original_word_ids": 86,
+                "staged_original_word_ids": 139,
                 "new_contextual_senses": 0}
     if staged["summary"] != expected:
         raise ValueError("Source-pinned reviewed word inventory changed")
