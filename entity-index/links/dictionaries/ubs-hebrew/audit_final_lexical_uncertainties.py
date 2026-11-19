@@ -93,7 +93,8 @@ def run(ledger, additional, english, french, macula, base=None):
             source.append(data)
 
     if len(source) != 26 or len({r["word_id"] for r in source}) != 26:
-        raise ValueError("Original residual lexical source inventory not exactly 26")
+        cases = {str(k): sum(key(r["lang"], r["lemma_original"], r["strong_original"]) == k for r in source) for k in original}
+        raise ValueError(f"Original residual lexical source inventory not exactly 26: found {len(source)} words; giant present: {any(r['word_id'] == hold_id for r in source)}; source family counts: {cases}")
     for d in original.values():
         tokens = [r for r in source
                   if key(r["lang"], r["lemma_original"], r["strong_original"]) ==
