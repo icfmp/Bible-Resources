@@ -35,6 +35,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_families_batch4.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_no_ln_batch5.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_224_ambiguities.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_taxonomy_headwords.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -454,6 +455,43 @@ jobs:
           assert all("sense_id" not in row for row in d["by_macula_ambiguous_word"].values())
           print("GREEK_220_AMBIGUOUS_ORIGINAL_WORD_HEADWORDS_SOURCE_REVIEWED_LEGACY_STRONG_PRESERVED")
           PY
+      - name: Review exact Greek numerals, relative pronouns and articles across source POS labels
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_taxonomy_headwords.py \
+            --candidate /tmp/bsi-ubs-greek-reviewed-220-ambiguities-private.json \
+            --previous_ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch4.json \
+            --residual /tmp/bsi-ubs-greek-173-original-word-evidence.json \
+            --taxonomy_ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_taxonomy_headwords.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-32-taxonomy-review-private.json
+          python3 - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          c=json.loads(Path('/tmp/bsi-ubs-greek-32-taxonomy-review-private.json').read_text())
+          base=json.loads(Path('entity-index/links/dictionaries/ubs-greek/index.json').read_text())
+          assert all(c[k]==v for k,v in base.items())
+          assert len(c['by_macula_word'])==9187
+          assert len(c['by_macula_ambiguous_word'])==220
+          assert c['editorial_candidate']['reviewed_original_headword_words_total']==9184
+          assert c['editorial_candidate']['other_original_words_still_unapproved']==3
+          assert c['editorial_candidate']['new_inferred_contextual_lexical_sense_ids']==0
+          assert c['editorial_candidate']['publication_approved'] is False
+          assert c['word_aware_coverage']['word_aware_entry_candidate_words']==137309
+          counts=Counter(w['match_type'] for w in c['by_macula_word'].values())
+          assert counts['source_reviewed_original_greek_headword_grammatical_taxonomy_only']==32
+          assert counts['nfc_canonically_identical_lemma_and_original_ln_unapproved_word_candidate']==3
+          assert all('sense_id' not in v for v in c['by_macula_word'].values())
+          print('GREEK_TAXONOMY_32_ORIGINAL_WORD_HEADWORDS_REVIEWED_NO_CONTEXTUAL_LEXID')
+          PY
+      - name: Upload Greek grammatical-taxonomy word headwords (PRIVATE, NOT published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-32-taxonomy-word-headwords-reviewed-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-32-taxonomy-review-private.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload source-reviewed Greek ambiguity headwords (PRIVATE, NOT published)
         uses: actions/upload-artifact@v4
         with:
