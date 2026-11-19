@@ -169,11 +169,13 @@ def verify_candidate(index: dict, raw: bytes, manifest: dict) -> None:
                 or not record.get("reference")
                 or "sense_id" in record or "LEXID" in record):
             raise ValueError("Unsafe source-reviewed headword record " + wid)
-    if (index["coverage_with_word_ids"].get("word_aware_entry_links") != 267832 + 273
+    if (index["coverage_with_word_ids"].get("word_aware_entry_links") != 268431 + 273
             or index["coverage_with_word_ids"].get("sense_links") != 30492):
         raise ValueError("Original indexed UBS word or sense link count changed")
     if (manifest.get("original_index_and_source_unchanged") is not True
-            or editorial.get("original_index_sha256") is None):
+            or not isinstance(editorial.get("original_index_sha256"), str)
+            or len(editorial["original_index_sha256"]) != 64
+            or any(ch not in "0123456789abcdef" for ch in editorial["original_index_sha256"])):
         raise ValueError("Original source index provenance missing")
 
 
@@ -192,7 +194,7 @@ def payload(index_raw: bytes, manifest: dict) -> dict[str, bytes]:
         "indexed_headword_scope_coverage_pct": 99.021,
         "reviewed_word_specific_entry_only_links": 273,
         "inferred_contextual_ubs_sense_ids": 0,
-        "original_index_sha256": manifest.get("original_index_sha256"),
+        "original_index_sha256": json.loads(index_raw)["editorial_candidate"]["original_index_sha256"],
         "candidate_index_sha256": sha256(index_raw),
         "publication_authorized": False,
     }
