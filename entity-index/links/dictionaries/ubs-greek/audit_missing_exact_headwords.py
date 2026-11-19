@@ -137,6 +137,7 @@ def main():
     read = lambda p: json.loads(p.read_text(encoding="utf-8-sig"))
     data = audit(read(a.source), read(a.english), read(a.french))
     a.output.write_text(json.dumps(data, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    print("UBS_GREEK_CASEFOLD_SOURCE_EVIDENCE", json.dumps([{"lemma": x["original_greek_lemma_nfc_for_comparison"], "word_count": x["original_word_count"], "source_classes": x["original_source_classes"], "original_strong": x["original_source_strong"], "original_ln_codes": x["original_ln_code_counts"], "casefold_original_ubs_entry_ids": x["ubs_case_only_spelling_main_ids"]} for x in data["source_word_families"] if x["ubs_case_only_spelling_main_ids"]], ensure_ascii=False, sort_keys=True))
     print("GREEK_459_SOURCE_MISSING_UBS_ORIGINAL_HEADWORDS", json.dumps({
         "original_words": data["original_words"],
         "families": data["original_families"],
