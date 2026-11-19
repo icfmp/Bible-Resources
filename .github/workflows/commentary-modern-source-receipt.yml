@@ -3969,14 +3969,62 @@ jobs:
                           raise ValueError("Exact valid source target not uniquely seen in GUI HTML")
                       label_sha=hashlib.sha256(
                           " ".join(valid_labels[0].split()).casefold().encode()).hexdigest()
+                      # Prepare a distinctive 10-word target-Bible witness
+                      # independently from the compiled BRLSG1910 module.
+                      # Neither prose nor its token sequence enters CI logs.
+                      tcode,target_bible=query("BRLSG1910","Hebrews 11:8",
+                          fmt="plain",root=root,exe="diatheke",
+                          limit=256*1024,timeout=25)
+                      if tcode or not present_key("Hebrews 11:8",target_bible,tcode):
+                          raise ValueError("Exact target Scripture reader is unavailable")
+                      def normalized_words(value):
+                          if isinstance(value,bytes):
+                              value=value.decode("utf-8",errors="replace")
+                          return re.findall(r"\w+",str(value).casefold())
+                      tw=normalized_words(target_bible)
+                      sw=normalized_words(comparisons["Gen 12:6"]["bible"])
+                      unique=[tw[i:i+10] for i in range(max(0,len(tw)-9))
+                          if tw[i:i+10] and tw[i:i+10] not in
+                              [sw[j:j+10] for j in range(max(0,len(sw)-9))]]
+                      if not unique:
+                          raise ValueError("Target Bible does not provide a distinctive witness")
+                      target_phrase=" ".join(unique[len(unique)//2])
                       # AT-SPI link extents originate in the genuine Xiphos UI.
                       # A subprocess drives the real X11 pointer only when there
                       # is one visible matching link in the commentary half.
                       script=textwrap.dedent("""
-                          import hashlib,json,re,subprocess,sys
+                          import hashlib,json,re,subprocess,sys,time
                           import pyatspi
                           expected=" ".join(sys.argv[1].split()).casefold()
+                          target_phrase=" ".join(re.findall(r"\w+",sys.argv[2].casefold()))
                           digest=hashlib.sha256(expected.encode()).hexdigest()
+                          def actual_accessible_target_present():
+                              # Observe real visible Xiphos accessibility text,
+                              # never count clipboard markup or source hrefs.
+                              todo=[pyatspi.Registry.getDesktop(0)]
+                              fragments=[]
+                              visited=0
+                              while todo and visited<750:
+                                  item=todo.pop();visited+=1
+                                  try:
+                                      name=item.name or ""
+                                      if name: fragments.append(name[:1500])
+                                      if item.getRoleName().lower() in (
+                                              "text","paragraph","static","label",
+                                              "document frame","web document","heading"):
+                                          try:
+                                              interface=item.queryText()
+                                              chars=min(interface.characterCount,6000)
+                                              if chars>0:
+                                                  fragments.append(interface.getText(0,chars))
+                                          except (LookupError,RuntimeError,AttributeError):
+                                              pass
+                                      todo.extend(item[i] for i in range(min(item.childCount,100)))
+                                  except (LookupError,RuntimeError,AttributeError):
+                                      continue
+                              joined=" ".join(re.findall(r"\w+",
+                                  " ".join(fragments).casefold()))
+                              return bool(target_phrase and target_phrase in joined)
                           out={"status":"REAL_GUI_ATSPI_SOURCE_LABEL_SEARCH",
                                "matching_showing_link_count":0,
                                "x11_actual_click_dispatched":False}
@@ -4015,14 +4063,21 @@ jobs:
                           if right:
                               x,y=max(right,key=lambda item:item[0])
                               if sum(abs(px-x)<10 for px,_ in right)==1:
+                                  before=actual_accessible_target_present()
                                   click=subprocess.run(["xdotool","mousemove",str(x),str(y),
                                       "click","1"],timeout=7,capture_output=True)
                                   out["x11_actual_click_dispatched"]=click.returncode==0
+                                  if click.returncode==0:
+                                      time.sleep(1)
+                                      after=actual_accessible_target_present()
+                                      out["target_phrase_already_visible_before_click"]=before
+                                      out["real_post_click_target_scripture_prose_appeared"]=(
+                                          not before and after)
                           print(json.dumps(out,sort_keys=True))
                       """)
-                      attempt=subprocess.run(["/usr/bin/python3","-c",script,valid_labels[0]],
+                      attempt=subprocess.run(["/usr/bin/python3","-c",script,valid_labels[0],target_phrase],
                           env=probe_env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
-                          text=True,timeout=18,check=False)
+                          text=True,timeout=30,check=False)
                       if attempt.returncode!=0 or len(attempt.stdout)>4096:
                           raise ValueError("Real AT-SPI link activation unavailable")
                       click_proof=json.loads(attempt.stdout)
@@ -4054,7 +4109,10 @@ jobs:
                           click_proof["post_click_independent_bible_excerpt_match"]=bool(match)
                           click_proof["status"]=(
                               "REAL_XIPHOS_CLICK_AND_POSTCLICK_BIBLE_TEXT_MATCH"
-                              if match else "REAL_XIPHOS_CLICK_DISPATCHED_DESTINATION_NOT_PROVEN")
+                              if match else
+                              "REAL_XIPHOS_CLICK_TARGET_PROSE_APPEARED_IN_ACCESSIBILITY"
+                              if click_proof.get("real_post_click_target_scripture_prose_appeared")
+                              else "REAL_XIPHOS_CLICK_DISPATCHED_DESTINATION_NOT_PROVEN")
                       click_proof["exact_original_valid_link_GUI_HTML_attested"]=True
                   except (ValueError,PilotError,OSError,subprocess.TimeoutExpired,KeyError):
                       click_proof={"status":"REAL_GUI_VALID_ANCHOR_CLICK_PROBE_INCONCLUSIVE"}
