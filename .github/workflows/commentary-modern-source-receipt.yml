@@ -1,5 +1,8 @@
 name: Modern commentary source-native receipt (metadata-only)
 on:
+  # Scoped push trigger for this PR's fail-closed GUI validation.
+  push:
+    branches: [feature/mhcc-modern-english]
   pull_request:
     paths:
       - '.github/workflows/commentary-modern-source-receipt.yml'
