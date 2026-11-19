@@ -125,7 +125,9 @@ def main():
         "words": report["unapproved_words"],
         "top_families": [
             {"lemma": r["lemma_nfc"], "main_id": r["ubs_main_id"], "words": r["original_word_count"],
-             "parts_of_speech": r["ubs_original_pos"]}
+             "parts_of_speech": r["ubs_original_pos"],
+             "source_classes": r["original_classes"],
+             "source_strong_counts": r["original_strong_counts"]}
             for r in report["families"][:30]
         ],
         "published": False,
