@@ -17,6 +17,7 @@ def fixture():
     row = {"lang": "H", "lemma": "אַל", "original_strong": "0408",
            "occurrences": 2, "decision": "candidate_lexical_nonidentity",
            "rationale": "Negative particle is not the noun.",
+           "candidate_relation": "different_strong_same_consonants",
            "ubs_candidate": candidate,
            "source_witness": {"word_id": "word-one", "reference": "GEN 1:1!1",
                               "english": "not", "pos": "particle", "class": "adv"}}
@@ -64,6 +65,59 @@ class VerifyNonidentityTests(unittest.TestCase):
         ledger, report, entries = fixture()
         del ledger["decisions"][0]["rationale"]
         with self.assertRaisesRegex(ValueError, "Unexplained or unsupported"):
+            verify["verify_metadata"](ledger, report, entries)
+
+    def test_same_strong_compound_source_component_rejection(self):
+        ledger, report, entries = fixture()
+        d = ledger["decisions"][0]
+        f = report["families"][0]
+        d["candidate_relation"] = "same_strong_family_unresolved"
+        f["reason"] = "same_strong_family_unresolved"
+        d["original_strong"] = f["original_strong"] = "7417b"
+        d["lemma"] = f["lemma"] = "רִמּוֹן"
+        d["source_witness"] = {
+            "word_id": "word-one", "reference": "2KI 5:18!9",
+            "original_sdbh": "006818002005000"
+        }
+        f["source_witnesses"] = [{
+            "original_word_id": "word-one", "reference": "2KI 5:18!9",
+            "original_sdbh": "006818002005000"
+        }]
+        d["source_classes"] = f["source_classes"] = {"noun": 2}
+        d["ubs_candidate"] = {
+            "main_id": "000001000000000", "lemma": "רִמּוֹנוֹ",
+            "strong_codes": ["H7417"], "parts_of_speech": ["name"]
+        }
+        entries[0]["Lemma"] = "רִמּוֹנוֹ"
+        entries[0]["StrongCodes"] = ["H7417"]
+        entries[0]["BaseForms"][0]["PartsOfSpeech"] = ["name"]
+        with tempfile.TemporaryDirectory() as temp:
+            p = Path(temp) / "macula.tsv"
+            p.write_text(
+                "xml:id\\tlang\\tlemma\\tstrongnumberx\\tref\\tsdbh\\tclass\\n"
+                "word-one\\tH\\tרִמּוֹן\\t7417b\\t2KI 5:18!9\\t"
+                "006818002005000\\tnoun\\n",
+                encoding="utf-8"
+            )
+            self.assertEqual(verify["verify"](ledger, report, entries, p),
+                             {"families": 1, "occurrences": 2})
+            p.write_text(p.read_text(encoding="utf-8").replace(
+                "006818002005000", "WRONG_ID"), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "Original MACULA witness changed"):
+                verify["verify"](ledger, report, entries, p)
+        changed = deepcopy(ledger)
+        changed["decisions"][0]["source_classes"] = {"verb": 2}
+        with self.assertRaisesRegex(ValueError, "source-class counts changed"):
+            verify["verify_metadata"](changed, report, entries)
+        changed = deepcopy(entries)
+        changed[0]["StrongCodes"] = ["H7418"]
+        with self.assertRaisesRegex(ValueError, "candidate Strong metadata changed"):
+            verify["verify_metadata"](ledger, report, changed)
+
+    def test_original_candidate_reason_drift_rejected(self):
+        ledger, report, entries = fixture()
+        ledger["decisions"][0]["candidate_relation"] = "same_strong_family_unresolved"
+        with self.assertRaisesRegex(ValueError, "supported unresolved family"):
             verify["verify_metadata"](ledger, report, entries)
 
     def test_non_exhaustive_candidate_rejection_is_rejected(self):
