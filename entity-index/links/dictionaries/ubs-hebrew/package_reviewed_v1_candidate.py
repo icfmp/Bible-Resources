@@ -13,7 +13,7 @@ import json
 import zipfile
 from pathlib import Path
 
-NAME = "BSI-UBSHebrew-0.9.4-v1.0-rc1"
+NAME = "BSI-UBSHebrew-0.9.4-v1.0-rc2"
 PREFIX = NAME + "/"
 FIXED_TIME = (1980, 1, 1, 0, 0, 0)
 CC_BY_SA = "https://creativecommons.org/licenses/by-sa/4.0/"
@@ -23,7 +23,7 @@ MARKER = "editorially_reviewed_original_wlc_headword_only"
 
 README = """# UBS Hebrew lexical crosswalk for Bible Semantic Index
 
-Review candidate: v1.0-rc1. **Not published or approved as a release.**
+Review candidate: v1.0-rc2. **Not published or approved as a release.**
 
 Source-anchored, offline lexical headword lookup connecting original MACULA
 Hebrew WLC word IDs to UBS Dictionary of Biblical Hebrew 0.9.4 (EN/FR).
@@ -44,9 +44,11 @@ these independently reviewed word-ID-only candidate links.
 * 248,680 selected original lexical WLC word occurrences (unchanged).
 * 240,371 candidate occurrences with a UBS headword.
 * 242,747 original UBS 0.9.4 indexed-headword-scope denominator.
-* 99.021% coverage of that edition-specific scope, NOT semantic accuracy
+* 99.022% coverage of that edition-specific scope, NOT semantic accuracy
   or full Hebrew vocabulary coverage.
-* 273 independently reviewed WLC word-specific entry-only links.
+* 275 independently reviewed WLC word-specific entry-only links (273 baseline
+  + 2 independently substantiated exact-source lexical identities).
+* 24 further individually audited original words retain explicit no-links.
 * Zero editorially invented contextual UBS sense IDs.
 * One ambiguous reviewed word deliberately not linked in 2 Sam. 21:22.
 * All original editorial exclusions, source rights and homograph warnings
@@ -85,9 +87,13 @@ redistributed in this package.
 
 Changes relative to original datasets: verified original word-ID keyed,
 headword-only crosswalk; conservative original Strong-family checks;
-quarantined misleading matching SDBH IDs from unrelated editions; 273
+quarantined misleading matching SDBH IDs from unrelated editions; 275
 independently documented original source-word UBS headword decisions;
 source-attested exclusions retained; no inferred contextual UBS senses.
+
+Additional reviewed original WLC word-specific headword links: Joshua 19:13
+Rimmon/Rimmono and 1 Samuel 17:39 יאל/H2974; no other homonym or
+source text, Strong code or UBS lexical sense is changed.
 
 No original publishers, authors or organizations endorse this adaptation.
 Retain this attribution and the ShareAlike license when redistributing.
@@ -141,24 +147,30 @@ def verify_candidate(index: dict, raw: bytes, manifest: dict) -> None:
                 manifest["source_editions"]):
         raise ValueError("Source or dictionary edition drift")
     if (scope.get("original_lexical_source_occurrences") != 248680
-            or scope.get("linked_occurrences") != 240371
+            or scope.get("linked_occurrences") != 240373
             or scope.get("indexable_denominator") != 242747
-            or scope.get("indexable_unresolved") != 2376
-            or scope.get("coverage_pct") != 99.021
+            or scope.get("indexable_unresolved") != 2374
+            or scope.get("coverage_pct") != 99.022
             or manifest.get("original_source_linked_lexical_occurrences") != 240098
-            or manifest.get("new_entry_only_word_links") != 273
-            or manifest.get("original_source_words_left_unlinked_by_review") != 1):
+            or manifest.get("new_entry_only_word_links") != 275
+            or manifest.get("original_source_words_left_unlinked_by_review") != 1
+            or manifest.get("final_original_source_word_approvals") != 2
+            or manifest.get("remaining_last_original_word_abstentions") != 24
+            or manifest.get("previous_candidate_index_sha256") !=
+               "7c2e386a07d0dede3bcb836f64db66a5779b7e4c9d8f6d20ec76e06d156c1b35"):
         raise ValueError("Candidate source population/coverage changed")
     if (editorial.get("original_index_left_unchanged") is not True
             or editorial.get("source_corpus_left_unchanged") is not True
-            or editorial.get("new_headword_only_wlc_word_ids") != 273
+            or editorial.get("new_headword_only_wlc_word_ids") != 275
+            or editorial.get("additional_final_source_specific_approvals") != 2
+            or editorial.get("remaining_source_specific_unlinked_words") != 24
             or editorial.get("inferred_contextual_sense_ids") != 0
             or manifest.get("contextual_sense_ids_inferred") != 0):
         raise ValueError("Unreviewed source word or contextual sense leaked into candidate")
     word_links = index.get("by_macula_word") or {}
     reviewed = {wid: entry for wid, entry in word_links.items()
                 if entry.get("match_type") == MARKER}
-    if (len(reviewed) != 273
+    if (len(reviewed) != 275
             or index["coverage_with_word_ids"].get("additional_entry_only_links") != len(word_links)):
         raise ValueError("Word link inventory mismatches reviewed source ledger")
     for wid, record in reviewed.items():
@@ -169,7 +181,7 @@ def verify_candidate(index: dict, raw: bytes, manifest: dict) -> None:
                 or not record.get("reference")
                 or "sense_id" in record or "LEXID" in record):
             raise ValueError("Unsafe source-reviewed headword record " + wid)
-    if (index["coverage_with_word_ids"].get("word_aware_entry_links") != 268431 + 273
+    if (index["coverage_with_word_ids"].get("word_aware_entry_links") != 268431 + 275
             or index["coverage_with_word_ids"].get("sense_links") != 30492):
         raise ValueError("Original indexed UBS word or sense link count changed")
     if (manifest.get("original_index_and_source_unchanged") is not True
@@ -183,16 +195,18 @@ def payload(index_raw: bytes, manifest: dict) -> dict[str, bytes]:
     provenance = {
         "schema_version": 1,
         "type": "bsi_ubs_hebrew_lexical_headword_crosswalk",
-        "version": "1.0-rc1",
+        "version": "1.0-rc2",
         "release_status": "private_candidate_not_approved_or_published",
         "edition": "UBS Hebrew 0.9.4",
         "source_editions": manifest["source_editions"],
         "license": "CC BY-SA 4.0",
         "source_original_lexical_occurrences": 248680,
-        "linked_original_occurrences": 240371,
+        "linked_original_occurrences": 240373,
         "indexed_headword_scope_denominator": 242747,
-        "indexed_headword_scope_coverage_pct": 99.021,
-        "reviewed_word_specific_entry_only_links": 273,
+        "indexed_headword_scope_coverage_pct": 99.022,
+        "reviewed_word_specific_entry_only_links": 275,
+        "last_word_specific_additional_approvals": 2,
+        "retained_unlinked_original_final_word_reviews": 24,
         "inferred_contextual_ubs_sense_ids": 0,
         "original_index_sha256": json.loads(index_raw)["editorial_candidate"]["original_index_sha256"],
         "candidate_index_sha256": sha256(index_raw),
