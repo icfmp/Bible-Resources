@@ -16,30 +16,6 @@
   "families": [
     {
       "lang": "A",
-      "lemma_editorial": "אַחְמְתָא",
-      "strong_original": "0307",
-      "candidate_ubs_main_id": "000290000000000",
-      "editorial_meaning": "Ecbatana, the city where the scroll was found in Ezra 6:2",
-      "ubs_attested_gloss": "Ecbatana",
-      "reviewed_original_occurrences": 1,
-      "already_reviewed_word_ids": 1,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "A",
-      "lemma_editorial": "אִמַּר",
-      "strong_original": "0563",
-      "candidate_ubs_main_id": "000513000000000",
-      "editorial_meaning": "lamb offered in Ezra 6:9",
-      "ubs_attested_gloss": "lamb",
-      "reviewed_original_occurrences": 3,
-      "already_reviewed_word_ids": 3,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "A",
       "lemma_editorial": "אֱנָשׁ",
       "strong_original": "0606",
       "candidate_ubs_main_id": "000553000000000",
@@ -339,6 +315,30 @@
           "morph_original": "Np"
         }
       ]
+    },
+    {
+      "lang": "A",
+      "lemma_editorial": "אִמַּר",
+      "strong_original": "0563",
+      "candidate_ubs_main_id": "000513000000000",
+      "editorial_meaning": "lamb offered in Ezra 6:9",
+      "ubs_attested_gloss": "lamb",
+      "reviewed_original_occurrences": 3,
+      "already_reviewed_word_ids": 3,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
+    },
+    {
+      "lang": "A",
+      "lemma_editorial": "אַחְמְתָא",
+      "strong_original": "0307",
+      "candidate_ubs_main_id": "000290000000000",
+      "editorial_meaning": "Ecbatana, the city where the scroll was found in Ezra 6:2",
+      "ubs_attested_gloss": "Ecbatana",
+      "reviewed_original_occurrences": 1,
+      "already_reviewed_word_ids": 1,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
     },
     {
       "lang": "A",
@@ -1021,6 +1021,18 @@
     },
     {
       "lang": "A",
+      "lemma_editorial": "חֲנַנְיָה",
+      "strong_original": "2608a",
+      "candidate_ubs_main_id": "002405000000000",
+      "editorial_meaning": "Hananiah, Daniel's companion, in Daniel 2:17",
+      "ubs_attested_gloss": "Hananiah",
+      "reviewed_original_occurrences": 1,
+      "already_reviewed_word_ids": 1,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
+    },
+    {
+      "lang": "A",
       "lemma_editorial": "חַגַּי",
       "strong_original": "2292a",
       "candidate_ubs_main_id": "002124000000000",
@@ -1038,18 +1050,6 @@
       "candidate_ubs_main_id": "002220000000000",
       "editorial_meaning": "Ezra 6:17 lists twelve male goats as a sin offering, corresponding to the UBS sin-offering sense, not a contextually assigned LEXID",
       "ubs_attested_gloss": "sin-offering",
-      "reviewed_original_occurrences": 1,
-      "already_reviewed_word_ids": 1,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "A",
-      "lemma_editorial": "חֲנַנְיָה",
-      "strong_original": "2608a",
-      "candidate_ubs_main_id": "002405000000000",
-      "editorial_meaning": "Hananiah, Daniel's companion, in Daniel 2:17",
-      "ubs_attested_gloss": "Hananiah",
       "reviewed_original_occurrences": 1,
       "already_reviewed_word_ids": 1,
       "new_word_id_count": 0,
@@ -1135,6 +1135,86 @@
           "morph_original": "Np"
         }
       ]
+    },
+    {
+      "lang": "A",
+      "lemma_editorial": "יִשְׂרָאֵל",
+      "strong_original": "3479",
+      "candidate_ubs_main_id": "003192000000000",
+      "editorial_meaning": "Israel, the people or nation, as referred to in the Aramaic Ezra 5:1 witness",
+      "ubs_attested_gloss": "Israel",
+      "reviewed_original_occurrences": 8,
+      "already_reviewed_word_ids": 3,
+      "new_word_id_count": 5,
+      "source_words_pending_individual_review": [
+        {
+          "word_id": "o150060160031",
+          "reference": "EZR 6:16!3",
+          "lemma_original": "יִשְׂרָאֵל",
+          "strong_original": "3479",
+          "sdbh_original": "003188001001000",
+          "class_original": "noun",
+          "pos_original": "noun",
+          "english_original": "Israel",
+          "morph_original": "Np"
+        },
+        {
+          "word_id": "o150060170191",
+          "reference": "EZR 6:17!19",
+          "lemma_original": "יִשְׂרָאֵל",
+          "strong_original": "3479",
+          "sdbh_original": "003188001001000",
+          "class_original": "noun",
+          "pos_original": "noun",
+          "english_original": "Israel",
+          "morph_original": "Np"
+        },
+        {
+          "word_id": "o150060170241",
+          "reference": "EZR 6:17!24",
+          "lemma_original": "יִשְׂרָאֵל",
+          "strong_original": "3479",
+          "sdbh_original": "003188001001000",
+          "class_original": "noun",
+          "pos_original": "noun",
+          "english_original": "Israel",
+          "morph_original": "Np"
+        },
+        {
+          "word_id": "o150070130101",
+          "reference": "EZR 7:13!10",
+          "lemma_original": "יִשְׂרָאֵל",
+          "strong_original": "3479",
+          "sdbh_original": "003188001001000",
+          "class_original": "noun",
+          "pos_original": "noun",
+          "english_original": "Israel",
+          "morph_original": "Np"
+        },
+        {
+          "word_id": "o150070150091",
+          "reference": "EZR 7:15!9",
+          "lemma_original": "יִשְׂרָאֵל",
+          "strong_original": "3479",
+          "sdbh_original": "003188001001000",
+          "class_original": "noun",
+          "pos_original": "noun",
+          "english_original": "Israel",
+          "morph_original": "Np"
+        }
+      ]
+    },
+    {
+      "lang": "A",
+      "lemma_editorial": "יֵשׁוּעַ",
+      "strong_original": "3443",
+      "candidate_ubs_main_id": "003155000000000",
+      "editorial_meaning": "Jeshua, son of Jozadak, in Ezra 5:2",
+      "ubs_attested_gloss": "Jeshua",
+      "reviewed_original_occurrences": 1,
+      "already_reviewed_word_ids": 1,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
     },
     {
       "lang": "A",
@@ -1318,83 +1398,15 @@
     },
     {
       "lang": "A",
-      "lemma_editorial": "יֵשׁוּעַ",
-      "strong_original": "3443",
-      "candidate_ubs_main_id": "003155000000000",
-      "editorial_meaning": "Jeshua, son of Jozadak, in Ezra 5:2",
-      "ubs_attested_gloss": "Jeshua",
+      "lemma_editorial": "כֹּר",
+      "strong_original": "3734a",
+      "candidate_ubs_main_id": "003422000000000",
+      "editorial_meaning": "Ezra 7:22 names the kor, a dry capacity measure, indexed under the original UBS kor headword",
+      "ubs_attested_gloss": "kor",
       "reviewed_original_occurrences": 1,
       "already_reviewed_word_ids": 1,
       "new_word_id_count": 0,
       "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "A",
-      "lemma_editorial": "יִשְׂרָאֵל",
-      "strong_original": "3479",
-      "candidate_ubs_main_id": "003192000000000",
-      "editorial_meaning": "Israel, the people or nation, as referred to in the Aramaic Ezra 5:1 witness",
-      "ubs_attested_gloss": "Israel",
-      "reviewed_original_occurrences": 8,
-      "already_reviewed_word_ids": 3,
-      "new_word_id_count": 5,
-      "source_words_pending_individual_review": [
-        {
-          "word_id": "o150060160031",
-          "reference": "EZR 6:16!3",
-          "lemma_original": "יִשְׂרָאֵל",
-          "strong_original": "3479",
-          "sdbh_original": "003188001001000",
-          "class_original": "noun",
-          "pos_original": "noun",
-          "english_original": "Israel",
-          "morph_original": "Np"
-        },
-        {
-          "word_id": "o150060170191",
-          "reference": "EZR 6:17!19",
-          "lemma_original": "יִשְׂרָאֵל",
-          "strong_original": "3479",
-          "sdbh_original": "003188001001000",
-          "class_original": "noun",
-          "pos_original": "noun",
-          "english_original": "Israel",
-          "morph_original": "Np"
-        },
-        {
-          "word_id": "o150060170241",
-          "reference": "EZR 6:17!24",
-          "lemma_original": "יִשְׂרָאֵל",
-          "strong_original": "3479",
-          "sdbh_original": "003188001001000",
-          "class_original": "noun",
-          "pos_original": "noun",
-          "english_original": "Israel",
-          "morph_original": "Np"
-        },
-        {
-          "word_id": "o150070130101",
-          "reference": "EZR 7:13!10",
-          "lemma_original": "יִשְׂרָאֵל",
-          "strong_original": "3479",
-          "sdbh_original": "003188001001000",
-          "class_original": "noun",
-          "pos_original": "noun",
-          "english_original": "Israel",
-          "morph_original": "Np"
-        },
-        {
-          "word_id": "o150070150091",
-          "reference": "EZR 7:15!9",
-          "lemma_original": "יִשְׂרָאֵל",
-          "strong_original": "3479",
-          "sdbh_original": "003188001001000",
-          "class_original": "noun",
-          "pos_original": "noun",
-          "english_original": "Israel",
-          "morph_original": "Np"
-        }
-      ]
     },
     {
       "lang": "A",
@@ -1466,15 +1478,38 @@
     },
     {
       "lang": "A",
-      "lemma_editorial": "כֹּר",
-      "strong_original": "3734a",
-      "candidate_ubs_main_id": "003422000000000",
-      "editorial_meaning": "Ezra 7:22 names the kor, a dry capacity measure, indexed under the original UBS kor headword",
-      "ubs_attested_gloss": "kor",
-      "reviewed_original_occurrences": 1,
-      "already_reviewed_word_ids": 1,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
+      "lemma_editorial": "מְלַל",
+      "strong_original": "4449",
+      "candidate_ubs_main_id": "004070000000000",
+      "editorial_meaning": "the Aramaic verb for speaking in Daniel 6:22",
+      "ubs_attested_gloss": "to speak",
+      "reviewed_original_occurrences": 5,
+      "already_reviewed_word_ids": 3,
+      "new_word_id_count": 2,
+      "source_words_pending_individual_review": [
+        {
+          "word_id": "o270070200201",
+          "reference": "DAN 7:20!20",
+          "lemma_original": "מְלַל",
+          "strong_original": "4449",
+          "sdbh_original": "004067002002000",
+          "class_original": "verb",
+          "pos_original": "verb",
+          "english_original": "spoke",
+          "morph_original": "Vprmsa"
+        },
+        {
+          "word_id": "o270070250051",
+          "reference": "DAN 7:25!5",
+          "lemma_original": "מְלַל",
+          "strong_original": "4449",
+          "sdbh_original": "004067002002000",
+          "class_original": "verb",
+          "pos_original": "verb",
+          "english_original": "speak",
+          "morph_original": "Vpi3ms"
+        }
+      ]
     },
     {
       "lang": "A",
@@ -1560,41 +1595,6 @@
     },
     {
       "lang": "A",
-      "lemma_editorial": "מְלַל",
-      "strong_original": "4449",
-      "candidate_ubs_main_id": "004070000000000",
-      "editorial_meaning": "the Aramaic verb for speaking in Daniel 6:22",
-      "ubs_attested_gloss": "to speak",
-      "reviewed_original_occurrences": 5,
-      "already_reviewed_word_ids": 3,
-      "new_word_id_count": 2,
-      "source_words_pending_individual_review": [
-        {
-          "word_id": "o270070200201",
-          "reference": "DAN 7:20!20",
-          "lemma_original": "מְלַל",
-          "strong_original": "4449",
-          "sdbh_original": "004067002002000",
-          "class_original": "verb",
-          "pos_original": "verb",
-          "english_original": "spoke",
-          "morph_original": "Vprmsa"
-        },
-        {
-          "word_id": "o270070250051",
-          "reference": "DAN 7:25!5",
-          "lemma_original": "מְלַל",
-          "strong_original": "4449",
-          "sdbh_original": "004067002002000",
-          "class_original": "verb",
-          "pos_original": "verb",
-          "english_original": "speak",
-          "morph_original": "Vpi3ms"
-        }
-      ]
-    },
-    {
-      "lang": "A",
       "lemma_editorial": "מֹשֶׁה",
       "strong_original": "4873",
       "candidate_ubs_main_id": "004466000000000",
@@ -1602,18 +1602,6 @@
       "ubs_attested_gloss": "Moses",
       "reviewed_original_occurrences": 1,
       "already_reviewed_word_ids": 1,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "A",
-      "lemma_editorial": "עִדֹּוא",
-      "strong_original": "5714b",
-      "candidate_ubs_main_id": "005250000000000",
-      "editorial_meaning": "Iddo, ancestor of the prophet Zechariah in Ezra 5:1",
-      "ubs_attested_gloss": "Iddo",
-      "reviewed_original_occurrences": 2,
-      "already_reviewed_word_ids": 2,
       "new_word_id_count": 0,
       "source_words_pending_individual_review": []
     },
@@ -1651,6 +1639,18 @@
           "morph_original": "Ncmsd"
         }
       ]
+    },
+    {
+      "lang": "A",
+      "lemma_editorial": "עִדֹּוא",
+      "strong_original": "5714b",
+      "candidate_ubs_main_id": "005250000000000",
+      "editorial_meaning": "Iddo, ancestor of the prophet Zechariah in Ezra 5:1",
+      "ubs_attested_gloss": "Iddo",
+      "reviewed_original_occurrences": 2,
+      "already_reviewed_word_ids": 2,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
     },
     {
       "lang": "A",
@@ -1924,18 +1924,6 @@
     },
     {
       "lang": "H",
-      "lemma_editorial": "טֹחֲנֹות",
-      "strong_original": "2912a",
-      "candidate_ubs_main_id": "002686000000000",
-      "editorial_meaning": "The plural grinders who cease in Ecclesiastes 12:3",
-      "ubs_attested_gloss": "to grind",
-      "reviewed_original_occurrences": 1,
-      "already_reviewed_word_ids": 1,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "H",
       "lemma_editorial": "טַפְחָה",
       "strong_original": "2948a",
       "candidate_ubs_main_id": "002716000000000",
@@ -1960,11 +1948,11 @@
     },
     {
       "lang": "H",
-      "lemma_editorial": "יָמַר",
-      "strong_original": "0559a",
-      "candidate_ubs_main_id": "000511000000000",
-      "editorial_meaning": "Israel's priests will boast in the riches of the nations (Isaiah 61:6)",
-      "ubs_attested_gloss": "to boast",
+      "lemma_editorial": "טֹחֲנֹות",
+      "strong_original": "2912a",
+      "candidate_ubs_main_id": "002686000000000",
+      "editorial_meaning": "The plural grinders who cease in Ecclesiastes 12:3",
+      "ubs_attested_gloss": "to grind",
       "reviewed_original_occurrences": 1,
       "already_reviewed_word_ids": 1,
       "new_word_id_count": 0,
@@ -1977,6 +1965,18 @@
       "candidate_ubs_main_id": "003016000000000",
       "editorial_meaning": "Psalm 29:9 concerns the forests stripped bare, matching UBS יער forest/woods and not an unrelated same-spelling personal name",
       "ubs_attested_gloss": "forest",
+      "reviewed_original_occurrences": 1,
+      "already_reviewed_word_ids": 1,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
+    },
+    {
+      "lang": "H",
+      "lemma_editorial": "יָמַר",
+      "strong_original": "0559a",
+      "candidate_ubs_main_id": "000511000000000",
+      "editorial_meaning": "Israel's priests will boast in the riches of the nations (Isaiah 61:6)",
+      "ubs_attested_gloss": "to boast",
       "reviewed_original_occurrences": 1,
       "already_reviewed_word_ids": 1,
       "new_word_id_count": 0,
@@ -2008,6 +2008,18 @@
     },
     {
       "lang": "H",
+      "lemma_editorial": "כִּנְעָנִי",
+      "strong_original": "3667b",
+      "candidate_ubs_main_id": "003359000000000",
+      "editorial_meaning": "Isaiah 23:8 explicitly refers to Tyre's merchants/traders; UBS כנען includes merchants in its separate lexical senses",
+      "ubs_attested_gloss": "merchants",
+      "reviewed_original_occurrences": 1,
+      "already_reviewed_word_ids": 1,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
+    },
+    {
+      "lang": "H",
       "lemma_editorial": "כַּלְנֹו",
       "strong_original": "3641a",
       "candidate_ubs_main_id": "003338000000000",
@@ -2020,11 +2032,11 @@
     },
     {
       "lang": "H",
-      "lemma_editorial": "כִּנְעָנִי",
-      "strong_original": "3667b",
-      "candidate_ubs_main_id": "003359000000000",
-      "editorial_meaning": "Isaiah 23:8 explicitly refers to Tyre's merchants/traders; UBS כנען includes merchants in its separate lexical senses",
-      "ubs_attested_gloss": "merchants",
+      "lemma_editorial": "מַעֲנִית",
+      "strong_original": "4618a",
+      "candidate_ubs_main_id": "004236000000000",
+      "editorial_meaning": "Psalm 129:3 compares the oppressors' wounds to long ploughing furrows, matching the source UBS furrow noun",
+      "ubs_attested_gloss": "furrow",
       "reviewed_original_occurrences": 1,
       "already_reviewed_word_ids": 1,
       "new_word_id_count": 0,
@@ -2124,13 +2136,25 @@
     },
     {
       "lang": "H",
-      "lemma_editorial": "מַעֲנִית",
-      "strong_original": "4618a",
-      "candidate_ubs_main_id": "004236000000000",
-      "editorial_meaning": "Psalm 129:3 compares the oppressors' wounds to long ploughing furrows, matching the source UBS furrow noun",
-      "ubs_attested_gloss": "furrow",
-      "reviewed_original_occurrences": 1,
-      "already_reviewed_word_ids": 1,
+      "lemma_editorial": "נֵרִיָהוּ",
+      "strong_original": "5374a",
+      "candidate_ubs_main_id": "004928000000000",
+      "editorial_meaning": "Baruch's father Neriah in Jeremiah 36:14",
+      "ubs_attested_gloss": "Neriah",
+      "reviewed_original_occurrences": 3,
+      "already_reviewed_word_ids": 3,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
+    },
+    {
+      "lang": "H",
+      "lemma_editorial": "נַחֲלָה",
+      "strong_original": "5158a",
+      "candidate_ubs_main_id": "004735000000000",
+      "editorial_meaning": "Ezekiel 47:19 describes the Wadi of Egypt; the UBS נחל headword explicitly includes wadi, a geographical streambed",
+      "ubs_attested_gloss": "wadi",
+      "reviewed_original_occurrences": 2,
+      "already_reviewed_word_ids": 2,
       "new_word_id_count": 0,
       "source_words_pending_individual_review": []
     },
@@ -2155,30 +2179,6 @@
       "ubs_attested_gloss": "noble words",
       "reviewed_original_occurrences": 1,
       "already_reviewed_word_ids": 1,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "H",
-      "lemma_editorial": "נַחֲלָה",
-      "strong_original": "5158a",
-      "candidate_ubs_main_id": "004735000000000",
-      "editorial_meaning": "Ezekiel 47:19 describes the Wadi of Egypt; the UBS נחל headword explicitly includes wadi, a geographical streambed",
-      "ubs_attested_gloss": "wadi",
-      "reviewed_original_occurrences": 2,
-      "already_reviewed_word_ids": 2,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "H",
-      "lemma_editorial": "נֵרִיָהוּ",
-      "strong_original": "5374a",
-      "candidate_ubs_main_id": "004928000000000",
-      "editorial_meaning": "Baruch's father Neriah in Jeremiah 36:14",
-      "ubs_attested_gloss": "Neriah",
-      "reviewed_original_occurrences": 3,
-      "already_reviewed_word_ids": 3,
       "new_word_id_count": 0,
       "source_words_pending_individual_review": []
     },
@@ -2220,6 +2220,18 @@
     },
     {
       "lang": "H",
+      "lemma_editorial": "צָרַר",
+      "strong_original": "6862",
+      "candidate_ubs_main_id": "006321000000000",
+      "editorial_meaning": "Lamentations 1:20 explicitly describes internal distress; UBS's צר distress noun/adjective includes the published gloss distress.",
+      "ubs_attested_gloss": "distress",
+      "reviewed_original_occurrences": 1,
+      "already_reviewed_word_ids": 1,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
+    },
+    {
+      "lang": "H",
       "lemma_editorial": "צֹר",
       "strong_original": "6697a",
       "candidate_ubs_main_id": "006168000000000",
@@ -2237,30 +2249,6 @@
       "candidate_ubs_main_id": "006167000000000",
       "editorial_meaning": "Exodus 23:22 speaks of God treating Israel's foes as enemies. The UBS source verb צור includes to attack, corresponding to the original hostile action and source verbal classification.",
       "ubs_attested_gloss": "to attack",
-      "reviewed_original_occurrences": 1,
-      "already_reviewed_word_ids": 1,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "H",
-      "lemma_editorial": "צָרַר",
-      "strong_original": "6862",
-      "candidate_ubs_main_id": "006321000000000",
-      "editorial_meaning": "Lamentations 1:20 explicitly describes internal distress; UBS's צר distress noun/adjective includes the published gloss distress.",
-      "ubs_attested_gloss": "distress",
-      "reviewed_original_occurrences": 1,
-      "already_reviewed_word_ids": 1,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "H",
-      "lemma_editorial": "קוץ",
-      "strong_original": "6974a",
-      "candidate_ubs_main_id": "006463000000000",
-      "editorial_meaning": "Job 14:12 says the dead do not awaken, an exact lexical match to UBS קיץ's awaken/wake-up senses",
-      "ubs_attested_gloss": "to awaken",
       "reviewed_original_occurrences": 1,
       "already_reviewed_word_ids": 1,
       "new_word_id_count": 0,
@@ -2326,35 +2314,23 @@
     },
     {
       "lang": "H",
+      "lemma_editorial": "קוץ",
+      "strong_original": "6974a",
+      "candidate_ubs_main_id": "006463000000000",
+      "editorial_meaning": "Job 14:12 says the dead do not awaken, an exact lexical match to UBS קיץ's awaken/wake-up senses",
+      "ubs_attested_gloss": "to awaken",
+      "reviewed_original_occurrences": 1,
+      "already_reviewed_word_ids": 1,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
+    },
+    {
+      "lang": "H",
       "lemma_editorial": "רָמָה",
       "strong_original": "7436",
       "candidate_ubs_main_id": "006823000000000",
       "editorial_meaning": "Samuel's Ramathaim-Zophim, associated with the UBS Ramah settlement in Ephraim",
       "ubs_attested_gloss": "Ramah",
-      "reviewed_original_occurrences": 1,
-      "already_reviewed_word_ids": 1,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "H",
-      "lemma_editorial": "רעה",
-      "strong_original": "7489a",
-      "candidate_ubs_main_id": "006883000000000",
-      "editorial_meaning": "Isaiah 24:19 describes the earth as utterly broken; UBS רעע explicitly includes be broken and come to ruin",
-      "ubs_attested_gloss": "to be broken",
-      "reviewed_original_occurrences": 1,
-      "already_reviewed_word_ids": 1,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "H",
-      "lemma_editorial": "רֹעָה",
-      "strong_original": "7489a",
-      "candidate_ubs_main_id": "006883000000000",
-      "editorial_meaning": "Proverbs 25:19 compares misplaced confidence to a broken tooth; UBS רעע includes be broken / be crushed and the source word is not the unrelated evil-doing sense",
-      "ubs_attested_gloss": "to be broken",
       "reviewed_original_occurrences": 1,
       "already_reviewed_word_ids": 1,
       "new_word_id_count": 0,
@@ -2398,11 +2374,47 @@
     },
     {
       "lang": "H",
+      "lemma_editorial": "רֹעָה",
+      "strong_original": "7489a",
+      "candidate_ubs_main_id": "006883000000000",
+      "editorial_meaning": "Proverbs 25:19 compares misplaced confidence to a broken tooth; UBS רעע includes be broken / be crushed and the source word is not the unrelated evil-doing sense",
+      "ubs_attested_gloss": "to be broken",
+      "reviewed_original_occurrences": 1,
+      "already_reviewed_word_ids": 1,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
+    },
+    {
+      "lang": "H",
+      "lemma_editorial": "רעה",
+      "strong_original": "7489a",
+      "candidate_ubs_main_id": "006883000000000",
+      "editorial_meaning": "Isaiah 24:19 describes the earth as utterly broken; UBS רעע explicitly includes be broken and come to ruin",
+      "ubs_attested_gloss": "to be broken",
+      "reviewed_original_occurrences": 1,
+      "already_reviewed_word_ids": 1,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
+    },
+    {
+      "lang": "H",
       "lemma_editorial": "שְׁאָלָה",
       "strong_original": "7585a",
       "candidate_ubs_main_id": "007130000000000",
       "editorial_meaning": "Sheol / the realm of the dead in Isaiah 7:11's contrast between depth and height",
       "ubs_attested_gloss": "world of the dead",
+      "reviewed_original_occurrences": 1,
+      "already_reviewed_word_ids": 1,
+      "new_word_id_count": 0,
+      "source_words_pending_individual_review": []
+    },
+    {
+      "lang": "H",
+      "lemma_editorial": "שַׁחֲטָה",
+      "strong_original": "7821a",
+      "candidate_ubs_main_id": "007292000000000",
+      "editorial_meaning": "Hosea 5:2 describes slaughter in its judgment oracle; UBS שחיטה is the slaughtering noun",
+      "ubs_attested_gloss": "slaughtering",
       "reviewed_original_occurrences": 1,
       "already_reviewed_word_ids": 1,
       "new_word_id_count": 0,
@@ -2417,18 +2429,6 @@
       "ubs_attested_gloss": "to be thirsty",
       "reviewed_original_occurrences": 2,
       "already_reviewed_word_ids": 2,
-      "new_word_id_count": 0,
-      "source_words_pending_individual_review": []
-    },
-    {
-      "lang": "H",
-      "lemma_editorial": "שַׁחֲטָה",
-      "strong_original": "7821a",
-      "candidate_ubs_main_id": "007292000000000",
-      "editorial_meaning": "Hosea 5:2 describes slaughter in its judgment oracle; UBS שחיטה is the slaughtering noun",
-      "ubs_attested_gloss": "slaughtering",
-      "reviewed_original_occurrences": 1,
-      "already_reviewed_word_ids": 1,
       "new_word_id_count": 0,
       "source_words_pending_individual_review": []
     },
