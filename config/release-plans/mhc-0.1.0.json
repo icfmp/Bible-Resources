@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "tag": "mhc-0.1.0",
+  "module_id": "mhc-crosswire",
+  "sword_id": "MHC",
+  "version": "0.1.0",
+  "title": "Matthew Henry Complete Commentary — Bible Resources MHC 0.1.0",
+  "zip_name": "MHC-0.1.0.zip",
+  "package_sha256": "9cea77ed7652f8a1e8f529819a746b04ef7a30ad87579381bb2bd68a89e046b5",
+  "package_size_bytes": 16409112,
+  "notes_path": "docs/releases/MHC-0.1.0.md",
+  "evidence_path": "modules/mhc-crosswire/SOURCE_VALIDATION.json",
+  "editorial_path": "modules/mhc-crosswire/EDITORIAL.md",
+  "authorization": {
+    "reviewed_by": "Bible Resources project owner",
+    "decision": "Publish full source-attested MHC 0.1.0 with 25 source reference target repairs, Romans 4 split and 2 Chronicles 1 introduction; original source/authorship, provenance and words preserved, with intentional upstream MHC collision documented.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/285",
+    "source_rights": "CrossWire MHC 2.2 Public Domain — Copy Freely accepted by owner on 2026-11-19; original CrossWire, CCEL and Logos credits retained"
+  }
+}
