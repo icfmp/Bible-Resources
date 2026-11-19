@@ -526,6 +526,8 @@ jobs:
             --compact-source-notes-osis "$RUNNER_TEMP/mhcc-modern-compact-restored-with-source-notes.osis.xml" \
             --source-K-heading-range-linked-osis "$RUNNER_TEMP/mhcc-modern-heading-ranges.osis.xml" \
             --source-K-heading-range-notes-osis "$RUNNER_TEMP/mhcc-modern-heading-ranges-with-notes.osis.xml" \
+            --same-K-implicit-verses-osis "$RUNNER_TEMP/mhcc-modern-local-verses.osis.xml" \
+            --same-K-implicit-verse-notes-osis "$RUNNER_TEMP/mhcc-modern-local-verses-with-notes.osis.xml" \
             --source-notes-errata-manifest work/mhcc-modern/production/FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json \
             --source-errata-proposals-osis "$RUNNER_TEMP/mhcc-modern-proposed-errata-navigation.osis.xml" \
             --linked-osis "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked.osis.xml" \
@@ -607,6 +609,27 @@ jobs:
                 " exact partial ranges now linked inside authored K prose; " +
                 str(headings["source_valid_references_still_in_section_notes"]) +
                 " valid source links remain in section notes (four bad targets separately withheld)")
+          local=report["private_implicit_original_K_verse_mentions"]
+          local_notes=report["private_implicit_verse_remaining_source_notes"]
+          assert local["status"] == (
+              "PRIVATE_UNIQUE_SOURCE_K_LOCAL_VERSE_NUMBER_LINKS_NOT_RELEASE")
+          assert local["local_verse_references_recovered_in_authored_modern_prose"] >= 10
+          assert (local["local_verse_references_recovered_in_authored_modern_prose"] +
+                  local["unplaced_valid_original_links_still_in_source_only_notes"]
+                  == headings["source_valid_references_still_in_section_notes"])
+          assert local["original_defective_link_occurrences_still_excluded"] == 4
+          assert not local["modern_authored_visible_text_modified"]
+          assert not local["original_source_or_native_K_scope_modified"]
+          assert not local["publication_authorized"]
+          assert (local_notes["original_link_occurrences_preserved_only_in_separate_source_notes"]
+                  ==local["unplaced_valid_original_links_still_in_source_only_notes"])
+          assert Path(base/"mhcc-modern-local-verses.osis.xml").is_file()
+          assert Path(base/"mhcc-modern-local-verses-with-notes.osis.xml").is_file()
+          print("SOURCE ORIGINAL-K IMPLICIT VERSE LABEL RECOVERY: " +
+                str(local["local_verse_references_recovered_in_authored_modern_prose"]) +
+                " additional source-pinned exact printed verse digits linked; " +
+                str(local["unplaced_valid_original_links_still_in_source_only_notes"]) +
+                " remain in separate K notes")
           inline_index=report["private_visible_source_reference_index_preview"]
           assert inline_index["status"] == (
               "PRIVATE_SOURCE_REFERENCES_VISIBLE_IN_K_NOT_EXACT_AUTHORIAL_INLINE")
@@ -1140,6 +1163,118 @@ jobs:
                 str(sum(seen_notes.values()))+
                 " remaining source notes, all 28792 exact K keys and real diatheke "+
                 "render confirmed; not an approved original-inline link transfer")
+          PY
+      - name: Compile local K explicit verse-number references and read back exact source destinations
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mhcc-local-verses-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-local-verses-root/modules/comments/zcom/mhcclocal"
+          timeout 240s osis2mod \
+            "$RUNNER_TEMP/mhcc-local-verses-root/modules/comments/zcom/mhcclocal" \
+            "$RUNNER_TEMP/mhcc-modern-local-verses-with-notes.osis.xml" \
+            -z z -b 3 > "$RUNNER_TEMP/mhcc-local-verses-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-local-verses-root/mods.d/mhcclocal.conf" <<'EOF'
+          [MHCCLOCAL]
+          Description=Private original source verified K-local verse mentions
+          DataPath=./modules/comments/zcom/mhcclocal/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          python - <<'PY'
+          import hashlib,json,os,subprocess,sys
+          from collections import Counter
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          all_reports=json.loads((base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
+          local=all_reports["private_implicit_original_K_verse_mentions"]
+          notes=all_reports["private_implicit_verse_remaining_source_notes"]
+          expected={}
+          for row in local["placements"]:
+              expected.setdefault(row["source_first_key"],[]).append((
+                  row["source_original_literal_target_sha256"],
+                  row["modern_visible_verse_token_sha256"]))
+          fallback={
+              row["source_first_key"]:row["original_source_reference_hashes"]
+              for row in notes["note_source_K_reference_hashes_for_private_native_readback"]}
+          seen={}
+          seen_fallback={}
+          def observe(kind,key,raw):
+              if kind!="K" or key not in expected and key not in fallback:
+                  return
+              xml=ET.fromstring(b"<native>"+raw+b"</native>")
+              note_nodes=[n for n in xml.iter() if isinstance(n.tag,str)
+                  and n.tag.rsplit("}",1)[-1]=="note"]
+              if key in expected:
+                  source_links=[]
+                  for r in xml.iter():
+                      if not isinstance(r.tag,str) or r.tag.rsplit("}",1)[-1]!="reference":
+                          continue
+                      if any(r in list(n.iter()) for n in note_nodes):
+                          continue
+                      source_links.append((
+                          hashlib.sha256(r.get("osisRef").encode()).hexdigest(),
+                          hashlib.sha256("".join(r.itertext()).encode()).hexdigest()))
+                  histogram=Counter(source_links)
+                  for item in expected[key]:
+                      if histogram[item]<=0:
+                          raise ValueError("K-local restored source verse anchor lost in real SWORD")
+                      histogram[item]-=1
+                  seen[key]=len(expected[key])
+              if key in fallback:
+                  target_notes=[n for n in note_nodes if
+                      "Unplaced links from original edition" in "".join(n.itertext())]
+                  if len(target_notes)!=1:
+                      raise ValueError("Source-only fallback missing from native K")
+                  exact=[(
+                      hashlib.sha256(r.get("osisRef").encode()).hexdigest(),
+                      hashlib.sha256("".join(r.itertext()).encode()).hexdigest())
+                      for r in target_notes[0].iter()
+                      if isinstance(r.tag,str) and r.tag.rsplit("}",1)[-1]=="reference"]
+                  wanted=[(
+                      item["source_original_literal_target_sha256"],
+                      item["supplement_display_sha256"])
+                      for item in fallback[key]]
+                  if exact!=wanted:
+                      raise ValueError("K-local source-only fallback has changed original target or display")
+                  seen_fallback[key]=len(exact)
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-local-verses-root").resolve())
+          proc=subprocess.Popen([
+              str((base/"commentary-modern-source-raw").resolve()),"MHCCLOCAL"],
+              env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          try:
+              result,keys,_,_=parse_native_raw_corpus(proc.stdout,on_entry=observe)
+              proc.stdout.close()
+              if proc.wait(timeout=120)!=0:
+                  raise ValueError("Native K-local modern commentary SWORD readback failed")
+          finally:
+              if proc.poll() is None:
+                  proc.kill()
+                  proc.wait()
+          if (len(keys)!=28792 or set(seen)!=set(expected) or
+              set(seen_fallback)!=set(fallback)
+              or sum(seen.values())!=
+                 local["local_verse_references_recovered_in_authored_modern_prose"]
+              or sum(seen_fallback.values())!=
+                 local["unplaced_valid_original_links_still_in_source_only_notes"]):
+              raise ValueError("Private source-linked local verse candidate incomplete")
+          reader=subprocess.run(["diatheke","-b","MHCCLOCAL","-f","OSIS","-k",
+              "Isaiah 15:1"],env=env,text=True,capture_output=True,timeout=30)
+          if reader.returncode!=0 or "Verse" not in reader.stdout:
+              raise ValueError("Native local-verse SWORD cannot display Isaiah 15")
+          print("PRIVATE NATIVE K-LOCAL VERSE SWORD PASS: local verses="+
+                str(sum(seen.values()))+", source-only notes="+
+                str(sum(seen_fallback.values()))+
+                ", 28792 K keys, diatheke reader output verified; private, unapproved")
           PY
       - name: Compile private visible in-commentary source reference index and verify 176 targets
         shell: bash
