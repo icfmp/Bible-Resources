@@ -60,6 +60,12 @@ class VerifyNonidentityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Source revisions differ"):
             verify["verify_metadata"](changed, report, entries)
 
+    def test_missing_editorial_reason_is_rejected_explicitly(self):
+        ledger, report, entries = fixture()
+        del ledger["decisions"][0]["rationale"]
+        with self.assertRaisesRegex(ValueError, "Unexplained or unsupported"):
+            verify["verify_metadata"](ledger, report, entries)
+
     def test_non_exhaustive_candidate_rejection_is_rejected(self):
         ledger, report, entries = fixture()
         report["families"][0]["ubs_candidate_entries"].append("000002000000000")
