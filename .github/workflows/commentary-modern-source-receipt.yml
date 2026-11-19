@@ -38,6 +38,9 @@ jobs:
           python-version: '3.12'
       - name: Test source-native and draft-coverage guards on synthetic fixtures
         run: python -m unittest tests/test_commentary_modern_source_receipt.py tests/test_commentary_modern_ionly_preview.py tests/test_commentary_modern_draft_guard.py tests/test_commentary_modern_draft_osis_preview.py tests/test_commentary_modern_reference_gate.py tests/test_commentary_modern_linked_candidate_preview.py tests/test_commentary_modern_native_witness_probe.py tests/test_commentary_modern_k_scope_preview.py -v
+      - name: Test fail-closed real-Xiphos GUI harness before any SWORD build
+        shell: bash
+        run: PYTHONPATH=scripts python -m unittest tests/test_commentary_xiphos_dual_reader.py -v
       - name: Install real SWORD source reader
         shell: bash
         run: |
