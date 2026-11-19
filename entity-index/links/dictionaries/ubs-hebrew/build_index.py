@@ -314,9 +314,12 @@ def lookup_word(index, word_id, sdbh, strongnumberx, lang, lemma):
     record = index.get("by_macula_word", {}).get(str(word_id))
     if record is None:
         return ordinary
-    if (record["lemma"], record["strong"], record["lang"]) != (
+    if ((record["lemma"], record["strong"], record["lang"]) != (
         str(lemma), str(strongnumberx), str(lang)
-    ):
+    ) or (
+        record.get("match_type") == "editorially_reviewed_original_wlc_headword_only"
+        and record.get("original_sdbh") != str(sdbh or "")
+    )):
         return {
             "status": "source_word_mismatch",
             "entry_ids": [], "sense_ids": [], "evidence": "source_identity_mismatch",
@@ -326,7 +329,9 @@ def lookup_word(index, word_id, sdbh, strongnumberx, lang, lemma):
         "entry_ids": [record["entry_id"]],
         "sense_ids": [],
         "evidence": (
-            "macula_word_verb_consonants_unique_entry_same_strong_family"
+            "macula_word_editorially_reviewed_headword_only"
+            if record.get("match_type") == "editorially_reviewed_original_wlc_headword_only"
+            else "macula_word_verb_consonants_unique_entry_same_strong_family"
             if record.get("match_type") == "verb_consonants_same_strong_family"
             else "macula_word_nonverb_consonants_unique_entry_same_strong_family"
             if record.get("match_type") == "nonverb_consonants_same_strong_family"
