@@ -36,6 +36,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_source_morpheme_abstentions.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_v1_disposition_coverage.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_single_candidate_abstentions.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_reviewed_word_anchor_preview.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -190,6 +191,30 @@ jobs:
             --decisions entity-index/links/dictionaries/ubs-hebrew/v1_single_candidate_abstentions.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
+      - name: Stage only exact reviewed WLC word witnesses as entry-only candidate overlay
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/stage_reviewed_word_anchors.py \
+            --register /tmp/bsi-ubs-hebrew-family-register.json \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-reviewed-word-preview.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          rel = Path("entity-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json")
+          observed = json.loads(Path("/tmp/bsi-ubs-reviewed-word-preview.json").read_text(encoding="utf-8"))
+          expected = json.loads(rel.read_text(encoding="utf-8"))
+          assert observed == expected, "Reviewed anchor preview differs from pinned WLC"
+          assert observed["summary"] == {
+              "reviewed_families": 81,
+              "reviewed_family_occurrences_not_automatically_linked": 274,
+              "staged_original_word_ids": 139,
+              "new_contextual_senses": 0,
+          }
+          print("UBS_EXPLICIT_WORD_WITNESS_PREVIEW_SOURCE_VERIFIED")
+          PY
       - name: Verify all lexical families classified without editorial assumptions
         run: |
           python3 - <<'PY'
