@@ -77,3 +77,17 @@ The metadata-only audit artifact retains `mhcc-modern-private-rc-metadata-only.j
 The first complete private `MHCCMODRC` build and real reader compare **passed as an individual GitHub Actions step** on the current draft pipeline. The repository's read-only tool registry needed a subsequent metadata regeneration; the final status must be taken from the **latest PR-head** CI checks, not that intermediate run. Keep the PR draft pending all release-specific permissions.
 
 The candidate-building workflow is intentionally part of the existing reproducible test infrastructure, **not a new publication path**. No new commentary resource has been advertised as available for download.
+
+## Real Xiphos click-navigation acceptance matrix — pending execution
+
+**Status: NOT RUN.** The 2026-11-19 HTML clipboard checks prove link presence or absence in selected rich-text captures, but **do not** prove actual navigation on mouse activation. The following separate, reproducible GUI gate is required; no outcomes should be inferred from clipboard markup.
+
+| Case | Setup and action in the actual isolated Xiphos GUI | Pass evidence |
+| --- | --- | --- |
+| Known valid source citation | Open `Gen 12:6` under private `MHCCMODRC`, locate the independently attested original-labelled citation, activate it by a real GUI click | Reader's post-click destination independently matches the exact original source `osisRef`, not merely an href or a changed selection; collect UI state before and after |
+| Known quarantined references | Open original source-K passages `Deut 9:1`, `Esth 1:1`, `Gen 12:6` and attempt activation at the exact attested suspect labels | No navigable anchor or activation to the pinned original *wrong* destination; retain the visible printed label, and verify the unaffected legitimate anchor remains usable |
+| Other suspect links | Iterate the remaining eight cases from the SHA-pinned eleven-case source manifest, selecting each actual source-K slot | Each wrong destination is non-navigable in the reader; report each case individually rather than treating three samples as 11/11 GUI coverage |
+| Introduction navigation | Use Xiphos's chapter-heading menu on Exodus and Romans to display the actual native `I` introduction, then return to ordinary commentary | Navigation preserves the current Bible reference and renders the expected native introduction, without implying automatic inline preface display |
+| Chapter-only sections | Visit end verses `Lev 19:37` and `Ps 108:13`, then change chapters and return | The chapter-only authored exposition remains reachable and is not accidentally duplicated as a fabricated verse commentary |
+
+**Evidence requirements:** record the Xiphos version, Ubuntu/GTK/virtual-display details, module identities and package hashes; report each action, independently observed before/after reference, timeout/failure and screenshots or confidential metadata-only UI receipts. A displayed link, `xdotool click` success, an unchanged clipboard, or a DOM href is **not** successful navigation evidence on its own. A blocked link must not be credited solely because a click was missed or the UI was unfocused. Use bounded retries and fail closed on ambiguity. No original prose/screenshots/binary artifacts in public CI logs. These acceptance conditions do not authorize source-link retargeting, manuscript edits, merging or publication.
