@@ -1,5 +1,21 @@
 # MHC 2.2 — exact-edition digital redistribution rights review (2026-11-19)
 
+> **Owner decision recorded 2026-11-19:** the project owner explicitly
+> accepts CrossWire's official **MHC 2.2 Public Domain — Copy Freely**
+> declaration as the *working rights basis* for this module. CrossWire's
+> own [module information page](https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC)
+> explicitly says both `Public Domain--Copy Freely.` and
+> `Distribution License Public Domain`, and credits CCEL and Logos.
+> This resolves the **internal source/license-choice decision** in favor
+> of CrossWire's published declaration, without claiming independent
+> legal certainty over every later digital editorial addition or
+> international derivative. A CCEL reply is no longer an owner-mandated
+> prerequisite to continuing private technical work. **Publication is
+> not authorized by this decision**; retain provenance and attribution
+> and the outstanding controlled release signoff. The original
+> historical rights research below is preserved intact for audit.
+>
+
 **Decision: HOLD.** This is source-oriented due diligence, **not legal advice and not authorization** to publish original, cleaned or corrected OSIS/SWORD files. The privately compiled candidate and textual contents remain outside GitHub.
 
 ## Precisely identified proposed work
