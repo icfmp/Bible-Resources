@@ -3891,7 +3891,7 @@ jobs:
                           if not pid.isdecimal():
                               continue
                           try:
-                              variables=Path("/proc/"+pid+"/environ").read_bytes().split(b"\\0")
+                              variables=Path("/proc/"+pid+"/environ").read_bytes().split(b"\0")
                               address=next((v.split(b"=",1)[1] for v in variables
                                   if v.startswith(b"DBUS_SESSION_BUS_ADDRESS=")),None)
                               if address and len(address)<2048:
