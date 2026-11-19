@@ -1715,9 +1715,15 @@ jobs:
           proc=subprocess.Popen([str(native),module],env=env,
                                 stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
           native_samples={}
+          intro_native_samples={}
           parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
                                  no_network=True,recover=False,huge_tree=True)
           def capture(kind,key,raw):
+              if kind=="I" and key=="2Chr.1":
+                  intro_native_samples["chapter_intro"]=raw
+                  return
+              if kind=="K" and key=="2Chr.1.1":
+                  intro_native_samples["following_verse"]=raw
               if kind!="K" or len(native_samples)==len(proof):
                   return
               if not any(value.encode() in raw for value in proof.values()):
@@ -1739,6 +1745,13 @@ jobs:
               proc.wait()
           if set(native_samples)!=set(proof):
               raise SystemExit("Corrected source targets absent from native GUI test keys")
+          if set(intro_native_samples)!={"chapter_intro","following_verse"}:
+              raise SystemExit("Real chapter-intro and following verse keys not both present")
+          intro_fragment=etree.fromstring(
+              b"<fragment>"+intro_native_samples["chapter_intro"]+b"</fragment>",parser)
+          intro_expected=" ".join(intro_fragment.itertext()).encode("utf-8")
+          if not 128<=len(intro_expected)<=256000:
+              raise SystemExit("Unexpected private chapter-introduction prose length")
           identity=verify_and_install_reviewed_bible(work)
           if not identity["all_five_published_bible_files_sha256_attested"]:
               raise SystemExit("GUI reader Bible identity changed")
@@ -1767,16 +1780,39 @@ jobs:
               source_line_by_passage[passage]=line
           if len(set(sample_book_by_anchor.values()))!=3:
               raise SystemExit("Independent GUI sample books are not distinct")
+          # Add an extra diagnostic passage without changing the three
+          # successful link-bearing GUI witnesses or their acceptance count.
+          # The original chapter preface is taken from the NATIVE SWORD
+          # introduction frame; the following verse is a distinct source.
+          intro_passage="2Chr 1:1"
+          if intro_passage in comparisons:
+              raise SystemExit("Independent introduction witness is not distinct")
+          rc,verse_comment=query(module,intro_passage,fmt="plain",root=work,
+                                 timeout=30,limit=256*1024)
+          bc,verse_bible=query(identity["module_id"],intro_passage,
+                               fmt="plain",root=work,timeout=30,limit=256*1024)
+          if (not present_key(intro_passage,verse_comment,rc)
+                  or not present_key(intro_passage,verse_bible,bc)):
+              raise SystemExit("Independent 2Chr 1:1 GUI probe unavailable")
+          comparisons[intro_passage]={
+              "commentary":verse_comment,
+              "bible":verse_bible,
+              "commentary_internal":intro_native_samples["following_verse"],
+              "intro_expected":intro_expected,
+          }
           result=_run_real_gui(work,comparisons,seconds=12,
                                commentary_module_id=module)
-          matches=result["independent_gui_commentary_excerpt_match_count"]
+          matches=sum(result["commentary_clipboard_match_by_passage"].get(p,False)
+                      for p in source_line_by_passage)
           if not 0<=matches<=3:
-              raise SystemExit("Invalid real GUI excerpt evidence")
+              raise SystemExit("Invalid three original GUI excerpt witnesses")
           markup=result["real_markup_rendering_observation_by_passage"]
           if set(markup)!=set(comparisons):
               raise SystemExit("GUI markup evidence is missing a real reader sample")
           source_target_href_by_line={}
           for passage,observation in markup.items():
+              if passage==intro_passage:
+                  continue
               original_line=source_line_by_passage[passage]
               expected_digest=sha256(proof[original_line].encode("utf-8")).hexdigest()
               matches_hrefs=observation["exact_matching_source_target_sha256_in_real_gui_HTML"]
@@ -1806,7 +1842,7 @@ jobs:
           gui_copy_diagnostics_by_line={}
           clipboard_bytes=result["copied_gui_clipboard_byte_count_by_passage"]
           pane_attempts=result["bounded_right_commentary_pane_focus_attempts_by_passage"]
-          for passage in comparisons:
+          for passage in source_line_by_passage:
               gui_copy_diagnostics_by_line[str(source_line_by_passage[passage])]={
                   "actual_commentary_pane_copy_attempts":pane_attempts[passage],
                   "last_clipboard_byte_count":clipboard_bytes[passage],
@@ -1819,7 +1855,15 @@ jobs:
                         if matches==3 else
                         "INCONCLUSIVE_REAL_GUI_SELECTION_NOT_A_RELEASE_GATE"),
               "real_xiphos_window":result["real_xiphos_executable_started_and_visible"],
-              "sample_count":len(comparisons),
+              "sample_count":len(source_line_by_passage),
+              "additional_independent_chapter_intro_probe":True,
+              "chapter_intro_native_frame_and_following_verse_separate":True,
+              "chapter_intro_prose_found_in_real_GUI_clipboard":
+                  bool(result["chapter_intro_prose_clipboard_match_by_passage"].get(
+                      intro_passage,False)),
+              "following_2Chr_1_1_exposition_gui_excerpt_matched":
+                  bool(result["commentary_clipboard_match_by_passage"].get(
+                      intro_passage,False)),
               "sampled_authored_link_source_lines":list(audited_lines),
               "independent_gui_excerpt_matches":matches,
               "corrected_source_target_href_evidence_by_line":
@@ -1840,8 +1884,14 @@ jobs:
                 json.dumps(outcome,sort_keys=True),flush=True)
           # Keep native source integrity a separate blocking gate, but a
           # green GUI step must never hide zero verified real-window content.
-          if matches!=len(comparisons) or not result["actual_passage_commands_accepted"]:
-              raise SystemExit("INCONCLUSIVE_REAL_GUI_SELECTION: real commentary excerpts not verified")
+          if matches!=len(source_line_by_passage) or any(
+              ref in result["bounded_xiphos_ui_failed_action_by_passage"]
+              for ref in source_line_by_passage
+          ):
+              raise SystemExit("INCONCLUSIVE_REAL_GUI_SELECTION: original three commentary excerpts not verified")
+          # The new chapter-introduction probe is observational. Absence of
+          # copied preface from the Xiphos passage pane is NOT proof of an
+          # incorrect native SWORD introduction frame; report it as pending.
           PY
       - name: Report corrected-MHC GUI status independently from native-source integrity
         if: always() && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-mhc-final-gui]')))
