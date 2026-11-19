@@ -301,6 +301,27 @@ words or meanings never occur in definitions or another edition.
 This section supersedes earlier numerical status snapshots in this README;
 those historical snapshots are retained to document how the index evolved.
 
+## Additional editorial-alias owner corroboration
+
+A source-word-anchored cross-Strong lookup now checks whether a full
+original MACULA `sdbh` identifier is owned by a *unique* UBS headword
+whose **source-published `AlternateLemmas`** includes the exact NFC source
+lemma, with matching H/A language. This requires both original UBS editor
+attestation and source-ID ownership; an alternate spelling by itself is
+not sufficient to bridge different Strong numbers.
+
+The pinned corpus yields **1 additional entry-only link** under this rule.
+No contextual sense link is inferred and prior matches are unchanged.
+
+- Original WLC linked headword tokens: **268,431**.
+- Selected lexical-class linked tokens: **240,098 / 248,680**.
+- Edition-attested headword coverage: **240,098 / 242,747 =
+  98.909%**, leaving **2,649** in scope.
+- Outside verifiable edition headword scope: **5,933**, unchanged.
+
+The source and dictionary texts are unchanged; homograph collisions,
+unknown source IDs, and different H/A language are rejected.
+
 ## Source integrity and test workflow
 
 - [build_index.py](build_index.py) produces `index.json`, preserving `by_sdbh` and `by_strong`, adding `by_entry_strong_family` for corroboration and retaining full coverage statistics. The generated index never contains dictionary definitions.

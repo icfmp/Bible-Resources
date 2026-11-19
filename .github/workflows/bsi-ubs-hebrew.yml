@@ -159,21 +159,22 @@ jobs:
           assert actual["coverage"]["with_exact_ubs_sense_candidates"]==30492
           assert actual["coverage"]["ambiguous_ubs_entry_candidates"]==5024
           assert actual["coverage"]["no_entry_match"]==218868
-          assert actual["coverage_with_word_ids"]["additional_entry_only_links"] == 11392
+          assert actual["coverage_with_word_ids"]["additional_entry_only_links"] == 11393
+          assert actual["coverage_with_word_ids"]["macula_word_ubs_alternate_lemma_and_source_sdbh_owner_entry_only"] == 1
           assert actual["coverage_with_word_ids"]["macula_word_ubs_published_alternate_lemma_same_strong_family"] == 610
           assert actual["coverage_with_word_ids"]["macula_word_consonants_and_source_sdbh_ubs_owner_entry_only"] == 2
           assert actual["coverage_with_word_ids"]["macula_word_exact_lemma_and_source_sdbh_ubs_owner_entry_only"] == 16
-          assert actual["coverage_with_word_ids"]["word_aware_entry_links"] == 268430
+          assert actual["coverage_with_word_ids"]["word_aware_entry_links"] == 268431
           scope=actual["coverage_scope"]
           assert scope["original_lexical_source_occurrences"] == 248680
-          assert scope["linked_occurrences"] == 240097
+          assert scope["linked_occurrences"] == 240098
           assert scope["outside_indexed_headword_scope"] == 5933
           assert scope["indexable_denominator"] == 242747
-          assert scope["indexable_unresolved"] == 2650
-          assert scope["coverage_pct"] == 98.908
+          assert scope["indexable_unresolved"] == 2649
+          assert scope["coverage_pct"] == 98.909
           assert scope["full_source_coverage_pct"] == 96.549
           assert scope["review"] == {
-              "different_strong_same_exact_headword_review": 206,
+              "different_strong_same_exact_headword_review": 205,
               "different_strong_same_consonants_review": 2015,
               "matching_strong_family_unresolved_review": 427,
               "source_code_unreadable_review": 2,

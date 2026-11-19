@@ -321,6 +321,46 @@ class OriginalWordAnchoredLinksTest(unittest.TestCase):
             )
             self.assertEqual(build_word_links(ix,[a,b],src),{})
 
+    def test_published_ubs_alternate_plus_exact_sdbh_owner_cross_strong(self):
+        source_entry = entry("000009000000000", "אֲבַדּוֹן", ["H11a"])
+        source_entry["AlternateLemmas"] = ["אֲבַדּוֹ"]
+        index = build([source_entry], [source_entry])
+        with tempfile.TemporaryDirectory() as directory:
+            macula = Path(directory) / "words.tsv"
+            macula.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tאֲבַדּוֹ\t000009001001000\t0012\tH\tnoun\n",
+                encoding="utf-8",
+            )
+            index["by_macula_word"] = build_word_links(index, [source_entry], macula)
+        out = lookup_word(index, "o010010010011", "000009001001000", "0012", "H", "אֲבַדּוֹ")
+        self.assertEqual(out["entry_ids"], [source_entry["MainId"]])
+        self.assertEqual(out["sense_ids"], [])
+        self.assertEqual(
+            out["evidence"],
+            "macula_word_ubs_alternate_lemma_and_source_sdbh_owner_entry_only",
+        )
+
+    def test_cross_strong_alternate_rejects_unowned_ids_and_homographs(self):
+        e = entry("000009000000000", "אֲבַדּוֹן", ["H11a"])
+        e["AlternateLemmas"] = ["אֲבַדּוֹ"]
+        with tempfile.TemporaryDirectory() as directory:
+            macula = Path(directory) / "words.tsv"
+            macula.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tאֲבַדּוֹ\t000999001001000\t0012\tH\tnoun\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(build_word_links(build([e], [e]), [e], macula), {})
+            twin = entry("000010000000000", "אֲבַדּ", ["H10a"])
+            twin["AlternateLemmas"] = ["אֲבַדּוֹ"]
+            macula.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tאֲבַדּוֹ\t000009001001000\t0012\tH\tnoun\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(build_word_links(build([e, twin], [e, twin]), [e, twin], macula), {})
+
     def test_no_promotion_of_sense_id_collision(self):
         wrong = entry("006653000000000", "רֹאשׁ", ["H7218"])
         right = entry("006660000000000", "רֵאשִׁית", ["H7225a"])
