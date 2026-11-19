@@ -419,6 +419,53 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertNotIn("The first creation", str(report))
         self.assertNotIn("Gen.2.1", str(report))
 
+    def test_quarantined_source_target_is_detected_in_real_html_independently_of_valid_reference_list(self):
+        from commentary_xiphos_dual_reader import _markup_display_witness
+        # The BAD destination is deliberately represented as non-link text
+        # in the candidate: checking <reference> inventory alone misses it.
+        bad="2Cor.11.12"
+        source=b'<seg type="x-original-link-target-quarantined">11, 12</seg>'
+        html=b'<p><a href="sword://Bible/2Cor.11.12">11, 12</a></p>'
+        report=_markup_display_witness(
+            source,b"11, 12",html,blocked_osis_targets=(bad,))
+        self.assertEqual(report["original_internal_reference_elements_found"],0)
+        self.assertEqual(
+            report["quarantined_source_target_sha256_exposed_as_real_GUI_HTML_href"],
+            [sha256(bad.encode()).hexdigest()],
+        )
+        self.assertEqual(report["quarantined_source_targets_checked_in_real_GUI_HTML"],1)
+        self.assertNotIn(bad,str(report))
+
+    def test_quarantined_source_target_no_false_positive_from_longer_href_or_plain_text(self):
+        from commentary_xiphos_dual_reader import _markup_display_witness
+        bad="2Cor.11.12"
+        source=b'<seg type="x-original-link-target-quarantined">11, 12</seg>'
+        for html in (
+            b'<a href="sword://Bible/2Cor.11.123">11,12</a>',
+            b'<span>2Cor.11.12</span>',
+            None,
+        ):
+            with self.subTest(html=html):
+                report=_markup_display_witness(
+                    source,b"11, 12",html,blocked_osis_targets=(bad,))
+                self.assertEqual(
+                    report["quarantined_source_target_sha256_exposed_as_real_GUI_HTML_href"],
+                    [],
+                )
+                self.assertEqual(report["quarantined_source_targets_checked_in_real_GUI_HTML"],1)
+                self.assertEqual(report["real_gui_rich_html_selection_available"],bool(html))
+
+    def test_reject_untrusted_quarantine_link_targets(self):
+        from commentary_xiphos_dual_reader import _markup_display_witness
+        for malformed in (
+            ("",), ("../unsafe",), ("2Cor.11.12", "2Cor.11.12"),
+            tuple("Matt.1.1" for _ in range(21)), "Matt.1.1",
+        ):
+            with self.subTest(malformed=malformed):
+                with self.assertRaises(PilotError):
+                    _markup_display_witness(b"",b"",None,
+                                            blocked_osis_targets=malformed)
+
     def test_compound_reference_reports_independent_exact_label_components(self):
         from commentary_xiphos_dual_reader import _markup_display_witness
         old=b'<reference osisRef="Ps.60 2Sam.8.13 2Sam.8.14">Psalm 60 title; 2 Samuel 8:13-14</reference>'
