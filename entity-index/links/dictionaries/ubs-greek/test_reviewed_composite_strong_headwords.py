@@ -29,7 +29,7 @@ class ReviewedGreekCompositeSourceTests(unittest.TestCase):
     def test_fails_closed_if_original_strong_components_normalized(self):
         wrong=copy.deepcopy(LEDGER)
         wrong["reviewed_families"][0]["original_macula_strong"]="G4053a"
-        with self.assertRaisesRegex(ValueError,"source original"):
+        with self.assertRaisesRegex(ValueError,"independent evidence"):
             MOD["review_ledger"](wrong,{"source_editions":LEDGER["source_editions"]})
 
     def test_no_inferred_lexid_global_alias_or_publication(self):
