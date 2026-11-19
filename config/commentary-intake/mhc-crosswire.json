@@ -23,17 +23,18 @@
     "Rev 22:21"
   ],
   "rights": {
-    "status": "project_distribution_rights_approved_from_crosswire_public_domain",
+    "status": "research_only",
     "upstream_license_claim": "Public Domain--Copy Freely (CrossWire MHC 2.2)",
     "evidence_url": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
     "digital_corrections_and_derivatives_reviewed": true,
-    "owner_approved": true,
+    "owner_approved": false,
     "owner_approval_scope": "Accept CrossWire official MHC 2.2 Public Domain / Copy Freely declaration as the project's working rights basis; does not authorize release or certify all derivative/jurisdiction questions.",
     "owner_approval_date": "2026-11-19",
     "owner_publication_approved": false,
     "publication_rights_basis": "official CrossWire MHC 2.2 module page, attribution retained to CrossWire, CCEL, and Logos",
     "rights_review_decision": "The project owner accepts CrossWire MHC 2.2 Public Domain--Copy Freely as sufficient distribution and technical-derivative basis; no additional CCEL permission request is required by project policy.",
-    "rights_review_independent_legal_opinion": false
+    "rights_review_independent_legal_opinion": false,
+    "intake_stage_explanation": "This manifest is the immutable research/intake contract; project acceptance of CrossWire's license is separately documented in the private release readiness and rights-review decision."
   },
   "commentary_source": {
     "format": "compiled CrossWire zCom4 with SourceType=OSIS; official original authoring OSIS now independently SHA-pinned, but source/native parity is still unverified",
