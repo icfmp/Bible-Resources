@@ -39,6 +39,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_reviewed_word_anchor_preview.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_positive_family_unwitnessed.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_additional_word_headwords.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_private_reviewed_candidate.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -374,6 +375,49 @@ jobs:
           else:
               print("BSI_UBS_HEBREW_INITIAL_INDEX_PENDING_COMMIT")
           PY
+      - name: Rebuild private source-word-verified v1 candidate without touching original index
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/build_private_reviewed_candidate.py \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --first entity-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json \
+            --additional entity-index/links/dictionaries/ubs-hebrew/reviewed_additional_word_anchor_preview.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-v1-private-reviewed-candidate.json
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          original=Path("/tmp/bsi-ubs-hebrew-index.json")
+          path=Path("/tmp/bsi-ubs-v1-private-reviewed-candidate.json")
+          base=json.loads(original.read_text(encoding="utf-8"))
+          candidate=json.loads(path.read_text(encoding="utf-8"))
+          assert len(candidate["by_macula_word"]) == len(base["by_macula_word"]) + 273
+          assert candidate["coverage_scope"]["linked_occurrences"] == 240371
+          assert candidate["coverage_scope"]["indexable_unresolved"] == 2376
+          assert candidate["coverage_scope"]["indexable_denominator"] == 242747
+          assert candidate["editorial_candidate"]["status"] == "private_v1_candidate_not_published_or_approved"
+          assert candidate["editorial_candidate"]["inferred_contextual_sense_ids"] == 0
+          assert candidate["editorial_candidate"]["original_index_sha256"] == hashlib.sha256(original.read_bytes()).hexdigest()
+          manifest=Path("entity-index/links/dictionaries/ubs-hebrew/v1_private_candidate_manifest.json")
+          if manifest.is_file():
+              expected=json.loads(manifest.read_text(encoding="utf-8"))
+              assert expected["source_editions"] == candidate["editorial_candidate"]["index_source_revisions"]
+              assert expected["status"] == candidate["editorial_candidate"]["status"]
+              assert expected["candidate_index_sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
+              assert expected["new_entry_only_word_links"] == 273
+              assert expected["candidate_source_linked_lexical_occurrences"] == 240371
+              assert expected["candidate_ubs_indexed_headword_coverage_pct"] == 99.021
+              assert expected["original_source_words_left_unlinked_by_review"] == 1
+              assert expected["contextual_sense_ids_inferred"] == 0
+              assert expected["release_approved"] is False
+          print("UBS_PRIVATE_CANDIDATE_REVIEW_NOT_PUBLICATION")
+          PY
+      - name: Upload private UBS 0.9.4 v1 word-level index candidate (NOT released)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-v1-private-reviewed-word-candidate
+          path: /tmp/bsi-ubs-v1-private-reviewed-candidate.json
+          retention-days: 7
       - name: Upload generated QA index (not upstream dictionary definitions)
         uses: actions/upload-artifact@v4
         with:

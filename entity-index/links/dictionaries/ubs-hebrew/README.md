@@ -1164,3 +1164,28 @@ candidates**. Both independently verified overlays are still separate
 from the frozen generated index.json. No original sources, SDBH, Strong,
 UBS sense IDs or application code changed. Actual index regeneration and
 explicit publication approval are separate future gates.
+
+### Source-word-verified private v1 candidate index (not publication)
+
+The [private candidate rebuild](build_private_reviewed_candidate.py) combines
+exactly **273 individually reviewed MACULA WLC word IDs** from the two
+independently source-checked entry-only overlays (139 + 134). It preserves
+one deliberately unresolved word in 2 Samuel 21:22, never fabricates
+contextual UBS lexical sense IDs, and does not modify original MACULA or
+UBS data or the frozen, committed original `index.json`.
+
+The builder independently checks each original source word's exact raw
+Unicode lemma, full Strong, SDBH, verse and source class against the pinned
+MACULA TSV, plus actual UBS headword membership; confirms no previous
+lexical link is overwritten; then recomputes complete original WLC coverage
+and the separately defined UBS edition-headword scope. It refuses unrelated
+source drift, wrong counts, duplicate candidates and any changed legacy
+lexical sense or Strong mapping.
+
+The reviewed candidate is regenerated in pinned UBS CI and uploaded as
+the separate GitHub Actions artifact
+`bsi-ubs-v1-private-reviewed-word-candidate`. It is explicitly marked
+**not approved or published** and is not added to public download catalogues.
+Only the independently approved source-word entry anchors are considered;
+no global Strong equivalences, original source changes or semantic
+inferences are introduced.
