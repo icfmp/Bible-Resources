@@ -82,7 +82,7 @@
     "pull_request": "https://github.com/icfmp/Bible-Resources/pull/286",
     "pull_request_draft": true,
     "public_catalog_updated": false,
-    "draft_release_plan_path": "config/release-plans/mhc-0.1.0-DRAFT.json",
+    "draft_release_plan_path": "config/release-drafts/mhc-0.1.0.json",
     "draft_release_notes_path": "docs/releases/MHC-0.1.0-DRAFT.md",
     "production_module_identity": "MHC",
     "production_version_proposed": "0.1.0",
