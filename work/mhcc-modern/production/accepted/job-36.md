@@ -61,15 +61,17 @@ Who would wisely wish for more?
 
 They also enjoy **inward pleasures and the deep peace of those who love God's law**.
 
-When suffering fails to produce its intended effect and a person continues unrepentant, judgment may become more severe.
+If affliction fails to do its work, a person should expect **the furnace to be heated until it consumes them**.
+
+Those who die **without knowledge and without grace** are lost forever.
 
 Hypocrisy is principally a condition **of the heart**.
 
 It loves the world and bodily desires while outwardly appearing devoted to God and religion.
 
-Whether sinners die young or live long enough to store up judgment, the end of unrepentance is dreadful.
+Whether sinners die young or live long enough to **heap up wrath**, their end is dreadful.
 
-The souls of the wicked continue beyond bodily death, but in misery.
+The souls of the wicked live beyond bodily death, but in **everlasting misery**.
 
 ## Elihu warns Job against contending with God (verses 15–23)
 
@@ -112,6 +114,8 @@ When sins come between us and his countenance, we may no longer perceive the sun
 ---
 
 ## Editorial review — Job 36
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** Verses 5–14 previously softened Henry's expected *furnace heated until consumed* to vague intensification of judgment, omitted the statement about dying without knowledge and grace, and replaced *heap up wrath* / *everlasting misery* with generic judgment and misery. Restored each distinct warning from [CCEL Job 36](https://ccel.org/ccel/henry/mhcc.xix.xxxvi.html). The CCEL duplicated phrase in 1–4 and probable omission in 24–33 remain separate source-witness uncertainties; the original module was not amended. Native MHCC 0.1.1 semantic confirmation and independent approval are still required.
 
 **Complete secondary original-English source read:** [CCEL, Job 36](https://ccel.org/ccel/henry/mhcc.xix.xxxvi.html). The released `MHCC 0.1.1` remains authoritative pending original-native SWORD comparison and independent editorial sign-off.
 
