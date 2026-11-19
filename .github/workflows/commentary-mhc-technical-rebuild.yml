@@ -1932,6 +1932,8 @@ jobs:
             echo "Dependency installation: ${GUI_DEPS}"
             echo "Reader GUI experiment: ${GUI_TEST}"
             echo "GUI success is not clicked hyperlink navigation or Psalm 60 title acceptance."
+            echo "The separate 2Chr 1 native chapter-heading/menu observer prints metadata-only"
+            echo "normal-pane and context-menu results; GUI success alone is not intro approval."
             echo "Any dependency/GUI failure is independently unresolved; full native-source integrity remains separate."
             echo "No source text, corrected module, screenshots or original prose published."
           } >> "$GITHUB_STEP_SUMMARY"
