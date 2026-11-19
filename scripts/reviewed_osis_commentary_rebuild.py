@@ -75,9 +75,24 @@ def reviewed_osis_commentary_errors(module_dir, root, metadata, conf):
                 or artifact.get("review_zip_sha256")!=r["candidate_artifact_sha256"]
                 or artifact.get("review_zip_bytes")!=r["candidate_artifact_bytes"]
                 or artifact.get("original_authoring_osis_sha256")!=r["original_authoring_osis_sha256"]
-                or artifact.get("source_binary_payload_byte_identical") is not True
+                or artifact.get("source_binary_payload_byte_identical") is not False
+                or artifact.get("six_compiled_data_members_byte_identical_to_review_artifact") is not True
                 or artifact.get("full_native_corpus_readback_equal") is not True):
             raise ValueError("Authenticated artifact identity or native proof differs")
+        edit=artifact.get("metadata_only_conf_delta",{})
+        original_conf_sha=artifact.get("original_review_member_conf_sha256")
+        if (not isinstance(original_conf_sha,str) or len(original_conf_sha)!=64
+                or edit.get("operation")!="add TextSource entry following SourceType=OSIS"
+                or edit.get("original_conf_sha256")!=original_conf_sha):
+            raise ValueError("Missing exact reversible metadata-only .conf edit")
+        final_conf=(module_dir/"payload"/"mods.d"/(metadata["sword_id"].lower()+".conf")).read_bytes()
+        added=b"TextSource=https://gitlab.com/crosswire-bible-society/mhc\\n"
+        # A single source URL may be added, never alter the attested original config.
+        # Its expected value comes from the original official authoring repository.
+        original_url=commit["repository_url"].encode("utf-8")
+        added=b"TextSource="+original_url+b"\\n"
+        if final_conf.count(added)!=1 or sha256(final_conf.replace(added,b"")).hexdigest()!=original_conf_sha:
+            raise ValueError("Metadata edit is not exactly source-reversible")
         if (conf.get("ModDrv") not in ("zCom","zCom4")
                 or conf.get("BlockType") not in ("BOOK","CHAPTER","VERSE")):
             raise ValueError("Unsupported commentary driver or compression layout")
