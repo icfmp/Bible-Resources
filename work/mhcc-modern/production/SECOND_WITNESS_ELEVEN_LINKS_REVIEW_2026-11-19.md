@@ -13,9 +13,9 @@ This is an additional **secondary digital witness comparison**, not a scan of a 
 
 | Source K / original link ordinal | Published native target | Printed Concise source context verified | Candidate derivative target | Disposition |
 | --- | --- | --- | --- | --- |
-| `Deut.9.1` #2 | `2Cor.11.12` | Deut 9:1–6 explicitly cites **Ephesians 2:9, 11, 12** ([CCEL](https://ccel.org/ccel/henry/mhcc.vi.ix.html)) | `Eph.2.11-Eph.2.12` | Very strong digital-target mismatch; no application |
+| `Deut.9.1` #2 | `2Cor.11.12` | Deut 9:1–6 explicitly cites **Ephesians 2:9, 11, 12** ([CCEL](https://ccel.org/ccel/henry/mhcc.vi.ix.html)) | `Eph.2.11` and `Eph.2.12` (distinct citations) | Very strong digital-target mismatch; no application |
 | `Esth.1.1` #2 | `2Cor.2.16` | Esther 1:1–9 prints **Habakkuk 2:15, 16** ([CCEL](https://ccel.org/ccel/henry/mhcc.xviii.i.html)) | `Hab.2.16` | Very strong digital-target mismatch; no application |
-| `Gen.12.6` #2 | `Heb.13.14` | Genesis 12:6–9 prints **Hebrews 11:8, 13, 14** ([CCEL](https://ccel.org/ccel/henry/mhcc.ii.xii.html)) | `Heb.11.13-Heb.11.14` | Very strong digital-target mismatch; no application |
+| `Gen.12.6` #2 | `Heb.13.14` | Genesis 12:6–9 prints **Hebrews 11:8, 13, 14** ([CCEL](https://ccel.org/ccel/henry/mhcc.ii.xii.html)) | `Heb.11.13` and `Heb.11.14` (distinct citations) | Very strong digital-target mismatch; no application |
 | `Matt.5.43` #2 | `1Cor.1.16` | Matthew 5:43–48 prints **1 Peter 1:15, 16** ([CCEL](https://ccel.org/ccel/henry/mhcc.xxxii.v.html)) | `1Pet.1.16` | Very strong digital-target mismatch; no application |
 | `Song.1.1` #5 | `2Cor.3.1` | Song introduction prints **Jeremiah 2:2; 3:1** ([CCEL](https://ccel.org/ccel/henry/mhcc.xxiii.html)) | `Jer.3.1` | Very strong digital-target mismatch; source-first-K introduction ownership must remain explicit |
 | `Song.1.1` #6 | `1Cor.7.8` | Song 1 commentary marks the next section **Song 1:7, 8** ([CCEL](https://ccel.org/ccel/henry/mhcc.xxiii.i.html)) | `Song.1.7-Song.1.8` | Very strong digital-target mismatch; **section heading/transition**, not Henry's prose |
