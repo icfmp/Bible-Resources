@@ -44,14 +44,18 @@
       "run": "https://github.com/icfmp/Bible-Resources/actions/runs/44528250861"
     },
     "actual_gui_clicked_reference_navigation": {
-      "status": "not_tested"
+      "status": "not_tested",
+      "release_blocker_under_documented_reader_scope": false
     },
     "full_heading_paragraph_and_note_presentation": {
-      "status": "not_approved"
+      "status": "not_approved_in_every_frontend",
+      "release_blocker_under_documented_reader_scope": false
     },
     "independent_android_reader_gui": {
       "status": "not_tested"
-    }
+    },
+    "bounded_reader_acceptance": "accepted_with_explicit_frontend_click_and_visual_limits",
+    "bounded_reader_acceptance_file": "docs/evidence/mhc-285/reader-acceptance-scope-2026-11-19.md"
   },
   "legal": {
     "status": "project_rights_decision_closed_on_crosswire_public_domain",
@@ -115,10 +119,9 @@
     }
   },
   "release_gate": {
-    "status": "awaiting_final_reader_and_publication_authorization",
+    "status": "technical_candidate_ready_waiting_main_reconciliation_and_owner_publication_authorization",
     "blocking_requirements": [
       "owner/editorial publication authorization",
-      "clicked link navigation, representative title/note/paragraph GUI presentation, or explicitly documented partial-reader acceptance",
       "reconcile draft branch with latest main and revalidate final production package before release"
     ],
     "prohibited_actions_before_release": [
@@ -126,7 +129,8 @@
       "merge release PR",
       "publish or add to downloadable catalog"
     ],
-    "technical_package_candidate_verified": true
+    "technical_package_candidate_verified": true,
+    "bounded_reader_acceptance_status": "accepted_with_documented_untested_reader_behaviors"
   },
   "notes": "Technical evidence is bound to each listed historic successful workflow and the exact pinned source. This is a metadata-only release-readiness receipt, not a downloadable build, checksum of a final production package, or legal determination."
 }
