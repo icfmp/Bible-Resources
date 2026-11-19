@@ -4102,6 +4102,7 @@ jobs:
                                "x11_actual_click_dispatched":False}
                           todo=[pyatspi.Registry.getDesktop(0)]
                           matches=[]
+                          scroll_candidates=[]
                           matching_states=[]
                           matching_names=0
                           seen=0
@@ -4135,10 +4136,41 @@ jobs:
                                           if (showing and visible and enabled and ext.width>0
                                               and ext.height>0 and 0<x<1280 and 0<y<800):
                                               matches.append((x,y))
+                                          elif (visible and enabled and ext.width>0 and ext.height>0
+                                                and 0<x<1280 and 0<y<800):
+                                              # AT-SPI VIEWABLE but not SHOWING: an
+                                              # actual link exists in the document,
+                                              # yet the user cannot click it until
+                                              # scrolling reveals it. Never click
+                                              # its stale extents directly.
+                                              scroll_candidates.append(item)
                                   todo.extend(item[i] for i in range(min(item.childCount,100)))
                               except (LookupError,RuntimeError,AttributeError):
                                   continue
+                          scroll_results=[]
+                          if not matches:
+                              for item in scroll_candidates[:3]:
+                                  try:
+                                      moved=bool(item.queryComponent().scrollTo(
+                                          pyatspi.SCROLL_ANYWHERE))
+                                      time.sleep(.65)
+                                      now=item.getState()
+                                      scrolled_showing=now.contains(pyatspi.STATE_SHOWING)
+                                      ext=item.queryComponent().getExtents(pyatspi.DESKTOP_COORDS)
+                                      x,y=ext.x+ext.width//2,ext.y+ext.height//2
+                                      scroll_results.append({
+                                          "AT_SPI_scroll_to_anywhere_returned":moved,
+                                          "source_link_becomes_SHOWING":bool(scrolled_showing),
+                                          "screen_center_after_scroll":[x,y],
+                                      })
+                                      if (scrolled_showing and ext.width>0 and ext.height>0
+                                          and 0<x<1280 and 0<y<800):
+                                          matches.append((x,y))
+                                          break
+                                  except (AttributeError,LookupError,RuntimeError):
+                                      scroll_results.append({"AT_SPI_scroll_unavailable":True})
                           coordinates=sorted(set(matches))
+                          out["invisible_source_link_scroll_probe"]=scroll_results
                           out["matching_accessibility_role_names"]=matching_names
                           out["matched_source_link_actual_accessible_states"]=matching_states[:8]
                           out["matching_screen_coordinates"]=coordinates[:8]
