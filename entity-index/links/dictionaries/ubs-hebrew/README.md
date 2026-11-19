@@ -889,3 +889,48 @@ approved**. Every new ledger or edition change must update the
 snapshot, then satisfy the read-only CI comparison against a fresh
 rebuild from pinned original UBS and MACULA data. No coverage or
 release percentage is fabricated from the editorial ledger count.
+
+### Sixth source-reviewed batch: real lexical identities versus deceptive inherited headwords
+
+Thirteen additional original WLC families, **14 original lexical occurrences**,
+received deliberately limited editorial decisions after checking the original
+passage and real UBS 0.9.4 headword meanings:
+
+- **Nine false sole-candidate relationships / 10 occurrences:** palace
+  **towers/strongholds** versus 'forsaken'; the two original **Beth-Haggan**
+  word segments versus an unrelated **Beth-gilgal** location; **plenty**
+  versus the person **Shiphi**; the Psalm 88 **leannoth** superscription
+  versus **wormwood**; **Jeremoth** the person versus the towns named
+  **Ramah**; a **robe** versus **measurement**; and two **Manahathite**
+  clan-name forms versus **half**. These are *source-keyed rejections of the
+  sole UBS candidate only*, not original corpus corrections.
+- **Four independently corroborated UBS headword-only relationships /
+  four occurrences:** **Tokhath** is also known as **Tikvah** (2 Chr
+  34:22); **Ramathaim** belongs to the UBS **Ramah** entry that expressly
+  names Ramathaim-Zophim (1 Sam 1:1); **Dragon Spring / En-Tannin**
+  (Neh 2:13); and **Sheol**, world of the dead (Isa 7:11). The original
+  source's pointed spelling, original word ID and source full Strong
+  number are retained. None of these adjudications assigns a contextual
+  UBS LEXID/SDBH sense or a universal Hebrew/Aramaic Strong alias.
+
+The pinned UBS original candidate lemma, complete Strong/POS metadata
+and published lexical gloss are checked against the actual source edition.
+The independent original MACULA word ID, source verse, exact lemma, Strong,
+class, English/POS witness and original SDBH are checked in the existing
+read-only verifiers. For multi-occurrence families, the family decision
+preserves all original unresolved tokens and does not silently create
+word-to-headword mappings.
+
+The source-conserving [v1 disposition coverage worklist](
+v1_disposition_coverage.json) is regenerated from all five manual ledgers
+without touching the original machine [family register](family_register.json)
+or the pinned generated [index](index.json).
+
+**After this batch:** **164/197 in-scope lexical families / 2,606/2,649
+original occurrences** have distinct lexical dispositions. The two
+original composite Strong-code families are separately preserved
+losslessly. **31 families / 41 original occurrences** still have *no
+disposition*. Reviewed positives are not actual new WLC links;
+word-linked corpus coverage remains **240,098/248,680**, and the
+UBS 0.9.4 edition-indexed-headword scope remains **98.909%**.
+No v1.0 release or lexical-sense approval is claimed.

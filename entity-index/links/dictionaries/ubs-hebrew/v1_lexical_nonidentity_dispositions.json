@@ -733,6 +733,266 @@
       },
       "ubs_attested_gloss": "Jaarah",
       "rationale": "1 Samuel 14:27 concerns the honeycomb from which Jonathan ate; UBS's sole exact-spelling candidate names a person Jaarah. The food noun must not be linked to that person."
+    },
+    {
+      "lang": "H",
+      "lemma": "אַלְמָנָה",
+      "original_strong": "0488a",
+      "occurrences": 2,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o230130220032",
+        "reference": "ISA 13:22!3",
+        "english": "towers",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "000455001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "000453000000000",
+        "lemma": "אַלְמָן",
+        "strong_codes": [
+          "H0488"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "ubs_attested_gloss": "forsaken",
+      "rationale": "Isaiah 13:22 (towers) and Ezekiel 19:7 (strongholds) use אַלְמָנָה for architectural strongholds; the sole pinned UBS candidate אַלְמָן means a person who is forsaken or widowed, not palace towers or fortified places. No general orthographic/Strong equivalence may be presumed."
+    },
+    {
+      "lang": "H",
+      "lemma": "בֵּית הַגָּן",
+      "original_strong": "1019a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o120090270071",
+        "reference": "2KI 9:27!7",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "000946001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "000945000000000",
+        "lemma": "בֵּית הַגִּלְגָּל",
+        "strong_codes": [
+          "H1019"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Beth-gilgal",
+      "rationale": "2 Kings 9:27 names the distinct location Beth-Haggan (House of the Garden) on the flight of Ahaziah. UBS candidate בֵּית הַגִּלְגָּל denotes Beth-gilgal, a separate town indexed in Nehemiah 12:29, not the similarly prefixed Beth-Haggan location."
+    },
+    {
+      "lang": "H",
+      "lemma": "גַּן",
+      "original_strong": "1019a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o120090270081",
+        "reference": "2KI 9:27!8",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "000946001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "000945000000000",
+        "lemma": "בֵּית הַגִּלְגָּל",
+        "strong_codes": [
+          "H1019"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Beth-gilgal",
+      "rationale": "2 Kings 9:27 supplies the second original source word Haggan of the Beth-Haggan place name. The sole UBS candidate is the *different complete place name* Beth-gilgal, not the independent 'garden' component or this named place."
+    },
+    {
+      "lang": "H",
+      "lemma": "שֵׂפֶק",
+      "original_strong": "8230b",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o180200220021",
+        "reference": "JOB 20:22!2",
+        "english": "plenty",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "007081001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "007598000000000",
+        "lemma": "שִׁפְעִי",
+        "strong_codes": [
+          "H8230"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Shiphi",
+      "rationale": "Job 20:22 uses שֵׂפֶק for a wicked man's plenty/sufficiency during prosperity. The UBS candidate שִׁפְעִי denotes the person Shiphi, son of Allon (1 Chronicles 4:37), not the common noun 'plenty'."
+    },
+    {
+      "lang": "H",
+      "lemma": "עָנָה",
+      "original_strong": "3939a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o190880010082",
+        "reference": "PSA 88:1!8",
+        "english": "leannoth",
+        "pos": "verb",
+        "class": "verb",
+        "original_sdbh": "005536001003000"
+      },
+      "ubs_candidate": {
+        "main_id": "003611000000000",
+        "lemma": "לַעֲנָה",
+        "strong_codes": [
+          "H3939"
+        ],
+        "parts_of_speech": [
+          "noun f"
+        ]
+      },
+      "ubs_attested_gloss": "wormwood",
+      "rationale": "The original superscription Psalm 88:1 has the instruction לְעַנּוֹת, transcribed 'leannoth', a verb/form associated with affliction or response. The UBS candidate לַעֲנָה denotes the bitter plant wormwood, not that original verbal superscription form. No contextual sense is inferred."
+    },
+    {
+      "lang": "H",
+      "lemma": "רָמֹות",
+      "original_strong": "7414a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o150100290092",
+        "reference": "EZR 10:29!9",
+        "english": "Jeremoth",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": ""
+      },
+      "ubs_candidate": {
+        "main_id": "006823000000000",
+        "lemma": "רָמָה",
+        "strong_codes": [
+          "H7413",
+          "H7414",
+          "H7434",
+          "H7437"
+        ],
+        "parts_of_speech": [
+          "noun f",
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Ramah",
+      "rationale": "Ezra 10:29 lists a man Jeremoth (source lemma רָמֹות); the UBS רָמָה headword's attested Ramah meanings denote heights and geographical towns, not the person Jeremoth. Similar Hebrew surface letters and an overlapping Strong family cannot establish personal-name identity."
+    },
+    {
+      "lang": "H",
+      "lemma": "מַד",
+      "original_strong": "4060",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o191330020131",
+        "reference": "PSA 133:2!13",
+        "english": "robes",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "003711001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "003719000000000",
+        "lemma": "מִדָּה",
+        "strong_codes": [
+          "H4060a",
+          "H4060b",
+          "H4061"
+        ],
+        "parts_of_speech": [
+          "noun f"
+        ]
+      },
+      "ubs_attested_gloss": "measure",
+      "rationale": "Psalm 133:2 refers to the collar/edge of Aaron's robes. UBS מִדָּה with Strong H4060a/b and H4061 describes dimensions, measurement and administrative taxation; no garment or robe gloss is present. Source מַד here is a robe, not 'measure'."
+    },
+    {
+      "lang": "H",
+      "lemma": "מְנוּחָה",
+      "original_strong": "2680a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o130020520092",
+        "reference": "1CH 2:52!9",
+        "english": "Manahathites",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "004111003001000 004119001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "002472000000000",
+        "lemma": "חֲצִי",
+        "strong_codes": [
+          "H2677",
+          "H2680"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "ubs_attested_gloss": "half (of object or substance)",
+      "rationale": "1 Chronicles 2:52 identifies the Manahathites as a genealogical clan, whereas UBS חֲצִי H2677/H2680 denotes the fraction 'half'. The inherited original composite Strong family does not make a clan name equal to the common fractional noun."
+    },
+    {
+      "lang": "H",
+      "lemma": "מָנַחְתִּי",
+      "original_strong": "2680a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o130020540102",
+        "reference": "1CH 2:54!10",
+        "english": "Manahathites",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "004122001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "002472000000000",
+        "lemma": "חֲצִי",
+        "strong_codes": [
+          "H2677",
+          "H2680"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "ubs_attested_gloss": "half (of object or substance)",
+      "rationale": "1 Chronicles 2:54 has the named Manahathite(s), a gentilic/people designation, not the noun 'half' in the sole UBS חֲצִי candidate despite the original shared Strong family."
     }
   ]
 }
