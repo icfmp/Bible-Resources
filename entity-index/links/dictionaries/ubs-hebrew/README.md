@@ -977,3 +977,41 @@ remain preserved without lexical decision; **24 source families /
 34 occurrences** still lack a disposition. None of the newly
 reviewed headword identities has been written into the generated
 word index, and no contextual sense was inferred or v1.0 approved.
+
+### Eighth batch: original names, attested lexical forms, and dissimilar proper places
+
+The original source-fidelity review now records **eight more distinct
+lexical families / nine WLC occurrences**:
+
+- **Six entry-only headword identities:** the two *separately indexed*
+  Aramaic components `יְגַר` and `שָׂהֲדוּ` of
+  *Jegar-Sahadutha* (Gen 31:47); the Hebrew verbal `חָלָה`
+  'grief' (Ps 77:11) corresponding to published UBS *to grieve*;
+  `ירה` 'afraid' (Isa 44:8), explicitly supported by UBS
+  *to be afraid*; `טֹחֲנֹות` 'grinders' (Eccl 12:3),
+  a nominalized grinding agent with the same original Strong family
+  as UBS *to grind*; and `אָשׁוּר` 'cypresses' (Ezek 27:6),
+  supported by the UBS *cypress* tree term. Their original source
+  lemma, source POS, full Strong number and SDBH identifier remain
+  unchanged, even where the dictionary headword treats a nominalized
+  form under a verbal entry. **No contextual lexical sense is inferred.**
+- **Two false sole-candidate lexical links / three occurrences:**
+  original *Eglath-Shelishiyah* in Isaiah 15:5 and Jeremiah 48:34
+  is a Moabite place, not UBS *Eglah*, David's wife, nor an
+  ordinary heifer; and the original Zuphite/Zophim ancestral
+  designation in 1 Samuel 1:1 is not the UBS *field of Zophim*
+  located in Moab (Num 23:14), nor the verb *to watch*.
+
+The new positive and negative decisions remain keyed to the precise
+original word-ID/reference/family, with original English and full
+UBS 0.9.4 lexical evidence. The independent source-pinned checks and
+full cross-ledger conservation audit reject any drift of original
+candidate identities, source revision or lexical witness.
+
+With this batch, **179 / 197 in-scope families** and
+**2,622 / 2,649 original in-scope occurrences** have a lexical
+disposition. **16 distinct source families / 25 occurrences** have
+no disposition yet. The two original composite Strong-code annotations
+remain separately preserved. Actual generated word links and the
+UBS 0.9.4 indexed-headword coverage remain unchanged; the
+version 1.0 publication and contextual sense assignment remain unapproved.
