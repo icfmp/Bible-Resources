@@ -139,6 +139,7 @@ def main():
             "original_composite_strong":f["source_original_composite_strong"],
             "original_word_count":f["source_original_word_count"],
             "original_classes":f["source_original_classes"],
+            "original_word_ln_witnesses":[{"word_id":w["original_word_id"],"ln":w["original_ln"],"reference":w["original_reference"]} for w in f["source_original_word_witnesses"]],
             "original_ubs_candidates":f["original_ubs_lexical_headword_candidates_NOT_APPROVED"],
         } for f in data["original_source_lexical_families"]],
         "published":False,
