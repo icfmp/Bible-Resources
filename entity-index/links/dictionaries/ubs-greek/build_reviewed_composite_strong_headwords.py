@@ -79,7 +79,9 @@ def review_ledger(ledger, report):
             or row["original_word_count"]<1
             or len(row.get("editorial_basis",""))<250
             or not row["original_ubs_strong_codes"]
-            or not row["source_original_ln_code"]):
+            or not row["source_original_ln_code"]
+            or not isinstance(row.get("exact_original_word_ids_with_missing_ln_allowed"), list)
+            or len(set(row["exact_original_word_ids_with_missing_ln_allowed"])) != len(row["exact_original_word_ids_with_missing_ln_allowed"])):
             raise ValueError("Greek composite original-word lexical decision lacks independent evidence")
         decisions[key]=row
     if len(decisions)!=3 or sum(row["original_word_count"] for row in decisions.values())!=5:
@@ -104,6 +106,7 @@ def review(candidate, raw_source, report, ledger, english, french):
         raise ValueError("Original UBS Greek lexical inventory/bilingual IDs changed")
     out=copy.deepcopy(candidate)
     new_ids=set()
+    missing_ln_seen=set()
     groups=set()
     for family in report["original_source_lexical_families"]:
         alternatives=family["original_ubs_lexical_headword_candidates_NOT_APPROVED"]
@@ -136,6 +139,10 @@ def review(candidate, raw_source, report, ledger, english, french):
         if not en_codes or en_codes!=fr_codes:
             raise ValueError("Original UBS Greek composite lexeme LN code parity changed")
         groups.add(key)
+        source_zero_ln_ids=set(decision["exact_original_word_ids_with_missing_ln_allowed"])
+        family_zero_ln_ids={w["original_word_id"] for w in family["source_original_word_witnesses"] if not w["original_ln"]}
+        if source_zero_ln_ids != family_zero_ln_ids:
+            raise ValueError("Missing original Greek LN annotations differ from explicit individual-word editorial scope")
         for word in family["source_original_word_witnesses"]:
             wid=word["original_word_id"]
             shared=sorted(set(word["original_ln"].split())&en_codes&fr_codes)
@@ -145,9 +152,12 @@ def review(candidate, raw_source, report, ledger, english, french):
                 or nfc(word["original_lemma"])!=decision["lemma_nfc"]
                 or word["original_class"]!=decision["original_macula_class"]
                 or not word["original_morph"] or not word["original_reference"]
-                or decision["source_original_ln_code"] not in shared):
+                or (not shared and (wid not in source_zero_ln_ids or word["original_ln"]))
+                or (shared and decision["source_original_ln_code"] not in shared)):
                 raise ValueError("Original Greek compound Strong word-ID, lemma, morphology or LN drift: "+repr({"wid":wid,"lemma":word["original_lemma"],"strong":word["original_strong"],"class":word["original_class"],"ln":word["original_ln"],"shared":shared,"expected_ln":decision["source_original_ln_code"],"already_indexed":wid in candidate["by_macula_word"],"already_ambiguous":wid in candidate.get("by_macula_ambiguous_word",{})}))
             new_ids.add(wid)
+            if not shared:
+                missing_ln_seen.add(wid)
             out["by_macula_word"][wid]={
                 "entry_id":mid,
                 "match_type":STATUS,
@@ -159,9 +169,9 @@ def review(candidate, raw_source, report, ledger, english, french):
                 "original_morph":word["original_morph"],
                 "corroborating_ubs_ln_codes":shared,
                 "ubs_original_strong_codes_separate_not_alias":alt["source_ubs_strong_codes"],
-                "source_lexical_headword_evidence":"exact_Greek_lemma_and_original_bilingual_LN_word_only",
+                "source_lexical_headword_evidence":("exact_Greek_lemma_and_compatible_source_class_entry_only_original_LN_absent" if not shared else "exact_Greek_lemma_and_original_bilingual_LN_word_only"),
             }
-    if len(groups)!=3 or groups!=set(decisions) or len(new_ids)!=5 or len(out["by_macula_word"])!=9195:
+    if len(groups)!=3 or groups!=set(decisions) or len(new_ids)!=5 or len(out["by_macula_word"])!=9195 or len(missing_ln_seen)!=1:
         raise ValueError("Greek all five source-original compound Strong words were not reviewed")
     for key,value in candidate.items():
         if key not in ("by_macula_word","editorial_candidate","word_aware_coverage") and out[key]!=value:
@@ -175,6 +185,7 @@ def review(candidate, raw_source, report, ledger, english, french):
         "status":"PRIVATE_five_source_Greek_compound_Strong_word_headwords_NOT_PUBLISHED",
         "reviewed_original_headword_words_total":9194,
         "new_original_compound_Strong_word_headwords":5,
+        "original_compound_word_ids_with_missing_ln_preserved":sorted(missing_ln_seen),
         "other_original_words_still_unapproved":1,
         "editorial_source_compound_strong":"v1_reviewed_composite_strong_headwords.json",
         "new_inferred_contextual_lexical_sense_ids":0,
@@ -186,6 +197,7 @@ def review(candidate, raw_source, report, ledger, english, french):
         "word_aware_entry_candidate_words":137285,
         "remaining_no_ubs_headword_candidate_original_words":456,
         "source_reviewed_original_compound_Strong_word_headwords":5,
+        "source_reviewed_compound_word_headwords_without_original_ln":len(missing_ln_seen),
         "other_unapproved_word_headword_candidates":1,
         "new_inferred_contextual_lexical_sense_ids":0,
     }
@@ -205,6 +217,7 @@ def main():
     print("GREEK_FIVE_ORIGINAL_COMPOSITE_STRONG_HEADWORDS_SOURCE_REVIEWED",json.dumps({
         "additional_original_word_headwords_reviewed":5,
         "original_strong_composites_modified":False,
+        "original_words_with_missing_ln_left_missing":1,
         "total_source_reviewed_word_headwords":9194,
         "source_supported_lexical_word_coverage":137284,
         "original_words_without_editorially_approved_headwords":457,
