@@ -401,3 +401,27 @@ is neither necessary nor an acceptance gate.
 - The [GitHub Actions workflow](../../../../.github/workflows/bsi-ubs-hebrew.yml) verifies the exact pinned sources, runs all audits, regenerates both committed JSON datasets, and compares them deterministically. It operates in **read-only mode** after the validated source snapshot is committed.
 
 The original source annotations and original WLC IDs are never rewritten. The next appropriate step is **edition-aware lexical reconciliation with an editorially validated sense policy**, not assuming numeric `LEXID` equality is a semantic guarantee.
+
+## V1 edition-scope editorial dispositions (2026-11-19)
+
+[Source-keyed scope decisions](v1_scope_dispositions.json) independently record the
+complete set of **five UBS 0.9.4 indexed-headword nonattestations** (5,933
+original WLC occurrences). This accepts *only their exclusion from the edition
+coverage denominator*, after the pinned Strong, exact main/alternate lemma and
+consonant inventory tests; it does not assert semantic absence, rewrite the
+MACULA tokens, or invent UBS entries. Re-evaluate when changing the UBS edition.
+
+The same decision file explicitly **preserves both source composite Strong
+strings** as unresolved original annotations (two source occurrences); splitting
+or selecting a component has **not** been approved. The accompanying
+`test_editorial_scope_dispositions.py` fails if a family key, original witness,
+occurrence count, pinned source edition, or the lossless/no-lexical-link policy
+changes. This is a separate manual disposition ledger: the generated
+`family_register.json` remains a byte-reproducible *machine classification*
+and its `families_with_editorial_decision=0` field must **not** be relabeled
+as independent lexical editorial validation.
+
+**No cross-Strong lexical identities or contextual meanings have been accepted**
+by this scope-only review. The **197 in-scope families / 2,649 occurrences**
+still need original source dictionary metadata and lexeme-level adjudication
+under [#366](https://github.com/icfmp/Bible-Resources/issues/366).
