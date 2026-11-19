@@ -3444,7 +3444,7 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json,os,subprocess,sys
+          import hashlib,json,os,re,subprocess,sys
           from pathlib import Path
           from lxml import etree
           sys.path.insert(0,"scripts")
@@ -3508,10 +3508,40 @@ jobs:
           if set(compiled_intros)!=set(intro_targets):
               raise ValueError("Private SWORD candidate lacks an expected real book-I intro")
           intro_expected={intro_targets[key]:value for key,value in compiled_intros.items()}
-          # Two chapter-I-only end verses + one authentic OT and one NT
-          # book preface. All eight ordinary commentary texts must match GUI.
+          # Extend the eight independent GUI prose checks with a bounded,
+          # source-hash-attested sample of ORIGINAL wrong-target quarantine
+          # positions. This checks the actual reader pane, not click behavior.
+          errata=json.loads(Path(
+              "work/mhcc-modern/production/ADDITIONAL_ORIGINAL_LINK_TARGET_ERRATA_2026-11-18.json"
+          ).read_text(encoding="utf-8"))
+          if (errata.get("status")!="ORIGINAL_DIGITAL_SOURCE_LINK_DISCREPANCIES_REVIEW_ONLY_NOT_APPLIED"
+                  or errata.get("original_corpus_sha256")!=proof["original_source_corpus_sha256"]
+                  or len(errata.get("cases",[]))!=11
+                  or any(x.get("approval") is not False for x in errata["cases"])):
+              raise ValueError("Unreviewed source link errata inventory")
+          link_samples={}
+          for row in errata["cases"]:
+              if len(link_samples)>=3:
+                  break
+              key=row["source_first_key"]
+              if not re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*",key):
+                  raise ValueError("Invalid original source first-K link key")
+              book,ch,verse=key.rsplit(".",2)
+              ref=f"{book} {ch}:{verse}"
+              if ref in link_samples:
+                  continue
+              if hashlib.sha256(row["original_osisRef"].encode()).hexdigest()!=row["original_target_sha256"]:
+                  raise ValueError("An original wrong hyperlink target hash drifted")
+              link_samples[ref]={
+                  "original_target_sha256":row["original_target_sha256"],
+                  "published_original_first_K":key,
+                  "source_link_ordinal":row["source_reference_ordinal"],
+              }
+          if len(link_samples)!=3 or proof["source_suspect_links_rendered_non_navigable"]!=11:
+              raise ValueError("Source-strict original hyperlink quarantine proof missing")
           samples=("Gen 1:1","Matt 3:7","Ps 95:1","Rev 22:2",
-                   "Lev 19:37","Ps 108:13","Exod 1:1","Rom 1:1")
+                   "Lev 19:37","Ps 108:13","Exod 1:1","Rom 1:1",
+                   *link_samples)
           comparisons={}
           for ref in samples:
               code,commentary=query(
@@ -3526,6 +3556,13 @@ jobs:
                       or len(commentary)<=100 or len(bible_text)<=64):
                   raise ValueError("Xiphos sample not backed by two substantial real SWORD texts: "+ref)
               comparisons[ref]={"commentary":commentary,"bible":bible_text}
+              if ref in link_samples:
+                  icode,imarkup=query(
+                      "MHCCMODRC",ref,fmt="internal",root=root,
+                      exe="diatheke",limit=256*1024,timeout=25)
+                  if icode!=0 or not present_key(ref,imarkup,icode):
+                      raise ValueError("Missing genuine SWORD internal markup at link sample")
+                  comparisons[ref]["commentary_internal"]=imarkup
               if ref in intro_expected:
                   comparisons[ref]["intro_expected"]=intro_expected[ref]
           def inspect_book_intro_menu(env):
@@ -3569,6 +3606,33 @@ jobs:
               row=menu[ref]["book_and_chapter_menu_observations"]["chapter"]
               menu_classes[ref]=row["GUI_menu_observation_class"]
               ordinary_intro_classes[ref]=row["normal_chapter_GUI_observation_class"]
+          # Rich clipboard HTML, if Xiphos exposes it, is independently
+          # inspected by the shared real-GUI reader. An absence of HTML never
+          # turns native quarantine into invented proof of an unclickable link.
+          markup=result.get("real_markup_rendering_observation_by_passage",{})
+          link_gui={}
+          if not isinstance(markup,dict) or not set(link_samples).issubset(markup):
+              raise ValueError("Real Xiphos link-bearing GUI inspection omitted")
+          for ref,row in link_samples.items():
+              m=markup[ref]
+              exact=m.get("exact_matching_source_target_sha256_in_real_gui_HTML",[])
+              if not isinstance(exact,list):
+                  raise ValueError("Malformed real GUI HTML link observation")
+              link_gui[ref]={
+                  **row,
+                  "real_gui_rich_HTML_observed":m.get("real_gui_rich_html_selection_available") is True,
+                  "real_gui_HTML_anchor_count":m.get("real_gui_rich_html_anchor_elements_found",0),
+                  "candidate_valid_reference_source_labels_in_real_GUI_HTML":
+                      m.get("source_reference_labels_observed_as_real_gui_HTML_anchors",0),
+                  "candidate_exact_valid_href_destinations_in_real_GUI_HTML":
+                      m.get("exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations",0),
+                  "original_bad_target_observed_as_verified_valid_GUI_href":
+                      row["original_target_sha256"] in exact,
+                  "bad_target_mouse_click_not_tested":True,
+                  "missing_rich_HTML_is_inconclusive_not_a_negative_link_test":True,
+              }
+              if row["original_target_sha256"] in exact:
+                  raise ValueError("Quarantined source hyperlink unexpectedly exposed in GUI")
           receipt={
               "status":(
                   "PRIVATE_MODERN_REAL_XIPHOS_GUI_SUBSTANTIVE_CLIPBOARD_PASS"
@@ -3589,6 +3653,9 @@ jobs:
               "per_compiled_book_I_native_heading_menu_GUI_class":menu_classes,
               "per_compiled_book_I_normal_GUI_class":ordinary_intro_classes,
               "all_book_prefaces_in_GUI_approved":False,
+              "sampled_original_wrong_target_link_GUI_markup_observations":link_gui,
+              "source_strict_eleven_wrong_target_non_navigable_links_proven_natively":True,
+              "all_link_click_navigation_approved":False,
               "actual_GUI_actions_completed":result.get("actual_passage_commands_accepted") is True,
               "xiphos_link_mouse_click_and_target_verified":False,
               "xiphos_gui_all_pages_approved":False,
@@ -3609,6 +3676,14 @@ jobs:
                 "a non-match remains inconclusive, never missing source text")
           print("PRIVATE REAL XIPHOS BOOK-I HEADING MENU OUTCOMES (no text): "+
                 str(menu_classes)+"; normal chapter classes: "+str(ordinary_intro_classes))
+          print("PRIVATE REAL XIPHOS SOURCE-STRICT LINK GUI HTML OBSERVATION (counts only): "+
+                str({ref:{
+                    "rich":item["real_gui_rich_HTML_observed"],
+                    "valid_label_anchors":item["candidate_valid_reference_source_labels_in_real_GUI_HTML"],
+                    "valid_target_hrefs":item["candidate_exact_valid_href_destinations_in_real_GUI_HTML"],
+                    "bad_target_verified_href":item["original_bad_target_observed_as_verified_valid_GUI_href"]
+                } for ref,item in link_gui.items()})+
+                "; no mouse click or negative GUI conclusion without positive HTML")
           if positives!=len(samples) or result.get("actual_passage_commands_accepted") is not True:
               raise ValueError(
                   "Actual Xiphos modern commentary GUI did not display every "
