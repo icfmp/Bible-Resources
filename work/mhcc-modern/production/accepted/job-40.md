@@ -96,7 +96,7 @@ If even this animal overwhelms human strength, how much more ought we to humble 
 
 The God who made the human soul knows every way to reach it.
 
-He can bring the sword of divine justice against it.
+He can bring **the sword of his justice and wrath** against it.
 
 But godly people have spiritual weapons: **the whole armor of God**, by which they resist and overcome the tempter.
 
@@ -105,6 +105,8 @@ Thus their immortal souls may remain safe whatever happens to their fragile, mor
 ---
 
 ## Editorial review — Job 40
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** In the Behemoth unit the modern exposition omitted the original's explicit *wrath* linked to the metaphor of the sword of divine justice. Restored both against [CCEL Job 40](https://ccel.org/ccel/henry/mhcc.xix.xl.html). Exact published native MHCC 0.1.1 review remains outstanding; no chapter divisions or original changed.
 
 **Complete secondary original-English witness read:** [CCEL, Job 40](https://ccel.org/ccel/henry/mhcc.xix.xl.html). Exact released `MHCC 0.1.1` remains the publishing original requiring source-native SWORD key/annotation and independent QA.
 
