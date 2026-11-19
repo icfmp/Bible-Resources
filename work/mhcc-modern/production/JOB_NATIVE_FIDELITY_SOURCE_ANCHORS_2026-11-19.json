@@ -4,9 +4,57 @@
   "native_module_id": "MHCC",
   "source_zip_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
   "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
-  "purpose": "Read-only exact-authenticated original K-boundary and lexical witness verification of previously documented Job 21/24–42 draft fidelity corrections. A found phrase is not full source-to-modern semantic approval.",
+  "purpose": "Read-only exact-authenticated original K-boundary and lexical witness verification of Job 4–6, 21, 24–42 draft fidelity corrections. A found phrase is not full source-to-modern semantic approval.",
   "source_group_hash_policy": "manifest_exact",
   "source_group_probes": [
+    {
+      "chapter": "Job.4",
+      "first": "Job.4.12",
+      "last": "Job.4.21",
+      "sha": "01b7bf81e094f9fa7c5f75ee93d6b241eab8dbf097d1a835e1bc045e40486aae",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "let him wonder that he is out of hell"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "Will God justify sinful mortals and clear them from guilt"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.5",
+      "first": "Job.5.6",
+      "last": "Job.5.16",
+      "sha": "46b0531676d81a538468cd2bd677f553c1f0a32c2f2c93dc8d4a7664bf1eba51",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "for they are from God"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "nor our sins to fate for they are from ourselves"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.6",
+      "first": "Job.6.1",
+      "last": "Job.6.7",
+      "sha": "7943dd70d15eb418d30a7e6ccd2c002833de7c8fa76435e5ce291dc13824d1a5",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "God is pleased to lay upon us"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "the use of our reason and the peace of our conscience"
+        }
+      ]
+    },
     {
       "chapter": "Job.21",
       "first": "Job.21.17",
