@@ -3683,7 +3683,7 @@ jobs:
           timeout 660s sudo -E apt-get -o Acquire::Retries=1 \
             -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 \
             -o DPkg::Lock::Timeout=15 install -y --no-install-recommends \
-            xiphos xvfb xdotool xclip dbus-x11
+            xiphos xvfb xdotool xclip dbus-x11 at-spi2-core python3-pyatspi
           for binary in xiphos Xvfb xdotool xclip dbus-run-session; do
             command -v "$binary" >/dev/null || exit 1
           done
@@ -3833,7 +3833,65 @@ jobs:
                       ordinary_first_verse=comparisons[ref]["commentary"],
                   )
                   proofs[ref]=proof
-              return {"book_preface_I_menu_GUI_observations":proofs}
+              # Read only accessibility role counts and SHA-only anchor names.
+              # This does NOT claim a click, valid target or GUI navigation.
+              import textwrap
+              from commentary_xiphos_dual_reader import _x11,_main_xiphos_window
+              win=_main_xiphos_window(env)
+              accessibility={"status":"ACCESSIBILITY_PROBE_UNAVAILABLE"}
+              if win:
+                  _x11(["xdotool","windowfocus",win],env)
+                  for action in (
+                      ["xdotool","key","--clearmodifiers","ctrl+l"],
+                      ["xdotool","type","--clearmodifiers","--delay","25","Gen 12:6"],
+                      ["xdotool","key","Return"],
+                      ["xdotool","key","--clearmodifiers","alt+c"],
+                  ):
+                      _x11(action,env)
+                  import time
+                  time.sleep(2)
+                  probe=textwrap.dedent("""
+                      import hashlib,json,os
+                      import pyatspi
+                      desktop=pyatspi.Registry.getDesktop(0)
+                      results={"status":"REAL_XIPHOS_ATSPI_ROLE_INVENTORY_ONLY",
+                               "xiphos_application_found":False,
+                               "accessible_link_roles":0,"visited_objects":0,
+                               "link_name_sha256":[]}
+                      pending=[desktop]
+                      while pending and results["visited_objects"]<2500:
+                          node=pending.pop()
+                          results["visited_objects"]+=1
+                          try:
+                              role=node.getRoleName().lower()
+                              name=node.name or ""
+                              if role=="application" and "xiphos" in name.lower():
+                                  results["xiphos_application_found"]=True
+                              if role=="link":
+                                  results["accessible_link_roles"]+=1
+                                  if name:
+                                      digest=hashlib.sha256(name.encode()).hexdigest()
+                                      results["link_name_sha256"].append(digest)
+                              count=min(node.childCount,100)
+                              pending.extend(node[i] for i in range(count))
+                          except (LookupError,RuntimeError,AttributeError):
+                              continue
+                      print(json.dumps(results,sort_keys=True))
+                  """)
+                  try:
+                      observed=subprocess.run(
+                          ["/usr/bin/python3","-c",probe],
+                          env=dict(env,NO_AT_BRIDGE="0",GTK_A11Y="1"),
+                          stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
+                          text=True,timeout=18,check=False)
+                      if observed.returncode==0 and len(observed.stdout)<20000:
+                          candidate=json.loads(observed.stdout)
+                          if candidate.get("status")=="REAL_XIPHOS_ATSPI_ROLE_INVENTORY_ONLY":
+                              accessibility=candidate
+                  except (OSError,subprocess.TimeoutExpired,ValueError):
+                      pass
+              return {"book_preface_I_menu_GUI_observations":proofs,
+                      "real_accessibility_link_inventory":accessibility}
           result=_run_real_gui(root,comparisons,seconds=25,
                                commentary_module_id="MHCCMODRC",
                                on_gui_ready=inspect_book_intro_menu)
