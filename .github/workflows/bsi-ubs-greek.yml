@@ -412,6 +412,28 @@ jobs:
           assert result["original_ambiguous_ubs_entries_all_preserved"] is True
           print("GREEK_ORIGINAL_499_EXCEPTIONS_AND_224_AMBIGUITIES_DOCUMENTED_NO_GUESSES")
           PY
+      - name: Partition 224 Greek source Strong ambiguities without selecting senses
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_224_ambiguities.py \
+            --source /tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json \
+            --output /tmp/bsi-ubs-greek-224-ambiguity-partition.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("/tmp/bsi-ubs-greek-224-ambiguity-partition.json").read_text())
+          assert sum(r["reason_counts"].values()) == 224
+          assert r["new_approved_lexical_headwords"] == 0
+          assert r["contextual_ubs_lexids_inferred"] == 0
+          assert r["publication_approved"] is False
+          print("GREEK_224_ORIGINAL_STRONG_AMBIGUITIES_PARTITIONED_WITHOUT_GUESSES")
+          PY
+      - name: Upload Greek 224 word ambiguity review (PRIVATE, NOT approved)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-224-original-ambiguity-dispositions-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-224-ambiguity-partition.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload original Greek lexical exceptions (PRIVATE, UNRESOLVED)
         uses: actions/upload-artifact@v4
         with:
