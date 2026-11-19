@@ -4025,6 +4025,56 @@ jobs:
                               joined=" ".join(re.findall(r"\w+",
                                   " ".join(fragments).casefold()))
                               return bool(target_phrase and target_phrase in joined)
+                          def sidebar_verse_list_target():
+                              # Xiphos show_ref() sends a clicked Scripture
+                              # hyperlink to sidebar.results_list, NOT the
+                              # main Bible pane (src/main/url.cc). Only a
+                              # real selected GtkTreeView row can prove it.
+                              todo=[(pyatspi.Registry.getDesktop(0),())]
+                              seen=0
+                              selected=False
+                              listed=False
+                              candidate_cells=0
+                              target_role_hashes=set()
+                              target_re=re.compile(
+                                  r"\b(?:heb(?:rews)?)\s*11\s*[:.]\s*8\b",
+                                  re.I)
+                              while todo and seen<2500:
+                                  item,parents=todo.pop()
+                                  seen+=1
+                                  try:
+                                      role=item.getRoleName().lower()
+                                      if role in ("table cell","table row","list item"):
+                                          candidate_cells+=1
+                                          name=(item.name or "")[:250]
+                                          text=name
+                                          if not text:
+                                              try:
+                                                  tx=item.queryText()
+                                                  text=tx.getText(0,min(tx.characterCount,180))
+                                              except (LookupError,RuntimeError,AttributeError):
+                                                  pass
+                                          if target_re.search(text) and any(
+                                                  "table" in p or "list" in p for p in parents):
+                                              listed=True
+                                              target_role_hashes.add(
+                                                  hashlib.sha256(role.encode()).hexdigest())
+                                              try:
+                                                  state=item.getState()
+                                                  if state.contains(pyatspi.STATE_SELECTED):
+                                                      selected=True
+                                              except (LookupError,RuntimeError,AttributeError):
+                                                  pass
+                                      todo.extend((item[i],(role,)+parents[:6])
+                                          for i in range(min(item.childCount,100)))
+                                  except (LookupError,RuntimeError,AttributeError):
+                                      continue
+                              return {
+                                  "target_verse_appeared_in_real_sidebar_list":listed,
+                                  "target_verse_selected_in_real_sidebar_list":selected,
+                                  "sidebar_real_cell_count":candidate_cells,
+                                  "target_accessibility_role_hashes":sorted(target_role_hashes),
+                              }
                           out={"status":"REAL_GUI_ATSPI_SOURCE_LABEL_SEARCH",
                                "matching_showing_link_count":0,
                                "x11_actual_click_dispatched":False}
@@ -4064,15 +4114,22 @@ jobs:
                               x,y=max(right,key=lambda item:item[0])
                               if sum(abs(px-x)<10 for px,_ in right)==1:
                                   before=actual_accessible_target_present()
+                                  sidebar_before=sidebar_verse_list_target()
                                   click=subprocess.run(["xdotool","mousemove",str(x),str(y),
                                       "click","1"],timeout=7,capture_output=True)
                                   out["x11_actual_click_dispatched"]=click.returncode==0
                                   if click.returncode==0:
-                                      time.sleep(1)
+                                      time.sleep(1.4)
                                       after=actual_accessible_target_present()
+                                      sidebar_after=sidebar_verse_list_target()
                                       out["target_phrase_already_visible_before_click"]=before
                                       out["real_post_click_target_scripture_prose_appeared"]=(
                                           not before and after)
+                                      out["real_sidebar_before_click"]=sidebar_before
+                                      out["real_sidebar_after_click"]=sidebar_after
+                                      out["real_post_click_target_verse_selected_in_sidebar"]=(
+                                          not sidebar_before["target_verse_appeared_in_real_sidebar_list"]
+                                          and sidebar_after["target_verse_selected_in_real_sidebar_list"])
                           print(json.dumps(out,sort_keys=True))
                       """)
                       attempt=subprocess.run(["/usr/bin/python3","-c",script,valid_labels[0],target_phrase],
@@ -4110,7 +4167,9 @@ jobs:
                           click_proof["status"]=(
                               "REAL_XIPHOS_CLICK_AND_POSTCLICK_BIBLE_TEXT_MATCH"
                               if match else
-                              "REAL_XIPHOS_CLICK_TARGET_PROSE_APPEARED_IN_ACCESSIBILITY"
+                              "REAL_XIPHOS_CLICK_TARGET_VERSE_SELECTED_IN_REAL_SIDEBAR"
+                              if click_proof.get("real_post_click_target_verse_selected_in_sidebar")
+                              else "REAL_XIPHOS_CLICK_TARGET_PROSE_APPEARED_IN_ACCESSIBILITY"
                               if click_proof.get("real_post_click_target_scripture_prose_appeared")
                               else "REAL_XIPHOS_CLICK_DISPATCHED_DESTINATION_NOT_PROVEN")
                       click_proof["exact_original_valid_link_GUI_HTML_attested"]=True
