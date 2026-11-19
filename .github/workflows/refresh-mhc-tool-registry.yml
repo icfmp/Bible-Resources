@@ -1,0 +1,31 @@
+name: Refresh exact tool registry for MHC release branch
+on:
+  push:
+    branches:
+      - release/mhc-0.1.0-publication
+    paths:
+      - .github/workflows/refresh-mhc-tool-registry.yml
+permissions:
+  contents: write
+jobs:
+  refresh:
+    if: github.repository == 'icfmp/Bible-Resources'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Remove bootstrap and regenerate canonical inventory from final files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/refresh-mhc-tool-registry.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/TOOL_REGISTRY.md docs/TOOL_REGISTRY.json
+          git diff --cached --check
+          git commit -m "Refresh source-bound tool registry for reviewed commentary validator"
+          git push origin HEAD:release/mhc-0.1.0-publication
