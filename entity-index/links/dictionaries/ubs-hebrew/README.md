@@ -1136,3 +1136,31 @@ infer UBS contextual senses, and does not alter the immutable crosswalk
 or original corpus. Any additional entries require independent word-specific
 editorial evidence; a family-wide positive decision is not a licence to
 assume all contexts mean the same thing.
+
+### Individual WLC word-headword reviews beyond the first 139
+
+The [additional editorial word ledger](v1_additional_word_headword_dispositions.json)
+records **134 further original WLC word IDs** after checking each exact
+source English, POS/morphology, passage, original full Strong and SDBH
+against an independently published UBS headword meaning. The decisions
+cover **19 families** and are headword-entry-only, not contextual sense IDs.
+
+Every record preserves its original MACULA spelling and combining-mark order.
+The [read-only verifier](verify_additional_word_headwords.py) checks the
+135-word source census, exact complete original MACULA TSV evidence,
+UBS pinned lexical glosses and original index nonlink status. CI fails
+for altered WLC words, unsupported English meanings, dictionary drift,
+existing-link collisions or fabricated senses.
+
+The last original pending word in **2 Samuel 21:22**, Hebrew רָפָה
+(MACULA English 'giant'), is **deliberately kept unlinked**. This
+original source word need not refer to the named Raphah ancestor rather
+than a giant/descendant. The UBS personal-name headword does not alone
+resolve the contextual identity; we must not force this link.
+
+The 134 newly reviewed words, together with the existing 139 exact
+word-ID entries in the first preview, yield **273 staged headword-only
+candidates**. Both independently verified overlays are still separate
+from the frozen generated index.json. No original sources, SDBH, Strong,
+UBS sense IDs or application code changed. Actual index regeneration and
+explicit publication approval are separate future gates.
