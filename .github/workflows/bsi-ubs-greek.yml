@@ -37,6 +37,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_224_ambiguities.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_taxonomy_headwords.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_missing_strong_word_headwords.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_missing_exact_headwords.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
