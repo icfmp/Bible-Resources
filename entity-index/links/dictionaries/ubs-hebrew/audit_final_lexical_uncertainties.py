@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import runpy
 import unicodedata
 from pathlib import Path
 
@@ -56,6 +57,8 @@ def run(ledger, additional, english, french, macula, base=None):
         raise ValueError("Malformed original residual word identifier")
 
     source = []
+    previously_linked_words_excluded = 0
+    lookup_word = runpy.run_path(str(Path(__file__).with_name("build_index.py")))["lookup_word"]
     with Path(macula).open(encoding="utf-8-sig", newline="") as stream:
         for row in csv.DictReader(stream, delimiter="\t"):
             k = key(row["lang"], row["lemma"], row["strongnumberx"])
@@ -64,9 +67,13 @@ def run(ledger, additional, english, french, macula, base=None):
             if row["class"] not in CLASSES:
                 raise ValueError("Missing original lexical word classification")
             if base:
-                base_link = base["by_macula_word"].get(row["xml:id"])
-                if base_link:
-                    raise ValueError("Previously unlinked WLC word now has entry: " + row["xml:id"])
+                old = lookup_word(base, row["xml:id"], row["sdbh"],
+                                  row["strongnumberx"], row["lang"], row["lemma"])
+                if old["entry_ids"]:
+                    if row["xml:id"] == hold_id:
+                        raise ValueError("Source-held Raphah word already has a headword")
+                    previously_linked_words_excluded += 1
+                    continue
             data = {
                 "word_id": row["xml:id"],
                 "reference": row["ref"],
@@ -133,6 +140,7 @@ def run(ledger, additional, english, french, macula, base=None):
         "source_editions": ledger["source_editions"],
         "summary": {
             "sole_candidate_families": len(original),
+            "same_lexical_family_source_words_already_linked": previously_linked_words_excluded,
             "sole_candidate_words": len(source) - 1,
             "individually_unlinked_rapha_words": 1,
             "original_word_records_verified": len(source),
