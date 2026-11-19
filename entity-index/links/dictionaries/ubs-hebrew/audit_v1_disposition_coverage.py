@@ -20,6 +20,7 @@ DISPOSITION_SOURCES = (
     "lexical_nonidentity_rejections",
     "multiple_headword_abstentions",
     "grammatical_morpheme_nonlinks",
+    "single_candidate_abstentions",
     "positive_headword_only_reviews",
 )
 
@@ -107,6 +108,16 @@ def collect(register, scope, ledgers, index=None):
                     or f["ubs_candidate_entries"] !=
                     [decision["ubs_candidate_entry_id"]]):
                 raise ValueError(f"{source}: source segment candidate changed")
+        elif source == "single_candidate_abstentions":
+            if (decision["disposition"] !=
+                    "reversible_single_candidate_identity_abstention"
+                    or f["ubs_candidate_entries"] !=
+                    [decision["ubs_candidate"]["main_id"]]
+                    or len(f["ubs_candidate_entries"]) != 1
+                    or decision["lexical_identity_approved"] is not False
+                    or decision["contextual_sense_approved"] is not False
+                    or decision["index_word_links_applied"] is not False):
+                raise ValueError(f"{source}: unsafe or unverified lexical abstention")
         elif source == "positive_headword_only_reviews":
             if (decision["disposition"] !=
                     "source_reviewed_ubs_headword_entry_only"
@@ -154,10 +165,13 @@ def collect(register, scope, ledgers, index=None):
         ("lexical_nonidentity_rejections", "occurrences"),
         ("multiple_headword_abstentions", "original_occurrences"),
         ("grammatical_morpheme_nonlinks", "original_occurrences"),
+        ("single_candidate_abstentions", "original_occurrences"),
         ("positive_headword_only_reviews", "original_occurrences"),
     ):
         ledger = ledgers[source]
-        records = ledger["decisions"] if source != "multiple_headword_abstentions" else ledger["dispositions"]
+        records = (ledger["dispositions"] if source in (
+            "multiple_headword_abstentions", "single_candidate_abstentions"
+        ) else ledger["decisions"])
         for d in records:
             register_decision(source, d, field)
 
@@ -179,6 +193,7 @@ def collect(register, scope, ledgers, index=None):
             "lexical_nonidentity_rejections",
             "multiple_headword_abstentions",
             "grammatical_morpheme_nonlinks",
+            "single_candidate_abstentions",
             "positive_headword_only_reviews",
         )
     )
@@ -223,6 +238,7 @@ def collect(register, scope, ledgers, index=None):
                 "lexical_nonidentity_rejections",
                 "multiple_headword_abstentions",
                 "grammatical_morpheme_nonlinks",
+                "single_candidate_abstentions",
                 "positive_headword_only_reviews",
             )
         ),
@@ -263,13 +279,14 @@ def collect(register, scope, ledgers, index=None):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     for name in ("register", "scope", "nonidentity", "ambiguous",
-                 "morphemes", "positive", "index", "output"):
+                 "morphemes", "single", "positive", "index", "output"):
         p.add_argument("--" + name, required=True, type=Path)
     args = p.parse_args()
     ledgers = {
         "lexical_nonidentity_rejections": json.loads(args.nonidentity.read_text(encoding="utf-8")),
         "multiple_headword_abstentions": json.loads(args.ambiguous.read_text(encoding="utf-8")),
         "grammatical_morpheme_nonlinks": json.loads(args.morphemes.read_text(encoding="utf-8")),
+        "single_candidate_abstentions": json.loads(args.single.read_text(encoding="utf-8")),
         "positive_headword_only_reviews": json.loads(args.positive.read_text(encoding="utf-8")),
     }
     report = collect(

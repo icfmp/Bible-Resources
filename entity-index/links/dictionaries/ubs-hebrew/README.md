@@ -1015,3 +1015,72 @@ no disposition yet. The two original composite Strong-code annotations
 remain separately preserved. Actual generated word links and the
 UBS 0.9.4 indexed-headword coverage remain unchanged; the
 version 1.0 publication and contextual sense assignment remain unapproved.
+
+### Final 16 single-candidate families: documented abstention, not a guessed UBS link
+
+The independent [v1 single-candidate abstention ledger](
+v1_single_candidate_abstentions.json) now records an explicit, source-keyed,
+**reversible no-link editorial decision for the last 16 in-scope source families
+(25 original WLC occurrences)**. Although the machine classifier finds
+exactly one UBS dictionary candidate for each, its Strong or orthographic
+similarity alone does not establish atomic original lexeme identity.
+
+The case-by-case decisions retain concrete uncertainty rather than
+inventing links or arbitrarily declaring nonidentity. Representative
+categories include:
+
+- **Distinct or incompletely identified places:** original Rimmon
+  settlement witnesses spanning Judah/Simeon and Zebulun versus the
+  narrower UBS Rimmono Levite-town headword; Bamoth-Baal versus UBS
+  Bamoth of the Exodus route.
+- **Segmentation/granularity:** the first original word of the Bor
+  Sirah proper name versus a single UBS full-compound place entry;
+  a standalone animal-name constituent versus the complete
+  *mole rat* entry; the original components of the cryptic
+  Leb-Kamai name and of Ammi-nadib versus ordinary lexical headwords.
+- **Related yet unproven derivational or semantic identities:**
+  valuable gifts versus the verbal desiderative lexeme; the
+  original garment-wearing form versus a UBS clothing noun;
+  incense altars and sacrificial incense forms versus a UBS
+  action noun for burning; helpless sufferers versus a proposed
+  victim noun.
+- **Original contextual conflicts:** a named individual Hesed
+  versus a common-noun loyalty dictionary entry; a Joshua 9:4
+  source verb with competing English and analytical glosses;
+  the exact meaning and species of the Ezekiel 31 tree term.
+
+For **each exact family**, the ledger records original NFC lemma, H/A
+language, **unchanged full Strong code**, source word count, all pinned
+sample word IDs/references/SDBH fields and source classes, original
+first-word English and POS, the exact sole UBS MainId with original
+lemma/Strong/POS and an actual original UBS published gloss, a distinct
+uncertainty category and a substantive contextual rationale. The
+[independent verifier](verify_single_candidate_abstentions.py) rechecks
+these source witnesses in the frozen MACULA WLC TSV and the complete
+UBS Hebrew 0.9.4 dictionary; synthetic regression tests and GitHub CI
+forbid silently converting an abstention into lexical/sense approval.
+
+A recorded abstention **is neither a proven negative equivalence nor a
+verified positive headword identity**, and may be revisited on stronger
+original-language evidence. It cannot create a generated link, inferred
+contextual UBS LEXID/SDBH or a universal Strong alias.
+
+**Source-conserved disposition checkpoint:**
+- **All 202/202 original unresolved families have a recorded disposition**:
+  5 indexed-UBS-edition scope exclusions, 2 preserved original composite
+  Strong code annotations, and **195 other lexically dispositioned
+  families**.
+- All **197/197 in-scope families / 2,649 original occurrences** have
+  an explicit outcome, but the two composite source-code families
+  (2 occurrences) are **preservation-only**, not lexical identity sign-off.
+  Thus **195 lexical dispositions / 2,647 occurrences**, plus
+  2 separate lossless source-annotation dispositions.
+- Positive source-backed UBS headword identities remain editorial
+  evidence and have **not yet been promoted to generated WLC word links**.
+  Original source lexical linking remains **240,098/248,680**
+  and UBS edition-indexed headword scope **98.909%**.
+
+**Do not close issue #366 or publish/approve UBS v1.0 on this worklist
+alone.** Final acceptance still requires source-to-index link integration
+for approved word-level cases, independent zero-known-incorrect-link
+audit, full pinned regeneration/CI and owner editorial approval.

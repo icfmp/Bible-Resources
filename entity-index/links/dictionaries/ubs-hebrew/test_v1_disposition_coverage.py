@@ -19,6 +19,7 @@ def load_full():
             "lexical_nonidentity_rejections": file("v1_lexical_nonidentity_dispositions.json"),
             "multiple_headword_abstentions": file("v1_multi_headword_abstentions.json"),
             "grammatical_morpheme_nonlinks": file("v1_source_morpheme_abstentions.json"),
+            "single_candidate_abstentions": file("v1_single_candidate_abstentions.json"),
             "positive_headword_only_reviews": file("v1_reviewed_headword_dispositions.json"),
         },
         file("index.json"),
@@ -57,6 +58,7 @@ def miniature():
         "lexical_nonidentity_rejections": {"source_editions": editions, "decisions": []},
         "multiple_headword_abstentions": {"source_editions": editions, "dispositions": []},
         "grammatical_morpheme_nonlinks": {"source_editions": editions, "decisions": []},
+        "single_candidate_abstentions": {"source_editions": editions, "dispositions": []},
         "positive_headword_only_reviews": {"source_editions": editions, "decisions": [
             {"lang": "H", "lemma": "שָׁלוֹם", "original_strong": "7965",
              "original_occurrences": 2, "ubs_candidate_main_id": "a",
@@ -100,6 +102,13 @@ class V1EditorialAuditTests(unittest.TestCase):
             counts["not_yet_dispositioned_original_families"],
         )
         self.assertIs(report["policy"]["publication_approved"], False)
+        self.assertEqual(counts["not_yet_dispositioned_original_families"], 0)
+        self.assertEqual(counts["not_yet_dispositioned_original_occurrences"], 0)
+        self.assertEqual(counts["in_scope_families_with_any_disposition"], 197)
+        self.assertEqual(counts["in_scope_lexical_family_dispositions"], 195)
+        self.assertEqual(counts["composite_source_code_preservations"]["families"], 2)
+        self.assertEqual(counts["single_candidate_abstentions"],
+                         {"families": 16, "occurrences": 25})
 
     def test_synthetic_coverage_and_pending_partition(self):
         data = miniature()

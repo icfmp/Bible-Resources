@@ -1,0 +1,688 @@
+{
+  "schema_version": 1,
+  "source_editions": {
+    "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
+  },
+  "policy": "Explicit source-reviewed v1 abstentions for lexical families with exactly one UBS candidate but no independently established atomic word-to-headword identity. Preserve all original MACULA word IDs, edition metadata, SDBH, full Strong codes, and candidate IDs. Not a rejection, a positive identity, dictionary absence, generalized alias, lexical-sense mapping, or permission to alter source text. Re-examine on edition updates or stronger independent evidence.",
+  "dispositions": [
+    {
+      "lang": "H",
+      "lemma": "רִמּוֹן",
+      "original_strong": "7417a",
+      "original_occurrences": 9,
+      "original_source_classes": {
+        "noun": 9
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "005389003002000",
+          "original_word_id": "o060150320042",
+          "reference": "JOS 15:32!4"
+        },
+        {
+          "original_sdbh": "006818002001000",
+          "original_word_id": "o060190070021",
+          "reference": "JOS 19:7!2"
+        },
+        {
+          "original_sdbh": "006818002002000",
+          "original_word_id": "o060190130101",
+          "reference": "JOS 19:13!10"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o060150320042",
+        "english": "Rimmon",
+        "pos": "noun",
+        "class": "noun"
+      },
+      "candidate_relation": "same_strong_family_unresolved",
+      "ubs_candidate": {
+        "main_id": "006826000000000",
+        "lemma": "רִמּוֹנוֹ",
+        "strong_codes": [
+          "H7417"
+        ],
+        "parts_of_speech": [
+          "name"
+        ],
+        "attested_gloss": "Rimmono"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "mixed_original_named_referents",
+      "rationale": "The original family spans nine word occurrences in distinct Joshua settlement lists (Judah/Simeon and Zebulun). The sole UBS Rimmono headword describes one Levite town in Zebulun. A family-wide identity would conflate distinct named settlements; isolate each original place referent before accepting any word-specific link."
+    },
+    {
+      "lang": "H",
+      "lemma": "בָּמוֹת",
+      "original_strong": "1181a",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "noun": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "001039001001000",
+          "original_word_id": "o040220410091",
+          "reference": "NUM 22:41!9"
+        },
+        {
+          "original_sdbh": "001039001001000",
+          "original_word_id": "o060130170081",
+          "reference": "JOS 13:17!8"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o040220410091",
+        "english": "",
+        "pos": "noun",
+        "class": "noun"
+      },
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "ubs_candidate": {
+        "main_id": "001038000000000",
+        "lemma": "בָּמוֹת",
+        "strong_codes": [
+          "H1120"
+        ],
+        "parts_of_speech": [
+          "name"
+        ],
+        "attested_gloss": "Bamoth"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "related_proper_names_unverified",
+      "rationale": "Numbers 22:41 and Joshua 13:17 name Bamoth-Baal, whereas the sole UBS Bamoth headword explicitly describes the Exodus-route location Bamoth (Num 21:19). The relationship between those place forms is not established by their shared name component; do not merge them on that basis."
+    },
+    {
+      "lang": "H",
+      "lemma": "אֶל",
+      "original_strong": "0352a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "000331003001000",
+          "original_word_id": "o260310140181",
+          "reference": "EZK 31:14!18"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o260310140181",
+        "english": "trees",
+        "pos": "noun",
+        "class": "noun"
+      },
+      "candidate_relation": "same_strong_family_unresolved",
+      "ubs_candidate": {
+        "main_id": "000330000000000",
+        "lemma": "אַיִל",
+        "strong_codes": [
+          "H0352"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ],
+        "attested_gloss": "terebinth"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "botanical_identity_uncertain",
+      "rationale": "Ezekiel 31:14 uses a tree/oak term in its description of the trees of Eden; the candidate אַיִל has several unrelated senses (ram, chief, architectural support, terebinth). Exact species, original orthographic identity and the correct source-edition lexical choice are not independently established."
+    },
+    {
+      "lang": "H",
+      "lemma": "אלה",
+      "original_strong": "2974a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "000391003001000",
+          "original_word_id": "o090170390072",
+          "reference": "1SA 17:39!7"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o090170390072",
+        "english": "tried",
+        "pos": "verb",
+        "class": "verb"
+      },
+      "candidate_relation": "same_strong_family_unresolved",
+      "ubs_candidate": {
+        "main_id": "002740000000000",
+        "lemma": "יאל",
+        "strong_codes": [
+          "H2973",
+          "H2974"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ],
+        "attested_gloss": "to resolve"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "verbal_lexeme_overlap_unverified",
+      "rationale": "1 Samuel 17:39 says David tried or undertook to go in Saul's armor. UBS יאל includes willing/resolve/persist, a plausible semantic neighbor, but the original pointed lexeme אלה is not independently corroborated as that UBS entry; do not equate a contextual paraphrase with lexical identity."
+    },
+    {
+      "lang": "H",
+      "lemma": "בּוֹר",
+      "original_strong": "5626a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "000883001001000 000884001001000",
+          "original_word_id": "o100030260112",
+          "reference": "2SA 3:26!11"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o100030260112",
+        "english": "",
+        "pos": "noun",
+        "class": "noun"
+      },
+      "candidate_relation": "same_strong_family_unresolved",
+      "ubs_candidate": {
+        "main_id": "000883000000000",
+        "lemma": "בּוֹר הַסִּרָה",
+        "strong_codes": [
+          "H0877",
+          "H5626"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ],
+        "attested_gloss": "Cistern of Sirah"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "compound_place_headword_granularity",
+      "rationale": "2 Samuel 3:26 names Bor Sirah; the original MACULA witness represents the first well/cistern segment and has a multi-part original SDBH annotation, while UBS indexes the entire name בּוֹר הַסִּרָה. Whether the first source segment should open the whole-place dictionary entry is a reader/indexing granularity question, not automatic one-word lexical identity."
+    },
+    {
+      "lang": "H",
+      "lemma": "חֲמֻדֹות",
+      "original_strong": "2530a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270110380163",
+          "reference": "DAN 11:38!16"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o270110380163",
+        "english": "costly gifts",
+        "pos": "noun",
+        "class": "noun"
+      },
+      "candidate_relation": "same_strong_family_unresolved",
+      "ubs_candidate": {
+        "main_id": "002332000000000",
+        "lemma": "חמד",
+        "strong_codes": [
+          "H2530"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ],
+        "attested_gloss": "desirable"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "derived_lexeme_semantics_uncertain",
+      "rationale": "Daniel 11:38 refers to costly gifts/precious objects. UBS חמד includes the quality desirable as well as the verbal desire; semantic kinship does not yet establish whether the source plural noun denotes this same lexical headword instead of a distinct nominal derivative."
+    },
+    {
+      "lang": "H",
+      "lemma": "חֶסֶד",
+      "original_strong": "2618",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "001050001001000",
+          "original_word_id": "o110040100021",
+          "reference": "1KI 4:10!2"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o110040100021",
+        "english": "Hesed",
+        "pos": "noun",
+        "class": "noun"
+      },
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "ubs_candidate": {
+        "main_id": "002414000000000",
+        "lemma": "חֶסֶד",
+        "strong_codes": [
+          "H2617"
+        ],
+        "parts_of_speech": [
+          "noun m",
+          "name"
+        ],
+        "attested_gloss": "loyalty"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "proper_name_vs_common_noun_uncertain",
+      "rationale": "1 Kings 4:10 names the official Ben-Hesed / Hesed. The UBS חֶסֶד entry glosses the common noun loyalty/favor/disgrace and has a name-form POS, but no source-pinned explicit Hesed person meaning was independently confirmed; do not accept or reject the named-person match solely by homography."
+    },
+    {
+      "lang": "H",
+      "lemma": "כָּאֶה",
+      "original_strong": "2489a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "adj": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003219001001000",
+          "original_word_id": "o190100100081",
+          "reference": "PSA 10:10!8"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o190100100081",
+        "english": "helpless",
+        "pos": "adjective",
+        "class": "adj"
+      },
+      "candidate_relation": "same_strong_family_unresolved",
+      "ubs_candidate": {
+        "main_id": "002301000000000",
+        "lemma": "חֵלְכָה",
+        "strong_codes": [
+          "H2489"
+        ],
+        "parts_of_speech": [
+          "noun f"
+        ],
+        "attested_gloss": "victim"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "lexical_forms_diverge",
+      "rationale": "Psalm 10:10 refers to helpless or disheartened sufferers. UBS חֵלְכָה glosses victim, a related referent, but its consonants and lexical form differ substantially from original כָּאֶה. Semantic similarity alone is insufficient for headword identity."
+    },
+    {
+      "lang": "H",
+      "lemma": "לָבֵשׁ",
+      "original_strong": "3830a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "adj": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003516001002000",
+          "original_word_id": "o090170050081",
+          "reference": "1SA 17:5!8"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o090170050081",
+        "english": "wore",
+        "pos": "verb",
+        "class": "adj"
+      },
+      "candidate_relation": "same_strong_family_unresolved",
+      "ubs_candidate": {
+        "main_id": "003509000000000",
+        "lemma": "לְבוּשׁ",
+        "strong_codes": [
+          "H3830",
+          "A3831"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ],
+        "attested_gloss": "clothing"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "derived_noun_verb_relation_unverified",
+      "rationale": "1 Samuel 17:5 describes Goliath as clothed/wearing armor, while the sole UBS לְבוּשׁ candidate denotes clothing or garments. The source verbal/adjectival form and the UBS nominal headword may be derivationally related but cannot be treated as identical without morpholexical corroboration."
+    },
+    {
+      "lang": "H",
+      "lemma": "מְקַטְּרֹות",
+      "original_strong": "4729b",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "004330001001000",
+          "original_word_id": "o140300140092",
+          "reference": "2CH 30:14!9"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o140300140092",
+        "english": "incense altars",
+        "pos": "noun",
+        "class": "noun"
+      },
+      "candidate_relation": "same_strong_family_unresolved",
+      "ubs_candidate": {
+        "main_id": "004334000000000",
+        "lemma": "מִקְטָר",
+        "strong_codes": [
+          "H4729"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ],
+        "attested_gloss": "burning"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "cultic_object_vs_action_uncertain",
+      "rationale": "2 Chronicles 30:14 concerns actual incense altars removed from Jerusalem; UBS מִקְטָר describes the burning/setting-alight action. Possible cultic metonymy or derived morphology has not been verified, so neither a positive link nor categorical lexical nonidentity is justified."
+    },
+    {
+      "lang": "H",
+      "lemma": "נָדִיב",
+      "original_strong": "5993",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "004658001002000",
+          "original_word_id": "o220060120071",
+          "reference": "SNG 6:12!7"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o220060120071",
+        "english": "",
+        "pos": "adjective",
+        "class": "noun"
+      },
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "ubs_candidate": {
+        "main_id": "004664000000000",
+        "lemma": "נָדִיב",
+        "strong_codes": [
+          "H5081"
+        ],
+        "parts_of_speech": [
+          "adj"
+        ],
+        "attested_gloss": "noble person"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "proper_name_constituent_ambiguous",
+      "rationale": "Song of Songs 6:12 retains the source constituent nadib inside the debated Ammi-nadib expression. UBS נָדִיב indexes a willing/noble person. Etymological resemblance of a possible name element does not prove that this original word is an autonomous common adjective or the corresponding UBS lexeme."
+    },
+    {
+      "lang": "H",
+      "lemma": "עַם",
+      "original_strong": "5993",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o220060120061",
+          "reference": "SNG 6:12!6"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o220060120061",
+        "english": "",
+        "pos": "noun",
+        "class": "noun"
+      },
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "ubs_candidate": {
+        "main_id": "005490000000000",
+        "lemma": "עַם",
+        "strong_codes": [
+          "H5971",
+          "A5972"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ],
+        "attested_gloss": "people"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "proper_name_constituent_ambiguous",
+      "rationale": "Song of Songs 6:12 includes the source Ammi element of Ammi-nadib, with an original composite Strong shared across segments. The UBS עַם noun means people, but this original token's name-fragment segmentation and actual referent remain editorially disputed. Preserve it without inferring a standalone people-noun link."
+    },
+    {
+      "lang": "H",
+      "lemma": "פֵּרֹות",
+      "original_strong": "2661a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002454001001000",
+          "original_word_id": "o230020200161",
+          "reference": "ISA 2:20!16"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o230020200161",
+        "english": "",
+        "pos": "noun",
+        "class": "noun"
+      },
+      "candidate_relation": "same_strong_family_unresolved",
+      "ubs_candidate": {
+        "main_id": "002457000000000",
+        "lemma": "חֲפַרְפָּרָה",
+        "strong_codes": [
+          "H2661",
+          "H6512"
+        ],
+        "parts_of_speech": [
+          "noun f"
+        ],
+        "attested_gloss": "mole rat"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "compound_animal_name_segmentation",
+      "rationale": "Isaiah 2:20 gives the second original segment of חְפֹּר פֵּרוֹת, glossed 'of moles'. The UBS חֲפַרְפָּרָה is an animal noun for mole rat; source segment and complete UBS compound may share a referent, but atomic word-to-headword identity is not independently verified."
+    },
+    {
+      "lang": "H",
+      "lemma": "צָיַר",
+      "original_strong": "6718b",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o060090040062",
+          "reference": "JOS 9:4!6"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o060090040062",
+        "english": "prepared provisions",
+        "pos": "verb",
+        "class": "verb"
+      },
+      "candidate_relation": "same_strong_family_unresolved",
+      "ubs_candidate": {
+        "main_id": "006189000000000",
+        "lemma": "צַיִד",
+        "strong_codes": [
+          "H6718"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ],
+        "attested_gloss": "provisions"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "source_gloss_and_morphology_conflict",
+      "rationale": "Joshua 9:4 has a source verb with original English 'prepared provisions' but original analytical gloss 'they acted as ambassadors'. UBS צַיִד indexes provisions as a noun. The exact source lexical analysis is unsettled; do not choose the noun headword on English overlap alone."
+    },
+    {
+      "lang": "H",
+      "lemma": "קום",
+      "original_strong": "3820a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o240510010111",
+          "reference": "JER 51:1!11"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o240510010111",
+        "english": "",
+        "pos": "noun",
+        "class": "noun"
+      },
+      "candidate_relation": "same_strong_family_unresolved",
+      "ubs_candidate": {
+        "main_id": "003499000000000",
+        "lemma": "לֵב",
+        "strong_codes": [
+          "H3820",
+          "A3821"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ],
+        "attested_gloss": "Leb-Kamai"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "cryptic_name_component",
+      "rationale": "Jeremiah 51:1 uses the cryptonym Leb-Kamai with this source token as an original component. UBS לֵב lists the full cryptonym under a heart-related entry, but the standalone קום source component is not thereby the same lexeme as 'heart' or the entire name."
+    },
+    {
+      "lang": "H",
+      "lemma": "קטר",
+      "original_strong": "4729a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "004329001001000 006437001001000",
+          "original_word_id": "o390010110111",
+          "reference": "MAL 1:11!11"
+        }
+      ],
+      "source_first_word": {
+        "word_id": "o390010110111",
+        "english": "incense",
+        "pos": "verb",
+        "class": "noun"
+      },
+      "candidate_relation": "same_strong_family_unresolved",
+      "ubs_candidate": {
+        "main_id": "004334000000000",
+        "lemma": "מִקְטָר",
+        "strong_codes": [
+          "H4729"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ],
+        "attested_gloss": "burning"
+      },
+      "disposition": "reversible_single_candidate_identity_abstention",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "uncertainty_category": "liturgical_participle_lexeme_uncertain",
+      "rationale": "Malachi 1:11 uses an incense/burning passive liturgical form. UBS מִקְטָר indexes the act of setting alight/burning. The original source verb and UBS nominal action are related in ritual context, yet independent morpholexical identity at the source-word level has not been established."
+    }
+  ]
+}
