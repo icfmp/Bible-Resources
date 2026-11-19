@@ -1397,9 +1397,18 @@ def probe_private_full_index_alias_jsword(*, candidate_root: Path, module_id: st
             counts = None
     accepted = (proc.returncode == 0 and counts ==
                 {"tests": 2, "failures": 0, "errors": 0, "skipped": 0})
+    # No unreviewed Gradle text, Java diagnostics, URLs or commentary content
+    # may enter CI artifacts. Report only a fixed error category and exit code.
+    diagnosis = classify_private_gradle_failure(
+        log.read_bytes() if not accepted else b"",
+        proc.returncode, counts,
+    )
     return {
         "status": ("PRIVATE_PINNED_AND_BIBLE_JSWORD_ALIAS_ENGINE_PASS"
                    if accepted else "PRIVATE_PINNED_JSWORD_ALIAS_ENGINE_INCONCLUSIVE_OR_FAIL"),
+        "gradle_failure_category": diagnosis,
+        "gradle_exit_code": proc.returncode,
+        "junit_report_present": counts is not None,
         "pinned_andbible_jsword_commit": AND_BIBLE_JSWORD_SHA,
         "sample_aliases": len(rows),
         "junit_counts": counts,
@@ -1408,6 +1417,42 @@ def probe_private_full_index_alias_jsword(*, candidate_root: Path, module_id: st
         "private_commentary_text_or_java_log_uploaded": False,
         "published": False,
     }
+
+
+
+def classify_private_gradle_failure(
+        log_bytes: bytes, exit_code: int, junit_counts: dict | None) -> str:
+    """Return a bounded diagnosis; never expose a private Gradle log.
+
+    This is advisory only: a category cannot make a failed reader test pass.
+    Both source text and private build errors may occur in the log, so return
+    only predeclared codes independent of arbitrary diagnostic contents.
+    """
+    if (not isinstance(log_bytes, bytes) or len(log_bytes) > 4_000_000
+            or type(exit_code) is not int
+            or not -128 <= exit_code <= 255):
+        raise ValueError("Invalid bounded private build diagnostic")
+    if exit_code == 0 and junit_counts == {
+            "tests": 2, "failures": 0, "errors": 0, "skipped": 0}:
+        return "PASS"
+    text = log_bytes.lower()
+    if (b"gradlewrappermain" in text or
+            b"could not install gradle distribution" in text):
+        return "GRADLE_WRAPPER_SETUP"
+    if (b"could not resolve" in text or b"could not download" in text or
+            b"read timed out" in text or b"connection timed out" in text or
+            b"connection reset" in text or b"unable to load maven meta-data" in text):
+        return "DEPENDENCY_NETWORK"
+    if b"no tests found for given includes" in text:
+        return "TEST_SELECTION"
+    if (b"compilation failed" in text or
+            b":compiletestjava failed" in text or
+            b"error: cannot find symbol" in text):
+        return "TEST_COMPILATION"
+    if junit_counts is not None:
+        return "JUNIT_FAILURE"
+    return "NO_JUNIT_REPORT"
+
 
 
 def probe_complete_original_transport(
