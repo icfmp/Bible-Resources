@@ -54,13 +54,16 @@
     }
   },
   "legal": {
-    "status": "hold",
+    "status": "upstream_public_domain_claim_accepted_by_owner",
     "upstream_license_claim": "Public Domain",
     "upstream_license_page": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
     "ccel_policy": "https://www.ccel.org/about/copyright.html",
     "debian_rights_dispute": "https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=883932",
     "modified_electronic_derivative_rights_cleared": false,
-    "territorial_rights_cleared": false
+    "territorial_rights_cleared": false,
+    "owner_accepted_crosswire_public_domain_claim": true,
+    "owner_acceptance_scope": "Use official CrossWire MHC 2.2 'Public Domain--Copy Freely' distribution declaration as project working source-rights basis, retaining CrossWire/CCEL/Logos credits.",
+    "owner_acceptance_date": "2026-11-19"
   },
   "delivery": {
     "candidate_generated_in_ephemeral_ci": true,
@@ -73,16 +76,16 @@
     "public_catalog_updated": false
   },
   "release_gate": {
-    "status": "hold",
+    "status": "private_candidate_only",
     "blocking_requirements": [
-      "exact electronic edition digital modification/redistribution rights confirmed",
+      "document any remaining scope/territorial uncertainty for digital editorial derivatives (owner has accepted CrossWire official Public Domain declaration as working rights basis)",
       "owner/editorial publication authorization",
       "clicked link navigation, representative title/note/paragraph GUI presentation, or explicitly documented partial-reader acceptance",
       "fresh final release candidate integrity and metadata check"
     ],
     "prohibited_actions_before_release": [
+      "state that all CCEL/Logos derivative and international rights are independently proven",
       "upload MHC full OSIS or SWORD archive",
-      "mark rights approved",
       "merge release PR",
       "publish or add to downloadable catalog"
     ]
