@@ -33,6 +33,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_lexical_nonidentity.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_multi_headword_abstentions.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_reviewed_headwords.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_source_morpheme_abstentions.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -171,6 +172,13 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_reviewed_headwords.py \
             --register /tmp/bsi-ubs-hebrew-family-register.json \
             --decisions entity-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
+      - name: Source-verify grammatical morphemes kept unlinked from inherited UBS headwords
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_source_morpheme_abstentions.py \
+            --register /tmp/bsi-ubs-hebrew-family-register.json \
+            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_source_morpheme_abstentions.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
       - name: Verify all lexical families classified without editorial assumptions

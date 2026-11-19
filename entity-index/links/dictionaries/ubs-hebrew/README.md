@@ -610,3 +610,44 @@ rejections (1,809 occurrences), 40 multi-headword abstentions (275), and
 occurrences**. Remaining **129 families / 411 occurrences**, excluding
 the separately tracked 5 UBS edition-headword inventory exclusions.
 An independent merge and explicit release gate are still required for v1.0.
+
+### Original Hebrew grammatical segments carrying a compound Strong number
+
+A distinct source-bound [ten-family morpheme decision ledger](
+v1_source_morpheme_abstentions.json) records **27 original WLC word
+occurrences** whose lexeme field is an **independent Hebrew preposition or
+article**, not the UBS lexical noun/name headword that shares the
+source annotation's inherited original Strong family.
+
+- `לְ` with H3820b (11) and H5892b (2): preposition attached to a
+  proper-name/compound context, **not** the named UBS headword.
+- `הַ` with H0425b (3), H0329b (2), H3466a (2), H3873a (2),
+  H5626a (1) and H6762a (1): definite article fragments inside lexical
+  constructions, **not** full UBS place/name headwords.
+- `בְּ` H1226a (2) and `מִן` H4675a (1): original location/source
+  prepositions, **not** the inherited-Strong UBS content-word entries.
+
+The original WLC source class can still say "noun" because the source
+morpheme inherits a **composite or full lexical annotation**; these
+editorial no-link decisions must not overwrite that source class, lemma,
+source word ID, Strong, SDBH, or verse. A no-link is **not** a repair of
+a potentially valid upstream segmentation convention.
+
+The [source-pinned verifier](verify_source_morpheme_abstentions.py)
+checks the original full family keys, 27 source counts, 19 original
+word-ID/reference/SDBH witnesses, class counts, exact sole UBS MainId,
+the original UBS Strong family, and the absence of equal standalone
+consonantal headwords (preserving shin/sin distinctions). Synthetic
+regressions forbid lexical approval or silent source rewriting. The
+original `family_register.json` and generated `index.json`
+remain byte-for-byte unchanged.
+
+This is distinct from an unresolved true lexical homograph. It records
+an explicit, reversible editorial **refusal to equate a grammatical
+source segment with a full UBS dictionary entry**, never an invented
+meaning or contextual sense.
+
+If the other current lexical disposition batches are merged, the
+combined in-scope tally becomes **86/197 families / 2,448 of 2,649
+occurrences**, leaving **111 families / 201 occurrences** for separate
+review. This conditional accounting is not a publication or merge claim.

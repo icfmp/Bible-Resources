@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "source_editions": {
+    "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
+  },
+  "policy": "Original MACULA segmented function-word witnesses remain unchanged. An original WLC morpheme carrying a parent or composite full Strong annotation is not silently equated with an independently named UBS headword just because the Strong numeric family overlaps. These ten source-verified no-link decisions do not assert the whole compound was wrong or authorize source correction.",
+  "decisions": [
+    {
+      "lang": "H",
+      "lemma": "לְ",
+      "original_strong": "3820b",
+      "original_occurrences": 11,
+      "source_classes": {
+        "noun": 11
+      },
+      "source_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o040130210091",
+          "reference": "NUM 13:21!9"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o040340080041",
+          "reference": "NUM 34:8!4"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o060130050131",
+          "reference": "JOS 13:5!13"
+        }
+      ],
+      "ubs_candidate_entry_id": "003499000000000",
+      "grammatical_role": "prefixed-to / destination marker",
+      "decision": "retain_unlinked_source_morpheme_not_candidate_headword",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The independent Hebrew לְ segment is a preposition, not the UBS noun/name indexed under the whole original composite Strong family."
+    },
+    {
+      "lang": "H",
+      "lemma": "לְ",
+      "original_strong": "5892b",
+      "original_occurrences": 2,
+      "source_classes": {
+        "noun": 2
+      },
+      "source_word_witnesses": [
+        {
+          "original_sdbh": "005411001001000",
+          "original_word_id": "o120190130071",
+          "reference": "2KI 19:13!7"
+        },
+        {
+          "original_sdbh": "005411001001000",
+          "original_word_id": "o230370130071",
+          "reference": "ISA 37:13!7"
+        }
+      ],
+      "ubs_candidate_entry_id": "005418000000000",
+      "grammatical_role": "prefixed-to / destination marker",
+      "decision": "retain_unlinked_source_morpheme_not_candidate_headword",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The original לְ preposition segment has a grammatical function distinct from the UBS place/noun headword sharing the compound's Strong code."
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "original_strong": "0425b",
+      "original_occurrences": 3,
+      "source_classes": {
+        "noun": 3
+      },
+      "source_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090170020071",
+          "reference": "1SA 17:2!7"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090170190071",
+          "reference": "1SA 17:19!7"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090210100091",
+          "reference": "1SA 21:10!9"
+        }
+      ],
+      "ubs_candidate_entry_id": "000392000000000",
+      "grammatical_role": "definite article",
+      "decision": "retain_unlinked_source_morpheme_not_candidate_headword",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The Hebrew הַ article is a separate morpheme in the attested Valley of Elah phrase (1 Sam 17:2), not the named place/headword entry under the inherited compound Strong code."
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "original_strong": "0329b",
+      "original_occurrences": 2,
+      "source_classes": {
+        "noun": 2
+      },
+      "source_word_witnesses": [
+        {
+          "original_sdbh": "000309002001000",
+          "original_word_id": "o010500100041",
+          "reference": "GEN 50:10!4"
+        },
+        {
+          "original_sdbh": "000309002001000",
+          "original_word_id": "o010500110081",
+          "reference": "GEN 50:11!8"
+        }
+      ],
+      "ubs_candidate_entry_id": "000308000000000",
+      "grammatical_role": "definite article",
+      "decision": "retain_unlinked_source_morpheme_not_candidate_headword",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The source הַ article at Genesis 50:10 belongs to a larger lexical/toponymic construction and cannot itself be indexed as the UBS noun/name candidate."
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "original_strong": "3466a",
+      "original_occurrences": 2,
+      "source_classes": {
+        "noun": 2
+      },
+      "source_word_witnesses": [
+        {
+          "original_sdbh": "003174001003000",
+          "original_word_id": "o160030060031",
+          "reference": "NEH 3:6!3"
+        },
+        {
+          "original_sdbh": "003174001003000",
+          "original_word_id": "o160120390061",
+          "reference": "NEH 12:39!6"
+        }
+      ],
+      "ubs_candidate_entry_id": "003179000000000",
+      "grammatical_role": "definite article",
+      "decision": "retain_unlinked_source_morpheme_not_candidate_headword",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "At Nehemiah 3:6 the source הַ article follows the lexical שער component in a proper-gate name; the grammatical article is not equivalent to the UBS named entry."
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "original_strong": "3873a",
+      "original_occurrences": 2,
+      "source_classes": {
+        "noun": 2
+      },
+      "source_word_witnesses": [
+        {
+          "original_sdbh": "003542001001000",
+          "original_word_id": "o160030120061",
+          "reference": "NEH 3:12!6"
+        },
+        {
+          "original_sdbh": "003542001001000",
+          "original_word_id": "o160100250011",
+          "reference": "NEH 10:25!1"
+        }
+      ],
+      "ubs_candidate_entry_id": "003546000000000",
+      "grammatical_role": "definite article",
+      "decision": "retain_unlinked_source_morpheme_not_candidate_headword",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The source article at Nehemiah 3:12 is a grammatical prefixed segment, not a stand-alone lexical referent of the sole inherited-Strong UBS headword."
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "original_strong": "5626a",
+      "original_occurrences": 1,
+      "source_classes": {
+        "noun": 1
+      },
+      "source_word_witnesses": [
+        {
+          "original_sdbh": "000884001001000 000884001001000",
+          "original_word_id": "o100030260121",
+          "reference": "2SA 3:26!12"
+        }
+      ],
+      "ubs_candidate_entry_id": "000883000000000",
+      "grammatical_role": "definite article",
+      "decision": "retain_unlinked_source_morpheme_not_candidate_headword",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The Hebrew article at 2 Samuel 3:26 is the second segmented morpheme of a named well phrase, not a separate dictionary entry for that well."
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "original_strong": "6762a",
+      "original_occurrences": 1,
+      "source_classes": {
+        "noun": 1
+      },
+      "source_word_witnesses": [
+        {
+          "original_sdbh": "000469003001000",
+          "original_word_id": "o060180280021",
+          "reference": "JOS 18:28!2"
+        }
+      ],
+      "ubs_candidate_entry_id": "006222000000000",
+      "grammatical_role": "definite article",
+      "decision": "retain_unlinked_source_morpheme_not_candidate_headword",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The article in Joshua 18:28 is a source split proper-name segment and is not identical to the named lexical entity sharing its inherited Strong annotation."
+    },
+    {
+      "lang": "H",
+      "lemma": "בְּ",
+      "original_strong": "1226a",
+      "original_occurrences": 2,
+      "source_classes": {
+        "noun": 2
+      },
+      "source_word_witnesses": [
+        {
+          "original_sdbh": "006321001001000",
+          "original_word_id": "o190090100071",
+          "reference": "PSA 9:10!7"
+        },
+        {
+          "original_sdbh": "006321001001000",
+          "original_word_id": "o190100010071",
+          "reference": "PSA 10:1!7"
+        }
+      ],
+      "ubs_candidate_entry_id": "001133000000000",
+      "grammatical_role": "prefixed-in / location marker",
+      "decision": "retain_unlinked_source_morpheme_not_candidate_headword",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The Hebrew בְּ preposition is not lexically identical to the UBS proper noun/name candidate indexed under the original compound's Strong code."
+    },
+    {
+      "lang": "H",
+      "lemma": "מִן",
+      "original_strong": "4675a",
+      "original_occurrences": 1,
+      "source_classes": {
+        "noun": 1
+      },
+      "source_word_witnesses": [
+        {
+          "original_sdbh": "006101001004000",
+          "original_word_id": "o380090080031",
+          "reference": "ZEC 9:8!3"
+        }
+      ],
+      "ubs_candidate_entry_id": "004291000000000",
+      "grammatical_role": "prefixed-from / source marker",
+      "decision": "retain_unlinked_source_morpheme_not_candidate_headword",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The Hebrew מִן preposition ('from') is distinct from the single UBS noun/name indexed under the composite-source Strong family."
+    }
+  ]
+}
