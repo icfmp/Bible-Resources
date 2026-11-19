@@ -76,6 +76,18 @@ def main():
     data = json.loads(a.source.read_text(encoding="utf-8-sig"))
     result = classify(data)
     a.output.write_text(json.dumps(result, sort_keys=True, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    grouped = Counter(
+        (x["original_lemma"], x["original_strong"],
+         x["original_same_lemma_and_ln_ubs_main_ids"][0])
+        for x in result["reason_witnesses"].get(
+            "unique_original_nfc_lemma_and_ln_headword_witness", [])
+    )
+    print("UBS_GREEK_220_INDIVIDUAL_WORD_HEADWORD_GROUPS", json.dumps(
+        [{"lemma": lemma, "source_strong": strong, "ubs_main_id": mid,
+          "original_words": count}
+         for (lemma, strong, mid), count in sorted(
+             grouped.items(), key=lambda item: (-item[1], item[0]))],
+        ensure_ascii=False, sort_keys=True))
     print("UBS_GREEK_224_STRONG_AMBIGUITY_REVIEW", json.dumps({
         "counts": result["reason_counts"],
         "word_examples": {
