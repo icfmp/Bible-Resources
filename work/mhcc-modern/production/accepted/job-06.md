@@ -28,7 +28,7 @@ In addition to his outward suffering, an inward sense of divine wrath destroyed 
 
 How much more must the Savior have endured in the garden and upon the cross when he bore our sins and offered his soul to divine justice for us!
 
-Whatever suffering God permits in our health or circumstances, we can submit more readily while our judgment remains clear and our conscience at peace.
+Whatever burden of suffering **God is pleased to lay upon us**, whether in health or circumstances, we can submit more readily while our judgment remains clear and our conscience is at peace.
 
 But when either sound reasoning or peace of conscience is disturbed, the sufferer's condition calls for deep sympathy.
 
@@ -97,6 +97,8 @@ On the final day, every upright believer will receive God's approval.
 ---
 
 ## Editorial review — Job 6
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** In verses 1–7 the previous rendering substituted *God permits* for Henry's explicitly active expression of burdens God is **pleased to lay upon us**. Restored the original agency against [CCEL Job 6](https://ccel.org/ccel/henry/mhcc.xix.vi.html), preserving the adjacent contrast with an inward sense of wrath. Exact native MHCC 0.1.1 and independent signoff pending.
 
 **Full English secondary witness read:** [CCEL, Job 6](https://ccel.org/ccel/henry/mhcc.xix.vi.html). Exact original **MHCC 0.1.1** remains authoritative; native SWORD and independent QA pending.
 
