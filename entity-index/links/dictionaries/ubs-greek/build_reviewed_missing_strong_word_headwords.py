@@ -108,7 +108,7 @@ def build(candidate, ledger, residual, english, french):
             or len(family["all_original_word_witnesses"]) != 1
             or decision["ubs_original_pos_prefix"] not in source_pos(en[mid])
             or decision["ubs_original_pos_prefix"] not in source_pos(fr[mid])):
-            raise ValueError("Original Greek Strong=0 lemma, morphological class or UBS bilingual POS changed: " + repr(key))
+            raise ValueError("Original Greek Strong=0 lemma, morphology or UBS bilingual POS mismatch: " + repr({"key": key, "family_count": family["original_word_count"], "classes": family["original_classes"], "strong_counts": family["original_strong_counts"], "en_pos": sorted(source_pos(en[mid])) if mid in en else [], "fr_pos": sorted(source_pos(fr[mid])) if mid in fr else [], "original_word_count": len(family["all_original_word_witnesses"])}))
         en_ln, fr_ln = source_ln(en[mid]), source_ln(fr[mid])
         if not en_ln or en_ln != fr_ln:
             raise ValueError("Original Greek Strong=0 bilingual Louw–Nida source disagreement")
