@@ -216,12 +216,12 @@ jobs:
               print("REVIEWED_PREVIEW_DIFFERING_WORDS", len([
                   k for k in set(aw) | set(ew) if aw.get(k) != ew.get(k)
               ]))
-              for k in sorted(set(aw) | set(ew)):
-                  if aw.get(k) != ew.get(k):
-                      print("REVIEWED_PREVIEW_SOURCE_WORD", k,
-                            "observed:", repr(aw.get(k)),
-                            "committed:", repr(ew.get(k)))
-                      break
+              mismatches = {
+                  k: aw.get(k) for k in sorted(set(aw) | set(ew))
+                  if aw.get(k) != ew.get(k)
+              }
+              print("REVIEWED_PREVIEW_ALL_SOURCE_MISMATCHES",
+                    json.dumps(mismatches, ensure_ascii=False, sort_keys=True))
               raise AssertionError("Reviewed anchor preview differs from pinned WLC")
           assert observed["summary"] == {
               "reviewed_families": 81,
