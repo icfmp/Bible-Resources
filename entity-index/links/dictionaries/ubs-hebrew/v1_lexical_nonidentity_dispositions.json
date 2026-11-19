@@ -152,7 +152,7 @@
         "reference": "GEN 2:18!12",
         "english": "suitable",
         "pos": "preposition",
-        "class": "Hebrew spatial relation ('before/opposite', Gen 2:18) is not the UBS verb נגד meaning 'to report/tell/flow'."
+        "class": "noun"
       },
       "ubs_candidate": {
         "main_id": "004632000000000",
@@ -164,7 +164,8 @@
         "parts_of_speech": [
           "verb"
         ]
-      }
+      },
+      "rationale": "Hebrew spatial relation ('before/opposite', Gen 2:18) is not the UBS verb נגד meaning 'to report/tell/flow'."
     },
     {
       "lang": "H",
@@ -177,7 +178,7 @@
         "reference": "PSA 39:2!9",
         "english": "long as",
         "pos": "adverb",
-        "class": "The source temporal adverb ('still', Ps 39:2) does not denote UBS H5749 verbal acts of testifying, warning, surrounding, or restoring."
+        "class": "adv"
       },
       "ubs_candidate": {
         "main_id": "005287000000000",
@@ -188,7 +189,8 @@
         "parts_of_speech": [
           "verb"
         ]
-      }
+      },
+      "rationale": "The source temporal adverb ('still', Ps 39:2) does not denote UBS H5749 verbal acts of testifying, warning, surrounding, or restoring."
     },
     {
       "lang": "A",
@@ -201,7 +203,7 @@
         "reference": "DAN 4:28!1",
         "english": "still",
         "pos": "adverb",
-        "class": "The Aramaic temporal adverb ('still', Dan 4:28) is not the UBS Hebrew verb H5749."
+        "class": "adv"
       },
       "ubs_candidate": {
         "main_id": "005287000000000",
@@ -212,7 +214,8 @@
         "parts_of_speech": [
           "verb"
         ]
-      }
+      },
+      "rationale": "The Aramaic temporal adverb ('still', Dan 4:28) is not the UBS Hebrew verb H5749."
     },
     {
       "lang": "H",
@@ -225,7 +228,7 @@
         "reference": "JER 51:3!9",
         "english": "not",
         "pos": "particle",
-        "class": "Source prohibited/negative 'not' (Jer 51:3) is not UBS אֵל divine noun/demonstrative pronoun."
+        "class": "adv"
       },
       "ubs_candidate": {
         "main_id": "000381000000000",
@@ -241,7 +244,8 @@
           "noun m",
           "dem.pron"
         ]
-      }
+      },
+      "rationale": "Source prohibited/negative 'not' (Jer 51:3) is not UBS אֵל divine noun/demonstrative pronoun."
     },
     {
       "lang": "H",
@@ -254,7 +258,7 @@
         "reference": "EXO 12:9!4",
         "english": "raw",
         "pos": "particle",
-        "class": "Hebrew uncooked/raw food in Exod 12:9 is not the UBS proper place-name נֹא/Thebes H4996."
+        "class": "adj"
       },
       "ubs_candidate": {
         "main_id": "004585000000000",
@@ -265,7 +269,8 @@
         "parts_of_speech": [
           "name"
         ]
-      }
+      },
+      "rationale": "Hebrew uncooked/raw food in Exod 12:9 is not the UBS proper place-name נֹא/Thebes H4996."
     },
     {
       "lang": "H",
@@ -278,7 +283,7 @@
         "reference": "1SA 2:10!6",
         "english": "against",
         "pos": "preposition",
-        "class": "The source preposition ('against', 1 Sam 2:10) is not UBS עֹל 'yoke' H5923."
+        "class": "noun"
       },
       "ubs_candidate": {
         "main_id": "005444000000000",
@@ -289,7 +294,8 @@
         "parts_of_speech": [
           "noun m"
         ]
-      }
+      },
+      "rationale": "The source preposition ('against', 1 Sam 2:10) is not UBS עֹל 'yoke' H5923."
     }
   ]
 }
