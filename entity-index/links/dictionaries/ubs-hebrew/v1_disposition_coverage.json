@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "format": "bsi-ubs-hebrew-v1-read-only-editorial-coverage-audit",
+  "source_editions": {
+    "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
+  },
+  "policy": {
+    "machine_classifications_are_not_editorial_dispositions": true,
+    "source_text_modified": false,
+    "automatic_contextual_sense_inference": false,
+    "publication_approved": false,
+    "remaining_is_not_a_claim_of_dictionary_absence": true
+  },
+  "counts": {
+    "original_lexical_occurrences": 248680,
+    "already_linked_occurrences": 240098,
+    "original_unresolved_families": 202,
+    "original_unresolved_occurrences": 8582,
+    "edition_scope_excluded_occurrences": 5933,
+    "in_scope_unresolved_occurrences_at_baseline": 2649,
+    "in_scope_lexically_dispositioned_occurrences": 2647,
+    "composite_source_syntax_preserved_occurrences": 2,
+    "in_scope_occurrences_with_any_disposition": 2649,
+    "in_scope_families_with_any_disposition": 197,
+    "in_scope_lexical_family_dispositions": 195,
+    "not_yet_dispositioned_original_families": 0,
+    "not_yet_dispositioned_original_occurrences": 0,
+    "edition_headword_scope_exclusions": {
+      "families": 5,
+      "occurrences": 5933
+    },
+    "composite_source_code_preservations": {
+      "families": 2,
+      "occurrences": 2
+    },
+    "lexical_nonidentity_rejections": {
+      "families": 40,
+      "occurrences": 1863
+    },
+    "multiple_headword_abstentions": {
+      "families": 48,
+      "occurrences": 458
+    },
+    "grammatical_morpheme_nonlinks": {
+      "families": 10,
+      "occurrences": 27
+    },
+    "positive_headword_only_reviews": {
+      "families": 81,
+      "occurrences": 274
+    },
+    "single_candidate_abstentions": {
+      "families": 16,
+      "occurrences": 25
+    }
+  },
+  "pending_families": []
+}

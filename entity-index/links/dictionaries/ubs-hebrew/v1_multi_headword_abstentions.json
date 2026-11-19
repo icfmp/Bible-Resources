@@ -1,0 +1,1180 @@
+{
+  "schema_version": 1,
+  "source_editions": {
+    "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
+  },
+  "policy": "Source-frozen manual abstentions for distinct UBS headword candidates: same original H/A numeric Strong family OR multiple consonantal candidates under different original Strong. No universal alias, forced headword pick, contextual sense, source rewrite or automatic identity assertion. An abstention is a reversible v1 editorial choice, not proof of permanent semantic ambiguity.",
+  "dispositions": [
+    {
+      "lang": "H",
+      "lemma": "קׇרְבָּן",
+      "original_strong": "7133",
+      "original_occurrences": 80,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o030010020111",
+        "reference": "LEV 1:2!11"
+      },
+      "source_classes": {
+        "noun": 80
+      },
+      "ubs_candidate_entries": [
+        "006568000000000",
+        "006569000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 7133 family at LEV 1:2!11 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 80 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "זָנָה",
+      "original_strong": "2181",
+      "original_occurrences": 60,
+      "original_word_witness": {
+        "original_sdbh": "002011001001000",
+        "original_word_id": "o010380240071",
+        "reference": "GEN 38:24!7"
+      },
+      "source_classes": {
+        "verb": 60
+      },
+      "ubs_candidate_entries": [
+        "002014000000000",
+        "002015000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 2181 family at GEN 38:24!7 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 60 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "תֹּולַעַת",
+      "original_strong": "8438",
+      "original_occurrences": 38,
+      "original_word_witness": {
+        "original_sdbh": "007746002001000",
+        "original_word_id": "o020250040032",
+        "reference": "EXO 25:4!3"
+      },
+      "source_classes": {
+        "noun": 38
+      },
+      "ubs_candidate_entries": [
+        "007750000000000",
+        "007751000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 8438 family at EXO 25:4!3 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 38 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "שָׁכַר",
+      "original_strong": "7937",
+      "original_occurrences": 18,
+      "original_word_witness": {
+        "original_sdbh": "007362001001000",
+        "original_word_id": "o010090210042",
+        "reference": "GEN 9:21!4"
+      },
+      "source_classes": {
+        "verb": 18
+      },
+      "ubs_candidate_entries": [
+        "007366000000000",
+        "007368000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 7937 family at GEN 9:21!4 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 18 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "סָכַךְ",
+      "original_strong": "5526",
+      "original_occurrences": 14,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o020250200061",
+        "reference": "EXO 25:20!6"
+      },
+      "source_classes": {
+        "verb": 14
+      },
+      "ubs_candidate_entries": [
+        "005073000000000",
+        "005074000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 5526 family at EXO 25:20!6 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 14 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "הִנֹּם",
+      "original_strong": "1516a",
+      "original_occurrences": 13,
+      "original_word_witness": {
+        "original_sdbh": "001045001001000 001391001001000",
+        "original_word_id": "o060150080051",
+        "reference": "JOS 15:8!5"
+      },
+      "source_classes": {
+        "noun": 13
+      },
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1516a family at JOS 15:8!5 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 13 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "בֶּן הִנֹּם",
+      "original_strong": "1516a",
+      "original_occurrences": 9,
+      "original_word_witness": {
+        "original_sdbh": "001045001001000 001391001001000",
+        "original_word_id": "o060150080041",
+        "reference": "JOS 15:8!4"
+      },
+      "source_classes": {
+        "noun": 9
+      },
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1516a family at JOS 15:8!4 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 9 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "כָּאָה",
+      "original_strong": "3512",
+      "original_occurrences": 3,
+      "original_word_witness": {
+        "original_sdbh": "003218001001000",
+        "original_word_id": "o191090160112",
+        "reference": "PSA 109:16!11"
+      },
+      "source_classes": {
+        "verb": 3
+      },
+      "ubs_candidate_entries": [
+        "003221000000000",
+        "003222000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 3512 family at PSA 109:16!11 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 3 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "רָעַע",
+      "original_strong": "7451",
+      "original_occurrences": 3,
+      "original_word_witness": {
+        "original_sdbh": "006879001004000",
+        "original_word_id": "o040110100161",
+        "reference": "NUM 11:10!16"
+      },
+      "source_classes": {
+        "adj": 3
+      },
+      "ubs_candidate_entries": [
+        "006851000000000",
+        "006863000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 7451 family at NUM 11:10!16 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 3 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "רעע",
+      "original_strong": "7451",
+      "original_occurrences": 3,
+      "original_word_witness": {
+        "original_sdbh": "006879001004000",
+        "original_word_id": "o020210080021",
+        "reference": "EXO 21:8!2"
+      },
+      "source_classes": {
+        "adj": 3
+      },
+      "ubs_candidate_entries": [
+        "006851000000000",
+        "006863000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 7451 family at EXO 21:8!2 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 3 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "original_strong": "1516c",
+      "original_occurrences": 2,
+      "original_word_witness": {
+        "original_sdbh": "004036001002000",
+        "original_word_id": "o130180120081",
+        "reference": "1CH 18:12!8"
+      },
+      "source_classes": {
+        "noun": 2
+      },
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1516c family at 1CH 18:12!8 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 2 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "יִפְתַּח אֵל",
+      "original_strong": "1516e",
+      "original_occurrences": 2,
+      "original_word_witness": {
+        "original_sdbh": "003034001001000",
+        "original_word_id": "o060190140091",
+        "reference": "JOS 19:14!9"
+      },
+      "source_classes": {
+        "noun": 2
+      },
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1516e family at JOS 19:14!9 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 2 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "יִפְתַּחאֵל",
+      "original_strong": "1516e",
+      "original_occurrences": 2,
+      "original_word_witness": {
+        "original_sdbh": "003034001001000",
+        "original_word_id": "o060190140101",
+        "reference": "JOS 19:14!10"
+      },
+      "source_classes": {
+        "noun": 2
+      },
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1516e family at JOS 19:14!10 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 2 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "שָׁפָל",
+      "original_strong": "8213",
+      "original_occurrences": 2,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o200160190021",
+        "reference": "PRO 16:19!2"
+      },
+      "source_classes": {
+        "verb": 2
+      },
+      "ubs_candidate_entries": [
+        "007583000000000",
+        "007586000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 8213 family at PRO 16:19!2 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 2 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "A",
+      "lemma": "פְּרַס",
+      "original_strong": "6537",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o270050280021",
+        "reference": "DAN 5:28!2"
+      },
+      "source_classes": {
+        "verb": 1
+      },
+      "ubs_candidate_entries": [
+        "006020000000000",
+        "006021000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original A 6537 family at DAN 5:28!2 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "A",
+      "lemma": "תְּקַל",
+      "original_strong": "8625",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o270050270021",
+        "reference": "DAN 5:27!2"
+      },
+      "source_classes": {
+        "verb": 1
+      },
+      "ubs_candidate_entries": [
+        "007923000000000",
+        "007924000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original A 8625 family at DAN 5:27!2 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "בֵּית רְחֹוב",
+      "original_strong": "0758a",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "000696001001000 000975001001000",
+        "original_word_id": "o100100060131",
+        "reference": "2SA 10:6!13"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "000694000000000",
+        "000695000000000",
+        "000696000000000",
+        "000697000000000",
+        "005799000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 0758a family at 2SA 10:6!13 has 5 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "בֵּיתרְחוֹב",
+      "original_strong": "0758a",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "000696001001000 000975001001000",
+        "original_word_id": "o100100060141",
+        "reference": "2SA 10:6!14"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "000694000000000",
+        "000695000000000",
+        "000696000000000",
+        "000697000000000",
+        "005799000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 0758a family at 2SA 10:6!14 has 5 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "בֵּן",
+      "original_strong": "1516a",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o120230100071",
+        "reference": "2KI 23:10!7"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1516a family at 2KI 23:10!7 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "גָּדֹול",
+      "original_strong": "1896b",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "001299001006000 001301001001000",
+        "original_word_id": "o160110140112",
+        "reference": "NEH 11:14!11"
+      },
+      "source_classes": {
+        "adj": 1
+      },
+      "ubs_candidate_entries": [
+        "001746000000000",
+        "001750000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1896b family at NEH 11:14!11 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "גדל",
+      "original_strong": "1419",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o140020080101",
+        "reference": "2CH 2:8!10"
+      },
+      "source_classes": {
+        "adj": 1
+      },
+      "ubs_candidate_entries": [
+        "001299000000000",
+        "001301000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1419 family at 2CH 2:8!10 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "original_strong": "1516b",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "002569001003000",
+        "original_word_id": "o160110350041",
+        "reference": "NEH 11:35!4"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1516b family at NEH 11:35!4 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "הַ",
+      "original_strong": "1516d",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "006116001002000",
+        "original_word_id": "o090130180151",
+        "reference": "1SA 13:18!15"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1516d family at 1SA 13:18!15 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "הַר",
+      "original_strong": "7311",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o190750070071",
+        "reference": "PSA 75:7!7"
+      },
+      "source_classes": {
+        "verb": 1
+      },
+      "ubs_candidate_entries": [
+        "006727000000000",
+        "006833000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 7311 family at PSA 75:7!7 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "זרה",
+      "original_strong": "2114",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "001953002001000",
+        "original_word_id": "o190580040011",
+        "reference": "PSA 58:4!1"
+      },
+      "source_classes": {
+        "verb": 1
+      },
+      "ubs_candidate_entries": [
+        "001955000000000",
+        "002044000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 2114 family at PSA 58:4!1 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "חָרָשׁ",
+      "original_strong": "1516b",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "002569001003000",
+        "original_word_id": "o130040140111",
+        "reference": "1CH 4:14!11"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1516b family at 1CH 4:14!11 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "טָבְאֵל",
+      "original_strong": "2870",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "004573001002000",
+        "original_word_id": "o150040070061",
+        "reference": "EZR 4:7!6"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "002645000000000",
+        "002646000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 2870 family at EZR 4:7!6 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "יָשַׁב",
+      "original_strong": "7628",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "007161001002000",
+        "original_word_id": "o230520020041",
+        "reference": "ISA 52:2!4"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "007166000000000",
+        "007167000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 7628 family at ISA 52:2!4 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "מִשְׁחַת",
+      "original_strong": "4893",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "004478001001000",
+        "original_word_id": "o230520140061",
+        "reference": "ISA 52:14!6"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "004484000000000",
+        "004486000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 4893 family at ISA 52:14!6 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "מֶלַח",
+      "original_strong": "1516c",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "004036001002000",
+        "original_word_id": "o120140070071",
+        "reference": "2KI 14:7!7"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1516c family at 2KI 14:7!7 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "מַעֲכָה",
+      "original_strong": "0758d",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "000698001001000",
+        "original_word_id": "o130190060221",
+        "reference": "1CH 19:6!22"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "000694000000000",
+        "000695000000000",
+        "000696000000000",
+        "000697000000000",
+        "005799000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 0758d family at 1CH 19:6!22 has 5 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "סָגַר",
+      "original_strong": "5462a",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "005004001001000",
+        "original_word_id": "o190350030032",
+        "reference": "PSA 35:3!3"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "005006000000000",
+        "005010000000000",
+        "005011000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 5462a family at PSA 35:3!3 has 3 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "סֹבֶא",
+      "original_strong": "5433",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "004976001001000",
+        "original_word_id": "o050210200132",
+        "reference": "DEU 21:20!13"
+      },
+      "source_classes": {
+        "verb": 1
+      },
+      "ubs_candidate_entries": [
+        "004982000000000",
+        "004984000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 5433 family at DEU 21:20!13 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "עִדֹּוא",
+      "original_strong": "5714d",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "005238001001000",
+        "original_word_id": "o110040140031",
+        "reference": "1KI 4:14!3"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "005245000000000",
+        "005250000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 5714d family at 1KI 4:14!3 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "עִיר",
+      "original_strong": "7344a",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "006750001001000",
+        "original_word_id": "o010100110111",
+        "reference": "GEN 10:11!11"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "006751000000000",
+        "006755000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 7344a family at GEN 10:11!11 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "צְפַתָה",
+      "original_strong": "1516f",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "006311001001000",
+        "original_word_id": "o140140090071",
+        "reference": "2CH 14:9!7"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "001390000000000",
+        "001391000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 1516f family at 2CH 14:9!7 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "צוּר",
+      "original_strong": "6864",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "006161003001000 006316001003000",
+        "original_word_id": "o190890440031",
+        "reference": "PSA 89:44!3"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "006321000000000",
+        "006322000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 6864 family at PSA 89:44!3 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "קִרְיַתסֵפֶר",
+      "original_strong": "7158",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "006587001001000",
+        "original_word_id": "o060150490031",
+        "reference": "JOS 15:49!3"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "006592000000000",
+        "006593000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 7158 family at JOS 15:49!3 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "רָאמֹות",
+      "original_strong": "7311",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o200240070011",
+        "reference": "PRO 24:7!1"
+      },
+      "source_classes": {
+        "verb": 1
+      },
+      "ubs_candidate_entries": [
+        "006727000000000",
+        "006833000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 7311 family at PRO 24:7!1 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "H",
+      "lemma": "שָׂכַךְ",
+      "original_strong": "5526",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o020330220072",
+        "reference": "EXO 33:22!7"
+      },
+      "source_classes": {
+        "verb": 1
+      },
+      "ubs_candidate_entries": [
+        "005073000000000",
+        "005074000000000"
+      ],
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The pinned original H 5526 family at EXO 33:22!7 has 2 distinct UBS 0.9.4 headword candidates sharing its Strong numeric family. No unique word-to-headword assignment has been independently verified for this unresolved family. Intentionally retain all 1 original occurrences without choosing a candidate; this is an abstention, not lexical nonidentity or source absence.",
+      "candidate_relation": "same_strong_numeric_family"
+    },
+    {
+      "lang": "A",
+      "lemma": "אֲמַר",
+      "original_strong": "0560",
+      "original_occurrences": 71,
+      "original_word_witness": {
+        "original_sdbh": "000512001001000",
+        "original_word_id": "o150050030131",
+        "reference": "EZR 5:3!13"
+      },
+      "source_classes": {
+        "verb": 71
+      },
+      "ubs_candidate_entries": [
+        "000511000000000",
+        "000512000000000",
+        "000513000000000",
+        "000514000000000",
+        "000515000000000"
+      ],
+      "candidate_relation": "same_consonants_different_strong_family",
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The original A אֲמַר 0560 lexical family has 71 original occurrences, including EZR 5:3!13 word o150050030131, but its original full Strong family is not shared by any UBS indexed candidate. The pinned source inventory lists 5 different UBS same-consonant headwords; original contextual SDBH 000512001001000 is not independently verified as an identity-bearing UBS sense. Reject automatic candidate selection, preserve original source words and the exact candidate set; require future lexeme and context inspection for any positive entry link."
+    },
+    {
+      "lang": "A",
+      "lemma": "הוה",
+      "original_strong": "1934",
+      "original_occurrences": 71,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o150040120021",
+        "reference": "EZR 4:12!2"
+      },
+      "source_classes": {
+        "verb": 71
+      },
+      "ubs_candidate_entries": [
+        "001785000000000",
+        "001786000000000"
+      ],
+      "candidate_relation": "same_consonants_different_strong_family",
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The original A הוה 1934 lexical family has 71 original occurrences, including EZR 4:12!2 word o150040120021, but its original full Strong family is not shared by any UBS indexed candidate. The pinned source inventory lists 2 different UBS same-consonant headwords; original contextual SDBH (absent) is not independently verified as an identity-bearing UBS sense. Reject automatic candidate selection, preserve original source words and the exact candidate set; require future lexeme and context inspection for any positive entry link."
+    },
+    {
+      "lang": "A",
+      "lemma": "קֳבֵל",
+      "original_strong": "6903",
+      "original_occurrences": 29,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o150040140031",
+        "reference": "EZR 4:14!3"
+      },
+      "source_classes": {
+        "noun": 29
+      },
+      "ubs_candidate_entries": [
+        "006360000000000",
+        "006361000000000"
+      ],
+      "candidate_relation": "same_consonants_different_strong_family",
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The original A קֳבֵל 6903 lexical family has 29 original occurrences, including EZR 4:14!3 word o150040140031, but its original full Strong family is not shared by any UBS indexed candidate. The pinned source inventory lists 2 different UBS same-consonant headwords; original contextual SDBH (absent) is not independently verified as an identity-bearing UBS sense. Reject automatic candidate selection, preserve original source words and the exact candidate set; require future lexeme and context inspection for any positive entry link."
+    },
+    {
+      "lang": "H",
+      "lemma": "הָוָה",
+      "original_strong": "1933a",
+      "original_occurrences": 5,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o010270290071",
+        "reference": "GEN 27:29!7"
+      },
+      "source_classes": {
+        "verb": 5
+      },
+      "ubs_candidate_entries": [
+        "001785000000000",
+        "001786000000000"
+      ],
+      "candidate_relation": "same_consonants_different_strong_family",
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The original H הָוָה 1933a lexical family has 5 original occurrences, including GEN 27:29!7 word o010270290071, but its original full Strong family is not shared by any UBS indexed candidate. The pinned source inventory lists 2 different UBS same-consonant headwords; original contextual SDBH (absent) is not independently verified as an identity-bearing UBS sense. Reject automatic candidate selection, preserve original source words and the exact candidate set; require future lexeme and context inspection for any positive entry link."
+    },
+    {
+      "lang": "A",
+      "lemma": "אֲמַן",
+      "original_strong": "0540",
+      "original_occurrences": 3,
+      "original_word_witness": {
+        "original_sdbh": "000496001008000",
+        "original_word_id": "o270020450292",
+        "reference": "DAN 2:45!29"
+      },
+      "source_classes": {
+        "verb": 3
+      },
+      "ubs_candidate_entries": [
+        "000484000000000",
+        "000495000000000",
+        "000496000000000",
+        "000497000000000",
+        "000498000000000"
+      ],
+      "candidate_relation": "same_consonants_different_strong_family",
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The original A אֲמַן 0540 lexical family has 3 original occurrences, including DAN 2:45!29 word o270020450292, but its original full Strong family is not shared by any UBS indexed candidate. The pinned source inventory lists 5 different UBS same-consonant headwords; original contextual SDBH 000496001008000 is not independently verified as an identity-bearing UBS sense. Reject automatic candidate selection, preserve original source words and the exact candidate set; require future lexeme and context inspection for any positive entry link."
+    },
+    {
+      "lang": "A",
+      "lemma": "חֲנַן",
+      "original_strong": "2604",
+      "original_occurrences": 2,
+      "original_word_witness": {
+        "original_sdbh": "002398001001000",
+        "original_word_id": "o270040240122",
+        "reference": "DAN 4:24!12"
+      },
+      "source_classes": {
+        "verb": 2
+      },
+      "ubs_candidate_entries": [
+        "002401000000000",
+        "002402000000000"
+      ],
+      "candidate_relation": "same_consonants_different_strong_family",
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The original A חֲנַן 2604 lexical family has 2 original occurrences, including DAN 4:24!12 word o270040240122, but its original full Strong family is not shared by any UBS indexed candidate. The pinned source inventory lists 2 different UBS same-consonant headwords; original contextual SDBH 002398001001000 is not independently verified as an identity-bearing UBS sense. Reject automatic candidate selection, preserve original source words and the exact candidate set; require future lexeme and context inspection for any positive entry link."
+    },
+    {
+      "lang": "A",
+      "lemma": "מְלֵךְ",
+      "original_strong": "4431",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "004047001001000",
+        "original_word_id": "o270040240031",
+        "reference": "DAN 4:24!3"
+      },
+      "source_classes": {
+        "noun": 1
+      },
+      "ubs_candidate_entries": [
+        "004049000000000",
+        "004050000000000",
+        "004051000000000",
+        "004052000000000"
+      ],
+      "candidate_relation": "same_consonants_different_strong_family",
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The original A מְלֵךְ 4431 lexical family has 1 original occurrences, including DAN 4:24!3 word o270040240031, but its original full Strong family is not shared by any UBS indexed candidate. The pinned source inventory lists 4 different UBS same-consonant headwords; original contextual SDBH 004047001001000 is not independently verified as an identity-bearing UBS sense. Reject automatic candidate selection, preserve original source words and the exact candidate set; require future lexeme and context inspection for any positive entry link."
+    },
+    {
+      "lang": "H",
+      "lemma": "הוה",
+      "original_strong": "1933",
+      "original_occurrences": 1,
+      "original_word_witness": {
+        "original_sdbh": "",
+        "original_word_id": "o180370060041",
+        "reference": "JOB 37:6!4"
+      },
+      "source_classes": {
+        "verb": 1
+      },
+      "ubs_candidate_entries": [
+        "001785000000000",
+        "001786000000000"
+      ],
+      "candidate_relation": "same_consonants_different_strong_family",
+      "disposition": "retain_unlinked_ambiguous_headword_choice",
+      "lexical_identity_approved": false,
+      "contextual_sense_approved": false,
+      "source_data_modified": false,
+      "rationale": "The original H הוה 1933 lexical family has 1 original occurrences, including JOB 37:6!4 word o180370060041, but its original full Strong family is not shared by any UBS indexed candidate. The pinned source inventory lists 2 different UBS same-consonant headwords; original contextual SDBH (absent) is not independently verified as an identity-bearing UBS sense. Reject automatic candidate selection, preserve original source words and the exact candidate set; require future lexeme and context inspection for any positive entry link."
+    }
+  ]
+}

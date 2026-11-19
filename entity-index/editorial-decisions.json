@@ -1,0 +1,2317 @@
+{
+  "schema_version": 1,
+  "decisions": [
+    {
+      "source_id": "person:Jashar",
+      "action": "replace_identity",
+      "id": "work:BookOfJashar",
+      "kind": "literary_work",
+      "canonical_id": "work:BookOfJashar",
+      "reason": "Joshua 10:13 and 2 Samuel 1:18 name a literary work, not a historical man; aligned Hebrew adjectives are the title epithet, not the whole phrase.",
+      "evidence": [
+        "Macula WLC JOS 10:13 o060100130142",
+        "Macula WLC 2SA 1:18 o100010180102"
+      ]
+    },
+    {
+      "source_id": "person:Perez-uzzah",
+      "action": "replace_identity",
+      "id": "place:PerezUzzah",
+      "kind": "place",
+      "canonical_id": "place:PerezUzzah",
+      "add_references": [
+        "13013011"
+      ],
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o130130110111",
+            "o130130110121"
+          ]
+        ]
+      },
+      "reason": "The named place Perez-uzzah is attested at 2 Samuel 6:8 and 1 Chronicles 13:11, distinct from Uzzah the man.",
+      "evidence": [
+        "Macula WLC 2SA 6:8 o100060080121 o100060080131",
+        "Macula WLC 1CH 13:11 o130130110111 o130130110121"
+      ]
+    },
+    {
+      "source_id": "person:Uzzah",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o100060080121",
+            "o100060080131"
+          ]
+        ]
+      },
+      "reason": "The compound Perez-uzzah is a place-name; genuine personal-name tokens including o100060080082 remain untouched.",
+      "evidence": [
+        "Macula WLC 2SA 6:8"
+      ]
+    },
+    {
+      "source_id": "person:Hammelech",
+      "action": "quarantine",
+      "reason": "Three aligned terms in Jeremiah 36:26 and 38:6 mean 'the king' (common noun, not a named man); do not infer one historical individual or kinship.",
+      "evidence": [
+        "Macula WLC JER 36:26 o240360260022 o240360260062",
+        "Macula WLC JER 38:6 o240380060102"
+      ]
+    },
+    {
+      "source_id": "person:Philistine",
+      "action": "quarantine",
+      "reason": "Genesis 10:14 and 1 Chronicles 1:12 speak of the plural Philistine people; ACAI incorrectly creates one male Philistine. Historical speech-span attributions are not part of the compact index and remain unchanged in the frozen original.",
+      "evidence": [
+        "Macula WLC GEN 10:14 o010100140081: Ngmpa plural gentilic",
+        "Macula WLC 1CH 1:12 o130010120081: Ngmpa plural gentilic"
+      ]
+    },
+    {
+      "source_id": "group:Philistine",
+      "action": "amend_occurrences",
+      "add_references": [
+        "01010014",
+        "13001012"
+      ],
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o010100140081"
+          ],
+          [
+            "o130010120081"
+          ]
+        ]
+      },
+      "reason": "Both source words explicitly name the Philistines as a plural people and belong in the existing canonical group:Philistine index, not under a fictitious person.",
+      "evidence": [
+        "Macula WLC GEN 10:14 o010100140081: Philistines plural",
+        "Macula WLC 1CH 1:12 o130010120081: Philistines plural"
+      ]
+    },
+    {
+      "source_id": "person:Shiloh",
+      "action": "quarantine",
+      "reason": "Genesis 49:10 contains a debated Hebrew form often glossed Shiloh. The pinned WLC annotates it as a proper noun but does not establish a named historical male individual in patriarchal times. Withhold this personal identity rather than forcing one textual/messianic interpretation; preserve the original token and record for later evidence review.",
+      "evidence": [
+        "Macula Hebrew WLC GEN 49:10 word o010490100121: lexical form Shiloh, noun/proper; personhood unsupported by this word annotation",
+        "icfmp/ACAI issue #57: disputed textual and Christological interpretations"
+      ]
+    },
+    {
+      "source_id": "keyterm:Universe",
+      "action": "replace_identity",
+      "id": "keyterm:Universe",
+      "kind": "keyterm",
+      "canonical_id": "keyterm:Universe",
+      "reason": "The source maps this Greek age/eon concept under keyterm:Ability, which is neither a verified semantic identity nor a legitimate automatic alias. Preserve the Universe entity's original token groups and source ID but separate its canonical ID; do not adjudicate the precise sense of each source occurrence.",
+      "evidence": [
+        "ACAI pinned source keyterms/json/Universe.json: primary_id=keyterm:Ability; Greek lemma αἰών",
+        "icfmp/ACAI issue #74: broad editorial primary-ID conflation requiring distinct candidate identities"
+      ]
+    },
+    {
+      "source_id": "keyterm:World",
+      "action": "replace_identity",
+      "id": "keyterm:World",
+      "kind": "keyterm",
+      "canonical_id": "keyterm:World",
+      "reason": "The source maps World under keyterm:Ability, but a world-related concept is not the identical entity as human ability. Preserve every original word group and verse claim; make the canonical identity independent, without assuming lexical sense unambiguity at any word occurrence.",
+      "evidence": [
+        "ACAI pinned source keyterms/json/World.json: primary_id=keyterm:Ability; concept labeled World",
+        "icfmp/ACAI issue #74: inherited keyterm primary-ID conflation"
+      ]
+    },
+    {
+      "source_id": "person:Johanan",
+      "action": "replace_identity",
+      "id": "person:Johanan",
+      "kind": "person",
+      "canonical_id": "person:Johanan",
+      "reason": "1 Chronicles 3:15 explicitly identifies Johanan as a distinct son of Josiah, while the source incorrectly canonicalizes this name form under person:Jehoahaz.3. The precise Johanan word remains attached to its own individual; no guess is made about Shallum.5.",
+      "evidence": [
+        "Macula WLC 1CH 3:15 o130030150041: proper Hebrew name Johanan, ref 1CH 3:15!4",
+        "ACAI issue #71 inherited royal-identity follow-up"
+      ]
+    },
+    {
+      "source_id": "person:Jehoahaz.3",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o130030150041"
+          ]
+        ]
+      },
+      "reason": "The direct word at 1 Chronicles 3:15!4 actually spells Johanan, a separately listed son of Josiah, and must not simultaneously be asserted as the Jehoahaz personal name. Other Jehoahaz/possibly Shallum references remain exactly as the source supplied them until contextual audit.",
+      "evidence": [
+        "Macula WLC 1CH 3:15 o130030150041: Johanan, not Jehoahaz",
+        "Macula WLC 1CH 3:15 o130030150101: separate Shallum form; no automatic transfer"
+      ]
+    },
+    {
+      "source_id": "place:Gadara",
+      "action": "replace_identity",
+      "id": "place:Gadara",
+      "kind": "place",
+      "canonical_id": "place:Gadara",
+      "reason": "Gadara (Umm Qais) and Gerasa (Jerash) are historically distinct Decapolis cities, not equivalent name forms. The source's Gadara.primary_id=place:Gerasa falsely merges their identities. Preserve ALL exact original Greek demonym word groups and verse references as candidates, including cross-gospel textual variants; a demonym is not proof of the precise miracle site. Gadara.2 (Perea) remains separate.",
+      "evidence": [
+        "UNESCO World Heritage Centre, Gadara (Modern Um Qeis or Qays): https://whc.unesco.org/en/tentativelists/1558/ — explicitly lists Gerasa as another, separate Decapolis city",
+        "Pinned ACAI places/json/Gadara.json: source_id place:Gadara, primary_id place:Gerasa; source word MAT 8:28!11 n40008028011 is Gadarenes",
+        "Pinned ACAI places/json/Gerasa.json: MRK 5:1!12 n41005001012 and LUK 8:26!7 n42008026007 are Gerasenes, while the Matthew Gadarenes token is also claimed; preserve ambiguity until site-specific textual review",
+        "Inherited ACAI issue #7: full source-token and regional-demonym audit"
+      ]
+    },
+    {
+      "source_id": "person:Shallum.5",
+      "action": "replace_identity",
+      "id": "person:Shallum.5",
+      "kind": "person",
+      "canonical_id": "person:Jehoahaz.3",
+      "reason": "The fourth son Shallum in 1 Chronicles 3:15 is commonly identified with Jehoahaz, Josiah's successor. Jeremiah 22:11 directly names Shallum son of Josiah who reigned in his father's place; 2 Kings 23:30–31 records successor Jehoahaz. Source word n/a: original WLC o130030150101 distinctly reads Shallum and is preserved. This aliases a historical individual without conflating the separate son Johanan (o130030150041), and without silently rewriting the source genealogy.",
+      "evidence": [
+        "Pinned Macula WLC 1CH 3:15!10 o130030150101: Shallum; 1CH 3:15!4 o130030150041: distinct Johanan",
+        "JER 22:11 names Shallum son of Josiah who reigned in place of his father; 2KI 23:30-31 names the successor Jehoahaz",
+        "SIL Translation Commentary on 1 Chronicles 3:15 https://tips.translation.bible/story/translation-commentary-on-1-chronicles-315/ — Shallum also called Jehoahaz",
+        "NET Bible 1 Chronicles 3:15 and ESV Reformation Study Bible 1 Chronicles 3:15 identify Shallum with Jehoahaz; genealogical order remains a contextual textual question",
+        "Inherited ACAI issue #71: distinguish Johanan and other royal name forms"
+      ]
+    },
+    {
+      "source_id": "person:Dishon",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o130010410031"
+          ],
+          [
+            "o130010410051"
+          ]
+        ]
+      },
+      "remove_references": [
+        "13001041"
+      ],
+      "reason": "1 Chronicles 1:38 names Dishon among the sons of Seir, while 1 Chronicles 1:41 explicitly lists a different Dishon as a son of Anah and immediately repeats his name before naming his sons. Both WLC word tokens in 1:41 therefore refer to person:Dishon.2 (Anah's son), not person:Dishon (Seir's son). Only these two wrong direct-name claims and the now-unsupported 1:41 source reference are removed in the derived index; their original source fields remain immutable. Genesis 36:26 has a lexically different Dishan word in pinned WLC, so it is not guessed or reassigned here.",
+      "evidence": [
+        "Pinned Macula WLC 1CH 1:38 o130010380072: Dishon among Seir's sons",
+        "Pinned Macula WLC 1CH 1:41 o130010410031 and o130010410051: Dishon introduced as son of Anah then repeated as father of named sons",
+        "ACAI pinned person:Dishon father=person:Seir; person:Dishon.2 father=person:Anah.2; both had the 1CH 1:41 tokens",
+        "Pinned Macula WLC GEN 36:26 o010360260031 has Hebrew lemma דִּישָׁן (Dishan), not assumed a Dishon identity in this edit",
+        "Inherited ACAI #75 exact-person token collisions; our derived-index audit #307"
+      ]
+    },
+    {
+      "source_id": "person:Bebai",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o150080110051"
+          ]
+        ]
+      },
+      "reason": "In Ezra 8:11, the first exact name token o150080110021 belongs to the phrase 'of the sons of Bebai', describing the older family/clan ancestor listed in Ezra 2:11 and Nehemiah 7:16; the second exact name token o150080110051 belongs to the separate phrase 'Zechariah son of Bebai'. The pinned ACAI source already distinguishes person:Bebai from person:Bebai.2, but assigns both tokens to both entries. Keep the ancestry token and remove only the misattributed father-name token from this first entry.",
+      "evidence": [
+        "Pinned Macula Hebrew WLC Ezra 8:11: o150080110013 'sons/descendants' plus o150080110021 'Bebai'; separate o150080110041 'son' plus o150080110051 'Bebai'",
+        "Pinned ACAI person:Bebai references Ezra 2:11, Ezra 8:11, Ezra 10:28, Nehemiah 7:16; its explicit word references both Ezra 8:11 names",
+        "Pinned ACAI person:Bebai.2 explicitly relates to person:Zechariah.19 as father, and is distinct in the source",
+        "Bible-Resources #299 / inherited ACAI #75: direct person-name token collision audit"
+      ]
+    },
+    {
+      "source_id": "person:Bebai.2",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o150080110021"
+          ]
+        ]
+      },
+      "reason": "In Ezra 8:11, the second name token o150080110051 specifically follows 'Zechariah son of', referring to the separate Bebai recorded by ACAI as father of Zechariah. The earlier word o150080110021 occurs in the clan expression 'sons of Bebai'. As the imported source models those as two distinct people, the two separate occurrences must not both be assigned to the father's record without independent evidence that they describe the same individual. Preserve the true father-name token and all original source fields.",
+      "evidence": [
+        "Pinned WLC Ezra 8:11: o150080110021 in 'sons of Bebai', o150080110051 following 'Zechariah son of'",
+        "Pinned ACAI person:Bebai.2 offspring=[person:Zechariah.19], explicit_instances.wlc contains both tokens",
+        "Intra-source identity separation: person:Bebai and person:Bebai.2 use different canonical IDs and roles; no conflation by matching spelling",
+        "Bible-Resources #299 / inherited ACAI #75: distinct original-word occurrence review"
+      ]
+    },
+    {
+      "source_id": "person:Hur",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o110040080031",
+            "o110040080041"
+          ]
+        ]
+      },
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o110040080041"
+          ]
+        ]
+      },
+      "reason": "1 Kings 4:8 explicitly spells Ben-Hur as two segmented original words, o110040080031 Hebrew בֵּן ('son'), and o110040080041 Hebrew חוּר ('Hur'). The Ben-Hur administrator requires the complete two-word expression. The father's person:Hur annotation must point only to the actual Hur name, not the separate lexical 'son' word; the source originally assigned the compound two-word group to both. Keep the father Hur word and family relationship. This removes the demonstrably false overlap of the common noun with the father's independent proper name, while preserving the legitimate shared Hur component of the patronymic. No canonical identities are merged.",
+      "evidence": [
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/11-1Ki-004-lowfat.xml 1KI 4:8!3 o110040080031: pos=noun,type=common,lemma=בֵּן,gloss='Ben-'",
+        "Same pinned source 1KI 4:8!4 o110040080041: pos=noun,type=proper,lemma=חוּר,gloss='Hur'",
+        "Pinned ACAI source e80a874e... people/json/Hur.json and people/json/Ben-hur.json explicitly claim same two-word group; the former is parent and latter is son",
+        "Bible-Resources issue #299 / original ACAI #75 distinct-person word audit"
+      ]
+    },
+    {
+      "source_id": "person:Israel",
+      "action": "amend_occurrences",
+      "remove_references": [
+        "02003018",
+        "11005005",
+        "16011003",
+        "14011003",
+        "14001002",
+        "14001013",
+        "14005002",
+        "14005003",
+        "14005004",
+        "14005006",
+        "14005010",
+        "14011001",
+        "14011013",
+        "14011016",
+        "14023002",
+        "14028002",
+        "14028003",
+        "14028005",
+        "14028008",
+        "14028013",
+        "14028019",
+        "14028023",
+        "14028026",
+        "14028027",
+        "13015012",
+        "13015014",
+        "13015025",
+        "13023001",
+        "13023002",
+        "13023025",
+        "13024019",
+        "14029007",
+        "14029010",
+        "14029024",
+        "14029027",
+        "14030006",
+        "14030021",
+        "14030025",
+        "14030026",
+        "14031005",
+        "14031006",
+        "14031008",
+        "14034007",
+        "14034009",
+        "14034021",
+        "14034023",
+        "14034026",
+        "14034033",
+        "14035003",
+        "14035004",
+        "14035017",
+        "14035025",
+        "14035027",
+        "16010034",
+        "16010040",
+        "16013002",
+        "16013003",
+        "16013018",
+        "16013026"
+      ],
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o020030180061"
+          ],
+          [
+            "o110050050032"
+          ],
+          [
+            "o160110030131"
+          ],
+          [
+            "o140110030101"
+          ],
+          [
+            "o140010020041"
+          ],
+          [
+            "o140010020121"
+          ],
+          [
+            "o140010130121"
+          ],
+          [
+            "o140050020061"
+          ],
+          [
+            "o140050020141"
+          ],
+          [
+            "o140050030061"
+          ],
+          [
+            "o140050040041"
+          ],
+          [
+            "o140050060051"
+          ],
+          [
+            "o140050100151"
+          ],
+          [
+            "o140110010171"
+          ],
+          [
+            "o140110130051"
+          ],
+          [
+            "o140110160041"
+          ],
+          [
+            "o140110160121"
+          ],
+          [
+            "o140230020112"
+          ],
+          [
+            "o140280020041"
+          ],
+          [
+            "o140280030171"
+          ],
+          [
+            "o140280050181"
+          ],
+          [
+            "o140280080031"
+          ],
+          [
+            "o140280130261"
+          ],
+          [
+            "o140280190091"
+          ],
+          [
+            "o140280230221"
+          ],
+          [
+            "o140280260132"
+          ],
+          [
+            "o140280270131"
+          ],
+          [
+            "o130150030051"
+          ],
+          [
+            "o130150120151"
+          ],
+          [
+            "o130150140091"
+          ],
+          [
+            "o130150250041"
+          ],
+          [
+            "o130150280021"
+          ],
+          [
+            "o130230010101"
+          ],
+          [
+            "o130230020051"
+          ],
+          [
+            "o130230250071"
+          ],
+          [
+            "o130240190151"
+          ],
+          [
+            "o140290070161"
+          ],
+          [
+            "o140290100081"
+          ],
+          [
+            "o140290240101"
+          ],
+          [
+            "o140290240131"
+          ],
+          [
+            "o140290270181"
+          ],
+          [
+            "o140300010051"
+          ],
+          [
+            "o140300010211"
+          ],
+          [
+            "o140300050061"
+          ],
+          [
+            "o140300050161"
+          ],
+          [
+            "o140300060081"
+          ],
+          [
+            "o140300060141"
+          ],
+          [
+            "o140300060212"
+          ],
+          [
+            "o140300210031"
+          ],
+          [
+            "o140300250102"
+          ],
+          [
+            "o140300250141"
+          ],
+          [
+            "o140300260111"
+          ],
+          [
+            "o140310010061"
+          ],
+          [
+            "o140310010291"
+          ],
+          [
+            "o140310050051"
+          ],
+          [
+            "o140310060021"
+          ],
+          [
+            "o140310080121"
+          ],
+          [
+            "o140340070141"
+          ],
+          [
+            "o140340090221"
+          ],
+          [
+            "o140340210082"
+          ],
+          [
+            "o140340230071"
+          ],
+          [
+            "o140340260151"
+          ],
+          [
+            "o140340330101"
+          ],
+          [
+            "o140340330152"
+          ],
+          [
+            "o140350030061"
+          ],
+          [
+            "o140350030201"
+          ],
+          [
+            "o140350030321"
+          ],
+          [
+            "o140350040081"
+          ],
+          [
+            "o140350170031"
+          ],
+          [
+            "o140350180052"
+          ],
+          [
+            "o140350180111"
+          ],
+          [
+            "o140350180222"
+          ],
+          [
+            "o140350250171"
+          ],
+          [
+            "o140350270091"
+          ],
+          [
+            "o160100340141"
+          ],
+          [
+            "o160100400061"
+          ],
+          [
+            "o160120470021"
+          ],
+          [
+            "o160130020061"
+          ],
+          [
+            "o160130030082"
+          ],
+          [
+            "o160130180191"
+          ],
+          [
+            "o160130260071"
+          ],
+          [
+            "o160130260221"
+          ]
+        ]
+      },
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o020030180181"
+          ],
+          [
+            "o020030180242"
+          ],
+          [
+            "o390020100101"
+          ],
+          [
+            "o390020100132"
+          ],
+          [
+            "o140110040051"
+          ],
+          [
+            "o140110040071"
+          ],
+          [
+            "o140110040101"
+          ],
+          [
+            "o140110040182"
+          ],
+          [
+            "o140110040222"
+          ],
+          [
+            "o140110040232"
+          ],
+          [
+            "o050120080021"
+          ],
+          [
+            "o230530060061"
+          ],
+          [
+            "o240510060011"
+          ],
+          [
+            "o240510060042"
+          ],
+          [
+            "o240510060081"
+          ]
+        ]
+      },
+      "reason": "Exodus 3:18 says 'elders of Israel' and speaks of the Israelite people centuries after Jacob; its proper-name Israel word and plural representative roles do not identify the deceased patriarch Jacob/Israel. In 1 Kings 5:5 Israel is a contemporary people dwelling safely under Solomon, not the long-dead patriarch Jacob; in Nehemiah 11:3 the name explicitly means the Israelite residents of Persian-era Judah, not Jacob. The singular 'each person' words inherit participant links to communities, not historical persons. Remove only these two complete verse-specific false-person groups. Jeremiah 33:10 the demonstrative 'this' indicates the desolate place in Judah/Israel awaiting restoration, not a historical reference to the deceased patriarch Israel/Jacob; remove only his incorrect indirect claim. Malachi 2:10 speaks as the living covenant community ('we', 'each one', 'our fathers') and cannot assign three present-day discourse words to the deceased founder Israel/Jacob. Retain the source's other participating people/collective links without automatically asserting an identity. 2 Chronicles 11:3 names 'all Israel in Judah and Benjamin' as the people commanded alongside Rehoboam; 11:4 orders these living representatives not to fight their brothers and to return home. The singular distributive 'each man' and six plural/infinitive action words cannot refer to the patriarch Jacob/Israel long deceased before this divided kingdom context. The frozen person:Israel name and seven referent tokens are retained in the original witness, but detached only from the derived historical-person entry. Deuteronomy 12:8 the plural 'you' and first-plural 'we' concern the living covenant community and Moses speaking in the wilderness, not Jacob centuries after his death. Pinned Macula source participantref on 'we' and distributive 'each' includes Moses and the contemporary people, rather than the historical founder. Isaiah 53:6's 'we all' and 'each' are an inclusive collective confession within the prophet's poem; the historical individual Jacob/Israel cannot be an independent living speaker here. Remove only these precisely attested false person:Israel words, without asserting that this interpretively debated prophetic 'we' exclusively denotes group:Israel. Jeremiah 51:6 directly orders the contemporary deportees to flee Babylon and for 'each person' to save his life, followed by a further second-person-plural warning. Both frozen historical-person records person:Israel (Jacob) and person:Judah.4 (Jacob's son) wrongly claim all four exact speech/imperative words, although neither ancient patriarch was alive during the Babylonian exile. Detach only these original person-to-word claims in the derived index; the frozen group:Judah source record already retains all four exact word groups. Batch follow-up (2 Chronicles 1, 5, 11, 23, 28): these exact word occurrences designate contemporary Israelite communities; source wording and original frozen witness remain untouched. Historical narrative source-name batch: Israelite community/nation rather than patriarch Jacob; original source bytes remain untouched and all chosen exact source words remain in the existing group (or are added to group:Israel).",
+      "evidence": [
+        "Pinned WLC Exodus 3:18 exact word o020030180061 and following referent groups o020030180181, o020030180242; frozen person:Israel source record",
+        "https://classic.net.bible.org/verse.php?book=Exo&chapter=3&verse=18",
+        "https://github.com/icfmp/ACAI/issues/10",
+        "Pinned WLC 1 Kings 5:5 o110050050032 = Israel as a people; o110050050051 = each resident, participantref Judah+Israel; Nehemiah 11:3 o160110030131 = Israelite residents, o160110030101 = each, participantref includes Israel and Levites. Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c.",
+        "Pinned WLC Jeremiah 33:10 word o240330100072 = singular demonstrative 'this' qualifying a place, with group:Judah already preserving the source word; Malachi 2:10 o390020100101 first-plural action, o390020100111 common noun 'each', o390020100132 covenant-of-fathers infinitive, none identifies Jacob.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/24-Jer-033-lowfat.xml and WLC/lowfat/39-Mal-002-lowfat.xml",
+        "Pinned WLC 2 Chronicles 11:3 o140110030101 names 'Israel' as the group alongside Rehoboam and Judah/Benjamin; 11:4 six actions at o140110040051, o140110040071, o140110040101, o140110040182, o140110040222, o140110040232 have Macula actor frames 140110030031 (Rehoboam) and 140110030101 (all Israel living in Judah/Benjamin); o140110040111 'each' participantref likewise names these contemporary actors.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/14-2Ch-011-lowfat.xml; frozen ACAI person:Israel describes Jacob, group:Israel describes the Israelites.",
+        "Pinned WLC Deuteronomy 12:8 o050120080021 Vqi2mp 'you shall do', o050120080051 Pp1cp 'we', o050120080091 Ncmsa 'each', source subjects 050110060261 (contemporary Israel community) and 050050010021 (Moses). Isaiah 53:6 o230530060041 'each', o230530060061 Vqp1cp 'we turned'; exact Macula actor frames identify a living collective speaker, not deceased Jacob.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/05-Deu-012-lowfat.xml and WLC/lowfat/23-Isa-053-lowfat.xml; frozen ACAI person:Israel identifies the historical patriarch Jacob.",
+        "Pinned Macula WLC Jeremiah 51:6 exact original words o240510060011 Vqv2mp 'flee', o240510060042 Vpv2mp 'save yourselves', o240510060051 Ncmsa 'each person', o240510060081 VNj2mp 'do not perish'; all source words exist in frozen group:Judah and are explicitly not the deceased ancestral individuals person:Israel/person:Judah.4.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/24-Jer-051-lowfat.xml and pinned Macula Hebrew TSV. Frozen original ACAI records and verb multiplicities retained.",
+        "Pinned Macula Hebrew WLC XML 2 Chronicles chapters 1, 5, 11, 23, 28 at 47db250bd55d0d8577f2a94fba114ef16c35b23c; verified exact original source-word ID/labels, source group crosswalk, and frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22.",
+        "Original-word and source-label verification in pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c lowfat chapters 13:15,23,24; 14:29,30,31,34,35; 16:10,12,13; frozen ACAI@e80a874e8282f996199c595378a3b3b9a43aac22; existing group exact source links. The six genealogical Levi proper-name words remain intact."
+      ],
+      "remove_pronominal_referents": {
+        "wlc": [
+          [
+            "o110050050051"
+          ],
+          [
+            "o160110030101"
+          ],
+          [
+            "o240330100072"
+          ],
+          [
+            "o390020100111"
+          ],
+          [
+            "o140110040111"
+          ],
+          [
+            "o050120080051"
+          ],
+          [
+            "o050120080091"
+          ],
+          [
+            "o230530060041"
+          ],
+          [
+            "o240510060051"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "group:Israel",
+      "action": "amend_occurrences",
+      "add_references": [
+        "02003018",
+        "11005005",
+        "16011003",
+        "14011003",
+        "14001002",
+        "14001013",
+        "14005002",
+        "14005003",
+        "14005004",
+        "14005006",
+        "14005010",
+        "14011001",
+        "14011013",
+        "14011016",
+        "14023002",
+        "14028002",
+        "14028003",
+        "14028005",
+        "14028008",
+        "14028013",
+        "14028019",
+        "14028023",
+        "14028026",
+        "14028027",
+        "13015003",
+        "13015012",
+        "13015014",
+        "13015025",
+        "13015028",
+        "13023001",
+        "13023002",
+        "13023025",
+        "13024019",
+        "14029007",
+        "14029010",
+        "14029024",
+        "14029027",
+        "14030001",
+        "14030005",
+        "14030006",
+        "14030021",
+        "14030025",
+        "14030026",
+        "14031001",
+        "14031005",
+        "14031006",
+        "14031008",
+        "14034007",
+        "14034009",
+        "14034021",
+        "14034023",
+        "14034026",
+        "14034033",
+        "14035003",
+        "14035004",
+        "14035017",
+        "14035018",
+        "14035025",
+        "14035027",
+        "16010034",
+        "16010040",
+        "16012047",
+        "16013002",
+        "16013003",
+        "16013018",
+        "16013026"
+      ],
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o020030180061"
+          ],
+          [
+            "o110050050032"
+          ],
+          [
+            "o160110030131"
+          ],
+          [
+            "o140110030101"
+          ],
+          [
+            "o140010020041"
+          ],
+          [
+            "o140010020121"
+          ],
+          [
+            "o140010130121"
+          ],
+          [
+            "o140050020061"
+          ],
+          [
+            "o140050020141"
+          ],
+          [
+            "o140050030061"
+          ],
+          [
+            "o140050040041"
+          ],
+          [
+            "o140050060051"
+          ],
+          [
+            "o140050100151"
+          ],
+          [
+            "o140110010171"
+          ],
+          [
+            "o140110130051"
+          ],
+          [
+            "o140110160041"
+          ],
+          [
+            "o140110160121"
+          ],
+          [
+            "o140230020112"
+          ],
+          [
+            "o140280020041"
+          ],
+          [
+            "o140280030171"
+          ],
+          [
+            "o140280050181"
+          ],
+          [
+            "o140280080031"
+          ],
+          [
+            "o140280130261"
+          ],
+          [
+            "o140280190091"
+          ],
+          [
+            "o140280230221"
+          ],
+          [
+            "o140280260132"
+          ],
+          [
+            "o140280270131"
+          ],
+          [
+            "o130150030051"
+          ],
+          [
+            "o130150120151"
+          ],
+          [
+            "o130150140091"
+          ],
+          [
+            "o130150250041"
+          ],
+          [
+            "o130150280021"
+          ],
+          [
+            "o130230010101"
+          ],
+          [
+            "o130230020051"
+          ],
+          [
+            "o130230250071"
+          ],
+          [
+            "o130240190151"
+          ],
+          [
+            "o140290070161"
+          ],
+          [
+            "o140290100081"
+          ],
+          [
+            "o140290240101"
+          ],
+          [
+            "o140290240131"
+          ],
+          [
+            "o140290270181"
+          ],
+          [
+            "o140300010051"
+          ],
+          [
+            "o140300010211"
+          ],
+          [
+            "o140300050061"
+          ],
+          [
+            "o140300050161"
+          ],
+          [
+            "o140300060081"
+          ],
+          [
+            "o140300060141"
+          ],
+          [
+            "o140300060212"
+          ],
+          [
+            "o140300210031"
+          ],
+          [
+            "o140300250102"
+          ],
+          [
+            "o140300250141"
+          ],
+          [
+            "o140300260111"
+          ],
+          [
+            "o140310010061"
+          ],
+          [
+            "o140310010291"
+          ],
+          [
+            "o140310050051"
+          ],
+          [
+            "o140310060021"
+          ],
+          [
+            "o140310080121"
+          ],
+          [
+            "o140340070141"
+          ],
+          [
+            "o140340090221"
+          ],
+          [
+            "o140340210082"
+          ],
+          [
+            "o140340230071"
+          ],
+          [
+            "o140340260151"
+          ],
+          [
+            "o140340330101"
+          ],
+          [
+            "o140340330152"
+          ],
+          [
+            "o140350030061"
+          ],
+          [
+            "o140350030201"
+          ],
+          [
+            "o140350030321"
+          ],
+          [
+            "o140350040081"
+          ],
+          [
+            "o140350170031"
+          ],
+          [
+            "o140350180052"
+          ],
+          [
+            "o140350180111"
+          ],
+          [
+            "o140350180222"
+          ],
+          [
+            "o140350250171"
+          ],
+          [
+            "o140350270091"
+          ],
+          [
+            "o160100340141"
+          ],
+          [
+            "o160100400061"
+          ],
+          [
+            "o160120470021"
+          ],
+          [
+            "o160130020061"
+          ],
+          [
+            "o160130030082"
+          ],
+          [
+            "o160130180191"
+          ],
+          [
+            "o160130260071"
+          ],
+          [
+            "o160130260221"
+          ]
+        ]
+      },
+      "reason": "The named Israel of 'elders of Israel' in Exodus 3:18 is the Israelite community, not the dead patriarch; attach the attested proper name to the existing Israelite group, without inferring links for other words. Add two exact attested collective Israel names to the existing Israelite people, not the ancient patriarch: Solomon-era Judah and Israel dwelling safely (1 Kings 5:5) and postexilic Israelite residents (Nehemiah 11:3). Their distributive 'each person' original words carry explicit Macula participantref pointers to Israelite people; retain the corresponding group links, not the dead founder. In 2 Chronicles 11:3-4, the exact living 'all Israel' cohort in Judah and Benjamin obeys the LORD's command alongside Rehoboam. Add source-proven collective Israel proper name in 11:3, and seven Macula source participant-referent tokens in 11:4 to the already existing group:Israel; retain the independently indexed king Rehoboam's roles. No new person or group identity is invented. Deuteronomy 12:8 source 'you', 'we' and 'each' in Moses' address to the living people of Israel are direct grammatical references to the Israelite community. Transfer exactly these original word groups from the wrongly inherited patriarch to the existing group:Israel while retaining person:Moses' original role and refraining from any interpretation-specific group assignment in Isaiah 53:6. Batch follow-up: in 2 Chronicles 1, 5, 11, 23 and 28 these precise named Israel occurrences concern Solomon's/Israel's/Judah's living communities, rulers and tribes, not Jacob personally; the original Hebrew names and existing historical-person source records remain frozen. Historical narrative follow-up: in 1 Chronicles 15/23/24, 2 Chronicles 29/30/31/34/35 and Nehemiah 10/12/13 these exact Israel occurrences refer to contemporaneous Israelites/nation, not the deceased founder Jacob.",
+      "evidence": [
+        "Pinned WLC Exodus 3:18 exact Hebrew Israel proper-name o020030180061",
+        "https://classic.net.bible.org/verse.php?book=Exo&chapter=3&verse=18",
+        "https://github.com/icfmp/ACAI/issues/10",
+        "Pinned WLC 1 Kings 5:5 o110050050032 + o110050050051 and Nehemiah 11:3 o160110030131 + o160110030101; source participantref labels the community of Israel rather than Jacob individually.",
+        "Pinned Macula WLC 2 Chronicles 11:3 o140110030101 'all Israel'; 11:4 original participantref/subjref frames on o140110040051, o140110040071, o140110040101, o140110040111, o140110040182, o140110040222, o140110040232 directly point to 140110030101; the historical Jacob is not present.",
+        "Pinned WLC Deuteronomy 12:8 o050120080021 second-plural 'you', o050120080051 first-plural 'we' (source participants include Moses and the community), o050120080091 singular distributive 'each'; Macula participantref 050110060261 points to the contemporaneous Israelite audience.",
+        "Pinned Macula WLC 2 Chronicles 1, 5, 11, 23 and 28 exact original-word proper names; 47db250bd55d0d8577f2a94fba114ef16c35b23c, frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22, source-person/group explicit-word comparison.",
+        "Exact WLC original-word receipts checked at frozen Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c; 1 Chronicles 15,23,24; 2 Chronicles 29,30,31,34,35; Nehemiah 10,12,13; frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22."
+      ],
+      "add_pronominal_referents": {
+        "wlc": [
+          [
+            "o110050050051"
+          ],
+          [
+            "o160110030101"
+          ],
+          [
+            "o140110040111"
+          ],
+          [
+            "o050120080051"
+          ],
+          [
+            "o050120080091"
+          ]
+        ]
+      },
+      "add_subject_referents": {
+        "wlc": [
+          [
+            "o140110040051"
+          ],
+          [
+            "o140110040071"
+          ],
+          [
+            "o140110040101"
+          ],
+          [
+            "o140110040182"
+          ],
+          [
+            "o140110040222"
+          ],
+          [
+            "o140110040232"
+          ],
+          [
+            "o050120080021"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:Judah.4",
+      "action": "amend_occurrences",
+      "remove_references": [
+        "23022008",
+        "24022018",
+        "11005005",
+        "14023008",
+        "16011003",
+        "24033010",
+        "14011001",
+        "14011003",
+        "14011005",
+        "14011010",
+        "14011012",
+        "14011014",
+        "14011017",
+        "14011023",
+        "14023002",
+        "14028006",
+        "14028009",
+        "14028010",
+        "14028017",
+        "14028018",
+        "14028019",
+        "14028025",
+        "14028026",
+        "14029008",
+        "14029021",
+        "14030006",
+        "14030024",
+        "14030025",
+        "14031001",
+        "14031006",
+        "14031020",
+        "14034003",
+        "14034005",
+        "14034009",
+        "14034011",
+        "14034021",
+        "14034024",
+        "14034026",
+        "14034029",
+        "14034030",
+        "14035018",
+        "14035021",
+        "14035024",
+        "14035027"
+      ],
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o230220080041"
+          ],
+          [
+            "o240220180101"
+          ],
+          [
+            "o110050050021"
+          ],
+          [
+            "o140230080041"
+          ],
+          [
+            "o160110030081"
+          ],
+          [
+            "o240330100181"
+          ],
+          [
+            "o140110010071"
+          ],
+          [
+            "o140110030071"
+          ],
+          [
+            "o140110030112"
+          ],
+          [
+            "o140110050072"
+          ],
+          [
+            "o140110100082"
+          ],
+          [
+            "o140110120111"
+          ],
+          [
+            "o140110140082"
+          ],
+          [
+            "o140110170041"
+          ],
+          [
+            "o140110230071"
+          ],
+          [
+            "o140230020022"
+          ],
+          [
+            "o140230020081"
+          ],
+          [
+            "o140280060052"
+          ],
+          [
+            "o140280090201"
+          ],
+          [
+            "o140280100031"
+          ],
+          [
+            "o140280170052"
+          ],
+          [
+            "o140280180062"
+          ],
+          [
+            "o140280190051"
+          ],
+          [
+            "o140280190122"
+          ],
+          [
+            "o140280250042"
+          ],
+          [
+            "o140280260121"
+          ],
+          [
+            "o140290080051"
+          ],
+          [
+            "o140290210171"
+          ],
+          [
+            "o140300010062"
+          ],
+          [
+            "o140300060092"
+          ],
+          [
+            "o140300120022"
+          ],
+          [
+            "o140300240041"
+          ],
+          [
+            "o140300250041"
+          ],
+          [
+            "o140300250162"
+          ],
+          [
+            "o140310010091"
+          ],
+          [
+            "o140310010201"
+          ],
+          [
+            "o140310060032"
+          ],
+          [
+            "o140310060061"
+          ],
+          [
+            "o140310200051"
+          ],
+          [
+            "o140340030181"
+          ],
+          [
+            "o140340050091"
+          ],
+          [
+            "o140340090241"
+          ],
+          [
+            "o140340110151"
+          ],
+          [
+            "o140340210093"
+          ],
+          [
+            "o140340240221"
+          ],
+          [
+            "o140340260031"
+          ],
+          [
+            "o140340290071"
+          ],
+          [
+            "o140340300071"
+          ],
+          [
+            "o140350180211"
+          ],
+          [
+            "o140350210091"
+          ],
+          [
+            "o140350240181"
+          ],
+          [
+            "o140350270102"
+          ]
+        ]
+      },
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o230220080052"
+          ],
+          [
+            "o240220180121"
+          ],
+          [
+            "o240220180191"
+          ],
+          [
+            "o140230080102"
+          ],
+          [
+            "o230360080021"
+          ],
+          [
+            "o230360080131"
+          ],
+          [
+            "o230360080142"
+          ],
+          [
+            "o230360090021"
+          ],
+          [
+            "o230360090102"
+          ],
+          [
+            "o240510060011"
+          ],
+          [
+            "o240510060042"
+          ],
+          [
+            "o240510060081"
+          ]
+        ]
+      },
+      "reason": "Isaiah 22:8 speaks of the defense of the nation of Judah, and Jeremiah 22:18 calls Jehoiakim king of Judah; neither passage names the patriarch Judah as a living individual. Frozen group:Judah already owns exactly these name and referent tokens, so remove only the false patriarch links. 1 Kings 5:5 speaks of the people of Judah during Solomon; 2 Chronicles 23:8 explicitly says 'all Judah' alongside the Levites carrying out Jehoiada's orders, not their deceased tribal founders; Nehemiah 11:3 refers to towns of Judah after exile, not the son of Jacob. The existing group:Judah has each correct source word and subject referent. Remove only these false patriarch-specific words and verse claims in the derived output. Isaiah 36:8-9 the Assyrian spokesman addresses the representatives and contemporary inhabitants of Judah; five original Hebrew second-person speech-role words cannot denote Jacob's son centuries later (the collective group:Judah already owns these same original-word pointers). Jeremiah 33:10 names the towns of Judah and 'this' desolate place, not the ancient person Judah; group:Judah already retains the exact name and demonstrative groups. Jeremiah 51:6 directly orders the contemporary deportees to flee Babylon and for 'each person' to save his life, followed by a further second-person-plural warning. Both frozen historical-person records person:Israel (Jacob) and person:Judah.4 (Jacob's son) wrongly claim all four exact speech/imperative words, although neither ancient patriarch was alive during the Babylonian exile. Detach only these original person-to-word claims in the derived index; the frozen group:Judah source record already retains all four exact word groups. Batch follow-up (2 Chronicles 11, 23, 28): these exact word occurrences designate the kingdom/people of Judah; source wording and original frozen witness remain untouched. Historical narrative source-name batch: Judah's kingdom and population rather than the patriarch; original source bytes remain untouched and all chosen exact source words remain in the existing group (or are added to group:Israel).",
+      "evidence": [
+        "Pinned WLC Isaiah 22:8 o230220080041 and Jeremiah 22:18 o240220180101, plus context-linked source referents; frozen group:Judah has all five exact pointers",
+        "https://classic.net.bible.org/verse.php?book=Isa&chapter=22&verse=8",
+        "https://classic.net.bible.org/verse.php?book=jer&chapter=22&verse=18",
+        "Pinned WLC 1KI 5:5 o110050050021 (Judah) and o110050050051 (each); 2CH 23:8 o140230080041 (all Judah), o140230080102 (they took), o140230080111 (each); NEH 11:3 o160110030081 (towns of Judah). Existing group:Judah has the exact original groups.",
+        "Pinned WLC Isaiah 36:8 exact o230360080021 o230360080131 o230360080142, 36:9 o230360090021 o230360090102; Macula source frames cite 36:3 contemporary royal officials/representatives, not the patriarch. Jeremiah 33:10 o240330100181 names the towns of Judah, o240330100072 the demonstrative 'this place'; frozen group:Judah already indexes both.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/23-Isa-036-lowfat.xml and WLC/lowfat/24-Jer-033-lowfat.xml",
+        "Pinned Macula WLC Jeremiah 51:6 exact original words o240510060011 Vqv2mp 'flee', o240510060042 Vpv2mp 'save yourselves', o240510060051 Ncmsa 'each person', o240510060081 VNj2mp 'do not perish'; all source words exist in frozen group:Judah and are explicitly not the deceased ancestral individuals person:Israel/person:Judah.4.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/24-Jer-051-lowfat.xml and pinned Macula Hebrew TSV. Frozen original ACAI records and verb multiplicities retained.",
+        "Pinned Macula Hebrew WLC XML 2 Chronicles chapters 11, 23, 28 at 47db250bd55d0d8577f2a94fba114ef16c35b23c; verified exact original source-word ID/labels, source group crosswalk, and frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22.",
+        "Original-word and source-label verification in pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c lowfat chapters 14:29,30,31,34,35; frozen ACAI@e80a874e8282f996199c595378a3b3b9a43aac22; existing group exact source links. The six genealogical Levi proper-name words remain intact."
+      ],
+      "remove_pronominal_referents": {
+        "wlc": [
+          [
+            "o110050050051"
+          ],
+          [
+            "o140230080111"
+          ],
+          [
+            "o240330100072"
+          ],
+          [
+            "o240510060051"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:Ephraim",
+      "action": "amend_occurrences",
+      "remove_references": [
+        "28013001",
+        "14028007",
+        "14028012",
+        "14030010",
+        "14030018",
+        "14031001",
+        "14034006",
+        "14034009"
+      ],
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o280130010021"
+          ],
+          [
+            "o140280070041"
+          ],
+          [
+            "o140280120051"
+          ],
+          [
+            "o140300010111"
+          ],
+          [
+            "o140300100071"
+          ],
+          [
+            "o140300180052"
+          ],
+          [
+            "o140310010223"
+          ],
+          [
+            "o140340060032"
+          ],
+          [
+            "o140340090192"
+          ]
+        ]
+      },
+      "remove_pronominal_referents": {
+        "wlc": [
+          [
+            "o280130010051"
+          ]
+        ]
+      },
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o280130010072"
+          ],
+          [
+            "o280130010092"
+          ]
+        ]
+      },
+      "reason": "Hosea 13:1 uses Ephraim as a metonymic/collective designation for the northern tribe/kingdom, not the historical son of Joseph. Frozen group:Ephraim already has the full exact explicit, pronoun and subject word groups, which remain unchanged. Batch follow-up (2 Chronicles 28): these exact word occurrences designate Ephraim's tribal affiliation, not Joseph's son; source wording and original frozen witness remain untouched. Historical narrative source-name batch: Ephraimite tribe rather than the patriarch; original source bytes remain untouched and all chosen exact source words remain in the existing group (or are added to group:Israel).",
+      "evidence": [
+        "Pinned WLC Hosea 13:1 explicit Ephraim o280130010021, pronominal o280130010051 and subjects o280130010072 / o280130010092; source group:Ephraim already carries them",
+        "https://classic.net.bible.org/verse.php?book=Hos&chapter=13&verse=1",
+        "https://tips.translation.bible/story/sil-translators-notes-on-hosea-131/",
+        "Pinned Macula Hebrew WLC XML 2 Chronicles chapters 28 at 47db250bd55d0d8577f2a94fba114ef16c35b23c; verified exact original source-word ID/labels, source group crosswalk, and frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22.",
+        "Original-word and source-label verification in pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c lowfat chapters 14:30,31,34; frozen ACAI@e80a874e8282f996199c595378a3b3b9a43aac22; existing group exact source links. The six genealogical Levi proper-name words remain intact."
+      ]
+    },
+    {
+      "source_id": "person:GenericDisciple",
+      "action": "amend_occurrences",
+      "reason": "Luke 9:58, 24:15 and 24:19 explicitly name Jesus at these three exact pinned Greek name tokens; the inherited GenericDisciple's subject/pronominal pointer to those same name tokens incorrectly identifies a different person. Other genuine disciple pointers stay intact. Luke 9:59 n42009059001 and Luke 24:19 n42024019002 are additionally third-singular 'he said' verbs spoken by Jesus, not by the unnamed disciple; retain all other actual disciple referents.",
+      "evidence": [
+        "Pinned Macula SBLGNT: Luke 9:58 n42009058005; Luke 24:15 n42024015011; Luke 24:19 n42024019011, all exact name instances under person:Jesus.2; frozen GenericDisciple original indirect fields",
+        "https://www.openbible.com/text/luke/9-58.htm",
+        "https://biblehub.com/luke/24-15.htm",
+        "https://biblehub.com/luke/24-19.htm",
+        "Pinned SBLGNT Luke 9:59 n42009059001 (= Jesus speaks 'Follow me'); Luke 24:19 n42024019002 (= Jesus asks 'What things?') — both source forms are third singular and source participant roles distinguish the interlocutors"
+      ],
+      "remove_subject_referents": {
+        "SBLGNT": [
+          [
+            "n42009058005"
+          ],
+          [
+            "n42024015011"
+          ],
+          [
+            "n42009059001"
+          ],
+          [
+            "n42024019002"
+          ]
+        ]
+      },
+      "remove_pronominal_referents": {
+        "SBLGNT": [
+          [
+            "n42024019011"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:MotherOfRebekah",
+      "action": "amend_occurrences",
+      "reason": "Genesis 24:58 directly names Rebekah as the woman being called to answer; the Hebrew Rebekah token is not an anonymous indirect word for her mother, who is a separate person in 24:55. Genesis 24:58: exact original word o010240580092 is the speaking subject of person:Rebekah (Rebekah replies 'I will go'; the mother does not speak), not person:MotherOfRebekah. Preserve the actual named speaker and the unaltered original source record.",
+      "evidence": [
+        "Pinned WLC Gen 24:58 o010240580022, explicit record person:Rebekah vs frozen MotherOfRebekah subject pointer",
+        "https://www.biblegateway.com/passage/?search=Genesis+24%3A55-58&version=NIV",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/01-Gen-024-lowfat.xml, Genesis 24:58, word o010240580092; inherited ACAI source tags both person:MotherOfRebekah and person:Rebekah"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o010240580022"
+          ],
+          [
+            "o010240580092"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:WifeOfSamson",
+      "action": "amend_occurrences",
+      "reason": "Judges 14:16 mentions both Samson (explicit personal name) and Samson's wife (the speaking woman). The exact word spelling Samson is not her own subject/identity mention; keep the wife entity's other pointers untouched. Judges 14:16: exact original word o070140160172 is the speaking subject of person:Samson (Samson answers his wife 'I have not told my father or mother'), not person:WifeOfSamson. Preserve the actual named speaker and the unaltered original source record.",
+      "evidence": [
+        "Pinned WLC Judg 14:16 o070140160031, explicit person:Samson, false indirect WifeOfSamson subject",
+        "https://www.biblegateway.com/verse/en/Judges%2014%3A16",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/07-Jdg-014-lowfat.xml, Judges 14:16, word o070140160172; inherited ACAI source tags both person:WifeOfSamson and person:Samson"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o070140160031"
+          ],
+          [
+            "o070140160172"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:UncleOfSaul",
+      "action": "amend_occurrences",
+      "reason": "1 Samuel 10:14 explicitly distinguishes Saul, his uncle and his servant. The word naming Saul is not an indirect naming of the uncle who is the speaker. 1 Samuel 10:14: exact original word o090100140092 is the speaking subject of person:Saul.2 (Saul replies to his uncle's question about the missing donkeys), not person:UncleOfSaul. Preserve the actual named speaker and the unaltered original source record.",
+      "evidence": [
+        "Pinned WLC 1 Sam 10:14 o090100140031, explicit person:Saul.2 and unrelated uncle's subject pointer",
+        "https://classic.net.bible.org/passage.php?passage=1Sa+10%3A14-16",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/09-1Sa-010-lowfat.xml, 1 Samuel 10:14, word o090100140092; inherited ACAI source tags both person:UncleOfSaul and person:Saul.2"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o090100140031"
+          ],
+          [
+            "o090100140092"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:GenericPerson",
+      "action": "amend_occurrences",
+      "reason": "1 Kings 2:29 explicitly names King Solomon (person:Solomon); the generic anonymous person subject does not refer to a different individual on that proper-name word. Do not change other GenericPerson positions.",
+      "evidence": [
+        "Pinned WLC 1 Kings 2:29 o110020290141 under explicit person:Solomon, frozen GenericPerson subject pointer on same word",
+        "https://classic.net.bible.org/verse.php?book=1ki&chapter=2&verse=29"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o110020290141"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:GenericServant",
+      "action": "amend_occurrences",
+      "reason": "1 Samuel 9:10 has distinct pinned Hebrew word segments for the spoken subject Saul (o090090100021) and the addressee's common noun 'servant' (o090090100032). The inherited two-word GenericServant group falsely included Saul's proper name. Replace only that group with the verified singleton servant word; keep every other original segment, including the suffix 'his' in its original witness. Separately, 1 Kings 18:42 names Elijah, not his servant, so detach its erroneous GenericServant singleton pointer while leaving other roles untouched. 1 Kings 18:44: exact original word o110180440112 is the speaking subject of person:Elijah (Elijah tells the servant to warn Ahab after the cloud report), not person:GenericServant. Preserve the actual named speaker and the unaltered original source record.",
+      "evidence": [
+        "Pinned WLC 1 Kings 18:42 o110180420052 under explicit person:Elijah and frozen GenericServant singleton subject group",
+        "https://www.biblegateway.com/passage/?search=1+Kings+18%3A42-46&version=NIV",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/09-1Sa-009-lowfat.xml: 1 Samuel 9:10 o090090100021 proper-name Saul, o090090100032 common noun servant, o090090100033 possessive suffix his",
+        "https://www.openbible.com/text/1_samuel/9-10.htm",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/11-1Ki-018-lowfat.xml, 1 Kings 18:44, word o110180440112; inherited ACAI source tags both person:GenericServant and person:Elijah"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o090090100021",
+            "o090090100032"
+          ],
+          [
+            "o110180420052"
+          ],
+          [
+            "o110180440112"
+          ]
+        ]
+      },
+      "add_subject_referents": {
+        "wlc": [
+          [
+            "o090090100032"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:Messenger",
+      "action": "amend_occurrences",
+      "reason": "2 Kings 10:5 names Jehu as recipient of a message; Jeremiah 11:1 names the prophet as recipient of the LORD's word. Neither proper-name word directly names a separate anonymous messenger. Distinguish the messenger in 2 Kings 10:8 and the actual prophet in Jeremiah. 2 Kings 10:8: exact original word o120100080102 is the speaking subject of person:Jehu.2 (Jehu commands the heads to be put in heaps after the messenger reports), not person:Messenger. Preserve the actual named speaker and the unaltered original source record.",
+      "evidence": [
+        "Pinned WLC 2 Kings 10:5 o120100050111 under explicit person:Jehu.2, and Jeremiah 11:1 o240110010051 under explicit person:Jeremiah.6; frozen Messenger indirect pointers",
+        "https://classic.net.bible.org/passage.php?mode=text&passage=2ki+10%3A1-8",
+        "https://classic.net.bible.org/verse.php?book=Jer&chapter=11&verse=1",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/12-2Ki-010-lowfat.xml, 2 Kings 10:8, word o120100080102; inherited ACAI source tags both person:Messenger and person:Jehu.2"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o120100050111"
+          ],
+          [
+            "o240110010051"
+          ],
+          [
+            "o120100080102"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:GenericMale",
+      "action": "amend_occurrences",
+      "reason": "Daniel 10:7 explicitly distinguishes Daniel from unnamed other men, and Zechariah 1:7 explicitly names the prophet Zechariah. Their proper-name words do not refer to a separate anonymous generic man. Daniel 10:19: exact original word o270100190132 is the speaking subject of person:Daniel.3 (The Hebrew verb is first-person singular 'I said', spoken by Daniel), not person:GenericMale. Preserve the actual named speaker and the unaltered original source record. Zechariah 2:6 (pinned WLC source wording) opens with the narrator's first-person singular 'I said' (o380020060012). Its actor frame points to the named prophet Zechariah.17, not to an otherwise unidentified GenericMale speaker. Remove only the erroneous overlapping indirect subject pointer, not any original word or other person record.",
+      "evidence": [
+        "Pinned WLC Daniel 10:7 o270100070031 under person:Daniel.3; Zechariah 1:7 o380010070171 under person:Zechariah.17; frozen GenericMale source subject pointers",
+        "https://www.biblegateway.com/verse/en/Daniel%2010%3A7",
+        "https://classic.net.bible.org/bible.php/d/b/o/verse.php?book=Zec&chapter=1&verse=7",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/27-Dan-010-lowfat.xml, Daniel 10:19, word o270100190132; inherited ACAI source tags both person:GenericMale and person:Daniel.3",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/38-Zec-002-lowfat.xml: Zechariah 2:6 o380020060012 first-person Vqw1cs 'I said'; frame A0:380010070171 (Zechariah) and exact source index person:Zechariah.17."
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o270100070031"
+          ],
+          [
+            "o380010070171"
+          ],
+          [
+            "o270100190132"
+          ],
+          [
+            "o380020060012"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:Judas",
+      "action": "amend_occurrences",
+      "remove_pronominal_referents": {
+        "SBLGNT": [
+          [
+            "n42006016007"
+          ]
+        ]
+      },
+      "reason": "Luke 6:16 names Judas son of James and Judas Iscariot separately. The Greek relative ὃς ('who became a traitor') grammatically refers to Judas Iscariot, not the other apostle. Retain both explicit names and the correct pronominal claim under person:Judas.2.",
+      "evidence": [
+        "Pinned SBLGNT Luke 6:16 exact n42006016007 ὃς R-NSM; source person:Judas names the apostle son of James at n42006016002; person:Judas.2 names Iscariot at n42006016005/n42006016006",
+        "https://biblehub.com/interlinear/luke/6-16.htm"
+      ]
+    },
+    {
+      "source_id": "person:Joash.3",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130101"
+          ],
+          [
+            "o140250230101"
+          ]
+        ]
+      },
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130061"
+          ],
+          [
+            "o140250230061"
+          ]
+        ]
+      },
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o120140130162"
+          ],
+          [
+            "o120140130182"
+          ],
+          [
+            "o120140140012"
+          ],
+          [
+            "o120140140182"
+          ],
+          [
+            "o140250230152"
+          ],
+          [
+            "o140250230172"
+          ],
+          [
+            "o140250240202"
+          ]
+        ]
+      },
+      "reason": "2 Kings 14:13 and 2 Chronicles 25:23 each mention two kings named Joash: the first name is Amaziah's father Joash of Judah, the second is the capturing Joash/Jehoash of Israel. The source assigned the two exact explicit Hebrew words to the opposite men and additionally attributed seven singular action-verbs of the Israelite king to the deceased king of Judah. Correct only these two exact name groups and seven role pointers; preserve both historically distinct kings and all original source files and verse references.",
+      "evidence": [
+        "Pinned WLC 2 Kings 14:13 first Jehoash o120140130061 = father of Amaziah (Judah); second o120140130101 = Jehoash king of Israel; verbs o120140130162, o120140130182, 14:14 o120140140012, o120140140182 follow Israelite king",
+        "Pinned WLC 2 Chronicles 25:23 first Joash o140250230061 = father of Amaziah; second o140250230101 = king of Israel; verbs o140250230152, o140250230172, 25:24 o140250240202 follow Israelite king",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/12-2Ki-014-lowfat.xml and WLC/lowfat/14-2Ch-025-lowfat.xml",
+        "https://biblehub.com/2_kings/14-13.htm",
+        "https://biblehub.com/2_chronicles/25-23.htm"
+      ]
+    },
+    {
+      "source_id": "person:Joash.4",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130061"
+          ],
+          [
+            "o140250230061"
+          ]
+        ]
+      },
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130101"
+          ],
+          [
+            "o140250230101"
+          ]
+        ]
+      },
+      "reason": "The second named Jehoash/Joash in 2 Kings 14:13 and 2 Chronicles 25:23 is the king of Israel (the captor of Amaziah), not the Judahite father named immediately beforehand. Restore both exact Israelite king name tokens while leaving existing correctly associated Israelite action-word subject groups intact.",
+      "evidence": [
+        "Pinned WLC 2 Kings 14:13 o120140130061 = Judahite father, o120140130101 = Israelite king who captures Amaziah and then breaks Jerusalem's wall",
+        "Pinned WLC 2 Chronicles 25:23 o140250230061 = Judahite father, o140250230101 = Israelite king as explicit subject of 'captured'",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/12-2Ki-014-lowfat.xml and WLC/lowfat/14-2Ch-025-lowfat.xml"
+      ]
+    },
+    {
+      "source_id": "person:Jehoash",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130101"
+          ]
+        ]
+      },
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130061"
+          ]
+        ]
+      },
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o120140130162"
+          ],
+          [
+            "o120140130182"
+          ],
+          [
+            "o120140140012"
+          ],
+          [
+            "o120140140182"
+          ]
+        ]
+      },
+      "reason": "2 Kings 14:13 separately names Jehoash the Judahite father of Amaziah at the first name token and Jehoash the Israelite captor at the second; the frozen person:Jehoash (alias of Joash.3, Judah) mistakenly claims the second name and four subsequent action words describing Israel's king. Correct only those words, preserving the source alias and source JSON unchanged.",
+      "evidence": [
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/12-2Ki-014-lowfat.xml",
+        "Pinned WLC 2 Kings 14:13 o120140130061 = Amaziah's father (Judah); o120140130101 = Israel's king; 14:13-14 four verbs describe Israelite king",
+        "Frozen ACAI person:Jehoash primary_id=person:Joash.3; person:Jehoash.2 primary_id=person:Joash.4"
+      ]
+    },
+    {
+      "source_id": "person:Jehoash.2",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130061"
+          ]
+        ]
+      },
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130101"
+          ]
+        ]
+      },
+      "reason": "The frozen person:Jehoash.2 is the separate source alias of Joash.4, king of Israel. It incorrectly claims the first Jehoash name in 2 Kings 14:13 (Amaziah's Judahite father); assign its explicit occurrence to the second named Jehoash, the Israelite king who captures Amaziah, without altering valid subject pointers.",
+      "evidence": [
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/12-2Ki-014-lowfat.xml",
+        "Pinned WLC 2 Kings 14:13 first Jehoash o120140130061 is the father of Amaziah; second o120140130101 is the Israelite king",
+        "Frozen ACAI person:Jehoash.2 primary_id=person:Joash.4, originally pointing to first name token"
+      ]
+    },
+    {
+      "source_id": "person:Marymagdalene",
+      "action": "amend_occurrences",
+      "remove_pronominal_referents": {
+        "SBLGNT": [
+          [
+            "n40027061009"
+          ],
+          [
+            "n40028001015"
+          ]
+        ]
+      },
+      "reason": "Matthew 27:61 and 28:1 each distinguish Mary Magdalene from the other Mary. The singular Greek adjective ἄλλη ('other') at both exact tokens qualifies Mary.2 (the mother of James/Joses), not Mary Magdalene. Preserve Magdalene's separate explicit name instances, both original references and the other Mary's inherited candidates; remove only two false Magdalene pronoun-word associations.",
+      "evidence": [
+        "Pinned Macula SBLGNT Mt 27:61 n40027061009 ἄλλη A-NSF and Mt 28:1 n40028001015 ἄλλη A-NSF; exact source occurrences assigned in frozen ACAI to person:Marymagdalene and person:Mary.2",
+        "Matthew 27:61 names Mary Magdalene and the other Mary as different women; 28:1 repeats the same distinction",
+        "https://biblehub.com/interlinear/matthew/27-61.htm",
+        "https://biblehub.com/interlinear/matthew/28-1.htm"
+      ]
+    },
+    {
+      "source_id": "person:GenericSon",
+      "action": "amend_occurrences",
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o120040010012"
+          ]
+        ]
+      },
+      "reason": "2 Kings 4:1 uses the feminine singular Hebrew אִשָּׁה ('a woman') at o120040010012 to name the widow, not an unnamed son. The same verse separately mentions sons of prophets and her two children with other exact Hebrew tokens; without resolving those distinct child roles, remove only this demonstrably false source word from GenericSon. Preserve the source verse reference and original record; do not fabricate a replacement child word or merge the widow and her sons.",
+      "evidence": [
+        "Pinned Macula WLC 2 Kings 4:1 o120040010012 feminine noun 'woman' Ncfsa; other genuine plural child terms o120040010041 ('sons') and o120040010261 ('children') are distinct source tokens",
+        "https://github.com/Clear-Bible/macula-hebrew/blob/47db250bd55d0d8577f2a94fba114ef16c35b23c/WLC/lowfat/12-2Ki-004-lowfat.xml",
+        "Frozen ACAI person:GenericSon incorrectly claims the woman word; person:Widow has two original repeated singleton subject groups for the same word, preserved untouched"
+      ]
+    },
+    {
+      "source_id": "person:Levi.3",
+      "action": "amend_occurrences",
+      "remove_references": [
+        "14023008",
+        "16011003",
+        "15008033",
+        "14005004",
+        "14005005",
+        "14005012",
+        "14011013",
+        "14011014",
+        "14023002",
+        "14023004",
+        "14023006",
+        "14023007",
+        "14023018",
+        "13015004",
+        "13015011",
+        "13015012",
+        "13015015",
+        "13015016",
+        "13015017",
+        "13015022",
+        "13023002",
+        "13023003",
+        "13023014",
+        "13023026",
+        "13024006",
+        "13024030",
+        "13024031",
+        "14029004",
+        "14029012",
+        "14029025",
+        "14029026",
+        "14029030",
+        "14030021",
+        "14030025",
+        "14031009",
+        "14031014",
+        "14031017",
+        "14031019",
+        "14034012",
+        "14034030",
+        "14035003",
+        "14035005",
+        "14035008",
+        "14035009",
+        "14035010",
+        "14035015",
+        "14035018",
+        "16010010",
+        "16010029",
+        "16010039",
+        "16012008",
+        "16012022",
+        "16012024",
+        "16012047",
+        "16013005",
+        "16013013",
+        "16013022",
+        "16013029",
+        "16013030"
+      ],
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o140230080022"
+          ],
+          [
+            "o160110030153"
+          ],
+          [
+            "o150080330262"
+          ],
+          [
+            "o140050040062"
+          ],
+          [
+            "o140050050162"
+          ],
+          [
+            "o140050120013"
+          ],
+          [
+            "o140110130023"
+          ],
+          [
+            "o140110140032"
+          ],
+          [
+            "o140230020052"
+          ],
+          [
+            "o140230040103"
+          ],
+          [
+            "o140230060092"
+          ],
+          [
+            "o140230070022"
+          ],
+          [
+            "o140230180082"
+          ],
+          [
+            "o130150020112"
+          ],
+          [
+            "o130150040072"
+          ],
+          [
+            "o130150110063"
+          ],
+          [
+            "o130150120062"
+          ],
+          [
+            "o130150140033"
+          ],
+          [
+            "o130150150032"
+          ],
+          [
+            "o130150160042"
+          ],
+          [
+            "o130150170022"
+          ],
+          [
+            "o130150220032"
+          ],
+          [
+            "o130150260052"
+          ],
+          [
+            "o130150270062"
+          ],
+          [
+            "o130230020073"
+          ],
+          [
+            "o130230030022"
+          ],
+          [
+            "o130230140082"
+          ],
+          [
+            "o130230260022"
+          ],
+          [
+            "o130240060072"
+          ],
+          [
+            "o130240060193"
+          ],
+          [
+            "o130240300082"
+          ],
+          [
+            "o130240310173"
+          ],
+          [
+            "o140290040052"
+          ],
+          [
+            "o140290050042"
+          ],
+          [
+            "o140290120022"
+          ],
+          [
+            "o140290160192"
+          ],
+          [
+            "o140290250032"
+          ],
+          [
+            "o140290260022"
+          ],
+          [
+            "o140290300052"
+          ],
+          [
+            "o140290340132"
+          ],
+          [
+            "o140290340212"
+          ],
+          [
+            "o140300150083"
+          ],
+          [
+            "o140300160142"
+          ],
+          [
+            "o140300170073"
+          ],
+          [
+            "o140300210172"
+          ],
+          [
+            "o140300220062"
+          ],
+          [
+            "o140300250063"
+          ],
+          [
+            "o140300270032"
+          ],
+          [
+            "o140310020063"
+          ],
+          [
+            "o140310020133"
+          ],
+          [
+            "o140310040083"
+          ],
+          [
+            "o140310090053"
+          ],
+          [
+            "o140310120112"
+          ],
+          [
+            "o140310140042"
+          ],
+          [
+            "o140310170063"
+          ],
+          [
+            "o140310190212"
+          ],
+          [
+            "o140340090142"
+          ],
+          [
+            "o140340120092"
+          ],
+          [
+            "o140340120193"
+          ],
+          [
+            "o140340130094"
+          ],
+          [
+            "o140340300113"
+          ],
+          [
+            "o140350030022"
+          ],
+          [
+            "o140350050122"
+          ],
+          [
+            "o140350080053"
+          ],
+          [
+            "o140350090102"
+          ],
+          [
+            "o140350090122"
+          ],
+          [
+            "o140350100073"
+          ],
+          [
+            "o140350110063"
+          ],
+          [
+            "o140350140143"
+          ],
+          [
+            "o140350150232"
+          ],
+          [
+            "o140350180193"
+          ],
+          [
+            "o160100010101"
+          ],
+          [
+            "o160100100013"
+          ],
+          [
+            "o160100290042"
+          ],
+          [
+            "o160100350072"
+          ],
+          [
+            "o160100380182"
+          ],
+          [
+            "o160100380202"
+          ],
+          [
+            "o160100390062"
+          ],
+          [
+            "o160100390082"
+          ],
+          [
+            "o160100390093"
+          ],
+          [
+            "o160120010033"
+          ],
+          [
+            "o160120080013"
+          ],
+          [
+            "o160120220012"
+          ],
+          [
+            "o160120240022"
+          ],
+          [
+            "o160120270062"
+          ],
+          [
+            "o160120300033"
+          ],
+          [
+            "o160120440183"
+          ],
+          [
+            "o160120440252"
+          ],
+          [
+            "o160120470152"
+          ],
+          [
+            "o160120470163"
+          ],
+          [
+            "o160130050182"
+          ],
+          [
+            "o160130100042"
+          ],
+          [
+            "o160130100102"
+          ],
+          [
+            "o160130130102"
+          ],
+          [
+            "o160130220022"
+          ],
+          [
+            "o160130290093"
+          ],
+          [
+            "o160130300073"
+          ]
+        ]
+      },
+      "remove_pronominal_referents": {
+        "wlc": [
+          [
+            "o140230080111"
+          ],
+          [
+            "o160110030101"
+          ],
+          [
+            "o140230070061"
+          ]
+        ]
+      },
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o140230080102"
+          ],
+          [
+            "o150080330031"
+          ],
+          [
+            "o160080100012"
+          ],
+          [
+            "o140050050012"
+          ],
+          [
+            "o140050120022"
+          ],
+          [
+            "o140050120141"
+          ],
+          [
+            "o140110140072"
+          ],
+          [
+            "o140110140142"
+          ],
+          [
+            "o140110170012"
+          ],
+          [
+            "o140110170052"
+          ],
+          [
+            "o140110170131"
+          ],
+          [
+            "o140230020122"
+          ],
+          [
+            "o140230070132"
+          ]
+        ]
+      },
+      "reason": "2 Chronicles 23:8 explicitly names the plural gentilic Levites cooperating with all Judah in Jehoiada's time; Nehemiah 11:3 lists the postexilic Levite residents. Neither text refers to the ancient individual Levi, son of Jacob. The already-existing group:Levi holds the exact plural word, distributive 'each' and 2 Chronicles action verb groups. Remove only those false son-of-Jacob links, preserving the frozen source. Ezra 8:33 explicitly mentions the plural Levites who helped weigh the returned treasures, not the long-deceased son of Jacob Levi: group:Levi already retains the exact plural gentilic word and passive weighing token. Nehemiah 8:10 follows Nehemiah, Ezra and the Levites teaching contemporary returnees; its speech verb can refer to these living participants, never to the patriarch Levi. Remove only two erroneous source subject words plus the exact Ezra 8:33 name/verse from person:Levi.3, not the legitimate Levitical community. Batch follow-up (2 Chronicles 5, 11, 23): these exact word occurrences designate plural Levites, never the deceased patriarch Levi; source wording and original frozen witness remain untouched. Historical narrative source-name batch: 84 exact singular/plural gentilic 'Levite(s)' words; all six proper-name Levi words in the same selected chapters remain untouched; original source bytes remain untouched and all chosen exact source words remain in the existing group (or are added to group:Israel).",
+      "evidence": [
+        "Pinned WLC 2CH 23:8 o140230080022 Ngmpa 'Levites', o140230080102 Vqw3mp plural 'they took' (subjref the Levites and all Judah), o140230080111 distributive 'each'; NEH 11:3 o160110030153 Ngmpa 'Levites', o160110030101 each. All source words remain attached to group:Levi.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/14-2Ch-023-lowfat.xml and WLC/lowfat/16-Neh-011-lowfat.xml",
+        "Frozen ACAI person:Levi.3 identifies the patriarch, not the later collective.",
+        "Pinned WLC Ezra 8:33 o150080330262 plural 'Levites', o150080330031 passive 'it was weighed' with silver/gold participants; Nehemiah 8:10 o160080100012 'he said' and Macula frame points to Neh 8:9 Nehemiah/Ezra/Levites, not Jacob's son.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/15-Ezr-008-lowfat.xml and WLC/lowfat/16-Neh-008-lowfat.xml",
+        "Pinned Macula Hebrew WLC XML 2 Chronicles chapters 5, 11, 23 at 47db250bd55d0d8577f2a94fba114ef16c35b23c; verified exact original source-word ID/labels, source group crosswalk, and frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22.",
+        "Original-word and source-label verification in pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c lowfat chapters 13:15,23,24; 14:29,30,31,34,35; 16:10,12,13; frozen ACAI@e80a874e8282f996199c595378a3b3b9a43aac22; existing group exact source links. The six genealogical Levi proper-name words remain intact."
+      ]
+    },
+    {
+      "source_id": "person:GenericPriest",
+      "action": "amend_occurrences",
+      "remove_subject_referents": {
+        "SBLGNT": [
+          [
+            "n42010025003"
+          ],
+          [
+            "n42010025008"
+          ]
+        ]
+      },
+      "reason": "Luke 10:25 introduces a singular 'law expert' (νομικός) who asks Jesus a question; the priest appears only in the later Good Samaritan parable (Luke 10:31), so the two source tokens naming the lawyer and his speaking role are not references to an anonymous priest. Keep the inherited person:Scribe source witness and any other claims untouched.",
+      "evidence": [
+        "Pinned SBLGNT Luke 10:25 n42010025003 νομικός A-NSM substantive 'expert in the Law', and n42010025008 λέγων V-PAP-NSM 'saying'; the speaker is the lawyer and not the priest who is introduced much later at Luke 10:31.",
+        "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e, SBLGNT/tsv/macula-greek-SBLGNT.tsv and original frozen ACAI person:GenericPriest / person:Scribe records"
+      ]
+    },
+    {
+      "source_id": "person:MilitaryMember",
+      "action": "amend_occurrences",
+      "remove_subject_referents": {
+        "SBLGNT": [
+          [
+            "n44021037023"
+          ]
+        ]
+      },
+      "reason": "Acts 21:37 reports a Roman commander asking Paul 'Do you know Greek?' The pinned second-person-singular verb γινώσκεις is predicated of Paul, the one addressed, not of the military officer asking the question. Retain the explicit named Paul source claim and the military participant's other original words and narrative role.",
+      "evidence": [
+        "Pinned SBLGNT Acts 21:37 n44021037023 γινώσκεις V-PAI-2S, second-person-singular 'do you know', addressed by the tribune to Paul in the exact quoted question.",
+        "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e SBLGNT original TSV and frozen ACAI person:MilitaryMember / person:Paul"
+      ]
+    },
+    {
+      "source_id": "person:Barzillai",
+      "action": "amend_occurrences",
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o150020610101"
+          ],
+          [
+            "o150020610152"
+          ],
+          [
+            "o160070630101"
+          ],
+          [
+            "o160070630152"
+          ]
+        ]
+      },
+      "reason": "Ezra 2:61 and Nehemiah 7:63 distinguish the descendant priest who married a daughter of Barzillai the Gileadite and assumed that family name from Barzillai the Gileadite himself (the older family namesake who supported David). The Hebrew singular verb 'took [a woman]' and passive 'was called [by their name]' refer to the marrying priest, already indexed as person:Barzillai.3, not the historically distinct Gileadite elder in person:Barzillai. The two direct proper-name tokens naming the Gileadite elder and both original verse references remain unchanged.",
+      "evidence": [
+        "Pinned WLC Ezra 2:61 o150020610101 (לָקַח 'had taken'), o150020610152 (יִּקָּרֵא 'was called'); Nehemiah 7:63 o160070630101 and o160070630152. In both verses the priest first named Barzillai marries a daughter of Barzillai the Gileadite. Original frozen ACAI person:Barzillai is the Gileadite elder, person:Barzillai.3 the marrying priest; both have independent explicit name records and original word groups.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/15-Ezr-002-lowfat.xml and WLC/lowfat/16-Neh-007-lowfat.xml",
+        "Frozen ACAI names at icfmp/ACAI@e80a874e8282f996199c595378a3b3b9a43aac22 people/json/Barzillai.json and Barzillai.3.json"
+      ]
+    },
+    {
+      "source_id": "person:Jehoram",
+      "action": "amend_occurrences",
+      "remove_pronominal_referents": {
+        "wlc": [
+          [
+            "o140220060281"
+          ]
+        ]
+      },
+      "reason": "2 Chronicles 22:6 explicitly names two different rulers: Jehoram king of Judah, the father of Ahaziah, and Joram son of Ahab king of Israel. The final singular personal pronoun הוּא ('he was sick') directly follows the second man and the visit to him at Jezreel, while the pinned Macula Hebrew participantref 140220060221 points at Joram king of Israel. Do not attach the sick man pronoun to the historically distinct father of Ahaziah (person:Jehoram); preserve both kings' explicit name words and the valid source verse reference for Jehoram.",
+      "evidence": [
+        "Pinned WLC 2 Chronicles 22:6 o140220060281 personal pronoun Pp3ms 'he', Macula participantref 140220060221 (= Joram son of Ahab), while o140220060161 separately names Jehoram king of Judah as father of Ahaziah.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/14-2Ch-022-lowfat.xml",
+        "Frozen ACAI person:Jehoram = Judahite son of Jehoshaphat, person:Joram.3 = Israelite son of Ahab (distinct people)."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "purpose": "Edition-specific scope decisions and lossless source-code preservation, not UBS lexical identity acceptance",
+  "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+  "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c",
+  "dispositions": [
+    {
+      "lang": "H",
+      "lemma": "כֹּל",
+      "original_strong": "3605",
+      "original_occurrences": 5412,
+      "original_word_witness": "o010010210071",
+      "disposition": "approved_ubs_0_9_4_indexed_headword_scope_exclusion",
+      "basis": "full_pinned_ubs_headword_inventory_main_and_alternate_lemma_strong_and_consonant_negative_test",
+      "lexical_identity_approved": false,
+      "source_data_modified": false
+    },
+    {
+      "lang": "H",
+      "lemma": "מְאֹד",
+      "original_strong": "3966",
+      "original_occurrences": 300,
+      "original_word_witness": "o010010310091",
+      "disposition": "approved_ubs_0_9_4_indexed_headword_scope_exclusion",
+      "basis": "full_pinned_ubs_headword_inventory_main_and_alternate_lemma_strong_and_consonant_negative_test",
+      "lexical_identity_approved": false,
+      "source_data_modified": false
+    },
+    {
+      "lang": "H",
+      "lemma": "יֵשׁ",
+      "original_strong": "3426",
+      "original_occurrences": 138,
+      "original_word_witness": "o010180240021",
+      "disposition": "approved_ubs_0_9_4_indexed_headword_scope_exclusion",
+      "basis": "full_pinned_ubs_headword_inventory_main_and_alternate_lemma_strong_and_consonant_negative_test",
+      "lexical_identity_approved": false,
+      "source_data_modified": false
+    },
+    {
+      "lang": "A",
+      "lemma": "כֹּל",
+      "original_strong": "3606",
+      "original_occurrences": 82,
+      "original_word_witness": "o150040200072",
+      "disposition": "approved_ubs_0_9_4_indexed_headword_scope_exclusion",
+      "basis": "full_pinned_ubs_headword_inventory_main_and_alternate_lemma_strong_and_consonant_negative_test",
+      "lexical_identity_approved": false,
+      "source_data_modified": false
+    },
+    {
+      "lang": "H",
+      "lemma": "אֲרוּמָה",
+      "original_strong": "1886a|0725",
+      "original_occurrences": 1,
+      "original_word_witness": "o070090410032",
+      "disposition": "preserve_composite_source_code_pending_original_annotation_review",
+      "basis": "original_full_strong_code_is_composite_not_parseable_as_single_strong",
+      "lexical_identity_approved": false,
+      "source_data_modified": false
+    },
+    {
+      "lang": "H",
+      "lemma": "הָרֹאֶה",
+      "original_strong": "1886a|7204a",
+      "original_occurrences": 1,
+      "original_word_witness": "o130020520071",
+      "disposition": "preserve_composite_source_code_pending_original_annotation_review",
+      "basis": "original_full_strong_code_is_composite_not_parseable_as_single_strong",
+      "lexical_identity_approved": false,
+      "source_data_modified": false
+    },
+    {
+      "lang": "H",
+      "lemma": "כִּי",
+      "original_strong": "3587",
+      "original_occurrences": 1,
+      "original_word_witness": "o230030240171",
+      "disposition": "approved_ubs_0_9_4_indexed_headword_scope_exclusion",
+      "basis": "full_pinned_ubs_headword_inventory_main_and_alternate_lemma_strong_and_consonant_negative_test",
+      "lexical_identity_approved": false,
+      "source_data_modified": false
+    }
+  ]
+}

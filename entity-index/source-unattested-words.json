@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "kind": "pinned_original_word_absences",
+  "corpus": "wlc",
+  "source_edition": "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c",
+  "provenance": [
+    {
+      "source": "https://github.com/icfmp/ACAI/issues/80",
+      "evidence": "Complete frozen-WLC original-word comparison: 97,970 distinct WLC words checked, 97,952 present, 18 absent (19 annotations); all under subject_referents."
+    }
+  ],
+  "word_ids": [
+    "o020020130103",
+    "o060010120014",
+    "o060010120024",
+    "o070160020013",
+    "o080020040063",
+    "o090020150103",
+    "o110130200112",
+    "o140050130043",
+    "o140050130054",
+    "o150050030102",
+    "o160020160094",
+    "o160020160104",
+    "o160020160114",
+    "o160020160124",
+    "o190730030033",
+    "o270080130083",
+    "o380070020042",
+    "o380070020052"
+  ],
+  "policy": "Quarantine only derived exact-word lookups for these source-unattested IDs. Keep all original word groups and the original JSON unchanged. No inference of replacement IDs or entity identity is permitted."
+}
