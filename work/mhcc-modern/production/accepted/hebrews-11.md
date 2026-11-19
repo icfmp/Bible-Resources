@@ -173,7 +173,7 @@ The cruelty of persecutors is dreadful; so is the power of grace that enables th
 
 **The world is not worthy of those saints** whom it treats as unworthy even to live.
 
-It does not value their company, counsel, example or service, because it rejects Christ and his grace.
+It does not value their company, counsel, example or service, because it rejects Christ and his grace (**Hebrews 11:39**).
 
 ## God's better provision for believers (verses 39 and 40)
 
@@ -194,6 +194,8 @@ Let us pray continually for **greater faith**, follow their shining examples, an
 ---
 
 ## Editorial review — Hebrews 11
+
+- **2026-11-19 original-native link restoration:** The original commentary section `Heb.11.32` concludes with the printed parenthetical Scripture link **Hebrews 11:39**. Restored that exact cross-reference after the corresponding modern conclusion without changing its underlying meaning; the real source's K/ordinal SHA and exact compiled navigation remain release-validation requirements.
 
 **2026-11-17 renewed complete CCEL Hebrews 11 collation:** restored Henry's **roaring lion** example in 32–38 and, importantly, the omitted final argument of verses 39–40: gospel privileges should yield **obedient faith, patient hope and loving service**; the faithful forebears will condemn faithlessness at judgment; and the author closes with a prayer for growing faith and ultimate perfected holiness/happiness, **shining like the sun in the Father's kingdom**. The previous manuscript had ended before these major pastoral applications. [CCEL Hebrews 11](https://ccel.org/ccel/henry/mhcc.l.xi.html). Actual published native SWORD 0.1.1 authorial prose, notes, key links and independent review still pending.
 
