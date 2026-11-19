@@ -3162,6 +3162,9 @@ jobs:
               strict_receipt=strict_receipt)
           assert proof["status"]=="PRIVATE_MODERN_SWORD_PREFLIGHT_NOT_RELEASE"
           assert proof["candidate_sword_id"]=="MHCCMODRC"
+          assert proof["candidate_full_display_name"]=="Henry's Modern Concise Commentary"
+          assert proof["candidate_short_display_name"]=="HMCC Modern"
+          assert proof["candidate_sword_abbreviation"]=="HMCCModern"
           assert proof["modern_canonical_chapters"]==1189
           assert proof["native_K_and_I_only_authored_sections"]==4049
           assert proof["disabled_suspect_original_link_occurrences"]==11
@@ -3170,7 +3173,7 @@ jobs:
           assert proof["nonquarantined_literal_target_and_display_list_unchanged"]
           assert not any(proof[k] for k in (
               "public_distribution","editorial_approval","rights_approval"))
-          for attack in ("wrong_K_sha","wrong_target","original_label","approved","missing_case"):
+          for attack in ("wrong_K_sha","wrong_target","original_label","approved","missing_case","wrong_full_name","wrong_short_name","wrong_sword_abbrev"):
               bad=copy.deepcopy(suspects)
               bad_candidate=copy.deepcopy(candidate)
               if attack=="wrong_K_sha":
@@ -3181,6 +3184,12 @@ jobs:
                   bad["cases"][0]["original_link_label"]="UNVERIFIED"
               elif attack=="approved":
                   bad_candidate["publishing_authorized"]=True
+              elif attack=="wrong_full_name":
+                  bad_candidate["selected_full_display_name"]="Wrong source title"
+              elif attack=="wrong_short_name":
+                  bad_candidate["selected_short_display_name"]="Wrong short title"
+              elif attack=="wrong_sword_abbrev":
+                  bad_candidate["candidate_sword_abbreviation"]="WrongAbbreviation"
               else:
                   bad["cases"].pop()
               try:
@@ -3208,7 +3217,8 @@ jobs:
             -z z -b 3 > "$RUNNER_TEMP/mhcc-modern-rc-osis2mod.log" 2>&1
           cat > "$RUNNER_TEMP/mhcc-modern-rc-root/mods.d/mhccmodrc.conf" <<'EOF'
           [MHCCMODRC]
-          Description=Matthew Henry's Concise Commentary - Modern English - PRIVATE REVIEW CANDIDATE
+          Description=Henry's Modern Concise Commentary
+          Abbreviation=HMCCModern
           DataPath=./modules/comments/zcom/mhccmodrc/
           ModDrv=zCom
           CompressType=ZIP
@@ -3231,6 +3241,17 @@ jobs:
           base=Path(os.environ["RUNNER_TEMP"])
           root=base/"mhcc-modern-rc-root"
           manifest=json.loads(Path("work/mhcc-modern/production/PRIVATE_MODERN_RELEASE_CANDIDATE_PREFLIGHT_2026-11-19.json").read_text())
+          conf=(root/"mods.d/mhccmodrc.conf").read_text(encoding="utf-8")
+          from configparser import ConfigParser
+          parser=ConfigParser(interpolation=None,strict=True)
+          parser.optionxform=str
+          parser.read_string(conf)
+          if (parser.sections()!=[manifest["candidate_sword_id"]]
+                  or parser["MHCCMODRC"]["Description"]!=manifest["selected_full_display_name"]
+                  or parser["MHCCMODRC"]["Abbreviation"]!=manifest["candidate_sword_abbreviation"]
+                  or " " in manifest["candidate_sword_abbreviation"]
+                  or manifest["selected_short_display_name"]!="HMCC Modern"):
+              raise ValueError("Native SWORD candidate title/abbreviation differs from owner-approved display names")
           suspects=json.loads(Path("work/mhcc-modern/production/ADDITIONAL_ORIGINAL_LINK_TARGET_ERRATA_2026-11-18.json").read_text())
           rc_receipt=json.loads((base/"mhcc-modern-private-release-candidate-preflight.json").read_text())
           native=json.loads((base/"mhcc-modern-whole-canon-native-receipt.json").read_text())
@@ -3335,6 +3356,9 @@ jobs:
           receipt={
               "status":"PRIVATE_SWORD_ZCOM_CANDIDATE_BUILT_AND_NATIVE_READER_VERIFIED_NOT_RELEASE",
               "candidate_sword_id":"MHCCMODRC",
+              "selected_full_display_name":manifest["selected_full_display_name"],
+              "selected_short_display_name":manifest["selected_short_display_name"],
+              "sword_safe_abbreviation":manifest["candidate_sword_abbreviation"],
               "original_source_corpus_sha256":manifest["original_native_corpus_sha256"],
               "canonical_chapters":1189,
               "source_authored_K_and_I_groups_exactly_preserved":len(compiled),
