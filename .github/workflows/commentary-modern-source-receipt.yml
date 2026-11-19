@@ -2016,6 +2016,40 @@ jobs:
                 f"chapters={report['probed_chapters']}; "
                 "no full-text semantic or independent editorial approval")
           PY
+      - name: Authenticate Ecclesiastes fidelity claims against released original SWORD K units
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_native_witness_probe.py \
+            --native-reader "$RUNNER_TEMP/commentary-modern-source-raw" \
+            --module-directory "$RUNNER_TEMP/mhcc-source-root" \
+            --native-receipt "$RUNNER_TEMP/mhcc-modern-whole-canon-native-receipt.json" \
+            --witness-manifest "work/mhcc-modern/production/ECCLESIASTES_NATIVE_FIDELITY_SOURCE_ANCHORS_2026-11-19.json" \
+            --report "$RUNNER_TEMP/mhcc-modern-ecclesiastes-native-fidelity-anchor-receipt.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          manifest = json.loads(Path(
+              "work/mhcc-modern/production/ECCLESIASTES_NATIVE_FIDELITY_SOURCE_ANCHORS_2026-11-19.json"
+          ).read_text())
+          report = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+              "mhcc-modern-ecclesiastes-native-fidelity-anchor-receipt.json").read_text())
+          assert report["status"] == (
+              "SHA_PINNED_NATIVE_SECONDARY_ANCHOR_PROBE_ONLY_NOT_EDITORIAL_APPROVAL"
+          )
+          assert report["exact_original_raw_corpus_sha256_matched"] is True
+          assert report["probed_source_groups"] == len(manifest["source_group_probes"])
+          assert report["probed_chapters"] == len({x["chapter"] for x in manifest["source_group_probes"]})
+          for group in report["groups"]:
+              if not group["all_witness_anchors_found"]:
+                  print("ECCLESIASTES_ORIGINAL_SOURCE_DIFFERENCE " +
+                        group["chapter"] + "@" + group["original_first_key"])
+          if not report["all_anchor_probes_found"]:
+              raise ValueError("Original published SWORD K text differs from secondary Ecclesiastes witness")
+          print(f"ECCLESIASTES_NATIVE_SOURCE_ANCHORS_PASS groups={report['probed_source_groups']} "
+                f"chapters={report['probed_chapters']}; lexical anchors only, no editorial approval")
+          PY
       - name: Compare five original-source witnesses with immutable MHCC 0.1.0 stock-preserving release
         shell: bash
         run: |
@@ -4010,6 +4044,7 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-complete-private-native-key-audit.json
             ${{ runner.temp }}/mhcc-modern-five-native-source-witness-probes.json
             ${{ runner.temp }}/mhcc-modern-job-native-fidelity-anchor-receipt.json
+            ${{ runner.temp }}/mhcc-modern-ecclesiastes-native-fidelity-anchor-receipt.json
             ${{ runner.temp }}/mhcc-crosswire-five-native-source-receipt.json
             ${{ runner.temp }}/mhcc-crosswire-five-native-witness-probes.json
             ${{ runner.temp }}/mhcc-two-ccel-to-native-section-word-alignment.json
