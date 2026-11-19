@@ -33,5 +33,6 @@
   "selected_short_display_name": "HMCC Modern",
   "selected_names_approved_by_owner": true,
   "final_public_sword_id_approved": false,
-  "naming_note": "Owner-selected public display names only. The private CI identifier MHCCMODRC and temporary 0.0.0 version remain unchanged. No release rights, final module-ID or publication approval is implied."
+  "naming_note": "The owner approved the display names Henry's Modern Concise Commentary / HMCC Modern. CrossWire SWORD .conf Abbreviation requires alphanumeric characters or underscores, so the native abbreviation is HMCCModern (no space); UI/catalogue short title remains HMCC Modern. MHCCMODRC and 0.0.0 are temporary, no final ID/version or rights/publication approval.",
+  "candidate_sword_abbreviation": "HMCCModern"
 }
