@@ -57,7 +57,7 @@ Prosperity may harden sinners in their wickedness.
 
 Those who take long delays of punishment as evidence that judgment will never come deceive themselves.
 
-**Divine judgment may arrive slowly, but it will arrive certainly**.
+**Divine vengeance may come slowly, but it will certainly come.**
 
 A godly person's days have substance and a good purpose.
 
@@ -88,6 +88,8 @@ They will continue even when bodily strength and earthly comfort fail.
 ---
 
 ## Editorial review — Ecclesiastes 8
+
+**2026-11-19 targeted secondary-witness fidelity repair (unapproved draft):** In Ecclesiastes 8:9–13, Henry writes of *vengeance coming slowly but surely*. The previous modern draft substituted generic *divine judgment*, removing his more particular claim. The revision restores **divine vengeance**, checked against [CCEL Ecclesiastes 8](https://ccel.org/ccel/henry/mhcc.xxii.viii.html). Exact source-native original and independent editorial review pending.
 
 **Whole readable English secondary witness checked:** [CCEL, Ecclesiastes 8](https://ccel.org/ccel/henry/mhcc.xxii.viii.html). The released exact `MHCC 0.1.1` remains authoritative, primary native SWORD/independent QA pending.
 
