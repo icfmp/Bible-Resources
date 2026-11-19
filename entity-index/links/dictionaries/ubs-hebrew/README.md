@@ -934,3 +934,46 @@ disposition*. Reviewed positives are not actual new WLC links;
 word-linked corpus coverage remains **240,098/248,680**, and the
 UBS 0.9.4 edition-indexed-headword scope remains **98.909%**.
 No v1.0 release or lexical-sense approval is claimed.
+
+### Seventh source-reviewed batch: completion, boasting, desolation, and false sole candidates
+
+Seven further original WLC lexical families, **seven original source-word
+occurrences**, have separately supported v1 dispositions:
+
+- **Four headword-only positive identities:** Aramaic `יצא` A3319 in
+  Ezra 6:15 = *completed* (the UBS verb explicitly includes
+  *to be completed*); Hebrew `יָמַר` H0559a in Isa 61:6 =
+  *boast* (UBS `אמר` includes *to boast*); Hebrew `יָצַת`
+  H5327a in Jer 2:15 = *destroyed* (UBS `נצה` includes
+  *to be desolated*); and Hebrew `מָדוֹן` H4060 in
+  2 Sam 21:20 = a man of unusually great stature (UBS `מִדָּה`
+  includes *man of stature* / *giant*). No source spelling or
+  sense identifier is changed.
+- **Three false sole-candidate links kept unlinked:** the Egyptian
+  magicians' *secret arts* `לְהָטִים` (Ex 7:11) versus a
+  physical *blaze*; the original source *Ammi-* proper-name
+  fragment `הוּא` (Song 6:12), annotated as a **suffix**,
+  versus the personal pronoun *he*; and the first original
+  *digging* segment `חֲפֹר` (Isa 2:20) versus the entire
+  UBS lexical noun *mole rat*. In the last two cases, the original
+  compound-family Strong annotation does not authorize a standalone
+  constituent-to-whole lexeme link.
+
+Possible **derived grammatical forms** (such as the grinders in
+Ecclesiastes 12:3 versus the verb *to grind*) and **closely related
+cultic terms** (such as incense altars versus burning) are **not**
+negatively adjudicated merely because the English glosses differ:
+they remain pending lexical-context review.
+
+The existing independent pinned-source verifiers check original WLC
+source words, languages, exact full Strong/SDBH, original English/POS,
+and UBS canonical headword metadata and actual published glosses.
+The generated index and original family machine report remain untouched.
+
+**Current source-pinned disposition count:** **171 / 197 lexical
+families**, representing **2,613 / 2,649 original in-scope occurrences**
+with lexical outcomes. Both original composite Strong-code records
+remain preserved without lexical decision; **24 source families /
+34 occurrences** still lack a disposition. None of the newly
+reviewed headword identities has been written into the generated
+word index, and no contextual sense was inferred or v1.0 approved.
