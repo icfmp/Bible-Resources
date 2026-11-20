@@ -6,7 +6,19 @@ not OSIS transcriptions reconstructed approximately from published SWORD.
 | Resource | Curated OSIS source file | Exact approved SHA-256 | Bytes |
 | --- | --- | --- | ---: |
 | Matthew Henry Complete 0.1.0 | [MHC OSIS](mhc-crosswire/mhc.osis.xml) | `c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4` | 48,020,780 |
+| **Matthew Henry Concise (classic) 0.1.1** | [Reconstructed MHCC OSIS](mhcc-crosswire/mhcc.osis.xml) | `6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39` (**new reconstructed source hash**, not historic source identity) | 7,171,699 |
 | Henry's Modern Concise Commentary 0.1.0 | [HMCC Modern OSIS](hmcc-modern/hmcc-modern.osis.xml) | `23f0872a67086d9f659bd96936ab63db63c8c7b8c10eb92e59537c3e6cf16189` | 5,596,387 |
+
+**The classic MHCC source differs in provenance:** no byte-identical original
+CrossWire authoring OSIS was recovered. Its new OSIS was generated from the
+already published MHCC 0.1.1 native edition and independently passed exact
+source-native coverage/semantics on all 28,742 K, 1,255 I and 2 TOP entries,
+including the 24 existing approved aliases and two existing prose errata.
+The SWORD compiler may add wrappers/normalize whitespace; no original prose,
+reference destinations or original structural attributes were dropped in
+full-corpus proof. [Source reconstruction manifest](mhcc-crosswire/CLEANUP_MANIFEST.json)
+records this explicitly. The approved original native corpus SHA is
+`2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e`. This is **not** the modern-English HMCC.
 
 The original CrossWire **MHC** OSIS is separately retained unchanged under
 [`sources/original/commentaries/en/mhc-crosswire/`](../../../../original/commentaries/en/mhc-crosswire/).
@@ -30,5 +42,5 @@ was modified. The sources are **maintained masters**, not a new public
 release. Additional verification of rebuild reproducibility must use the
 source-bound compiler contract and compare the entire native corpus.
 
-MHCC **original** is a distinct resource: do not present the HMCC Modern
-source as a recovered original MHCC OSIS.
+The **MHCC classic** and **HMCC Modern** are distinct editions with distinct
+sources; never use modern-English HMCC prose as classic MHCC.
