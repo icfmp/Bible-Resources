@@ -186,7 +186,7 @@ and reviewed OSIS/USFX schema procedures **before** updating immutable
 manifest pins. This change skips duplicate observation, **not source hash
 validation**, standards requirements, native readback or human review.
 
-See [Darby 2024 postmortem](../../docs/DARBY_2024_IMPORT_POSTMORTEM.md) for measured
+See [Darby 2024 postmortem](../../sources/cleaned/bibles/fr/darby-jnd-2024/editorial/history/DARBY_2024_IMPORT_POSTMORTEM.md) for measured
 preflight and full-source timing, where the stage 4/5 optimization helped, and
 what is deliberately still pending in generic fidelity work #28/#83.
 
