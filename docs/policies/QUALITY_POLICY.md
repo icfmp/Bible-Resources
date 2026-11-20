@@ -27,10 +27,7 @@ lossless structural changes to a **separate OSIS output**. The original
 source remains immutable, with a SHA-256-based review plan and optional
 private diff. See [EDITORIAL_AUDIT_WORKFLOW.md](../workflows/EDITORIAL_AUDIT_WORKFLOW.md).
 Do not treat an audit as proof a SWORD module's display is wrong: real
-LSG/Psalms and MHC/Genesis key probes already contain line/paragraph
-signals. Check Bible GTK rendering before touching an otherwise structured
-module. No actual imported/published reader-optimized resource is approved
-merely by this tool.
+The current source-to-source normalizer supports only reviewed structural operations; use its documented scope and tests, not edition-specific probes, as an acceptance gate.
 
 ## Mandatory SWORD reference-index attestation
 
