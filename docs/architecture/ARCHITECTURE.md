@@ -1,43 +1,33 @@
 # Architecture
 
-Bible Resources is a SWORD-compatible distribution service. Sources and editorial transformation recipes are distinct from compiled artifacts. GitHub Pages initially publishes `catalog/v1/catalog.json` alongside `sword/mods.d.tar.gz`, `sword/modules/` and `sword/packages/`. Bible consumes a configurable HTTPS catalogue endpoint. A future API must preserve the v1 contract or provide explicit migration.
+Bible Resources is a **source-first editorial and SWORD distribution repository**. It preserves exact upstream evidence, maintains explicitly reviewed editorial masters, compiles portable SWORD modules, and publishes a versioned catalogue. It is not a live Bible text API or a mirror of every upstream catalogue.
 
-CrossWire repositories remain upstream sources; this project is independent. Do not scrape and mirror their entire inventory without a per-edition license review.
+## Data ownership and boundaries
 
+| Layer | Responsibility | Must not do |
+| --- | --- | --- |
+| `sources/original/` | Keep acquired publisher/source files unchanged, with edition identity and checksums | Normalize in place |
+| `sources/cleaned/` | Hold the curated master and the edition's `editorial/` decisions, evidence and release notes | Conceal editorial decisions in global docs |
+| `work/` | Generate disposable or reviewable candidates | Become an untracked authoritative source |
+| `modules/` | Package native SWORD output and build metadata | Replace original source evidence |
+| `catalog/v1/` and `sword/` | Distribute approved, versioned module artifacts | Publish draft/research outputs |
+| `docs/` | Explain lasting, edition-independent architecture, policies, procedures and verification | Store individual-module histories or transient audit results |
+| `history/` | Retain historical cross-resource research when preservation has real value | Serve as current operating instructions |
+| `entity-index/` | Separate Bible Semantic Index project | Be altered by resource housekeeping |
 
-## One canonical curated edition across upstream repositories
+Directory conventions and exact storage responsibilities are in [workspace layout](WORKSPACE_LAYOUT.md). A resource's **current** editorial state is determined from its own manifest, issue, reviewed PR and release receipt, never inferred from documentation prose.
 
-The five upstream SWORD catalogues are discovery sources, not five independent import queues. Only one provider may supply each **verified identical edition**, according to [SOURCE_PRIORITY.md](../policies/SOURCE_PRIORITY.md). The selector is currently read-only, with ambiguity and higher-priority outages blocking import. Approved manifests require a provider-independent canonical edition ID; the build gate rejects duplicate edition variants. The future importer must consume the reviewed selection result and must not mirror every upstream automatically.
+## Publication interface
 
-## Compiled commentary preservation versus reviewed rebuilds — accepted decision (2026-11-16)
+The published catalogue is `catalog/v1/catalog.json`. SWORD distribution includes module configuration/archive and packages under `sword/`. Consumers, including the [Bible application](https://github.com/icfmp/Bible), should treat that interface as versioned; any future change needs an explicit migration plan.
 
-**Technical choice, delegated by the project owner; not authorization to merge
-or publish BRMHCC 0.1.1.** Two separate, source-neutral validation routes are
-kept because their claims are fundamentally different:
+Multiple upstream repositories are **discovery sources**, not automatic import queues. Candidate editions must be identified by exact source and rights; only verified-equivalent editions can be deduplicated. See [source priority](../policies/SOURCE_PRIORITY.md) and [rights](../policies/RIGHTS.md).
 
-- `stock_reader_keys` means the upstream compiled SWORD source itself remains
-  **byte-identical**. Its original archive, compression data, native content,
-  link topology and unedited source proof must not be replaced or weakened.
-- `reviewed_compiled_commentary_rebuild` means a commentary has been
-  **reconstructed from an authenticated original** with bounded, documented,
-  reversible source changes and/or navigation repairs. A full original-to-
-  candidate native I/K/TOP comparison, true SWORD link identity, all approved
-  source deltas, complete source provenance, independent evidence and exact
-  final compressed-file hashes are mandatory.
+## Two distinct proof routes for compiled commentaries
 
-A rebuilt edition must **never impersonate original stock identity**. The
-two validators do not silently share assertions, change verse segmentation,
-relax source-fidelity checks, or automatically authorize publication. New
-commentaries must use the appropriate proof contract, not resource-specific
-exceptions. The rebuilt module still requires human editorial and rights
-review, final file/digest verification and an explicitly authorized release
-plan. See [source-attested rebuild contract](../../sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/rebuilt-commentary-validation-contract.md)
-and [publication controls](../workflows/PUBLISHING.md).
+- **Unchanged upstream SWORD:** preserve the original binary and metadata, and verify archive identity and native key/content integrity.
+- **Reviewed source-derived reconstruction:** pin an authenticated source, record each approved reversible transformation, compare complete source and native output, and verify section scope, references, links, and readers.
 
-This architecture has passed [1,329 regression/unit tests](https://github.com/icfmp/Bible-Resources/actions/runs/43867792317)
-and a [full original and rebuilt MHCC native SWORD/Xiphos audit](https://github.com/icfmp/Bible-Resources/actions/runs/43867792111),
-but those technical checks **do not** constitute independent external code
-review, signed editorial permission, a final distributable package or a
-publication authorization. The existing approved BRMHCC 0.1.0 and its
-`SOURCE_VALIDATION.json` stay untouched.
+Neither route implies editorial approval or permission to publish. A rebuilt edition must never claim byte identity with its upstream compiled module. Detailed evidence and specific module decisions belong in the corresponding `sources/cleaned/**/editorial/` directory.
 
+For the authoritative process and its checkpoints, use [production pipeline](../PRODUCTION_PIPELINE.md). For technical verification, use [technical methods](../technical/README.md).
