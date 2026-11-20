@@ -43,7 +43,7 @@ def audit(report,english,french):
             or source_ln(e)!=source_ln(f)):
             raise ValueError("Original UBS EN/FR lemma alternate or LN source mismatch: "+mid)
         if not all(isinstance(x,str) and x for x in en_alt):
-            raise ValueError("Original UBS alternate source lemma malformed")
+            raise ValueError("Original UBS alternate source lemma malformed: "+repr({"id":mid,"values":en_alt[:3]}))
         for alt in en_alt:
             by_alternate[nfc(alt)].append(mid)
     source_word_ids=set()
