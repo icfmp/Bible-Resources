@@ -38,12 +38,21 @@ def audit(batches,en,fr):
         raise ValueError("Private original Greek ambiguity evidence drift")
     candidates=defaultdict(set)
     original_lemmas=Counter()
+    seen_word_ids=set()
     for batch in batches["review_batches"]:
         mid=batch["ubs_main_id"]
+        if not isinstance(mid,str) or not mid or not batch["candidate_ubs_lexids"]:
+            raise ValueError("Invalid original UBS source headword/sense batch")
+        for w in batch["word_id_evidence"]:
+            wid=w["original_word_id"]
+            if wid in seen_word_ids:
+                raise ValueError("Duplicate original Greek word ID")
+            seen_word_ids.add(wid)
         for sid in batch["candidate_ubs_lexids"]:
             candidates[mid].add(sid)
         original_lemmas[(batch["original_lemma"],mid)]+=len(batch["word_id_evidence"])
-    if not candidates:raise ValueError("No authentic UBS LEXID source candidates")
+    if len(seen_word_ids)!=2728 or not candidates:
+        raise ValueError("Incomplete original Greek UBS source review inventory")
     inventories={}
     for language,records in (("en",en),("fr",fr)):
         matched={}
