@@ -17,7 +17,7 @@ This is the navigation entry point. File location does not define authority: a h
 2. [Source-first six-phase policy](SOURCE_FIRST_EDITORIAL_PIPELINE.md): accepted production principles and editorial scope.
 3. [Seven-stage Bible checkpoint workflow](BIBLE_7_STAGE_WORKFLOW.md) and [its GitHub Actions runner guide](BIBLE_STAGE_AUTOMATION.md).
 4. [Seven-stage commentary checkpoint workflow](COMMENTARY_7_STAGE_WORKFLOW.md) and [commentary pipeline](COMMENTARY_PIPELINE.md).
-5. [Onboarding playbook](RESOURCE_ONBOARDING_PLAYBOOK.md) · [editorial audit](EDITORIAL_AUDIT_WORKFLOW.md) · [commentary translation from cleaned source](COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md).
+5. [Editorial audit execution reference](EDITORIAL_AUDIT_WORKFLOW.md) · [commentary translation from cleaned source](COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md). The older LSG-specific [onboarding playbook is archived](archive/RESOURCE_ONBOARDING_PLAYBOOK.md).
 6. [Publishing](PUBLISHING.md) · [catalogue integration](CATALOGUE_INTEGRATION.md) · [catalogue update protocol](CATALOGUE_UPDATE_PROTOCOL.md) · [upstream updates](UPDATES.md) · [upstream policy](UPSTREAM.md).
 
 **Six phases vs seven stages:** six phases describe the production lifecycle; seven stages are per-resource checkpoints for evidence and resumption. They are complementary, not separate competing import pipelines.
@@ -39,7 +39,7 @@ This is the navigation entry point. File location does not define authority: a h
 - Edition profiles: [profiles/](profiles/) — exact source/edition metadata. Similar profile titles are **not** automatically duplicates.
 - Release receipts: [releases/](releases/) — version-specific immutable publication/review history, including drafts when explicitly labeled.
 - Evidence and audit material: [evidence/](evidence/) — retain historical approvals and provenance.
-- Historical research is collected in the [archive index](archive/README.md): Darby postmortem, LSG research handoff, the first LSG/MHC pilot and the second Bible probe. Their old paths remain compatibility redirects.
+- Historical research is collected in the [archive index](archive/README.md): Darby postmortem, LSG research handoff, the first LSG/MHC pilot, the second Bible probe and the original onboarding playbook. Their old paths remain compatibility redirects.
 - [HMCC Modern editorial protocol](../sources/cleaned/commentaries/en/hmcc-modern/editorial/HISTORICAL_PROTOCOL.md) now lives beside its cleaned OSIS; its old `docs/MHCC_MODERN_ENGLISH.md` path redirects there.
 - [Roadmap](ROADMAP.md) — current high-level priorities, with active issues as the status authority.
 
