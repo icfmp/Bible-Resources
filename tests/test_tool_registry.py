@@ -67,9 +67,9 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertIn("scripts/research/commentary/"
                       "commentary_chapter_p_boundaries.py", entries)
         self.assertIn(
-            "scripts/research/commentary/commentary_chapter_paragraph_overlap.py",
+            "scripts/research/commentary/commentary_chapter_p_boundaries.py",
             entries["scripts/research/commentary/"
-                    "commentary_chapter_p_boundaries.py"]["static_references"],
+                    "commentary_chapter_paragraph_overlap.py"]["static_references"],
         )
 
     def test_registry_has_no_promoted_editorial_or_publication_claims(self):
