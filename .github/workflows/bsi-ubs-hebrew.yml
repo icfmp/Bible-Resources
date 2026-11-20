@@ -42,6 +42,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_private_reviewed_candidate.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_package_reviewed_v1_candidate.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_promote_verified_ubs_release.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_v11_semantic_feasibility.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -440,6 +441,36 @@ jobs:
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-v1-final-275-word-candidate.json
+      - name: Measure one-pass Hebrew v1.1 semantic evidence on pinned original UBS and complete WLC
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_v11_semantic_feasibility.py \
+            --index /tmp/bsi-ubs-v1-final-275-word-candidate.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --french ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-hebrew-v11-source-only-semantic-feasibility-PRIVATE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/bsi-ubs-hebrew-v11-source-only-semantic-feasibility-PRIVATE.json').read_text())
+          assert d['corpus']['all_original_wlc_words']==475911
+          assert d['corpus']['original_lexical_class_words']==248680
+          assert d['source_sense_inventory']['original_ubs_sense_ids']==16619
+          assert d['original_ubs_headwords']==7943
+          assert sum(d['source_only_semantic_candidate_dispositions'].values())==d['entry_only_review_word_count']
+          assert len(d['original_word_id_to_private_verse_witness_candidate'])==d['candidate_word_count']
+          assert d['independently_contextually_validated']==0
+          assert d['original_source_or_v1_release_modified'] is False
+          assert d['published'] is False and d['publication_approved'] is False
+          print('UBS_HEBREW_V11_SEMANTIC_FEASIBILITY_FULL_ORIGINAL_CORPUS_CHECKED_PRIVATE')
+          PY
+      - name: Upload Hebrew v1.1 semantic feasibility audit (PRIVATE, NO choices)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-hebrew-v11-source-semantic-feasibility-PRIVATE-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-hebrew-v11-source-only-semantic-feasibility-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload private final UBS v1 original-word-specific candidate (NOT released)
         uses: actions/upload-artifact@v4
         with:
