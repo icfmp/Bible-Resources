@@ -213,7 +213,7 @@ can identify a candidate anomaly but can neither rewrite an authorial
 passage nor authorize publication.
 
 For scripts and their preserved legacy callers, consult
-[the full tool registry](../../docs/TOOL_REGISTRY.md) and the
+[the full tool registry](../../reports/tooling/TOOL_REGISTRY.md) and the
 [contributor rules](../../CONTRIBUTING.md). General packaging and release
 checks belong in [PUBLISHING.md](../../docs/workflows/PUBLISHING.md); Bible
 translation source/native fidelity stays in #28, and resumable
