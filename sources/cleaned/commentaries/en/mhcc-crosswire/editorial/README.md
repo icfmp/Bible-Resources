@@ -1,23 +1,24 @@
-# Editorial record — Matthew Henry's Concise Commentary (classic English)
+# Matthew Henry Concise Commentary — editorial decisions
 
-**Scope:** CrossWire-derived released 0.1.1 native source, with a reconstructed OSIS master. **This is not the lost original CrossWire authoring OSIS.**
+**Release:** `MHCC` 0.1.1 (classic English), derived from CrossWire MHCC 2.0. Not the complete MHC commentary.
 
-## Decisions and boundaries
+## Decisions worth preserving
 
-- Maintain the authorial concise commentary's real chapter/verse/passage groupings, including chapter-only entries; do not fabricate verse entries.
-- The reconstructed cleaned OSIS is attested against the approved 0.1.1 source-native SWORD corpus and historical editorial approvals, **not** an exact-byte XML recreation of an original unpublished authoring source.
-- Existing approved changes include **24 aliases** and **two prose/reference errata already contained in the approved source**. These are historical records, not a mandate for additional correction.
-- Keep introduction/top-level opaque content and the section reference index intact; the reconstructed-versus-native comparisons apply to the specified semantic and navigation guarantees, not arbitrary XML byte identity.
-- Preserve authorial source divisions. Where the Bible application's presentation needs to show a chapter commentary for all verses, implement it as reader fallback when appropriate, not as source duplication.
+- The maintained OSIS is a **native-attested reconstruction** of the approved 0.1.1 SWORD module, **not** the recovered original CrossWire authoring XML. Never cite it as the original author's unpublished XML.
+- **24 reviewed native navigation aliases** make 17 existing commentary sections reachable. They do not create 24 new authorial comments.
+- Two narrow source corrections: Ezekiel 3 malformed reference `3:12–2` → `3:12–21`; 1 Chronicles 7 `Zebulun or Dn` → `Zebulun or Dan`. No general authority to revise prose.
+- Chapter-only commentary remains one authorial unit. A reader may expose it throughout the chapter without duplicating the source prose.
+- SWORD ID `MHCC` collides with CrossWire's own module name; old `BRMHCC` installs require deliberate handling.
 
-## Evidence
+## Source of truth
 
-- [Historical 0.1.1 editorial disposition](evidence/release-0.1.1/0.1.1-editorial-disposition.md) and [reader-oriented indexing decision](evidence/release-0.1.1/reader-oriented-indexing-decision.md). These contain earlier draft-status language and exploratory alternatives; current approved scope must be verified from the published 0.1.1 release and cleaned-source manifest, not copied blindly from preliminary proposals.
+| Need | Record |
+| --- | --- |
+| Reconstructed master, exact claims and SHA | [Cleaned source manifest](../CLEANUP_MANIFEST.json) |
+| Approved corrections and alias list | [Rebuild manifest](../../../../../../config/commentary-rebuilds/mhcc-crosswire.json) |
+| Release, rights and reader limitations | [0.1.1 release record](releases/MHCC-0.1.1.md) |
+| Native-entry evidence | [Native source audit](../../../../../../modules/mhcc-crosswire/SOURCE_AUDIT.json) |
+| Historical why/alternatives | [Editorial disposition](evidence/release-0.1.1/0.1.1-editorial-disposition.md), only when investigating a disputed decision |
+| Earlier untouched stock edition | [0.1.0 release](releases/MHCC-0.1.0.md) |
 
-- [Reconstructed-source attestation and limitations](../CLEANUP_MANIFEST.json)
-- [Approved corrections manifest](../../../../../../config/commentary-rebuilds/mhcc-crosswire.json)
-- [Classic 0.1.1 release](releases/MHCC-0.1.1.md)
-- [Native audit](../../../../../../modules/mhcc-crosswire/SOURCE_AUDIT.json)
-- [Reader profile](profiles/en-matthew-henry-concise-crosswire-2-0.md)
-
-**Status:** source-native attested 0.1.1; the original authoring OSIS remains unrecovered. No new edits approved.
+Original historical research receipts in `evidence/stock-research/` are **not current instructions**. Do not reinterpret old `DRAFT` statuses as the present published edition state.
