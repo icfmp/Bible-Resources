@@ -1,6 +1,6 @@
 # Source-first production: executable editorial contract
 
-**Status:** canonical operational entry point for new or revised resources. This document specifies required evidence, not a claim that all stages are automated. It complements the established [six-phase policy](workflows/SOURCE_FIRST_EDITORIAL_PIPELINE.md) and the [seven-stage Bible](workflows/BIBLE_7_STAGE_WORKFLOW.md) and [commentary](workflows/COMMENTARY_7_STAGE_WORKFLOW.md) checkpoint workflows. Where policies disagree, stop and resolve the discrepancy in a reviewed PR; do not silently select the weaker rule.
+**Status:** canonical operational entry point for new or revised resources. This document specifies required evidence, not a claim that all stages are automated. This is the **single authoritative production process**. The [Bible](workflows/BIBLE_7_STAGE_WORKFLOW.md) and [commentary](workflows/COMMENTARY_7_STAGE_WORKFLOW.md) seven-stage checklists track progress but do not define competing acceptance standards. Where policies disagree, stop and resolve the discrepancy in a reviewed PR; do not silently select the weaker rule.
 
 ## The production chain
 
