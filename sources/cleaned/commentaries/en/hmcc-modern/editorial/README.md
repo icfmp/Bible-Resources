@@ -1,20 +1,23 @@
-# Editorial record — Henry's Modern Concise Commentary (English)
+# Henry's Modern Concise Commentary — editorial decisions
 
-**Scope:** independently authored *modern-language derivative* based on approved classic MHCC 0.1.1. Unlike a faithful-format cleanup, language modernization necessarily changes words; every meaning-bearing decision needs editorial evidence.
+**Edition:** `HMCCModern` 0.1.0, a **new modern-English derivative** of reviewed classic MHCC 0.1.1, not Matthew Henry's historical wording.
 
-## Decisions and boundaries
+## Authorial fidelity and necessary exceptions
 
-- Modernize readability without silently altering Matthew Henry's argument, theological meaning, illustrations, scriptural connections or commentary coverage. No additional biblical interpretation is permitted merely to improve flow.
-- The authorial modern manuscripts remain recorded under `work/mhcc-modern/`; the cleaned OSIS is a **recovered exact approved editorial source** matching the attested release hash. The original authored manuscripts have **not** been rewritten as part of this recovery.
-- Preserve chapter-commentary coverage and review paragraph boundaries separately from reader presentation defects.
-- Historically approved work includes **28 destinations**, **15 approved link cases** and **two separately restored expositions**. Verify precise individual decisions against the project editorial protocol and source receipts; the counts alone do not authorize further modifications.
-- This modern-language edition must remain clearly distinct from the public-domain original MHCC. Never present reconstructed or modernized prose as Matthew Henry's exact historical text.
+- The scope is **1,189 biblical chapters**, with original source units, introductions, citations and chapter-level coverage preserved or independently reconciled. Modernized prose changes the words **deliberately**, but must retain argument, theological qualification, imagery and exhortation.
+- Write clear contemporary English with meaningful paragraphs. Do not simplify away substantive statements, reinterpret doctrine or mistake a pleasant draft for a semantic review.
+- **15 specifically approved reference corrections (28 targets)** and **two restored historical expositions** belong to this separate derivative, not to classic MHCC.
+- Source chapter-only comments (including Leviticus 19 and Psalm 108) must not be turned into multiple authored per-verse comments. Navigation may use shared/linked keys where evidenced.
+- Reader verification remains distinct: the release record identifies a **manual Xiphos note-click follow-up**, notably Numbers 29:1 → Leviticus 23:24. Do not silently claim that every GUI destination was clicked.
 
-## Evidence
+## Source of truth
 
-- [OSIS master source and provenance manifest](../CLEANUP_MANIFEST.json)
-- [Full edition-specific editorial/technical protocol](../../../../../../docs/MHCC_MODERN_ENGLISH.md)
-- [HMCC Modern 0.1.0 release receipt](releases/HMCC-Modern-0.1.0.md)
-- [Edition metadata/rights basis](../../../../../../modules/hmcc-modern/metadata.json)
+| Need | Record |
+| --- | --- |
+| Exact cleaned OSIS, SHA and provenance | [Cleaned source manifest](../CLEANUP_MANIFEST.json) |
+| Version, approved corrections and limits | [0.1.0 release record](releases/HMCC-Modern-0.1.0.md) |
+| Rights and technical edition identity | [Module metadata](../../../../../../modules/hmcc-modern/metadata.json) |
+| How modernization is reviewed generally | [Generic translation procedure](../../../../../../docs/workflows/COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md) |
+| Historical difficult decisions | [Short edition-specific decision record](HISTORICAL_PROTOCOL.md) |
 
-**Status:** index of existing approved decisions; not a second translation approval. The full historical working protocol remains preserved until a referenced-content migration audit.
+The long obsolete progress narrative is not the current workflow. New updates must cite exact original/modern passages, reviewer decisions and native-reader receipts.
