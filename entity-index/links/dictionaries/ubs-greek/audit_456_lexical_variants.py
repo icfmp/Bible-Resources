@@ -124,6 +124,21 @@ def main():
     read=lambda path:json.loads(path.read_text(encoding="utf-8-sig"))
     result=audit(read(a.missing),read(a.english),read(a.french))
     a.output.write_text(json.dumps(result,ensure_ascii=False,sort_keys=True,indent=2)+"\n",encoding="utf-8")
+    print("GREEK_UBS_SOURCE_ALTERNATIVE_METADATA_DIAGNOSTICS",json.dumps([
+        {"main_id":mid,"lemma":entry["Lemma"],"source_lexical_ln_codes":sorted(source_codes(entry)),
+         "source_original_strong_codes":entry.get("StrongCodes") or [],
+         "source_lemma_alternative_metadata":source_variant_metadata(entry),
+         "source_top_level_keys":sorted(entry),
+         "source_first_baseform_keys":sorted(entry["BaseForms"][0]) if entry.get("BaseForms") else []}
+        for mid,entry in ((x["MainId"],x) for x in read(a.english))
+        if source_codes(entry)&{"93.480a","93.480b","91.13","91.10","7.16","53.9"}
+    ][:36],ensure_ascii=False,sort_keys=True))
+    print("GREEK_ACCENTLESS_SOURCE_DIAGNOSTICS_ONLY",json.dumps([
+        {"lemma":x["original_lemma"],"count":x["original_words"],
+         "original_strong":x["original_strong"],
+         "diagnostic_ubs":x["original_ubs_v1_headword_accentless_diagnostic_only"]}
+        for x in result["families"] if x["original_ubs_v1_headword_accentless_diagnostic_only"]
+    ],ensure_ascii=False,sort_keys=True))
     print("GREEK_456_ORIGINAL_VARIANT_LEXICAL_AUDIT",json.dumps({
         "words":result["original_word_count"],
         "families":result["original_lexical_families"],
