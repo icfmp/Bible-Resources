@@ -68,14 +68,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 10,
+      "static_reference_count": 9,
       "static_references": [
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/pilot-source-audit.yml",
         "docs/EDITORIAL_AUDIT_WORKFLOW.md",
         "docs/NORMALIZATION_POLICY.md",
         "docs/QUALITY_POLICY.md",
-        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "docs/evidence/mhc-285/mhc-shared-verse-navigation-2026-11-18.md",
         "docs/evidence/mhc-285/source-cleanup/CLEANUP_STATUS.md",
         "tests/test_commentary_shared_key_retrieval.py",
@@ -250,11 +249,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
         "docs/BIBLE_STAGE_AUTOMATION.md",
         "docs/SOURCE_USFX_STRUCTURE.md",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/tool_registry.py",
         "tests/test_bible_stage_runner.py",
         "tests/test_stage4_receipt_replay.py"
@@ -3268,13 +3268,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 18,
+      "static_reference_count": 17,
       "static_references": [
         ".github/workflows/darby-link-repair-research.yml",
         ".github/workflows/osis-schema-review.yml",
         "docs/EDITORIAL_AUDIT_WORKFLOW.md",
         "docs/NORMALIZATION_POLICY.md",
-        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "scripts/audit_osis.py",
         "scripts/bible_stage_runner.py",
         "scripts/fetch_reviewed_schema.py",
@@ -3476,9 +3475,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/source_native_maintext_probe.py",
         "tests/test_maintext_whitespace_patterns.py"
       ]
@@ -3617,9 +3617,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/source_native_maintext_probe.py",
         "tests/test_native_book_intro_screen.py"
       ]
@@ -3653,9 +3654,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 11,
+      "static_reference_count": 12,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/native_book_intro_screen.py",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
@@ -3693,9 +3695,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/source_native_maintext_probe.py",
         "tests/test_native_sword_markup_census.py",
         "tests/test_source_native_layout_anchors.py"
@@ -3734,13 +3737,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 8,
       "static_references": [
         ".github/workflows/pilot-source-audit.yml",
         "docs/EDITORIAL_AUDIT_WORKFLOW.md",
         "docs/NORMALIZATION_POLICY.md",
         "docs/QUALITY_POLICY.md",
-        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "scripts/propose_upstream_edit.py",
         "scripts/tool_registry.py",
         "tests/test_editorial_pipeline.py",
@@ -3771,7 +3773,7 @@
       "static_reference_count": 4,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
-        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
+        "docs/archive/LSG_AUDIT_RESEARCH_HANDOFF.md",
         "scripts/maintext_whitespace_patterns.py",
         "tests/test_note_whitespace_diagnostics.py"
       ]
@@ -4158,7 +4160,7 @@
       "static_reference_count": 3,
       "static_references": [
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
-        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
+        "docs/archive/LSG_AUDIT_RESEARCH_HANDOFF.md",
         "tests/test_private_sword_bundle.py"
       ]
     },
@@ -4499,13 +4501,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 11,
+      "static_reference_count": 10,
       "static_references": [
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-zcom-private-candidate.yml",
         ".github/workflows/lsg-first-release.yml",
         ".github/workflows/private-sword-promotion-proof.yml",
-        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "scripts/commentary_stock_candidate.py",
         "scripts/materialize_attested_ztext_release.py",
         "scripts/prepare_darby_011_private_release_candidate.py",
@@ -5736,9 +5737,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/source_native_maintext_probe.py",
         "tests/test_source_native_nonspace_boundaries.py"
       ]
@@ -5841,9 +5843,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/source_native_maintext_probe.py",
@@ -5982,9 +5985,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 8,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/native_book_intro_screen.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/source_native_ordered_body.py",
@@ -6020,9 +6024,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/source_native_maintext_probe.py",
         "tests/test_source_native_record_scope_triage.py"
       ]
@@ -6091,9 +6096,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/source_native_maintext_probe.py",
         "tests/test_source_native_structural_whitespace.py",
         "tests/test_source_usfx_newline_provenance.py"
@@ -6125,9 +6131,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/source_native_maintext_probe.py",
         "tests/test_source_native_structure_topology.py"
       ]
@@ -6164,9 +6171,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 9,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/source_native_maintext_probe.py",
         "scripts/source_native_record_scope_triage.py",
         "scripts/source_usfx_newline_provenance.py",
@@ -6208,9 +6216,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 31,
+      "static_reference_count": 30,
       "static_references": [
-        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "docs/SOURCE_NATIVE_INDEX_AUDIT.md",
         "docs/SOURCE_OSIS_INVENTORY.md",
         "scripts/audit_omitted_verse_notes.py",
@@ -6341,9 +6348,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
+        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "scripts/bible_stage_runner.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/source_native_structural_whitespace.py",
@@ -6809,7 +6817,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 17,
+      "static_reference_count": 16,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
         ".github/workflows/darby-0.1.1-preflight.yml",
@@ -6823,7 +6831,6 @@
         ".github/workflows/validate.yml",
         "docs/NATIVE_SWORD_INDEX_INVENTORY.md",
         "docs/NATIVE_SWORD_WHOLE_CORPUS.md",
-        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "docs/SOURCE_NATIVE_INDEX_AUDIT.md",
         "docs/SOURCE_NATIVE_MAIN_TEXT.md",
         "scripts/sword_native_inventory.py",
@@ -6862,11 +6869,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 20,
+      "static_reference_count": 19,
       "static_references": [
         ".github/workflows/validate.yml",
         "docs/NATIVE_SWORD_INDEX_INVENTORY.md",
-        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "docs/SOURCE_NATIVE_INDEX_AUDIT.md",
         "scripts/materialize_attested_ztext_release.py",
         "scripts/native_book_intro_screen.py",
