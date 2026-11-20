@@ -27,7 +27,14 @@ This is the navigation entry point. File location does not define authority: a h
 - Original/native scope: [source inventory](SOURCE_INVENTORY.md), [OSIS inventory](SOURCE_OSIS_INVENTORY.md), [native book scope](SOURCE_NATIVE_BOOK_SCOPE.md), [native main text](SOURCE_NATIVE_MAIN_TEXT.md), [notes](SOURCE_NATIVE_NOTES_AUDIT.md), [index](SOURCE_NATIVE_INDEX_AUDIT.md), [USFX structure](SOURCE_USFX_STRUCTURE.md).
 - SWORD checks: [native index inventory](NATIVE_SWORD_INDEX_INVENTORY.md), [native raw witness](NATIVE_SWORD_RAW_WITNESS.md), [whole corpus](NATIVE_SWORD_WHOLE_CORPUS.md), [stable references](STABLE_SWORD_REFERENCE_AUDIT.md), [OSIS paragraph QA](OSIS_PARAGRAPH_RENDERING_QA.md).
 
-## 4. Editions, historical research and publication receipts
+## 4. Edition-specific editorial records
+
+**Canonical location:** `sources/cleaned/<type>/<language>/<resource-id>/editorial/`. The [per-resource decisions](../sources/cleaned/README.md) are kept alongside each approved cleaned master and its `CLEANUP_MANIFEST.json`; global rules remain in `docs/`. These records preserve historical approvals and cite evidence, but do not themselves authorize new textual changes.
+
+- French Bibles: [LSG 1910](../sources/cleaned/bibles/fr/lsg-1910/editorial/README.md) · [Darby JND 2024](../sources/cleaned/bibles/fr/darby-jnd-2024/editorial/README.md)
+- English commentaries: [MHC complete](../sources/cleaned/commentaries/en/mhc-crosswire/editorial/README.md) · [MHCC classic](../sources/cleaned/commentaries/en/mhcc-crosswire/editorial/README.md) · [HMCC Modern](../sources/cleaned/commentaries/en/hmcc-modern/editorial/README.md)
+
+## 5. Editions, historical research and publication receipts
 
 - Edition profiles: [profiles/](profiles/) — exact source/edition metadata. Similar profile titles are **not** automatically duplicates.
 - Release receipts: [releases/](releases/) — version-specific immutable publication/review history, including drafts when explicitly labeled.
@@ -35,7 +42,7 @@ This is the navigation entry point. File location does not define authority: a h
 - Resource narratives: [MHCC Modern](MHCC_MODERN_ENGLISH.md), [Darby postmortem](DARBY_2024_IMPORT_POSTMORTEM.md), [LSG research handoff](LSG_AUDIT_RESEARCH_HANDOFF.md), [LSG/MHC pilot](PILOT_SEGOND_MHC.md), [second Bible probe](SECOND_REAL_BIBLE_PROBE.md). These are **not** general policy.
 - [Roadmap](ROADMAP.md) — historically accumulated proposals; validate against active issues and decisions before acting on it.
 
-## 5. Generated technical inventory
+## 6. Generated technical inventory
 
 - [Tool registry (generated Markdown)](TOOL_REGISTRY.md) and [machine-readable registry](TOOL_REGISTRY.json): regenerate with `python scripts/tool_registry.py --write`; verify with `python scripts/tool_registry.py --check`. Do not manually edit generated contents. Any removal/renaming of script entrypoints is separately tracked by [#430](https://github.com/icfmp/Bible-Resources/issues/430).
 
