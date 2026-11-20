@@ -1,45 +1,37 @@
-# Bible Resources — contributor guide
+# Bible Resources documentation
 
-Bible Resources maintains **source-faithful, verifiable and redistributable** Biblical resources for SWORD-compatible readers. This documentation explains *how the project works*. It does **not** record each individual edition's construction history, current approval status or one-off fixes.
+**Start here if you are new to the repository.** Bible Resources preserves, verifies and distributes source-faithful SWORD resources. A successful build is not proof of textual fidelity, a license to redistribute, or an approved release.
 
-## Start here
+## Your first five minutes
 
-1. [How the repository is organized](architecture/README.md) — original sources, cleaned editorial masters, native SWORD modules and their metadata.
-2. **[The production process](PRODUCTION_PIPELINE.md)** — edition and rights verification → immutable original → cleaning → exhaustive source fidelity → SWORD → independent readers → publication.
-3. [Editorial and legal principles](policies/README.md) — what must never change silently, and what requires recorded approval.
-4. [Operational workflows](workflows/README.md) — checks, commands, resumable stages, imports and publication.
-5. [Technical verification](technical/README.md) — OSIS/USFM inventories, reference integrity, notes, native readback and rendering.
+1. Read [the architecture](architecture/ARCHITECTURE.md): what is original, what can be edited, what is compiled, and what gets published.
+2. Read [the production pipeline](PRODUCTION_PIPELINE.md): the **single** end-to-end procedure and the evidence required to advance.
+3. Check [editorial and legal policies](policies/README.md) before touching content.
+4. Choose [a workflow](workflows/README.md) for a Bible, commentary, technical audit or release.
+5. Consult [verification methods](technical/README.md) only when performing a corresponding check.
 
-## How to use this documentation
+## Where to find things
 
-**Adding a resource?** First identify the exact edition and redistribution rights, then follow [the production contract](PRODUCTION_PIPELINE.md). Separate acquisition, cleanup, validation, editorial approval and public publication; a CI run alone does not establish all five.
-
-**Investigating a textual or structural mismatch?** Compare the immutable original, reviewed cleaned master, compiled native entries and reader display in that order. Follow [the general verification guides](technical/README.md). A workaround for a particular reader is not evidence that the author's wording needs revision.
-
-**Editing the process?** Change the relevant generic policy/workflow, with tests and reproducible justification. Do not insert one edition's exceptions into the general pipeline.
-
-**Reviewing an individual Bible or commentary?** Go directly to `sources/cleaned/<type>/<language>/<module-id>/editorial/`. Each module maintains its own decisions, original witnesses, audit reports, versioned release records and reader profiles. The `CLEANUP_MANIFEST.json` beside the cleaned master pins derivation and hashes.
-
-**Looking for old experiments?** `history/` preserves superseded cross-project research. Historical observations are not production instructions.
-
-## Documentation responsibilities
-
-| Location | Authoritative purpose |
+| Looking for | Go to |
 | --- | --- |
-| [`docs/architecture/`](architecture/README.md) | Repository design, file structure, formats and reader metadata standards |
-| [`docs/policies/`](policies/README.md) | Source fidelity, editorial decisions, licensing, versification and quality |
-| [`docs/workflows/`](workflows/README.md) | Actions to take, required checkpoints, translation and release process |
-| [`docs/technical/`](technical/README.md) | Reusable inspection and verification techniques |
-| `sources/cleaned/**/editorial/` | **Per-edition** decisions, notes, QA, source evidence, profiles and release receipts |
-| `history/` | Historical cross-cutting experiments and superseded research |
-| `modules/` | Compiled SWORD modules, metadata and source-audit artifacts |
+| Source download and original identity | `sources/original/<type>/<language>/<id>/` and provenance records |
+| Cleaned editorial master, exact decisions and audits | `sources/cleaned/<type>/<language>/<id>/editorial/` |
+| Generic project design and directory conventions | [architecture](architecture/README.md) |
+| Rules for fidelity, rights, versification and changes | [policies](policies/README.md) |
+| How to execute a production or release step | [workflows](workflows/README.md) |
+| How to inspect OSIS, SWORD, notes, references or rendering | [technical methods](technical/README.md) |
+| Current priorities, blockers and actual progress | GitHub issues, PRs, Actions and approved edition manifests |
+| Older cross-cutting experiments retained for provenance | `history/` — never treat these as instructions |
+| Compiled modules and distribution outputs | `modules/`, `sword/`, `catalog/v1/` |
 
-## Non-negotiable safeguards
+## A concrete way to contribute
 
-- Do not silently change Biblical wording, punctuation, versification, notes, cross-references or commentary scopes.
-- Preserve source identity, edition, rights, original files and their hashes; make every transformation documented and reversible.
-- Distinguish source defect, editorial convention, compiler behavior and reader rendering.
-- Keep the independent `entity-index/` (Bible Semantic Index) untouched by Bible Resources housekeeping.
-- Never promote a draft, historical test, or successful compilation as an approved public release.
+Choose an existing issue before starting duplicate work. Pin the exact source, edition, rights and hash. Keep the original immutable; work on a separate cleaned candidate. Produce an exhaustive source-to-candidate diff, document every approved transformation, and test the compiled module independently. Do not publish without explicit editorial, rights and release approval. Record a resumable checkpoint in the issue, referencing commits and actual test runs.
 
-[Current priorities](ROADMAP.md) are a navigation aid; GitHub issues and approved release manifests are the status authority.
+Do not confuse **source defect**, **editorial convention**, **compiler/index behavior**, and **reader rendering defect**. A workaround for a particular client does not justify rewriting the author's text.
+
+## Documentation maintenance rule
+
+Keep `docs/` short and durable. Document a reusable rule **once**, at its most natural home, with links from entry points. Remove superseded explanations rather than accumulating variants. Place dated tests and module-specific history with the module; preserve cross-project research in `history/` only when its evidence is useful. Do not add execution logs or lists of temporary PR results to general guides.
+
+`entity-index/` is the separate Bible Semantic Index workstream: do not touch it during documentation housekeeping.
