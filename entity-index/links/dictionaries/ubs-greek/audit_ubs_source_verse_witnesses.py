@@ -145,10 +145,13 @@ def audit(index,reviewed,batches,en,fr,macula,form_defaults):
             reason="multiple_same_UBS_headword_original_words_in_source_verse"
         else:
             candidate_refs={}
-            for sid in original["candidates"]:
+            for sid in sorted(original["candidates"]):
                 e,f=eng[mid][sid],fra[mid][sid]
-                if e["ln"]!=f["ln"] or e["invalid"] or f["invalid"]:
-                    raise ValueError("Original UBS source sense LN/reference malformed")
+                if e["ln"]!=f["ln"]:
+                    raise ValueError("Original bilingual UBS source Louw-Nida mismatch")
+                if e["invalid"] or f["invalid"]:
+                    reason="source_UBS_reference_metadata_malformed_no_choice"
+                    break
                 if e["verses"]!=f["verses"]:
                     reason="original_UBS_EN_FR_reference_verses_disagree"
                     break
