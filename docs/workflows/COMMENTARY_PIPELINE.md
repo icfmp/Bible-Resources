@@ -1,221 +1,40 @@
-# Reusable commentary pipeline — source first, no invented changes
+# Commentary production — source-first execution
 
-This is a **compact execution guide** for the existing, authoritative
-[commentary seven-stage workflow](COMMENTARY_7_STAGE_WORKFLOW.md), itself
-based on the [Bible workflow](BIBLE_7_STAGE_WORKFLOW.md). It does **not**
-create another sequence or override that document. The stages express
-release gates, **not** an artificial deadline or a set of mandatory
-one-off helper scripts. Each completed step has a source-bound,
-independently reproducible receipt in its GitHub issue. A tool's status
-is never a substitute for a source-specific editorial or rights decision.
+This guide describes **what to do for any commentary**, independently of language, original source provider, author's theological tradition, or SWORD module implementation. The [canonical production contract](../PRODUCTION_PIPELINE.md) sets the mandatory gates; the [seven-stage commentary checklist](COMMENTARY_7_STAGE_WORKFLOW.md) records progress. Neither a successful SWORD compilation nor the output of a research script constitutes editorial approval.
 
-| Official stage | Required evidence and reusable tooling |
-| --- | --- |
-| 1/7. **Select source and rights** | Work/edition and licensor; source rights for digital corrections, not just historic author. `commentary_intake.py --stage 1` is metadata-only research. |
-| 2/7. **Pin originals** | Download observed compiled ZIP to a *private temporary directory*, independently record hash/size and declared driver/versification; review discrepancy, then require exact SHA at `--stage 2`. Never silently repin. |
-| 3/7. **Original commentary audit** | Inventory all occupied native K/I/TOP slots, authorial headings, ranges, notes, citation links and markup using `commentary_native_inventory.py` / `commentary_native_raw_inventory.py`. Entry count is not section count. |
-| 4/7. **SWORD integrity and source parity** | Select exact-stock reuse (strict compiled-source equality) or source-corrected rebuild (reversible attested deltas); verify full original/candidate native text, punctuation, notes, references, identity and links with `compiled_stock_commentary_proof.py` or `reviewed_compiled_commentary_rebuild.py`. |
-| 5/7. **Editorial decisions** | Classify digital corruption vs intentional edition/author choice vs rendering defect; review source-bound patches and legal rights, preserve original text/divisions, and obtain explicit human approval. |
-| 6/7. **Independent readers** | Run real `diatheke`, selected Xiphos and/or AndBible checks with explicit PASS/FAIL/NOT TESTED/INCONCLUSIVE outcomes; no claim that a CLI smoke confirms GUI layout. |
-| 7/7. **Approve and publish** | Signed source/rights/reader decision; `validate.py`, `release_preflight.py`, `build.py`, `catalogue_release_coverage.py`, then **one** `pages.yml` Release-before-Pages workflow and independent `verify_public_catalogue.py` download/hashes. |
+## 1. Identify the exact source
 
-Each stage's reviewed input/output and next action belongs in its existing
-GitHub import issue. Subchecks may run in batches without altering the
-seven source-controlled completion gates. A completed stage is not another
-publication permission, and a published source may still expose separate
-application display bugs.
+Record its edition, author and editorial attributions, source owner, URL, acquisition time, original hashes and distribution rights (including notes and illustrations). Preserve the original unchanged under `sources/original/commentaries/<language>/<module-id>/`. Prefer original OSIS/USFM, and document any necessary conversion from native SWORD or publisher XML. **Do not represent a reconstructed source as the publisher's original authoring XML.**
 
+## 2. Inventory authorial structure
 
-## When the source has already been cleaned and validated
+Inventory every commentary entry and scope before changing it: book, chapter, passage range, verse, introduction, paragraph, heading, link label, target, note, and any unanchored material. Keep chapter-wide entries distinct from verse-specific entries. Capture counts and unresolved anomalies at source locations.
 
-For **translation or modern-English modernization only**, start with the accepted
-structured source and follow [Translation from an accepted clean source](
-COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md). This dedicated procedure covers
-semantic fidelity and relocating each existing citation/link to the corresponding
-translated words or editorial element. **Do not repeat acquisition, source
-repair, original-link correction or whole upstream reconstruction.** The
-seven-stage source/release requirements remain inherited from the previously
-validated source handoff; the new translation still requires its own editorial,
-rights, link-placement, native-reader and release evidence.
+## 3. Create the reviewed cleaned master
 
-## Provider independence and clean rebuild — decision (2026-11-18)
+Produce a deterministic and reversible candidate, then the accepted `sources/cleaned/commentaries/<language>/<module-id>/<module-id>.osis.xml` (use the existing actual filename where different). Preserve wording, punctuation, theology, commentary boundaries, cross-reference labels and destinations unless source-backed corrections are explicitly approved. Store transformation evidence in the adjacent `CLEANUP_MANIFEST.json` and **human editorial decisions** in `editorial/README.md`. If a reader wants to display a chapter-level commentary at every verse, solve that at the reader layer instead of duplicating authored entries.
 
-**CrossWire, eBible and other reviewed sources are inputs, not architectural
-authorities.** Continue to discover and obtain permitted material from them.
-A correct reconstruction need not reproduce their binary layout, module
-identity, incidental verse aliases, broken index, metadata or provider-specific
-workarounds. We do not need upstream cooperation to implement a clean compiler
-using documented standard formats. This choice does **not** relax the fidelity
-requirement for the actual texts, punctuation, intentional divisions, notes,
-cross-references, versification or edition provenance.
+## 4. Check the entire source against the cleaned master
 
-Use the **shortest reusable extraction-to-build path** before commissioning
-more bespoke MHC diagnostics:
+Validate OSIS structure and compare all original keys, text, paragraphs, references and notes. Record any reindexing explicitly. Separately verify claimed source defects against an independently identified witness to the **same edition**, not a convenient modern retelling. Uncertain references remain unresolved, not guessed.
 
-- **Read:** use a format/provider adapter to get all source-bearing payload,
-  including native SWORD introductions and opaque keys, or read verified
-  source XML/USFM directly. Keep immutable originals and hashes.
-- **Classify:** inventory identifiable content units and original reference
-  scopes independently of the upstream storage keys. Keep multiple sections
-  sharing a start address as separate units. Treat unmapped original content
-  as an explicit blocking discrepancy, not a reason to discard it.
-- **Build:** map reviewed units to standard SWORD semantics and compile new
-  modules from scratch where simpler or more reliable. Do not make an
-  MHC/English-only intermediate file format, nor blindly copy a defective
-  provider index. Document any necessary source correction separately.
-- **Check:** perform complete source-to-output coverage, text, Unicode,
-  structure, notes and references comparison, then test independent readers.
-  Input-to-output content checks, not byte-equivalence with a flawed provider
-  binary, determine the acceptance of a reconstruction.
-- **Prove reuse:** the first extractor/compiler must be tried on at least one
-  actual English and one actual French source with the same core, without
-  hardcoded book labels or English-specific text processing. Additional
-  format adapters should be small, not new pipelines.
+## 5. Build and read back SWORD
 
-**Execution priority:** stop enhancing the private MHC-specific CCEL trial
-except to extract reusable lessons and test fixtures. Inspect the existing
-general SWORD inventory/reader and build helpers first; implement only the
-missing source adapters/conversion step. Rebuild the MHC with this shared
-pipeline when possible. Keep the already verified MHC source hashes and
-collision evidence; these are useful inputs, not blockers mandating loyalty
-to CrossWire's packaging. Do not merge or publish a partial module.
+Use existing tested SWORD tools and versioned input hashes. Run complete native key/text/markup inventories and compare against the approved source; record compiler versions, native file hashes, reproducibility results and exceptions. For source-native reconstruction, the old SWORD module is an attested witness, not automatically proof of original authorial XML.
 
-**Important distinction:** a two-minute conversion benchmark measures
-throughput, not semantic fidelity or redistribution rights. Neither a
-YouVersion technical export nor a public-domain author automatically
-authorizes redistribution of a third party's digital edition.
+## 6. Test readers, decide and publish
 
-## Source-format and language neutrality — design constraint (2026-11-18)
+Verify chapter introductions, passage overlaps, paragraph spacing, note destinations, real links and scope in an independent SWORD reader. Record candidate hash, reader/version and screenshots. Distinguish a source issue from a compiler or UI issue. Rights, editorial review, native parity, reader acceptance and publication are distinct decisions. Publish only via the [release protocol](PUBLISHING.md) and check the public download after publication.
 
-**The import/reconstruction engine must not be built around English MHC, CCEL,
-a particular commentary, or one book/verse scheme.** Research-only MHC
-experiments under \`work/commentaries/mhc-crosswire/experiments/ccel-imp/\` are historical feasibility evidence,
-not a new production importer, accepted data model, or instruction to add
-MHC-specific exceptions. The CCEL trial's SWORD CLI success is not a complete
-source-structure or reader-parity proof.
+## Optional: translation or modernization
 
-The reusable design should extend existing tooling in this order:
+A new-language or modernized edition is **a distinct editorial product**, not a structural cleanup. Only begin from an approved cleaned source, follow [the translation workflow](COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md), and retain separate edition identity, provenance, review and release authorization.
 
-1. **Source acquisition and source-native inventory:** keep exact original
-   bytes, formats, encoding, language metadata, edition and rights provenance;
-   use format-aware adapters for *actual* SWORD, OSIS, USFM or ThML sources.
-   Do not translate, silently normalize Unicode/punctuation or assume English
-   book names. Preserve original labels separately from canonical reference
-   identifiers; use the source's own versification.
-2. **Lossless structural inspection:** represent, in memory, ordered original
-   text nodes, paragraphs, poetry, headings, quotes, notes, hyperlinks,
-   introductions, section identities, original full ranges and source
-   positions. The source markup remains authoritative, not a hand-invented
-   proprietary replacement. Flag structures the chosen standards cannot
-   express without loss rather than dropping them.
-3. **Language-independent mapping and diagnostics:** preserve duplicate-start
-   sections as distinct source identities; classify incompatible SWORD address
-   ownership without selecting a winner, concatenating silently, or inventing
-   first-verse aliases. Use exact text/markup and reference comparisons as
-   baseline. Any optional linguistic tokenization must be language-aware,
-   explicitly configured, advisory, and never a source mutation or release
-   requirement (e.g. no English-only word regex or case heuristics).
-4. **Standard output and reversible build:** choose a supported
-   SWORD/OSIS/USFM conversion route appropriate to the *actual* source;
-   retain evidence for unsupported mappings. Compile only after every
-   independently inventoried source unit has an explicit preserved, mapped
-   or blocked disposition. Audit the compiled SWORD native index, complete
-   text, punctuation, headings, note/reference targets, structure, and
-   introductions against the originals; record every transformation.
-5. **Cross-language acceptance:** validate the same engine with at least one
-   real English and one real French source, including accents, apostrophes,
-   Unicode, names/references and source-specific versification; add other
-   languages without branching the core by language. A passing English
-   example alone is not a generic implementation certificate.
+## Where evidence belongs
 
-The existing seven-stage, per-edition rights/editorial/reader approval gates
-remain unchanged. MHC is a demanding **fixture** for the reusable pipeline,
-not an architectural dependency. A temporary incomplete MHC experiment must
-not become an automatically required CI job for unrelated resource changes.
+- Global process, schemas and validation rules: `docs/`.
+- Source-specific readings, correction decisions, ambiguous scopes and link decisions: `sources/cleaned/commentaries/<language>/<module-id>/editorial/`.
+- Versioned release receipts and source-bound audit reports: the same module's `editorial/releases/` and `editorial/evidence/`.
+- Dated, superseded research **not** defining current workflow: `history/`. The previous mixed commentary research/procedure is preserved in [historical records](../../history/pipeline/COMMENTARY_PIPELINE_LEGACY_2026-11-20.md).
 
-## Commands (metadata-only preflight, no release)
-
-For an existing manifest, source observation performs network access but must
-**never** be treated as approved redistribution or a source-content proof:
-
-```sh
-python scripts/commentary_intake.py --resource-id RESOURCE --stage 1 \
-  --report /tmp/commentary-identity.json
-python scripts/commentary_intake.py --resource-id RESOURCE --stage observe \
-  --report /tmp/commentary-observation.json
-# Review and separately pin the exact source archive SHA; do not autopin it.
-python scripts/commentary_intake.py --resource-id RESOURCE --stage 2 \
-  --report /tmp/commentary-pinned.json
-```
-
-Actual checked-in **approved** resources can all use the same offline
-source/rights/payload/release proof, without a second packaging implementation:
-
-```sh
-python scripts/release_preflight.py \
-  --module-id lsg-1910 \
-  --module-id darby-jnd-2024 \
-  --module-id mhcc-crosswire \
-  --report /tmp/verified-sword-packages.json
-```
-
-The release preflight simply composes the production gates and reconstructs
-the exact deterministic public-plan ZIP **in a temporary directory**. It
-does not change the repository, approve a new rights claim, call the GitHub
-publishing API or prove UI rendering in every reader. The integration test
-covers three **independently attested and already published** real editions:
-LSG `RawText`, Darby `zText` and MHCC `zCom`. Their checked-in
-source native proofs and rights records remain edition-specific.
-
-## Companion original-compilation audit
-
-The supported original commentary drivers are `RawCom`, `RawCom4`,
-`zCom` and `zCom4` only where the actual module and native reader
-support them. A reference/entry count is **not** authorial scope parity:
-linked verse slots can share one physical commentary body; introductions
-and opaque entries must be inventoried separately. Extract source text
-only privately where rights permit, using actual standard SWORD tools.
-Never invent OSIS markup, citation ranges, or original sections just
-to make a tool pass. A reader-rendering bug (such as a double heading)
-belongs in the Bible application, not a destructive edit to the module.
-
-The large [historic MHCC scope experiment](../../.github/workflows/commentary-editorial-section-scope.yml) and related
-private source/CCEL experiments are evidence for
-[the MHCC 0.1.1 decision](../evidence/mhcc-274/mhcc-0.1.1-editorial-rights-acceptance.md), **not** a
-generic stable runner or an invitation to rerun 2,000 lines of
-edition-specific assertions for a new commentary. Shared helpers may
-be reused after independent tests; keep historical workflows for
-reproducibility until reviewed migration coverage exists.
-
-### A second independent commentary
-
-The CrossWire public catalogue lists **John Wesley's Notes on the Bible**
-as `Wesley` 1.1 (2001-11-28) with a **Public Domain** claim. Its source
-description attributes electronic edition/markup work to named editors.
-This makes it a useful **private, read-only** cross-commentary
-intake/inventory pilot; no edition-equivalence, corrective editing, or
-redistribution approval is implied. John Gill should be considered only
-after discovering a verified source and separate rights. Unlike MHCC,
-a Wesley pilot must exercise the actual driver and native inventory it
-offers, not copy MHCC's 28,742-key counts, alias plan, editor or correction
-list. If the original ZIP cannot be pinned or independently read, record
-`BLOCKED` rather than inventing PASS.
-
-## Error categories and review decisions
-
-Use `DONE` only for a clearly defined completed gate, `PARTIAL` for
-demonstrated limited coverage, `BLOCKED` for a real failed prerequisite,
-and `INCONCLUSIVE` where source witnesses/readers disagree. Keep report
-identity (resource ID, source SHA, code commit, driver, native keys,
-exit status, URLs and independent receipts); avoid logging original
-licensed prose or notes in public artifacts. A single private observation
-can identify a candidate anomaly but can neither rewrite an authorial
-passage nor authorize publication.
-
-For scripts and their preserved legacy callers, consult
-[the full tool registry](../TOOL_REGISTRY.md) and the
-[contributor rules](../../CONTRIBUTING.md). General packaging and release
-checks belong in [PUBLISHING.md](PUBLISHING.md); Bible
-translation source/native fidelity stays in #28, and resumable
-multi-stage audit orchestration stays in #83 rather than being
-reimplemented here.
+Do not introduce provider-specific or book-specific fixes into the generic toolchain to make a single module pass.
