@@ -44,7 +44,7 @@ The research workflow now **pins both exact upstream ZIP SHA-256 values** above.
 
 ### Canonical-book crosswalk versus the complete authorial source
 
-The follow-up [standard USFM→SWORD native book-scope audit](../SOURCE_NATIVE_BOOK_SCOPE.md) adds an **explicit source book-code mapping** for the standard 66 books. Instead of assuming that the ordinal 40th USFX book is the ordinal 40th native reader book after extra source books, it checks every mapped **chapter and verse identifier** by book code.
+The follow-up [standard USFM→SWORD native book-scope audit](../technical/SOURCE_NATIVE_BOOK_SCOPE.md) adds an **explicit source book-code mapping** for the standard 66 books. Instead of assuming that the ordinal 40th USFX book is the ordinal 40th native reader book after extra source books, it checks every mapped **chapter and verse identifier** by book code.
 
 It preserves a separate enumerated list of **all additional authorial USFX books and their numbered verse counts**, including unnumbered `FRT` and `GLO`. It never silently removes or merges those sections. The experiment reports canonical-key parity or precise mismatched references as a **scoped index diagnostic**, while leaving complete source-to-compiled correspondence and literary/editorial equivalence **unverified**. Even an exact canonical key subset cannot justify treating the larger source as a proven edition-identical 66-book module.
 

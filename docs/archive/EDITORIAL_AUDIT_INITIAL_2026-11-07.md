@@ -1,6 +1,6 @@
 # Initial editorial audit observations — 2026-11-07
 
-**Historical evidence only.** These original observations predate subsequent module imports and releases. Consult [the active OSIS editorial audit tooling guide](../EDITORIAL_AUDIT_WORKFLOW.md) and [canonical production contract](../PRODUCTION_PIPELINE.md) for current processes.
+**Historical evidence only.** These original observations predate subsequent module imports and releases. Consult [the active OSIS editorial audit tooling guide](../workflows/EDITORIAL_AUDIT_WORKFLOW.md) and [canonical production contract](../PRODUCTION_PIPELINE.md) for current processes.
 
 ## Actual first-source observations (2026-11-07)
 
@@ -23,5 +23,5 @@ if the original source cannot be obtained, the future extraction adapter
 must reconstruct a clearly *generated* intermediate with SWORD entry keys,
 never assert that generated lines are original source lines.
 
-See also [the full quality policy](../QUALITY_POLICY.md), [editorial rules](../EDITORIAL_RULES.md),
+See also [the full quality policy](../policies/QUALITY_POLICY.md), [editorial rules](../policies/EDITORIAL_RULES.md),
 and [pilot issue #12](https://github.com/icfmp/Bible-Resources/issues/12).

@@ -77,7 +77,7 @@ quotation that Henry uses in his argument.
 ## Versification and omitted verses
 
 Official SWORD v11n data, **not one mapping per translation**:
-[VERSIFICATION_POLICY.md](../VERSIFICATION_POLICY.md).
+[VERSIFICATION_POLICY.md](../policies/VERSIFICATION_POLICY.md).
 
 - Confirm *actual* `Versification` value in each downloaded module's
   `mods.d/*.conf` (CrossWire lists MHC as KJV in several source records,

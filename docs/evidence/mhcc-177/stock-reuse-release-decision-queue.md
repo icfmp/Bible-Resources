@@ -2,7 +2,7 @@
 
 **As of 2026-11-14 · Research / pre-publication only · NOT APPROVED FOR RELEASE**
 
-This short decision record consolidates the latest evidence for [import #177](https://github.com/icfmp/Bible-Resources/issues/177). It **does not** replace the complete source audits, seven-stage [commentary workflow](../../COMMENTARY_7_STAGE_WORKFLOW.md), [rights dossier](crosswire-exact-stock-rights-review.md), [CCEL comparison queue](source-book-identity-five-case-review-queue.md), or the [draft reader profile](../../profiles/en-matthew-henry-concise-crosswire-2.0-draft.md). It adds no content correction or publication approval.
+This short decision record consolidates the latest evidence for [import #177](https://github.com/icfmp/Bible-Resources/issues/177). It **does not** replace the complete source audits, seven-stage [commentary workflow](../../workflows/COMMENTARY_7_STAGE_WORKFLOW.md), [rights dossier](crosswire-exact-stock-rights-review.md), [CCEL comparison queue](source-book-identity-five-case-review-queue.md), or the [draft reader profile](../../profiles/en-matthew-henry-concise-crosswire-2.0-draft.md). It adds no content correction or publication approval.
 
 ## Scope and production choice
 

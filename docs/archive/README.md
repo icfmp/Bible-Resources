@@ -2,7 +2,7 @@
 
 These are **source and decision evidence**, not current instructions for importing or publishing resources. Historical status statements should be read against their original dates.
 
-For new or revised editions, use [the canonical production pipeline](../PRODUCTION_PIPELINE.md), [Bible seven-stage checkpoints](../BIBLE_7_STAGE_WORKFLOW.md), [commentary seven-stage checkpoints](../COMMENTARY_7_STAGE_WORKFLOW.md), and [publishing](../PUBLISHING.md).
+For new or revised editions, use [the canonical production pipeline](../PRODUCTION_PIPELINE.md), [Bible seven-stage checkpoints](../workflows/BIBLE_7_STAGE_WORKFLOW.md), [commentary seven-stage checkpoints](../workflows/COMMENTARY_7_STAGE_WORKFLOW.md), and [publishing](../workflows/PUBLISHING.md).
 
 ## Preserved records
 
