@@ -9,7 +9,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
-from commentary_chapter_ref_labels import link_label_location
+from research.commentary.commentary_chapter_ref_labels import link_label_location
 from pilot_preflight import PilotError
 
 
