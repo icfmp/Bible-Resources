@@ -1,6 +1,6 @@
 # Source and SWORD formats
 
-For new cleaned Bible and commentary editions, follow the versioned [Bible Resources Normalization Profile (BRNP v0.1)](BRNP.md). It standardizes **representation**, not editorial text; it is currently a read-only structural pilot, not an enforced publication gate. Official OSIS validity, source fidelity and native reader tests remain separate.
+A common [Bible Resources Normalization Profile (BRNP)](BRNP.md) is **proposed**, not yet enforced; implementation and conformance tests are deferred to [issue #451](https://github.com/icfmp/Bible-Resources/issues/451). The existing official format, source fidelity and native reader gates remain authoritative.
 
 Use standard SWORD drivers (RawText/zText, RawCom/RawCom4/zCom, RawLD/zLD, RawGenBook). Prefer structured OSIS for scripture and commentary when source material supports it; TEI is appropriate for dictionaries. Preserve authorial structure instead of enforcing a single type on all content. Configuration uses UTF-8, an accurate language code, checked Versification and standard mods.d entries. Test actual retrieval in diatheke or another SWORD client before publishing.
 
