@@ -52,6 +52,8 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_unresolved_semantic_priorities.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_lower_confidence_single_sense.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_context_review_batches.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_sense_form_witnesses.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_form_supported_provisional_senses.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -960,6 +962,47 @@ jobs:
           assert r['contextually_verified']==0 and r['source_modified'] is False and r['published'] is False
           print('GREEK_2728_AMBIGUOUS_UBS_ORIGINAL_WORDS_GROUPED_WITHOUT_CONTEXTUAL_SELECTION')
           PY
+      - name: Compare original UBS bilingual form evidence for Greek ἰδού and ἴδε
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_sense_form_witnesses.py \
+            --batches /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-ide-idou-original-source-form-evidence-PRIVATE.json
+      - name: Stage 223 authentic source-form-specific Greek UBS provisional sense choices
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_form_supported_provisional_senses.py \
+            --batches /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-223-source-form-provisional-sense-choices-PRIVATE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/bsi-ubs-greek-223-source-form-provisional-sense-choices-PRIVATE.json').read_text())
+          assert x['additional_original_word_provisional_choices']==223
+          assert len(x['new_word_id_to_source_form_supported_provisional_lexid'])==223
+          assert x['all_other_original_ambiguities_still_unselected']==2505
+          assert len(x['same_family_extra_sense_candidate_not_selected'])==1
+          assert x['independently_contextually_validated']==0
+          assert x['source_modified'] is False and x['published'] is False
+          assert x['publication_approved'] is False
+          print('GREEK_223_SOURCE_FORM_SUPPORTED_PROVISIONAL_SENSES_NO_CONTEXT_VERIFICATION')
+          PY
+      - name: Upload 223 source-form-supported Greek provisional senses (PRIVATE)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-223-source-form-provisional-lexids-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-223-source-form-provisional-sense-choices-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload pinned Greek sense form metadata (PRIVATE, NOT validated)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-ide-idou-source-sense-forms-PRIVATE
+          path: /tmp/bsi-ubs-greek-ide-idou-original-source-form-evidence-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload Greek 2728 contextual sense review batches (PRIVATE, NO selections)
         uses: actions/upload-artifact@v4
         with:
