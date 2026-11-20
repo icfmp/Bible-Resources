@@ -77,7 +77,7 @@ Perform **full native readback** (keys, text, markup, metadata, commentary scope
 
 Install the exact candidate in an external SWORD reader such as Xiphos; use another reader where coverage warrants it (e.g. AndBible/JSword). Verify representative **high-risk** cases in the GUI: introductory sections, chapter-only commentary, verse/range anchors, omitted verses, paragraphs and poetry, notes, hyperlinks and their true destinations, cross-book navigation, language direction and nonstandard versification. Distinguish a reader display bug from a source or SWORD payload defect. Record tested application/version, environment, exact candidate hashes, screenshots and failure classification.
 
-Reader samples supplement, **never replace**, exhaustive native parity. Do not modify the separate `icfmp/Bible` application to conceal source defects. See [reader QA](technical/OSIS_PARAGRAPH_RENDERING_QA.md) and [onboarding playbook](RESOURCE_ONBOARDING_PLAYBOOK.md).
+Reader samples supplement, **never replace**, exhaustive native parity. Do not modify the separate `icfmp/Bible` application to conceal source defects. See [reader QA](technical/OSIS_PARAGRAPH_RENDERING_QA.md).
 
 ## 6. Release approval, publication, and retention
 
