@@ -1,0 +1,97 @@
+name: Publish approved BSI UBS Greek identifier-only v0.1.0
+
+on:
+  workflow_run:
+    workflows: ["BSI UBS Greek dictionary crosswalk"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  publish-approved-identifier-only-crosswalk:
+    # Never publish anything built from a PR, fork, feature branch or failed
+    # review. The upstream workflow itself must finish successfully after a
+    # push to the repository's protected main branch.
+    if: >-
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main' &&
+          github.event.workflow_run.head_repository.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - name: Check out exactly the verified protected-main commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+      - name: Require source commit to still be current protected main
+        env:
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$SOURCE_SHA"
+          test -f entity-index/links/dictionaries/ubs-greek/build_public_identifier_release.py
+          test -f entity-index/links/dictionaries/ubs-greek/PUBLIC_RELEASE_NOTES.md
+      - name: Download only the identifier-only archive from the successful source CI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p public-release
+          gh run download "$RUN_ID" -R "$GH_REPO" \
+            --name bsi-ubs-greek-v0.1.0-identifier-only-release-candidate \
+            --dir public-release
+          test -s public-release/BSI-UBS-Greek-0.1.0.zip
+          test -s public-release/BSI-UBS-Greek-0.1.0.zip.sha256
+      - name: Independently inspect final downloadable fields, size and checksums
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,zipfile
+          from pathlib import Path
+          f=Path('public-release/BSI-UBS-Greek-0.1.0.zip')
+          expected=f.with_name(f.name+'.sha256').read_text().split()
+          assert len(expected)==2 and expected[1]==f.name
+          assert expected[0]==hashlib.sha256(f.read_bytes()).hexdigest()
+          with zipfile.ZipFile(f) as z:
+            assert z.namelist()==['ATTRIBUTION.md','README.md','index.json','manifest.json']
+            idx=json.loads(z.read('index.json'))
+            man=json.loads(z.read('manifest.json'))
+            assert len(idx['by_word_id'])==137741
+            assert idx['version']=='0.1.0'
+            assert idx['license']=='CC BY-SA 4.0'
+            assert idx['contextual_semantics_independently_verified'] is False
+            assert idx['counts']['supported_lexical_word_ids']==137694
+            assert idx['counts']['provisional_sense_word_ids']==123195
+            assert idx['counts']['unassigned_sense_word_ids']==14546
+            assert man['sha256']==hashlib.sha256(z.read('index.json')).hexdigest()
+            allowed={'status','entry_ids','provisional_lexid','candidate_lexids','evidence_tier'}
+            assert all(set(row)==allowed for row in idx['by_word_id'].values())
+            assert not any(name.endswith('.txt') for name in z.namelist())
+            assert b'CC BY-SA 4.0' in z.read('ATTRIBUTION.md')
+            assert b'Biblica' in z.read('ATTRIBUTION.md')
+          print('PUBLIC_UBS_GREEK_IDENTIFIER_ONLY_RELEASE_ARCHIVE_REVERIFIED')
+          PY
+      - name: Create immutable versioned release from protected main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          TAG=bsi-ubs-greek-v0.1.0
+          if gh release view "$TAG" -R "$GH_REPO" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; never overwrite published assets"
+            exit 0
+          fi
+          gh release create "$TAG" \
+            public-release/BSI-UBS-Greek-0.1.0.zip \
+            public-release/BSI-UBS-Greek-0.1.0.zip.sha256 \
+            --repo "$GH_REPO" \
+            --target "$SOURCE_SHA" \
+            --title "Bible Semantic Index — UBS Greek NT lexical crosswalk v0.1.0" \
+            --notes-file entity-index/links/dictionaries/ubs-greek/PUBLIC_RELEASE_NOTES.md
