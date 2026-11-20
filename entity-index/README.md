@@ -89,6 +89,8 @@ nonexhaustive source-candidate study, not a dictionary or published release.
 The first version's **internal-only** build receipt, licensing caveats and
 Bible consumer integration contract are in
 [the v0.1 candidate handoff](V0_1_CANDIDATE_HANDOFF.md).
+The [BSI UBS Greek NT word-level crosswalk v0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/bsi-ubs-greek-v0.1.0) is now also **published separately** as an identifier-only CC BY-SA 4.0 ZIP (137,741 original MACULA word IDs; 137,694 supported UBS lexical headwords; 123,195 **provisional**, not independently contextually verified UBS LEXIDs; explicit ambiguity and entry-only fallback). It contains **no Greek text, definitions, Strong/LN annotations or morph data**, and is **not** a SWORD module or Bible app integration. See [rights and release boundaries](links/dictionaries/ubs-greek/RELEASE_READINESS.md).
+
 The [standalone BSI v0.1.0 data release](https://github.com/icfmp/Bible-Resources/releases/tag/bsi-v0.1.0) is published as a **separate, keyterm-free distribution ZIP**; it is not an SWORD module or application integration. The internal full-corpus QA index remains unpublished. The [BSI v0.1 release-readiness record](BSI_V0_1_RELEASE_READINESS.md) documents the adopted name, field-level rights questions and release gates; integration into the Bible app is owned separately.
 
 ## Initial independent editorial corrections
