@@ -37,7 +37,7 @@ For each real cleaned master, require a SHA-locked original, a reversible
 delta manifest, full text/structure/Strong/notes/reference parity, and a
 native SWORD readback and independent Xiphos acceptance receipt.
 
-[Workspace layout](../../docs/WORKSPACE_LAYOUT.md).
+[Workspace layout](../../docs/architecture/WORKSPACE_LAYOUT.md).
 
 ## Edition-specific editorial decisions
 

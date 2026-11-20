@@ -602,7 +602,7 @@ These are **distinct-body** annotation occurrences, **not** the much higher tota
 
 ## Exact-source Ezekiel 3 erratum: independently corroborated, byte-reversible PRIVATE preview (2026-11-15)
 
-[Full source-pinned private audit CI #43713005607](https://github.com/icfmp/Bible-Resources/actions/runs/43713005607) **SUCCESS**; the generic reversed-reference and exact-byte-literal-edit synthetic tests also pass. The preflight is explicitly marked *research only* in [the separately pinned, unapproved proposal](../../../../config/commentary-intake/mhcc-crosswire-proposed-literal-errata.json) and in [erratum issue #277](https://github.com/icfmp/Bible-Resources/issues/277).
+[Full source-pinned private audit CI #43713005607](https://github.com/icfmp/Bible-Resources/actions/runs/43713005607) **SUCCESS**; the generic reversed-reference and exact-byte-literal-edit synthetic tests also pass. The preflight is explicitly marked *research only* in [the separately pinned, unapproved proposal](../../../config/commentary-intake/mhcc-crosswire-proposed-literal-errata.json) and in [erratum issue #277](https://github.com/icfmp/Bible-Resources/issues/277).
 
 ### Three independent observations, with careful editorial boundaries
 

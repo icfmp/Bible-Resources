@@ -17,4 +17,4 @@ and [HMCC Modern](en/hmcc-modern/hmcc-modern.osis.xml) are different editions.
 
 Preserve comment bodies, introductions, section scopes/ranges, original text,
 notes and reference mapping through all future source-to-native rebuilds.
-[Source inventory](../../../docs/RESOURCE_WORKSPACE_INDEX.md).
+[Source inventory](../../../docs/architecture/RESOURCE_WORKSPACE_INDEX.md).

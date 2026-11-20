@@ -196,4 +196,4 @@ Ces particularités sont documentées et ne constituent pas une modification des
 - [ ] Complete edition-specific variant evidence review (including Greek witnesses and 1910 revision provenance), then explicitly approve the profile's machine/public display separately from the existing module `quality.status`
 - [ ] Decide how the application/catalogue represents approved profile revisions and retains attribution offline
 
-**Editorial rule:** the already-published 0.1.0 Scripture and its immutable release hashes are not changed by edits to this profile. See [resource profile evidence policy](../RESOURCE_PROFILES.md).
+**Editorial rule:** the already-published 0.1.0 Scripture and its immutable release hashes are not changed by edits to this profile. See [resource profile evidence policy](../architecture/RESOURCE_PROFILES.md).

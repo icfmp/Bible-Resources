@@ -13,4 +13,4 @@ morphology links by *word position*, translation notes, caller labels,
 cross-references and semantic structures. Record a full source/native parity
 audit and reversible cleanup receipt.
 
-[Source inventory](../../../docs/RESOURCE_WORKSPACE_INDEX.md).
+[Source inventory](../../../docs/architecture/RESOURCE_WORKSPACE_INDEX.md).

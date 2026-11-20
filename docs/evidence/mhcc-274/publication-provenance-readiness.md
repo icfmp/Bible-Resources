@@ -87,7 +87,7 @@ The normal [`scripts/build.py`](../../../scripts/build.py) builds the public SWO
 - Final independent code/source and rights review, especially the new generic source-correction and final metadata guard.
 - Editorial confirmation that the original CrossWire public-domain declaration is sufficient for the narrowly corrected derivative; verify the final about/source attribution remains accurate, without adding separately licensed CCEL annotations.
 - Choose the **actual approved release day**, produce its final attributed `.conf`, update the curated version and source review fields, and build the **new final deterministic ZIP/size/hash**. The temporary private SHA cannot serve as the new public metadata-adjusted asset checksum.
-- Create a versioned, source-pinned approved release plan matching the final package's exact SHA/byte length. Enforce the repository [single ordered publication workflow](../../../docs/PUBLISHING.md), whose GitHub Release must exist and be download-verified *before* the Pages catalogue is deployed.
+- Create a versioned, source-pinned approved release plan matching the final package's exact SHA/byte length. Enforce the repository [single ordered publication workflow](../../workflows/PUBLISHING.md), whose GitHub Release must exist and be download-verified *before* the Pages catalogue is deployed.
 - Ask the project owner for **separate express authorization** for the GitHub Release, catalogue update and any merge, then verify genuine public ZIP download, catalogue install/update and unchanged 0.1.0 rollback.
 
 **Not completed:** public date, public versioned ZIP/checksum, release plan, independent approval, GitHub Release, Pages catalogue verification. None is implied by CI tests or this document.
