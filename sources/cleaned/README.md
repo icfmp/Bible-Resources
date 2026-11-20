@@ -22,7 +22,7 @@ Every file includes an adjacent original/source-bound `CLEANUP_MANIFEST.json`
 and its SHA matches its existing, previously authorized release/source proof.
 The original unchanged witnesses are separate under `../original/`.
 The historical MHC cleanup reports remain under
-[`docs/evidence/mhc-285/source-cleanup/`](../../docs/evidence/mhc-285/source-cleanup/).
+[`docs/evidence/mhc-285/source-cleanup/`](commentaries/en/mhc-crosswire/editorial/evidence/source-cleanup).
 
 **Classic MHCC is now present** as a *newly reconstructed, semantically
 round-trip verified OSIS* from the published and source-attested SWORD 0.1.1

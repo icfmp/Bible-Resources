@@ -1,9 +1,9 @@
-> **Historical detailed research reference.** Preserved complete, including experimental stage-4 analyses and earlier operator guidance. Current operator instructions are at [BIBLE_STAGE_AUTOMATION.md](../workflows/BIBLE_STAGE_AUTOMATION.md), and the authoritative source-first release contract is [PRODUCTION_PIPELINE.md](../PRODUCTION_PIPELINE.md). Dated experiments are not general proof of a working full-corpus round-trip.
+> **Historical detailed research reference.** Preserved complete, including experimental stage-4 analyses and earlier operator guidance. Current operator instructions are at [BIBLE_STAGE_AUTOMATION.md](../../docs/workflows/BIBLE_STAGE_AUTOMATION.md), and the authoritative source-first release contract is [PRODUCTION_PIPELINE.md](../../docs/PRODUCTION_PIPELINE.md). Dated experiments are not general proof of a working full-corpus round-trip.
 
 # Run Bible onboarding checks through GitHub Actions
 
 This is the **machine-execution companion** to the
-[seven-stage Bible workflow](../workflows/BIBLE_7_STAGE_WORKFLOW.md).
+[seven-stage Bible workflow](../../docs/workflows/BIBLE_7_STAGE_WORKFLOW.md).
 It is **read-only research**. It does not translate, modify, normalize,
 compile, publish, license or approve biblical content.
 
@@ -186,7 +186,7 @@ and reviewed OSIS/USFX schema procedures **before** updating immutable
 manifest pins. This change skips duplicate observation, **not source hash
 validation**, standards requirements, native readback or human review.
 
-See [Darby 2024 postmortem](../DARBY_2024_IMPORT_POSTMORTEM.md) for measured
+See [Darby 2024 postmortem](../../docs/DARBY_2024_IMPORT_POSTMORTEM.md) for measured
 preflight and full-source timing, where the stage 4/5 optimization helped, and
 what is deliberately still pending in generic fidelity work #28/#83.
 
@@ -517,7 +517,7 @@ Step 4 is split **internally** into 4a (stock identity / complete reference
 index), 4b (full numbered main text), 4c (whitespace and major editorial
 structure triage), and 4d (stock reuse versus source-faithful rebuild decision).
 The top-level workflow, issue checklist and user-facing progress remain **seven
-stages**. See [the bounded 4a–4d checklist](../workflows/BIBLE_7_STAGE_WORKFLOW.md).
+stages**. See [the bounded 4a–4d checklist](../../docs/workflows/BIBLE_7_STAGE_WORKFLOW.md).
 
 The original-USFX structural anchor probe is a *diagnostic precursor* to a
 source-relative paragraph and poetry proof:

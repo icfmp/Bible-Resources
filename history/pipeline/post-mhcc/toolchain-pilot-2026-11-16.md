@@ -4,7 +4,7 @@
 
 Maintained `main` baseline: `a1cb96cb87f5a8d21200810159187552c61c4bff` (MHCC 0.1.1 published and public SHA verified). The cleanup is isolated to [PR #280](https://github.com/icfmp/Bible-Resources/pull/280); original published modules, notes, SWORD identities and public catalogue must remain **byte-for-byte unchanged**.
 
-At kickoff: **152 tracked Python scripts, six native C++ scripts, 45 workflows, 147 Python test files and 105 docs/evidence files**. A generated [complete source- and caller-bound registry](../../TOOL_REGISTRY.md) records every current tracked script; no script is deleted based on guessed use. These numbers are the fixed baseline, not the expected count after adding future reusable tools.
+At kickoff: **152 tracked Python scripts, six native C++ scripts, 45 workflows, 147 Python test files and 105 docs/evidence files**. A generated [complete source- and caller-bound registry](../../../docs/TOOL_REGISTRY.md) records every current tracked script; no script is deleted based on guessed use. These numbers are the fixed baseline, not the expected count after adding future reusable tools.
 
 ## Reusable SWORD packaging/preflight
 

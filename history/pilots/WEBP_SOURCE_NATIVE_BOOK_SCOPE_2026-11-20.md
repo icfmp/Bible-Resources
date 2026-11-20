@@ -36,4 +36,4 @@ This result **does not** justify adding an exception, relocating the doxology or
 3. Independently extract full actual compiled SWORD text, notes, lexical values, authored explicit links and structural start **and closing** events, including verse-zero and non-addressable intros. Compare against the original edition without deleting annotations or inventing verses.
 4. Test a genuinely second complete edition with its actual source, compiler outputs and separate stock-SWORD/reader verification; record licence and owner editorial approval before publication.
 
-See also [SECOND_REAL_BIBLE_PROBE.md](../SECOND_REAL_BIBLE_PROBE.md), [SOURCE_OSIS_INVENTORY.md](SOURCE_OSIS_INVENTORY.md), [NATIVE_SWORD_INDEX_INVENTORY.md](NATIVE_SWORD_INDEX_INVENTORY.md).
+See also [SECOND_REAL_BIBLE_PROBE.md](../SECOND_REAL_BIBLE_PROBE.md), [SOURCE_OSIS_INVENTORY.md](../../docs/technical/SOURCE_OSIS_INVENTORY.md), [NATIVE_SWORD_INDEX_INVENTORY.md](../../docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md).

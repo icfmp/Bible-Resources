@@ -12,11 +12,11 @@
 
 ## Evidence
 
-- [Historical stage-5 editorial review draft](../../../../../../docs/evidence/frajnd-2024-stage5-editorial-review.md) and [final 0.1.1 reader QA](../../../../../../docs/evidence/darby-2024-0.1.1-final-reader-qa.md). The stage-5 draft predates final authorization; do not treat its pending status as the present edition status.
+- [Historical stage-5 editorial review draft](evidence/frajnd-2024-stage5-editorial-review.md) and [final 0.1.1 reader QA](evidence/darby-2024-0.1.1-final-reader-qa.md). The stage-5 draft predates final authorization; do not treat its pending status as the present edition status.
 
 - [Original/cleaned stage manifest](../CLEANUP_MANIFEST.json)
-- [Darby reader profile](../../../../../../docs/profiles/fr-darby-jnd-2024.md)
-- [0.1.1 release receipt](../../../../../../docs/releases/DARBY-JND-2024-0.1.1.md)
+- [Darby reader profile](profiles/fr-darby-jnd-2024.md)
+- [0.1.1 release receipt](releases/DARBY-JND-2024-0.1.1.md)
 - [Historical stage-4 retrospective](../../../../../../docs/DARBY_2024_IMPORT_POSTMORTEM.md)
 - [0.1.1 editorial authorization](../../../../../../config/darby-0.1.1-release-authorization.json)
 - [Published provenance](../../../../../../modules/darby-jnd-2024/RELEASE_PROVENANCE.json)

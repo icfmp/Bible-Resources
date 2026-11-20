@@ -1,8 +1,8 @@
 # Reusable commentary pipeline — source first, no invented changes
 
 This is a **compact execution guide** for the existing, authoritative
-[commentary seven-stage workflow](COMMENTARY_7_STAGE_WORKFLOW.md), itself
-based on the [Bible workflow](BIBLE_7_STAGE_WORKFLOW.md). It does **not**
+[commentary seven-stage workflow](../../docs/workflows/COMMENTARY_7_STAGE_WORKFLOW.md), itself
+based on the [Bible workflow](../../docs/workflows/BIBLE_7_STAGE_WORKFLOW.md). It does **not**
 create another sequence or override that document. The stages express
 release gates, **not** an artificial deadline or a set of mandatory
 one-off helper scripts. Each completed step has a source-bound,
@@ -181,7 +181,7 @@ belongs in the Bible application, not a destructive edit to the module.
 
 The large [historic MHCC scope experiment](../../.github/workflows/commentary-editorial-section-scope.yml) and related
 private source/CCEL experiments are evidence for
-[the MHCC 0.1.1 decision](../evidence/mhcc-274/mhcc-0.1.1-editorial-rights-acceptance.md), **not** a
+[the MHCC 0.1.1 decision](../../sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/mhcc-0.1.1-editorial-rights-acceptance.md), **not** a
 generic stable runner or an invitation to rerun 2,000 lines of
 edition-specific assertions for a new commentary. Shared helpers may
 be reused after independent tests; keep historical workflows for
@@ -213,9 +213,9 @@ can identify a candidate anomaly but can neither rewrite an authorial
 passage nor authorize publication.
 
 For scripts and their preserved legacy callers, consult
-[the full tool registry](../TOOL_REGISTRY.md) and the
+[the full tool registry](../../docs/TOOL_REGISTRY.md) and the
 [contributor rules](../../CONTRIBUTING.md). General packaging and release
-checks belong in [PUBLISHING.md](PUBLISHING.md); Bible
+checks belong in [PUBLISHING.md](../../docs/workflows/PUBLISHING.md); Bible
 translation source/native fidelity stays in #28, and resumable
 multi-stage audit orchestration stays in #83 rather than being
 reimplemented here.
