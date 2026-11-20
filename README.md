@@ -4,6 +4,13 @@
 
 Bible Resources is an **independent community project**, not an official CrossWire repository. Its goal is to provide one reliable catalogue of biblical texts, commentaries, dictionaries and related resources, with clear provenance and consistent editorial quality. Improvements suitable for the original upstream project should be offered back to their maintainers.
 
+The retired experimental offline `place-context` dataset has been removed.
+Any future Wikipedia/Wikidata enrichment belongs to
+[Bible-Resources-Wikipedia](https://github.com/icfmp/Bible-Resources-Wikipedia)
+and **must use the independently reviewed Bible Semantic Index (BSI) entity
+identifiers**, not the discarded OpenBible-only place-data prototype. The BSI
+work under `entity-index/` is independent and is not altered by this cleanup.
+
 ## Principles
 
 1. **SWORD first.** Preserve standard module drivers, versification systems and layout. Never introduce a Bible-only binary format.
