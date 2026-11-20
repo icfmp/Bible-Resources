@@ -332,7 +332,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "3c002047a017eb7118de228f92e2bd3b68607c596ff47ef273b79831e692487b",
+      "sha256_at_inventory": "071ed879bad3b14998b74d17234eebc69dac5d5c05bb13d3e48f2f4f81587c56",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -7019,7 +7019,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "8b1fc4cb3a0b7ce5c85dd8e3318715761ab6481c280ac79c7e8c1fc14e77fef7",
+      "sha256_at_inventory": "eafe71cba6d5a8d3330189733bfee2f8a20e9b440055e0c2d0448164421c7a64",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
