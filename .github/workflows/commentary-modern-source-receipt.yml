@@ -3810,7 +3810,8 @@ jobs:
           PY
           # Restore unmodified original production workflow to avoid leaving a
           # permanent special-purpose recovery/publishing mechanism.
-          git restore --source=HEAD^ -- .github/workflows/commentary-modern-source-receipt.yml
+          git fetch --depth=1 origin main
+          git restore --source=FETCH_HEAD -- .github/workflows/commentary-modern-source-receipt.yml
           git add .github/workflows/commentary-modern-source-receipt.yml sources/cleaned/commentaries/en/hmcc-modern/
           git diff --cached --check -- ':!sources/cleaned/**/*.xml'
           git config user.name "github-actions[bot]"
