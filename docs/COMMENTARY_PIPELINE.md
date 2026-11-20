@@ -89,7 +89,7 @@ authorizes redistribution of a third party's digital edition.
 
 **The import/reconstruction engine must not be built around English MHC, CCEL,
 a particular commentary, or one book/verse scheme.** Research-only MHC
-experiments under \`research/mhc-ccel/\` are historical feasibility evidence,
+experiments under \`work/commentaries/mhc-crosswire/experiments/ccel-imp/\` are historical feasibility evidence,
 not a new production importer, accepted data model, or instruction to add
 MHC-specific exceptions. The CCEL trial's SWORD CLI success is not a complete
 source-structure or reader-parity proof.

@@ -113,8 +113,9 @@ without a separate, fully tested path-migration PR:
 - `work/mhcc-modern/`: ~1,300 historically versioned modern-commentary
   manuscripts and review receipts. **Do not call this scratch to be deleted**:
   retain existing references, source-diff hashes and final-release proof.
-- `research/mhc-ccel/`: experimental historical source adapter and its tests,
-  preserved for replay, **not a supported importer**.
+- `work/commentaries/mhc-crosswire/experiments/ccel-imp/`: archived historical CCEL
+  feasibility adapter and its tests, **not a supported importer**. This was
+  moved with byte-identical Python source and updated historical workflow.
 
 These are **legacy-compatible paths**, not new locations to target. New
 projects and future versioned source editions follow the typed structure
