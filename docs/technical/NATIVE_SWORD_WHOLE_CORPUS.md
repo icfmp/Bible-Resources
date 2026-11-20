@@ -1,21 +1,16 @@
-# Complete stock SWORD raw-corpus SHA inventory — source-neutral
+# Native SWORD whole-corpus inventory
 
-The goal of [#28](https://github.com/icfmp/Bible-Resources/issues/28) is **independent full source-to-compiled text, notes, explicit links, verse-zero and ordered layout fidelity**. A necessary first compiled-side step is proving we can read and fingerprint **every actual native compiled entry**, not just a few selected verses. This is the purpose of this tool.
+**Purpose:** independently inspect and fingerprint **every populated native SWORD entry**, including numbered passages, book/chapter introductions and anonymous TOP records. A whole-module raw hash establishes what compiled bytes are read, **not** their source fidelity.
 
-## What this stage actually delivers
+## Secure procedure
 
-- `scripts/sword_native_raw_corpus.cpp` iterates the **real released stock libSWORD VerseKey** over the entire configured native versification, with introductory keys enabled. It emits **every occupied numbered verse**, every occupied book/chapter introduction, and separately numbered anonymous TOP entry (if present).
-- Its stdout contains **private unfiltered SWORD XML and must NEVER be invoked directly in a CI command, public shell, log or artifact**. Data is length-framed so embedded newlines, tabs and markup cannot corrupt entry boundaries.
-- `scripts/sword_native_raw_corpus_inventory.py` captures the C++ stdout **directly into a Python process pipe**. It checks framing, exact byte lengths, no duplicate/unsupported reference IDs, valid UTF-8, bounded entry/corpus sizes, completion totals and explicit non-overwrite of output.
-- The Python verifier independently invokes the existing **separate native reference-index inspector** and requires an **identical complete ordered set of numbered keys, intro IDs and occupied anonymous TOP count**. A missing final verse or a skipped introduction blocks the proof.
-- Every entry's original raw bytes are SHA-256 digested in memory and discarded. For each book (plus anonymous TOP), the metadata-only JSON reports the **ordered raw-entry manifest SHA-256**, ordinary/introduction counts, first/last original native references and byte totals. A whole-module ordered manifest SHA-256 includes raw bytes from **all** occupied entries. The report is bound to the exact pre/post immutable module payload SHA-256, native driver, v11n, stock engine version and trusted inspector binary hashes.
-- Source verse words, Scripture, notes, original XML and compiled SWORD raw content **never appear in the receipt or CI log**.
+- Compile the repository's `scripts/sword_native_index.cpp` and `scripts/sword_native_raw_corpus.cpp` against a released stable `libsword-dev`, and pin the binaries.
+- **Never invoke the raw-corpus C++ binary directly in public shell logs or CI:** it outputs private unfiltered native markup. `scripts/sword_native_raw_corpus_inventory.py` captures length-framed output in a private pipe and publishes only metadata/hashes.
+- Use an isolated, exact-source-pinned SWORD root and module ID. The wrapper rejects malformed framing, duplicate/unordered native identifiers, invalid UTF-8, mismatched entry lengths, unexpected index/TOP counts and unsafe output paths.
+- Independently read the real native key/index inventory and require matching ordered numbered keys, introductions and TOP occupancy. Hash every native entry in memory, with per-book and whole-corpus ordered SHA-256 receipts bound to the exact payload, driver, versification, engine and inspectors.
+- **Mandatory cursor safety:** `SWModule::getRawEntry()` depends on the module's current key, not merely a `VerseKey` pointer passed to `hasEntry()`. The native reader must position the module before reading. A *second, independently compiled* exact-key raw inspector (`scripts/sword_native_raw_entry.cpp`) must spot-check bounded first/middle/last references so a stale cursor cannot yield repeated content under distinct keys. Historic receipts from before that fix must **not** be used as content attestations.
 
-The ordinary `Validate` workflow now builds and tests the real **published LSG 0.1.0 RawText** compiled module. The optional real [WEBP USFX/zText source research workflow](../../.github/workflows/second-bible-proof.yml) additionally hashes all occupied entries of eBible's **actual original, independently SHA-pinned WEBP zText** module. Both compare their corpus counts/ordered keys to independently generated native index evidence.
-
-## Example
-
-Only use the C++ inspector from the Python wrapper. The module must be installed at an isolated SWORD root containing one `mods.d` conf and its `modules` payload.
+## Example on an isolated module
 
 ```sh
 g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp \
@@ -24,55 +19,17 @@ g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp \
   -o /private/sword-native-raw-corpus -lsword
 
 python scripts/sword_native_raw_corpus_inventory.py \
-  --module-directory modules/lsg-1910 \
-  --module-id BRLSG1910 \
+  --module-directory /private/module \
+  --module-id MODULE_ID \
   --native-index-binary /private/sword-native-index \
   --native-raw-binary /private/sword-native-raw-corpus \
-  --report /private/new-text-free-native-corpus.json
+  --report /private/new-native-corpus-receipt.json
 ```
 
-## What this DOES NOT prove
+For the independent exact-key check, follow the script's supported options and the tests/CI; this sample does not claim the spot-check has run.
 
-A SHA fingerprint of *what the compiled module actually contains* **does not prove those bytes are faithful to original publisher Scripture**. The compiler is allowed by SWORD to transform paragraph boundaries, whitespace, verse addresses and encoded notes; two different XML representations can produce the same reader text, and two text-equivalent editions can have different raw-markup hashes.
+## Proof boundary
 
-In particular this stage does **not** yet independently align whole source-versus-compiled text, punctuation, capitalization, footnote bodies/callouts, authored original `osisRef` targets, original Strong/morph word ordinals, poetry/paragraph opening and closing events, supplementary source books or source-edition revision identity. It does not cure the WEBP missing native `Rom.14.24–26` slots; a [separate source-only-word witness](NATIVE_SWORD_RAW_WITNESS.md) found those original word runs in compiled `Rom.14.23` but not their exact complete text/annotations.
+A complete raw-corpus digest cannot prove source wording/punctuation, note callers, references and their targets, Strong/lemma ordinal alignment, verses absent by textual decision, poetry and paragraph positions, licensing or reader display. These require separate [source/native text](SOURCE_NATIVE_MAIN_TEXT.md), [notes](SOURCE_NATIVE_NOTES_AUDIT.md), [index](SOURCE_NATIVE_INDEX_AUDIT.md) and [reader/release](../PRODUCTION_PIPELINE.md) gates.
 
-It does **not** validate publishing rights or authorize any change to a Biblical source, its approved LSG compiled module or public catalogue. Source-to-compiled semantics, original edition rights, reader compatibility and owner editorial decisions remain distinct review gates.
-
-No changes to published Bible Resource packages, verses, notes or versification are made by this scanner.
-
-## Important corrective note — stock-SWORD reader cursor, 2026-11-10
-
-**Historical PR #48's all-entry raw-content SHA receipts are superseded,
-not an independently valid content inventory.** The original C++ raw
-enumerator used `hasEntry(&current)` to check each candidate VerseKey
-but then called `module->getRawEntry()` **without positioning the module
-on `current`**. The SWORD API reads `SWModule::key`, not the separate
-pointer supplied to `hasEntry()`. Consequently the stream could carry
-distinct correct verse IDs but repeatedly hash a stale module entry,
-and the full-corpus metadata digest did not describe the actual ordered
-text. The independent **native key index** and existing published
-LSG 0.1.0 payload were not altered by this bug.
-
-PR #50 positions `SWModule` for each enumerated `VerseKey` before
-reading raw content, then checks the copied key and entry occupancy
-again. More importantly, the Python whole-corpus wrapper now accepts
-a **second independently compiled** `sword_native_raw_entry.cpp`
-exact-key reader. It selects bounded first/intermediate/last canonical
-keys from the independently captured index, privately reads those exact
-entries and compares their SHA-256 with the full stream. A stale cursor
-that repeats one verse in every frame is rejected even when index
-inventories and total frame counts appear correct.
-
-This independent second raw reader is **required in repository LSG
-RawText and real WEBP zText CI**. A test that merely rehashes the
-whole-corpus stream cannot detect this cursor defect. New receipts have
-a distinct `independent_native_exact_key_raw_spotcheck_verified` field.
-Older recorded raw-corpus hash values must not be treated as compiled
-content attestations. References, Bible text, annotations, source
-archives and release packages have not been changed.
-
-The corrected private raw hash still does **not** establish original
-publisher USFX/OSIS conversion, source-char parity, note anchors,
-layout preservation, graphical readers or rights; those remain separate
-gates in [#28](https://github.com/icfmp/Bible-Resources/issues/28).
+Resource-specific historical observations, raw-hash supersession and corrections must be retained in edition evidence or relevant GitHub issue/PR, not used as general current instructions.
