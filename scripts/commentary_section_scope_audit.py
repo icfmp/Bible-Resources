@@ -57,7 +57,7 @@ from commentary_stock_prefix_topology import (
     source_word_prefix_topology, stock_prefixed_source_body_concordance,
     single_word_stock_markup_diagnostic, stock_prefix_context_correspondence,
 )
-from commentary_chapter_ref_labels import link_label_location
+from research.commentary.commentary_chapter_ref_labels import link_label_location
 from commentary_editorial_topology import NativeCommentaryEditorialTopology
 from commentary_layout_census import NativeCommentaryLayoutCensus
 from commentary_paragraph_witness_probe import compare_paragraph_witness
