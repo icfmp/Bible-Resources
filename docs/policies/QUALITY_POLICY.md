@@ -9,7 +9,7 @@ Never substitute editorial taste for original intent. Index by the original vers
 
 ## Mandatory structure verification
 
-All approved source documents must have a pinned official XSD validation result and reviewed explicit treatment of every source element, with exact source path/line diagnostics for unexpected cases. Unknown structure cannot pass by "best effort" or a warning downgrade. The compiled SWORD module additionally needs a fidelity round-trip and reader validation before release. See [NORMALIZATION_POLICY.md](NORMALIZATION_POLICY.md).
+Every approved resource must pass its **actual source format's** authoritative validation and a reviewed treatment of its structural constructs. OSIS requires the pinned official OSIS XSD; a genuinely XML-based USFX/TEI source uses its independently reviewed schema; USFM and native SWORD require their **own** format-appropriate checks, not a fictional OSIS XSD result. Where original authoring XML is unavailable, report source/provider/native keys, **not invented XML paths or line numbers**. Unknown structure must not pass by "best effort" or a warning downgrade. The compiled SWORD module additionally needs a fidelity round-trip and reader validation before release. See [NORMALIZATION_POLICY.md](NORMALIZATION_POLICY.md).
 
 ## Unprocessable resources: clarity over abundance
 
@@ -17,7 +17,7 @@ If a source is structurally atypical or initially unsupported, stop and request 
 
 ## Verse omissions and versification
 
-Use SWORD's actual official versification systems (not a unique map invented for every Bible). An intentional editorial/text-critical omission does not authorize filling a blank verse with another translation's words. If the chosen v11n contains the slot, retain a structurally empty verse and an evidence-backed editorial note. Test first-empty-verse handling in actual SWORD clients. A different verse number or a corrupt import must not be mislabeled as an intentional omission. See [VERSIFICATION_POLICY.md](VERSIFICATION_POLICY.md).
+Use SWORD's actual official versification systems (not a unique map invented for every Bible). An intentional editorial/text-critical omission does not authorize filling a blank verse with another translation's words. If the selected SWORD versification contains that address, **preserve the original edition's absence of biblical text**; do not insert a numbered source verse, explanatory note or placeholder unless that exact content is source-attested or a *separate, explicitly reviewed technical representation* has been proven lossless and identified as non-Scripture. A reference slot in SWORD's registry is not evidence of an authored verse element. Test first-empty-reference handling in actual SWORD clients and block ambiguous conversions. A different verse number or a corrupt import must not be mislabeled as an intentional omission. See [VERSIFICATION_POLICY.md](VERSIFICATION_POLICY.md).
 
 ## Actual reversible editorial workflow
 
