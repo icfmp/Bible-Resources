@@ -74,7 +74,9 @@ jobs:
           git rm .github/workflows/import-pinned-language-sources-once.yml
           git add sources/original/bibles/fr/lsg-1910/fraLSG_usfm.zip \
                   sources/original/bibles/fr/darby-jnd-2024/bible_jnd_2_0.xml
-          git diff --cached --check
+          # An immutable publisher original may contain intentional trailing
+          # spaces; never rewrite its bytes just to satisfy git diff --check.
+          git diff --cached --check -- ':!sources/original/**'
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Store byte-pinned French Bible original USFM and OSIS sources"
