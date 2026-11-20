@@ -44,6 +44,9 @@ Perform a **read-only** full inventory: book/chapter/verse or commentary-entry k
 
 ## 2. Normalize structure; do not rewrite the author's meaning
 
+For every cleaned resource, write its **edition-specific editorial decisions** to `sources/cleaned/<type>/<language>/<resource-id>/editorial/README.md` (and link to more detailed evidence under that directory as necessary). Global policies remain in `docs/`; `CLEANUP_MANIFEST.json` stays the machine-readable recovery/hash record. Do not confuse approved historical decisions with authorization to change new text. See [module-local editorial records](../sources/cleaned/README.md).
+
+
 Produce a **new** deterministic candidate under `work/<type>/<language>/<resource-id>/`, then, after review, the curated master under `sources/cleaned/<type>/<language>/<resource-id>/`. Use genuine OSIS or USFM; any adapter must be separately reviewed and preserve source provenance. Prefer standard elements over presentation-only HTML while keeping meaningful distinctions.
 
 Allowed candidates include documented repair of invalid markup, removal of objectively redundant display artifacts, and restoration of source-attested paragraphs, poetry or headings. **Not automatically allowed:** wording changes, punctuation changes, translations, textual variants, versification changes, added/deleted notes, inferred cross-reference targets, changes in emphasis that carry meaning, or reshaping commentary ranges for a particular reader.
