@@ -27,7 +27,7 @@ categories: KEEP_GENERIC, GENERALIZE, MERGE, HISTORICAL/ARCHIVE, UNDECIDED.
 
 **Production:** extend existing generic intake, OSIS normalization, USFM
 support, source parity, reference validation, SWORD build and reader checks.
-Use the standard six-phase pipeline; avoid new program-per-resource scripts.
+Use the single [production contract](../docs/PRODUCTION_PIPELINE.md); avoid new program-per-resource scripts.
 
 **Research:** historical one-off readers/probes may be kept for replay, but
 are not the preferred production pipeline. Relocate only after the real
@@ -39,4 +39,4 @@ that a file is dead code; the nine historical/archivable flags have active
 script, test or workflow references. Reorganization is not an authorization
 to delete or silently change their outputs.
 
-[Canonical workspace paths](../docs/WORKSPACE_LAYOUT.md).
+[Canonical workspace paths](../docs/architecture/WORKSPACE_LAYOUT.md).
