@@ -133,7 +133,7 @@ Bibles/commentaries in `scripts/validate.py`, `scripts/build.py`,
 `scripts/publish_reviewed_release.py`.
 
 The full inventory and known edition-specific diagnostics are maintained in
-[`TOOL_REGISTRY.md`](../TOOL_REGISTRY.md). Treat the large historic MHCC
+[generated tool registry](../../reports/tooling/TOOL_REGISTRY.md). Treat the large historic MHCC
 private orchestration as **historical acceptance evidence**, not a generic
 one-button runner for a new edition. A second commentary requires its own
 source pins, authorial edition/rights review and independent native audit.
