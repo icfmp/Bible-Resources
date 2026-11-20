@@ -6,6 +6,8 @@ For new or revised editions, use [the canonical production pipeline](../PRODUCTI
 
 ## Preserved records
 
+- [Initial OSIS editorial audit observations (2026-11-07)](EDITORIAL_AUDIT_INITIAL_2026-11-07.md) — early read-only LSG/MHC signals, not completed releases.
+
 - [Bible staged-audit technical research](BIBLE_STAGE_AUTOMATION_RESEARCH.md) — preserved extensive WEBP and stage-4/5 investigations, distinct from the live operator quick guide.
 - [Historical LSG onboarding playbook](RESOURCE_ONBOARDING_PLAYBOOK.md) — dated guidance superseded by the canonical production pipeline.
 - [First LSG/MHC pilot](PILOT_SEGOND_MHC.md) — dated early pipeline experiment, before the published editions.
