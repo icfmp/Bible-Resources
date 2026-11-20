@@ -32,9 +32,13 @@ def extract_lexical_senses(records):
             for s in form.get("LEXMeanings") or []:
                 sid=s.get("LEXID")
                 code=s.get("LEXEntryCode")
-                if not isinstance(sid,str) or not sid or not isinstance(code,str) or not code:
+                if not isinstance(sid,str) or not sid or not isinstance(code,str):
                     raise ValueError("UBS original lexical sense has invalid LEXID/LN: "+repr({"main_id":rec["MainId"],"lexid":sid,"ln_code":code}))
-                senses.add((sid,code))
+                # Genuine original UBS source senses can have an empty LN code.
+                # Preserve them in the full source inventory but never fabricate
+                # an LN-backed word-specific sense candidate from a blank code.
+                if code:
+                    senses.add((sid,code))
         if rec["MainId"] in result:
             raise ValueError("Duplicate original UBS Greek entry")
         result[rec["MainId"]]=senses
@@ -54,7 +58,8 @@ def verify_sources(index,en,fr):
     f=extract_lexical_senses(fr)
     if e!=f or len(e)!=5507:
         raise ValueError("Original UBS Greek EN/FR LEXID or LN differences")
-    if sum(len(v) for v in e.values())!=9160:
+    raw_source_count=sum(len(form.get("LEXMeanings") or []) for entry in en for form in entry.get("BaseForms") or [])
+    if raw_source_count!=9160:
         raise ValueError("Original 9160 UBS source lexical sense inventory drift")
     return e
 
@@ -203,7 +208,8 @@ def audit(index,reviewed,en,fr,macula):
         "source_editions":{"ubs_greek_revision":BUILD["UBS_REVISION"],"macula_sblgnt_revision":BUILD["MACULA_REVISION"]},
         "original_word_ids":total,
         "source_ubs_entries":len(senses),
-        "source_ubs_sense_pairs":sum(len(x) for x in senses.values()),
+        "source_ubs_sense_pairs":9160,
+        "source_ubs_sense_pairs_with_nonblank_original_ln":sum(len(x) for x in senses.values()),
         "distinct_original_word_headword_provenance":dict(sorted(group_counts.items())),
         "original_word_sense_candidate_outcomes":dict(sorted(outcomes.items())),
         "original_word_ids_with_multiple_MACULA_LN_codes":original_multi_ln,
