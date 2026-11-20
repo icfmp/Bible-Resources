@@ -1,11 +1,7 @@
-# Architecture and resource layout
+# Architecture
 
-How the repository stores original source files, cleaned editorial masters, SWORD modules and per-edition metadata.
+Read [architecture](ARCHITECTURE.md) to understand **what is authoritative** and where the boundaries between original, edited and compiled data lie. Read [workspace layout](WORKSPACE_LAYOUT.md) when adding or locating files.
 
-- [Architecture](ARCHITECTURE.md)
-- [Supported formats](FORMATS.md)
-- [Workspace layout](WORKSPACE_LAYOUT.md)
-- [Resource workspace index](RESOURCE_WORKSPACE_INDEX.md)
-- [Edition profiles](RESOURCE_PROFILES.md)
+The only additional architecture references are [supported formats](FORMATS.md) and [resource profile contract](RESOURCE_PROFILES.md). [Resource workspace index](RESOURCE_WORKSPACE_INDEX.md) is a compact path reference, **not** a status list.
 
-**Operational procedure:** [source-first OSIS/USFM → SWORD production](../PRODUCTION_PIPELINE.md). **Protected boundary:** `entity-index/` is a separate Bible Semantic Index workstream.
+For how to process an edition, go to the [production pipeline](../PRODUCTION_PIPELINE.md). For edition-specific decisions and evidence, go directly to its `sources/cleaned/**/editorial/` directory. The independent `entity-index/` workstream is out of scope.
