@@ -1,0 +1,51 @@
+{
+  "annotated_original_verse_keys": 31166,
+  "cleaned_bytes": 9276832,
+  "cleaned_source_sha256": "35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d",
+  "language": "fr",
+  "original_bible_text_prose_unchanged_outside_explicitly_reviewed_division_metadata": true,
+  "original_path": "sources/original/bibles/fr/darby-jnd-2024/bible_jnd_2_0.xml",
+  "original_sha256": "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
+  "original_source_untouched": true,
+  "original_translation_note_count": 6340,
+  "published_source_proof": "modules/darby-jnd-2024/RELEASE_PROVENANCE.json",
+  "resource_id": "darby-jnd-2024",
+  "reviewed_inline_operations": 2,
+  "reviewed_link_operations": 11,
+  "reviewed_omitted_verse_plain_labels": 3,
+  "reviewed_stage_hashes": [
+    [
+      "original",
+      "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3"
+    ],
+    [
+      "source_note_repair",
+      "23b6225cf4f827f6f84e321ed60fedb55ec42c3bc2b5cf58747942bd32f6ad8d"
+    ],
+    [
+      "inline_semantic_repair",
+      "89b67a1007547b113c0049a2df8912b66716a406d19237f036d5dad71f7771c8"
+    ],
+    [
+      "lexical_patches",
+      "90a7a67db2c43cced53c1c34e4578c20470f3a247e16f07cb45145eae8d326c5"
+    ],
+    [
+      "omitted_verse_label_wrappers",
+      "1f0d439b20b763e3548a05bb766d9f59447918f973ea92f8695d7578e096178a"
+    ],
+    [
+      "editorial_division_metadata",
+      "ea9870b7a6283d06e10ae6644cd85fe1206b1f46ce864fd3e9aaea2e3e222bf5"
+    ],
+    [
+      "paragraph_xml_indentation",
+      "35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d"
+    ]
+  ],
+  "schema_version": 1,
+  "source_format": "OSIS",
+  "source_owner_approval": "config/darby-0.1.1-release-authorization.json",
+  "status": "exact_approved_0_1_1_compiler_input_restored",
+  "type": "bible"
+}
