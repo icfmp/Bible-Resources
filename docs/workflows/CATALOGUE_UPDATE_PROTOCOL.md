@@ -53,6 +53,4 @@ A passed Pages workflow alone does not certify independent external HTTP deliver
 
 Repository CI also tests that the generated catalogue and committed snapshot match; the ZIP really exists with the advertised SHA-256 and size; every entry corresponds to an approved resource with the correct reviewed canonical edition; and the embedded SWORD conf Version matches the JSON version. A deliberately mismatched version is rejected.
 
-This protocol does **not** change the published LSG 0.1.0 Scripture text, notes, indexes, released version or binary payloads.
-
 For monitoring updates **from upstream providers** into Bible Resources, including same-version binary drift, see [upstream update tracking](UPDATES.md) and [issue #5](https://github.com/icfmp/Bible-Resources/issues/5).
