@@ -1,0 +1,29 @@
+name: Refresh script caller inventory for language source migration
+on:
+  push:
+    branches:
+      - maintenance/real-language-sources-20261120
+    paths:
+      - .github/workflows/refresh-language-source-registry-once.yml
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    if: github.repository == 'icfmp/Bible-Resources'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild registry from new existing document paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/refresh-language-source-registry-once.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git add docs/TOOL_REGISTRY.json docs/TOOL_REGISTRY.md
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Refresh source-bound tool registry after moving MHC evidence"
+          git push origin HEAD:maintenance/real-language-sources-20261120
