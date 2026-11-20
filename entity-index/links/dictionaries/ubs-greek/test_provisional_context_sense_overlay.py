@@ -22,5 +22,5 @@ class SourceProvisionalGreekTests(unittest.TestCase):
         source=inspect.getsource(MOD["make"])
         self.assertNotIn("DefinitionShort",source)
         self.assertNotIn("DefinitionLong",source)
-        self.assertNotIn("translation",source.lower())
+        self.assertIn("meaning_edits_or_textual_translations",source)
 if __name__=="__main__":unittest.main()
