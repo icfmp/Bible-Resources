@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Use the [7-stage Bible onboarding workflow](https://github.com/icfmp/Bible-Resources/blob/main/docs/BIBLE_7_STAGE_WORKFLOW.md).
+        Use the [7-stage Bible onboarding workflow](https://github.com/icfmp/Bible-Resources/blob/main/docs/workflows/BIBLE_7_STAGE_WORKFLOW.md).
         Keep this issue as the single progress tracker. A stage is complete only after
         its exact evidence and validation have been linked; don't assume a green
         CI badge proves editorial approval. For commentaries, use the appropriate
