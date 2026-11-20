@@ -48,6 +48,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_explicit_ubs_alternates.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_last_47_lexical_forms.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_contextual_sense_candidates.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_provisional_context_sense_overlay.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -842,6 +843,50 @@ jobs:
           assert c['publication_approved'] is False
           print('GREEK_ALL_137741_ORIGINAL_WORDS_SENSE_CANDIDATE_PARTITIONED_NOT_CONTEXT_VALIDATED')
           PY
+      - name: Stage 122504 original-word UBS LEXID source candidates as provisional, preserving every unresolved word
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_provisional_context_sense_overlay.py \
+            --index entity-index/links/dictionaries/ubs-greek/index.json \
+            --reviewed /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --audit /tmp/bsi-ubs-greek-original-contextual-sense-candidate-census-PRIVATE.json \
+            --accepted /tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json \
+            --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json')
+          u=Path('/tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json')
+          a=json.loads(p.read_text());b=json.loads(u.read_text())
+          assert a['provisional_source_supported_original_word_count']==122504
+          assert b['unresolved_original_word_count']==15237
+          assert len(a['word_id_to_provisional_ubs_lexid'])==122504
+          assert len(b['word_id_to_unresolved_original_source_evidence'])==15237
+          assert not set(a['word_id_to_provisional_ubs_lexid']).intersection(b['word_id_to_unresolved_original_source_evidence'])
+          assert len(set(a['word_id_to_provisional_ubs_lexid'])|set(b['word_id_to_unresolved_original_source_evidence']))==137741
+          assert a['contextual_senses_independently_verified']==0
+          assert b['contextual_senses_independently_verified']==0
+          assert a['public_release_approved'] is False and b['public_release_approved'] is False
+          assert all(x['verse_context_semantically_verified'] is False for x in a['word_id_to_provisional_ubs_lexid'].values())
+          assert all(x['verse_context_semantically_verified'] is False for x in b['word_id_to_unresolved_original_source_evidence'].values())
+          print('GREEK_UBS_LEXID_SOURCE_CANDIDATES_AND_UNRESOLVED_EXHAUSTIVE_REVERSIBLE_PRIVATE')
+          PY
+      - name: Upload privately staged 122504 word-specific provisional UBS source LEXIDs (NOT validated/published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-122504-source-provisional-lexids-NOT-SEMANTICALLY-VALIDATED
+          path: /tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload private all 15237 unresolved original Greek contextual sense witnesses
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-15237-unresolved-original-sense-evidence-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload source-specific UBS sense candidate census (PRIVATE, NOT semantically approved)
         uses: actions/upload-artifact@v4
         with:
