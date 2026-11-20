@@ -4557,18 +4557,25 @@ jobs:
               # Use the Xiphos application's private child session bus, as
               # required by the previously validated existing-link click test.
               probe_env=dict(env,NO_AT_BRIDGE="0",GTK_A11Y="1")
-              p=subprocess.run(["pgrep","-x","xiphos"],capture_output=True,
-                               text=True,timeout=4,check=False)
-              for pid in p.stdout.splitlines():
-                  if not pid.isdecimal(): continue
+              # The first real GUI probe has already run and may leave a
+              # second Xiphos PID briefly visible. Resolve the *current*
+              # test window's owning process, never pgrep's first match.
+              try:
+                  pid=_x11(["xdotool","getwindowpid",win],env).decode().strip()
+              except Exception:
+                  pid=""
+              bound=False
+              if pid.isdecimal():
                   try:
                       parts=Path("/proc/"+pid+"/environ").read_bytes().split(b"\\0")
                       address=next((v.split(b"=",1)[1] for v in parts
                                      if v.startswith(b"DBUS_SESSION_BUS_ADDRESS=")),None)
-                      if address:
+                      if address and len(address)<2048:
                           probe_env["DBUS_SESSION_BUS_ADDRESS"]=address.decode()
-                          break
-                  except (OSError,UnicodeError): continue
+                          bound=True
+                  except (OSError,UnicodeError): pass
+              if not bound:
+                  return {"status":"REAL_APPROVED_NOTE_GUI_WINDOW_BUS_NOT_ATTESTED"}
               script=textwrap.dedent("""
                   import json,sys,re,time,subprocess,pyatspi
                   def compact(value):
