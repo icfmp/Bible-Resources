@@ -14,7 +14,7 @@
 
 | Purpose | Record |
 | --- | --- |
-| Exact native aliases and two corrections | [Approved rebuild manifest](../../../../../../../config/commentary-rebuilds/mhcc-crosswire.json) |
+| Exact native aliases and two corrections | [Approved rebuild manifest](../../../../../../../../config/commentary-rebuilds/mhcc-crosswire.json) |
 | Reconstructed master, limits and source SHA | [Cleaned manifest](../../../CLEANUP_MANIFEST.json) |
 | Final release decision and module identity | [MHCC 0.1.1 release](../../releases/MHCC-0.1.1.md) |
 | Original source/stock scope research | [Issue #274](https://github.com/icfmp/Bible-Resources/issues/274) and [native inventory #43604048677](https://github.com/icfmp/Bible-Resources/actions/runs/43604048677) |
