@@ -46,6 +46,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_456_lexical_variants.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_explicit_alternate_lemmas.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_explicit_ubs_alternates.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_last_47_lexical_forms.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -609,6 +610,32 @@ jobs:
           assert x['publication_approved'] is False
           print('GREEK_ORIGINAL_UBS_EXPLICIT_ALTERNATE_LEMMA_SOURCE_WITNESSES_UNAPPROVED')
           PY
+      - name: Independently inspect original UBS inflections for the last 47 Greek source words
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_last_47_lexical_forms.py \
+            --alternates /tmp/bsi-ubs-greek-456-explicit-original-ubs-alternate-lemmas.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-last-47-source-inflection-evidence.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/bsi-ubs-greek-last-47-source-inflection-evidence.json').read_text())
+          assert x['remaining_original_word_ids']==47
+          assert sum(x['source_evidence_counts'].values())==47
+          assert x['new_lexical_headwords_approved']==0
+          assert x['contextual_senses_inferred']==0
+          assert x['original_greek_and_strong_modified'] is False
+          assert x['publication_approved'] is False
+          print('GREEK_47_SOURCE_LEXICAL_GAPS_PRESERVED_NO_UNVERIFIED_UBS_MAPPINGS')
+          PY
+      - name: Upload final 47 Greek original word lexical metadata audit (PRIVATE, NOT approved)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-47-original-UBS-inflection-evidence-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-last-47-source-inflection-evidence.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload source UBS Greek explicit alternate lemma evidence (PRIVATE)
         uses: actions/upload-artifact@v4
         with:
