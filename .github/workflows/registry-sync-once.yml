@@ -2,7 +2,9 @@
 # Only this same-repository documentation PR is authorized to use it.
 name: Refresh moved documentation registry once
 on:
-  pull_request:
+  push:
+    branches:
+      - docs/physical-taxonomy-layout-20261120
     paths:
       - '.github/workflows/registry-sync-once.yml'
 permissions:
@@ -10,13 +12,13 @@ permissions:
   actions: write
 jobs:
   reconcile-generated-metadata:
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'docs/physical-taxonomy-layout-20261120' }}
+    if: ${{ github.repository == 'icfmp/Bible-Resources' && github.ref == 'refs/heads/docs/physical-taxonomy-layout-20261120' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.sha }}
           persist-credentials: true
       - uses: actions/setup-python@v5
         with:
