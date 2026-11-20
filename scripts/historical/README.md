@@ -14,6 +14,5 @@ These tools are retained for source-pinned historical experiments and exact rele
 ## Organized historical research
 
 - [LSG source/SWORD research](lsg/README.md) — source/reader text diagnostic and synthetic versification probe with CI coverage.
-- [Darby private reader research](darby/README.md) — source-pinned 0.1.1 Android identity probe.
 
-**Current migration scope:** source-bound probes with direct workflow and test callers. Other historical candidates remain at their former paths until separately validated under [issue #430](https://github.com/icfmp/Bible-Resources/issues/430).
+**Current migration scope:** source-bound LSG probes with direct workflow and test callers. A Darby migration is deferred until its legacy private preflight baseline can be independently verified. Other historical candidates remain at their former paths until separately validated under [issue #430](https://github.com/icfmp/Bible-Resources/issues/430).
