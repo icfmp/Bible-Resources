@@ -87,7 +87,7 @@ jobs:
             --usfx-zip "$RUNNER_TEMP/lsg-original/usfx.zip" \
             --converter "$RUNNER_TEMP/u2o-reviewed/u2o.py" \
             --schema "$RUNNER_TEMP/lsg-reviewed-osis/osisCore.2.1.1-cw-latest.xsd" \
-            --report "$RUNNER_TEMP/lsg-recovery.json"
+            --report "$RUNNER_TEMP/lsg-recovery.json" || { python -c 'import json,os; p=os.environ["RUNNER_TEMP"]+"/lsg-recovery.json"; r=json.load(open(p)); print("RECOVERY_BLOCKER",r.get("category"),r.get("detail"),r.get("status"))'; exit 1; }
       - name: Verify publisher witness and commit approved cleaned OSIS
         shell: bash
         run: |
