@@ -28,6 +28,16 @@ reproducible distribution package. This six-phase production path operates
 **inside** the existing seven-stage source/rights/evidence checkpoints.
 See [the source-first OSIS/USFM production policy](docs/SOURCE_FIRST_EDITORIAL_PIPELINE.md).
 
+## Workspace organization
+
+New sources and drafts are grouped by resource type
+(`bibles`, `commentaries`, `dictionaries`, `encyclopedias`, `other`)
+and stable resource ID: `sources/original/`, `sources/cleaned/`, and
+`work/`. Compiled SWORD packages remain in `modules/`, and the existing
+script entrypoints remain stable until verified lifecycle consolidation.
+See [canonical workspace layout and migration rules](docs/WORKSPACE_LAYOUT.md).
+Legacy MHC/HMCC Modern evidence is retained intact.
+
 ## Status
 
 **Published and verified resources:** [Louis Segond 1910 `BRLSG1910` 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0), [Darby `BRJND2024` 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.1), and [Matthew Henry Concise Commentary `MHCC` 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1), plus [Matthew Henry Complete Commentary `MHC` 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/mhc-0.1.0). Their [source-reviewed files](modules/) and current catalogue entries are in `main`. The [public JSON catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json) and standard [SWORD repository](https://icfmp.github.io/Bible-Resources/sword/) are deployed and verified through the ordered GitHub Release-before-Pages workflow. Historic release ZIPs remain immutable, including the original `BRMHCC` 0.1.0; the newer `MHCC` SWORD ID may collide with CrossWire's original `MHCC` and does **not** automatically remove an old `BRMHCC` installation.

@@ -20,6 +20,16 @@ their incremental evidence checkpoints and approval gates remain mandatory.
 The same phases apply to both, with the resource-specific validation rules
 of those workflows.
 
+## Stable workspace organization
+
+The canonical source and work directories are grouped by resource type and
+stable curated ID. Originals, reviewed cleaned masters, working drafts/evidence
+and compiled SWORD distributions are different artifacts; never mix them.
+Follow [workspace layout and safe migration gates](WORKSPACE_LAYOUT.md).
+Bible translations with Strong/morphology and translator notes retain all
+original word-to-annotation associations during cleanup and full native
+SWORD round-trip validation.
+
 ## Accepted input formats: minimal by design
 
 1. **OSIS** — preferred when the real, identifiable publisher/authoring source
