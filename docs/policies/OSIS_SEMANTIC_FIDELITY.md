@@ -9,7 +9,8 @@ Validate each input against the pinned official OSIS schema first. Run the gener
 ```sh
 python scripts/osis_semantic_fidelity.py \
   --source-osis /private/original.osis.xml \
-  --candidate-osis /private/cleaned.osis.xml
+  --candidate-osis /private/cleaned.osis.xml \
+  --report /private/semantic-fidelity-report.json
 ```
 
 Check the script's actual `--help` and repository tests before incorporating it into automation; do not infer that the illustrative invocation proves every kind of fidelity.
