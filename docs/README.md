@@ -6,9 +6,9 @@
 
 1. Read [the architecture](architecture/ARCHITECTURE.md): what is original, what can be edited, what is compiled, and what gets published.
 2. Read [the production pipeline](PRODUCTION_PIPELINE.md): the **single** end-to-end procedure and the evidence required to advance.
-3. Check [editorial and legal policies](policies/README.md) before touching content.
-4. Choose [a workflow](workflows/README.md) for a Bible, commentary, technical audit or release.
-5. Consult [verification methods](technical/README.md) only when performing a corresponding check.
+3. Study the [BRNP structural profile](architecture/BRNP.md) for our proposed common OSIS representation (pilot; not a release gate yet).\n4. Check [editorial and legal policies](policies/README.md) before touching content.
+5. Choose [a workflow](workflows/README.md) for a Bible, commentary, technical audit or release.
+6. Consult [verification methods](technical/README.md) only when performing a corresponding check.
 
 ## Where to find things
 
