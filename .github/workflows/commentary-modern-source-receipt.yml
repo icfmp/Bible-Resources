@@ -4452,7 +4452,23 @@ jobs:
               raise ValueError("Private editorial SWORD source not approved")
           if verify_and_install_reviewed_bible(root)["module_id"]!="BRLSG1910":
               raise ValueError("Published independent Bible missing")
-          refs=("Ps 95:11","1 Samuel 25:39","Gen 12:6","Num 29:1")
+          decisions=json.loads(Path(
+              "work/mhcc-modern/production/OWNER_EDITORIAL_DECISIONS_2026-11-19.json"
+          ).read_text())
+          if len(decisions["link_cases"])!=15 or len(decisions["ccel_only_sections"])!=2:
+              raise ValueError("Approved editorial verification inventory changed")
+          # Probe every individually approved source-K correction, not merely
+          # four reader samples. End with a known printed-citation erratum,
+          # so its actual WebKit HTML can be independently examined in GUI.
+          approved_refs=tuple(dict.fromkeys(
+              item["source_first_key"].replace(".", " ",1).replace(".",":")
+              for item in decisions["link_cases"]))
+          refs=tuple(dict.fromkeys((
+              "Ps 95:11","1 Samuel 25:39",
+              *(ref for ref in approved_refs if ref!="Num 29:1"),
+              "Num 29:1")))
+          if len(set(approved_refs))<9 or "Num 29:1" not in refs:
+              raise ValueError("Actual GUI coverage of editorial positions incomplete")
           cases={}
           for ref in refs:
               c,t=query("MHCCMODAP",ref,fmt="plain",root=root,
@@ -4463,7 +4479,48 @@ jobs:
                   or len(t)<100 or len(v)<60):
                   raise ValueError("Approved modern GUI sample not independently sourced")
               cases[ref]={"commentary":t,"bible":v}
-          obs=_run_real_gui(root,cases,seconds=25,commentary_module_id="MHCCMODAP")
+          def actual_approved_citation_markup(env):
+              # On GUI-ready, the last independently matched passage is the
+              # source position Num 29:1. Read real Xiphos clipboard HTML,
+              # not generated OSIS, and report only destination metadata.
+              import time
+              from html import unescape
+              from urllib.parse import unquote
+              from commentary_xiphos_dual_reader import (
+                  _main_xiphos_window,_commentary_pane_focus_points,
+                  _x11,_seed_x11_clipboard,_optional_real_rich_xiphos_selection,
+                  _BoundedMarkupScanner)
+              win=_main_xiphos_window(env)
+              if not win:
+                  return {"approved_citation_actual_reader_HTML_available":False}
+              observed=[]
+              for px,py in _commentary_pane_focus_points(env,win):
+                  _x11(["xdotool","mousemove",str(px),str(py),"click","1"],env)
+                  time.sleep(.5)
+                  _seed_x11_clipboard(env)
+                  _x11(["xdotool","key","--clearmodifiers","ctrl+a"],env)
+                  _x11(["xdotool","key","--clearmodifiers","ctrl+c"],env)
+                  time.sleep(.7)
+                  rich=_optional_real_rich_xiphos_selection(env)
+                  if not rich: continue
+                  parser=_BoundedMarkupScanner()
+                  parser.feed(rich.decode("utf-8",errors="replace"))
+                  anchors=parser.anchor_destinations
+                  matches=[href for _,href in anchors
+                           if "lev.23.24" in unquote(unescape(href)).casefold()]
+                  observed.append({"real_GUI_anchor_count":len(anchors),
+                      "exact_approved_citation_destination_in_GUI_href":
+                          bool(matches),
+                      "exact_approved_citation_GUI_href_count":len(matches)})
+                  if matches:break
+              return {"approved_citation_actual_reader_HTML_available":bool(observed),
+                  "attested_position":"Num.29.1",
+                  "source_verified_editorial_destination":"Lev.23.24",
+                  "real_GUI_markup_observations":observed,
+                  "mouse_click_of_approved_destination_verified":False}
+          obs=_run_real_gui(root,cases,seconds=25,
+              commentary_module_id="MHCCMODAP",
+              on_gui_ready=actual_approved_citation_markup)
           found=obs.get("commentary_clipboard_match_by_passage",{})
           if (set(found)!=set(refs) or not all(found.values())
               or obs.get("actual_passage_commands_accepted") is not True):
@@ -4472,13 +4529,18 @@ jobs:
               "module":"MHCCMODAP","pinned_bible":"BRLSG1910",
               "actual_GUI_matched":sum(found.values()),"requested_GUI_samples":len(refs),
               "both_source_witness_restorations_sampled":True,
+              "all_15_approved_cases_real_GUI_source_positions_covered":True,
+              "corrected_citation_real_GUI_HTML_observation":
+                  obs.get("real_GUI_markup_observations",{}),
               "actual_cross_reference_mouse_click_navigation_accepted":False,
               "published":False}
           (base/"mhcc-modern-approved-editorial-gui-receipt.json").write_text(
               json.dumps(report,sort_keys=True,indent=2)+"\n")
           print("PRIVATE APPROVED EDITORIAL XIPHOS GUI PASS: "+str(sum(found.values()))+
-                "/"+str(len(refs))+" real commentary excerpts, including both restored "+
-                "authored sections; no click-navigation or publication claim")
+                "/"+str(len(refs))+" real commentary excerpts, including all 15 approved "+
+                "source-K errata positions and both restored authored sections")
+          print("PRIVATE APPROVED PRINTED CITATION REAL GUI HTML EVIDENCE (metadata only): "+
+                str(obs.get("real_GUI_markup_observations",{})))
           PY
       - name: Preserve explicit Xiphos acceptance status, never infer GUI pass from source CI
         if: always()
