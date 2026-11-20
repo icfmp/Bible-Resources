@@ -105,13 +105,6 @@ def audit(index,reviewed,batches,en,fr,macula,form_defaults):
             if wid in corpus_words:raise ValueError("Duplicated original MACULA word ID")
             corpus_words.add(wid)
             verse=verse_key(row["ref"])
-            group,heads,_=AUDIT["candidates_for_original_word"](row,index,reviewed,
-                defaultdict(set)) if False else (None,None,None)
-            # Headword identity is independently rechecked with the source-
-            # verified method below, using genuine UBS original sense pairs.
-            group,heads,_=AUDIT["candidates_for_original_word"](row,index,reviewed,
-                {m:{(sid,info["ln"]) for sid,info in eng[m].items() if isinstance(info["ln"],str) and info["ln"]}
-                 for m in mids} | {}) if False else (None,None,None)
             if wid in wanted:
                 original_verses[wid]=verse
                 witness=wanted[wid]["word"]
@@ -133,6 +126,8 @@ def audit(index,reviewed,batches,en,fr,macula,form_defaults):
                 heads=[reviewed_ambiguity["entry_id"]]
             else:
                 heads=old["entry_ids"]
+            if wid in wanted and wanted[wid]["mid"] not in heads:
+                raise ValueError("Original reviewed word missing its authentic UBS headword")
             for mid in set(heads):
                 if mid in mids:per_verse_headword[(verse,mid)]+=1
     if len(corpus_words)!=137741 or len(original_verses)!=EXPECTED:
