@@ -9,8 +9,8 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from commentary_chapter_cross_slot import ChapterNeighborSameBookAlternativeProbe
-from commentary_chapter_neighbors import original_chapter_neighbors, ChapterNeighborNumberedProbe
+from research.commentary.commentary_chapter_cross_slot import ChapterNeighborSameBookAlternativeProbe
+from research.commentary.commentary_chapter_neighbors import original_chapter_neighbors, ChapterNeighborNumberedProbe
 from commentary_private_text_compare import raw_as_strict_xml_text
 
 

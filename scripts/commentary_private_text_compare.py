@@ -23,11 +23,11 @@ import zipfile
 
 from lxml import etree
 
-from commentary_chapter_neighbors import (original_chapter_neighbors, compare_chapter_neighbors,
+from research.commentary.commentary_chapter_neighbors import (original_chapter_neighbors, compare_chapter_neighbors,
                                           ChapterNeighborNumberedProbe)
-from commentary_chapter_cross_slot import ChapterNeighborSameBookAlternativeProbe
-from commentary_chapter_paragraph_overlap import OriginalChapterParagraphSpanProbe
-from commentary_chapter_p_boundaries import ChapterParagraphBoundaryProbe
+from research.commentary.commentary_chapter_cross_slot import ChapterNeighborSameBookAlternativeProbe
+from research.commentary.commentary_chapter_paragraph_overlap import OriginalChapterParagraphSpanProbe
+from research.commentary.commentary_chapter_p_boundaries import ChapterParagraphBoundaryProbe
 from commentary_reference_cross_slot import ReferenceCrossSlotTopology
 from commentary_prose_cross_slot import (OriginalProseAlternativeNativeSlotProbe,
     OriginalExtraGapNativeChapterProbe)
