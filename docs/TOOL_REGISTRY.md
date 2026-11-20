@@ -105,10 +105,11 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/fetch_reviewed_schema.py`](../scripts/fetch_reviewed_schema.py) | UNDECIDED | not established | 11 | not determined |
 | [`scripts/guard_commentary.py`](../scripts/guard_commentary.py) | KEEP_GENERIC | not established | 6 | not determined |
 | [`scripts/guard_osis.py`](../scripts/guard_osis.py) | KEEP_GENERIC | named test | 18 | not determined |
+| [`scripts/historical/darby/probe_darby_011_final_android.py`](../scripts/historical/darby/probe_darby_011_final_android.py) | HISTORICAL/ARCHIVE | named test | 2 | source/native audit |
+| [`scripts/historical/lsg/lsg_sword_compare.py`](../scripts/historical/lsg/lsg_sword_compare.py) | HISTORICAL/ARCHIVE | named test | 2 | source/native audit |
 | [`scripts/historical/lsg/probe_lsg_v11n.py`](../scripts/historical/lsg/probe_lsg_v11n.py) | HISTORICAL/ARCHIVE | not established | 2 | source/native audit |
 | [`scripts/inspect_paragraph_rendering.py`](../scripts/inspect_paragraph_rendering.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/lsg_source_compare.py`](../scripts/lsg_source_compare.py) | HISTORICAL/ARCHIVE | named test | 10 | source/native audit |
-| [`scripts/lsg_sword_compare.py`](../scripts/lsg_sword_compare.py) | HISTORICAL/ARCHIVE | named test | 2 | source/native audit |
 | [`scripts/maintext_fidelity_classification.py`](../scripts/maintext_fidelity_classification.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/maintext_whitespace_patterns.py`](../scripts/maintext_whitespace_patterns.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/materialize_attested_lsg_release.py`](../scripts/materialize_attested_lsg_release.py) | HISTORICAL/ARCHIVE | named test | 1 | publication/release |
@@ -129,7 +130,6 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/probe_andbible_android_emulator.py`](../scripts/probe_andbible_android_emulator.py) | UNDECIDED | not established | 6 | source/native audit |
 | [`scripts/probe_andbible_android_private_import.py`](../scripts/probe_andbible_android_private_import.py) | UNDECIDED | named test | 5 | source/native audit |
 | [`scripts/probe_andbible_jsword.py`](../scripts/probe_andbible_jsword.py) | UNDECIDED | not established | 4 | source/native audit |
-| [`scripts/probe_darby_011_final_android.py`](../scripts/probe_darby_011_final_android.py) | HISTORICAL/ARCHIVE | named test | 2 | source/native audit |
 | [`scripts/probe_official_osis.py`](../scripts/probe_official_osis.py) | UNDECIDED | not established | 3 | source/native audit |
 | [`scripts/probe_private_repaired_darby_sword.py`](../scripts/probe_private_repaired_darby_sword.py) | HISTORICAL/ARCHIVE | not established | 6 | source/native audit |
 | [`scripts/promote_sword_preview.py`](../scripts/promote_sword_preview.py) | KEEP_GENERIC | named test | 11 | not determined |
