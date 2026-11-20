@@ -979,8 +979,13 @@ The original Greek, Strong, Louw–Nida, morphology, verses, and UBS
 dictionary definitions are never rewritten or bundled.
 
 **Licensing and release boundary:** UBS Greek Dictionary source is licensed
-CC BY-SA 4.0 (United Bible Societies); MACULA source is licensed CC BY 4.0
-(Clear.Bible). A later separately approved redistribution must preserve
+CC BY-SA 4.0 (United Bible Societies); MACULA Greek Linguistic Datasets
+(© Biblica, Inc.; hosted by Clear.Bible) are licensed CC BY 4.0, **but the
+pinned MACULA source explicitly identifies third-party material and UBS
+MARBLE annotations “used with permission”**. See the original upstream
+notices and [exact-source release-readiness audit](RELEASE_READINESS.md)
+before treating any particular output field as redistributable. A later
+separately approved redistribution must preserve
 applicable attribution, license and share-alike obligations. The review
 index stores identifiers and original MACULA lexical witness metadata,
 **not UBS copyrighted definitions or verse text**. No Bible app integration,
