@@ -781,3 +781,30 @@ morphology, LN, verse references and both UBS original dictionaries
 remain byte-for-byte unchanged. The new candidate overlay is only
 a **private, expiring CI artifact**. No SWORD resource, public
 redistribution or Bible app integration was performed.
+
+## Final unmatched Greek original words — source editorial report
+
+The separate [47-original-word source editorial report](remaining_47_source_editorial_report.md)
+enumerates all **26 source lexical families** (47 exact original word
+IDs) left unmatched after direct UBS primary headword, exact
+English/French authentic `AlternateLemmas` and original
+`BaseForms.Inflections` metadata checks. All individual original
+word-ID witnesses, authentic Greek spelling, original Strong, LN,
+morphology and references remain recoverable from the pinned-source
+[read-only audit](audit_last_47_lexical_forms.py).
+
+No original UBS source inflection matched those original MACULA
+lemmas as an exact Greek entry. The original UBS source also has
+semantic-domain related entries for many of the 47 words, but
+**semantic-domain overlap is not evidence of lexical headword
+identity**. The 47 original words remain intentionally **unlinked**.
+Any future correction requires independent genuine Greek morphological
+or lexicographic evidence and a documented per-word editorial
+decision, preferably also proposed upstream to UBS source maintainers.
+
+There are **no further automated or source-explicit matching
+opportunities demonstrated by these pinned UBS v1.0 fields**. This is
+not a claim that the 47 Greek words lack meaning, nor that another
+independent lexicon cannot authoritatively establish a match. The
+candidate remains private and unpublished, with the original
+index and source text unchanged.
