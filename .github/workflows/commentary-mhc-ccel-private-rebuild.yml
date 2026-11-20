@@ -25,7 +25,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install -r requirements.txt -q
-          python -m unittest discover -s research/mhc-ccel -p "test_*.py" -v
+          python -m unittest discover -s work/commentaries/mhc-crosswire/experiments/ccel-imp -p "test_*.py" -v
       - name: Fetch six source-SHA-pinned CCEL XML volumes privately
         shell: bash
         run: |
