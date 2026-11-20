@@ -11,7 +11,7 @@
 
 ## Read-only integration
 
-The private, optional [second real Bible workflow](../.github/workflows/second-bible-proof.yml) already downloads publisher original WEBP USFX and actual original SWORD `zText` ZIPs, pinned by previously recorded independent exact SHA-256 values, into temporary Actions storage. It now adds `explicit_standard_book_scope_reference_audit` to the **metadata-only** receipt, plus `standard_66_book_crosswalk_sha256`. The actual original USFX and SWORD assets remain ephemeral and are never added to this repository or uploaded as CI artifacts.
+The private, optional [second real Bible workflow](../../.github/workflows/second-bible-proof.yml) already downloads publisher original WEBP USFX and actual original SWORD `zText` ZIPs, pinned by previously recorded independent exact SHA-256 values, into temporary Actions storage. It now adds `explicit_standard_book_scope_reference_audit` to the **metadata-only** receipt, plus `standard_66_book_crosswalk_sha256`. The actual original USFX and SWORD assets remain ephemeral and are never added to this repository or uploaded as CI artifacts.
 
 An explicit scoped canonical **verse-key match**, should it occur, is only an index check. It still does **not** establish a matching publisher revision, complete SWORD source-text, lexical markup, note body/anchors, explicit references, intro/poetry/paragraph positions, licensing/redistribution or editorial publication approval. The existing whole-source versus compiled-source **canon discrepancy remains blocked** until its exact provenance and full content are reviewed; no extra USFX books may be silently discarded or represented as missing verses.
 
@@ -36,4 +36,4 @@ This result **does not** justify adding an exception, relocating the doxology or
 3. Independently extract full actual compiled SWORD text, notes, lexical values, authored explicit links and structural start **and closing** events, including verse-zero and non-addressable intros. Compare against the original edition without deleting annotations or inventing verses.
 4. Test a genuinely second complete edition with its actual source, compiler outputs and separate stock-SWORD/reader verification; record licence and owner editorial approval before publication.
 
-See also [SECOND_REAL_BIBLE_PROBE.md](SECOND_REAL_BIBLE_PROBE.md), [SOURCE_OSIS_INVENTORY.md](SOURCE_OSIS_INVENTORY.md), [NATIVE_SWORD_INDEX_INVENTORY.md](NATIVE_SWORD_INDEX_INVENTORY.md).
+See also [SECOND_REAL_BIBLE_PROBE.md](../SECOND_REAL_BIBLE_PROBE.md), [SOURCE_OSIS_INVENTORY.md](SOURCE_OSIS_INVENTORY.md), [NATIVE_SWORD_INDEX_INVENTORY.md](NATIVE_SWORD_INDEX_INVENTORY.md).

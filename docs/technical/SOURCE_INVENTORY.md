@@ -6,8 +6,8 @@ Two additional non-SWORD datasets are declared in
 [bible/reference_data.py](https://github.com/icfmp/Bible/blob/main/bible/reference_data.py)
 and [bible/topic_data.py](https://github.com/icfmp/Bible/blob/main/bible/topic_data.py).
 
-This repository keeps one reviewed snapshot in [config/upstreams.json](../config/upstreams.json).
-The read-only checker in [scripts/check_provider_parity.py](../scripts/check_provider_parity.py)
+This repository keeps one reviewed snapshot in [config/upstreams.json](../../config/upstreams.json).
+The read-only checker in [scripts/check_provider_parity.py](../../scripts/check_provider_parity.py)
 compares all provider IDs, source URLs, catalogue URLs, package URLs, and
 OpenBible dataset URLs with Bible's current main branch. It parses Python AST
 literals only; it never imports or executes Bible code, fetches Bible texts,
@@ -79,9 +79,9 @@ or publish a release.
    identities and source attribution.
 6. Never redistribute a resource until its independent rights review is approved.
 
-Related: [UPDATES.md](UPDATES.md) and [Bible's affiliated-source audit](https://github.com/icfmp/Bible/blob/main/docs/SOURCES_AFFILIEES_11.md).
+Related: [UPDATES.md](../workflows/UPDATES.md) and [Bible's affiliated-source audit](https://github.com/icfmp/Bible/blob/main/docs/SOURCES_AFFILIEES_11.md).
 
 
 ## Edition-level duplicate selection
 
-For Bibles and commentaries available through several SWORD providers, check [source priority](SOURCE_PRIORITY.md). The read-only `scripts/select_sources.py` command reports one preferred candidate per *verified identical edition*, lower-priority copies to skip, and unresolved same-ID/title collisions that need review. Priority is a separate policy from the live declaration parity check; a provider can remain registered for Bible even if its copies lose selection to a higher-priority upstream. The source audit uploads a distinct `source-selection.json` report and never imports or deletes content.
+For Bibles and commentaries available through several SWORD providers, check [source priority](../policies/SOURCE_PRIORITY.md). The read-only `scripts/select_sources.py` command reports one preferred candidate per *verified identical edition*, lower-priority copies to skip, and unresolved same-ID/title collisions that need review. Priority is a separate policy from the live declaration parity check; a provider can remain registered for Bible even if its copies lose selection to a higher-priority upstream. The source audit uploads a distinct `source-selection.json` report and never imports or deletes content.
