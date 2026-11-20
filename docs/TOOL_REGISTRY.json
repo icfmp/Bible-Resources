@@ -7080,7 +7080,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "8b1fc4cb3a0b7ce5c85dd8e3318715761ab6481c280ac79c7e8c1fc14e77fef7",
+      "sha256_at_inventory": "04018516e24e4fa40a675d28bb9e7edab278dc2b4d9d44207fad765f9c835fe5",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
