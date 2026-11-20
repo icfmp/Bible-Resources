@@ -34,6 +34,7 @@ def audit(report,english,french):
     if len(en)!=len(english) or len(fr)!=len(french) or set(en)!=set(fr):
         raise ValueError("UBS original bilingual entry inventory mismatch")
     by_alternate=defaultdict(list)
+    source_blank_alternate_entries=[]
     for mid,e in en.items():
         f=fr[mid]
         en_alt=e.get("AlternateLemmas") or []
@@ -42,10 +43,13 @@ def audit(report,english,french):
             or sorted(nfc(x) for x in en_alt)!=sorted(nfc(x) for x in fr_alt)
             or source_ln(e)!=source_ln(f)):
             raise ValueError("Original UBS EN/FR lemma alternate or LN source mismatch: "+mid)
-        if not all(isinstance(x,str) and x for x in en_alt):
-            raise ValueError("Original UBS alternate source lemma malformed: "+repr({"id":mid,"values":en_alt[:3]}))
+        if not all(isinstance(x,str) for x in en_alt):
+            raise ValueError("Original UBS alternate source lemma non-string: "+mid)
+        if any(not x.strip() for x in en_alt):
+            source_blank_alternate_entries.append(mid)  # Preserve this genuine source metadata defect.
         for alt in en_alt:
-            by_alternate[nfc(alt)].append(mid)
+            if alt.strip():
+                by_alternate[nfc(alt)].append(mid)
     source_word_ids=set()
     census=Counter()
     families=[]
@@ -102,6 +106,7 @@ def audit(report,english,french):
         "status":"PRIVATE_Greek_original_UBS_explicit_alternate_lemmas_source_evidence_UNAPPROVED",
         "source_editions":report["source_editions"],
         "original_word_count":456,
+        "original_ubs_blank_alternate_lemma_main_ids":sorted(source_blank_alternate_entries),
         "source_evidence_counts":dict(sorted(census.items())),
         "source_families":families,
         "new_source_word_lexical_headwords_approved":0,
