@@ -457,6 +457,9 @@ jobs:
           assert d['corpus']['original_lexical_class_words']==248680
           assert d['source_sense_inventory']['original_ubs_sense_ids']==16619
           assert d['original_ubs_headwords']==7943
+          assert d['entry_only_review_word_count']==233190
+          assert d['candidate_word_count']==53981
+          assert d['candidate_headword_families']==1768
           assert sum(d['source_only_semantic_candidate_dispositions'].values())==d['entry_only_review_word_count']
           assert len(d['original_word_id_to_private_verse_witness_candidate'])==d['candidate_word_count']
           assert d['independently_contextually_validated']==0
