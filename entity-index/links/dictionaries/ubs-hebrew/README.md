@@ -1247,3 +1247,23 @@ outside UBS 0.9.4's attested indexed-headword inventory. These are not
 2,374 known fixable errors. Headword coverage is not a contextual
 semantic-accuracy metric; no contextual UBS sense ID is inferred.
 
+
+
+## Bounded v1.1 semantic feasibility — no inferred sense changes
+
+A one-pass, source-pinned v1.1 audit [documents the complete outcome](
+V11_SEMANTIC_FEASIBILITY.md): **53,981** original WLC source words
+without an accepted UBS sense have a *single UBS sense whose EN/FR source
+reference cites their verse*, and the original verse has only one
+source-verified WLC word of that UBS headword. These words span **1,768**
+lexical entries, but **zero** are promoted to contextual meaning
+decisions. The 233,190 original entry-only words are fully partitioned
+into defensible citation candidates, collisions, missing or ambiguous
+references and other unresolved source outcomes.
+
+**Decision:** this is enough scale to justify an *independently
+sample-validated semantic experiment*, but not enough to auto-assign
+53,981 contextual LEXIDs. Avoid the known MACULA SDBH ↔ UBS 0.9.4
+numeric-ID collision, preserve the source editions and ambiguity,
+and leave the [published v1.0.0](https://github.com/icfmp/Bible-Resources/releases/tag/bsi-ubs-hebrew-v1.0.0)
+unchanged.
