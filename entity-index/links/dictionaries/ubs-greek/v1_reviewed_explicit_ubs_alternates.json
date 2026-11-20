@@ -1,0 +1,519 @@
+{
+  "schema_version": 1,
+  "status": "PRIVATE_explicit_UBS_bilingual_original_Greek_alternate_headword_word_id_review",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "source_word_ids_are_exact": true,
+    "bilingual_ubs_AlternateLemmas_exact_nfc": true,
+    "original_word_specific_bilingual_ln_intersection": true,
+    "only_unique_original_ubs_headword": true,
+    "source_pos_differences_not_rewritten": true,
+    "original_strong_never_aliased": true,
+    "no_contextual_lexid_inferred": true,
+    "preserve_old_index_and_all_overlays": true,
+    "publication_approved": false
+  },
+  "reviewed_original_lexical_families": [
+    {
+      "macula_original_lemma_nfc": "ἰδού",
+      "macula_original_strong": "2400",
+      "macula_original_word_count": 200,
+      "macula_original_class_counts": {
+        "intj": 2,
+        "ptcl": 198
+      },
+      "macula_original_ln_counts": {
+        "91.10": 6,
+        "91.13": 195
+      },
+      "ubs_original_main_id": "003615000000000",
+      "ubs_original_main_lemma_nfc": "ὁράω",
+      "ubs_original_pos_en": [
+        "verb"
+      ],
+      "ubs_original_pos_fr": [
+        "verbe"
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G3708"
+      ],
+      "attested_ubs_original_alternate_lemma": "ἰδού",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "Ἰερουσαλήμ",
+      "macula_original_strong": "2419",
+      "macula_original_word_count": 76,
+      "macula_original_class_counts": {
+        "noun": 76
+      },
+      "macula_original_ln_counts": {
+        "93.480a": 71,
+        "93.480b": 5
+      },
+      "ubs_original_main_id": "002418000000000",
+      "ubs_original_main_lemma_nfc": "Ἱεροσόλυμα",
+      "ubs_original_pos_en": [
+        "noun-name, f./n."
+      ],
+      "ubs_original_pos_fr": [
+        "nom, f./n."
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G2414"
+      ],
+      "attested_ubs_original_alternate_lemma": "Ἰερουσαλήμ",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "ἱερόν",
+      "macula_original_strong": "2411",
+      "macula_original_word_count": 30,
+      "macula_original_class_counts": {
+        "adj": 29,
+        "noun": 1
+      },
+      "macula_original_ln_counts": {
+        "53.9": 1,
+        "7.16": 29
+      },
+      "ubs_original_main_id": "002417000000000",
+      "ubs_original_main_lemma_nfc": "ἱερός",
+      "ubs_original_pos_en": [
+        "adjc."
+      ],
+      "ubs_original_pos_fr": [
+        "adjc."
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G2413"
+      ],
+      "attested_ubs_original_alternate_lemma": "ἱερόν",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "ἴδε",
+      "macula_original_strong": "2396",
+      "macula_original_word_count": 30,
+      "macula_original_class_counts": {
+        "ptcl": 30
+      },
+      "macula_original_ln_counts": {
+        "27.5": 1,
+        "91.13": 29
+      },
+      "ubs_original_main_id": "003615000000000",
+      "ubs_original_main_lemma_nfc": "ὁράω",
+      "ubs_original_pos_en": [
+        "verb"
+      ],
+      "ubs_original_pos_fr": [
+        "verbe"
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G3708"
+      ],
+      "attested_ubs_original_alternate_lemma": "ἴδε",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "ἕνεκεν",
+      "macula_original_strong": "1752",
+      "macula_original_word_count": 20,
+      "macula_original_class_counts": {
+        "prep": 20
+      },
+      "macula_original_ln_counts": {
+        "89.31": 7,
+        "89.58": 1,
+        "90.43": 12
+      },
+      "ubs_original_main_id": "001766000000000",
+      "ubs_original_main_lemma_nfc": "ἕνεκα",
+      "ubs_original_pos_en": [
+        "prep. (with gen.)"
+      ],
+      "ubs_original_pos_fr": [
+        "prep. (avec gen.)"
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G1752a"
+      ],
+      "attested_ubs_original_alternate_lemma": "ἕνεκεν",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "περισσότερος",
+      "macula_original_strong": "4055",
+      "macula_original_word_count": 15,
+      "macula_original_class_counts": {
+        "adj": 15
+      },
+      "macula_original_ln_counts": {
+        "58.57": 2,
+        "78.31": 13
+      },
+      "ubs_original_main_id": "003959000000000",
+      "ubs_original_main_lemma_nfc": "περισσός",
+      "ubs_original_pos_en": [
+        "adjc., advb."
+      ],
+      "ubs_original_pos_fr": [
+        "adjc., advb."
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G4053"
+      ],
+      "attested_ubs_original_alternate_lemma": "περισσότερος",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "Ἰσκαριώτης",
+      "macula_original_strong": "2469",
+      "macula_original_word_count": 8,
+      "macula_original_class_counts": {
+        "noun": 8
+      },
+      "macula_original_ln_counts": {
+        "93.181": 8
+      },
+      "ubs_original_main_id": "002468000000000",
+      "ubs_original_main_lemma_nfc": "Ἰσκαριώθ",
+      "ubs_original_pos_en": [
+        "noun-name, m."
+      ],
+      "ubs_original_pos_fr": [
+        "nom, m."
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G2469a"
+      ],
+      "attested_ubs_original_alternate_lemma": "Ἰσκαριώτης",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "πλατεῖα",
+      "macula_original_strong": "4113",
+      "macula_original_word_count": 6,
+      "macula_original_class_counts": {
+        "adj": 6
+      },
+      "macula_original_ln_counts": {
+        "1.103": 6
+      },
+      "ubs_original_main_id": "004022000000000",
+      "ubs_original_main_lemma_nfc": "πλατύς",
+      "ubs_original_pos_en": [
+        "adjc."
+      ],
+      "ubs_original_pos_fr": [
+        "adjc."
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G4116"
+      ],
+      "attested_ubs_original_alternate_lemma": "πλατεῖα",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "δανείζω",
+      "macula_original_strong": "1155",
+      "macula_original_word_count": 4,
+      "macula_original_class_counts": {
+        "verb": 4
+      },
+      "macula_original_ln_counts": {
+        "57.209": 3,
+        "57.213": 1
+      },
+      "ubs_original_main_id": "001170000000000",
+      "ubs_original_main_lemma_nfc": "δανίζω",
+      "ubs_original_pos_en": [
+        "verb"
+      ],
+      "ubs_original_pos_fr": [
+        "verbe"
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G1155a"
+      ],
+      "attested_ubs_original_alternate_lemma": "δανείζω",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "δεκάτη",
+      "macula_original_strong": "1181",
+      "macula_original_word_count": 4,
+      "macula_original_class_counts": {
+        "adj": 4
+      },
+      "macula_original_ln_counts": {
+        "60.66": 4
+      },
+      "ubs_original_main_id": "001197000000000",
+      "ubs_original_main_lemma_nfc": "δέκατος",
+      "ubs_original_pos_en": [
+        "adjc."
+      ],
+      "ubs_original_pos_fr": [
+        "adjc."
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G1182"
+      ],
+      "attested_ubs_original_alternate_lemma": "δεκάτη",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "τοὐναντίον",
+      "macula_original_strong": "5121",
+      "macula_original_word_count": 3,
+      "macula_original_class_counts": {
+        "adv": 1,
+        "noun": 2
+      },
+      "macula_original_ln_counts": {
+        "89.134": 3
+      },
+      "ubs_original_main_id": "001739000000000",
+      "ubs_original_main_lemma_nfc": "ἐναντίον",
+      "ubs_original_pos_en": [
+        "prep. (with gen.)"
+      ],
+      "ubs_original_pos_fr": [
+        "prep. (avec gen.)"
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G1726"
+      ],
+      "attested_ubs_original_alternate_lemma": "τοὐναντίον",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "ἡττάομαι",
+      "macula_original_strong": "2274",
+      "macula_original_word_count": 3,
+      "macula_original_class_counts": {
+        "verb": 3
+      },
+      "macula_original_ln_counts": {
+        "39.61": 2,
+        "88.134": 1
+      },
+      "ubs_original_main_id": "002275000000000",
+      "ubs_original_main_lemma_nfc": "ἡσσάομαι",
+      "ubs_original_pos_en": [
+        "verb"
+      ],
+      "ubs_original_pos_fr": [
+        "verbe"
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G2274a"
+      ],
+      "attested_ubs_original_alternate_lemma": "ἡττάομαι",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "εἵνεκεν",
+      "macula_original_strong": "1752",
+      "macula_original_word_count": 2,
+      "macula_original_class_counts": {
+        "prep": 2
+      },
+      "macula_original_ln_counts": {
+        "89.31": 1,
+        "89.58": 1
+      },
+      "ubs_original_main_id": "001766000000000",
+      "ubs_original_main_lemma_nfc": "ἕνεκα",
+      "ubs_original_pos_en": [
+        "prep. (with gen.)"
+      ],
+      "ubs_original_pos_fr": [
+        "prep. (avec gen.)"
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G1752a"
+      ],
+      "attested_ubs_original_alternate_lemma": "εἵνεκεν",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "μιμνῄσκομαι",
+      "macula_original_strong": "3403",
+      "macula_original_word_count": 2,
+      "macula_original_class_counts": {
+        "verb": 2
+      },
+      "macula_original_ln_counts": {
+        "29.16": 2,
+        "29.7": 1
+      },
+      "ubs_original_main_id": "003310000000000",
+      "ubs_original_main_lemma_nfc": "μιμνῄσκω",
+      "ubs_original_pos_en": [
+        "verb"
+      ],
+      "ubs_original_pos_fr": [
+        "verbe"
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G3415"
+      ],
+      "attested_ubs_original_alternate_lemma": "μιμνῄσκομαι",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "Βόος",
+      "macula_original_strong": "1003",
+      "macula_original_word_count": 1,
+      "macula_original_class_counts": {
+        "noun": 1
+      },
+      "macula_original_ln_counts": {
+        "93.79": 1
+      },
+      "ubs_original_main_id": "001003000000000",
+      "ubs_original_main_lemma_nfc": "Βόες",
+      "ubs_original_pos_en": [
+        "noun-name, m."
+      ],
+      "ubs_original_pos_fr": [
+        "nom, m."
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G1003b"
+      ],
+      "attested_ubs_original_alternate_lemma": "Βόος",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "αἴτιον",
+      "macula_original_strong": "159",
+      "macula_original_word_count": 1,
+      "macula_original_class_counts": {
+        "adj": 1
+      },
+      "macula_original_ln_counts": {
+        "89.15": 1
+      },
+      "ubs_original_main_id": "000157000000000",
+      "ubs_original_main_lemma_nfc": "αἴτιος",
+      "ubs_original_pos_en": [
+        "adjc."
+      ],
+      "ubs_original_pos_fr": [
+        "adjc."
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G0158"
+      ],
+      "attested_ubs_original_alternate_lemma": "αἴτιον",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "γαμίσκω",
+      "macula_original_strong": "1061",
+      "macula_original_word_count": 1,
+      "macula_original_class_counts": {
+        "verb": 1
+      },
+      "macula_original_ln_counts": {
+        "34.72": 1
+      },
+      "ubs_original_main_id": "001071000000000",
+      "ubs_original_main_lemma_nfc": "γαμίζω",
+      "ubs_original_pos_en": [
+        "verb"
+      ],
+      "ubs_original_pos_fr": [
+        "verbe"
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G1061a"
+      ],
+      "attested_ubs_original_alternate_lemma": "γαμίσκω",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "εὐπάρεδρον",
+      "macula_original_strong": "2145",
+      "macula_original_word_count": 1,
+      "macula_original_class_counts": {
+        "adj": 1
+      },
+      "macula_original_ln_counts": {
+        "53.68": 1
+      },
+      "ubs_original_main_id": "002150000000000",
+      "ubs_original_main_lemma_nfc": "εὐπάρεδρος",
+      "ubs_original_pos_en": [
+        "adjc."
+      ],
+      "ubs_original_pos_fr": [
+        "adjc."
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G2145a"
+      ],
+      "attested_ubs_original_alternate_lemma": "εὐπάρεδρον",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "καταβαρύνομαι",
+      "macula_original_strong": "925",
+      "macula_original_word_count": 1,
+      "macula_original_class_counts": {
+        "verb": 1
+      },
+      "macula_original_ln_counts": {
+        "23.69": 1
+      },
+      "ubs_original_main_id": "002606000000000",
+      "ubs_original_main_lemma_nfc": "καταβαρύνω",
+      "ubs_original_pos_en": [
+        "verb"
+      ],
+      "ubs_original_pos_fr": [
+        "verbe"
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G2599a"
+      ],
+      "attested_ubs_original_alternate_lemma": "καταβαρύνομαι",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    },
+    {
+      "macula_original_lemma_nfc": "συμμορφίζομαι",
+      "macula_original_strong": "4833",
+      "macula_original_word_count": 1,
+      "macula_original_class_counts": {
+        "verb": 1
+      },
+      "macula_original_ln_counts": {
+        "58.6": 1
+      },
+      "ubs_original_main_id": "004736000000000",
+      "ubs_original_main_lemma_nfc": "συμμορφίζω",
+      "ubs_original_pos_en": [
+        "verb"
+      ],
+      "ubs_original_pos_fr": [
+        "verbe"
+      ],
+      "ubs_original_strong_codes_separate": [
+        "G4833a"
+      ],
+      "attested_ubs_original_alternate_lemma": "συμμορφίζομαι",
+      "editorial_disposition": "Approve only exact source-word-ID lexical HEADWORD through original UBS AlternateLemmas explicitly attested in both English and French and individual original MACULA LN domains; retain original word class, morphology, Strong, Greek and source reference. UBS category differences are documented lexical-vs-token classifications, never rewritten or generalized."
+    }
+  ],
+  "previous_individual_word_headword_reviews": 9195,
+  "new_explicit_alternate_lemma_word_headword_reviews": 409,
+  "original_ubs_lexemes_still_absent": 47
+}
