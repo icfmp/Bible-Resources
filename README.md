@@ -48,7 +48,7 @@ python -m pip install -r requirements.txt
 python -m unittest discover -s tests -v
 python scripts/validate.py
 python scripts/build.py --output dist --base-url https://icfmp.github.io/Bible-Resources/
-python scripts/smoke.py --dist dist
+python scripts/smoke.py
 ```
 
 Do not interpret a local build as rights clearance, complete source fidelity or public deployment.
