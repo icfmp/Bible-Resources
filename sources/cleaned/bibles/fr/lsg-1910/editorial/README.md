@@ -12,10 +12,10 @@
 
 ## Evidence and outstanding decisions
 
-- [Resource profile and print evidence](../../../../../docs/profiles/fr-segond-1910.md)
-- [Historical source research handoff](../../../../../docs/LSG_AUDIT_RESEARCH_HANDOFF.md)
-- [Published release receipt](../../../../../docs/releases/LSG-0.1.0.md)
+- [Resource profile and print evidence](../../../../../../docs/profiles/fr-segond-1910.md)
+- [Historical source research handoff](../../../../../../docs/LSG_AUDIT_RESEARCH_HANDOFF.md)
+- [Published release receipt](../../../../../../docs/releases/LSG-0.1.0.md)
 - [Cleaned source manifest](../CLEANUP_MANIFEST.json)
-- [Compiled-native source audit](../../../../../modules/lsg-1910/SOURCE_AUDIT.json)
+- [Compiled-native source audit](../../../../../../modules/lsg-1910/SOURCE_AUDIT.json)
 
 **Status:** existing historical approvals only; no new punctuation, translation, verse or format change approved by this file.
