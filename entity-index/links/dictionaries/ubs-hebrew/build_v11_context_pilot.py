@@ -103,10 +103,15 @@ def sample(report, english, french, macula):
                 if other_id==sid:continue
                 other_sense_headers.append({
                     "lexid":other_id,
-                    "source_fields":{k:(v[:140] if isinstance(v,str) else
-                        json.dumps(v,ensure_ascii=False)[:140])
-                        for k,v in sense.items()
-                        if k not in ("LEXID","LEXReferences") and isinstance(v,(str,list,dict))}
+                    "source_sense_glosses":[
+                        {"glosses":(meaning.get("Glosses") or []),
+                         "definition":str(meaning.get("DefinitionShort") or "")[:250]}
+                        for meaning in (sense.get("LEXSenses") or [])
+                        if isinstance(meaning,dict)
+                    ],
+                    "source_domains":[x.get("Domain","") for x in
+                        (sense.get("LEXDomains") or []) if isinstance(x,dict)],
+                    "source_form_constraints":sense.get("LEXForms") or [],
                 })
             entries[language]={
                 "source_lemma":original["Lemma"],
