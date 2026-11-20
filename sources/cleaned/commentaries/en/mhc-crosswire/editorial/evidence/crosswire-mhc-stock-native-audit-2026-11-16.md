@@ -1,6 +1,6 @@
 # MHC 2.2 — original CrossWire stock/native investigation
 
-**Historical read-only audit.** Its source/stock discrepancy research helped justify reconstructing the reviewed MHC master. The released source and final native hashes are controlled by [`CLEANUP_MANIFEST.json`](../../CLEANUP_MANIFEST.json), [module audit](../../../../../../../modules/mhc-crosswire/SOURCE_AUDIT.json) and the [MHC 0.1.0 release](../releases/MHC-0.1.0.md). The detailed chronological probes remain in the file's Git history.
+**Historical read-only audit.** Its source/stock discrepancy research helped justify reconstructing the reviewed MHC master. The released source and final native hashes are controlled by [`CLEANUP_MANIFEST.json`](../../CLEANUP_MANIFEST.json), [module source validation](../../../../../../../modules/mhc-crosswire/SOURCE_VALIDATION.json) and the [MHC 0.1.0 release](../releases/MHC-0.1.0.md). The detailed chronological probes remain in the file's Git history.
 
 ## Exact inputs
 
