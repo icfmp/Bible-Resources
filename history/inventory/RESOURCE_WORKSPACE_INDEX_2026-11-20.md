@@ -51,4 +51,4 @@ remains unavailable; our reconstructed, version-specific MHCC source is
 
 The canonical workflow and directory rules are in
 [WORKSPACE_LAYOUT.md](../../docs/architecture/WORKSPACE_LAYOUT.md) and
-[SOURCE_FIRST_EDITORIAL_PIPELINE.md](../../docs/workflows/SOURCE_FIRST_EDITORIAL_PIPELINE.md).
+[SOURCE_FIRST_EDITORIAL_PIPELINE.md](../../docs/PRODUCTION_PIPELINE.md).
