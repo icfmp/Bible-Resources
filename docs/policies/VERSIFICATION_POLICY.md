@@ -79,7 +79,7 @@ verified. Do not ship a misleading literal ellipsis as Scripture.
 
 This is an editorial and QA policy. **No automatic blank-verse insertion,
 note creation or cross-versification mapping is implemented yet.** See the
-Segond + MHC pilot in [PILOT_SEGOND_MHC.md](../PILOT_SEGOND_MHC.md).
+Historical Segond/MHC pilot observations are retained under `history/pilots/`; they do not define versification policy.
 
 ## Enforced publication index evidence
 
