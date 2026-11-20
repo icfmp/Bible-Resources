@@ -33,7 +33,7 @@ def extract_lexical_senses(records):
                 sid=s.get("LEXID")
                 code=s.get("LEXEntryCode")
                 if not isinstance(sid,str) or not sid or not isinstance(code,str) or not code:
-                    raise ValueError("UBS original lexical sense has invalid LEXID/LN")
+                    raise ValueError("UBS original lexical sense has invalid LEXID/LN: "+repr({"main_id":rec["MainId"],"lexid":sid,"ln_code":code}))
                 senses.add((sid,code))
         if rec["MainId"] in result:
             raise ValueError("Duplicate original UBS Greek entry")
