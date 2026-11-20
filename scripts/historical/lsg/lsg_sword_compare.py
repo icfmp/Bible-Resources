@@ -38,7 +38,7 @@ SAMPLES = {
     "ROM":("Rom",[8]),
     "REV":("Rev",[22]),
 }
-BOOK_ALIASES_PATH = Path(__file__).resolve().parents[1] / "config/diatheke-usfm-book-aliases.json"
+BOOK_ALIASES_PATH = Path(__file__).resolve().parents[3] / "config/diatheke-usfm-book-aliases.json"
 
 def chapter_plan(all_keys, *, full: bool) -> dict[str,tuple[str,list[int]]]:
     if not full:
