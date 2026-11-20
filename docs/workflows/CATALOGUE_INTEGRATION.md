@@ -32,8 +32,7 @@ curl -fLsS https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json \
 
 ## 2. Read a module entry
 
-The example below is intentionally abbreviated: the public catalogue also
-includes full, potentially long Markdown descriptions and their provenance.
+The following is an **abbreviated historical illustration**, not a live catalogue response. The actual feed may have newer versions, changed checksums and different module entries. It also contains longer approved Markdown descriptions and provenance.
 
 ```json
 {
@@ -73,9 +72,7 @@ includes full, potentially long Markdown descriptions and their provenance.
 }
 ```
 
-The example represents the **currently published LSG 0.1.0**. Do not copy its
-checksum or file size into application code: always obtain them from the
-catalogue response at the moment of download.
+The example illustrates the **LSG 0.1.0 catalogue shape at the time it was recorded**. It does not assert that this remains the latest public version or that its sample download metadata are current. Never copy a sample checksum or size into application code: retrieve them from the live catalogue immediately before download.
 
 | Field | How to use it |
 | --- | --- |
@@ -142,47 +139,73 @@ A client should perform these steps in order:
 6. Handle unavailable/invalid catalogue responses as an **unknown network or
    feed state**, not as instructions to delete installed resources.
 
-A minimal, **download-only** Python example (it does not extract or install
-anything):
+A minimal **download-and-verify only** Python example follows. It stages the bytes in a temporary file and exposes a named ZIP **only after** a successful checksum and size match. It does not extract, install or overwrite a module. Choose the curated `id` from the live catalogue rather than hard-coding a historical SWORD identifier.
 
 ```python
 import hashlib
 import json
+import os
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from urllib.parse import urlsplit
 from urllib.request import urlopen
 
 CATALOGUE = "https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json"
+CURATED_ID = "lsg-1910"  # Example choice; read it from current discovery UI.
+
 with urlopen(CATALOGUE, timeout=30) as response:
     catalogue = json.load(response)
 if catalogue.get("schema_version") != 1:
     raise ValueError("Unsupported catalogue schema")
 
-module = next(m for m in catalogue["modules"] if m["sword_id"] == "BRLSG1910")
+module = next(m for m in catalogue["modules"] if m["id"] == CURATED_ID)
 download = module["download"]
 if urlsplit(download["url"]).scheme != "https":
     raise ValueError("HTTPS download required")
 
-# Example only: consumers should stage downloads with bounded size and
-# an atomic final rename; never use this as a complete ZIP installer.
-destination = Path("BRLSG1910.zip")
-size = 0
-digest = hashlib.sha256()
-with urlopen(download["url"], timeout=60) as response, destination.open("wb") as out:
-    while block := response.read(64 * 1024):
-        size += len(block)
-        if size > download["size_bytes"]:
-            raise ValueError("Download exceeds declared size")
-        digest.update(block)
-        out.write(block)
+expected_size = download["size_bytes"]
+if not isinstance(expected_size, int) or expected_size <= 0:
+    raise ValueError("Invalid expected size")
+expected_sha = download["sha256"]
+if not isinstance(expected_sha, str) or len(expected_sha) != 64:
+    raise ValueError("Invalid expected SHA-256")
 
-if size != download["size_bytes"] or digest.hexdigest() != download["sha256"]:
-    destination.unlink(missing_ok=True)
-    raise ValueError("Download failed integrity verification")
-print("Verified download:", destination)
+destination = Path(f"{module['sword_id']}.zip")
+if destination.exists():
+    raise FileExistsError("Refuse to replace an existing download")
+
+temporary = None
+try:
+    with NamedTemporaryFile(
+        mode="wb", prefix=".sword-download-", suffix=".part",
+        dir=destination.parent, delete=False,
+    ) as out:
+        temporary = Path(out.name)
+        digest = hashlib.sha256()
+        size = 0
+        with urlopen(download["url"], timeout=60) as response:
+            while block := response.read(64 * 1024):
+                size += len(block)
+                if size > expected_size:
+                    raise ValueError("Download exceeds declared size")
+                digest.update(block)
+                out.write(block)
+
+    if size != expected_size or digest.hexdigest() != expected_sha:
+        raise ValueError("Download failed integrity verification")
+    # This is an example staging operation, NOT a complete secure installer.
+    # Production clients also need exclusive final-file creation and ZIP checks.
+    if destination.exists():
+        raise FileExistsError("Destination appeared during download")
+    os.replace(temporary, destination)
+    temporary = None
+    print("Verified download:", destination)
+finally:
+    if temporary is not None:
+        temporary.unlink(missing_ok=True)
 ```
 
-The snippet intentionally stops **before extraction or installation**.
+This intentionally stops **before archive safety checks, extraction or installation**. A production client must additionally use exclusive final-file creation (not rely on the example's existence check), enforce a maximum allowed package size independently of untrusted catalogue data, verify ZIP members and module metadata, and preserve installed resources until a checked replacement is ready.
 
 ## 5. Alternatively use the standard SWORD repository
 
