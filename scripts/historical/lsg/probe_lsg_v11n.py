@@ -17,6 +17,11 @@ import sys
 import tempfile
 from xml.etree import ElementTree as ET
 
+
+# Historical probe relocated from the top-level scripts directory.
+# Preserve imports of the shared source/reader helpers without a stub.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
 from lsg_source_compare import read_source_xml, scan_usfx
 from pilot_preflight import PilotError, ROOT
 from pilot_subprocess import query, present_key

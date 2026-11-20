@@ -1,4 +1,20 @@
-# Executable tooling — lifecycle and maintenance
+# Executable tooling — navigation, lifecycle and maintenance
+
+**Active entrypoints remain at the root during audited migration.** See [the historical tools directory](historical/README.md) for the first real relocation and its reproducible CI/test callers. The root is not intended as a permanent home for every experiment. The inventory covers nested paths automatically; use [issue #430](https://github.com/icfmp/Bible-Resources/issues/430) for tested migration batches.
+
+## Responsibility map (destination categories)
+
+| Category | Purpose | Stable examples / migration condition |
+| --- | --- | --- |
+| `intake/` (future) | Source edition, licence and provenance acquisition | `bible_intake.py`, `commentary_intake.py`; migrate only with validated workflow paths |
+| `source/` (future) | OSIS/USFM schema, normalization, notes and references | `guard_osis.py`, `normalize_osis.py`, `source_osis_inventory.py` |
+| `native/` (future) | SWORD native readback, mapping, text and link parity | `sword_native_inventory.py`, `source_native_*`; C++ compiler paths require care |
+| `readers/` (future) | Xiphos, JSword and Android compatibility probes | Migrate only after integration tests and runner setup parity |
+| `release/` (future) | Deterministic package, signing, catalogue and publication | `build.py`, `validate.py`, `release_preflight.py`; public entrypoints stay stable until explicitly migrated |
+| [`historical/`](historical/README.md) | Exact source-pinned reproduction and superseded experiments | Begin with relocated LSG synthetic versification probe; no deletion without replay |
+
+**These future category names are a target design, not folders claimed as already populated.** Create them incrementally when their actual callers and import contracts pass tests. A bare mass move or hundreds of compatibility wrappers would conceal, not solve, the maintenance problem.
+
 
 Keep stable script paths as public interfaces until their **actual** Python
 imports, tests, CI workflows, external documented commands, and historical
