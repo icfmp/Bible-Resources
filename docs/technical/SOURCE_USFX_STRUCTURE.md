@@ -1,85 +1,23 @@
-# Generic source-native USFX structure inventory (stage 3)
+# Original USFX structural inventory
 
-This read-only audit is for an **original publisher USFX** archive, not a
-license to convert, rewrite or publish its contents. It applies to eBible
-sources such as `frajnd-2024` and the earlier WEBP research fixture, with no
-edition-specific versification exceptions. Tracked under [#28](https://github.com/icfmp/Bible-Resources/issues/28),
-with the second-real-source checkpoint in [#62](https://github.com/icfmp/Bible-Resources/issues/62).
+**Purpose:** inspect every book, chapter, verse and structural marker of a publisher's original USFX source **without altering it**. USFX is an input format, not itself proof of the canonical OSIS output or permission to redistribute text.
 
-## What the original-source inspector does
+## Verification procedure
 
-`scripts/source_usfx_structure.py` parses the full original XML using a
-non-recovering, network-disabled XML parser. It rejects DTD/entity
-declarations, duplicate book IDs, invalid roots, structurally unsafe or
-oversized files, and limits total elements. It preserves immutable source
-bytes and records:
+1. Identify and pin the exact source archive, publisher edition/revision, licence, URL and SHA-256.
+2. Independently validate the original against the reviewed, SHA-pinned USFX schema described in `config/usfx-schema-policy.json`. An XML parse alone is insufficient.
+3. Run the read-only `scripts/source_usfx_structure.py` inventory using its currently documented CLI and source path. Never use a test fixture's edition ID as the default for new imports.
+4. Review counts and order of **all** authored books, chapter markers and numbered verses. Record native source-only books or unusual versification explicitly.
+5. Inspect original XML element/attribute occurrence counts; ordered structural hashes; paragraph/poetry/heading markers; note kinds and callers; and explicitly encoded reference destinations.
+6. Classify duplicates, reversed or inconsistent ranges, ambiguous nesting, unknown elements and nonstandard constructs as **BLOCKED**, not automatically corrected.
 
-- **every original book** in its original order, with chapter-marker and
-  expanded numbered-verse counts;
-- ordered numbered-key SHA-256 and original source XML SHA-256, alongside an
-  independent inventory via `scan_usfx`;
-- source XML element/attribute counts and a hash of structural-event order
-  (no Bible words, note bodies, title strings or private reference targets);
-- note kinds and literal-vs-automatic caller counts, plus the number of
-  heading, paragraph, poetry, reference and explicit-target elements;
-- duplicates, reversed verse/chapter keys, range anomalies and illegal
-  note-contained verse/chapter markers, with bounded reference-only examples.
+The emitted receipt must contain metadata, structural digests and bounded reference IDs, not original Scripture, note content, title text or private reference target strings.
 
-Any such structural discrepancy is **BLOCKED**, not silently normalized or
-`fixed` using standard-canon assumptions. Source-only books and unusual
-markup remain visible. A missing or unfamiliar element is not silently
-dropped; XML Schema validation and independent editorial assessment are
-separate gates.
+## Source-only and compilation boundaries
 
-The source archive and content never enter GitHub artifacts or logs. The
-metadata receipt from stage 3 can be compared between runs and used to
-investigate a source revision without distributing the authored Scripture.
+- Source labels, verse endings, speaker styles, notes outside numbered text and source-only books remain part of the author's edition; do not silently strip them or treat every marker as Scripture prose.
+- A source can pass USFX structure checks while still having errors in OSIS conversion, native SWORD verse indexing, text/notes/links, reader display or rights.
+- When redistributing an approved stock module without converting source USFX, record **conversion not performed**; do not invent an OSIS master or claim source/native equivalence without independent proof.
+- A rebuilt edition requires its own full original-to-cleaned and cleaned-to-native comparison, with source-attested decisions for every difference.
 
-## Evidence **not** certified by this inventory
-
-- eBible's [USFX format documentation](https://ebible.org/usfx/) identifies
-  the [official XSD](https://ebible.org/usfx.xsd). The exact 67,661-byte
-  upstream snapshot was observed and compiled offline in
-  [GitHub Actions run 42812816320](https://github.com/icfmp/Bible-Resources/actions/runs/42812816320),
-  then SHA-256 pinned in `config/usfx-schema-policy.json`. Stage 3 now
-  downloads and checks the pinned snapshot before validating the original
-  source; changed upstream bytes **block**, never silently update the
-  approved standard. An XML parser or element-counter success alone remains
-  insufficient.
-- Note body/caller and text-position equivalence to a compiled SWORD module
-  is still part of stages 4 and 5. This stage cannot prove them.
-- The publisher's exact edition/revision must be independently evidenced;
-  the URL and module naming alone cannot prove equivalence.
-- A faithful **reuse** of an official stock SWORD module need not invent a
-  USFX→OSIS conversion. Mark conversion **N/A** only when the approved
-  workflow genuinely does not convert anything and the original→compiled
-  fidelity investigation supports this choice. A conversion performed for
-  a rebuilt SWORD candidate demands independent source→converted parity.
-- No original book, note, verse or special typography may be silently
-  omitted. The 2024 JND eBible `Versification=Luther` is retained as source
-  evidence and native reader registry comparison is still pending.
-
-Even after the official XSD validates, `bible_stage_runner.py` reports
-**PARTIAL** until the publisher's edition provenance and applicability of a
-conversion are reviewed by the project maintainer. A successful stock-SWORD
-reuse path may document `USFX→OSIS conversion: N/A (not performed)`, but
-cannot infer original-to-binary text or annotation equivalence: those gates
-belong to stages 4 and 5. The seven-stage checkbox stays unchecked until
-the remaining authorial source review is complete.
-
-## Reproduce offline
-
-```sh
-python -m unittest discover -s tests -p 'test_source_usfx_structure.py' -v
-python -m unittest discover -s tests -p 'test_bible_stage_runner.py' -v
-```
-
-On an open `[Import]` resource issue, the repository owner runs exactly
-one original-source diagnostic using:
-
-```text
-/bible-audit frajnd-2024 3
-```
-
-It produces a metadata-only report and a permanent issue comment with
-the exact Actions run URL. No Scripture source ZIP is committed or uploaded.
+For executable staging use [Bible onboarding](../workflows/BIBLE_7_STAGE_WORKFLOW.md), [stage automation](../workflows/BIBLE_STAGE_AUTOMATION.md), [OSIS source inventory](SOURCE_OSIS_INVENTORY.md) and the [production contract](../PRODUCTION_PIPELINE.md). Keep real-edition run IDs, anomalies and editorial decisions beside the edition in `sources/cleaned/**/editorial/evidence/`.
