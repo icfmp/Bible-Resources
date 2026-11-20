@@ -26,6 +26,18 @@ publication permission, and a published source may still expose separate
 application display bugs.
 
 
+## When the source has already been cleaned and validated
+
+For **translation or modern-English modernization only**, start with the accepted
+structured source and follow [Translation from an accepted clean source](
+COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md). This dedicated procedure covers
+semantic fidelity and relocating each existing citation/link to the corresponding
+translated words or editorial element. **Do not repeat acquisition, source
+repair, original-link correction or whole upstream reconstruction.** The
+seven-stage source/release requirements remain inherited from the previously
+validated source handoff; the new translation still requires its own editorial,
+rights, link-placement, native-reader and release evidence.
+
 ## Provider independence and clean rebuild — decision (2026-11-18)
 
 **CrossWire, eBible and other reviewed sources are inputs, not architectural
