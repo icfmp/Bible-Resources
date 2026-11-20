@@ -55,6 +55,23 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertIn("retain", historic["proposed_action"].lower())
         self.assertIn("historical", historic["proposed_action"].lower())
 
+    def test_nested_package_imports_count_as_real_static_callers(self):
+        entries = {item["path"]: item for item in self.result["files"]}
+        module = ("scripts/research/commentary/"
+                  "commentary_chapter_neighbors.py")
+        self.assertIn(module, entries)
+        self.assertIn("scripts/commentary_private_text_compare.py",
+                      entries[module]["static_references"])
+        self.assertIn("tests/test_commentary_chapter_neighbors.py",
+                      entries[module]["static_references"])
+        self.assertIn("scripts/research/commentary/"
+                      "commentary_chapter_p_boundaries.py", entries)
+        self.assertIn(
+            "scripts/research/commentary/commentary_chapter_paragraph_overlap.py",
+            entries["scripts/research/commentary/"
+                    "commentary_chapter_p_boundaries.py"]["static_references"],
+        )
+
     def test_registry_has_no_promoted_editorial_or_publication_claims(self):
         for entry in self.result["files"]:
             self.assertEqual(entry["release_approval"],
