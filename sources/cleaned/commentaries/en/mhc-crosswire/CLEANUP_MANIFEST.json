@@ -1,0 +1,44 @@
+{
+  "approved_cleaned_sha256": "c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4",
+  "cleaned_path": "sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml",
+  "language": "en",
+  "no_authorial_prose_changed": true,
+  "published_release": "https://github.com/icfmp/Bible-Resources/releases/tag/mhc-0.1.0",
+  "reconstruction_method": "Existing generic scripts and source-SHA-pinned plans; byte-for-byte validated against all historical checkpoint digests; original untouched.",
+  "resource_id": "mhc-crosswire",
+  "reviewed_patches": {
+    "chapter_intro_reclassification": 1,
+    "cross_reference_destinations": 25,
+    "empty_inert_hi": 11,
+    "invalid_range_endpoints": 3,
+    "overlap_reindex_groups": 6
+  },
+  "schema_version": 1,
+  "source_attestation_run": "https://github.com/icfmp/Bible-Resources/actions/runs/44554276085",
+  "source_original_path": "sources/original/commentaries/en/mhc-crosswire/mhc.osis.xml",
+  "source_original_sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
+  "status": "recovered_exact_approved_source_input",
+  "transformation_steps": [
+    {
+      "sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
+      "stage": "original"
+    },
+    {
+      "sha256": "ded53fe37e83609790433a01b2dabf0ea3a13e929bd3bded39262ce4a5b24016",
+      "stage": "cosmetic"
+    },
+    {
+      "sha256": "dbf5aedadf7ef4f2f02ddedf8cc22de1ecc51b0b8ee2ece7c29acaf540a8d93c",
+      "stage": "endpoints"
+    },
+    {
+      "sha256": "49da878758587e52fa25fe59a0b55fc3d058c511fb7c31c4f42f7163fab70f10",
+      "stage": "crossreferences"
+    },
+    {
+      "sha256": "c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4",
+      "stage": "chapter_intro"
+    }
+  ],
+  "type": "commentary"
+}
