@@ -123,7 +123,7 @@ Releases remain reproducible from their explicitly approved source/proof
 contracts; file movements alone are not permission to republish.
 
 Script cleanup is a **different** audited task [#430](https://github.com/icfmp/Bible-Resources/issues/430).
-The existing [tool registry](../TOOL_REGISTRY.md) notes 177 script entrypoints
+The generated [tool registry](../../reports/tooling/TOOL_REGISTRY.md) inventories script entrypoints
 with real references; archive/merge only once tests, workflows, Python imports,
 historical tags and shared behavior have been checked.
 
