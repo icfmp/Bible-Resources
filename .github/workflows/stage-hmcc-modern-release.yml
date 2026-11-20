@@ -36,7 +36,11 @@ jobs:
       - name: Stage the exact reviewed compiled binary and build immutable catalogue/release plan
         run: |
           set -euo pipefail
-          python scripts/stage_hmcc_modern_release.py --qa-dir "${RUNNER_TEMP}/hmcc-modern-reviewed-qa"
+          if [ ! -d modules/hmcc-modern ]; then
+            python scripts/stage_hmcc_modern_release.py --qa-dir "${RUNNER_TEMP}/hmcc-modern-reviewed-qa"
+          else
+            echo 'Already staged: preserving exactly the committed reviewed payload'
+          fi
           python scripts/tool_registry.py --write
       - name: Independent final prepublication source and archive gates
         env:
@@ -45,11 +49,11 @@ jobs:
           set -euo pipefail
           python scripts/validate.py
           python -m unittest discover -s tests
-          python scripts/build.py --output "${RUNNER_TEMP}/hmcc-modern-approved-public-build"
-          python scripts/smoke.py --help >/dev/null || true
-          python scripts/catalogue_release_coverage.py --built "${RUNNER_TEMP}/hmcc-modern-approved-public-build"
+          python scripts/build.py --output dist
+          python scripts/smoke.py
+          python scripts/catalogue_release_coverage.py --built dist
           python scripts/publish_reviewed_release.py \
-            --built "${RUNNER_TEMP}/hmcc-modern-approved-public-build" \
+            --built dist \
             --repository "${GITHUB_REPOSITORY}" \
             --target-sha "${GITHUB_SHA}" \
             --verify-only
@@ -67,7 +71,7 @@ jobs:
             docs/TOOL_REGISTRY.json docs/TOOL_REGISTRY.md \
             catalog/v1/catalog.json
           git diff --cached --check
-          git diff --cached --quiet && { echo 'No new reviewed release files'; exit 1; }
+          git diff --cached --quiet && { echo 'Existing review files already exact; no commit needed'; exit 0; }
           git commit -m "release: stage verified HMCC Modern 0.1.0 for source-gated publication"
           git push origin HEAD:refs/heads/feature/mhcc-modern-english
       - name: Owner review notes
