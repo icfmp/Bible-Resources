@@ -16,6 +16,7 @@
 | Exact source, stages and changed bytes | [Transformation manifest](../CLEANUP_MANIFEST.json) |
 | Approved version and source/payload hashes | [0.1.1 release](releases/DARBY-JND-2024-0.1.1.md) |
 | Actual reader samples | [Final 0.1.1 reader QA](evidence/darby-2024-0.1.1-final-reader-qa.md) |
+| Original note-link anomalies worth reporting upstream | [Source reference dossier](evidence/upstream-reference-anomalies.md) |
 | Resource presentation | [Reviewed French profile](profiles/fr-darby-jnd-2024.md) |
 | Earlier processing bottlenecks | [Import retrospective](history/DARBY_2024_IMPORT_POSTMORTEM.md); historical, not an active checklist |
 
