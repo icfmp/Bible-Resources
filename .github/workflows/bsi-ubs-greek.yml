@@ -43,6 +43,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_composite_strong_headwords.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_word_coverage_invariants.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_hopote_headword.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_456_lexical_variants.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -568,6 +569,32 @@ jobs:
           assert r['publication_approved'] is False
           print('GREEK_459_ORIGINAL_SOURCE_HEADWORD_EXCEPTIONS_UNAPPROVED_AND_DOCUMENTED')
           PY
+      - name: Read-only source analysis of 456 remaining Greek lexeme spellings
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_456_lexical_variants.py \
+            --missing /tmp/bsi-ubs-greek-459-lexeme-source-gaps.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-456-original-source-variant-evidence.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/bsi-ubs-greek-456-original-source-variant-evidence.json').read_text())
+          assert x['original_word_count']==456
+          assert sum(x['source_diagnostics_counts'].values())==456
+          assert x['new_source_lexical_headword_links']==0
+          assert x['new_inferred_contextual_ubs_lexids']==0
+          assert x['original_source_or_index_modified'] is False
+          assert x['publication_approved'] is False
+          print('GREEK_456_VARIANTS_DIAGNOSTIC_READ_ONLY_NO_AUTOMATIC_LEXICAL_ALIASES')
+          PY
+      - name: Upload 456 Greek original source-word lexical diagnostic evidence (PRIVATE)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-456-original-lexical-variant-diagnostics-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-456-original-source-variant-evidence.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Review three authentic Greek Alpha letter-name word headwords without rewriting capitalization
         run: |
           python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_alpha_case_only.py \
