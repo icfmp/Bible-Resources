@@ -64,7 +64,7 @@ this first source-specific candidate:
 The generic, **private, metadata-only** functions
 `source_commentary_shared_key_retrieval_map` and
 `source_commentary_reviewed_shared_key_plan` in
-[`scripts/audit_osis.py`](../../../scripts/audit_osis.py):
+[`scripts/audit_osis.py`](../../../../../../../scripts/audit_osis.py):
 
 1. Enumerate actual original commentary OSIS verse-group source identities
    with distinct SHA fingerprints (source line, original scope, full body).
@@ -81,7 +81,7 @@ The generic, **private, metadata-only** functions
    CI runner temporary directory**, with no source paragraphs, notes,
    copyrighted text, repository resource file or public artifact.
 
-The private [review plan](../../../config/commentary-osis-repair-plans/mhc-shared-scope-review-private.json)
+The private [review plan](../../../../../../../config/commentary-osis-repair-plans/mhc-shared-scope-review-private.json)
 records the Romans 4:17 independent section-index witness and checks
 the exact expected 7 original → 1 corrected-source + 1 retained
 intra-verse exception → **2 actual reader multiowner keys** transition.

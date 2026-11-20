@@ -36,4 +36,4 @@ The first version number, title, module packaging, catalogue provider behavior a
 - [ ] Reconcile and independently revalidate the draft PR against current `main`.
 - [ ] Obtain **explicit final owner authorization** to merge and publish, then update catalogue/release notes and publish a verified archive in a distinct release step.
 
-**Do not publish from this draft.** Track status in [issue #285](https://github.com/icfmp/Bible-Resources/issues/285), [PR #286](https://github.com/icfmp/Bible-Resources/pull/286) and the [private readiness receipt](../evidence/mhc-285/private-release-readiness-2026-11-19.json).
+**Do not publish from this draft.** Track status in [issue #285](https://github.com/icfmp/Bible-Resources/issues/285), [PR #286](https://github.com/icfmp/Bible-Resources/pull/286) and the [private readiness receipt](../evidence/private-release-readiness-2026-11-19.json).

@@ -12,12 +12,12 @@
 
 ## Evidence
 
-- [Historical 0.1.1 editorial disposition](../../../../../../docs/evidence/mhcc-274/0.1.1-editorial-disposition.md) and [reader-oriented indexing decision](../../../../../../docs/evidence/mhcc-274/reader-oriented-indexing-decision.md). These contain earlier draft-status language and exploratory alternatives; current approved scope must be verified from the published 0.1.1 release and cleaned-source manifest, not copied blindly from preliminary proposals.
+- [Historical 0.1.1 editorial disposition](evidence/release-0.1.1/0.1.1-editorial-disposition.md) and [reader-oriented indexing decision](evidence/release-0.1.1/reader-oriented-indexing-decision.md). These contain earlier draft-status language and exploratory alternatives; current approved scope must be verified from the published 0.1.1 release and cleaned-source manifest, not copied blindly from preliminary proposals.
 
 - [Reconstructed-source attestation and limitations](../CLEANUP_MANIFEST.json)
 - [Approved corrections manifest](../../../../../../config/commentary-rebuilds/mhcc-crosswire.json)
-- [Classic 0.1.1 release](../../../../../../docs/releases/MHCC-0.1.1.md)
+- [Classic 0.1.1 release](releases/MHCC-0.1.1.md)
 - [Native audit](../../../../../../modules/mhcc-crosswire/SOURCE_AUDIT.json)
-- [Reader profile](../../../../../../docs/profiles/en-matthew-henry-concise-crosswire-2-0.md)
+- [Reader profile](profiles/en-matthew-henry-concise-crosswire-2-0.md)
 
 **Status:** source-native attested 0.1.1; the original authoring OSIS remains unrecovered. No new edits approved.

@@ -52,7 +52,7 @@ material. Do not import them or silently rewrite CrossWire's text.
 
 **2 Chronicles 1 is no longer an unresolved source-index collision.** The
 original authoring file separates the first preface and the 1:1–12 exposition.
-The reviewed [private chapter-introduction plan](../../../config/commentary-osis-repair-plans/mhc-chapter-introduction-private.json)
+The reviewed [private chapter-introduction plan](../../../../../../../config/commentary-osis-repair-plans/mhc-chapter-introduction-private.json)
 moves the *existing* OSIS introduction boundaries to enclose all preface
 paragraphs and removes the misleading standalone `2Chr.1.1` milestone pair.
 The full separate 1:1–12 verse exposition remains in place. This does not
