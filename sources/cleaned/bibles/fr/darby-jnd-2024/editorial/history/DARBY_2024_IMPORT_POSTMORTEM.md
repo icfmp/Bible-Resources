@@ -1,4 +1,4 @@
-> **Archived historical record.** Preserved for source provenance and reproducibility. For current production instructions see [the canonical pipeline](../PRODUCTION_PIPELINE.md). Historical dates, statuses and findings below are not current release status.
+> **Archived historical record.** Preserved for source provenance and reproducibility. For current production instructions see [the canonical pipeline](../../../../../../../docs/PRODUCTION_PIPELINE.md). Historical dates, statuses and findings below are not current release status.
 
 # J. N. Darby 2024 import retrospective — stage-4 bottlenecks and automation
 

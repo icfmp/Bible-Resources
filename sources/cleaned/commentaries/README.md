@@ -5,7 +5,7 @@ Only real reviewed commentary OSIS/USFM sources under
 [`sources/original/commentaries/en/mhc-crosswire/`](../../original/commentaries/en/mhc-crosswire/).
 
 The earlier MHC cleaning **reports** were moved to
-[`docs/evidence/mhc-285/source-cleanup/`](../../../docs/evidence/mhc-285/source-cleanup/)
+[`docs/evidence/mhc-285/source-cleanup/`](en/mhc-crosswire/editorial/evidence/source-cleanup)
 because they are not a cleaned OSIS source. HMCC Modern manuscripts remain
 indexed at [historical manuscript work](../../../work/commentaries/hmcc-modern/README.md).
 

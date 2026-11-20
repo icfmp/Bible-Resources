@@ -14,7 +14,7 @@
 
 - [OSIS master source and provenance manifest](../CLEANUP_MANIFEST.json)
 - [Full edition-specific editorial/technical protocol](../../../../../../docs/MHCC_MODERN_ENGLISH.md)
-- [HMCC Modern 0.1.0 release receipt](../../../../../../docs/releases/HMCC-Modern-0.1.0.md)
+- [HMCC Modern 0.1.0 release receipt](releases/HMCC-Modern-0.1.0.md)
 - [Edition metadata/rights basis](../../../../../../modules/hmcc-modern/metadata.json)
 
 **Status:** index of existing approved decisions; not a second translation approval. The full historical working protocol remains preserved until a referenced-content migration audit.

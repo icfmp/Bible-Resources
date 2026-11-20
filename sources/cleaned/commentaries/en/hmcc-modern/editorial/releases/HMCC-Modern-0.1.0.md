@@ -6,7 +6,7 @@ An independently packaged modern-English Matthew Henry concise commentary for SW
 
 **Manual follow-up:** In Xiphos, open Numbers 29:1 and activate the corrected note marker leading to Leviticus 23:24; confirm the destination verse is selected in the sidebar. Other note-linked destinations have verified SWORD markup but have not all been individually clicked in Xiphos. The owner chose post-release manual verification rather than treating an inaccessible CI GUI harness as a textual failure.
 
-The primary Matthew Henry edition is public domain according to CrossWire. The modern rendering and separately recorded derivative editorial elements are not presented as a new copyright in Matthew Henry's original prose. See [the editorial record](../../modules/hmcc-modern/EDITORIAL.md).
+The primary Matthew Henry edition is public domain according to CrossWire. The modern rendering and separately recorded derivative editorial elements are not presented as a new copyright in Matthew Henry's original prose. See [the editorial record](../../../../../../../modules/hmcc-modern/EDITORIAL.md).
 
 ## Publication verification
 

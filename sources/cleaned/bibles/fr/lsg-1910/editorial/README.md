@@ -12,9 +12,9 @@
 
 ## Evidence and outstanding decisions
 
-- [Resource profile and print evidence](../../../../../../docs/profiles/fr-segond-1910.md)
+- [Resource profile and print evidence](profiles/fr-segond-1910.md)
 - [Historical source research handoff](../../../../../../docs/LSG_AUDIT_RESEARCH_HANDOFF.md)
-- [Published release receipt](../../../../../../docs/releases/LSG-0.1.0.md)
+- [Published release receipt](releases/LSG-0.1.0.md)
 - [Cleaned source manifest](../CLEANUP_MANIFEST.json)
 - [Compiled-native source audit](../../../../../../modules/lsg-1910/SOURCE_AUDIT.json)
 
