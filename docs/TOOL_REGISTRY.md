@@ -106,7 +106,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/lsg_source_compare.py`](../scripts/lsg_source_compare.py) | HISTORICAL/ARCHIVE | named test | 10 | source/native audit |
 | [`scripts/maintext_fidelity_classification.py`](../scripts/maintext_fidelity_classification.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/maintext_whitespace_patterns.py`](../scripts/maintext_whitespace_patterns.py) | UNDECIDED | named test | 4 | not determined |
-| [`scripts/materialize_attested_lsg_release.py`](../scripts/materialize_attested_lsg_release.py) | HISTORICAL/ARCHIVE | named test | 1 | publication/release |
+| [`scripts/materialize_attested_lsg_release.py`](../scripts/materialize_attested_lsg_release.py) | HISTORICAL/ARCHIVE | named test | 2 | publication/release |
 | [`scripts/materialize_attested_ztext_release.py`](../scripts/materialize_attested_ztext_release.py) | HISTORICAL/ARCHIVE | named test | 4 | publication/release |
 | [`scripts/native_absorbed_verse_groups.py`](../scripts/native_absorbed_verse_groups.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/native_book_intro_screen.py`](../scripts/native_book_intro_screen.py) | UNDECIDED | named test | 4 | not determined |
