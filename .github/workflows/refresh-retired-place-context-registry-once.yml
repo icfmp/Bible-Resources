@@ -1,0 +1,28 @@
+name: Refresh tool registry after removing obsolete place-context feature
+on:
+  push:
+    branches: [cleanup/remove-obsolete-place-context-dataset]
+    paths: [.github/workflows/refresh-retired-place-context-registry-once.yml]
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    if: github.repository == 'icfmp/Bible-Resources'
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: true}
+      - name: Regenerate exact tool reference registry and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/refresh-retired-place-context-registry-once.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git add docs/TOOL_REGISTRY.json docs/TOOL_REGISTRY.md
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Refresh script inventory after obsolete place-context removal'
+          git push origin HEAD:cleanup/remove-obsolete-place-context-dataset
