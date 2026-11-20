@@ -1,0 +1,1544 @@
+{
+  "schema_version": 1,
+  "scope": "exact-published-corrected-MHCC-0.1.1-source-native-metadata-only",
+  "module_id": "MHCC",
+  "edition": "0.1.1",
+  "package_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
+  "whole_native_source_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "source_workflow": "https://github.com/icfmp/Bible-Resources/actions/runs/43928878187",
+  "semantic_translation_review_approved": false,
+  "source_full_raw_osis_markup_exported": false,
+  "native_source_integrity_passed": true,
+  "modernized_derivative_sword_roundtrip_passed": false,
+  "chapter_count": 24,
+  "total_original_raw_groups": 54,
+  "chapters": {
+    "2John.1": {
+      "source_payload_groups": 4,
+      "native_occupied_verse_keys": 13,
+      "original_introduction_keys": 2,
+      "units": [
+        {
+          "first_key": "2John.1.1",
+          "native_keys": [
+            "2John.1.1",
+            "2John.1.2",
+            "2John.1.3"
+          ],
+          "raw_sha256": "a8f2e9b3ed54d2cdac8b476c1c799cd210b7957b5c6d552023a325e707d0f85f",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 8,
+              "div": 22,
+              "hi": 1,
+              "row": 4,
+              "table": 4,
+              "title": 2
+            }
+          }
+        },
+        {
+          "first_key": "2John.1.4",
+          "native_keys": [
+            "2John.1.4",
+            "2John.1.5",
+            "2John.1.6"
+          ],
+          "raw_sha256": "75ffea71742f1d8d56279dc40556b8f5e3764a14e14da66b4d6207860cc576c2",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 9,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "2John.1.7",
+          "native_keys": [
+            "2John.1.7",
+            "2John.1.8",
+            "2John.1.9",
+            "2John.1.10",
+            "2John.1.11"
+          ],
+          "raw_sha256": "f880d87f117e5efc57a29200e58a6cb87d2ef1ca1e5ba3bce1cef5ddee32aae9",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "2John.1.12",
+          "native_keys": [
+            "2John.1.12",
+            "2John.1.13"
+          ],
+          "raw_sha256": "c2a5458ef891b1f93d2ffd69107defaa10d802c84e52501234630e123a8414d2",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 12,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "2John",
+          "raw_sha256": "6442f151b711428bcd7806bb74192a1bd2d1ec969652de728db7f200f5aeb4b4",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 4,
+              "title": 1
+            }
+          }
+        },
+        {
+          "key": "2John.1",
+          "raw_sha256": "66b0ff85b9755dd658d202b223ce2d6f2c80a568cde6a4f8e1a7c98f33686ced",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 5
+            }
+          }
+        }
+      ]
+    },
+    "3John.1": {
+      "source_payload_groups": 3,
+      "native_occupied_verse_keys": 14,
+      "original_introduction_keys": 2,
+      "units": [
+        {
+          "first_key": "3John.1.1",
+          "native_keys": [
+            "3John.1.1",
+            "3John.1.2",
+            "3John.1.3",
+            "3John.1.4",
+            "3John.1.5",
+            "3John.1.6",
+            "3John.1.7",
+            "3John.1.8"
+          ],
+          "raw_sha256": "5d4ca3ffd171a9e1d38c6b2f7c23ab369ae0fdc751166a1c7a6fc13d952603df",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 6,
+              "div": 20,
+              "hi": 1,
+              "row": 3,
+              "table": 3,
+              "title": 2
+            }
+          }
+        },
+        {
+          "first_key": "3John.1.9",
+          "native_keys": [
+            "3John.1.9",
+            "3John.1.10",
+            "3John.1.11",
+            "3John.1.12"
+          ],
+          "raw_sha256": "c17aa903713137e374988b8b36464063f596b4d330e0c0af2b4345fdcca9367f",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "3John.1.13",
+          "native_keys": [
+            "3John.1.13",
+            "3John.1.14"
+          ],
+          "raw_sha256": "163c0ec95eef3c63bbf28459f5ead496ce554a066dc6a2c8f271a3a86dac965f",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 11,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "3John",
+          "raw_sha256": "b69ef50ec557af219bc8c62778fabe8f636dd1818c641ea93b4cf6ba831c5766",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 4,
+              "title": 1
+            }
+          }
+        },
+        {
+          "key": "3John.1",
+          "raw_sha256": "8dac353b7cc7a8bfff92570c5a62568c1bbbc94f678dabf8fda8f4001e15c137",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 5
+            }
+          }
+        }
+      ]
+    },
+    "Heb.7": {
+      "source_payload_groups": 4,
+      "native_occupied_verse_keys": 28,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Heb.7.1",
+          "native_keys": [
+            "Heb.7.1",
+            "Heb.7.2",
+            "Heb.7.3"
+          ],
+          "raw_sha256": "04313f5e32f0b38e547353e38a843d2405de39050282df279db3f08ae252988b",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 38,
+              "hi": 1,
+              "title": 1
+            }
+          }
+        },
+        {
+          "first_key": "Heb.7.4",
+          "native_keys": [
+            "Heb.7.4",
+            "Heb.7.5",
+            "Heb.7.6",
+            "Heb.7.7",
+            "Heb.7.8",
+            "Heb.7.9",
+            "Heb.7.10"
+          ],
+          "raw_sha256": "815d15e9647d7c064b574a107ebb6a3a03ed06c462516e147d5e4614fb855d29",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 10,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "Heb.7.11",
+          "native_keys": [
+            "Heb.7.11",
+            "Heb.7.12",
+            "Heb.7.13",
+            "Heb.7.14",
+            "Heb.7.15",
+            "Heb.7.16",
+            "Heb.7.17",
+            "Heb.7.18",
+            "Heb.7.19",
+            "Heb.7.20",
+            "Heb.7.21",
+            "Heb.7.22",
+            "Heb.7.23",
+            "Heb.7.24",
+            "Heb.7.25"
+          ],
+          "raw_sha256": "aa78e87d28c6109853701dea7e48ec18b6436c672abb4fc49f8457db96d1a7b3",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 10,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "Heb.7.26",
+          "native_keys": [
+            "Heb.7.26",
+            "Heb.7.27",
+            "Heb.7.28"
+          ],
+          "raw_sha256": "eb6c2e9a6a37780b26b83243ffa5bf9899c6f881b6e561bb9aac616e029725b8",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 9,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Heb.7",
+          "raw_sha256": "c00933809c9b8c0591b48cae63b5682855e0b07d6fbe22ba76257135843ac5e9",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 3
+            }
+          }
+        }
+      ]
+    },
+    "Phlm.1": {
+      "source_payload_groups": 4,
+      "native_occupied_verse_keys": 25,
+      "original_introduction_keys": 2,
+      "units": [
+        {
+          "first_key": "Phlm.1.1",
+          "native_keys": [
+            "Phlm.1.1",
+            "Phlm.1.2",
+            "Phlm.1.3",
+            "Phlm.1.4",
+            "Phlm.1.5",
+            "Phlm.1.6",
+            "Phlm.1.7"
+          ],
+          "raw_sha256": "14a496b2d2c8f5696342617c026e4741c80b24019b7c22d74b6928afb6ea0877",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 6,
+              "div": 20,
+              "hi": 1,
+              "row": 3,
+              "table": 3,
+              "title": 2
+            }
+          }
+        },
+        {
+          "first_key": "Phlm.1.8",
+          "native_keys": [
+            "Phlm.1.8",
+            "Phlm.1.9",
+            "Phlm.1.10",
+            "Phlm.1.11",
+            "Phlm.1.12",
+            "Phlm.1.13",
+            "Phlm.1.14"
+          ],
+          "raw_sha256": "ab5857487aeba49ba077fddd6398a6db0c01385c464cf5cbb42ed3647bb5fa37",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 9,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "Phlm.1.15",
+          "native_keys": [
+            "Phlm.1.15",
+            "Phlm.1.16",
+            "Phlm.1.17",
+            "Phlm.1.18",
+            "Phlm.1.19",
+            "Phlm.1.20",
+            "Phlm.1.21",
+            "Phlm.1.22"
+          ],
+          "raw_sha256": "bc30958af025fd85186d6cf3dbf80ba1e8c410bd68a2e0b685363cf5ec05afbc",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "Phlm.1.23",
+          "native_keys": [
+            "Phlm.1.23",
+            "Phlm.1.24",
+            "Phlm.1.25"
+          ],
+          "raw_sha256": "bc1523b5b47dcc5d823ac14c7080d2ac7dc790e33a086c9243a1703c2da8c9bc",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 12,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Phlm",
+          "raw_sha256": "6f9c2583cc7b1e8e5cf51f806e68d50ff63371c59723586859b77e432abb5752",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 4,
+              "title": 1
+            }
+          }
+        },
+        {
+          "key": "Phlm.1",
+          "raw_sha256": "9cf0b2ee7e0e73762d096520fe71d62c7c3f3ec9475e4d33a1ffe6806b527fcc",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 5
+            }
+          }
+        }
+      ]
+    },
+    "Ps.1": {
+      "source_payload_groups": 2,
+      "native_occupied_verse_keys": 6,
+      "original_introduction_keys": 2,
+      "units": [
+        {
+          "first_key": "Ps.1.1",
+          "native_keys": [
+            "Ps.1.1",
+            "Ps.1.2",
+            "Ps.1.3"
+          ],
+          "raw_sha256": "c9dc1def220557ae2bbcdc0b911111f8e3b8092b204d9bda08b21e205bf49d45",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 4,
+              "div": 22,
+              "hi": 1,
+              "row": 2,
+              "table": 2,
+              "title": 3
+            }
+          }
+        },
+        {
+          "first_key": "Ps.1.4",
+          "native_keys": [
+            "Ps.1.4",
+            "Ps.1.5",
+            "Ps.1.6"
+          ],
+          "raw_sha256": "fec0ccf2ef172841331147a7ad16260a22b0656ebf4fb431ed021b2ff37d589c",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 9,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps",
+          "raw_sha256": "cb4ae09af4e38237f18e493f0e74988901917e5514159c309347213ecb42f1af",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        },
+        {
+          "key": "Ps.1",
+          "raw_sha256": "59143f5666af6943502d981741ef832ddbd166ce32ea0deb46ec29961ff96561",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 1
+            }
+          }
+        }
+      ]
+    },
+    "Ps.100": {
+      "source_payload_groups": 1,
+      "native_occupied_verse_keys": 1,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.100.1",
+          "native_keys": [
+            "Ps.100.1"
+          ],
+          "raw_sha256": "0f17e182d5c798409e8479cd24f7af747d3539c0fc3722c7c398e68db23c6ba8",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 9,
+              "title": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.100",
+          "raw_sha256": "384918894243e40211f9911a44d13566648ff0aa718a0a83adf2e94141742a17",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 3
+            }
+          }
+        }
+      ]
+    },
+    "Ps.117": {
+      "source_payload_groups": 1,
+      "native_occupied_verse_keys": 1,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.117.1",
+          "native_keys": [
+            "Ps.117.1"
+          ],
+          "raw_sha256": "c20830eaf8b635b9715c9e127b8f01b8c8d1caa902da94ce787ec3e7867cff89",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "reference": 1,
+              "title": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.117",
+          "raw_sha256": "bb4b71583dcbeeb980d1ba2c467bc3f8cb31d026e7baef3890e0fba2586366a4",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    },
+    "Ps.120": {
+      "source_payload_groups": 2,
+      "native_occupied_verse_keys": 7,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.120.1",
+          "native_keys": [
+            "Ps.120.1",
+            "Ps.120.2",
+            "Ps.120.3",
+            "Ps.120.4"
+          ],
+          "raw_sha256": "6f2c53ddbd44a55d3f58fdcb5bf7504044aceb767977445237b5e43985564d8b",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 4,
+              "div": 14,
+              "hi": 1,
+              "row": 2,
+              "table": 2,
+              "title": 2
+            }
+          }
+        },
+        {
+          "first_key": "Ps.120.5",
+          "native_keys": [
+            "Ps.120.5",
+            "Ps.120.6",
+            "Ps.120.7"
+          ],
+          "raw_sha256": "3bd08a7b2ad8cbbe4e05488b8c9cd5179d4d3ca5345ba33dec5edca9a6b1ba54",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.120",
+          "raw_sha256": "870b6c1983c37bc1331b0c6ac2fac7886947d6cfbfda51228d9cc8edf019b938",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    },
+    "Ps.121": {
+      "source_payload_groups": 1,
+      "native_occupied_verse_keys": 1,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.121.1",
+          "native_keys": [
+            "Ps.121.1"
+          ],
+          "raw_sha256": "28758d44b9cb39a62d8c145018acd6cf3f02369b0c408cab56247b6c1f04224f",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "title": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.121",
+          "raw_sha256": "2126b0af17fbe701dd82c33bfa22752a11a9e7954fc50d8b1608701ca81b335a",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    },
+    "Ps.122": {
+      "source_payload_groups": 2,
+      "native_occupied_verse_keys": 9,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.122.1",
+          "native_keys": [
+            "Ps.122.1",
+            "Ps.122.2",
+            "Ps.122.3",
+            "Ps.122.4",
+            "Ps.122.5"
+          ],
+          "raw_sha256": "646e204ce2a8eacb07ca0cb389e4ddc8359903e17a5988b8c962ebab2374f251",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 4,
+              "div": 14,
+              "hi": 1,
+              "row": 2,
+              "table": 2,
+              "title": 2
+            }
+          }
+        },
+        {
+          "first_key": "Ps.122.6",
+          "native_keys": [
+            "Ps.122.6",
+            "Ps.122.7",
+            "Ps.122.8",
+            "Ps.122.9"
+          ],
+          "raw_sha256": "feb35bb005dc47a19bb3c3e06c11f146100c44ffbf7c44b26d30a004ea3a032b",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.122",
+          "raw_sha256": "7b3252fd8d43f67eff4640f336c716d86b6f30cd20f572dde489e1aa7b1a380a",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    },
+    "Ps.123": {
+      "source_payload_groups": 1,
+      "native_occupied_verse_keys": 1,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.123.1",
+          "native_keys": [
+            "Ps.123.1"
+          ],
+          "raw_sha256": "506fa5156981b7ee440b474089b26334745fdcce83dde3fd62bc9cf7e33c2b2f",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "title": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.123",
+          "raw_sha256": "fc4b3be3fff1c038243068436a41e7e27ad0fa0c4c01f4098f246dd08de41a1e",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    },
+    "Ps.124": {
+      "source_payload_groups": 2,
+      "native_occupied_verse_keys": 8,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.124.1",
+          "native_keys": [
+            "Ps.124.1",
+            "Ps.124.2",
+            "Ps.124.3",
+            "Ps.124.4",
+            "Ps.124.5"
+          ],
+          "raw_sha256": "6a912f9e1656f40089fa1d1ab17fff82d004b205dd02fceaa4b72f5b0650e210",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 4,
+              "div": 14,
+              "hi": 1,
+              "row": 2,
+              "table": 2,
+              "title": 2
+            }
+          }
+        },
+        {
+          "first_key": "Ps.124.6",
+          "native_keys": [
+            "Ps.124.6",
+            "Ps.124.7",
+            "Ps.124.8"
+          ],
+          "raw_sha256": "72b0865f1252fabe466ffb476064a396979c59c679ad8f6a6e714162c8b50fb3",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.124",
+          "raw_sha256": "1d557237f9e30fdafaae96e3003b464f67521194d9cb06069cd2cb1c2c57eab0",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    },
+    "Ps.125": {
+      "source_payload_groups": 2,
+      "native_occupied_verse_keys": 5,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.125.1",
+          "native_keys": [
+            "Ps.125.1",
+            "Ps.125.2",
+            "Ps.125.3"
+          ],
+          "raw_sha256": "b4b395e175f5e8ae7104dbf1bc6f988d652ea6e6c7a29fd45c514120227b2f40",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 4,
+              "div": 14,
+              "hi": 1,
+              "row": 2,
+              "table": 2,
+              "title": 2
+            }
+          }
+        },
+        {
+          "first_key": "Ps.125.4",
+          "native_keys": [
+            "Ps.125.4",
+            "Ps.125.5"
+          ],
+          "raw_sha256": "8bc11de2d6eb14d00f0868f00fdf19bff8b03ef7e1f470512c5aaae716e9ff59",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.125",
+          "raw_sha256": "4172ecec57d7e91df94b8aa84f3ad826161a932e38163b5df2d638ecd053b3c7",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    },
+    "Ps.131": {
+      "source_payload_groups": 1,
+      "native_occupied_verse_keys": 1,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.131.1",
+          "native_keys": [
+            "Ps.131.1"
+          ],
+          "raw_sha256": "f01b595d655da9ec071a7e87d08d8626fd0666ce52a8af20a529fde8271d52a8",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "reference": 1,
+              "title": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.131",
+          "raw_sha256": "fdaf02cc390a43fe67a895401e733f0a806d40d5774f1f33f2477f204c5617a1",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    },
+    "Ps.133": {
+      "source_payload_groups": 1,
+      "native_occupied_verse_keys": 1,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.133.1",
+          "native_keys": [
+            "Ps.133.1"
+          ],
+          "raw_sha256": "13ecf95315e415cb27cea3d6f65b769a342ab5ee6dbf23116ea1a335233d1598",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "title": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.133",
+          "raw_sha256": "916a3cfd2645523540e4165246ab004337d5f03ddfc375939242f6dc6b8a18bb",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    },
+    "Ps.134": {
+      "source_payload_groups": 1,
+      "native_occupied_verse_keys": 1,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.134.1",
+          "native_keys": [
+            "Ps.134.1"
+          ],
+          "raw_sha256": "65455ce71bab38b8584b6a64895b86a29d2dd15fe3d88f5290ed178e41c071e5",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "title": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.134",
+          "raw_sha256": "8f8d35f015cf375f77a7a1a8642a30b9f926dd59b7d3981422edaf61d72b007b",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    },
+    "Ps.148": {
+      "source_payload_groups": 2,
+      "native_occupied_verse_keys": 14,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.148.1",
+          "native_keys": [
+            "Ps.148.1",
+            "Ps.148.2",
+            "Ps.148.3",
+            "Ps.148.4",
+            "Ps.148.5",
+            "Ps.148.6"
+          ],
+          "raw_sha256": "82f79a2eab22de0035e1205870a42d64466ab234f633e949d743923ddcb67a2a",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 4,
+              "div": 14,
+              "hi": 1,
+              "row": 2,
+              "table": 2,
+              "title": 2
+            }
+          }
+        },
+        {
+          "first_key": "Ps.148.7",
+          "native_keys": [
+            "Ps.148.7",
+            "Ps.148.8",
+            "Ps.148.9",
+            "Ps.148.10",
+            "Ps.148.11",
+            "Ps.148.12",
+            "Ps.148.13",
+            "Ps.148.14"
+          ],
+          "raw_sha256": "f19b50bc4150ab86b89a9912972132065b81ffd78be1253321e8256613458cfb",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.148",
+          "raw_sha256": "d2b5ca14c03bbd75fa7130c07db40ec053a79c3178f5dcca79bb0c804a94a87b",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    },
+    "Ps.150": {
+      "source_payload_groups": 1,
+      "native_occupied_verse_keys": 1,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.150.1",
+          "native_keys": [
+            "Ps.150.1"
+          ],
+          "raw_sha256": "e55dd38d87ca8b2ebde7d20afa7008257aca8b524e13e1174644f114bf894888",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 12,
+              "title": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.150",
+          "raw_sha256": "e655b910aedc97cce2390628d29f69edaf2af40b0e889dd3548fdd24159ae497",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    },
+    "Ps.23": {
+      "source_payload_groups": 1,
+      "native_occupied_verse_keys": 1,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ps.23.1",
+          "native_keys": [
+            "Ps.23.1"
+          ],
+          "raw_sha256": "0bd5b09ea476d0018715cf091ad19fdd72e83a3c722a12c22566753fcdefba3a",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 9,
+              "title": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ps.23",
+          "raw_sha256": "82b37f0505766117fce96bc07eea650ed2d5b8b2660248b2e453db71154b5910",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 3
+            }
+          }
+        }
+      ]
+    },
+    "Rom.3": {
+      "source_payload_groups": 5,
+      "native_occupied_verse_keys": 31,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Rom.3.1",
+          "native_keys": [
+            "Rom.3.1",
+            "Rom.3.2",
+            "Rom.3.3",
+            "Rom.3.4",
+            "Rom.3.5",
+            "Rom.3.6",
+            "Rom.3.7",
+            "Rom.3.8"
+          ],
+          "raw_sha256": "0ea697e9968d6243fc1bd84d7d7190ba9e611d41332c721c994563943ede77cb",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 8,
+              "div": 22,
+              "hi": 1,
+              "row": 4,
+              "table": 4,
+              "title": 2
+            }
+          }
+        },
+        {
+          "first_key": "Rom.3.9",
+          "native_keys": [
+            "Rom.3.9",
+            "Rom.3.10",
+            "Rom.3.11",
+            "Rom.3.12",
+            "Rom.3.13",
+            "Rom.3.14",
+            "Rom.3.15",
+            "Rom.3.16",
+            "Rom.3.17",
+            "Rom.3.18"
+          ],
+          "raw_sha256": "87d31a44737255812f6cb83cce9fcf41c78c9ee2b9405350511d52c0d3793694",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 10,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "Rom.3.19",
+          "native_keys": [
+            "Rom.3.19",
+            "Rom.3.20"
+          ],
+          "raw_sha256": "b58a7a708ac939374d03ce92f6b23ebd1865f3dda6e2be0be1a6afa414ec118e",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 10,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "Rom.3.21",
+          "native_keys": [
+            "Rom.3.21",
+            "Rom.3.22",
+            "Rom.3.23",
+            "Rom.3.24",
+            "Rom.3.25",
+            "Rom.3.26"
+          ],
+          "raw_sha256": "aba974e72e9aaaf602a53a2b4d5c400fe240cd67066023de4ff011887974079a",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 10,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "Rom.3.27",
+          "native_keys": [
+            "Rom.3.27",
+            "Rom.3.28",
+            "Rom.3.29",
+            "Rom.3.30",
+            "Rom.3.31"
+          ],
+          "raw_sha256": "4e22ef3880cf2fd44667f8a5ee397e3811733c4930bcb1eb023f75785d67299a",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 9,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Rom.3",
+          "raw_sha256": "94adff8a07673baf27fa5ac87ea627c1810a3f7b64e02ca7bfb3199461aff2d0",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 3
+            }
+          }
+        }
+      ]
+    },
+    "Ruth.1": {
+      "source_payload_groups": 4,
+      "native_occupied_verse_keys": 22,
+      "original_introduction_keys": 2,
+      "units": [
+        {
+          "first_key": "Ruth.1.1",
+          "native_keys": [
+            "Ruth.1.1",
+            "Ruth.1.2",
+            "Ruth.1.3",
+            "Ruth.1.4",
+            "Ruth.1.5"
+          ],
+          "raw_sha256": "4e262cc7111f91da639b50357e8ec93ef4211337dd37cf1f6a56ce475f4685d0",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 8,
+              "div": 26,
+              "hi": 1,
+              "row": 4,
+              "table": 4,
+              "title": 3
+            }
+          }
+        },
+        {
+          "first_key": "Ruth.1.6",
+          "native_keys": [
+            "Ruth.1.6",
+            "Ruth.1.7",
+            "Ruth.1.8",
+            "Ruth.1.9",
+            "Ruth.1.10",
+            "Ruth.1.11",
+            "Ruth.1.12",
+            "Ruth.1.13",
+            "Ruth.1.14"
+          ],
+          "raw_sha256": "68fdb671d8c4c72f29635145ad745ed4a2d1e951ff834250450f82397d03387d",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 10,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "Ruth.1.15",
+          "native_keys": [
+            "Ruth.1.15",
+            "Ruth.1.16",
+            "Ruth.1.17",
+            "Ruth.1.18"
+          ],
+          "raw_sha256": "462ff8b89c22b7f16efa9611c2dc0ff3e09ff7e0e41a9d7305d7c7030b60ec27",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 10,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "Ruth.1.19",
+          "native_keys": [
+            "Ruth.1.19",
+            "Ruth.1.20",
+            "Ruth.1.21",
+            "Ruth.1.22"
+          ],
+          "raw_sha256": "1d2df715fc7a01f99e82d066a66256c5159ff252254ea5d5fa78c07a19a510d6",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 9,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ruth",
+          "raw_sha256": "83a4fc0f67d42ad2007a2fbe8430e9fed0157f3b1f817e0eb98d045ade4233ab",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        },
+        {
+          "key": "Ruth.1",
+          "raw_sha256": "83a5161a75e1a49a72e6680caeed5ab8ec2e89c6df7fe7e9cee9a585e80d2f92",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 1
+            }
+          }
+        }
+      ]
+    },
+    "Ruth.2": {
+      "source_payload_groups": 3,
+      "native_occupied_verse_keys": 23,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ruth.2.1",
+          "native_keys": [
+            "Ruth.2.1",
+            "Ruth.2.2",
+            "Ruth.2.3"
+          ],
+          "raw_sha256": "a4f994dfced52d837511e6d29b18c7af9bd5c2ed7a7111027dbdfa9674f308bd",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 4,
+              "div": 24,
+              "hi": 1,
+              "row": 2,
+              "table": 2,
+              "title": 2
+            }
+          }
+        },
+        {
+          "first_key": "Ruth.2.4",
+          "native_keys": [
+            "Ruth.2.4",
+            "Ruth.2.5",
+            "Ruth.2.6",
+            "Ruth.2.7",
+            "Ruth.2.8",
+            "Ruth.2.9",
+            "Ruth.2.10",
+            "Ruth.2.11",
+            "Ruth.2.12",
+            "Ruth.2.13",
+            "Ruth.2.14",
+            "Ruth.2.15",
+            "Ruth.2.16"
+          ],
+          "raw_sha256": "0bdc2778d505d63df6e04bac8fc549109d91bcd46253527b8b0175c929957d78",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 10,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "Ruth.2.17",
+          "native_keys": [
+            "Ruth.2.17",
+            "Ruth.2.18",
+            "Ruth.2.19",
+            "Ruth.2.20",
+            "Ruth.2.21",
+            "Ruth.2.22",
+            "Ruth.2.23"
+          ],
+          "raw_sha256": "16863603ff597941cb759a09eca5a646d0aa680a49a29660989cc88392f5cffb",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 9,
+              "hi": 1,
+              "reference": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ruth.2",
+          "raw_sha256": "9b48be4721bd55411cf3230301c2c90e2d8b6a941b98d8470cb2c19f82a224b2",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 3
+            }
+          }
+        }
+      ]
+    },
+    "Ruth.3": {
+      "source_payload_groups": 3,
+      "native_occupied_verse_keys": 18,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ruth.3.1",
+          "native_keys": [
+            "Ruth.3.1",
+            "Ruth.3.2",
+            "Ruth.3.3",
+            "Ruth.3.4",
+            "Ruth.3.5"
+          ],
+          "raw_sha256": "6ef68a000a1bdd6ebf8feaa2ecfbeda5f0d12b187dd2db3359575b3162b62efa",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 4,
+              "div": 24,
+              "hi": 1,
+              "reference": 1,
+              "row": 2,
+              "table": 2,
+              "title": 2
+            }
+          }
+        },
+        {
+          "first_key": "Ruth.3.6",
+          "native_keys": [
+            "Ruth.3.6",
+            "Ruth.3.7",
+            "Ruth.3.8",
+            "Ruth.3.9",
+            "Ruth.3.10",
+            "Ruth.3.11",
+            "Ruth.3.12",
+            "Ruth.3.13"
+          ],
+          "raw_sha256": "eee0e343702a9461256e1c4b63bce62547a6136aa3650f0f3e8f65a1d0bff63a",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 10,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "Ruth.3.14",
+          "native_keys": [
+            "Ruth.3.14",
+            "Ruth.3.15",
+            "Ruth.3.16",
+            "Ruth.3.17",
+            "Ruth.3.18"
+          ],
+          "raw_sha256": "acb7ac714e5bf4ba1c2bc6ac6acf48776c4be9f23616688186b8f31e06369987",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 9,
+              "hi": 1,
+              "reference": 2
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ruth.3",
+          "raw_sha256": "17d8dde6dba4f1fee6bcd444c1fb15c306edb8f782395ed3357de472a88a9921",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 3
+            }
+          }
+        }
+      ]
+    },
+    "Ruth.4": {
+      "source_payload_groups": 3,
+      "native_occupied_verse_keys": 22,
+      "original_introduction_keys": 1,
+      "units": [
+        {
+          "first_key": "Ruth.4.1",
+          "native_keys": [
+            "Ruth.4.1",
+            "Ruth.4.2",
+            "Ruth.4.3",
+            "Ruth.4.4",
+            "Ruth.4.5",
+            "Ruth.4.6",
+            "Ruth.4.7",
+            "Ruth.4.8"
+          ],
+          "raw_sha256": "121c14e11d5365c736382b890789167e2371dc26e30375221fa71dfd0d19cd5d",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "cell": 6,
+              "div": 16,
+              "hi": 1,
+              "row": 3,
+              "table": 3,
+              "title": 2
+            }
+          }
+        },
+        {
+          "first_key": "Ruth.4.9",
+          "native_keys": [
+            "Ruth.4.9",
+            "Ruth.4.10",
+            "Ruth.4.11",
+            "Ruth.4.12"
+          ],
+          "raw_sha256": "6186d6bb64b4dc22d5085f6495804ad49401bac8e25a99300544d8ba13d594c2",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 8,
+              "hi": 1
+            }
+          }
+        },
+        {
+          "first_key": "Ruth.4.13",
+          "native_keys": [
+            "Ruth.4.13",
+            "Ruth.4.14",
+            "Ruth.4.15",
+            "Ruth.4.16",
+            "Ruth.4.17",
+            "Ruth.4.18",
+            "Ruth.4.19",
+            "Ruth.4.20",
+            "Ruth.4.21",
+            "Ruth.4.22"
+          ],
+          "raw_sha256": "837a824ddb81e80a9989dc60734fe294740a2502d8ef21523e7473407b42d27b",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 12,
+              "hi": 1
+            }
+          }
+        }
+      ],
+      "introductions": [
+        {
+          "key": "Ruth.4",
+          "raw_sha256": "45827c984a5cefeba68933562252244fe7ce65ea1a0b9e2a0ae581a18e52ef46",
+          "markup": {
+            "strict_xml_fragment": true,
+            "tag_counts": {
+              "div": 2
+            }
+          }
+        }
+      ]
+    }
+  }
+}

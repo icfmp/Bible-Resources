@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "status": "OWNER_EDITORIAL_CORRECTIONS_APPROVED_IMPLEMENTATION_PENDING",
+  "decision_date": "2026-11-19",
+  "decision_source": "User explicit instruction: fais tout ça (approval of 15 corrections and two missing passages)",
+  "source_module": "MHCC 0.1.1",
+  "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "original_source_unchanged": true,
+  "modern_manuscript_prose_unchanged_until_separate_reversible_change": true,
+  "proposed_changes_approved_for_unpublished_derivative": true,
+  "approved_for_publication": false,
+  "approved_for_merge": false,
+  "original_source_manifests": [
+    "ADDITIONAL_ORIGINAL_LINK_TARGET_ERRATA_2026-11-18.json",
+    "FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json",
+    "PRIMARY_SOURCE_STRICT_TWO_SECTION_QUARANTINE_2026-11-19.json"
+  ],
+  "link_cases": [
+    {
+      "source_first_key": "Deut.9.1",
+      "source_reference_ordinal": 2,
+      "original_native_unit_sha256": "3a9deb2b7a9b1a828d2f5b2351ef085e32da90b1bbf842630bc9ab91fabd888f",
+      "original_target_sha256": "9b5e02309e5b1738c1714c67ff27dcceaa733a82e25b8d5f89e56e488d8af441",
+      "original_label_sha256": "fc83c3dbe59089eba457fb647052a902f5fd4811ac3c9bacfb6b80729c43a5fd",
+      "approved_derived_destinations": [
+        "Eph.2.11",
+        "Eph.2.12"
+      ],
+      "mode": "digital_destination_correction"
+    },
+    {
+      "source_first_key": "Esth.1.1",
+      "source_reference_ordinal": 2,
+      "original_native_unit_sha256": "9025f2510561373d27d5343fe1e9d15566cfefd511b9d36fb9a8c4fac07bedf5",
+      "original_target_sha256": "c93fca82e39a5e3574884f79d8e340518213958df3883434cb693e8aabafb6b4",
+      "original_label_sha256": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9",
+      "approved_derived_destinations": [
+        "Hab.2.16"
+      ],
+      "mode": "digital_destination_correction"
+    },
+    {
+      "source_first_key": "Gen.12.6",
+      "source_reference_ordinal": 2,
+      "original_native_unit_sha256": "0440ea4c8ae3267c52531bae62754ed8d475d60f448bb3419cbd165850dabf36",
+      "original_target_sha256": "04fdf6472f9ebc7af962a40c7662555b91d917d98d7ac7403dd71809b1a409fc",
+      "original_label_sha256": "6b498e63dac653d36cb7cd18550a7e1d6e2c2e24d2d3c149a7d824e45985d7f6",
+      "approved_derived_destinations": [
+        "Heb.11.13",
+        "Heb.11.14"
+      ],
+      "mode": "digital_destination_correction"
+    },
+    {
+      "source_first_key": "Matt.5.43",
+      "source_reference_ordinal": 2,
+      "original_native_unit_sha256": "27cd1da156f10c9cd264cab2e54b9d5c715bf7955d147340755f1526e2525445",
+      "original_target_sha256": "e13fae47b943193b633efefa94d394ff8b26f95788c17859013dfc552a3ff526",
+      "original_label_sha256": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9",
+      "approved_derived_destinations": [
+        "1Pet.1.16"
+      ],
+      "mode": "digital_destination_correction"
+    },
+    {
+      "source_first_key": "Song.1.1",
+      "source_reference_ordinal": 5,
+      "original_native_unit_sha256": "aac8a0159ed497454febfab63e0bec7d56d01434b543b6ed9a26ff895e11816c",
+      "original_target_sha256": "fcca6c9fd7cd4d59c41e598b205ae6b1c59e3fa66de915c58a8a5cb642b7c4dd",
+      "original_label_sha256": "59a5a0c7c39734d9c3359438fe114555c618f012aea84f3e4933246f7795575d",
+      "approved_derived_destinations": [
+        "Jer.3.1"
+      ],
+      "mode": "digital_destination_correction"
+    },
+    {
+      "source_first_key": "Song.1.1",
+      "source_reference_ordinal": 6,
+      "original_native_unit_sha256": "aac8a0159ed497454febfab63e0bec7d56d01434b543b6ed9a26ff895e11816c",
+      "original_target_sha256": "a62cc4e02a326d801b0cf0622436aa80e9ce93cd8e0388825e4857fd7ce94d9f",
+      "original_label_sha256": "04d90e75974e0ca55a278c6991c0ec249ed535ab23c33fb64671112f9a3d5cc1",
+      "approved_derived_destinations": [
+        "Song.1.7",
+        "Song.1.8"
+      ],
+      "mode": "section_navigation"
+    },
+    {
+      "source_first_key": "Jude.1.8",
+      "source_reference_ordinal": 2,
+      "original_native_unit_sha256": "91d247c84885f9db87dc02091a709958efc580c4641068a5038d3e963a3b2f4c",
+      "original_target_sha256": "d81a4a5696be98f43223147cedd3854066f9c22e92cda8c71c376398b630fa2e",
+      "original_label_sha256": "7c10bbbe26499f6b8f43bbf857efc964e6ffc2d96cecfada79b9dc56e34e9d08",
+      "approved_derived_destinations": [
+        "Jude.1.17-Jude.1.23"
+      ],
+      "mode": "section_navigation"
+    },
+    {
+      "source_first_key": "Matt.23.1",
+      "source_reference_ordinal": 2,
+      "original_native_unit_sha256": "aa2b646c4e1b23d657aa662db4df8869c83dabbe5b3cd48297031ba5dcc69626",
+      "original_target_sha256": "310e1a216e643067538eb133c4332c089c207a3e094069104b108f4ab48194e8",
+      "original_label_sha256": "8ba02b6c4de95971fbb106c6bf26d3d851b0dcb8421c707a4c2c7db1dc0b7d6f",
+      "approved_derived_destinations": [
+        "Deut.11.13-Deut.11.21"
+      ],
+      "mode": "digital_destination_correction"
+    },
+    {
+      "source_first_key": "Job.21.27",
+      "source_reference_ordinal": 2,
+      "original_native_unit_sha256": "a67347152c58b459f974d3a3913ab6d7f7e1e228b2be3d54f3a806123e21147b",
+      "original_target_sha256": "8b4c538f0f8ef6968f5c48c6d62f8eab4b7c3144de75018f666745c4b8130cc2",
+      "original_label_sha256": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb",
+      "approved_derived_destinations": [
+        "Jude.1.15"
+      ],
+      "mode": "digital_destination_correction"
+    },
+    {
+      "source_first_key": "Song.1.9",
+      "source_reference_ordinal": 1,
+      "original_native_unit_sha256": "855cde2cc71ed82e40f0502d56d298c239819aa5037115fd8b6dcd6374fd8a49",
+      "original_target_sha256": "98955085867c984fc9464959ce81e78c01d31cc894c15034e6977d07dcf037c1",
+      "original_label_sha256": "093b1b341f5089831a438ee78b4f164ed89ac03bb6b68e84263b7caafb85c9a3",
+      "approved_derived_destinations": [
+        "Song.1.10",
+        "Song.1.11"
+      ],
+      "mode": "section_navigation"
+    },
+    {
+      "source_first_key": "Num.29.1",
+      "source_reference_ordinal": 1,
+      "original_native_unit_sha256": "ae0f93c3f86e3d226e57d542a0758925e2f6158c83210f858d57009275278fdc",
+      "original_target_sha256": "60720e6d23a473a6e6a9c8534f475d93804ae3e22f5efbc91be61886b1625943",
+      "original_label_sha256": "e75d871e0b87a3f6e309e201854cf196a81df4c1231d68bb3ab77b18e5971086",
+      "approved_derived_destinations": [
+        "Lev.23.24"
+      ],
+      "mode": "visible_printed_citation_erratum"
+    },
+    {
+      "source_first_key": "Eccl.10.11",
+      "source_reference_ordinal": 1,
+      "original_native_unit_sha256": "df7c5d1b82b50b7683ebbd918ab73c0a0ec567a56d4b5e65092fc4f2ffbd30d9",
+      "original_target_sha256": "8c30222385edb1d5e6b2a404e4532f6d1734d65bd6a45625ae9ebbfb02921fef",
+      "original_label_sha256": "b9d1ad798553f80645e62124bf86095f41b47b00659250faca2752e38292155a",
+      "approved_derived_destinations": [
+        "Isa.35.8"
+      ],
+      "mode": "visible_printed_citation_erratum"
+    },
+    {
+      "source_first_key": "Jer.50.1",
+      "source_reference_ordinal": 1,
+      "original_native_unit_sha256": "be18473d8be9824cf305bf1efcceb923ccda76d2c8cf3b6aa90ef35feab587e5",
+      "original_target_sha256": "70e54e46af7bf90a9c58a1a17cfb3cff04ba80a6fe7f608eb199361404f2b6df",
+      "original_label_sha256": "7972d266ab1e31b433e34d9dcefce8f1164d2e299017e786184f625927a6d871",
+      "approved_derived_destinations": [
+        "Jer.50.1-Jer.50.3",
+        "Jer.50.8-Jer.50.16",
+        "Jer.50.21-Jer.50.32",
+        "Jer.50.35-Jer.50.46"
+      ],
+      "mode": "disjoint_composite_outline"
+    },
+    {
+      "source_first_key": "Jer.50.1",
+      "source_reference_ordinal": 2,
+      "original_native_unit_sha256": "be18473d8be9824cf305bf1efcceb923ccda76d2c8cf3b6aa90ef35feab587e5",
+      "original_target_sha256": "f6b8ecb3d15ba597fc3b17911c3a5807b2188ba12d9195623e989c57eb4f2ec5",
+      "original_label_sha256": "c141feb7f25e34f11529722fcdd100bc8d97d230aa142dfcf5cab6c4ae5e5e15",
+      "approved_derived_destinations": [
+        "Jer.50.4-Jer.50.7",
+        "Jer.50.17-Jer.50.20",
+        "Jer.50.33",
+        "Jer.50.34"
+      ],
+      "mode": "disjoint_composite_outline"
+    },
+    {
+      "source_first_key": "Matt.23.1",
+      "source_reference_ordinal": 1,
+      "original_native_unit_sha256": "aa2b646c4e1b23d657aa662db4df8869c83dabbe5b3cd48297031ba5dcc69626",
+      "original_target_sha256": "86fe8cf0c4b5b95e324c3ac6cd3b3ee84744a96eb7ae2870fba23b0a6327218a",
+      "original_label_sha256": "860b353792f934c60b00f237f4447df24bca6b678bb79aac6bfcfbf6444c6fff",
+      "approved_derived_destinations": [
+        "Exod.13.2-Exod.13.10",
+        "Exod.13.11-Exod.13.16",
+        "Deut.6.4-Deut.6.9",
+        "Deut.11.13-Deut.11.21"
+      ],
+      "mode": "disjoint_composite_outline"
+    }
+  ],
+  "ccel_only_sections": [
+    {
+      "chapter": "1Sam.25",
+      "original_source_first_K": "1Sam.25.32",
+      "original_source_last_K": "1Sam.25.44",
+      "original_source_K_raw_sha256": "a7219b836582c17e1032af2733abd881e6d37e23a22c04d3b6d11ba7d1a6c272",
+      "original_matched_heading": "David is restrained; Nabal dies (verses 32–39)",
+      "approved_additional_authored_heading": "David marries Abigail (verses 39–44)",
+      "source_provenance": "secondary CCEL concise witness; absent from pinned original SWORD K",
+      "decision": "include as independently attributed, separately scoped modern derivative commentary after rights/provenance verification",
+      "rights_cleared_for_release": false
+    },
+    {
+      "chapter": "Ps.95",
+      "original_source_first_K": "Ps.95.1",
+      "original_source_last_K": "Ps.95.11",
+      "original_source_K_raw_sha256": "8fd73ec5b07b5f38a39677d632196db2ee35061ecb33dd5d2511758f229dca8c",
+      "original_matched_heading": "Worshiping the Lord and our Shepherd (verses 1–7)",
+      "approved_additional_authored_heading": "Hearing Christ's voice today (verses 7–11)",
+      "source_provenance": "secondary CCEL concise witness; absent from pinned original SWORD K",
+      "decision": "include as independently attributed, separately scoped modern derivative commentary after rights/provenance verification",
+      "rights_cleared_for_release": false
+    }
+  ],
+  "acceptance": {
+    "source_hash_pins": true,
+    "individually_documented_derivative_overlay": true,
+    "visible_printed_labels_not_silently_changed": true,
+    "composite_references_not_falsely_flattened": true,
+    "real_native_sword_roundtrip_required": true,
+    "real_xiphos_click_navigation_required": true,
+    "publication_rights_review_required": true
+  }
+}

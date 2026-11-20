@@ -1,0 +1,411 @@
+{
+  "status": "SOURCE_TEXT_SECONDARY_WITNESS_ANCHOR_CANDIDATES_NOT_EDITORIAL_APPROVAL",
+  "source_module": "MHCC 0.1.1",
+  "native_module_id": "MHCC",
+  "source_zip_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
+  "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "purpose": "Read-only exact-authenticated original K-boundary and lexical witness verification of Job 4–6, 12–14, 17, 21, 24–42 draft fidelity corrections. A found phrase is not a semantic translation approval.",
+  "source_group_hash_policy": "manifest_exact",
+  "source_group_probes": [
+    {
+      "chapter": "Job.12",
+      "first": "Job.12.12",
+      "last": "Job.12.25",
+      "sha": "536727f8d2427df1b1bdb442e07cba01e1428503e2033d737f9f0b63d12867eb",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "the Lord Jesus was crucified by the malice of the Jews"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "this one event was the salvation of the world"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.13",
+      "first": "Job.13.23",
+      "last": "Job.13.28",
+      "sha": "789c1f52e0654a480abb050f5520dc79b3a997955c5bd2e13bb76a3f7ee988e5",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "both body and soul feel his righteous vengeance"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "there is salvation devised provided and made known in Christ"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.14",
+      "first": "Job.14.16",
+      "last": "Job.14.22",
+      "sha": "befe682c90f2a9ccf98f4c592a95e4fec70a82c03c1d51c0d6bb0e81cf428635",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "God may send disease and pain"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "will receive the believer into realms of eternal happiness"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.17",
+      "first": "Job.17.1",
+      "last": "Job.17.9",
+      "sha": "3550bacdb2653f8a4d6efbf51e042ab23a8c2d934470c0ff46a5097f7e72b71d",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "from God from enemies and from friends"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "Instead of being discouraged in the service of God"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.4",
+      "first": "Job.4.12",
+      "last": "Job.4.21",
+      "sha": "01b7bf81e094f9fa7c5f75ee93d6b241eab8dbf097d1a835e1bc045e40486aae",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "let him wonder that he is out of hell"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "Will God justify sinful mortals and clear them from guilt"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.5",
+      "first": "Job.5.6",
+      "last": "Job.5.16",
+      "sha": "46b0531676d81a538468cd2bd677f553c1f0a32c2f2c93dc8d4a7664bf1eba51",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "for they are from God"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "nor our sins to fate for they are from ourselves"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.6",
+      "first": "Job.6.1",
+      "last": "Job.6.7",
+      "sha": "7943dd70d15eb418d30a7e6ccd2c002833de7c8fa76435e5ce291dc13824d1a5",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "God is pleased to lay upon us"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "the use of our reason and the peace of our conscience"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.21",
+      "first": "Job.21.17",
+      "last": "Job.21.26",
+      "sha": "edef2d683c5a13ea279a6c1af3ecb897121df0c15a6d0a842047e642f88292de",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "if hell be the lot of every sinner at last"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "one goes singing thither and another sighing"
+        },
+        {
+          "id": "source_claim_3",
+          "words": "the worm that dies not and the fire that is not quenched"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.24",
+      "first": "Job.24.13",
+      "last": "Job.24.17",
+      "sha": "8258f2617c31a5ba42ecfd15993d305efdb7d89772b69cd43b6de9d7d3b9da2b",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "then to hide that which will end in death and hell at last"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "Less pains would mortify and crucify the flesh"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.26",
+      "first": "Job.26.5",
+      "last": "Job.26.14",
+      "sha": "eaf96f8a1aafb320c1248af54a73a8f796df3f225b10c4ccdec216563e44ba94",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "If we consider hell beneath though out of our sight"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "we may conceive the discoveries of God's power there"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.27",
+      "first": "Job.27.11",
+      "last": "Job.27.23",
+      "sha": "26a4a98f6f1d40519d418ee526fb1afa5b563537b6bc47213861ffaadf6d0206",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "he will pour out upon him his wrath"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "arms of Divine grace which are stretched out to receive them"
+        },
+        {
+          "id": "source_claim_3",
+          "words": "arms of Divine wrath which will shortly be stretched out to destroy them"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.30",
+      "first": "Job.30.15",
+      "last": "Job.30.31",
+      "sha": "e44749ed1914630fd8c061f2ecb88b5af73de594c22355651e8b83afeb613017",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "God's wrath might bring him to death"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "his soul would be safe and happy in the world of spirits"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.31",
+      "first": "Job.31.9",
+      "last": "Job.31.15",
+      "sha": "621a6bdeda2125ca645c9cd973b401f02fda477e0eecd690e00a5281ee5eb504",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "It kindles the fire of God's wrath"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "Burning lusts bring burning judgments"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.32",
+      "first": "Job.32.15",
+      "last": "Job.32.22",
+      "sha": "fc2e2f1415d9ba3782e0ced4b2b50150a259ceca5740933059512c310f65e351",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "the more we dread his wrath and justice"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "in his mercies and his terrors"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.33",
+      "first": "Job.33.14",
+      "last": "Job.33.18",
+      "sha": "a74b2d806b06ea66a795434e33d12a65397d8d56fb08c19f29d27d39cec2487d",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "That which turns men from sin saves them from hell"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "the restraints of an awakened conscience"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.33",
+      "first": "Job.33.19",
+      "last": "Job.33.28",
+      "sha": "01ad2286947ef5dcfb4f34ddb0b89fc5a1c03bfcb88880c06be3ac2ae7952c93",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "God often afflicts the body for good to the soul"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "Jesus Christ is the Messenger and the Ransom"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.34",
+      "first": "Job.34.10",
+      "last": "Job.34.15",
+      "sha": "32bcaac69f35186bba452aa6e6f064f26645a1692c3aeb7ba24da75578ae723b",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "God meant him no hurt by afflicting him"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "God did him no wrong by afflicting him"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.35",
+      "first": "Job.35.14",
+      "last": "Job.35.16",
+      "sha": "a622ea3ec73054966dce48279286608cd39ad02b523961775203dd4fab6a4300",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "if there is Divine wrath in our troubles"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "Elihu was directed by God to humble Job"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.36",
+      "first": "Job.36.1",
+      "last": "Job.36.4",
+      "sha": "4c0b37f31c0faa3b7b92dc6a30dd4302f2f599f43bb28eb06cad25d58211a5dd",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "the affliction was sent for his trial"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "lengthened because Job was not yet thoroughly humbled under it"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.36",
+      "first": "Job.36.5",
+      "last": "Job.36.14",
+      "sha": "73814d2d3b226aa3b617e879d9122f257b396bffaff10ce1a34f7149db4b95a5",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "the furnace to be heated till they are consumed"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "Those that die without knowledge die without grace"
+        },
+        {
+          "id": "source_claim_3",
+          "words": "live long to heap up wrath"
+        },
+        {
+          "id": "source_claim_4",
+          "words": "but it is in everlasting misery"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.37",
+      "first": "Job.37.1",
+      "last": "Job.37.13",
+      "sha": "07b861711680fd178a8deef1e610f187d6f93ded01ffcbda60220c26c42f72fc",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "warns them to flee from the wrath to come"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "invites them to accept his salvation"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.39",
+      "first": "Job.39.1",
+      "last": "Job.39.1",
+      "sha": "0dad17cda2ab3c2ea378501692b36486d41c3d6166163f627ff7c43ecf1c2e14",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "no making him fear the wrath of God"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "fatal consequences of sin"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.40",
+      "first": "Job.40.15",
+      "last": "Job.40.24",
+      "sha": "b7f7a74eaa8d08690477a273d6e51bbb20f020523f6e104a8d9be1f515b16ccd",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "the sword of justice his wrath to approach and touch it"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "whole armour of God to resist yea to overcome the tempter"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.42",
+      "first": "Job.42.1",
+      "last": "Job.42.6",
+      "sha": "01163f5bf9d93eea097813cbf365a1a3b0eab28b74c02128ff4d779013027ddd",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "he abhorred himself as a sinner in heart and life"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "Self loathing is ever the companion of true repentance"
+        }
+      ]
+    }
+  ]
+}

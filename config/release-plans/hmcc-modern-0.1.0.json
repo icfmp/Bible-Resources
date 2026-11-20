@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "Publish source-attested HMCC Modern 0.1.0 with approved corrections; manual Xiphos note-click check explicitly deferred",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/pull/272",
+    "reviewed_by": "Bible Resources project owner — 2026-11-20",
+    "source_rights": "Original Matthew Henry via CrossWire Public Domain; separate modern derivative authorized by project owner; no imported CCEL formatting"
+  },
+  "editorial_path": "modules/hmcc-modern/EDITORIAL.md",
+  "evidence_path": "modules/hmcc-modern/SOURCE_VALIDATION.json",
+  "module_id": "hmcc-modern",
+  "notes_path": "docs/releases/HMCC-Modern-0.1.0.md",
+  "package_sha256": "dd1940b3bf85cc09659b634dc74c9a9d8810816bc2f8316a8293f893c3eb94ee",
+  "package_size_bytes": 2771760,
+  "schema_version": 1,
+  "sword_id": "HMCCModern",
+  "tag": "hmcc-modern-0.1.0",
+  "title": "HMCC Modern 0.1.0 — Henry's Modern Concise Commentary",
+  "version": "0.1.0",
+  "zip_name": "HMCCModern-0.1.0.zip"
+}

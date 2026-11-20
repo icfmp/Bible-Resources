@@ -1,0 +1,91 @@
+{
+  "status": "SOURCE_TEXT_SECONDARY_WITNESS_ANCHOR_CANDIDATES_NOT_EDITORIAL_APPROVAL",
+  "source_module": "MHCC 0.1.1",
+  "native_module_id": "MHCC",
+  "source_zip_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
+  "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "purpose": "Authenticate the published MHCC 0.1.1 K bodies against original-English witness words for five proposed Ecclesiastes modern fidelity amendments. Exact lexical anchors are not independent semantic signoff or editorial/publication approval.",
+  "source_group_hash_policy": "manifest_exact",
+  "source_group_probes": [
+    {
+      "chapter": "Eccl.2",
+      "first": "Eccl.2.12",
+      "last": "Eccl.2.17",
+      "sha": "da79b0a35d1bb14a93dfa79d2922321934a8437d17ce63513bf0f299ceb65ae1",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "or the soul in hell"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "The most learned of men who dies a stranger to Christ Jesus"
+        }
+      ]
+    },
+    {
+      "chapter": "Eccl.6",
+      "first": "Eccl.6.1",
+      "last": "Eccl.6.6",
+      "sha": "6ec9e74f4dac6ff925fed94c0866a9a80f2da0f8a4eb9d0481805f3b0d91fe98",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "the Lord leaves him so to covetousness or evil dispositions"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "his possessions come to strangers"
+        }
+      ]
+    },
+    {
+      "chapter": "Eccl.7",
+      "first": "Eccl.7.11",
+      "last": "Eccl.7.22",
+      "sha": "4255a77a2c78a28ec93c2b9f82c51b7efbfa086e3d5594d3d1d3d86d8088fd5f",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "the fear of God and the dread of hell"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "expose to public justice"
+        }
+      ]
+    },
+    {
+      "chapter": "Eccl.8",
+      "first": "Eccl.8.9",
+      "last": "Eccl.8.13",
+      "sha": "113e5fc6baa35f69ca9c63d706172f9e608d0c970fbf8d8a2e28baa0a924e15c",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "Vengeance comes slowly but it comes surely"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "prosperity hardens them in their wickedness"
+        }
+      ]
+    },
+    {
+      "chapter": "Eccl.10",
+      "first": "Eccl.10.16",
+      "last": "Eccl.10.20",
+      "sha": "a3a33af36da0e633d3e7691bbc6ed0b6f20a79639d9faba0b301ebf8f8913fae",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "his curse coming down upon you will sink you to the lowest hell"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "curse not THIS KING in thy inmost thought"
+        }
+      ]
+    }
+  ]
+}

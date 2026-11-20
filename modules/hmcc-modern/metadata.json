@@ -1,0 +1,36 @@
+{
+  "canonical_edition_id": "matthew-henry-concise-modern-english-2026",
+  "category": "commentary",
+  "id": "hmcc-modern",
+  "index_audit": {
+    "manifest": "config/commentary-rebuilds/hmcc-modern.json",
+    "mode": "reviewed_modern_commentary_rebuild"
+  },
+  "language": "en",
+  "origin": {
+    "publisher": "Bible Resources (modern English); original Matthew Henry text via CrossWire",
+    "source_revision": "Matthew Henry's Concise Commentary; curated MHCC 0.1.1 primary witness; separately attested historical passages",
+    "url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC"
+  },
+  "quality": {
+    "edition": "reader_optimized",
+    "reviewed_by": "Bible Resources project owner — previously approved modern English translation and 15+2 editorial decisions; explicit publication instruction 2026-11-20; Xiphos note-marker manual QA deliberately deferred",
+    "smoke_key": "Gen 12:6",
+    "status": "approved"
+  },
+  "rights": {
+    "derivatives_allowed": true,
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/pull/272",
+    "license": "Copyrighted; Permission to distribute granted by copyright holder",
+    "redistribution_allowed": true,
+    "reviewed_by": "Bible Resources project owner — direct publication instruction 2026-11-20; primary Matthew Henry text public domain; distinct modern derivative not relicensed as the source"
+  },
+  "schema_version": 1,
+  "sword_id": "HMCCModern",
+  "title": {
+    "en": "Henry's Modern Concise Commentary",
+    "fr": "Commentaire concis de Matthew Henry en anglais moderne"
+  },
+  "versification": "KJV",
+  "version": "0.1.0"
+}

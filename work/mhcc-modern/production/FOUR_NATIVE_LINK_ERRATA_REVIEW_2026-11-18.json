@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "status": "PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED",
+  "recorded_on": "2026-11-18",
+  "original_source": "MHCC 0.1.1 SWORD",
+  "original_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "source_evidence_workflow": "https://github.com/icfmp/Bible-Resources/actions/runs/44317666725",
+  "independent_citation_witnesses": {
+    "ecclesiastes_10": "https://ccel.org/ccel/henry/mhcc.xxii.x.html",
+    "jeremiah_50": "https://ccel.org/ccel/henry/mhcc.xxv.l.html",
+    "matthew_23": "https://ccel.org/ccel/henry/mhcc.xxxii.xxiii.html"
+  },
+  "provenance_note": "Exact literal native osisRef values were reverse-matched against the source-hashed K/ordinal review queue. CCEL text is a secondary editorial witness, not a source rights license or proof of bytewise edition equivalence. The four candidate literal targets were tested against the exact native osisRef SHA-256 hashes, not guessed from the commentary alone.",
+  "original_sword_changed": false,
+  "modern_prose_changed": false,
+  "modern_osis_links_automatically_changed": false,
+  "editorial_target_corrections_approved": false,
+  "redistributed": false,
+  "cases": [
+    {
+      "source_first_key": "Eccl.10.11",
+      "original_native_unit_sha256": "df7c5d1b82b50b7683ebbd918ab73c0a0ec567a56d4b5e65092fc4f2ffbd30d9",
+      "original_reference_ordinal": 1,
+      "original_target": "Isa.25.8",
+      "original_target_sha256": "8c30222385edb1d5e6b2a404e4532f6d1734d65bd6a45625ae9ebbfb02921fef",
+      "original_visible_label_sha256": "b9d1ad798553f80645e62124bf86095f41b47b00659250faca2752e38292155a",
+      "finding": "ORIGINAL_DIGITAL_WITNESS_POINTS_TO_WRONG_VERSE",
+      "proposed_corrected_target": "Isa.35.8",
+      "evidence": "The wayfaring highway phrase aligns with Isaiah 35:8; original SWORD and CCEL reproduce Isaiah 25:8.",
+      "action": "REVIEW_AND_APPROVE_EXPLICIT_EDIT_BEFORE_LINK_INSERTION",
+      "approval": false,
+      "proposed_navigation_targets_for_unpublished_review": [
+        "Isa.35.8"
+      ],
+      "proposed_navigation_witness_class": "ISAIAH_HIGHWAY_EVIDENCE_ISAIAH_35_8"
+    },
+    {
+      "source_first_key": "Jer.50.1",
+      "original_native_unit_sha256": "be18473d8be9824cf305bf1efcceb923ccda76d2c8cf3b6aa90ef35feab587e5",
+      "original_reference_ordinal": 1,
+      "original_target": "Jer.50.1-Jer.3.8",
+      "original_target_sha256": "70e54e46af7bf90a9c58a1a17cfb3cff04ba80a6fe7f608eb199361404f2b6df",
+      "original_visible_label_sha256": "7972d266ab1e31b433e34d9dcefce8f1164d2e299017e786184f625927a6d871",
+      "finding": "INVALID_CROSS_CHAPTER_NAVIGATION_IN_ORIGINAL_OSISREF",
+      "printed_secondary_witness_section": "Jeremiah 50 topical outline: ruin of Babylon (1–3, 8–16, 21–32, 35–46)",
+      "candidate_fragment": "Jer.50.1-Jer.50.3",
+      "action": "VERIFY_EXACT_SOURCE_VISIBLE_LABEL_AND_COMPOUND_OUTLINE_SPAN_OWNERSHIP_BEFORE_FIXING",
+      "approval": false,
+      "proposed_navigation_targets_for_unpublished_review": [
+        "Jer.50.1-Jer.50.3",
+        "Jer.50.8-Jer.50.16",
+        "Jer.50.21-Jer.50.32",
+        "Jer.50.35-Jer.50.46"
+      ],
+      "proposed_navigation_witness_class": "CCEL_CONCISE_JEREMIAH_50_RUIN_FOUR_DISJOINT_SPANS"
+    },
+    {
+      "source_first_key": "Jer.50.1",
+      "original_native_unit_sha256": "be18473d8be9824cf305bf1efcceb923ccda76d2c8cf3b6aa90ef35feab587e5",
+      "original_reference_ordinal": 2,
+      "original_target": "Jer.50.4-Jer.7.17",
+      "original_target_sha256": "f6b8ecb3d15ba597fc3b17911c3a5807b2188ba12d9195623e989c57eb4f2ec5",
+      "original_visible_label_sha256": "c141feb7f25e34f11529722fcdd100bc8d97d230aa142dfcf5cab6c4ae5e5e15",
+      "finding": "INVALID_CROSS_CHAPTER_NAVIGATION_IN_ORIGINAL_OSISREF",
+      "printed_secondary_witness_section": "Jeremiah 50 topical outline: redemption of God's people (4–7, 17–20, 33–34)",
+      "candidate_fragment": "Jer.50.4-Jer.50.7",
+      "action": "VERIFY_EXACT_SOURCE_VISIBLE_LABEL_AND_COMPOUND_OUTLINE_SPAN_OWNERSHIP_BEFORE_FIXING",
+      "approval": false,
+      "proposed_navigation_targets_for_unpublished_review": [
+        "Jer.50.4-Jer.50.7",
+        "Jer.50.17-Jer.50.20",
+        "Jer.50.33",
+        "Jer.50.34"
+      ],
+      "proposed_navigation_witness_class": "CCEL_CONCISE_JEREMIAH_50_REDEMPTION_FOUR_DISJOINT_SPANS"
+    },
+    {
+      "source_first_key": "Matt.23.1",
+      "original_native_unit_sha256": "aa2b646c4e1b23d657aa662db4df8869c83dabbe5b3cd48297031ba5dcc69626",
+      "original_reference_ordinal": 1,
+      "original_target": "Exod.13.2-Exod.10.13",
+      "original_target_sha256": "86fe8cf0c4b5b95e324c3ac6cd3b3ee84744a96eb7ae2870fba23b0a6327218a",
+      "original_visible_label_sha256": "860b353792f934c60b00f237f4447df24bca6b678bb79aac6bfcfbf6444c6fff",
+      "finding": "INVALID_CROSS_CHAPTER_NAVIGATION_IN_ORIGINAL_OSISREF",
+      "printed_secondary_witness_section": "Matthew 23 phylacteries: Ex 13:2–10; 13:11–16; Deut 6:4–9; 11:13–21",
+      "candidate_fragment": "Exod.13.2-Exod.13.10",
+      "action": "VERIFY_EXACT_SOURCE_VISIBLE_LABEL_AND_COMPOUND_CITATION_BEFORE_FIXING",
+      "approval": false,
+      "proposed_navigation_targets_for_unpublished_review": [
+        "Exod.13.2-Exod.13.10",
+        "Exod.13.11-Exod.13.16",
+        "Deut.6.4-Deut.6.9",
+        "Deut.11.13-Deut.11.21"
+      ],
+      "proposed_navigation_witness_class": "CCEL_CONCISE_MATTHEW_23_FOUR_PENTATEUCH_PORTIONS"
+    }
+  ],
+  "remaining_link_ledger_unchanged": {
+    "original": 1204,
+    "represented": 1015,
+    "spurious_excluded": 9,
+    "pending": 180
+  },
+  "proposed_navigation_note_status": "UNAPPROVED_SEPARATE_EDITORIAL_REPAIR_PREVIEW_NOT_IN_ORIGINAL_SOURCE",
+  "proposed_navigation_note_count": 13,
+  "proposed_navigation_source_links_repaired_in_editorial_preview": 4,
+  "proposed_navigation_note_publication_authorized": false
+}

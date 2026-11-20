@@ -1,0 +1,91 @@
+{
+  "status": "SOURCE_TEXT_SECONDARY_WITNESS_ANCHOR_CANDIDATES_NOT_EDITORIAL_APPROVAL",
+  "source_module": "MHCC 0.1.1",
+  "native_module_id": "MHCC",
+  "source_zip_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
+  "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "purpose": "Original published K-body lexical probes for Proverbs 2, 3, 5, 16 editorial fidelity claims. Probe presence and K identity only; not independent full semantic acceptance.",
+  "source_group_hash_policy": "manifest_exact",
+  "source_group_probes": [
+    {
+      "chapter": "Prov.2",
+      "first": "Prov.2.10",
+      "last": "Prov.2.22",
+      "sha": "74753e71d8d6f3d38e6171d943ad1aad9a80ea22b3e45472ee6486a722429070",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "by the everlasting torments which follow them"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "to the wicked it is all the heaven they ever shall have"
+        }
+      ]
+    },
+    {
+      "chapter": "Prov.3",
+      "first": "Prov.3.27",
+      "last": "Prov.3.35",
+      "sha": "3d4c1fe8b95cdedf3e87118d018f1a917395d80578ad555c9ece67b94164bf0f",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "everlasting contempt will be the portion of such scorners"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "Divine favour is shown to the humble believer"
+        }
+      ]
+    },
+    {
+      "chapter": "Prov.5",
+      "first": "Prov.5.1",
+      "last": "Prov.5.14",
+      "sha": "882ba0ba9b5779314c62d2ea8607e7e7c2a29ea7555efc58b3f4f155d8300a58",
+      "anchors": [
+        {
+          "id": "hell_torments",
+          "words": "It leads to the torments of hell"
+        },
+        {
+          "id": "body_soul",
+          "words": "the destruction of body and soul"
+        }
+      ]
+    },
+    {
+      "chapter": "Prov.16",
+      "first": "Prov.16.4",
+      "last": "Prov.16.4",
+      "sha": "0bab952d1e298c9e0dc6691b588ea2116590e53fc1b022e18857ada707ed9e6e",
+      "anchors": [
+        {
+          "id": "vengeance",
+          "words": "God makes use of the wicked to execute righteous vengeance on each other"
+        },
+        {
+          "id": "destruction",
+          "words": "he will be glorified by their destruction at last"
+        }
+      ]
+    },
+    {
+      "chapter": "Prov.16",
+      "first": "Prov.16.9",
+      "last": "Prov.16.9",
+      "sha": "5d4ea8f0ec6b0cb2a7419787fee77cf5b140a1c4bef01cd5b3c85f1456101ef0",
+      "anchors": [
+        {
+          "id": "guided",
+          "words": "If men make God's glory their end and his will their rule"
+        },
+        {
+          "id": "rulers",
+          "words": "Let kings and judges of the earth be just and rule in the fear of God"
+        }
+      ]
+    }
+  ]
+}

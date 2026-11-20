@@ -96,9 +96,10 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
                     dest, source=source, attestation=receipt
                 )
 
+    @patch("commentary_xiphos_dual_reader._dismiss_transient_xiphos_notice", return_value=False)
     @patch("commentary_xiphos_dual_reader.time.sleep")
     @patch("commentary_xiphos_dual_reader._main_xiphos_window")
-    def test_real_xiphos_window_appearing_late_is_accepted_without_bypassing_ui(self, window, sleep):
+    def test_real_xiphos_window_appearing_late_is_accepted_without_bypassing_ui(self, window, sleep, notice):
         from commentary_xiphos_dual_reader import _await_xiphos_visible_window
         from unittest.mock import Mock
         window.side_effect = [None] * 27 + ["12345"]
@@ -111,10 +112,12 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(sleep.call_count, 27)
         self.assertEqual(app.poll.call_count, 28)
         self.assertEqual(display.poll.call_count, 28)
+        self.assertEqual(notice.call_count, 27)
 
+    @patch("commentary_xiphos_dual_reader._dismiss_transient_xiphos_notice", return_value=False)
     @patch("commentary_xiphos_dual_reader.time.sleep")
     @patch("commentary_xiphos_dual_reader._main_xiphos_window", return_value=None)
-    def test_xiphos_gui_readiness_fails_closed_if_window_never_visible(self, window, sleep):
+    def test_xiphos_gui_readiness_fails_closed_if_window_never_visible(self, window, sleep, notice):
         from commentary_xiphos_dual_reader import _await_xiphos_visible_window
         from unittest.mock import Mock
         app = Mock()
@@ -125,12 +128,14 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
             _await_xiphos_visible_window(app, display, {"DISPLAY": ":91"}, seconds=8)
         self.assertEqual(window.call_count, 44)
         self.assertEqual(sleep.call_count, 44)
+        self.assertEqual(notice.call_count, 44)
         with self.assertRaisesRegex(PilotError, "Unsafe"):
             _await_xiphos_visible_window(app, display, {}, seconds=26)
 
+    @patch("commentary_xiphos_dual_reader._dismiss_transient_xiphos_notice", return_value=False)
     @patch("commentary_xiphos_dual_reader.time.sleep")
     @patch("commentary_xiphos_dual_reader._main_xiphos_window", return_value=None)
-    def test_xiphos_gui_readiness_fails_fast_on_reader_exit(self, window, sleep):
+    def test_xiphos_gui_readiness_fails_fast_on_reader_exit(self, window, sleep, notice):
         from commentary_xiphos_dual_reader import _await_xiphos_visible_window
         from unittest.mock import Mock
         app = Mock()
@@ -141,6 +146,72 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
             _await_xiphos_visible_window(app, display, {"DISPLAY": ":91"}, seconds=8)
         window.assert_not_called()
         sleep.assert_not_called()
+        notice.assert_not_called()
+
+    @patch("commentary_xiphos_dual_reader._dismiss_transient_xiphos_notice", return_value=True)
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window", side_effect=[None, "12345"])
+    def test_first_run_notice_dismissed_before_waiting_for_main_window(self, window, sleep, notice):
+        from commentary_xiphos_dual_reader import _await_xiphos_visible_window
+        from unittest.mock import Mock
+        app = Mock()
+        display = Mock()
+        app.poll.return_value = None
+        display.poll.return_value = None
+        _await_xiphos_visible_window(app, display, {"DISPLAY": ":91"}, seconds=8)
+        self.assertEqual(window.call_count, 2)
+        notice.assert_called_once_with({"DISPLAY": ":91"})
+        sleep.assert_called_once_with(0.5)
+
+    @patch("commentary_xiphos_dual_reader._dismiss_transient_xiphos_notice")
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader.attempt_real_xiphos_passage_copy")
+    def test_real_gui_retries_until_independent_source_text_matches(
+        self, actual_copy, sleep, notice
+    ):
+        from commentary_xiphos_dual_reader import (
+            _observe_real_xiphos_with_bounded_retries,
+        )
+        def observed(count, actions):
+            return {
+                "independent_gui_commentary_excerpt_match_count": count,
+                "actual_passage_commands_accepted": actions,
+            }
+        actual_copy.side_effect = [
+            observed(0, False), observed(2, True), observed(4, True),
+        ]
+        passages = {ref: {} for ref in ("Gen 1:1", "Ps 95:1", "Matt 3:7", "Rev 22:2")}
+        result = _observe_real_xiphos_with_bounded_retries(
+            {"DISPLAY": ":91"}, passages
+        )
+        self.assertEqual(result["independent_gui_commentary_excerpt_match_count"], 4)
+        self.assertTrue(result["actual_passage_commands_accepted"])
+        self.assertEqual(result["independent_excerpt_match_counts_by_real_attempt"],
+                         [0, 2, 4])
+        self.assertEqual(result["bounded_real_gui_selection_attempts"], 3)
+        self.assertEqual(actual_copy.call_count, 3)
+        self.assertEqual(sleep.call_count, 2)
+        self.assertEqual(notice.call_count, 2)
+
+    @patch("commentary_xiphos_dual_reader._dismiss_transient_xiphos_notice")
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader.attempt_real_xiphos_passage_copy")
+    def test_retries_never_invent_a_gui_match(self, actual_copy, sleep, notice):
+        from commentary_xiphos_dual_reader import (
+            _observe_real_xiphos_with_bounded_retries,
+        )
+        actual_copy.return_value = {
+            "independent_gui_commentary_excerpt_match_count": 0,
+            "actual_passage_commands_accepted": False,
+        }
+        result = _observe_real_xiphos_with_bounded_retries(
+            {"DISPLAY": ":91"}, {"Gen 1:1": {}}
+        )
+        self.assertEqual(result["independent_gui_commentary_excerpt_match_count"], 0)
+        self.assertFalse(result["actual_passage_commands_accepted"])
+        self.assertEqual(result["independent_excerpt_match_counts_by_real_attempt"],
+                         [0, 0, 0])
+        self.assertEqual(actual_copy.call_count, 3)
 
     @patch("commentary_xiphos_dual_reader._x11")
     def test_visible_full_xiphos_window_required_not_tiny_notice(self, command):
@@ -347,6 +418,53 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertFalse(report["xiphos_link_click_target_and_navigation_verified"])
         self.assertNotIn("The first creation", str(report))
         self.assertNotIn("Gen.2.1", str(report))
+
+    def test_quarantined_source_target_is_detected_in_real_html_independently_of_valid_reference_list(self):
+        from commentary_xiphos_dual_reader import _markup_display_witness
+        # The BAD destination is deliberately represented as non-link text
+        # in the candidate: checking <reference> inventory alone misses it.
+        bad="2Cor.11.12"
+        source=b'<seg type="x-original-link-target-quarantined">11, 12</seg>'
+        html=b'<p><a href="sword://Bible/2Cor.11.12">11, 12</a></p>'
+        report=_markup_display_witness(
+            source,b"11, 12",html,blocked_osis_targets=(bad,))
+        self.assertEqual(report["original_internal_reference_elements_found"],0)
+        self.assertEqual(
+            report["quarantined_source_target_sha256_exposed_as_real_GUI_HTML_href"],
+            [sha256(bad.encode()).hexdigest()],
+        )
+        self.assertEqual(report["quarantined_source_targets_checked_in_real_GUI_HTML"],1)
+        self.assertNotIn(bad,str(report))
+
+    def test_quarantined_source_target_no_false_positive_from_longer_href_or_plain_text(self):
+        from commentary_xiphos_dual_reader import _markup_display_witness
+        bad="2Cor.11.12"
+        source=b'<seg type="x-original-link-target-quarantined">11, 12</seg>'
+        for html in (
+            b'<a href="sword://Bible/2Cor.11.123">11,12</a>',
+            b'<span>2Cor.11.12</span>',
+            None,
+        ):
+            with self.subTest(html=html):
+                report=_markup_display_witness(
+                    source,b"11, 12",html,blocked_osis_targets=(bad,))
+                self.assertEqual(
+                    report["quarantined_source_target_sha256_exposed_as_real_GUI_HTML_href"],
+                    [],
+                )
+                self.assertEqual(report["quarantined_source_targets_checked_in_real_GUI_HTML"],1)
+                self.assertEqual(report["real_gui_rich_html_selection_available"],bool(html))
+
+    def test_reject_untrusted_quarantine_link_targets(self):
+        from commentary_xiphos_dual_reader import _markup_display_witness
+        for malformed in (
+            ("",), ("../unsafe",), ("2Cor.11.12", "2Cor.11.12"),
+            tuple("Matt.1.1" for _ in range(21)), "Matt.1.1",
+        ):
+            with self.subTest(malformed=malformed):
+                with self.assertRaises(PilotError):
+                    _markup_display_witness(b"",b"",None,
+                                            blocked_osis_targets=malformed)
 
     def test_compound_reference_reports_independent_exact_label_components(self):
         from commentary_xiphos_dual_reader import _markup_display_witness

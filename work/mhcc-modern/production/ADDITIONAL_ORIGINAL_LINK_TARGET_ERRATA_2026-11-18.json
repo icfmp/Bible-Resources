@@ -1,0 +1,197 @@
+{
+  "status": "ORIGINAL_DIGITAL_SOURCE_LINK_DISCREPANCIES_REVIEW_ONLY_NOT_APPLIED",
+  "edition": "MHCC 0.1.1 pinned compiled SWORD",
+  "original_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "original_source_modified": false,
+  "modern_chapter_prose_modified": false,
+  "proposed_navigation_approved": false,
+  "publication_authorized": false,
+  "provenance": "Eleven explicitly source-attested original digital or printed-reference anomalies are individually hash pinned and review-only; separate from four earlier blocked malformed targets. Printed-source errors are distinguished from digital-link-only mismatches, and no corrections are approved. Source-native per-K SHA identities reconciled against successful complete-1189-chapter receipt at CI #44521639444 (original original corpus contains 1189 chapters). Added private, unapproved, review-note-only derived navigation targets; never alter the original source.",
+  "cases": [
+    {
+      "source_first_key": "Deut.9.1",
+      "source_reference_ordinal": 2,
+      "original_osisRef": "2Cor.11.12",
+      "original_target_sha256": "9b5e02309e5b1738c1714c67ff27dcceaa733a82e25b8d5f89e56e488d8af441",
+      "original_link_label": "11, 12",
+      "original_label_sha256": "fc83c3dbe59089eba457fb647052a902f5fd4811ac3c9bacfb6b80729c43a5fd",
+      "printed_antecedent": "Ep 2:9",
+      "proposed_destinations": [
+        "Eph.2.11",
+        "Eph.2.12"
+      ],
+      "finding": "Printed reference continues Ephesians 2:9, but second native hyperlink targets 2 Corinthians 11:12.",
+      "approval": false,
+      "original_native_unit_sha256": "3a9deb2b7a9b1a828d2f5b2351ef085e32da90b1bbf842630bc9ab91fabd888f",
+      "proposed_navigation_context": "DIGITAL_LINK_TARGET_MISMATCH_VS_PRINTED_SOURCE"
+    },
+    {
+      "source_first_key": "Esth.1.1",
+      "source_reference_ordinal": 2,
+      "original_osisRef": "2Cor.2.16",
+      "original_target_sha256": "c93fca82e39a5e3574884f79d8e340518213958df3883434cb693e8aabafb6b4",
+      "original_link_label": "16",
+      "original_label_sha256": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9",
+      "printed_antecedent": "Ha 2:15",
+      "proposed_destinations": [
+        "Hab.2.16"
+      ],
+      "finding": "Printed Habakkuk 2:15, 16 has a native continuation pointing instead to 2 Corinthians 2:16.",
+      "approval": false,
+      "original_native_unit_sha256": "9025f2510561373d27d5343fe1e9d15566cfefd511b9d36fb9a8c4fac07bedf5",
+      "proposed_navigation_context": "DIGITAL_LINK_TARGET_MISMATCH_VS_PRINTED_SOURCE"
+    },
+    {
+      "source_first_key": "Gen.12.6",
+      "source_reference_ordinal": 2,
+      "original_osisRef": "Heb.13.14",
+      "original_target_sha256": "04fdf6472f9ebc7af962a40c7662555b91d917d98d7ac7403dd71809b1a409fc",
+      "original_link_label": "13, 14",
+      "original_label_sha256": "6b498e63dac653d36cb7cd18550a7e1d6e2c2e24d2d3c149a7d824e45985d7f6",
+      "printed_antecedent": "He 11:8",
+      "proposed_destinations": [
+        "Heb.11.13",
+        "Heb.11.14"
+      ],
+      "finding": "Printed Hebrews 11:8, 13, 14 appears to continue chapter 11; source hyperlink unexpectedly targets Hebrews 13:14.",
+      "approval": false,
+      "original_native_unit_sha256": "0440ea4c8ae3267c52531bae62754ed8d475d60f448bb3419cbd165850dabf36",
+      "proposed_navigation_context": "DIGITAL_LINK_TARGET_MISMATCH_VS_PRINTED_SOURCE"
+    },
+    {
+      "source_first_key": "Matt.5.43",
+      "source_reference_ordinal": 2,
+      "original_osisRef": "1Cor.1.16",
+      "original_target_sha256": "e13fae47b943193b633efefa94d394ff8b26f95788c17859013dfc552a3ff526",
+      "original_link_label": "16",
+      "original_label_sha256": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9",
+      "printed_antecedent": "1Pe 1:15",
+      "proposed_destinations": [
+        "1Pet.1.16"
+      ],
+      "finding": "Printed 1 Peter 1:15, 16 has a native continuation pointing to 1 Corinthians 1:16.",
+      "approval": false,
+      "original_native_unit_sha256": "27cd1da156f10c9cd264cab2e54b9d5c715bf7955d147340755f1526e2525445",
+      "proposed_navigation_context": "DIGITAL_LINK_TARGET_MISMATCH_VS_PRINTED_SOURCE"
+    },
+    {
+      "source_first_key": "Song.1.1",
+      "source_reference_ordinal": 5,
+      "original_osisRef": "2Cor.3.1",
+      "original_target_sha256": "fcca6c9fd7cd4d59c41e598b205ae6b1c59e3fa66de915c58a8a5cb642b7c4dd",
+      "original_link_label": "3:1",
+      "original_label_sha256": "59a5a0c7c39734d9c3359438fe114555c618f012aea84f3e4933246f7795575d",
+      "printed_antecedent": "Jr 2:2",
+      "proposed_destinations": [
+        "Jer.3.1"
+      ],
+      "finding": "Printed Jeremiah 2:2; 3:1 has native continuation pointing instead to 2 Corinthians 3:1.",
+      "approval": false,
+      "original_native_unit_sha256": "aac8a0159ed497454febfab63e0bec7d56d01434b543b6ed9a26ff895e11816c",
+      "proposed_navigation_context": "DIGITAL_LINK_TARGET_MISMATCH_VS_PRINTED_SOURCE"
+    },
+    {
+      "source_first_key": "Song.1.1",
+      "source_reference_ordinal": 6,
+      "original_osisRef": "1Cor.7.8",
+      "original_target_sha256": "a62cc4e02a326d801b0cf0622436aa80e9ce93cd8e0388825e4857fd7ce94d9f",
+      "original_link_label": "1:7,8",
+      "original_label_sha256": "04d90e75974e0ca55a278c6991c0ec249ed535ab23c33fb64671112f9a3d5cc1",
+      "printed_antecedent": "Song",
+      "proposed_destinations": [
+        "Song.1.7",
+        "Song.1.8"
+      ],
+      "finding": "Source chapter-outline expression (Song 1:7,8) is linked digitally to 1 Corinthians 7:8.",
+      "approval": false,
+      "original_native_unit_sha256": "aac8a0159ed497454febfab63e0bec7d56d01434b543b6ed9a26ff895e11816c",
+      "proposed_navigation_context": "SOURCE_SECTION_NAVIGATION_NOT_AUTHORIAL_SENTENCE"
+    },
+    {
+      "source_first_key": "Jude.1.8",
+      "source_reference_ordinal": 2,
+      "original_osisRef": "Judg.1.17-Judg.1.23",
+      "original_target_sha256": "d81a4a5696be98f43223147cedd3854066f9c22e92cda8c71c376398b630fa2e",
+      "original_link_label": "Jud 1:17-23",
+      "original_label_sha256": "7c10bbbe26499f6b8f43bbf857efc964e6ffc2d96cecfada79b9dc56e34e9d08",
+      "printed_antecedent": "Jude 1 (commentary K is Jude.1.8)",
+      "proposed_destinations": [
+        "Jude.1.17-Jude.1.23"
+      ],
+      "finding": "The link appears in the original Jude commentary and the ambiguous printed abbreviation 'Jud' may refer to Jude, yet the original digital osisRef unexpectedly targets Judges 1:17-23. Confirm the exact historical printed edition before any retargeting; this is only a source-native anomaly candidate.",
+      "approval": false,
+      "original_native_unit_sha256": "91d247c84885f9db87dc02091a709958efc580c4641068a5038d3e963a3b2f4c",
+      "proposed_navigation_context": "SOURCE_SECTION_NAVIGATION_NOT_AUTHORIAL_SENTENCE"
+    },
+    {
+      "source_first_key": "Matt.23.1",
+      "source_reference_ordinal": 2,
+      "original_osisRef": "Deut.9.13-Deut.9.21",
+      "original_target_sha256": "310e1a216e643067538eb133c4332c089c207a3e094069104b108f4ab48194e8",
+      "original_link_label": "13-21",
+      "original_label_sha256": "8ba02b6c4de95971fbb106c6bf26d3d851b0dcb8421c707a4c2c7db1dc0b7d6f",
+      "printed_antecedent": "De 6:4-9; 11:13-21 (phylacteries; original link 1 of this K separately listed in the four existing errata)",
+      "proposed_destinations": [
+        "Deut.11.13-Deut.11.21"
+      ],
+      "finding": "The second source-native Matthew 23 hyperlink (ordinal 2) leads to Deuteronomy 9:13-21 while Henry's printed phylactery citation immediately before it specifies Deuteronomy 11:13-21. Distinct from the already-known ordinal-1 error; investigate separately and preserve original label/hash.",
+      "approval": false,
+      "original_native_unit_sha256": "aa2b646c4e1b23d657aa662db4df8869c83dabbe5b3cd48297031ba5dcc69626",
+      "proposed_navigation_context": "DIGITAL_LINK_TARGET_MISMATCH_VS_PRINTED_SOURCE"
+    },
+    {
+      "source_first_key": "Job.21.27",
+      "source_reference_ordinal": 2,
+      "original_osisRef": "1Cor.1.15",
+      "original_target_sha256": "8b4c538f0f8ef6968f5c48c6d62f8eab4b7c3144de75018f666745c4b8130cc2",
+      "original_link_label": "15",
+      "original_label_sha256": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb",
+      "printed_antecedent": "Jude 1:14, 15",
+      "proposed_destinations": [
+        "Jude.1.15"
+      ],
+      "finding": "Original source prose explicitly prints 'Jude 1:14, 15' and modern translation prints 'Jude 1:14–15', but the second digital hyperlink points to 1 Corinthians 1:15. Distinct from a possible citation present only in the prose.",
+      "approval": false,
+      "original_native_unit_sha256": "a67347152c58b459f974d3a3913ab6d7f7e1e228b2be3d54f3a806123e21147b",
+      "proposed_navigation_context": "DIGITAL_LINK_TARGET_MISMATCH_VS_PRINTED_SOURCE"
+    },
+    {
+      "source_first_key": "Song.1.9",
+      "source_reference_ordinal": 1,
+      "original_osisRef": "1Cor.10.11",
+      "original_target_sha256": "98955085867c984fc9464959ce81e78c01d31cc894c15034e6977d07dcf037c1",
+      "original_link_label": "1:10,11",
+      "original_label_sha256": "093b1b341f5089831a438ee78b4f164ed89ac03bb6b68e84263b7caafb85c9a3",
+      "printed_antecedent": "Song 1:10–11, in source commentary owned by Song.1.9",
+      "proposed_destinations": [
+        "Song.1.10",
+        "Song.1.11"
+      ],
+      "finding": "Source prints Song 1:10–11 within Song commentary and modern translation likewise refers to Song 1:10–11, but original digital hyperlink wrongly targets 1 Corinthians 10:11. Exact alternative link representation requires editorial approval.",
+      "approval": false,
+      "original_native_unit_sha256": "855cde2cc71ed82e40f0502d56d298c239819aa5037115fd8b6dcd6374fd8a49",
+      "proposed_navigation_context": "SOURCE_SECTION_NAVIGATION_NOT_AUTHORIAL_SENTENCE"
+    },
+    {
+      "source_first_key": "Num.29.1",
+      "source_reference_ordinal": 1,
+      "original_osisRef": "Lev.22.24",
+      "original_target_sha256": "60720e6d23a473a6e6a9c8534f475d93804ae3e22f5efbc91be61886b1625943",
+      "original_link_label": "Le 22:24",
+      "original_label_sha256": "e75d871e0b87a3f6e309e201854cf196a81df4c1231d68bb3ab77b18e5971086",
+      "printed_antecedent": "The blowing of the trumpets was appointed, Le 22:24",
+      "proposed_destinations": [
+        "Lev.23.24"
+      ],
+      "finding_type": "SUSPECT_ORIGINAL_PRINTED_CITATION_AND_LINK_TARGET",
+      "finding": "Both the original printed link and digital osisRef point to Leviticus 22:24 (blemished animals), whereas the described annual blowing of trumpets is commanded in Leviticus 23:24. Source witness and modern Numbers 29 audit already document the apparent printed citation problem. No silent change of the original printed text or hyperlink.",
+      "approval": false,
+      "original_native_unit_sha256": "ae0f93c3f86e3d226e57d542a0758925e2f6158c83210f858d57009275278fdc",
+      "proposed_navigation_context": "ORIGINAL_PRINTED_REFERENCE_DISCREPANCY_NOT_SILENTLY_CORRECTED"
+    }
+  ],
+  "private_review_candidate_only": true,
+  "proposed_derived_navigation_note_count": 15,
+  "proposed_navigation_source_links_for_private_review": 11,
+  "private_review_note_status": "PRIVATE_PROPOSED_SECONDARY_WITNESS_LINK_NAVIGATION_NOT_SOURCE_OR_RELEASE"
+}
