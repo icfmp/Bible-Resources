@@ -99,7 +99,7 @@ SWORD data is used as an invented source.
   (version 0.1.0, exact source SHA `23f0872a67086d9f659bd96936ab63db63c8c7b8c10eb92e59537c3e6cf16189`)
 
 The historical MHC source-cleanup reports live under
-[`docs/evidence/mhc-285/source-cleanup/`](../evidence/mhc-285/source-cleanup),
+[`docs/evidence/mhc-285/source-cleanup/`](../../sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/source-cleanup),
 not inside the clean source folder. The original historical CrossWire **MHCC authoring OSIS** has not been
 recovered. The classic 0.1.1 OSIS stored here is an independently validated
 **derivative reconstruction**, not a false claim of byte-exact authoring identity. Always distinguish a new
