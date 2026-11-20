@@ -12,6 +12,8 @@
 
 ## Evidence
 
+- [Historical stage-5 editorial review draft](../../../../../../docs/evidence/frajnd-2024-stage5-editorial-review.md) and [final 0.1.1 reader QA](../../../../../../docs/evidence/darby-2024-0.1.1-final-reader-qa.md). The stage-5 draft predates final authorization; do not treat its pending status as the present edition status.
+
 - [Original/cleaned stage manifest](../CLEANUP_MANIFEST.json)
 - [Darby reader profile](../../../../../../docs/profiles/fr-darby-jnd-2024.md)
 - [0.1.1 release receipt](../../../../../../docs/releases/DARBY-JND-2024-0.1.1.md)
