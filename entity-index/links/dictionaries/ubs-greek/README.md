@@ -913,6 +913,12 @@ targeted contextual editorial validation, with priority on the
 and the high-volume particle/preposition families.
 
 
+## Public identifier-only UBS Greek crosswalk v0.1.0 (published 2026-11-20)
+
+[Download the published standalone BSI UBS Greek crosswalk](https://github.com/icfmp/Bible-Resources/releases/tag/bsi-ubs-greek-v0.1.0). The release contains an identifier-only, offline, CC BY-SA 4.0 JSON ZIP and SHA-256. Source word IDs, authentic UBS MainId/LEXID identifiers, explicit provisional evidence and ambiguity statuses are included; original Greek/Strong/LN/morphology, verses, glosses and dictionary definitions are **not** distributed. This release **does not** constitute independent contextual semantic validation, nor a SWORD module or integration into `icfmp/Bible`.
+
+The full **private** evidence/witness index described below remains unpublished and regenerable. Public release scope, source attribution and third-party rights limitations are in [RELEASE_READINESS.md](RELEASE_READINESS.md).
+
 ## UBS Greek v1 — finalization policy and complete private original-word lookup
 
 **Editorial stopping decision (2026-11-20):** Do not force UBS Greek 1.0 to
