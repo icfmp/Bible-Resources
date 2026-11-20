@@ -256,7 +256,7 @@ checksum verification passed.
 [normalization contract](NORMALIZATION_POLICY.md),
 [Bible onboarding](BIBLE_7_STAGE_WORKFLOW.md),
 [commentary onboarding](COMMENTARY_7_STAGE_WORKFLOW.md),
-[reader/parity lessons](RESOURCE_ONBOARDING_PLAYBOOK.md),
+[archived reader/parity lessons](archive/RESOURCE_ONBOARDING_PLAYBOOK.md),
 [publication gates](PUBLISHING.md),
 [tool inventory](TOOL_REGISTRY.md).
 
