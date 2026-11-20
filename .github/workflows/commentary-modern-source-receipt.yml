@@ -3722,7 +3722,20 @@ jobs:
           for passage in ("Gen 12:6","Num 29:1","Ps 95:11","1 Sam 25:39"):
               p=subprocess.run(["diatheke","-b","HMCCModern","-f","OSIS","-k",passage],
                                env=env,capture_output=True,timeout=20)
+              print("HMCC_MODERN_FINAL_READER_DIAGNOSTIC "+json.dumps({
+                  "passage":passage,"returncode":p.returncode,
+                  "stdout_bytes":len(p.stdout),
+                  "stderr_bytes":len(p.stderr),
+                  "module_conf_present":conf.is_file(),
+                  "compiled_member_count":len(files)},sort_keys=True))
               if p.returncode or len(p.stdout)<90:
+                  catalog=subprocess.run(["diatheke","-b","system","-k","modulelist"],
+                                         env=env,capture_output=True,timeout=15)
+                  print("HMCC_MODERN_MODULE_DISCOVERY "+json.dumps({
+                      "exit":catalog.returncode,"output_bytes":len(catalog.stdout),
+                      "HMCCModern_seen":b"HMCCModern" in catalog.stdout,
+                      "source_preview_seen":b"MHCCMODAP" in catalog.stdout
+                  },sort_keys=True))
                   raise ValueError("Final SWORD module reader failed at "+passage)
           archive=base/"HMCCModern-0.1.0-MANUAL-QA.zip"
           with zipfile.ZipFile(archive,"w",compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
