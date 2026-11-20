@@ -11,7 +11,7 @@ The goal of [#28](https://github.com/icfmp/Bible-Resources/issues/28) is **indep
 - Every entry's original raw bytes are SHA-256 digested in memory and discarded. For each book (plus anonymous TOP), the metadata-only JSON reports the **ordered raw-entry manifest SHA-256**, ordinary/introduction counts, first/last original native references and byte totals. A whole-module ordered manifest SHA-256 includes raw bytes from **all** occupied entries. The report is bound to the exact pre/post immutable module payload SHA-256, native driver, v11n, stock engine version and trusted inspector binary hashes.
 - Source verse words, Scripture, notes, original XML and compiled SWORD raw content **never appear in the receipt or CI log**.
 
-The ordinary `Validate` workflow now builds and tests the real **published LSG 0.1.0 RawText** compiled module. The optional real [WEBP USFX/zText source research workflow](../.github/workflows/second-bible-proof.yml) additionally hashes all occupied entries of eBible's **actual original, independently SHA-pinned WEBP zText** module. Both compare their corpus counts/ordered keys to independently generated native index evidence.
+The ordinary `Validate` workflow now builds and tests the real **published LSG 0.1.0 RawText** compiled module. The optional real [WEBP USFX/zText source research workflow](../../.github/workflows/second-bible-proof.yml) additionally hashes all occupied entries of eBible's **actual original, independently SHA-pinned WEBP zText** module. Both compare their corpus counts/ordered keys to independently generated native index evidence.
 
 ## Example
 

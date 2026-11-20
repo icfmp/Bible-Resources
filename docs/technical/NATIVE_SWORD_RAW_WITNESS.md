@@ -13,7 +13,7 @@ The new implementation is completely edition-neutral:
 
 ## Reproduce on independently sourced stock SWORD
 
-The optional [second real Bible research workflow](../.github/workflows/second-bible-proof.yml) compiles both C++ readers against system `libsword-dev` and downloads the two **previously SHA-pinned** official eBible WEBP research archives. It then performs:
+The optional [second real Bible research workflow](../../.github/workflows/second-bible-proof.yml) compiles both C++ readers against system `libsword-dev` and downloads the two **previously SHA-pinned** official eBible WEBP research archives. It then performs:
 
 ```sh
 python scripts/sword_missing_verse_witness.py \

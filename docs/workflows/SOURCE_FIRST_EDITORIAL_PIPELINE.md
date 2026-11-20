@@ -1,6 +1,6 @@
 # Source-first editorial production: OSIS/USFM → SWORD
 
-**Operational entry point:** [Production pipeline — OSIS/USFM → cleanup → full verification → SWORD → readers → publication](PRODUCTION_PIPELINE.md). This page remains the underlying six-phase editorial policy; the new companion specifies per-step evidence and failure gates. [Documentation index](README.md).
+**Operational entry point:** [Production pipeline — OSIS/USFM → cleanup → full verification → SWORD → readers → publication](../PRODUCTION_PIPELINE.md). This page remains the underlying six-phase editorial policy; the new companion specifies per-step evidence and failure gates. [Documentation index](../README.md).
 
 **Status:** project-wide editorial production policy, adopted 2026-11-19.
 **Scope:** Bibles, commentaries and other compatible resources, subject to their
@@ -27,7 +27,7 @@ of those workflows.
 The canonical source and work directories are grouped by resource type,
 ISO 639 language identifier and stable curated resource ID. Originals, reviewed cleaned masters, working drafts/evidence
 and compiled SWORD distributions are different artifacts; never mix them.
-Follow [workspace layout and safe migration gates](WORKSPACE_LAYOUT.md).
+Follow [workspace layout and safe migration gates](../architecture/WORKSPACE_LAYOUT.md).
 Bible translations with Strong/morphology and translator notes retain all
 original word-to-annotation associations during cleanup and full native
 SWORD round-trip validation.
@@ -252,13 +252,13 @@ checksum verification passed.
 | Rights | Text and annotation redistribution/modification approval |
 | Release | Official release-before-Pages workflow plus live-download checksum proof |
 
-**Reuse first:** [Editorial rules](EDITORIAL_RULES.md),
-[normalization contract](NORMALIZATION_POLICY.md),
+**Reuse first:** [Editorial rules](../policies/EDITORIAL_RULES.md),
+[normalization contract](../policies/NORMALIZATION_POLICY.md),
 [Bible onboarding](BIBLE_7_STAGE_WORKFLOW.md),
 [commentary onboarding](COMMENTARY_7_STAGE_WORKFLOW.md),
-[archived reader/parity lessons](archive/RESOURCE_ONBOARDING_PLAYBOOK.md),
+[archived reader/parity lessons](../archive/RESOURCE_ONBOARDING_PLAYBOOK.md),
 [publication gates](PUBLISHING.md),
-[tool inventory](TOOL_REGISTRY.md).
+[tool inventory](../TOOL_REGISTRY.md).
 
 Track implementation gaps in existing issues rather than promising that
 every phase is already one-click automation: [#3](https://github.com/icfmp/Bible-Resources/issues/3)

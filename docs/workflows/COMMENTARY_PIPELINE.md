@@ -179,11 +179,9 @@ Never invent OSIS markup, citation ranges, or original sections just
 to make a tool pass. A reader-rendering bug (such as a double heading)
 belongs in the Bible application, not a destructive edit to the module.
 
-The large [historic MHCC scope experiment](
-../.github/workflows/commentary-editorial-section-scope.yml) and related
+The large [historic MHCC scope experiment](../../.github/workflows/commentary-editorial-section-scope.yml) and related
 private source/CCEL experiments are evidence for
-[the MHCC 0.1.1 decision](
-evidence/mhcc-274/mhcc-0.1.1-editorial-rights-acceptance.md), **not** a
+[the MHCC 0.1.1 decision](../evidence/mhcc-274/mhcc-0.1.1-editorial-rights-acceptance.md), **not** a
 generic stable runner or an invitation to rerun 2,000 lines of
 edition-specific assertions for a new commentary. Shared helpers may
 be reused after independent tests; keep historical workflows for
@@ -215,8 +213,8 @@ can identify a candidate anomaly but can neither rewrite an authorial
 passage nor authorize publication.
 
 For scripts and their preserved legacy callers, consult
-[the full tool registry](TOOL_REGISTRY.md) and the
-[contributor rules](../CONTRIBUTING.md). General packaging and release
+[the full tool registry](../TOOL_REGISTRY.md) and the
+[contributor rules](../../CONTRIBUTING.md). General packaging and release
 checks belong in [PUBLISHING.md](PUBLISHING.md); Bible
 translation source/native fidelity stays in #28, and resumable
 multi-stage audit orchestration stays in #83 rather than being

@@ -10,9 +10,9 @@ behaviour control every decision.
 https://github.com/icfmp/Bible-Resources/issues/234), corrected and
 independently released as [0.1.1](
 https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.1).
-Detailed [source/native diagnosis](evidence/darby-2024-paragraph-postrelease-qa.md),
-[final actual-reader evidence](evidence/darby-2024-0.1.1-final-reader-qa.md)
-and [release note](releases/DARBY-JND-2024-0.1.1.md) provide the exact proofs.
+Detailed [source/native diagnosis](../evidence/darby-2024-paragraph-postrelease-qa.md),
+[final actual-reader evidence](../evidence/darby-2024-0.1.1-final-reader-qa.md)
+and [release note](../releases/DARBY-JND-2024-0.1.1.md) provide the exact proofs.
 
 ## Two distinct failure mechanisms
 

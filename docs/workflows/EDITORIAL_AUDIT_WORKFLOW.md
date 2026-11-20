@@ -145,6 +145,6 @@ reimporting our own corrections later as a false update; see
 
 ## Historical observations
 
-The original November 7 LSG/MHC reconnaissance and its limitations are preserved in the [archived first-source observations](archive/EDITORIAL_AUDIT_INITIAL_2026-11-07.md). They are not a current module fidelity or publication verdict.
+The original November 7 LSG/MHC reconnaissance and its limitations are preserved in the [archived first-source observations](../archive/EDITORIAL_AUDIT_INITIAL_2026-11-07.md). They are not a current module fidelity or publication verdict.
 
-**Source-specific decisions** must be documented alongside each cleaned resource in `sources/cleaned/<type>/<language>/<resource-id>/editorial/`, not appended to this generic tooling guide. The normalizer's three currently documented operations are constrained reviewed tools, **not** a universal automated cleaner. The full [production contract](PRODUCTION_PIPELINE.md) controls the source-to-compiled fidelity and publication gates.
+**Source-specific decisions** must be documented alongside each cleaned resource in `sources/cleaned/<type>/<language>/<resource-id>/editorial/`, not appended to this generic tooling guide. The normalizer's three currently documented operations are constrained reviewed tools, **not** a universal automated cleaner. The full [production contract](../PRODUCTION_PIPELINE.md) controls the source-to-compiled fidelity and publication gates.

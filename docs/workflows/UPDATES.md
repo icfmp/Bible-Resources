@@ -27,7 +27,7 @@ Statuses intentionally mark every change as **requiring review**: same-version b
 
 ### Important baseline ambiguity: original source versus upstream compiled ZIP
 
-The current published LSG `modules/lsg-1910/metadata.json` links eBible `fraLSG1910eb` with `last_integrated_version=2026-10-29`, while the **separately observed upstream compiled zText module** in the original [real-source pilot](evidence/normalizer-3/real-pilot-source-signals.json) declares `Version=100.0`. The curated LSG was built from **source-attested original USFM/USFX archives**, not that provider's NRSV-indexed compiled zText payload. Therefore the snapshot date **must not be compared numerically to the compiled SWORD version, nor silently replaced with `100.0`**. This remains a source-lineage/provenance issue in [#5](https://github.com/icfmp/Bible-Resources/issues/5).
+The current published LSG `modules/lsg-1910/metadata.json` links eBible `fraLSG1910eb` with `last_integrated_version=2026-10-29`, while the **separately observed upstream compiled zText module** in the original [real-source pilot](../evidence/normalizer-3/real-pilot-source-signals.json) declares `Version=100.0`. The curated LSG was built from **source-attested original USFM/USFX archives**, not that provider's NRSV-indexed compiled zText payload. Therefore the snapshot date **must not be compared numerically to the compiled SWORD version, nor silently replaced with `100.0`**. This remains a source-lineage/provenance issue in [#5](https://github.com/icfmp/Bible-Resources/issues/5).
 
 Before automatically classifying a real upstream change, record the exact source revision type, matching publisher source archive hash, **separate** upstream SWORD `.conf` version and hash, its own package hash, and evidence that each belongs to the same edition/snapshot. Merely seeing a newer remote `Version` never proves that the compiled text differs or that our curated source should be changed.
 
@@ -61,7 +61,7 @@ The report records the local SWORD conf Version, curated metadata version, origi
 
 Supported statuses: upstream_update_available, up_to_date, upstream_metadata_changed, upstream_older_than_baseline, needs_review, upstream_unavailable, missing_upstream, provider_disabled_or_unknown.
 
-All five active SWORD repositories in Bible (CrossWire, AndBible Extra, AndBible, STEP and eBible) are registered for read-only HTTPS catalogue monitoring. YouVersion is an API source, and OpenBible.info supplies **two datasets** (cross-references and topic scores), not SWORD modules. These three external sources are explicitly reported as `inventory_only`; no API access, dataset-generation comparison, or automatic download is implied. Bible already manages separately versioned, SHA-256-pinned OpenBible study data; see [SOURCE_INVENTORY.md](SOURCE_INVENTORY.md).
+All five active SWORD repositories in Bible (CrossWire, AndBible Extra, AndBible, STEP and eBible) are registered for read-only HTTPS catalogue monitoring. YouVersion is an API source, and OpenBible.info supplies **two datasets** (cross-references and topic scores), not SWORD modules. These three external sources are explicitly reported as `inventory_only`; no API access, dataset-generation comparison, or automatic download is implied. Bible already manages separately versioned, SHA-256-pinned OpenBible study data; see [SOURCE_INVENTORY.md](../technical/SOURCE_INVENTORY.md).
 
 The scheduled check also runs `scripts/check_provider_parity.py` against the current `icfmp/Bible` provider declarations to detect added/removed sources or changed URLs. This comparison can fail because GitHub is unavailable, in which case the result is **unavailable**, not falsely current.
 
@@ -78,7 +78,7 @@ https://wiki.crosswire.org/Official_and_Affiliated_Module_Repositories
 
 ## Duplicate sources and canonical editions
 
-The five SWORD repositories can redistribute the same edition. The separately reviewed [priority policy](SOURCE_PRIORITY.md) decides a **single preferred import source**, while maintaining the ability to monitor alternate upstream copies. Do not create multiple curated modules or version streams merely because an identical edition appears in several catalogues. Explicit alias verification matters: module ID and title coincidences alone are not sufficient. `scripts/select_sources.py` produces a read-only selection report with blocked ambiguities and unavailable-provider fail-closed behavior. It does not automatically change upstream links or existing installed resources.
+The five SWORD repositories can redistribute the same edition. The separately reviewed [priority policy](../policies/SOURCE_PRIORITY.md) decides a **single preferred import source**, while maintaining the ability to monitor alternate upstream copies. Do not create multiple curated modules or version streams merely because an identical edition appears in several catalogues. Explicit alias verification matters: module ID and title coincidences alone are not sufficient. `scripts/select_sources.py` produces a read-only selection report with blocked ambiguities and unavailable-provider fail-closed behavior. It does not automatically change upstream links or existing installed resources.
 
 ## Avoiding the upstream-return loop for our own fixes
 

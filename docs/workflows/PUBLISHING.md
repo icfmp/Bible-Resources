@@ -1,7 +1,7 @@
 # Publication — one ordered release workflow
 
 **Publishing is one operation, not two independent workflows.** The
-[GitHub Pages publication workflow](../.github/workflows/pages.yml)
+[GitHub Pages publication workflow](../../.github/workflows/pages.yml)
 is the only workflow allowed to **create/verify GitHub Releases and
 then expose the same approved modules through Pages**. The previous
 independently triggered GitHub Release workflow was removed: its push
@@ -48,7 +48,7 @@ it **does not itself execute libSWORD or authenticate a human signature**.
 Prior to editorial approval, independently regenerate and review the complete
 native comparison from the SHA-pinned source and real candidate, and confirm
 the GitHub authorization record genuinely comes from the project owner.
-See [generic proof contract](evidence/mhcc-274/rebuilt-commentary-validation-contract.md).
+See [generic proof contract](../evidence/mhcc-274/rebuilt-commentary-validation-contract.md).
 A synthetic passing unit test does not authorize publication.
 
 ## Upgrading an approved resource, including a changed SWORD identifier
@@ -89,9 +89,8 @@ not serve as authorization on their own.
   Bible Resources SWORD ID therefore collides with the original provider;
   any client-side choice/replacement must be intentional. An old
   `BRMHCC` installation can remain installed alongside it. The
-  [source/rights record](
-  evidence/mhcc-274/mhcc-0.1.1-editorial-rights-acceptance.md)
-  and [public release notes](releases/MHCC-0.1.1.md) explain this boundary.
+  [source/rights record](../evidence/mhcc-274/mhcc-0.1.1-editorial-rights-acceptance.md)
+  and [public release notes](../releases/MHCC-0.1.1.md) explain this boundary.
 
 An optional public reader-description profile is **specific to the exact
 edition, version, source and SWORD identifier**. Never reuse an approval
@@ -122,11 +121,10 @@ fail-closed authorization rules.
 
 ### Reusable commands and evidence status
 
-Use [`scripts/commentary_intake.py`](../scripts/commentary_intake.py) for
+Use [`scripts/commentary_intake.py`](../../scripts/commentary_intake.py) for
 read-only source observations; source archives must be pinned before a
 stage-2 claim. For an edited compiled source, the reusable
-[`reviewed_compiled_commentary_rebuild.py`](
-../scripts/reviewed_compiled_commentary_rebuild.py) validates a separate
+[`reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) validates a separate
 fully attested source/native correction manifest, rather than pretending
 the corrected module is byte-identical to the upstream stock. Normal
 production validation and release packaging are already shared across
@@ -135,7 +133,7 @@ Bibles/commentaries in `scripts/validate.py`, `scripts/build.py`,
 `scripts/publish_reviewed_release.py`.
 
 The full inventory and known edition-specific diagnostics are maintained in
-[`TOOL_REGISTRY.md`](TOOL_REGISTRY.md). Treat the large historic MHCC
+[`TOOL_REGISTRY.md`](../TOOL_REGISTRY.md). Treat the large historic MHCC
 private orchestration as **historical acceptance evidence**, not a generic
 one-button runner for a new edition. A second commentary requires its own
 source pins, authorial edition/rights review and independent native audit.
@@ -146,13 +144,13 @@ Every **approved** catalogue entry must have exactly one documented
 versioned GitHub Release path:
 
 - **New or updated module:** an authorized,
-  [source-pinned release plan](../config/release-plans/)
+  [source-pinned release plan](../../config/release-plans)
   for the *same* module ID, version, exact deterministic SWORD ZIP
   SHA-256 and byte length as the official JSON catalogue. The existing
   source/rights/approval evidence must pass
   `scripts/publish_reviewed_release.py --verify-only`.
 - **Previously published module:** a frozen,
-  [reviewed historical binding](../config/release-legacy-bindings.json)
+  [reviewed historical binding](../../config/release-legacy-bindings.json)
   with the original GitHub Release tag/asset and independently pinned
   release and catalogue checksums. This is a historical migration
   record, **not permission to use exceptions for new modules**.
@@ -162,7 +160,7 @@ versioned GitHub Release path:
 Neither a published `mods.d` archive nor a successful local build
 counts as a GitHub Release.
 
-A pull request must pass [Validate](../.github/workflows/validate.yml),
+A pull request must pass [Validate](../../.github/workflows/validate.yml),
 including the exact local mapping of all approved catalogue entries
 to their release plans, the generated ZIP checksums and a read-only
 review of every current release authorization. A newly approved

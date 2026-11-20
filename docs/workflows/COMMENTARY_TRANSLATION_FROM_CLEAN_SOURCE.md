@@ -2,7 +2,7 @@
 
 **Purpose:** produce a faithful, readable translation or language modernization of an **already cleaned, structurally validated and reader-tested** commentary. The translation and the relocation of existing cross-references are the work. **Do not restart source acquisition, source repair, source-link correction or historical reconstruction.**
 
-**Relationship to other policies:** this is the **translation sub-workflow** used within [Commentary onboarding](COMMENTARY_7_STAGE_WORKFLOW.md) and the [source-first editorial pipeline](SOURCE_FIRST_EDITORIAL_PIPELINE.md), not an alternative publication path. [Commentary policy](COMMENTARY_POLICY.md), [editorial rules](EDITORIAL_RULES.md), [rights](RIGHTS.md) and [publishing](PUBLISHING.md) continue to apply. The historical [HMCC Modern English production protocol](MHCC_MODERN_ENGLISH.md) records edition-specific discoveries and experiments, **not steps to repeat for every next translation**.
+**Relationship to other policies:** this is the **translation sub-workflow** used within [Commentary onboarding](COMMENTARY_7_STAGE_WORKFLOW.md) and the [source-first editorial pipeline](SOURCE_FIRST_EDITORIAL_PIPELINE.md), not an alternative publication path. [Commentary policy](../policies/COMMENTARY_POLICY.md), [editorial rules](../policies/EDITORIAL_RULES.md), [rights](../policies/RIGHTS.md) and [publishing](PUBLISHING.md) continue to apply. The historical [HMCC Modern English production protocol](../MHCC_MODERN_ENGLISH.md) records edition-specific discoveries and experiments, **not steps to repeat for every next translation**.
 
 ## 0. Entry contract: accept a finished, verified source
 
