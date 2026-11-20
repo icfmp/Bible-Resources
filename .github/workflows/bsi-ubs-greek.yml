@@ -49,6 +49,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_last_47_lexical_forms.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_contextual_sense_candidates.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_provisional_context_sense_overlay.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_unresolved_semantic_priorities.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -878,6 +879,32 @@ jobs:
         with:
           name: bsi-ubs-greek-122504-source-provisional-lexids-NOT-SEMANTICALLY-VALIDATED
           path: /tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Independently triage all 15237 Greek source word semantic exceptions by authentic original LN evidence
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_unresolved_semantic_priorities.py \
+            --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-15237-original-source-LN-and-UBS-semantic-priorities.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/bsi-ubs-greek-15237-original-source-LN-and-UBS-semantic-priorities.json').read_text())
+          assert x['all_original_unresolved_words']==15237
+          assert sum(x['source_categories'].values())==15237
+          assert x['provisional_new_lexids_selected']==0
+          assert x['contextual_senses_independently_verified']==0
+          assert x['original_UBS_or_MACULA_modified'] is False
+          assert x['published'] is False
+          print('GREEK_UBS_SEMANTIC_PRIORITIES_BLANK_LN_DIFFERENT_FROM_UNMATCHED_LN_NO_FORCED_SENSE')
+          PY
+      - name: Upload private original Greek contextual sense unresolved prioritization (NOT published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-original-semantic-review-priorities-15237-PRIVATE
+          path: /tmp/bsi-ubs-greek-15237-original-source-LN-and-UBS-semantic-priorities.json
           if-no-files-found: error
           retention-days: 14
       - name: Upload private all 15237 unresolved original Greek contextual sense witnesses
