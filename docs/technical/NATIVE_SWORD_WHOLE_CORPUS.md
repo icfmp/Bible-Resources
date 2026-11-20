@@ -17,16 +17,19 @@ g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp \
   -o /private/sword-native-index -lsword
 g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp \
   -o /private/sword-native-raw-corpus -lsword
+g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_entry.cpp \
+  -o /private/sword-native-raw-entry -lsword
 
 python scripts/sword_native_raw_corpus_inventory.py \
   --module-directory /private/module \
   --module-id MODULE_ID \
   --native-index-binary /private/sword-native-index \
   --native-raw-binary /private/sword-native-raw-corpus \
+  --native-entry-binary /private/sword-native-raw-entry \
   --report /private/new-native-corpus-receipt.json
 ```
 
-For the independent exact-key check, follow the script's supported options and the tests/CI; this sample does not claim the spot-check has run.
+The independent exact-key binary is supplied here because the whole-corpus stream alone cannot detect a stale SWORD cursor. Confirm the resulting report's `independent_native_exact_key_raw_spotcheck_verified` and `exact_all_occupied_native_keys_matched_independent_index` flags. This is an example command, **not** a claim that this run has executed or that the authored source matches.
 
 ## Proof boundary
 
