@@ -63,7 +63,7 @@ jobs:
               raise SystemExit("Notes or note anchors changed")
           orig_keys,orig_info=source_inventory(original)
           final_keys,final_info=source_inventory(output)
-          if orig_keys!=final_keys or len(orig_keys)!=31166:
+          if (orig_keys!=final_keys or orig_info['source_verse_count']!=31166\n              or final_info['source_verse_count']!=31166):
               raise SystemExit("Canonical Bible verse keys altered")
           source_v,source_n,_=original_osis_verses_and_notes(original)
           final_v,final_n,_=original_osis_verses_and_notes(output)
@@ -92,14 +92,14 @@ jobs:
             "cleaned_source_sha256":digest(output),"cleaned_bytes":len(output),
             "published_source_proof":"modules/darby-jnd-2024/RELEASE_PROVENANCE.json",
             "source_owner_approval":"config/darby-0.1.1-release-authorization.json",
-            "reviewed_stage_hashes":stages,"annotated_original_verse_keys":len(orig_keys),
+            "reviewed_stage_hashes":stages,"annotated_original_verse_keys":orig_info["source_verse_count"],
             "original_translation_note_count":6340,
             "original_bible_text_prose_unchanged_outside_explicitly_reviewed_division_metadata":True,
             "reviewed_link_operations":11,"reviewed_inline_operations":2,
             "reviewed_omitted_verse_plain_labels":3,
             "original_source_untouched":True}
           (dest/"CLEANUP_MANIFEST.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
-          print("Exact 0.1.1 source recovered",len(output),digest(output), "keys",len(orig_keys))
+          print("Exact 0.1.1 source recovered",len(output),digest(output), "keys",orig_info["source_verse_count"])
           PY
       - name: Commit recovered exact source and remove one-time workflow
         run: |
