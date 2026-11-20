@@ -1,0 +1,134 @@
+name: Canonicalize and round-trip classic MHCC reconstructed source identity
+on:
+  push:
+    branches: [recovery/mhcc-classic-source-20261120]
+    paths: [.github/workflows/canonicalize-mhcc-source-once.yml]
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    if: github.repository == 'icfmp/Bible-Resources'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Install exact native SWORD source readers
+        run: |
+          set -euo pipefail
+          python -m pip install -q -r requirements.txt
+          timeout 150s sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=30 update -qq
+          timeout 360s sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=30 install -y --no-install-recommends libsword-dev libsword-utils diatheke
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_TEMP/native-mhcc" -lsword
+      - name: Canonical source work identity and full published native parallel readback
+        shell: bash
+        env:
+          PYTHONPATH: scripts
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from hashlib import sha256
+          from io import BytesIO
+          from pathlib import Path
+          import json,os,subprocess,tempfile
+          from lxml import etree
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          from commentary_osis_transport_probe import classify_native_osis_roundtrip_delta
+          root=Path.cwd()
+          dest=root/"sources/cleaned/commentaries/en/mhcc-crosswire"
+          source=dest/"mhcc.osis.xml"
+          raw=source.read_bytes()
+          if sha256(raw).hexdigest()!="675331c59e4989c778ae9dae6d9f02a9ea1e203195a9e5bebae88d93fdd19f23":
+              raise ValueError("Approved reviewed transport input changed")
+          expected_parts=[
+              (b'osisIDWork="BRIndexProbe"',b'osisIDWork="MHCC"'),
+              (b'osisWork="BRIndexProbe"',b'osisWork="MHCC"'),
+              (b'>BRIndexProbe</identifier>',b'>MHCC</identifier>'),
+              (b'<title>Private full original I/K transport</title>',
+               b"<title>Matthew Henry's Concise Commentary on the Whole Bible</title>")
+          ]
+          for before,after in expected_parts:
+              if raw.count(before)!=1:raise ValueError("Reconstructed source identity tokens drifted")
+              raw=raw.replace(before,after)
+          xml=etree.fromstring(raw,parser=etree.XMLParser(no_network=True,load_dtd=False,resolve_entities=False,recover=False))
+          if xml.tag!="{http://www.bibletechnologies.net/2003/OSIS/namespace}osis":
+              raise ValueError("Not standard OSIS")
+          with tempfile.TemporaryDirectory(prefix="mhcc-canonical-") as temp:
+              scratch=Path(temp)
+              data=scratch/"modules/comments/zcom/MHCC"
+              data.mkdir(parents=True)
+              xmlfile=scratch/"mhcc.osis.xml"
+              xmlfile.write_bytes(raw)
+              cmd=["osis2mod",str(data),str(xmlfile),"-z","z","-b","3","-s","4","-v","KJV"]
+              run=subprocess.run(cmd,cwd=scratch,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=360)
+              if run.returncode:raise ValueError("Canonical MHCC source rejected by standard osis2mod")
+              config=scratch/"mods.d"
+              config.mkdir()
+              (config/"mhcc.conf").write_text("[MHCC]\nDescription=Classic MHCC isolated OSIS parity\nDataPath=./modules/comments/zcom/MHCC\nModDrv=zCom4\nCompressType=ZIP\nBlockType=CHAPTER\nSourceType=OSIS\nVersification=KJV\nLang=en\n")
+              reader=Path(os.environ["RUNNER_TEMP"])/"native-mhcc"
+              def corpus(p):
+                  env=dict(os.environ,SWORD_PATH=str(p))
+                  r=subprocess.run([str(reader),"MHCC"],env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=280)
+                  if r.returncode or len(r.stdout)>350*1024*1024:
+                      raise ValueError("Canonical/native whole-corpus reader unavailable")
+                  frames={"K":{},"I":{},"U":[]}
+                  def collect(kind,key,body):
+                      if kind=="U":frames[kind].append(body)
+                      else:frames[kind][key]=body
+                  receipt,*_=parse_native_raw_corpus(BytesIO(r.stdout),on_entry=collect)
+                  return frames,receipt
+              original,original_receipt=corpus(root/"modules/mhcc-crosswire/payload")
+              rebuilt,rebuilt_receipt=corpus(scratch)
+              pinned="2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e"
+              if original_receipt["all_native_raw_entries_ordered_sha256"]!=pinned:
+                  raise ValueError("Published original MHCC source proof changed")
+              if len(original["K"])!=28742 or len(original["I"])!=1255 or len(original["U"])!=2:
+                  raise ValueError("Published MHCC I/K/TOP census mismatch")
+              if (set(original["K"])!=set(rebuilt["K"])
+                  or set(original["I"])!=set(rebuilt["I"])
+                  or original["U"]!=rebuilt["U"]):
+                  raise ValueError("Canonical source rebuild altered native keys or original TOP bytes")
+              cache={}
+              controls=(
+                  "normalized_whitespace_visible_unicode_equal",
+                  "non_div_element_order_and_exact_attribute_values_preserved",
+                  "original_div_elements_exact_attribute_multiset_preserved",
+                  "reference_attribute_values_in_original_document_order_preserved",
+                  "original_nondiv_text_and_tail_ownership_preserved")
+              for kind in ("I","K"):
+                  for key,body in original[kind].items():
+                      other=rebuilt[kind][key]
+                      digest=(sha256(body).digest(),sha256(other).digest())
+                      d=cache.get(digest)
+                      if d is None:
+                          d=classify_native_osis_roundtrip_delta(body,other)
+                          cache[digest]=d
+                      if d["word_sequence_relation"]!="EXACT_ORIGINAL_WORD_SEQUENCE" or any(d[field] is not True for field in controls):
+                          raise ValueError("Canonical source changed original SWORD semantic text/markup: "+kind+" "+key)
+              print("CANONICAL_MHCC_SOURCE_ROUNDTRIP_SUCCESS",
+                    sha256(raw).hexdigest(),len(raw),
+                    "numbered",len(original["K"]),"intros",len(original["I"]),
+                    "TOP",len(original["U"]),"unique-raw-deltas",len(cache))
+          source.write_bytes(raw)
+          p=dest/"CLEANUP_MANIFEST.json"
+          manifest=json.loads(p.read_text())
+          manifest["reconstructed_source_sha256"]=sha256(raw).hexdigest()
+          manifest["reconstructed_source_size"]=len(raw)
+          manifest["source_header_work_id"]="MHCC"
+          manifest["source_header_title"]="Matthew Henry's Concise Commentary on the Whole Bible"
+          manifest["canonical_source_full_native_recompile_semantic_parity"]=True
+          manifest["canonical_source_native_original_keys_and_opaque_top_preserved"]=True
+          manifest["original_crosswire_authoring_osis_recovered"]=False
+          p.write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
+          PY
+      - name: Commit validated source without retaining temporary recovery workflow
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/canonicalize-mhcc-source-once.yml
+          git add sources/cleaned/commentaries/en/mhcc-crosswire
+          git diff --cached --check -- ':!sources/cleaned/**/*.xml'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Assign canonical MHCC work identity and prove full compiled source parity"
+          git push origin HEAD:recovery/mhcc-classic-source-20261120
