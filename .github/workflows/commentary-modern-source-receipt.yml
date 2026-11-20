@@ -3673,32 +3673,24 @@ jobs:
               raise ValueError("Approved editorial source evidence is incomplete")
           if hashlib.sha256(original.read_bytes()).hexdigest()!=receipt["private_osis_sha256"]:
               raise ValueError("Private editorial OSIS source checksum drift")
-          ns="http://www.bibletechnologies.net/2003/OSIS/namespace"
-          tree=ET.parse(original)
-          osis=tree.getroot().find("{"+ns+"}osisText")
-          if osis is None or osis.get("osisIDWork")!="MHCCMODAP":
-              raise ValueError("Unexpected candidate OSIS identity")
-          osis.set("osisIDWork","HMCCModern")
-          work=osis.find(".//{"+ns+"}work")
-          if work is None or work.get("osisWork")!="MHCCMODAP":
-              raise ValueError("Source work identity does not match")
-          work.set("osisWork","HMCCModern")
-          identifier=work.find("{"+ns+"}identifier")
-          title=work.find("{"+ns+"}title")
-          if identifier is None or title is None:
-              raise ValueError("OSIS bibliographic work elements missing")
-          identifier.text="HMCCModern"
-          title.text="Henry's Modern Concise Commentary"
+          # Relabel the already SWORD-native-validated compiled zCom payload.
+          # Re-running osis2mod under a new OSIS work ID can change key
+          # occupancy. Reusing its six verified compressed members preserves
+          # every reviewed K/I address byte-for-byte.
+          import shutil
+          old=source_root/"modules/comments/zcom/mhccmodap"
+          if not old.is_dir() or not (source_root/"mods.d/mhccmodap.conf").is_file():
+              raise ValueError("Source-attested approved compiled SWORD not present")
           stage=base/"hmcc-modern-owner-review"
           out=stage/"modules/comments/zcom/hmccmodern"
           out.mkdir(parents=True,exist_ok=False)
-          osis_file=base/"hmcc-modern-owner-review.osis.xml"
-          tree.write(osis_file,encoding="utf-8",xml_declaration=True)
-          with (base/"hmcc-modern-owner-review-osis2mod.log").open("wb") as log:
-              p=subprocess.run(["osis2mod",str(out),str(osis_file),"-z","z","-b","3"],
-                               stdout=log,stderr=subprocess.STDOUT,timeout=200)
-          if p.returncode:
-              raise ValueError("Final-identity OSIS failed to compile as real SWORD zCom")
+          source_files=sorted(p for p in old.iterdir() if p.is_file())
+          if len(source_files)!=6:
+              raise ValueError("Approved source module does not contain six zCom members")
+          for p in source_files:
+              shutil.copyfile(p,out/p.name)
+              if hashlib.sha256(p.read_bytes()).digest()!=hashlib.sha256((out/p.name).read_bytes()).digest():
+                  raise ValueError("Native approved source member changed during relabeling")
           conf=stage/"mods.d/hmccmodern.conf"
           conf.parent.mkdir()
           conf.write_text("""[HMCCModern]
