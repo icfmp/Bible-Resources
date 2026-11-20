@@ -12,6 +12,8 @@
 
 ## Evidence
 
+- [Historical 0.1.1 editorial disposition](../../../../../../docs/evidence/mhcc-274/0.1.1-editorial-disposition.md) and [reader-oriented indexing decision](../../../../../../docs/evidence/mhcc-274/reader-oriented-indexing-decision.md). These contain earlier draft-status language and exploratory alternatives; current approved scope must be verified from the published 0.1.1 release and cleaned-source manifest, not copied blindly from preliminary proposals.
+
 - [Reconstructed-source attestation and limitations](../CLEANUP_MANIFEST.json)
 - [Approved corrections manifest](../../../../../../config/commentary-rebuilds/mhcc-crosswire.json)
 - [Classic 0.1.1 release](../../../../../../docs/releases/MHCC-0.1.1.md)
