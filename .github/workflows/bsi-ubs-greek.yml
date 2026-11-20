@@ -51,6 +51,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_provisional_context_sense_overlay.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_unresolved_semantic_priorities.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_lower_confidence_single_sense.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_context_review_batches.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -935,6 +936,35 @@ jobs:
         with:
           name: bsi-ubs-greek-original-semantic-review-priorities-15237-PRIVATE
           path: /tmp/bsi-ubs-greek-15237-original-source-LN-and-UBS-semantic-priorities.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Partition 2728 original multi-LEXID words into source-preserving contextual review batches
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_context_review_batches.py \
+            --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json \
+            --output /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
+            --batch-size 100
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json').read_text())
+          batches=r['review_batches']
+          assert r['original_multi_sense_word_count']==2728
+          assert len(batches)>=r['review_groups']>=1
+          assert sum(len(x['word_id_evidence']) for x in batches)==2728
+          assert all(1<=len(x['word_id_evidence'])<=100 for x in batches)
+          ids=[w['original_word_id'] for b in batches for w in b['word_id_evidence']]
+          assert len(ids)==len(set(ids))==2728
+          assert all(w['editorial_contextual_lexid_selection'] is None and w['contextually_verified'] is False
+                     for b in batches for w in b['word_id_evidence'])
+          assert r['contextually_verified']==0 and r['source_modified'] is False and r['published'] is False
+          print('GREEK_2728_AMBIGUOUS_UBS_ORIGINAL_WORDS_GROUPED_WITHOUT_CONTEXTUAL_SELECTION')
+          PY
+      - name: Upload Greek 2728 contextual sense review batches (PRIVATE, NO selections)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-2728-contextual-review-batches-PRIVATE-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json
           if-no-files-found: error
           retention-days: 14
       - name: Upload private all 15237 unresolved original Greek contextual sense witnesses
