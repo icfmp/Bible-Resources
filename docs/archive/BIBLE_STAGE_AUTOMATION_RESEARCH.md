@@ -62,7 +62,7 @@ fidelity*, not to be hidden by special cases.
 The source archives used in the 2026-11-09 WEBP research **changed on the
 eBible server**. The initial pinned fixture correctly failed instead of
 accepting changed material as identical. A read-only, HTTPS-allowlisted
-observational run ([PR #59, workflow #42799441256](../
+observational run ([PR #59, workflow #42799441256](
 https://github.com/icfmp/Bible-Resources/actions/runs/42799441256))
 recorded only file sizes and SHA-256 values:
 
@@ -124,7 +124,7 @@ a direct `workflow_dispatch` permission.
 
 **Alternative — manual dispatch through GitHub Actions:**
 
-Open [Actions → Audit one Bible onboarding stage (read-only)](../
+Open [Actions → Audit one Bible onboarding stage (read-only)](
 https://github.com/icfmp/Bible-Resources/actions/workflows/bible-staged-audit.yml),
 select **Run workflow** on `main`, and provide:
 
@@ -602,7 +602,7 @@ final typography checks. No change to published Bible modules or rights.
 ## OSIS overlapping hierarchies and typed paragraph milestones
 
 **Do not treat every `div` in a SWORD fragment as an authorial paragraph.**
-CrossWire's [osis2mod transformation documentation](../
+CrossWire's [osis2mod transformation documentation](
 https://wiki.crosswire.org/Osis2mod) distinguishes:
 
 - original paragraph `p` converted to `div type="x-p"` with generated
@@ -611,7 +611,7 @@ https://wiki.crosswire.org/Osis2mod) distinguishes:
   delimiting inter-verse/prepended content, **not a source paragraph**;
 - optional book/book-group divisions and other typed editorial containers.
 
-The [CrossWire OSIS milestone documentation](../
+The [CrossWire OSIS milestone documentation](
 https://wiki.crosswire.org/OSIS_Bibles#OSIS_Milestones) also describes
 the **overlap** of verse and document hierarchies. An all-tag global stack
 may see valid `div`/poetry/verse interleavings as "non-LIFO"; this alone
