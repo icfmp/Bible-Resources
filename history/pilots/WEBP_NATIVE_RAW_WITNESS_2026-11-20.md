@@ -2,7 +2,7 @@
 
 This is a **private diagnostic** for [issue #28](https://github.com/icfmp/Bible-Resources/issues/28), not a translator, a new versification scheme or a substitute for full source→compiled-content parity.
 
-The [standard USFM↔native OSIS key comparison](SOURCE_NATIVE_BOOK_SCOPE.md) revealed three authorial WEBP references whose native KJV `zText` index has no ordinary verse slots: `Rom.14.24`, `Rom.14.25`, `Rom.14.26`. **Do not infer missing text from missing index keys, or infer retained text from the documented `osis2mod` fallback behavior.**
+The [standard USFM↔native OSIS key comparison](../../docs/technical/SOURCE_NATIVE_BOOK_SCOPE.md) revealed three authorial WEBP references whose native KJV `zText` index has no ordinary verse slots: `Rom.14.24`, `Rom.14.25`, `Rom.14.26`. **Do not infer missing text from missing index keys, or infer retained text from the documented `osis2mod` fallback behavior.**
 
 The new implementation is completely edition-neutral:
 

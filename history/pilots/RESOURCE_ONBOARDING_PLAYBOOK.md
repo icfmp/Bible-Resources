@@ -1,14 +1,14 @@
-> **Historical onboarding playbook (LSG 0.1.0, 2026-11-09).** This contains original lessons and dated status claims. For new work use [the canonical production procedure](../PRODUCTION_PIPELINE.md); for live execution see [the seven-stage Bible checkpoints](../workflows/BIBLE_7_STAGE_WORKFLOW.md) or [commentary checkpoints](../workflows/COMMENTARY_7_STAGE_WORKFLOW.md). Retained without erasing historical evidence.
+> **Historical onboarding playbook (LSG 0.1.0, 2026-11-09).** This contains original lessons and dated status claims. For new work use [the canonical production procedure](../../docs/PRODUCTION_PIPELINE.md); for live execution see [the seven-stage Bible checkpoints](../../docs/workflows/BIBLE_7_STAGE_WORKFLOW.md) or [commentary checkpoints](../../docs/workflows/COMMENTARY_7_STAGE_WORKFLOW.md). Retained without erasing historical evidence.
 
 # Resource onboarding playbook — lessons from Louis Segond 1910
 
 Status: **operational guidance, not a claim that all gates are automated**. This records the first Bible release (LSG 0.1.0, 2026-11-09) and defines the repeatable procedure for future translations and commentaries.
 
-References: [First LSG release](../releases/LSG-0.1.0.md), [full LSG research PR #24](https://github.com/icfmp/Bible-Resources/pull/24), [generalization backlog #28](https://github.com/icfmp/Bible-Resources/issues/28), [normalizer issue #3](https://github.com/icfmp/Bible-Resources/issues/3).
+References: [First LSG release](../../sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-0.1.0.md), [full LSG research PR #24](https://github.com/icfmp/Bible-Resources/pull/24), [generalization backlog #28](https://github.com/icfmp/Bible-Resources/issues/28), [normalizer issue #3](https://github.com/icfmp/Bible-Resources/issues/3).
 
 ## Operational checkpoint tracking for the next Bible
 
-Use the [seven-stage resumable Bible workflow](../workflows/BIBLE_7_STAGE_WORKFLOW.md)
+Use the [seven-stage resumable Bible workflow](../../docs/workflows/BIBLE_7_STAGE_WORKFLOW.md)
 **before starting a new edition**. It is the day-to-day sequence and issue
 progress tracker; the checklists below are detailed technical evidence
 requirements inside those seven stages, **not dozens of extra steps**.
@@ -42,8 +42,8 @@ branch. The full source→SWORD audit remains under development in
 - Use main-branch read-only tools: **scripts/audit_osis.py** and **scripts/guard_osis.py** (official pinned OSIS 2.1.1 XSD).
 - Apply **scripts/normalize_osis.py** only with approved source/SHA-bound reversible structural plans. No automatic source rewrites.
 - If input is USFM or USFX, apply a reviewed standards-based conversion and verify exact original verse keys, titles, paragraphs, poetry, note order and introductions.
-- For a separately validated original OSIS document, run **`scripts/source_osis_inventory.py`** to produce the edition-independent, SHA-bound authorial key list. It rejects duplicate, non-ordered, ranged or unclosed source verse milestones, but does not prove the USFM/USFX conversion or actual compiled reader inventory. See [SOURCE_OSIS_INVENTORY.md](../technical/SOURCE_OSIS_INVENTORY.md).
-- Independently inventory **actual native stock-SWORD occupied reader keys**, chapter ceilings and verse-zero intro keys with `scripts/sword_native_index.cpp` / `scripts/sword_native_inventory.py` against an isolated exact compiled payload. See [NATIVE_SWORD_INDEX_INVENTORY.md](../technical/NATIVE_SWORD_INDEX_INVENTORY.md). This is not a source text or note parity test.
+- For a separately validated original OSIS document, run **`scripts/source_osis_inventory.py`** to produce the edition-independent, SHA-bound authorial key list. It rejects duplicate, non-ordered, ranged or unclosed source verse milestones, but does not prove the USFM/USFX conversion or actual compiled reader inventory. See [SOURCE_OSIS_INVENTORY.md](../../docs/technical/SOURCE_OSIS_INVENTORY.md).
+- Independently inventory **actual native stock-SWORD occupied reader keys**, chapter ceilings and verse-zero intro keys with `scripts/sword_native_index.cpp` / `scripts/sword_native_inventory.py` against an isolated exact compiled payload. See [NATIVE_SWORD_INDEX_INVENTORY.md](../../docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md). This is not a source text or note parity test.
 - Compare source chapter/verse keys with actual compiled SWORD reader slots and registry, including empty/omitted verses and all verse-zero material. Distinguish source omission, alternative numbering, inaccessible keys and actual missing data.
 - Any unavoidable source-index merge must be documented in an explicit, edition-bound, reviewer-authorized, reversible manifest. LSG's one special Mark merge does not justify a universal merge rule.
 
@@ -52,16 +52,16 @@ branch. The full source→SWORD audit remains under development in
 - Use the released stable SWORD importer and a separate installation root; verify the actual binary readback.
 - For the full source canon, compare Scripture character streams and individual references, word-to-Strong ordered pairs if present, notes (caller/type/body/word offsets), explicit machine reference targets, and the *ordered opening and closing* of title, poetry, quotation, verse and paragraph structures, including introductions.
 - Report exact/NFC/whitespace-normalized differences separately and flag escaped formatting residues (the LSG case left three literal backslash-i sequences in introductions).
-- **New (Darby 0.1.1 lesson):** audit each source-leading symbol and paragraph-open whitespace category against the **actual native SWORD**, not only verse-key and nonspace text parity. Authorial subject stars may require reversible structural metadata, whereas note/text-critical symbols must remain visible. XML pretty-print whitespace can leak into displayed verse starts. Do not blindly strip either. See [generic OSIS paragraph rendering QA](../technical/OSIS_PARAGRAPH_RENDERING_QA.md).
+- **New (Darby 0.1.1 lesson):** audit each source-leading symbol and paragraph-open whitespace category against the **actual native SWORD**, not only verse-key and nonspace text parity. Authorial subject stars may require reversible structural metadata, whereas note/text-critical symbols must remain visible. XML pretty-print whitespace can leak into displayed verse starts. Do not blindly strip either. See [generic OSIS paragraph rendering QA](../../docs/technical/OSIS_PARAGRAPH_RENDERING_QA.md).
 - Compare real upstream compiled data before claiming editorial improvements. Fail closed on unexplained differences.
 - **Current limit:** These exhaustive checks are predominantly **LSG-specific scripts in research PR #24**, not yet a generic one-command source-to-SWORD tool on main. Reuse their algorithms, not LSG-specific numbers or book IDs. Tracked in [#28](https://github.com/icfmp/Bible-Resources/issues/28).
-- **Recovered reusable aids:** `scripts/private_sword_bundle.py` tests a bounded, edition-parameterized SWORD ZIP in an isolated reader installation; `scripts/note_whitespace_diagnostics.py` records non-content-only note whitespace differences for explicit review. They were extracted from #24; neither performs the entire original-source-to-compiled full-canon audit. See [LSG audit research handoff](../LSG_AUDIT_RESEARCH_HANDOFF.md).
+- **Recovered reusable aids:** `scripts/private_sword_bundle.py` tests a bounded, edition-parameterized SWORD ZIP in an isolated reader installation; `scripts/note_whitespace_diagnostics.py` records non-content-only note whitespace differences for explicit review. They were extracted from #24; neither performs the entire original-source-to-compiled full-canon audit. See [LSG audit research handoff](../../docs/LSG_AUDIT_RESEARCH_HANDOFF.md).
 
 ### D. Reader matrix and release
 
 - Check isolated package install and real diatheke readbacks; test actual AndBible/JSword and Xiphos when available, distinguishing tested from untested.
 - Cover book ends, long poetry, headings, note-heavy verses, unusual introductions, editorially absent verses and actual verse-system boundaries. Compare standalone and parallel reading. Test both pane directions.
-- Include passage-specific checks for source-leading editorial signs, paragraph indentation and protected textual markers in at least two independent readers. Verify screenshots actually show the requested reference (a stale reader view is **not** visual signoff), on the exact final package/module ID. See [paragraph rendering preflight](../technical/OSIS_PARAGRAPH_RENDERING_QA.md).
+- Include passage-specific checks for source-leading editorial signs, paragraph indentation and protected textual markers in at least two independent readers. Verify screenshots actually show the requested reference (a stale reader view is **not** visual signoff), on the exact final package/module ID. See [paragraph rendering preflight](../../docs/technical/OSIS_PARAGRAPH_RENDERING_QA.md).
 - Separate application issues from source/module issues. Preserve every author's word even when a client fails.
 - Keep source archives immutable, metadata/rights evidence current, and package source/release SHA-256 pinned. Compare all data files byte-for-byte after any module-ID repackage.
 - **scripts/promote_sword_preview.py** is available on main but its current inventory and metadata assumptions are **RawText/Segond-specific**. It is not a generic zText packager. See [#28](https://github.com/icfmp/Bible-Resources/issues/28).

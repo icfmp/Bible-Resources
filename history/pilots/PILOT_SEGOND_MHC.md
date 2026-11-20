@@ -1,4 +1,4 @@
-> **Archived historical record.** Preserved for source provenance and reproducibility. For current production instructions see [the canonical pipeline](../PRODUCTION_PIPELINE.md). Historical dates, statuses and findings below are not current release status.
+> **Archived historical record.** Preserved for source provenance and reproducibility. For current production instructions see [the canonical pipeline](../../docs/PRODUCTION_PIPELINE.md). Historical dates, statuses and findings below are not current release status.
 
 # Pilot 1: Louis Segond 1910 (eBible) and Matthew Henry Complete (CrossWire)
 
@@ -77,7 +77,7 @@ quotation that Henry uses in his argument.
 ## Versification and omitted verses
 
 Official SWORD v11n data, **not one mapping per translation**:
-[VERSIFICATION_POLICY.md](../policies/VERSIFICATION_POLICY.md).
+[VERSIFICATION_POLICY.md](../../docs/policies/VERSIFICATION_POLICY.md).
 
 - Confirm *actual* `Versification` value in each downloaded module's
   `mods.d/*.conf` (CrossWire lists MHC as KJV in several source records,
@@ -201,7 +201,7 @@ not be declared normalized merely because this metadata preflight passes.
 
 ## Baseline source fingerprints (read-only, 2026-11-07)
 
-[Original SWORD/USFM source evidence](../evidence/normalizer-3/real-pilot-source-signals.json)
+[Original SWORD/USFM source evidence](../pipeline/normalizer-3/real-pilot-source-signals.json)
 was gathered from the real eBible `fraLSG1910eb` SWORD and USFM ZIPs and
 the actual CrossWire full `MHC` ZIP in GitHub Actions. Requests now put
 the SWORD `-k` key **last**, with bounded output and timeout: earlier
@@ -260,7 +260,7 @@ private text-free hashes, are retained with the successful
 
 ### Official SWORD canonical-slot probe (not Scripture conversion)
 
-[The source-verified 7-key `osis2mod` / `diatheke` evidence](../evidence/normalizer-3/lsg-versification-canonical-reference-probe.json)
+[The source-verified 7-key `osis2mod` / `diatheke` evidence](../pipeline/normalizer-3/lsg-versification-canonical-reference-probe.json)
 used only fabricated marker words and the installed SWORD 1.9.0 canonical
 index. Under `NRSV`, querying Exod 7.26–29 resolved to Exod 8.1–4,
 and Ps 3.9 resolved to Ps 4.1. Under `Segond`, all seven original
