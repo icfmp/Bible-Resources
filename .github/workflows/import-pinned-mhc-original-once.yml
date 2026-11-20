@@ -1,0 +1,59 @@
+name: Import exact CrossWire MHC authoring OSIS into English commentary originals
+on:
+  push:
+    branches:
+      - maintenance/real-language-sources-20261120
+    paths:
+      - .github/workflows/import-pinned-mhc-original-once.yml
+permissions:
+  contents: write
+jobs:
+  import-mhc:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    if: github.repository == 'icfmp/Bible-Resources'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Fetch exact upstream CrossWire authoring source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p sources/original/commentaries/en/mhc-crosswire
+          curl -fLsS --retry 2 --connect-timeout 25 --max-time 350 \
+            https://gitlab.com/crosswire-bible-society/mhc/-/raw/537591a94c991941877b47a06666b6a7812e05d8/mhc.osis.xml \
+            -o sources/original/commentaries/en/mhc-crosswire/mhc.osis.xml
+      - name: Verify source original SHA and size, XML safety
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          p=Path("sources/original/commentaries/en/mhc-crosswire/mhc.osis.xml")
+          d=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          expected=d["commentary_source"]["original_authoring_osis"]
+          if p.stat().st_size!=expected["authoring_osis_bytes"]:
+              raise SystemExit("Official MHC source size differs: do not commit")
+          sha=hashlib.sha256(p.read_bytes()).hexdigest()
+          if sha!=expected["authoring_osis_sha256"]:
+              raise SystemExit("Official MHC source hash differs: do not commit")
+          with p.open("rb") as f:
+              for _,elem in ET.iterparse(f,events=("start",)):
+                  if elem.tag.endswith("osis"):
+                      break
+              else:
+                  raise SystemExit("Original source not OSIS XML")
+          print("Verified exact CrossWire MHC authoring OSIS",sha,p.stat().st_size)
+          PY
+      - name: Commit pinned source unchanged and discard temporary workflow
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/import-pinned-mhc-original-once.yml
+          git add sources/original/commentaries/en/mhc-crosswire/mhc.osis.xml
+          # Original whitespace is content; never edit upstream bytes for formatting.
+          git diff --cached --check -- ':!sources/original/**'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Preserve exact CrossWire MHC original authoring OSIS with pinned provenance"
+          git push origin HEAD:maintenance/real-language-sources-20261120
