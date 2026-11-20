@@ -99,7 +99,7 @@ SWORD data is used as an invented source.
   (version 0.1.0, exact source SHA `23f0872a67086d9f659bd96936ab63db63c8c7b8c10eb92e59537c3e6cf16189`)
 
 The historical MHC source-cleanup reports live under
-[`docs/evidence/mhc-285/source-cleanup/`](evidence/mhc-285/source-cleanup/),
+[`docs/evidence/mhc-285/source-cleanup/`](../evidence/mhc-285/source-cleanup),
 not inside the clean source folder. The original historical CrossWire **MHCC authoring OSIS** has not been
 recovered. The classic 0.1.1 OSIS stored here is an independently validated
 **derivative reconstruction**, not a false claim of byte-exact authoring identity. Always distinguish a new
@@ -123,7 +123,7 @@ Releases remain reproducible from their explicitly approved source/proof
 contracts; file movements alone are not permission to republish.
 
 Script cleanup is a **different** audited task [#430](https://github.com/icfmp/Bible-Resources/issues/430).
-The existing [tool registry](TOOL_REGISTRY.md) notes 177 script entrypoints
+The existing [tool registry](../TOOL_REGISTRY.md) notes 177 script entrypoints
 with real references; archive/merge only once tests, workflows, Python imports,
 historical tags and shared behavior have been checked.
 
@@ -139,6 +139,6 @@ historical tags and shared behavior have been checked.
 6. Keep immutable proofs, seek the mandatory editorial/rights approvals,
    and publish via the existing GitHub Release-before-Pages process.
 
-See [source-first pipeline](SOURCE_FIRST_EDITORIAL_PIPELINE.md),
-[normalization](NORMALIZATION_POLICY.md), [editorial rules](EDITORIAL_RULES.md)
-and [publishing](PUBLISHING.md).
+See [source-first pipeline](../workflows/SOURCE_FIRST_EDITORIAL_PIPELINE.md),
+[normalization](../policies/NORMALIZATION_POLICY.md), [editorial rules](../policies/EDITORIAL_RULES.md)
+and [publishing](../workflows/PUBLISHING.md).

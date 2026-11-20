@@ -12,11 +12,11 @@ masters, **not newly edited commentary prose**.
 
 | Type | Language | Resource | Original actually committed | Cleaned OSIS/USFM master committed? |
 | --- | --- | --- | --- | --- |
-| Bible | fr | [Louis Segond 1910](../modules/lsg-1910/metadata.json) | [USFM archive](../sources/original/bibles/fr/lsg-1910/fraLSG_usfm.zip) · [provenance](../sources/original/bibles/fr/lsg-1910/PROVENANCE.json) | **Yes** — [verified 0.1.0 OSIS](../sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml), SHA-256 `d6abd741…` |
-| Bible | fr | [Darby 2024](../modules/darby-jnd-2024/metadata.json) | [OSIS XML](../sources/original/bibles/fr/darby-jnd-2024/bible_jnd_2_0.xml) · [provenance](../sources/original/bibles/fr/darby-jnd-2024/PROVENANCE.json) | **Yes** — [verified 0.1.1 OSIS](../sources/cleaned/bibles/fr/darby-jnd-2024/bible_jnd_2_0.osis.xml), SHA-256 `35eb23c6…` |
-| Commentary | en | [Matthew Henry Complete](../modules/mhc-crosswire/metadata.json) | [authoring OSIS XML](../sources/original/commentaries/en/mhc-crosswire/mhc.osis.xml) · [provenance](../sources/original/commentaries/en/mhc-crosswire/PROVENANCE.json) | **Yes** — [verified 0.1.0 OSIS](../sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml), SHA-256 `c64891f4…` |
-| Commentary | en | [Matthew Henry Concise](../modules/mhcc-crosswire/metadata.json) | Source witness identified in the official module/release records; **no original authoring OSIS file committed** | **Yes — rebuilt, not the historic source** — [OSIS for classic MHCC 0.1.1](../sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml), SHA-256 `6aca55c3…`; recompilation verified against the complete published native corpus |
-| Commentary | en | [Henry's Modern Concise Commentary](../modules/hmcc-modern/metadata.json) | Distinct modern edition, licensing and editorial evidence documented with [historical manuscripts](../work/commentaries/hmcc-modern/README.md) | **Yes** — [verified 0.1.0 OSIS](../sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml), SHA-256 `23f0872a…` |
+| Bible | fr | [Louis Segond 1910](../../modules/lsg-1910/metadata.json) | [USFM archive](../../sources/original/bibles/fr/lsg-1910/fraLSG_usfm.zip) · [provenance](../../sources/original/bibles/fr/lsg-1910/PROVENANCE.json) | **Yes** — [verified 0.1.0 OSIS](../../sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml), SHA-256 `d6abd741…` |
+| Bible | fr | [Darby 2024](../../modules/darby-jnd-2024/metadata.json) | [OSIS XML](../../sources/original/bibles/fr/darby-jnd-2024/bible_jnd_2_0.xml) · [provenance](../../sources/original/bibles/fr/darby-jnd-2024/PROVENANCE.json) | **Yes** — [verified 0.1.1 OSIS](../../sources/cleaned/bibles/fr/darby-jnd-2024/bible_jnd_2_0.osis.xml), SHA-256 `35eb23c6…` |
+| Commentary | en | [Matthew Henry Complete](../../modules/mhc-crosswire/metadata.json) | [authoring OSIS XML](../../sources/original/commentaries/en/mhc-crosswire/mhc.osis.xml) · [provenance](../../sources/original/commentaries/en/mhc-crosswire/PROVENANCE.json) | **Yes** — [verified 0.1.0 OSIS](../../sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml), SHA-256 `c64891f4…` |
+| Commentary | en | [Matthew Henry Concise](../../modules/mhcc-crosswire/metadata.json) | Source witness identified in the official module/release records; **no original authoring OSIS file committed** | **Yes — rebuilt, not the historic source** — [OSIS for classic MHCC 0.1.1](../../sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml), SHA-256 `6aca55c3…`; recompilation verified against the complete published native corpus |
+| Commentary | en | [Henry's Modern Concise Commentary](../../modules/hmcc-modern/metadata.json) | Distinct modern edition, licensing and editorial evidence documented with [historical manuscripts](../../work/commentaries/hmcc-modern/README.md) | **Yes** — [verified 0.1.0 OSIS](../../sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml), SHA-256 `23f0872a…` |
 
 Other types — dictionaries, encyclopedias, etc. — are only created in the
 source tree when actual licensed source files are obtained. The independent
@@ -43,12 +43,12 @@ remains unavailable; our reconstructed, version-specific MHCC source is
 
 ## Other working material
 
-- [Historical MHC original-to-cleaned source receipts](evidence/mhc-285/source-cleanup/)
-- [HMCC Modern working manuscript index](../work/commentaries/hmcc-modern/README.md):
+- [Historical MHC original-to-cleaned source receipts](../evidence/mhc-285/source-cleanup)
+- [HMCC Modern working manuscript index](../../work/commentaries/hmcc-modern/README.md):
   source-bound originals and review history remain under `work/mhcc-modern/`
-- [Historical CCEL private experiment](../work/commentaries/mhc-crosswire/experiments/ccel-imp/README.md)
+- [Historical CCEL private experiment](../../work/commentaries/mhc-crosswire/experiments/ccel-imp/README.md)
 - [Script lifecycle consolidation #430](https://github.com/icfmp/Bible-Resources/issues/430)
 
 The canonical workflow and directory rules are in
 [WORKSPACE_LAYOUT.md](WORKSPACE_LAYOUT.md) and
-[SOURCE_FIRST_EDITORIAL_PIPELINE.md](SOURCE_FIRST_EDITORIAL_PIPELINE.md).
+[SOURCE_FIRST_EDITORIAL_PIPELINE.md](../workflows/SOURCE_FIRST_EDITORIAL_PIPELINE.md).

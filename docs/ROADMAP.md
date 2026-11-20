@@ -15,5 +15,5 @@
 - Preserve Scripture wording, editorial apparatus, missing verses, original-language alignment and commentary scope. No silent changes or invented lexical/cross-reference mappings.
 - Do not propose direct YouVersion harvesting or reuse the old place-context dataset pipeline as an active roadmap item.
 - Distinguish implemented tools, tested modules, editorial approval and published releases. A draft PR or passed CI sample is not a complete production proof.
-- Keep historical pilots and postmortems under [the documentation archive](archive/) for provenance; they are not the current procedures.
-- Use [seven-stage Bible](BIBLE_7_STAGE_WORKFLOW.md) and [commentary](COMMENTARY_7_STAGE_WORKFLOW.md) checkpoints, the general production contract and [publishing rules](PUBLISHING.md) rather than resurrecting competing import procedures.
+- Keep historical pilots and postmortems under [the documentation archive](archive) for provenance; they are not the current procedures.
+- Use [seven-stage Bible](workflows/BIBLE_7_STAGE_WORKFLOW.md) and [commentary](workflows/COMMENTARY_7_STAGE_WORKFLOW.md) checkpoints, the general production contract and [publishing rules](workflows/PUBLISHING.md) rather than resurrecting competing import procedures.

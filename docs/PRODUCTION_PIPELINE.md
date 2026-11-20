@@ -1,6 +1,6 @@
 # Source-first production: executable editorial contract
 
-**Status:** canonical operational entry point for new or revised resources. This document specifies required evidence, not a claim that all stages are automated. It complements the established [six-phase policy](SOURCE_FIRST_EDITORIAL_PIPELINE.md) and the [seven-stage Bible](BIBLE_7_STAGE_WORKFLOW.md) and [commentary](COMMENTARY_7_STAGE_WORKFLOW.md) checkpoint workflows. Where policies disagree, stop and resolve the discrepancy in a reviewed PR; do not silently select the weaker rule.
+**Status:** canonical operational entry point for new or revised resources. This document specifies required evidence, not a claim that all stages are automated. It complements the established [six-phase policy](workflows/SOURCE_FIRST_EDITORIAL_PIPELINE.md) and the [seven-stage Bible](workflows/BIBLE_7_STAGE_WORKFLOW.md) and [commentary](workflows/COMMENTARY_7_STAGE_WORKFLOW.md) checkpoint workflows. Where policies disagree, stop and resolve the discrepancy in a reviewed PR; do not silently select the weaker rule.
 
 ## The production chain
 
@@ -40,7 +40,7 @@ Store unmodified originals at `sources/original/<type>/<language>/<resource-id>/
 
 Perform a **read-only** full inventory: book/chapter/verse or commentary-entry keys, source-native versification, omitted verses, introductions, paragraph boundaries, poetry, titles, tables, quotations, punctuation, notes, cross-references, link destinations, milestones, word/lemma/Strong/morphology markup, original-language directionality, invalid XML and unusual constructs. Capture totals and unexpected constructs; do not fabricate missing verses or move commentary to arbitrary verse keys.
 
-**Required evidence:** inventory counts, anomaly list (with source location or SWORD entry key), full original checksums, and explicit classification of unclear structures. See [source inventory](SOURCE_INVENTORY.md), [source OSIS inventory](SOURCE_OSIS_INVENTORY.md) and [versification policy](VERSIFICATION_POLICY.md).
+**Required evidence:** inventory counts, anomaly list (with source location or SWORD entry key), full original checksums, and explicit classification of unclear structures. See [source inventory](technical/SOURCE_INVENTORY.md), [source OSIS inventory](technical/SOURCE_OSIS_INVENTORY.md) and [versification policy](policies/VERSIFICATION_POLICY.md).
 
 ## 2. Normalize structure; do not rewrite the author's meaning
 
@@ -53,7 +53,7 @@ Allowed candidates include documented repair of invalid markup, removal of objec
 
 Record every transformation rule, why it is necessary, how it can be reversed, and affected entry IDs; exceptions belong in reviewed source/edition metadata, not hidden one-off code. Distinguish source error, editorial peculiarity, compiler behavior and reader rendering defects. If formatting is ambiguous, preserve it or flag it for review rather than pretending to fix it.
 
-**Required evidence:** deterministic script/commit and exact input/output hashes; machine-readable change inventory; human-readable semantic and structural diff; explicit list of unresolved decisions. See [normalization contract](NORMALIZATION_POLICY.md), [editorial rules](EDITORIAL_RULES.md), [semantic fidelity](OSIS_SEMANTIC_FIDELITY.md).
+**Required evidence:** deterministic script/commit and exact input/output hashes; machine-readable change inventory; human-readable semantic and structural diff; explicit list of unresolved decisions. See [normalization contract](policies/NORMALIZATION_POLICY.md), [editorial rules](policies/EDITORIAL_RULES.md), [semantic fidelity](policies/OSIS_SEMANTIC_FIDELITY.md).
 
 ## 3. Validate the cleaned master and prove fidelity
 
@@ -63,7 +63,7 @@ Changes must match an approved, reversible ledger; unexplained changes fail clos
 
 For Bible resources, validate the exact native versification including absent/omitted verses and nonstandard systems. For commentaries, validate annotateRef / section scope and internal/external link behavior. For Strong/lemma data, verify tokens, occurrence order and original-language directionality; do not infer lexical links purely from spelling.
 
-**Required evidence:** exhaustive before/after counts and exceptions, schema report, source-versus-witness decisions, and signed editorial review. See [main text fidelity](MAIN_TEXT_FIDELITY.md), [source-native main text](SOURCE_NATIVE_MAIN_TEXT.md), [source-native notes](SOURCE_NATIVE_NOTES_AUDIT.md), [source-native index](SOURCE_NATIVE_INDEX_AUDIT.md), [commentary policy](COMMENTARY_POLICY.md).
+**Required evidence:** exhaustive before/after counts and exceptions, schema report, source-versus-witness decisions, and signed editorial review. See [main text fidelity](policies/MAIN_TEXT_FIDELITY.md), [source-native main text](technical/SOURCE_NATIVE_MAIN_TEXT.md), [source-native notes](technical/SOURCE_NATIVE_NOTES_AUDIT.md), [source-native index](technical/SOURCE_NATIVE_INDEX_AUDIT.md), [commentary policy](policies/COMMENTARY_POLICY.md).
 
 ## 4. Compile and independently inspect SWORD
 
@@ -71,19 +71,19 @@ Build with existing upstream SWORD conventions/tools and the repository's approv
 
 Perform **full native readback** (keys, text, markup, metadata, commentary scope, verse mapping, notes and links as applicable) and compare it to the approved cleaned master. Use the native audits and stock SWORD probes already present in the repository. Do not claim a complete round-trip gate unless it has actually been run and passed for this source type.
 
-**Required evidence:** compiler/tool versions, reproducible build manifest, native full-corpus parity/exception report, archive SHA-256 and package inventory. See [native raw witness](NATIVE_SWORD_RAW_WITNESS.md), [whole corpus](NATIVE_SWORD_WHOLE_CORPUS.md), [stable reference audit](STABLE_SWORD_REFERENCE_AUDIT.md).
+**Required evidence:** compiler/tool versions, reproducible build manifest, native full-corpus parity/exception report, archive SHA-256 and package inventory. See [native raw witness](technical/NATIVE_SWORD_RAW_WITNESS.md), [whole corpus](technical/NATIVE_SWORD_WHOLE_CORPUS.md), [stable reference audit](technical/STABLE_SWORD_REFERENCE_AUDIT.md).
 
 ## 5. Test in independent readers
 
 Install the exact candidate in an external SWORD reader such as Xiphos; use another reader where coverage warrants it (e.g. AndBible/JSword). Verify representative **high-risk** cases in the GUI: introductory sections, chapter-only commentary, verse/range anchors, omitted verses, paragraphs and poetry, notes, hyperlinks and their true destinations, cross-book navigation, language direction and nonstandard versification. Distinguish a reader display bug from a source or SWORD payload defect. Record tested application/version, environment, exact candidate hashes, screenshots and failure classification.
 
-Reader samples supplement, **never replace**, exhaustive native parity. Do not modify the separate `icfmp/Bible` application to conceal source defects. See [reader QA](OSIS_PARAGRAPH_RENDERING_QA.md) and [onboarding playbook](RESOURCE_ONBOARDING_PLAYBOOK.md).
+Reader samples supplement, **never replace**, exhaustive native parity. Do not modify the separate `icfmp/Bible` application to conceal source defects. See [reader QA](technical/OSIS_PARAGRAPH_RENDERING_QA.md) and [onboarding playbook](RESOURCE_ONBOARDING_PLAYBOOK.md).
 
 ## 6. Release approval, publication, and retention
 
 Before publication, record evidence of rights and editorial approval, source lineage, completed/blocked checks, unresolved exceptions, exact module version and proposed release URLs. A reviewer must be able to reproduce outputs from the pinned original and scripts; keep prior versions and proof receipts. Publish only through the repository's existing verified **versioned GitHub Release before Pages catalogue** protocol. Download the public artifacts and independently compare sizes/hashes against the approved release receipts. Do not silently overwrite published bytes or claim publication from a merely staged private artifact.
 
-**Required evidence:** signed-off version manifest, successful required checks, immutable release receipts, live-download parity, updated catalogue and release documentation. See [publishing](PUBLISHING.md), [catalogue update protocol](CATALOGUE_UPDATE_PROTOCOL.md), and [releases](releases/).
+**Required evidence:** signed-off version manifest, successful required checks, immutable release receipts, live-download parity, updated catalogue and release documentation. See [publishing](workflows/PUBLISHING.md), [catalogue update protocol](workflows/CATALOGUE_UPDATE_PROTOCOL.md), and [releases](releases).
 
 ## Mandatory evidence record for every resource
 

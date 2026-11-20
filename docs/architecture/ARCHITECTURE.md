@@ -7,7 +7,7 @@ CrossWire repositories remain upstream sources; this project is independent. Do 
 
 ## One canonical curated edition across upstream repositories
 
-The five upstream SWORD catalogues are discovery sources, not five independent import queues. Only one provider may supply each **verified identical edition**, according to [SOURCE_PRIORITY.md](SOURCE_PRIORITY.md). The selector is currently read-only, with ambiguity and higher-priority outages blocking import. Approved manifests require a provider-independent canonical edition ID; the build gate rejects duplicate edition variants. The future importer must consume the reviewed selection result and must not mirror every upstream automatically.
+The five upstream SWORD catalogues are discovery sources, not five independent import queues. Only one provider may supply each **verified identical edition**, according to [SOURCE_PRIORITY.md](../policies/SOURCE_PRIORITY.md). The selector is currently read-only, with ambiguity and higher-priority outages blocking import. Approved manifests require a provider-independent canonical edition ID; the build gate rejects duplicate edition variants. The future importer must consume the reviewed selection result and must not mirror every upstream automatically.
 
 ## Compiled commentary preservation versus reviewed rebuilds — accepted decision (2026-11-16)
 
@@ -31,8 +31,8 @@ relax source-fidelity checks, or automatically authorize publication. New
 commentaries must use the appropriate proof contract, not resource-specific
 exceptions. The rebuilt module still requires human editorial and rights
 review, final file/digest verification and an explicitly authorized release
-plan. See [source-attested rebuild contract](evidence/mhcc-274/rebuilt-commentary-validation-contract.md)
-and [publication controls](PUBLISHING.md).
+plan. See [source-attested rebuild contract](../evidence/mhcc-274/rebuilt-commentary-validation-contract.md)
+and [publication controls](../workflows/PUBLISHING.md).
 
 This architecture has passed [1,329 regression/unit tests](https://github.com/icfmp/Bible-Resources/actions/runs/43867792317)
 and a [full original and rebuilt MHCC native SWORD/Xiphos audit](https://github.com/icfmp/Bible-Resources/actions/runs/43867792111),
