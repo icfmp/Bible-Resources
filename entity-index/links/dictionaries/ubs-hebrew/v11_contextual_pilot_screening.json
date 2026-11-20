@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "status": "PRIVATE_HEBREW_V11_72_SAMPLE_EDITORIAL_SCREENING_NOT_PUBLICATION",
+  "source_revisions": {
+    "ubs_hebrew_en_fr": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_hebrew_wlc": "47db250bd55d0d8577f2a94fba114ef16c35b23c"
+  },
+  "sample": {
+    "total_original_word_ids": 72,
+    "source_candidate_population": 53981,
+    "sampled_headword_families": 36,
+    "selection": "12 frequent UBS headwords x 3, 12 median x 2, 12 rare x 1; deterministic source-word SHA256",
+    "method": "screen exact UBS EN/FR candidate and competing sense definitions against WLC source lemma, English gloss, morphology, and local verse tokens",
+    "generalizable_accuracy_estimate": false,
+    "independently_certified_contextual_sense_ids": 0,
+    "automatic_new_semantic_assignments": 0,
+    "publication_approved": false
+  },
+  "editorial_screen": {
+    "no_obvious_conflict_in_short_source_context_NOT_independent_validation": 66,
+    "context_or_phrase_boundary_uncertain": 3,
+    "apparent_lexical_sense_or_granularity_conflict": 3
+  },
+  "source_specific_cautions": [
+    {
+      "original_word_id": "o170050140262",
+      "reference": "EST 5:14!26",
+      "ubs_headword": "001558000000000",
+      "candidate_ubs_lexid": "001558001004000",
+      "classification": "apparent_lexical_sense_or_granularity_conflict",
+      "rationale": "Original WLC context refers to a suggested course of action that pleased Haman; the UBS candidate is an event/matter sense, while a distinct UBS spoken-message sense exists. The broad 'matter' gloss may be defensible, but an exclusive specific sense assignment cannot be established from citation alone.",
+      "preferred_lexid_approved": null
+    },
+    {
+      "original_word_id": "o210110070032",
+      "reference": "ECC 11:7!3",
+      "ubs_headword": "002670000000000",
+      "candidate_ubs_lexid": "002670001003000",
+      "classification": "apparent_lexical_sense_or_granularity_conflict",
+      "rationale": "The source calls light pleasant to the eyes; the proposed UBS sense describes an event as morally right/beneficial, whereas another UBS sense covers objects pleasant to perceive. Citation uniqueness therefore does not prove the contextual sense.",
+      "preferred_lexid_approved": null
+    },
+    {
+      "original_word_id": "o090240030172",
+      "reference": "1SA 24:3!17",
+      "ubs_headword": "003001000000000",
+      "candidate_ubs_lexid": "003001002001000",
+      "classification": "apparent_lexical_sense_or_granularity_conflict",
+      "rationale": "The WLC source token is the wild-goats constituent in the phrase 'rocks of wild goats'; the chosen UBS sense denotes the entire named site Rocks of Wild Goats, while another sense names the animal. The word/token versus multiword place-name granularity is not resolved by a verse citation.",
+      "preferred_lexid_approved": null
+    },
+    {
+      "original_word_id": "o090050050021",
+      "reference": "1SA 5:5!2",
+      "ubs_headword": "003347000000000",
+      "candidate_ubs_lexid": "003347001001000",
+      "classification": "context_or_phrase_boundary_uncertain",
+      "rationale": "The word appears in a causal expression equivalent to 'therefore'; the cited UBS sense describes manner ('thus'). The syntax of the full phrase must be reviewed before an exclusive word-level meaning is selected.",
+      "preferred_lexid_approved": null
+    },
+    {
+      "original_word_id": "o030140360181",
+      "reference": "LEV 14:36!18",
+      "ubs_headword": "003347000000000",
+      "candidate_ubs_lexid": "003347001001000",
+      "classification": "context_or_phrase_boundary_uncertain",
+      "rationale": "The source expression is temporal ('after this') but the dictionary sense proposed by verse reference is the manner adverb ('thus'); an individual-word interpretation without recognizing the multiword phrase is underdetermined.",
+      "preferred_lexid_approved": null
+    },
+    {
+      "original_word_id": "o010310240162",
+      "reference": "GEN 31:24!16",
+      "ubs_headword": "002670000000000",
+      "candidate_ubs_lexid": "002670001003000",
+      "classification": "context_or_phrase_boundary_uncertain",
+      "rationale": "The lexical adjective is inside the fixed 'good or bad' prohibition on speech; interpreting the whole idiom as UBS's morally good/beneficial event sense may discard the idiomatic contrast. Abstain pending independent grammatical contextual review.",
+      "preferred_lexid_approved": null
+    }
+  ],
+  "policy": {
+    "source_reference_citation_is_not_contextual_semantic_validation": true,
+    "source_sdbh_numeric_identity_is_not_ubs_lexid_identity": true,
+    "original_text_and_identifiers_unchanged": true,
+    "release_v1_0_0_unchanged": true,
+    "automatic_mass_promotion_of_53981": false,
+    "pilot_go_no_go": "NO_GO_FOR_AUTOMATIC_53981_ASSIGMENTS; POSSIBLE_NARROW_SOURCE_REVIEWED_FAMILY_WORK_ONLY"
+  }
+}
