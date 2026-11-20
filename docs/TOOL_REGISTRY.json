@@ -272,14 +272,12 @@
       "purpose_first_line": "Build an HTTPS JSON catalogue and a standard SWORD repository deterministically.",
       "python_imports": [
         "argparse",
-        "build_place_context",
         "catalogue_profiles",
         "gzip",
         "hashlib",
         "io",
         "json",
         "pathlib",
-        "re",
         "shutil",
         "tarfile",
         "urllib",
@@ -288,11 +286,11 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "627cd500c3d5f6336cee9b3e61444eea17f0ab94a1cca81114d9125c7e08a48a",
+      "sha256_at_inventory": "42cb373dc495bd226ea5b1279550cfbf5b3d128a5e7d0fe3f1b8275a2a70d98e",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 25,
+      "static_reference_count": 24,
       "static_references": [
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
@@ -316,43 +314,8 @@
         "docs/evidence/mhcc-274/0.1.1-release-transition-DRAFT.md",
         "docs/evidence/mhcc-274/publication-provenance-readiness.md",
         "tests/test_catalogue_update_contract.py",
-        "tests/test_place_context.py",
         "tests/test_repository.py",
         "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": false,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/build_place_context.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Acquire source-backed context for explicit OpenBible modern-site identities.",
-      "python_imports": [
-        "argparse",
-        "datetime",
-        "hashlib",
-        "html",
-        "json",
-        "pathlib",
-        "re",
-        "urllib"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "9190e3437e120a5dab996eeae8fa7e111885bdf9e32122d29bf1c97a487468b0",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "publication/release",
-      "static_reference_count": 4,
-      "static_references": [
-        "scripts/build.py",
-        "scripts/prepare_place_manifest.py",
-        "docs/PLACE_CONTEXT.md",
-        "tests/test_place_context.py"
       ]
     },
     {
@@ -4167,36 +4130,6 @@
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/stage-darby-0.1.1.yml",
         "tests/test_prepare_darby_011_private_release_candidate.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": false,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/prepare_place_manifest.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Pin a previously committed place dataset for GitHub-hosted distribution.",
-      "python_imports": [
-        "argparse",
-        "build_place_context",
-        "hashlib",
-        "json",
-        "pathlib",
-        "re",
-        "subprocess"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "6ff1f42d1b21ab3f866451bc4ebd9f154f6f10eb4e719c0725e43ea2155a789a",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 1,
-      "static_references": [
-        "docs/PLACE_CONTEXT.md"
       ]
     },
     {
