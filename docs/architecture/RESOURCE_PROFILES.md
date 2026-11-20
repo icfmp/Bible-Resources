@@ -42,10 +42,6 @@ Keep reader-facing text neutral, concise and non-polemical. Include the original
 - A published claim must offer an evidence link and a correction path; if substantiation breaks, unpublish the claim until it has been reviewed again.
 - Software/build pipelines must not treat an incomplete profile as an authorization to publish unapproved texts, modules or derivative annotations.
 
-## First application: Louis Segond 1910
-
-The [Louis Segond 1910 French profile](../../sources/cleaned/bibles/fr/lsg-1910/editorial/profiles/fr-segond-1910.md) was **editorially approved on 2026-11-10** by the project owner and independently published to the catalogue through the explicitly approved [profile receipt](../../modules/lsg-1910/profiles/fr.json). The already approved [LSG 0.1.0 SWORD module](../../modules/lsg-1910/EDITORIAL.md) and [its release](../../sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-0.1.0.md) are unchanged. The short and long descriptions discuss evidenced textual differences without asserting an undocumented translator motive; the underlying original-language witness inventory remains an ongoing research lane, not a certification of systematic doctrinal bias.
-
 ## Machine publication contract for descriptive profiles
 
 The optional `modules/<slug>/profiles/<locale>.json` receipt contains a **separate editorial revision**, locale, matching module ID/version, explicit reviewer and approval URL, pinned original Markdown source **Git blob SHA-1**, exact section marker headings and HTTPS evidence links. `scripts/catalogue_profiles.py` compares those checks against the unchanged approved source file and fails closed on missing approval, source drift, malformed markers or unrelated module identity. No script infers profile approval from the SWORD `quality.status=approved` flag alone.
