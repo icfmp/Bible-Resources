@@ -262,6 +262,9 @@ def main():
               "candidate_words": report["candidate_word_count"],
               "headwords": report["candidate_headword_families"],
               "dispositions": report["source_only_semantic_candidate_dispositions"],
+              "source_sense_reference_inventory": report["source_sense_inventory"],
+              "bilingual_reference_cautions": report["bilingual_source_parity_cautions"],
+              "existing_v1_sdbh_sense_candidates": report["corpus"].get("existing_v1_source_corrob_sdbh_sense_words", 0),
               "contextually_verified": 0, "published": False,
           }, sort_keys=True))
 
