@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/lsg-v11n-probe.yml'
-      - 'scripts/probe_lsg_v11n.py'
+      - 'scripts/historical/lsg/probe_lsg_v11n.py'
       - 'tests/test_lsg_v11n_probe.py'
       - 'config/lsg-v11n-probes.json'
   workflow_dispatch:
@@ -39,7 +39,7 @@ jobs:
           PY
       - name: Compile synthetic reference cases against NRSV and Segond
         run: |
-          python scripts/probe_lsg_v11n.py \
+          python scripts/historical/lsg/probe_lsg_v11n.py \
             --usfx-zip "${{ runner.temp }}/source/usfx.zip" \
             --report reports/lsg-v11n-test.json
       - name: Upload only source-key diagnostic report
