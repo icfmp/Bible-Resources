@@ -12,11 +12,13 @@ sources/
     bibles/
       fr/
         lsg-1910/fraLSG_usfm.zip
+        lsg-1910/fraLSG_usfx.zip
         darby-jnd-2024/bible_jnd_2_0.xml
     commentaries/
       en/
         mhc-crosswire/mhc.osis.xml
   cleaned/
+    bibles/fr/lsg-1910/lsg-1910.osis.xml
     bibles/fr/darby-jnd-2024/bible_jnd_2_0.osis.xml
     commentaries/en/mhc-crosswire/mhc.osis.xml
     commentaries/en/hmcc-modern/hmcc-modern.osis.xml
@@ -81,6 +83,9 @@ paragraphs, introductions, section/range mapping and links. No manually edited
 SWORD data is used as an invented source.
 
 **Recovered and committed** approved editorial masters as of 2026-11-20:
+- `sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml`
+  (version 0.1.0, exact source SHA `d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0`; historical u2o generator date
+  2026-11-09 14:13:18 UTC established from original source SHA)
 - `sources/cleaned/bibles/fr/darby-jnd-2024/bible_jnd_2_0.osis.xml`
   (version 0.1.1, exact source SHA `35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d`)
 - `sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml`
@@ -90,8 +95,8 @@ SWORD data is used as an invented source.
 
 The historical MHC source-cleanup reports live under
 [`docs/evidence/mhc-285/source-cleanup/`](evidence/mhc-285/source-cleanup/),
-not inside the clean source folder. LSG 1910 and original MHCC do **not** yet
-have exact-source-recovered OSIS masters here. Always distinguish a new
+not inside the clean source folder. The **original MHCC** does **not** yet
+have an exact-source-recovered OSIS authoring master here. Always distinguish a new
 equivalent-looking output from a byte-exact restored authoring source.
 
 ## Work, documentation, release outputs and compatibility

@@ -14,6 +14,15 @@
   "license_claim": "Public Domain",
   "rights_witness_url": "https://ebible.org/find/details.php?id=fraLSG",
   "source_bytes_modified": false,
-  "cleaned_master_committed": false,
-  "compiled_sword_version_not_equivalent_to_original_source": true
+  "cleaned_master_committed": true,
+  "compiled_sword_version_not_equivalent_to_original_source": true,
+  "additional_original_witness": {
+    "format": "USFX",
+    "filename": "fraLSG_usfx.zip",
+    "source_url": "https://ebible.org/Scriptures/fraLSG_usfx.zip",
+    "sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+    "size_bytes": 3468665,
+    "role": "Independent authorial Bible text and notes witness for exact approved OSIS conversion",
+    "byte_identity_verified": true
+  }
 }

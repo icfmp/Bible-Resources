@@ -9,6 +9,13 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = (
     (
+        "bibles/fr/lsg-1910/lsg-1910.osis.xml",
+        "bibles/fr/lsg-1910/CLEANUP_MANIFEST.json",
+        "modules/lsg-1910/SOURCE_VALIDATION.json",
+        "source_sha256",
+        "cleaned_osis_sha256",
+    ),
+    (
         "bibles/fr/darby-jnd-2024/bible_jnd_2_0.osis.xml",
         "bibles/fr/darby-jnd-2024/CLEANUP_MANIFEST.json",
         "modules/darby-jnd-2024/RELEASE_PROVENANCE.json",
