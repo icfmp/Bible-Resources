@@ -1,0 +1,16 @@
+{
+  "approved_link_cases": 15,
+  "approved_link_destinations": 28,
+  "compiled_zcom_members_identical_to_accepted_QA": true,
+  "curated_module_id": "HMCCModern",
+  "curated_version": "0.1.0",
+  "historical_authorial_restorations": 2,
+  "modern_manuscripts_unchanged": true,
+  "original_native_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "original_source_unchanged": true,
+  "schema_version": 1,
+  "source_approved_osis_sha256": "23f0872a67086d9f659bd96936ab63db63c8c7b8c10eb92e59537c3e6cf16189",
+  "source_kind": "reviewed_modern_commentary_rebuild",
+  "source_reader_run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/44695710957",
+  "status": "validated"
+}

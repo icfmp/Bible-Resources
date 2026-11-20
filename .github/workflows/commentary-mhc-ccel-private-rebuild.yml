@@ -3,7 +3,7 @@ name: Research CCEL full MHC private IMP feasibility (no publication)
 on:
   pull_request:
     paths:
-      - "research/mhc-ccel/**"
+      - "work/commentaries/mhc-crosswire/experiments/ccel-imp/**"
       - ".github/workflows/commentary-mhc-ccel-private-rebuild.yml"
   workflow_dispatch:
 
@@ -25,7 +25,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install -r requirements.txt -q
-          python -m unittest discover -s research/mhc-ccel -p "test_*.py" -v
+          python -m unittest discover -s work/commentaries/mhc-crosswire/experiments/ccel-imp -p "test_*.py" -v
       - name: Fetch six source-SHA-pinned CCEL XML volumes privately
         shell: bash
         run: |
@@ -71,7 +71,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python research/mhc-ccel/ccel_imp_candidate.py \
+          python work/commentaries/mhc-crosswire/experiments/ccel-imp/ccel_imp_candidate.py \
             --manifest config/commentary-intake/mhc-crosswire.json \
             --source-dir "$RUNNER_TEMP/mhc-ccel-original" \
             --collision-census > "$RUNNER_TEMP/mhc-ccel-start-census.json"
@@ -103,7 +103,7 @@ jobs:
           umask 077
           export PRIVATE_IMP="$RUNNER_TEMP/mhc-ccel-trial.imp"
           export REPORT="$RUNNER_TEMP/mhc-ccel-trial-metadata.json"
-          python research/mhc-ccel/ccel_imp_candidate.py \
+          python work/commentaries/mhc-crosswire/experiments/ccel-imp/ccel_imp_candidate.py \
             --manifest config/commentary-intake/mhc-crosswire.json \
             --source-dir "$RUNNER_TEMP/mhc-ccel-original" \
             --quarantine-repeated-starts \

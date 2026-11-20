@@ -1,0 +1,27 @@
+{
+  "approved_link_cases": 15,
+  "approved_link_destinations": 28,
+  "authorization": {
+    "approval_url": "https://github.com/icfmp/Bible-Resources/pull/272",
+    "approved_by": "Bible Resources project owner",
+    "decision": "Publish the source-attested modern-English derivative as HMCC Modern 0.1.0, with owner-approved 15 link corrections and two historical restorations. Manual note-click navigation in Xiphos remains a post-publication test."
+  },
+  "derivative_rights_status": "owner_authorized_distribution_no_relicensing_of_underlying_source",
+  "historical_authorial_restorations": 2,
+  "module_id": "hmcc-modern",
+  "original_native_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "release_id": "HMCCModern",
+  "schema_version": 1,
+  "source_approved_osis_sha256": "23f0872a67086d9f659bd96936ab63db63c8c7b8c10eb92e59537c3e6cf16189",
+  "source_archive_sha256": "02751d269081c8b2d1ad1d446774eff94e7ddc2420e38f16f8fbb9075c79a2e3",
+  "source_archive_size_bytes": 2767663,
+  "source_artifact_id": 14610990289,
+  "source_decisions": "work/mhcc-modern/production/OWNER_EDITORIAL_DECISIONS_2026-11-19.json",
+  "source_module": "MHCC 0.1.1",
+  "source_reader_run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/44695710957",
+  "source_run_id": 44695710957,
+  "status": "owner_authorized_for_release",
+  "sword_id": "HMCCModern",
+  "underlying_public_domain_source": "CrossWire MHCC 2.0 — Public Domain / Copy Freely",
+  "version": "0.1.0"
+}

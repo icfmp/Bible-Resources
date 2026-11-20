@@ -12,6 +12,7 @@ from catalogue_profiles import approved_profiles, ProfileError
 from compiled_stock_commentary_proof import compiled_stock_commentary_errors
 from reviewed_compiled_commentary_rebuild import reviewed_rebuilt_commentary_errors
 from reviewed_osis_commentary_rebuild import reviewed_osis_commentary_errors
+from reviewed_modern_commentary_rebuild import reviewed_modern_commentary_errors
 
 ROOT = Path(__file__).resolve().parents[1]
 DRIVERS = {"RawText","zText","RawCom","RawCom4","zCom","zCom4","RawLD","RawLD4","zLD","RawGenBook"}
@@ -197,7 +198,12 @@ def validate(root=ROOT):
             errors.append(f"{d.name}: editorial review missing")
         if m["quality"]["edition"]=="reader_optimized" and not rights["derivatives_allowed"]:
             errors.append(f"{d.name}: derivative rights missing")
-        if m["category"] in ("bible","commentary"):
+        if m["category"] in ("bible","commentary") and not (
+                m["category"] == "commentary"
+                and m.get("index_audit",{}).get("mode") ==
+                    "reviewed_modern_commentary_rebuild"):
+            # Modern prose is not an unchanged structural normalization:
+            # its own reviewed semantic-source and compiled-binary gate applies.
             policy=json.loads((root/"config/osis-policy.json").read_text(encoding="utf-8"))
             errors.extend(normalization_report_errors(
                 d,m["quality"]["edition"],m["category"],policy.get("schema_sha256")))
@@ -236,6 +242,9 @@ def validate(root=ROOT):
         elif (m["category"] == "commentary" and
               m.get("index_audit", {}).get("mode") == "reviewed_osis_commentary_rebuild"):
             errors.extend(reviewed_osis_commentary_errors(d, root, m, conf))
+        elif (m["category"] == "commentary" and
+              m.get("index_audit", {}).get("mode") == "reviewed_modern_commentary_rebuild"):
+            errors.extend(reviewed_modern_commentary_errors(d, root, m, conf))
         else:
             errors.extend(source_gate_errors(d, conf.get("SourceType"), root, m["category"]))
         if m["category"] == "bible":

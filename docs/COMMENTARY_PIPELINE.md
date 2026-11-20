@@ -26,6 +26,18 @@ publication permission, and a published source may still expose separate
 application display bugs.
 
 
+## When the source has already been cleaned and validated
+
+For **translation or modern-English modernization only**, start with the accepted
+structured source and follow [Translation from an accepted clean source](
+COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md). This dedicated procedure covers
+semantic fidelity and relocating each existing citation/link to the corresponding
+translated words or editorial element. **Do not repeat acquisition, source
+repair, original-link correction or whole upstream reconstruction.** The
+seven-stage source/release requirements remain inherited from the previously
+validated source handoff; the new translation still requires its own editorial,
+rights, link-placement, native-reader and release evidence.
+
 ## Provider independence and clean rebuild — decision (2026-11-18)
 
 **CrossWire, eBible and other reviewed sources are inputs, not architectural
@@ -77,7 +89,7 @@ authorizes redistribution of a third party's digital edition.
 
 **The import/reconstruction engine must not be built around English MHC, CCEL,
 a particular commentary, or one book/verse scheme.** Research-only MHC
-experiments under \`research/mhc-ccel/\` are historical feasibility evidence,
+experiments under \`work/commentaries/mhc-crosswire/experiments/ccel-imp/\` are historical feasibility evidence,
 not a new production importer, accepted data model, or instruction to add
 MHC-specific exceptions. The CCEL trial's SWORD CLI success is not a complete
 source-structure or reader-parity proof.

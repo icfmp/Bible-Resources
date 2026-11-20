@@ -310,13 +310,22 @@ class _BoundedMarkupScanner(HTMLParser):
 
 
 def _markup_display_witness(internal: bytes, rendered_plain: bytes,
-                            rendered_html: bytes | None) -> dict:
+                            rendered_html: bytes | None,
+                            *, blocked_osis_targets: tuple[str, ...] = ()) -> dict:
     """Compare exact source headings to copied GUI text and count real links."""
     if (not isinstance(internal, bytes) or len(internal) > 256_000
             or not isinstance(rendered_plain, bytes) or len(rendered_plain) > 256_000
             or (rendered_html is not None and
                 (not isinstance(rendered_html, bytes) or len(rendered_html) > 256_000))):
         raise PilotError("Unbounded private Xiphos markup witness")
+    if (not isinstance(blocked_osis_targets, tuple)
+            or len(blocked_osis_targets) > 20
+            or len(set(blocked_osis_targets)) != len(blocked_osis_targets)
+            or any(not isinstance(target, str)
+                   or not 3 <= len(target) <= 160
+                   or not re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9.:-]*", target)
+                   for target in blocked_osis_targets)):
+        raise PilotError("Unreviewed source-link quarantine target list")
     original = internal.decode("utf-8", errors="replace")
     copied = rendered_plain.decode("utf-8", errors="replace")
     extracted_titles = []
@@ -402,7 +411,23 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
                 # This is still NOT an actual click/navigation test.
                 "all_components_found_in_one_GUI_href": best == len(atoms),
             }
+    # Negative source-link observation MUST inspect actual GUI hrefs
+    # independently. A quarantined <seg> is absent from the candidate's
+    # <reference> inventory; checking only valid-source references would
+    # produce a meaningless false "safe" result for every bad target.
+    exposed_blocked_target_hashes = sorted({
+        sha256(target.encode("utf-8")).hexdigest()
+        for target in blocked_osis_targets
+        if any(re.search(
+            r"(?<![a-z0-9])" + re.escape(target.casefold()) + r"(?![a-z0-9])",
+            unquote(unescape(href)).casefold(),
+        ) for _, href in actual_anchor_destinations)
+    })
     return {
+        "quarantined_source_targets_checked_in_real_GUI_HTML":
+            len(blocked_osis_targets),
+        "quarantined_source_target_sha256_exposed_as_real_GUI_HTML_href":
+            exposed_blocked_target_hashes,
         "original_internal_title_elements_found": len(extracted_titles),
         "exact_original_titles_in_copied_gui_text": exact_titles,
         "exact_original_titles_in_copied_gui_rich_html": sum(
@@ -586,7 +611,8 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                 },
                 "real_markup_rendering_observation_by_passage": {
                     key: _markup_display_witness(
-                        item.get("commentary_internal", b""), b"", None
+                        item.get("commentary_internal", b""), b"", None,
+                        blocked_osis_targets=tuple(item.get("blocked_osis_targets", ())),
                     ) for key, item in comparisons.items()
                 },
                 "chapter_intro_prose_clipboard_match_by_passage": {
@@ -625,7 +651,8 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
             result[ref] = False
             copied_sizes[ref] = 0
             markup_by_passage[ref] = _markup_display_witness(
-                originals.get("commentary_internal", b""), b"", None
+                originals.get("commentary_internal", b""), b"", None,
+                blocked_osis_targets=tuple(originals.get("blocked_osis_targets", ())),
             )
             # Two bounded passes over the same independently checked pane
             # coordinates allow lazy GTK/WebKit repaint after navigation.
@@ -659,6 +686,7 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                 markup_by_passage[ref] = _markup_display_witness(
                     originals.get("commentary_internal", b""),
                     selected, _optional_real_rich_xiphos_selection(env),
+                    blocked_osis_targets=tuple(originals.get("blocked_osis_targets", ())),
                 )
                 if ref in intro_matches:
                     # The expected chapter preface must originate from the
@@ -679,7 +707,8 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
             copied_sizes[ref] = 0
             focus_attempts.setdefault(ref, 0)
             markup_by_passage.setdefault(ref, _markup_display_witness(
-                originals.get("commentary_internal", b""), b"", None
+                originals.get("commentary_internal", b""), b"", None,
+                blocked_osis_targets=tuple(originals.get("blocked_osis_targets", ())),
             ))
             result[ref] = False
     return {
@@ -692,6 +721,39 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
         "real_markup_rendering_observation_by_passage": markup_by_passage,
         "chapter_intro_prose_clipboard_match_by_passage": intro_matches,
         "independent_gui_commentary_excerpt_match_count": sum(result.values()),
+    }
+
+
+def _observe_real_xiphos_with_bounded_retries(
+    env: dict, comparisons: dict[str, dict]
+) -> dict:
+    """Retry real passage selection, never substitute process startup for GUI text.
+
+    GTK/WebKit can show an already-visible Xiphos window before its text pane
+    accepts real X11 actions. Keep each attempt independent: the clipboard
+    is reseeded and every accepted excerpt must match real SWORD text.
+    """
+    best = None
+    counts = []
+    for attempt in range(3):
+        if attempt:
+            time.sleep(1.5)
+            _dismiss_transient_xiphos_notice(env)
+        observed = attempt_real_xiphos_passage_copy(env, comparisons)
+        count = observed["independent_gui_commentary_excerpt_match_count"]
+        counts.append(count)
+        if (best is None
+                or count > best["independent_gui_commentary_excerpt_match_count"]
+                or (count == best["independent_gui_commentary_excerpt_match_count"]
+                    and observed["actual_passage_commands_accepted"]
+                    and not best["actual_passage_commands_accepted"])):
+            best = observed
+        if count == len(comparisons) and observed["actual_passage_commands_accepted"]:
+            break
+    return {
+        **best,
+        "bounded_real_gui_selection_attempts": len(counts),
+        "independent_excerpt_match_counts_by_real_attempt": counts,
     }
 
 
@@ -715,6 +777,10 @@ def _await_xiphos_visible_window(app, display, env: dict, *, seconds: int) -> No
             # Require the actual full-sized Xiphos reader, not a small splash
             # or modal dialog; clipboard passage checks remain mandatory.
             return
+        # On an empty profile Xiphos can show a small first-run notice
+        # BEFORE its main window exists. Dismissing it only after readiness
+        # deadlocks the probe; handle it while waiting for the main reader.
+        _dismiss_transient_xiphos_notice(env)
         time.sleep(0.5)
     raise PilotError("No independently visible Xiphos window with Bible and commentary")
 
@@ -756,17 +822,40 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
         time.sleep(1.5)
         if display.poll() is not None:
             raise PilotError("Actual virtual Xiphos display did not start")
-        app = subprocess.Popen(
-            ["dbus-run-session", "--", "xiphos"], env=env,
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-            start_new_session=True,
-        )
-        _await_xiphos_visible_window(app, display, env, seconds=seconds)
+        # Keep GUI startup diagnostics private to the disposable runner home.
+        # A missing window is not evidence of defective commentary content.
+        startup_log = home / "xiphos-startup.stderr"
+        with startup_log.open("wb") as errors:
+            app = subprocess.Popen(
+                ["dbus-run-session", "--", "xiphos"], env=env,
+                stdout=subprocess.DEVNULL, stderr=errors,
+                start_new_session=True,
+            )
+            try:
+                _await_xiphos_visible_window(app, display, env, seconds=seconds)
+            except PilotError as exc:
+                # Report only diagnostic classes, never raw text or Bible content.
+                diagnostic = startup_log.read_text(
+                    encoding="utf-8", errors="replace"
+                ).casefold()
+                categories = [
+                    label for label, pattern in (
+                        ("gtk", "gtk"), ("webkit", "webkit"),
+                        ("display", "cannot open display"),
+                        ("dbus", "dbus"), ("segfault", "segmentation fault"),
+                        ("sword", "sword"), ("missing-library", "shared libraries"),
+                    ) if pattern in diagnostic
+                ]
+                raise PilotError(
+                    "Xiphos GUI not visible; launcher_exit=" +
+                    str(app.poll()) + "; startup_diagnostic_categories=" +
+                    (",".join(categories) if categories else "none")
+                ) from exc
         # Allow the already-visible GTK main window to finish initial layout
         # before accepting real, passage-specific Xiphos clipboard evidence.
         time.sleep(2)
         _dismiss_transient_xiphos_notice(env)
-        inspection = attempt_real_xiphos_passage_copy(env, comparisons)
+        inspection = _observe_real_xiphos_with_bounded_retries(env, comparisons)
         after = on_gui_ready(env) if on_gui_ready is not None else {}
         if not isinstance(after, dict):
             raise PilotError("Invalid private real-Xiphos post-readback observation")
