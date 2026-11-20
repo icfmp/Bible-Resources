@@ -5,6 +5,7 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
+sys.path.insert(0,str(ROOT/"scripts"/"historical"/"lsg"))
 from lsg_sword_compare import usfx_text_by_verse,parse_sword_chapter,plain,explain_wrapper
 from pilot_preflight import PilotError
 
