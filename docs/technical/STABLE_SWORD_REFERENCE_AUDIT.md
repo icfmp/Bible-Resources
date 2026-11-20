@@ -10,7 +10,7 @@ The reused [historical PR #23](https://github.com/icfmp/Bible-Resources/pull/23)
 
 Using this method requires `"index_audit": {"mode": "stock_reader_keys"}` in metadata, plus the proof and (only if used) original approved merge policy. Existing synthetic regressions cover missing, duplicated, out-of-registry, nonadjacent and unapproved mappings, stale hashes and unsupported runtimes.
 
-**Limit:** this proof checker consumes inventories produced independently; it is not itself an inventory extractor. The general-purpose producer, independently proven on a second real Bible, remains part of [issue #28](https://github.com/icfmp/Bible-Resources/issues/28).
+**Limit:** this proof checker consumes inventories produced independently; it is not itself an inventory extractor. Independent cross-edition verification of the full producer/reader chain remains tracked in [issue #28](https://github.com/icfmp/Bible-Resources/issues/28).
 
 ### `published_source_audit` — migration of an already released edition
 
@@ -44,12 +44,12 @@ The real repository CI installs stock `diatheke` and performs those tests. Tests
 
 ## Independent authorial OSIS index producer (first stage)
 
-The new [source OSIS inventory](SOURCE_OSIS_INVENTORY.md) provides a source-only, text-free `book.chapter.verse` key list and SHA-bound receipt after the independently validated OSIS source is available. It supports container and milestone verses with fail-closed duplicate/missing milestone detection and preserves editorial numeric gaps. It **does not** claim an original USFM/USFX-to-OSIS audit or stock-SWORD reader-key extraction; those and a second real edition remain pending in #28.
+The [source OSIS inventory](SOURCE_OSIS_INVENTORY.md) provides a source-only, text-free `book.chapter.verse` key list and SHA-bound receipt after the independently validated OSIS source is available. It supports container and milestone verses with fail-closed duplicate/missing milestone detection and preserves editorial numeric gaps. It **does not** claim an original USFM/USFX-to-OSIS audit or stock-SWORD reader-key extraction; those require separate evidence, tracked in #28.
 
 ## Independently collected actual native reader index
 
-The [native stable-SWORD inventory producer](NATIVE_SWORD_INDEX_INVENTORY.md) uses the stock `libsword` module's own `VerseKey` and `hasEntry` methods to enumerate **actual populated keys**, the full installed versification chapter ceilings and occupied book/chapter intros. A separate [OSIS source producer](SOURCE_OSIS_INVENTORY.md) outputs the independently authored source key list. Their outputs feed the existing fail-closed comparison, but **do not** by themselves certify source conversion, the full text/notes/layout or editorial approval. Current CI and real source/native evidence must be examined for each target release. A second real zText/other edition and complete content preservation remain unverified.
+The [native stable-SWORD inventory producer](NATIVE_SWORD_INDEX_INVENTORY.md) uses the stock `libsword` module's own `VerseKey` and `hasEntry` methods to enumerate **actual populated keys**, the full installed versification chapter ceilings and occupied book/chapter intros. A separate [OSIS source producer](SOURCE_OSIS_INVENTORY.md) outputs the independently authored source key list. Their outputs feed the existing fail-closed comparison, but **do not** by themselves certify source conversion, the full text/notes/layout or editorial approval. Current CI and real source/native evidence must be examined for each target release. Full text, notes and layout still need independently verified source/native evidence for each edition.
 
 ## Remaining multi-translation work
 
-The reusable guard is now implemented, but a separate generic *producer* must still capture source and reader inventories from original and compiled real modules; test a second Bible with different notes/driver/versification; and expand full original content, annotation and layout fidelity checks. Follow [issue #28](https://github.com/icfmp/Bible-Resources/issues/28). Do not claim these future capabilities already exist.
+The source and native inventory producers exist, but they must be run with exact source and compiled edition identity, across representative drivers and versifications. Complete original content, annotation and ordered-layout fidelity needs independent proof beyond key parity. Follow [issue #28](https://github.com/icfmp/Bible-Resources/issues/28). Do not claim these future capabilities already exist.
