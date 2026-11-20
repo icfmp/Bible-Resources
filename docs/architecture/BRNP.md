@@ -87,7 +87,15 @@ A failure at any gate leaves original and previously approved releases unchanged
 
 ## Pilot implementation and limitations
 
-Run the pilot without modifying the input:\n\n\`\`\`sh\npython scripts/check_brnp.py /path/to/cleaned.osis.xml --kind bible --report /tmp/brnp-report.json\n# For commentaries: --kind commentary\npython -m unittest tests.test_brnp -v\n\`\`\`\n\nThe read-only `scripts/check_brnp.py` checks a **small subset** of the invariants (namespace, source category, verse marker pairing, basic commentary reference presence and unknown structures). It is intentionally **not** a converter, full XSD validator, comprehensive note/link verifier or a release gate. Continue to use `scripts/guard_osis.py`, `scripts/guard_commentary.py` and [production contract](../PRODUCTION_PIPELINE.md).
+Run the pilot without modifying the input:
+
+```sh
+python scripts/check_brnp.py /path/to/cleaned.osis.xml --kind bible --report /tmp/brnp-report.json
+# For commentaries: --kind commentary
+python -m unittest tests.test_brnp -v
+```
+
+The read-only `scripts/check_brnp.py` checks a **small subset** of the invariants (namespace, source category, verse marker pairing, basic commentary reference presence and unknown structures). It is intentionally **not** a converter, full XSD validator, comprehensive note/link verifier or a release gate. Continue to use `scripts/guard_osis.py`, `scripts/guard_commentary.py` and [production contract](../PRODUCTION_PIPELINE.md).
 
 ### Versioning
 
