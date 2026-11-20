@@ -143,26 +143,8 @@ rights review and the upstream's own contribution process. This prevents
 reimporting our own corrections later as a false update; see
 [UPDATES.md](UPDATES.md) for the provenance reconciliation mechanism.
 
-## Actual first-source observations (2026-11-07)
+## Historical observations
 
-Read-only GitHub Actions evidence:
-[LSG and MHC structure fingerprints](evidence/normalizer-3/real-pilot-source-signals.json).
-The exact publisher ZIPs were downloaded into temporary storage and scanned
-with key-scoped `diatheke` requests. After correcting an initial flag-order
-bug, LSG **Psalm 23 already contains poetry markup signals** and full
-MHC **Genesis 1 contains paragraph markup signals**. Do not flatten or
-rebuild them merely because the Bible UI looks wrong; verify rendering first.
+The original November 7 LSG/MHC reconnaissance and its limitations are preserved in the [archived first-source observations](archive/EDITORIAL_AUDIT_INITIAL_2026-11-07.md). They are not a current module fidelity or publication verdict.
 
-This is **neither** a complete verse/text identity check nor proof that
-every paragraph is correct. No automatic source edits, original MHC OSIS
-reconstruction, SWORD recompilation or public resource release has occurred.
-Evidence from the earlier accidentally unbounded `diatheke` queries is
-explicitly invalidated; only the corrected bounded-reader run is cited.
-
-The OSIS editor cannot work directly on an opaque compiled SWORD archive:
-if the original source cannot be obtained, the future extraction adapter
-must reconstruct a clearly *generated* intermediate with SWORD entry keys,
-never assert that generated lines are original source lines.
-
-See also [the full quality policy](QUALITY_POLICY.md), [editorial rules](EDITORIAL_RULES.md),
-and [pilot issue #12](https://github.com/icfmp/Bible-Resources/issues/12).
+**Source-specific decisions** must be documented alongside each cleaned resource in `sources/cleaned/<type>/<language>/<resource-id>/editorial/`, not appended to this generic tooling guide. The normalizer's three currently documented operations are constrained reviewed tools, **not** a universal automated cleaner. The full [production contract](PRODUCTION_PIPELINE.md) controls the source-to-compiled fidelity and publication gates.

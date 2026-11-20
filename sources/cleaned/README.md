@@ -38,3 +38,10 @@ delta manifest, full text/structure/Strong/notes/reference parity, and a
 native SWORD readback and independent Xiphos acceptance receipt.
 
 [Workspace layout](../../docs/WORKSPACE_LAYOUT.md).
+
+## Edition-specific editorial decisions
+
+Keep module-specific editorial decisions alongside the approved cleaned master, in `<type>/<language>/<resource-id>/editorial/README.md`. These records document approved changes, unresolved questions, source witnesses and exact evidence; they must never replace the original source, the immutable cleanup manifest or publication receipts. Universal rules stay in `docs/`, while historical research reports remain available until their inbound links and evidence are reviewed.
+
+- [LSG 1910](bibles/fr/lsg-1910/editorial/README.md) · [Darby JND 2024](bibles/fr/darby-jnd-2024/editorial/README.md)
+- [MHC](commentaries/en/mhc-crosswire/editorial/README.md) · [MHCC classic](commentaries/en/mhcc-crosswire/editorial/README.md) · [HMCC Modern](commentaries/en/hmcc-modern/editorial/README.md)
