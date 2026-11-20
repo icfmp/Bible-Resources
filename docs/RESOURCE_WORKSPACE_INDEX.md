@@ -1,6 +1,8 @@
 # Source availability by type and language
 
 The source store has **actual original files**, not placeholder editions.
+The three original bodies were imported on 2026-11-20 from their pinned
+sources and independently checked against the existing audit digests.
 A downloaded original and a reviewed cleaned master are **different stages**.
 The published SWORD packages remain in `modules/<id>/`.
 
