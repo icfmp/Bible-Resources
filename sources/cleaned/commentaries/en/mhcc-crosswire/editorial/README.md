@@ -21,4 +21,4 @@
 | Historical why/alternatives | [Editorial disposition](evidence/release-0.1.1/0.1.1-editorial-disposition.md), only when investigating a disputed decision |
 | Earlier untouched stock edition | [0.1.0 release](releases/MHCC-0.1.0.md) |
 
-Original historical research receipts in `evidence/stock-research/` are **not current instructions**. Do not reinterpret old `DRAFT` statuses as the present published edition state.
+For the original-stock comparison, consult the [short historical evidence index](evidence/stock-research/README.md) before opening individual receipts. The optional ongoing [section/source research #274](https://github.com/icfmp/Bible-Resources/issues/274) does not retroactively revoke the separately approved 0.1.1 release. Do not reinterpret old `DRAFT` statuses as the present published edition state.
