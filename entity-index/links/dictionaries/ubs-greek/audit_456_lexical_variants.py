@@ -95,6 +95,7 @@ def audit(missing,english,french):
             "original_strong":family["original_source_strong"],
             "original_words":len(witness_ids),
             "original_word_ids":witness_ids,
+            "original_word_witnesses":family["source_original_word_witnesses"],
             "original_ln_counts":family["original_ln_code_counts"],
             "original_class_counts":family["original_source_classes"],
             "original_ubs_v1_headword_accentless_diagnostic_only":candidates,
