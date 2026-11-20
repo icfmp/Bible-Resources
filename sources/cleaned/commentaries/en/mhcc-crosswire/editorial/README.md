@@ -13,9 +13,9 @@
 ## Evidence
 
 - [Reconstructed-source attestation and limitations](../CLEANUP_MANIFEST.json)
-- [Approved corrections manifest](../../../../../config/commentary-rebuilds/mhcc-crosswire.json)
-- [Classic 0.1.1 release](../../../../../docs/releases/MHCC-0.1.1.md)
-- [Native audit](../../../../../modules/mhcc-crosswire/SOURCE_AUDIT.json)
-- [Reader profile](../../../../../docs/profiles/en-matthew-henry-concise-crosswire-2-0.md)
+- [Approved corrections manifest](../../../../../../config/commentary-rebuilds/mhcc-crosswire.json)
+- [Classic 0.1.1 release](../../../../../../docs/releases/MHCC-0.1.1.md)
+- [Native audit](../../../../../../modules/mhcc-crosswire/SOURCE_AUDIT.json)
+- [Reader profile](../../../../../../docs/profiles/en-matthew-henry-concise-crosswire-2-0.md)
 
 **Status:** source-native attested 0.1.1; the original authoring OSIS remains unrecovered. No new edits approved.
