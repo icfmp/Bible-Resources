@@ -1,14 +1,14 @@
-# Reviewed commentary source masters
+# Commentary cleaned sources
 
-Group accepted editable commentary sources by stable resource ID here.
-Preserve complete authorial commentary bodies, paragraph and section
-structure, book/chapter introductions, reference ranges, notes and real
-heading scope. Keep a reversible change manifest and exact source identity.
+Only real reviewed commentary OSIS/USFM sources under
+`<language>/<resource-id>/`. The CrossWire **MHC English original** is at
+[`sources/original/commentaries/en/mhc-crosswire/`](../../original/commentaries/en/mhc-crosswire/).
 
-MHC source provenance has a [typed navigation entry](mhc/README.md) pointing
-to its earlier original path; no complete clean OSIS body has been added.
-HMCC Modern working manuscripts are indexed from the
-[commentary workspace](../../../work/commentaries/hmcc-modern/README.md).
-Reviewed **SWORD releases** remain under `modules/`.
+The earlier MHC cleaning **reports** were moved to
+[`docs/evidence/mhc-285/source-cleanup/`](../../../docs/evidence/mhc-285/source-cleanup/)
+because they are not a cleaned OSIS source. HMCC Modern manuscripts remain
+indexed at [historical manuscript work](../../../work/commentaries/hmcc-modern/README.md).
 
-[Resource index](../../../docs/RESOURCE_WORKSPACE_INDEX.md).
+Preserve comment bodies, introductions, section scopes/ranges, original text,
+notes and reference mapping through all future source-to-native rebuilds.
+[Source inventory](../../../docs/RESOURCE_WORKSPACE_INDEX.md).

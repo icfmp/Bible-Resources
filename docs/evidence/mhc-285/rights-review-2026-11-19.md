@@ -52,7 +52,7 @@
 - [ ] Obtain or document sufficiently specific, attributable **redistribution and modification permission** for the exact electronic source and downstream SWORD derived from it. If necessary, ask CCEL/CrossWire rights maintainers with the pinned MHC 2.2 identity and our explicitly bounded edits. Do not infer permission merely from public availability or noncommercial intent.
 - [ ] Check territorial applicability, notably distribution to French and international users, and record the reviewed publication license/attribution obligations in a release manifest.
 - [ ] Obtain project owner/editorial approval after source-fidelity and real-reader coverage have been reviewed independently.
-- [ ] Only after approvals, decide whether to commit a cleaned OSIS master to `sources/cleaned/mhc/`, publish a SWORD release, or instead contribute verified repairs upstream to CrossWire.
+- [ ] Only after approvals, decide whether to commit a cleaned OSIS master to `docs/evidence/mhc-285/source-cleanup/`, publish a SWORD release, or instead contribute verified repairs upstream to CrossWire.
 
 ## Current technical state (not rights approval)
 

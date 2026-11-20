@@ -1,13 +1,15 @@
-# Reviewed Bible source masters
+# Bible cleaned sources
 
-This folder is ready for actual **source-reviewed** Bible OSIS/USFM, grouped
-by curated resource ID. Preserve exact text, punctuation, versification,
-text-critical omissions and notes. For Strong-enriched editions, require
-complete ordered word-to-Strong/morphology/lemma correspondence before and
-after compiled SWORD readback; preserve translation notes, note callouts and
-cross-references at their intended textual anchors.
+Only put **real, independently reviewed** Bible OSIS/USFM source files under
+`<language>/<resource-id>/`. Original USFM/OSIS source files are now
+[under immutable originals](../../original/bibles/fr/).
 
-Currently released Segond and Darby **SWORD binaries and their audits**
-remain in `modules/`; do not present those binaries as if the editable
-cleaned OSIS/USFM master were already committed here. See the
-[resource index](../../../docs/RESOURCE_WORKSPACE_INDEX.md).
+The existing source-audited Segond and Darby **SWORD** outputs are under
+`modules/`; neither released binary automatically constitutes a maintained
+and verified clean XML source. Before creating a cleaned master, preserve
+original Scripture, punctuation, version-specific omissions, all Strong and
+morphology links by *word position*, translation notes, caller labels,
+cross-references and semantic structures. Record a full source/native parity
+audit and reversible cleanup receipt.
+
+[Source inventory](../../../docs/RESOURCE_WORKSPACE_INDEX.md).
