@@ -4,6 +4,14 @@
 
 This is the navigation entry point. File location does not define authority: a historical audit is evidence, not a policy, and a draft experiment is not a published release. Do not move, delete or combine a document until all references from Markdown, GitHub workflows, scripts, tests and historical review links have been checked.
 
+## Documentation by responsibility
+
+- [Architecture and resource layout](architecture/README.md)
+- [Editorial and fidelity policies](policies/README.md)
+- [Operational workflows](workflows/README.md)
+- [Technical audits and SWORD verification](technical/README.md)
+- [Edition profiles](profiles/) · [Release records](releases/) · [Historical evidence](evidence/) · [Archive](archive/README.md)
+
 ## 1. Core principles and decisions
 
 - [Architecture](architecture/ARCHITECTURE.md) · [formats](architecture/FORMATS.md) · [workspace layout](architecture/WORKSPACE_LAYOUT.md) · [resource index](architecture/RESOURCE_WORKSPACE_INDEX.md)
@@ -47,8 +55,11 @@ This is the navigation entry point. File location does not define authority: a h
 
 - [Tool registry (generated Markdown)](TOOL_REGISTRY.md) and [machine-readable registry](TOOL_REGISTRY.json): regenerate with `python scripts/tool_registry.py --write`; verify with `python scripts/tool_registry.py --check`. Do not manually edit generated contents. Any removal/renaming of script entrypoints is separately tracked by [#430](https://github.com/icfmp/Bible-Resources/issues/430).
 
-## Cleanup policy and deferred moves
+## Compatibility and records
 
-A link-audited first cleanup has archived the clearly historical pilot/research reports and colocated the HMCC Modern edition protocol with its cleaned source. Other workflow guides still in active use remain at their current paths. A later relocation can group policies, workflows, technical references and generated reports into subfolders. Avoid moving these documents solely to make the top-level look cleaner: relative links are used by documentation, code and historical GitHub discussions, and a move would require an evidence-backed full-link audit. The index above establishes navigation immediately without breaking those paths.
+The active architectural, editorial, operational and technical references have been physically relocated into the four topic directories above, with relative Markdown links updated. The original `docs/` compatibility pointers for older external issues and PRs remain minimal; removing those would break historical links, so they are not active competing procedures. Historical reports continue to live under `archive/` and `evidence/`.
+
+Do not interpret moving files as permission to alter published source text, module metadata or earlier audit decisions. Future moves should update links and run the local Markdown link check and script inventory checks before merge.
+
 
 **Protected boundary:** `entity-index/` is the independent Bible Semantic Index workstream; documentation cleanup must not change it. The legacy place-context `datasets/` is separately scoped for removal in [#38](https://github.com/icfmp/Bible-Resources/issues/38), with public-endpoint and release parity checks required. These two tasks must not be conflated.
