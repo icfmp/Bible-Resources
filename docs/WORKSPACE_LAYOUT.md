@@ -21,6 +21,7 @@ sources/
     bibles/fr/lsg-1910/lsg-1910.osis.xml
     bibles/fr/darby-jnd-2024/bible_jnd_2_0.osis.xml
     commentaries/en/mhc-crosswire/mhc.osis.xml
+    commentaries/en/mhcc-crosswire/mhcc.osis.xml
     commentaries/en/hmcc-modern/hmcc-modern.osis.xml
     dictionaries/<language>/<resource-id>/
     encyclopedias/<language>/<resource-id>/
@@ -90,13 +91,18 @@ SWORD data is used as an invented source.
   (version 0.1.1, exact source SHA `35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d`)
 - `sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml`
   (version 0.1.0, exact source SHA `c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4`)
+- `sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml`
+  (classic MHCC 0.1.1, **new source reconstruction**, SHA `6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39`, all
+  29,999 native indexed records—including 24 approved aliases—checked
+  via SWORD round-trip; original historical authoring XML not recovered)
 - `sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml`
   (version 0.1.0, exact source SHA `23f0872a67086d9f659bd96936ab63db63c8c7b8c10eb92e59537c3e6cf16189`)
 
 The historical MHC source-cleanup reports live under
 [`docs/evidence/mhc-285/source-cleanup/`](evidence/mhc-285/source-cleanup/),
-not inside the clean source folder. The **original MHCC** does **not** yet
-have an exact-source-recovered OSIS authoring master here. Always distinguish a new
+not inside the clean source folder. The original historical CrossWire **MHCC authoring OSIS** has not been
+recovered. The classic 0.1.1 OSIS stored here is an independently validated
+**derivative reconstruction**, not a false claim of byte-exact authoring identity. Always distinguish a new
 equivalent-looking output from a byte-exact restored authoring source.
 
 ## Work, documentation, release outputs and compatibility

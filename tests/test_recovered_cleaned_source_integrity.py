@@ -59,3 +59,25 @@ class RecoveredSourceIntegrity(unittest.TestCase):
                         digest.update(chunk)
                 self.assertEqual(digest.hexdigest(), approved,
                                  f"Previously approved editable OSIS was altered: {rel}")
+
+    def test_classic_mhcc_source_reconstruction_is_real_and_source_attested(self):
+        """The classic MHCC OSIS is a NEW verified derivative, not a rescued original."""
+        path = ROOT / "sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml"
+        manifest_path = path.with_name("CLEANUP_MANIFEST.json")
+        self.assertTrue(path.is_file())
+        self.assertFalse(path.is_symlink())
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        digest = hashlib.sha256()
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024*1024), b""):
+                digest.update(chunk)
+        self.assertEqual(digest.hexdigest(), "6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39")
+        self.assertEqual(manifest["reconstructed_source_sha256"], digest.hexdigest())
+        self.assertEqual(manifest["reconstructed_source_size"], path.stat().st_size)
+        self.assertEqual(manifest["source_kind"], "native_source_attested_reconstructed_osis_not_original_authoring_osis")
+        self.assertIs(manifest["original_crosswire_authoring_osis_recovered"], False)
+        self.assertIs(manifest["canonical_source_full_native_recompile_semantic_parity"], True)
+        self.assertEqual(manifest["source_header_work_id"], "MHCC")
+        native = json.loads((ROOT/"modules/mhcc-crosswire/SOURCE_VALIDATION.json").read_text())
+        self.assertEqual(native["candidate_native_corpus_sha256"], manifest["source_native_corpus_sha256"])
+        self.assertEqual(manifest["source_native_key_counts"], {"K":28742,"I":1255,"TOP":2})
