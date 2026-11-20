@@ -60,6 +60,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_token_position_alignment.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_source_position_provisional_senses.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_consolidated_v1_review_index.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_public_identifier_release.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -1180,6 +1181,58 @@ jobs:
                      for x in d['by_original_macula_word_id'].values())
           print('GREEK_UBS_V1_CONSOLIDATED_137741_WORD_PRIVATE_REVIEW_INDEX_VERIFIED_NO_PUBLICATION')
           PY
+      - name: Build rights-minimized public UBS Greek v0.1.0 identifier-only archive
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_public_identifier_release.py \
+            --private-index /tmp/bsi-ubs-greek-v1-consolidated-original-word-index-PRIVATE.json \
+            --output /tmp/BSI-UBS-Greek-0.1.0.zip
+          python3 - <<'PY'
+          import hashlib,json,zipfile
+          from pathlib import Path
+          p=Path('/tmp/BSI-UBS-Greek-0.1.0.zip')
+          assert p.exists() and p.stat().st_size>100000
+          with zipfile.ZipFile(p) as z:
+            assert z.namelist()==['ATTRIBUTION.md','README.md','index.json','manifest.json']
+            index=json.loads(z.read('index.json'))
+            manifest=json.loads(z.read('manifest.json'))
+            assert index['schema']=='bsi.ubs-greek-word-crosswalk.v1'
+            assert index['version']=='0.1.0'
+            assert index['license']=='CC BY-SA 4.0'
+            assert index['contextual_semantics_independently_verified'] is False
+            assert len(index['by_word_id'])==137741
+            assert index['counts']['total_word_ids']==137741
+            assert index['counts']['provisional_sense_word_ids']==123195
+            assert index['counts']['unassigned_sense_word_ids']==14546
+            assert index['counts']['supported_lexical_word_ids']==137694
+            assert set(index['counts']['statuses'])=={
+              'provisional_ubs_lexid','ubs_entry_only','ambiguous_ubs_senses',
+              'ambiguous_ubs_headwords','missing_ubs_headword'}
+            assert set(index['counts']['tiers'])=={
+              'ln_unique','single_sense_without_ln','explicit_ubs_form',
+              'ubs_verse_citation','calibrated_ubs_word_locator'}
+            assert set(index)=={'schema','version','upstream_ubs_edition',
+              'source_ubs_revision','source_macula_revision','license',
+              'contextual_semantics_independently_verified','counts','by_word_id'}
+            allowed={'status','entry_ids','provisional_lexid','candidate_lexids','evidence_tier'}
+            assert all(set(w)==allowed for w in index['by_word_id'].values())
+            assert all(not k.startswith('original_') for w in index['by_word_id'].values() for k in w)
+            assert manifest['sha256']==hashlib.sha256(z.read('index.json')).hexdigest()
+            assert manifest['includes_original_ln_strong_morph_lemma'] is False
+            assert manifest['includes_verse_text'] is False
+            assert manifest['includes_dictionary_definitions'] is False
+          assert p.with_name(p.name+'.sha256').read_text().split()[0]==hashlib.sha256(p.read_bytes()).hexdigest()
+          print('UBS_GREEK_V0_1_0_PUBLIC_IDENTIFIER_ONLY_PACKAGE_VERIFIED')
+          PY
+      - name: Stage approved public UBS Greek v0.1.0 release files from protected main only
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-v0.1.0-identifier-only-release-candidate
+          path: |
+            /tmp/BSI-UBS-Greek-0.1.0.zip
+            /tmp/BSI-UBS-Greek-0.1.0.zip.sha256
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload consolidated Greek UBS v1 original-word review index (PRIVATE, NOT PUBLISHED)
         uses: actions/upload-artifact@v4
         with:
