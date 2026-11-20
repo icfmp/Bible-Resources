@@ -3395,11 +3395,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-paragraph-rendering.yml",
-        "docs/technical/OSIS_PARAGRAPH_RENDERING_QA.md",
         "tests/test_inspect_paragraph_rendering.py"
       ]
     },
@@ -3608,11 +3607,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/source_native_maintext_probe.py",
         ".github/workflows/second-bible-proof.yml",
-        "docs/technical/NATIVE_SWORD_RAW_WITNESS.md",
         "tests/test_native_absorbed_verse_groups.py"
       ]
     },
@@ -5119,13 +5117,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-paragraph-rendering.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
-        "docs/technical/OSIS_PARAGRAPH_RENDERING_QA.md",
         "tests/test_repair_osis_division_markers.py"
       ]
     },
@@ -5242,13 +5239,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-paragraph-rendering.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
-        "docs/technical/OSIS_PARAGRAPH_RENDERING_QA.md",
         "tests/test_repair_osis_paragraph_indentation.py"
       ]
     },
@@ -6033,7 +6029,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/fast_stock_note_probe.py",
         "scripts/publisher_osis_usfx_parity.py",
@@ -6041,7 +6037,6 @@
         "scripts/source_native_maintext_probe.py",
         "scripts/sword_missing_verse_witness.py",
         ".github/workflows/second-bible-proof.yml",
-        "docs/technical/SOURCE_NATIVE_BOOK_SCOPE.md",
         "tests/test_source_native_scope.py"
       ]
     },
@@ -6677,11 +6672,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/source_native_maintext_probe.py",
         ".github/workflows/second-bible-proof.yml",
-        "docs/technical/NATIVE_SWORD_RAW_WITNESS.md",
         "tests/test_sword_missing_verse_witness.py"
       ]
     },
@@ -6984,13 +6978,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 6,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
         ".github/workflows/darby-paragraph-rendering.yml",
         ".github/workflows/second-bible-proof.yml",
         ".github/workflows/validate.yml",
-        "docs/technical/NATIVE_SWORD_RAW_WITNESS.md",
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md"
       ]
