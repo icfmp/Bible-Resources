@@ -87,30 +87,30 @@ jobs:
           # using the previously immutable raw generated source SHA, not a
           # guessed or invented "clean" source.
           timestamp_restore='''        # Reproduce the exact historical XML timestamp, never mutate any Scripture.
-        import re
-        from datetime import datetime,timedelta,timezone
-        original_raw=raw.read_bytes()
-        found=list(re.finditer(rb"<date>([0-9]{4}\\.[0-9]{2}\\.[0-9]{2}T[0-9]{2}\\.[0-9]{2}\\.[0-9]{2})</date>",original_raw))
-        if len(found)!=1:raise PilotError("Unexpected converter date field")
-        match=found[0]
-        pfx=original_raw[:match.start(1)]
-        sfx=original_raw[match.end(1):]
-        historic="1752ea16f7c8b5ddbca3570b53110086243e0bb40a517af17ee11cce78cd2830"
-        begin=datetime(2026,11,9,14,13,9,tzinfo=timezone.utc)
-        end=datetime(2026,11,9,14,16,14,tzinfo=timezone.utc)
-        candidate=begin
-        restored=None
-        while candidate<=end:
-            stamp=candidate.strftime("%Y.%m.%dT%H.%M.%S").encode()
-            if hashlib.sha256(pfx+stamp+sfx).hexdigest()==historic:
-                restored=pfx+stamp+sfx
-                print("Exact original LSG generated OSIS timestamp recovered",stamp.decode(),historic)
-                break
-            candidate+=timedelta(seconds=1)
-        if restored is None:
-            raise PilotError("Historical raw OSIS hash not reproducible from exact 2026-11-09 build time")
-        raw.write_bytes(restored)
-'''
+                  import re
+                  from datetime import datetime,timedelta,timezone
+                  original_raw=raw.read_bytes()
+                  found=list(re.finditer(rb"<date>([0-9]{4}\\.[0-9]{2}\\.[0-9]{2}T[0-9]{2}\\.[0-9]{2}\\.[0-9]{2})</date>",original_raw))
+                  if len(found)!=1:raise PilotError("Unexpected converter date field")
+                  match=found[0]
+                  pfx=original_raw[:match.start(1)]
+                  sfx=original_raw[match.end(1):]
+                  historic="1752ea16f7c8b5ddbca3570b53110086243e0bb40a517af17ee11cce78cd2830"
+                  begin=datetime(2026,11,9,14,13,9,tzinfo=timezone.utc)
+                  end=datetime(2026,11,9,14,16,14,tzinfo=timezone.utc)
+                  candidate=begin
+                  restored=None
+                  while candidate<=end:
+                      stamp=candidate.strftime("%Y.%m.%dT%H.%M.%S").encode()
+                      if hashlib.sha256(pfx+stamp+sfx).hexdigest()==historic:
+                          restored=pfx+stamp+sfx
+                          print("Exact original LSG generated OSIS timestamp recovered",stamp.decode(),historic)
+                          break
+                      candidate+=timedelta(seconds=1)
+                  if restored is None:
+                      raise PilotError("Historical raw OSIS hash not reproducible from exact 2026-11-09 build time")
+                  raw.write_bytes(restored)
+          '''
           content=content.replace(insert,timestamp_restore+insert)
           p.write_text(content)
           PY
