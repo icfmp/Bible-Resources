@@ -31,7 +31,18 @@ Use the repository's established tools (`scripts/validate.py`, `scripts/build.py
 
 Before merge, [`validate.yml`](../../.github/workflows/validate.yml) must pass relevant unit/integration tests, native SWORD index/readback, exact compiled package checks, licence/source integrity, catalogue coverage and independent reader smoke tests.
 
-Check the approved release plan using `scripts/publish_reviewed_release.py --verify-only`. A compiled ZIP, successful `diatheke` probe or green build is not the same as a published and rights-cleared release.
+Check the approved release plan against the **exact checkout SHA** and built distribution (do not use a floating branch name):
+
+```sh
+python scripts/catalogue_release_coverage.py --built dist
+python scripts/publish_reviewed_release.py \
+  --built dist \
+  --repository icfmp/Bible-Resources \
+  --target-sha "$(git rev-parse HEAD)" \
+  --verify-only
+```
+
+This is a read-only release-plan verification, **not** a publication command. A compiled ZIP, successful `diatheke` probe or green build is not the same as a published and rights-cleared release.
 
 ## 4. Publish in the enforced order
 
