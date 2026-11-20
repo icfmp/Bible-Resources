@@ -1,0 +1,27 @@
+name: Sync fully verified classic MHCC source PR with current main
+on:
+  push:
+    branches: [recovery/mhcc-classic-source-20261120]
+    paths: [.github/workflows/sync-mhcc-classic-pr-once.yml]
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    if: github.repository == 'icfmp/Bible-Resources'
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: true, fetch-depth: 0}
+      - name: Merge current main and remove this one-time workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main
+          git merge --no-edit origin/main
+          git rm .github/workflows/sync-mhcc-classic-pr-once.yml
+          git diff --cached --check
+          git commit -m 'Synchronize classic MHCC editorial source with all current main changes'
+          git push origin HEAD:recovery/mhcc-classic-source-20261120
