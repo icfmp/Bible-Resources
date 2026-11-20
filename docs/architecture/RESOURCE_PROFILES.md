@@ -44,7 +44,7 @@ Keep reader-facing text neutral, concise and non-polemical. Include the original
 
 ## First application: Louis Segond 1910
 
-The [Louis Segond 1910 French profile](../profiles/fr-segond-1910.md) was **editorially approved on 2026-11-10** by the project owner and independently published to the catalogue through the explicitly approved [profile receipt](../../modules/lsg-1910/profiles/fr.json). The already approved [LSG 0.1.0 SWORD module](../../modules/lsg-1910/EDITORIAL.md) and [its release](../releases/LSG-0.1.0.md) are unchanged. The short and long descriptions discuss evidenced textual differences without asserting an undocumented translator motive; the underlying original-language witness inventory remains an ongoing research lane, not a certification of systematic doctrinal bias.
+The [Louis Segond 1910 French profile](../../sources/cleaned/bibles/fr/lsg-1910/editorial/profiles/fr-segond-1910.md) was **editorially approved on 2026-11-10** by the project owner and independently published to the catalogue through the explicitly approved [profile receipt](../../modules/lsg-1910/profiles/fr.json). The already approved [LSG 0.1.0 SWORD module](../../modules/lsg-1910/EDITORIAL.md) and [its release](../../sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-0.1.0.md) are unchanged. The short and long descriptions discuss evidenced textual differences without asserting an undocumented translator motive; the underlying original-language witness inventory remains an ongoing research lane, not a certification of systematic doctrinal bias.
 
 ## Machine publication contract for descriptive profiles
 
