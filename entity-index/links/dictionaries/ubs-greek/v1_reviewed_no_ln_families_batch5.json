@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "status": "source_verified_original_greek_entry_only_without_lexical_ln_batch5_private",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "original_macula_word_id_required": true,
+    "source_greek_nfc_lemma_identity": true,
+    "unique_original_ubs_en_fr_headword": true,
+    "original_ubs_part_of_speech_matches_source_class": true,
+    "original_strong_morph_ln_preserved": true,
+    "allow_entry_only_without_contextual_ln": true,
+    "never_infer_contextual_ubs_lexid": true,
+    "no_global_strong_alias": true,
+    "original_index_unmodified": true,
+    "publication_approved": false
+  },
+  "reviewed_lexical_families": [
+    {
+      "lemma_nfc": "ἑαυτοῦ",
+      "ubs_main_id": "001461000000000",
+      "macula_source_class": "pron",
+      "original_word_count": 493,
+      "original_strong_counts": {
+        "848": 493
+      },
+      "original_ubs_pos_en": [
+        "prfl."
+      ],
+      "original_ubs_pos_fr": [
+        "prfl."
+      ],
+      "editorial_basis": "The pinned original SBLGNT word IDs carry a Greek lemma canonically equal to one genuine UBS Greek 1.0 English/French lexical headword, with independently attested grammatical category and unmodified source Strong, LN, morphology and verse references. Although this individual MACULA source word has no UBS Louw–Nida sense-code intersection, headword/lexeme identity can be reviewed separately; no contextual semantic LEXID or global Strong alias is inferred."
+    },
+    {
+      "lemma_nfc": "σύ",
+      "ubs_main_id": "004674000000000",
+      "macula_source_class": "pron",
+      "original_word_count": 445,
+      "original_strong_counts": {
+        "4571": 34,
+        "4671": 45,
+        "4771": 26,
+        "5209": 96,
+        "5210": 26,
+        "5213": 95,
+        "5216": 123
+      },
+      "original_ubs_pos_en": [
+        "pprs."
+      ],
+      "original_ubs_pos_fr": [
+        "pprs."
+      ],
+      "editorial_basis": "The pinned original SBLGNT word IDs carry a Greek lemma canonically equal to one genuine UBS Greek 1.0 English/French lexical headword, with independently attested grammatical category and unmodified source Strong, LN, morphology and verse references. Although this individual MACULA source word has no UBS Louw–Nida sense-code intersection, headword/lexeme identity can be reviewed separately; no contextual semantic LEXID or global Strong alias is inferred."
+    },
+    {
+      "lemma_nfc": "οὗτος",
+      "ubs_main_id": "003683000000000",
+      "macula_source_class": "pron",
+      "original_word_count": 248,
+      "original_strong_counts": {
+        "3778": 60,
+        "5024": 2,
+        "5025": 4,
+        "5026": 15,
+        "5123": 8,
+        "5124": 98,
+        "5125": 9,
+        "5126": 2,
+        "5127": 10,
+        "5128": 2,
+        "5129": 21,
+        "5130": 17
+      },
+      "original_ubs_pos_en": [
+        "pdem."
+      ],
+      "original_ubs_pos_fr": [
+        "pdem."
+      ],
+      "editorial_basis": "The pinned original SBLGNT word IDs carry a Greek lemma canonically equal to one genuine UBS Greek 1.0 English/French lexical headword, with independently attested grammatical category and unmodified source Strong, LN, morphology and verse references. Although this individual MACULA source word has no UBS Louw–Nida sense-code intersection, headword/lexeme identity can be reviewed separately; no contextual semantic LEXID or global Strong alias is inferred."
+    },
+    {
+      "lemma_nfc": "ἐγώ",
+      "ubs_main_id": "001498000000000",
+      "macula_source_class": "pron",
+      "original_word_count": 17,
+      "original_strong_counts": {
+        "1473": 3,
+        "1691": 2,
+        "1698": 1,
+        "2248": 1,
+        "2254": 1,
+        "3165": 3,
+        "3427": 1,
+        "3450": 5
+      },
+      "original_ubs_pos_en": [
+        "pprs."
+      ],
+      "original_ubs_pos_fr": [
+        "pprs."
+      ],
+      "editorial_basis": "The pinned original SBLGNT word IDs carry a Greek lemma canonically equal to one genuine UBS Greek 1.0 English/French lexical headword, with independently attested grammatical category and unmodified source Strong, LN, morphology and verse references. Although this individual MACULA source word has no UBS Louw–Nida sense-code intersection, headword/lexeme identity can be reviewed separately; no contextual semantic LEXID or global Strong alias is inferred."
+    },
+    {
+      "lemma_nfc": "ῥέω",
+      "ubs_main_id": "004386000000000",
+      "macula_source_class": "verb",
+      "original_word_count": 10,
+      "original_strong_counts": {
+        "4483": 10
+      },
+      "original_ubs_pos_en": [
+        "verb"
+      ],
+      "original_ubs_pos_fr": [
+        "verbe"
+      ],
+      "editorial_basis": "The pinned original SBLGNT word IDs carry a Greek lemma canonically equal to one genuine UBS Greek 1.0 English/French lexical headword, with independently attested grammatical category and unmodified source Strong, LN, morphology and verse references. Although this individual MACULA source word has no UBS Louw–Nida sense-code intersection, headword/lexeme identity can be reviewed separately; no contextual semantic LEXID or global Strong alias is inferred."
+    },
+    {
+      "lemma_nfc": "ἄρχω",
+      "ubs_main_id": "000752000000000",
+      "macula_source_class": "verb",
+      "original_word_count": 3,
+      "original_strong_counts": {
+        "757": 3
+      },
+      "original_ubs_pos_en": [
+        "verb"
+      ],
+      "original_ubs_pos_fr": [
+        "verbe"
+      ],
+      "editorial_basis": "The pinned original SBLGNT word IDs carry a Greek lemma canonically equal to one genuine UBS Greek 1.0 English/French lexical headword, with independently attested grammatical category and unmodified source Strong, LN, morphology and verse references. Although this individual MACULA source word has no UBS Louw–Nida sense-code intersection, headword/lexeme identity can be reviewed separately; no contextual semantic LEXID or global Strong alias is inferred."
+    },
+    {
+      "lemma_nfc": "εἷς",
+      "ubs_main_id": "001534000000000",
+      "macula_source_class": "adj",
+      "original_word_count": 1,
+      "original_strong_counts": {
+        "3391": 1
+      },
+      "original_ubs_pos_en": [
+        "adjc."
+      ],
+      "original_ubs_pos_fr": [
+        "adjc."
+      ],
+      "editorial_basis": "The pinned original SBLGNT word IDs carry a Greek lemma canonically equal to one genuine UBS Greek 1.0 English/French lexical headword, with independently attested grammatical category and unmodified source Strong, LN, morphology and verse references. Although this individual MACULA source word has no UBS Louw–Nida sense-code intersection, headword/lexeme identity can be reviewed separately; no contextual semantic LEXID or global Strong alias is inferred."
+    },
+    {
+      "lemma_nfc": "προοράω",
+      "ubs_main_id": "004207000000000",
+      "macula_source_class": "verb",
+      "original_word_count": 1,
+      "original_strong_counts": {
+        "4275": 1
+      },
+      "original_ubs_pos_en": [
+        "verb"
+      ],
+      "original_ubs_pos_fr": [
+        "verbe"
+      ],
+      "editorial_basis": "The pinned original SBLGNT word IDs carry a Greek lemma canonically equal to one genuine UBS Greek 1.0 English/French lexical headword, with independently attested grammatical category and unmodified source Strong, LN, morphology and verse references. Although this individual MACULA source word has no UBS Louw–Nida sense-code intersection, headword/lexeme identity can be reviewed separately; no contextual semantic LEXID or global Strong alias is inferred."
+    }
+  ],
+  "previous_new_source_word_approvals": 7934,
+  "source_reviewed_entry_only_without_ln_word_count": 1218,
+  "remaining_strict_unapproved_words": 35
+}

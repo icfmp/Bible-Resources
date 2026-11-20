@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "status": "owner_authorized_for_stable_release_after_reviewed_ubs_v1_gates",
+  "owner_decision": "User replied 'continue' to the immediately preceding question requesting approval for publication of the verified BSI UBS Hebrew v1.0 resource, 2026-11-19 (ChatGPT Bible Ressources project).",
+  "release_tag": "bsi-ubs-hebrew-v1.0.0",
+  "release_title": "BSI UBS Hebrew lexical crosswalk — v1.0.0",
+  "published": false,
+  "requires_exact_verified_bytes": true,
+  "exclude_original_ubs_dictionary_prose": true,
+  "exclude_original_macula_biblical_text": true,
+  "independent_bible_app_integration": true,
+  "original_lexical_source_occurrences": 248680,
+  "linked_source_occurrences": 240373,
+  "edition_indexed_headword_denominator": 242747,
+  "indexed_scope_coverage_pct": 99.022,
+  "original_word_specific_reviewed_links": 275,
+  "inferred_contextual_sense_ids": 0,
+  "source_editions": {
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c"
+  },
+  "approved_private_index_sha256": "42f2ac19d981e924cff760708adeda71e3f2b183e969e11c27fd6df687badf65",
+  "approved_technical_rc2_zip_sha256": "7b05b1ec742e6840dbf231a8e6a3ebf6a2e9c1d67d086fee30195cf5975ceeec",
+  "expected_public_release_zip_sha256": "e448c7e4b6c0cb892789d78b487a3afe3dbe18cfb8c0b13be5fd910deabf640f"
+}

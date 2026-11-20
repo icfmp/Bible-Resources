@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "status": "PRIVATE_source_attested_Greek_temporal_lexical_headword_only_original_word_review",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "exact_original_macula_word_id": true,
+    "original_greek_lemma_nfc_equal_ubs": true,
+    "original_greek_and_strong_unchanged": true,
+    "original_source_conj_class_retained": true,
+    "original_source_adv_morphology_retained": true,
+    "original_ubs_advb_pos_retained": true,
+    "original_bilingual_ln_lexical_code_attested": true,
+    "no_contextual_ubs_lexid": true,
+    "no_global_strong_alias": true,
+    "historical_index_unchanged": true,
+    "publication_approved": false
+  },
+  "reviewed_original_word": {
+    "original_word_id": "n42006003014",
+    "original_lemma": "ὁπότε",
+    "original_strong": "3698",
+    "original_ln": "67.30",
+    "original_reference": "LUK 6:3!14",
+    "original_class": "conj",
+    "original_morph": "ADV",
+    "ubs_main_id": "003605000000000",
+    "ubs_original_pos_en": [
+      "advb."
+    ],
+    "ubs_original_pos_fr": [
+      "advb."
+    ],
+    "ubs_ln_code": "67.30",
+    "editorial_basis": "The sole original MACULA ὁπότε in Luke 6:3 is source class conj, yet its independently original morphology is ADV. Both pinned UBS v1.0 EN and FR identify exactly the same Greek lexical lemma as advb. and independently attest original LN 67.30. Greek grammatical authorities classify ὁπότε as a temporal conjunction or relative temporal adverb depending on the lexical versus syntactic framework. This supports only its original-word lexical HEADWORD identity; retain MACULA class conj, MACULA morphology ADV and all original annotations without inferring contextual UBS lexical sense."
+  },
+  "external_grammar_context": [
+    {
+      "work": "Dickinson College Commentaries, Goodell Attic Greek grammar, clauses with Ὅτε / Ὁπότε",
+      "url": "https://dcc.dickinson.edu/grammar/goodell/clauses-%E1%BD%85%CF%84%CE%B5-%E1%BD%81%CF%80%CF%8C%CF%84%CE%B5-%E1%BC%90%CF%80%CE%B5%CE%AF-%E1%BC%A1%CE%BD%CE%AF%CE%BA%CE%B1-%E1%BD%81%CF%80%CE%B7%CE%BD%CE%AF%CE%BA%CE%B1"
+    },
+    {
+      "work": "Logeion/LSJ lexical headword ὁπότε",
+      "url": "https://logeion.org/%E1%BD%81%CF%80%CF%8C%CF%84%CE%B5"
+    }
+  ],
+  "previous_extra_reviewed_original_headwords": 9194,
+  "original_word_specific_new_headwords": 1,
+  "no_ubs_source_lemma_words_still_unmatched": 456
+}

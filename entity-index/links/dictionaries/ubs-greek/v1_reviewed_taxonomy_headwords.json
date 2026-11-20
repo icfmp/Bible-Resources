@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "status": "PRIVATE_original_grammatical_taxonomy_crosswalk_lexical_headword_review_NOT_PUBLISHED",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "explicit_original_word_ids_only": true,
+    "retain_original_macula_and_ubs_pos": true,
+    "require_original_greek_nfc_lemma": true,
+    "require_attested_original_ln_in_both_ubs_languages": true,
+    "require_attested_nonzero_original_strong": true,
+    "source_pos_taxonomy_not_contextual_pos": true,
+    "preserve_historical_strong_aliases": true,
+    "no_contextual_lexid": true,
+    "no_source_edit": true,
+    "no_publication": true
+  },
+  "grammatical_class_crosswalk": [
+    {
+      "macula": "num",
+      "ubs": "adjc",
+      "basis": "A Greek cardinal numeral can be classified as a numeral by MACULA and lexicographically under adjectival forms by UBS. This is an explicit source taxonomic difference, not permission to rewrite Greek morphology or numerical meaning."
+    },
+    {
+      "macula": "pron",
+      "ubs": "prel",
+      "basis": "The original MACULA class identifies a pronoun and UBS p-rel identifies a relative pronoun lexical entry. Only lexical identity under the source lemma and LN corroboration is accepted."
+    },
+    {
+      "macula": "det",
+      "ubs": "artc",
+      "basis": "A determiner in MACULA and an article in UBS designate compatible grammatical taxonomies for the exact original Greek article headword, with LN corroboration."
+    }
+  ],
+  "reviewed_families": [
+    {
+      "lemma_nfc": "τεσσεράκοντα",
+      "ubs_main_id": "004963000000000",
+      "macula_class": "num",
+      "original_ubs_pos": "adjc.",
+      "original_word_count": 22,
+      "original_strong_counts": {
+        "5062": 22
+      },
+      "decision": "Approve individual original word-ID lexical HEADWORD only; do not normalize source POS, select contextual LEXID or derive global Strong equivalence."
+    },
+    {
+      "lemma_nfc": "ἐνενήκοντα",
+      "ubs_main_id": "001767000000000",
+      "macula_class": "num",
+      "original_ubs_pos": "adjc.",
+      "original_word_count": 4,
+      "original_strong_counts": {
+        "1768": 4
+      },
+      "decision": "Approve individual original word-ID lexical HEADWORD only; do not normalize source POS, select contextual LEXID or derive global Strong equivalence."
+    },
+    {
+      "lemma_nfc": "ὅστις",
+      "ubs_main_id": "003654000000000",
+      "macula_class": "pron",
+      "original_ubs_pos": "prel.",
+      "original_word_count": 5,
+      "original_strong_counts": {
+        "3755": 5
+      },
+      "decision": "Approve individual original word-ID lexical HEADWORD only; do not normalize source POS, select contextual LEXID or derive global Strong equivalence."
+    },
+    {
+      "lemma_nfc": "ὁ",
+      "ubs_main_id": "003491000000000",
+      "macula_class": "det",
+      "original_ubs_pos": "artc.",
+      "original_word_count": 1,
+      "original_strong_counts": {
+        "5120": 1
+      },
+      "decision": "Approve individual original word-ID lexical HEADWORD only; do not normalize source POS, select contextual LEXID or derive global Strong equivalence."
+    }
+  ],
+  "deferred_families": [
+    {
+      "lemma_nfc": "ὁπότε",
+      "ubs_main_id": "003605000000000",
+      "original_word_count": 1,
+      "reason": "MACULA conjunction versus original UBS adverb lexicographic class; require token-level independent semantic review"
+    },
+    {
+      "lemma_nfc": "ἄμωμον",
+      "ubs_main_id": "000299000000000",
+      "original_word_count": 1,
+      "reason": "Original source Strong 0 has no attested nonzero lexical identifier; retain source evidence unlinked"
+    },
+    {
+      "lemma_nfc": "Ἀρνί",
+      "ubs_main_id": "000717000000000",
+      "original_word_count": 1,
+      "reason": "Original source Strong 0 has no attested nonzero lexical identifier; retain source evidence unlinked"
+    }
+  ],
+  "new_source_reviewed_original_words": 32,
+  "remaining_strict_original_words": 3,
+  "previous_word_headword_reviews": 9152
+}

@@ -1,0 +1,1432 @@
+{
+  "schema_version": 1,
+  "status": "individual_original_greek_word_headword_review_batch4_private",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "original_word_ids_only": true,
+    "original_lemma_nfc_exact": true,
+    "require_original_ubs_en_fr_ln": true,
+    "require_matching_source_grammatical_class": true,
+    "require_attested_nonzero_original_strong": true,
+    "no_contextual_lexid": true,
+    "no_global_strong_alias": true,
+    "legacy_index_unchanged": true,
+    "publication_approved": false
+  },
+  "reviewed_families": [
+    {
+      "lemma_nfc": "ἕνεκα",
+      "ubs_main_id": "001766000000000",
+      "macula_class": "prep",
+      "source_word_count": 4,
+      "original_strong_counts": {
+        "1752": 4
+      },
+      "original_ubs_parts_of_speech": [
+        "prep. (with gen.)"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "τετρααρχέω",
+      "ubs_main_id": "004967000000000",
+      "macula_class": "verb",
+      "source_word_count": 3,
+      "original_strong_counts": {
+        "5075": 3
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἀργυροῦς",
+      "ubs_main_id": "000690000000000",
+      "macula_class": "adj",
+      "source_word_count": 3,
+      "original_strong_counts": {
+        "693": 3
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἐχθές",
+      "ubs_main_id": "002201000000000",
+      "macula_class": "adv",
+      "source_word_count": 3,
+      "original_strong_counts": {
+        "5504": 3
+      },
+      "original_ubs_parts_of_speech": [
+        "advb."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Ἰούδας",
+      "ubs_main_id": "002456000000000",
+      "macula_class": "noun",
+      "source_word_count": 3,
+      "original_strong_counts": {
+        "2448": 3
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Ἰσκαριώθ",
+      "ubs_main_id": "002468000000000",
+      "macula_class": "noun",
+      "source_word_count": 3,
+      "original_strong_counts": {
+        "2469": 3
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Βόες",
+      "ubs_main_id": "001003000000000",
+      "macula_class": "noun",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "1003": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Καναναῖος",
+      "ubs_main_id": "002586000000000",
+      "macula_class": "noun",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "2581": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Μαθθάτ",
+      "ubs_main_id": "003127000000000",
+      "macula_class": "noun",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "3158": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Μαθθίας",
+      "ubs_main_id": "003128000000000",
+      "macula_class": "noun",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "3159": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Ναζαρά",
+      "ubs_main_id": "003381000000000",
+      "macula_class": "noun",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "3478": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Σαλά",
+      "ubs_main_id": "004429000000000",
+      "macula_class": "noun",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "4527": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "κρείττων",
+      "ubs_main_id": "002924000000000",
+      "macula_class": "adj",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "2908": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "πλύνω",
+      "ubs_main_id": "004053000000000",
+      "macula_class": "verb",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "4150": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "πονηρός",
+      "ubs_main_id": "004093000000000",
+      "macula_class": "adj",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "4191": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "συνοράω",
+      "ubs_main_id": "004832000000000",
+      "macula_class": "verb",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "4894": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "σύνειμι",
+      "ubs_main_id": "004799000000000",
+      "macula_class": "verb",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "4895": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "σύνοιδα",
+      "ubs_main_id": "004827000000000",
+      "macula_class": "verb",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "4894": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ταχύς",
+      "ubs_main_id": "004935000000000",
+      "macula_class": "adj",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "5033": 1,
+        "5036": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "τεσσερακονταετής",
+      "ubs_main_id": "004964000000000",
+      "macula_class": "adj",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "5063": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "χοῦς",
+      "ubs_main_id": "005414000000000",
+      "macula_class": "noun",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "5522": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ψευδόμαρτυς",
+      "ubs_main_id": "005461000000000",
+      "macula_class": "noun",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "5575": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἀνάγαιον",
+      "ubs_main_id": "000313000000000",
+      "macula_class": "noun",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "508": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, n."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἀντιλέγω",
+      "ubs_main_id": "000483000000000",
+      "macula_class": "verb",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "471": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἄρχω",
+      "ubs_main_id": "000752000000000",
+      "macula_class": "verb",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "757": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Ἀσάφ",
+      "ubs_main_id": "000757000000000",
+      "macula_class": "noun",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "760": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἐπίστασις",
+      "ubs_main_id": "002007000000000",
+      "macula_class": "noun",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "1999": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἔοικα",
+      "ubs_main_id": "001873000000000",
+      "macula_class": "verb",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "1503": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἥσσων",
+      "ubs_main_id": "002276000000000",
+      "macula_class": "adj",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "2276": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Ἰωβήδ",
+      "ubs_main_id": "002496000000000",
+      "macula_class": "noun",
+      "source_word_count": 2,
+      "original_strong_counts": {
+        "5601": 2
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Καῦδα",
+      "ubs_main_id": "002748000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2802": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, n."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Μαγαδάν",
+      "ubs_main_id": "003112000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3093": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Μεννά",
+      "ubs_main_id": "003218000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3104": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Ναιμάν",
+      "ubs_main_id": "003387000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3497": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Νινευίτης",
+      "ubs_main_id": "003439000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3535": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Σμύρνα",
+      "ubs_main_id": "004572000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4668": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "αἰτίωμα",
+      "ubs_main_id": "000158000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "157": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, n."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "αἴτιος",
+      "ubs_main_id": "000157000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "159": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "αὐτόφωρος",
+      "ubs_main_id": "000844000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "1888": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "αὐχέω",
+      "ubs_main_id": "000846000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3166": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "βαρέω",
+      "ubs_main_id": "000915000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "925": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "βασίλειος",
+      "ubs_main_id": "000931000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "934": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "γνωρίζω",
+      "ubs_main_id": "001120000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "1232": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "δανιστής",
+      "ubs_main_id": "001172000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "1157": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "δεισιδαίμων",
+      "ubs_main_id": "001191000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "1174": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "δεσμεύω",
+      "ubs_main_id": "001211000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "1196": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "διαπαρατριβή",
+      "ubs_main_id": "001290000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3859": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "διόρθωμα",
+      "ubs_main_id": "001373000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2735": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, n."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "εἰ",
+      "ubs_main_id": "001511000000000",
+      "macula_class": "conj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2229": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "conj."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "εἰδέα",
+      "ubs_main_id": "001512000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2397": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "εὐρακύλων",
+      "ubs_main_id": "002160000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2148": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "θορυβάζω",
+      "ubs_main_id": "002355000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "5182": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "κίχρημι",
+      "ubs_main_id": "002811000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "5531": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "καλός",
+      "ubs_main_id": "002575000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2566": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "κατάθεμα",
+      "ubs_main_id": "002626000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2652": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, n."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "καταθεματίζω",
+      "ubs_main_id": "002627000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2653": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "καυστηριάζω",
+      "ubs_main_id": "002753000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2743": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "κιννάμωμον",
+      "ubs_main_id": "002809000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2792": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, n."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "λακάω",
+      "ubs_main_id": "002996000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2997": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "λῆμψις",
+      "ubs_main_id": "003045000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3028": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "νοσσός",
+      "ubs_main_id": "003460000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3502": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "παρίημι",
+      "ubs_main_id": "003837000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3935": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "παραβολεύομαι",
+      "ubs_main_id": "003752000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3851": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "παρακαθέζομαι",
+      "ubs_main_id": "003770000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3869": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "παρεδρεύω",
+      "ubs_main_id": "003818000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4332": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "πατρολῴας",
+      "ubs_main_id": "003871000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3964": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "περιάπτω",
+      "ubs_main_id": "003918000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "681": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "προστάσσω",
+      "ubs_main_id": "004272000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4384": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "πρότερος",
+      "ubs_main_id": "004290000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4387": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "πρόϊμος",
+      "ubs_main_id": "004188000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4406": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "σάρδιον",
+      "ubs_main_id": "004458000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4556": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, n."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "σιρικός",
+      "ubs_main_id": "004518000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4596": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "σπουδαίως",
+      "ubs_main_id": "004608000000000",
+      "macula_class": "adv",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4708": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "advb."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "σπουδαῖος",
+      "ubs_main_id": "004607000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4705": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "στασιαστής",
+      "ubs_main_id": "004614000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4955": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "στιβάς",
+      "ubs_main_id": "004643000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4746": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "συναλλάσσω",
+      "ubs_main_id": "004777000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4900": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ταπεινόφρων",
+      "ubs_main_id": "004918000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "5391": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "φαιλόνης",
+      "ubs_main_id": "005206000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "5341": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἀνέλεος",
+      "ubs_main_id": "000418000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "448": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἀφθορία",
+      "ubs_main_id": "000860000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "90": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἄραφος",
+      "ubs_main_id": "000683000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "729": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἄρκος",
+      "ubs_main_id": "000710000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "715": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Ἀμώς",
+      "ubs_main_id": "000302000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "301": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἐκτενής",
+      "ubs_main_id": "001631000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "1618": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἐλάχιστος",
+      "ubs_main_id": "001659000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "1647": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἐνέδρα",
+      "ubs_main_id": "001762000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "1747": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἐνδώμησις",
+      "ubs_main_id": "001761000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "1739": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἐπικέλλω",
+      "ubs_main_id": "001962000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2027": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἐπιλείχω",
+      "ubs_main_id": "001970000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "621": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἐπισκευάζομαι",
+      "ubs_main_id": "001998000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "643": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ἐσθής",
+      "ubs_main_id": "002082000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2067": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, f."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Ἰησοῦς",
+      "ubs_main_id": "002427000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2499": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Ἰσσαχάρ",
+      "ubs_main_id": "002475000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2466": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Ἰωανάν",
+      "ubs_main_id": "002490000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2490": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ὁμείρομαι",
+      "ubs_main_id": "003562000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2442": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ὑπεροράω",
+      "ubs_main_id": "005135000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "5237": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ὑπόλειμμα",
+      "ubs_main_id": "005164000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "2640": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun, n."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ὕστερος",
+      "ubs_main_id": "005196000000000",
+      "macula_class": "adj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "5306": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "adjc."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "ῥίπτω",
+      "ubs_main_id": "004398000000000",
+      "macula_class": "verb",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4495": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "verb"
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    },
+    {
+      "lemma_nfc": "Ῥαιφάν",
+      "ubs_main_id": "004373000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "4481": 1
+      },
+      "original_ubs_parts_of_speech": [
+        "noun-name, m."
+      ],
+      "editorial_basis": "Exact pinned MACULA original Greek word-ID witnesses have canonically identical lemma to a unique pinned UBS EN/FR 1.0 headword, with original bilingual Louw–Nida corroboration. Original Strong codes, verse references and morphology remain unchanged. The lexicographic part-of-speech label confirms the original word's grammatical class; accept lexical headword identity only, not a contextual UBS sense or global Strong alias."
+    }
+  ],
+  "deferred_families": [
+    {
+      "lemma_nfc": "τεσσεράκοντα",
+      "ubs_main_id": "004963000000000",
+      "macula_class": "num",
+      "source_word_count": 22,
+      "original_strong_counts": {
+        "5062": 22
+      },
+      "ubs_original_pos": [
+        "adjc."
+      ],
+      "editorial_status": "NOT_APPROVED_source_grammar_or_Strong_witness_requires_separate_review"
+    },
+    {
+      "lemma_nfc": "ὅστις",
+      "ubs_main_id": "003654000000000",
+      "macula_class": "pron",
+      "source_word_count": 5,
+      "original_strong_counts": {
+        "3755": 5
+      },
+      "ubs_original_pos": [
+        "prel."
+      ],
+      "editorial_status": "NOT_APPROVED_source_grammar_or_Strong_witness_requires_separate_review"
+    },
+    {
+      "lemma_nfc": "ἐνενήκοντα",
+      "ubs_main_id": "001767000000000",
+      "macula_class": "num",
+      "source_word_count": 4,
+      "original_strong_counts": {
+        "1768": 4
+      },
+      "ubs_original_pos": [
+        "adjc."
+      ],
+      "editorial_status": "NOT_APPROVED_source_grammar_or_Strong_witness_requires_separate_review"
+    },
+    {
+      "lemma_nfc": "ἄμωμον",
+      "ubs_main_id": "000299000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "0": 1
+      },
+      "ubs_original_pos": [
+        "noun, n."
+      ],
+      "editorial_status": "NOT_APPROVED_source_grammar_or_Strong_witness_requires_separate_review"
+    },
+    {
+      "lemma_nfc": "Ἀρνί",
+      "ubs_main_id": "000717000000000",
+      "macula_class": "noun",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "0": 1
+      },
+      "ubs_original_pos": [
+        "noun-name, m."
+      ],
+      "editorial_status": "NOT_APPROVED_source_grammar_or_Strong_witness_requires_separate_review"
+    },
+    {
+      "lemma_nfc": "ὁ",
+      "ubs_main_id": "003491000000000",
+      "macula_class": "det",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "5120": 1
+      },
+      "ubs_original_pos": [
+        "artc."
+      ],
+      "editorial_status": "NOT_APPROVED_source_grammar_or_Strong_witness_requires_separate_review"
+    },
+    {
+      "lemma_nfc": "ὁπότε",
+      "ubs_main_id": "003605000000000",
+      "macula_class": "conj",
+      "source_word_count": 1,
+      "original_strong_counts": {
+        "3698": 1
+      },
+      "ubs_original_pos": [
+        "advb."
+      ],
+      "editorial_status": "NOT_APPROVED_source_grammar_or_Strong_witness_requires_separate_review"
+    }
+  ],
+  "previously_reviewed_original_words": 7796,
+  "source_word_approvals_batch4": 138,
+  "remaining_strict_source_word_unapproved": 35
+}

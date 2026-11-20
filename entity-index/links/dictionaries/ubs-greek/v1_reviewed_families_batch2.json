@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "status": "SOURCE_ATTESTED_HEADWORD_ONLY_PRIVATE_NOT_PUBLISHED",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "original_word_ids_only": true,
+    "require_original_lemma_nfc": true,
+    "require_bilingual_ln_in_headword": true,
+    "require_compatible_source_grammar": true,
+    "preserve_original_strong": true,
+    "infer_contextual_senses": false,
+    "publish": false
+  },
+  "reviewed_families": [
+    {
+      "lemma_nfc": "πρῶτος",
+      "ubs_main_id": "004314000000000",
+      "macula_class": "adj",
+      "source_word_count": 96,
+      "editorial_basis": "Exact original MACULA word ID, canonically identical pinned UBS EN/FR headword, original per-word Louw–Nida intersection and compatible original lexical part of speech. Approve lexical headword identity only; preserve Greek, Strong, morphology and original annotation; never select contextual LEXID."
+    },
+    {
+      "lemma_nfc": "εἷς",
+      "ubs_main_id": "001534000000000",
+      "macula_class": "adj",
+      "source_word_count": 78,
+      "editorial_basis": "Exact original MACULA word ID, canonically identical pinned UBS EN/FR headword, original per-word Louw–Nida intersection and compatible original lexical part of speech. Approve lexical headword identity only; preserve Greek, Strong, morphology and original annotation; never select contextual LEXID."
+    },
+    {
+      "lemma_nfc": "λέγω",
+      "ubs_main_id": "003022000000000",
+      "macula_class": "verb",
+      "source_word_count": 72,
+      "editorial_basis": "Exact original MACULA word ID, canonically identical pinned UBS EN/FR headword, original per-word Louw–Nida intersection and compatible original lexical part of speech. Approve lexical headword identity only; preserve Greek, Strong, morphology and original annotation; never select contextual LEXID."
+    },
+    {
+      "lemma_nfc": "ἐσθίω",
+      "ubs_main_id": "002083000000000",
+      "macula_class": "verb",
+      "source_word_count": 64,
+      "editorial_basis": "Exact original MACULA word ID, canonically identical pinned UBS EN/FR headword, original per-word Louw–Nida intersection and compatible original lexical part of speech. Approve lexical headword identity only; preserve Greek, Strong, morphology and original annotation; never select contextual LEXID."
+    },
+    {
+      "lemma_nfc": "εὐθύς",
+      "ubs_main_id": "002129000000000",
+      "macula_class": "adj",
+      "source_word_count": 59,
+      "editorial_basis": "Exact original MACULA word ID, canonically identical pinned UBS EN/FR headword, original per-word Louw–Nida intersection and compatible original lexical part of speech. Approve lexical headword identity only; preserve Greek, Strong, morphology and original annotation; never select contextual LEXID."
+    },
+    {
+      "lemma_nfc": "πολύς",
+      "ubs_main_id": "004086000000000",
+      "macula_class": "adj",
+      "source_word_count": 59,
+      "editorial_basis": "Exact original MACULA word ID, canonically identical pinned UBS EN/FR headword, original per-word Louw–Nida intersection and compatible original lexical part of speech. Approve lexical headword identity only; preserve Greek, Strong, morphology and original annotation; never select contextual LEXID."
+    },
+    {
+      "lemma_nfc": "μέγας",
+      "ubs_main_id": "003193000000000",
+      "macula_class": "adj",
+      "source_word_count": 46,
+      "editorial_basis": "Exact original MACULA word ID, canonically identical pinned UBS EN/FR headword, original per-word Louw–Nida intersection and compatible original lexical part of speech. Approve lexical headword identity only; preserve Greek, Strong, morphology and original annotation; never select contextual LEXID."
+    },
+    {
+      "lemma_nfc": "ὑπάρχω",
+      "ubs_main_id": "005111000000000",
+      "macula_class": "verb",
+      "source_word_count": 46,
+      "editorial_basis": "Exact original MACULA word ID, canonically identical pinned UBS EN/FR headword, original per-word Louw–Nida intersection and compatible original lexical part of speech. Approve lexical headword identity only; preserve Greek, Strong, morphology and original annotation; never select contextual LEXID."
+    },
+    {
+      "lemma_nfc": "δείκνυμι",
+      "ubs_main_id": "001181000000000",
+      "macula_class": "verb",
+      "source_word_count": 33,
+      "editorial_basis": "Exact original MACULA word ID, canonically identical pinned UBS EN/FR headword, original per-word Louw–Nida intersection and compatible original lexical part of speech. Approve lexical headword identity only; preserve Greek, Strong, morphology and original annotation; never select contextual LEXID."
+    },
+    {
+      "lemma_nfc": "πίμπλημι",
+      "ubs_main_id": "003997000000000",
+      "macula_class": "verb",
+      "source_word_count": 24,
+      "editorial_basis": "Exact original MACULA word ID, canonically identical pinned UBS EN/FR headword, original per-word Louw–Nida intersection and compatible original lexical part of speech. Approve lexical headword identity only; preserve Greek, Strong, morphology and original annotation; never select contextual LEXID."
+    }
+  ],
+  "expected_original_words": 577,
+  "prior_reviewed_words": 5033,
+  "remaining_unapproved_words": 328
+}

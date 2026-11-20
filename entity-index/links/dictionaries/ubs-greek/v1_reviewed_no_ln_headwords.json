@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "status": "source_attested_entry_only_without_ubs_ln_private_not_published",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "require_exact_original_word_id": true,
+    "require_nfc_original_lemma_identity": true,
+    "require_original_source_morphology_and_class": true,
+    "require_unique_bilingual_ubs_headword": true,
+    "require_original_ubs_headword_no_lexmeanings": true,
+    "preserve_original_strong_codes": true,
+    "never_infer_contextual_ubs_lexid": true,
+    "no_global_strong_aliases": true,
+    "publication_approved": false
+  },
+  "reviewed_headword_families": [
+    {
+      "lemma_nfc": "εἰμί",
+      "original_ubs_strong": "G2258",
+      "original_macula_class": "verb",
+      "original_ubs_pos": "verb",
+      "original_source_unmatched_words": 2031,
+      "rationale": "The pinned UBS v1.0 English and French dictionaries have one exact Greek copular verb headword εἰμί with original Strong G2258 and no LEXMeanings; original MACULA word-specific inflection annotations have the same canonical Greek lemma and grammatical verb class, though their original Strong codes differ. Approve only the uniquely attested lexical entry for verified original word IDs, never a contextual Louw–Nida sense or global Strong alias."
+    }
+  ],
+  "previously_source_reviewed_headword_words": 5610,
+  "additional_source_reviewed_entry_only_words": 2031
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "status": "source_attested_pronoun_headword_review_without_publication",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "accept_only_exact_original_word_id": true,
+    "require_original_lemma_nfc_identity": true,
+    "require_original_class_pronoun": true,
+    "require_attested_common_ubs_original_ln": true,
+    "no_original_text_strong_morphology_changes": true,
+    "no_contextual_sense_ids": true,
+    "no_global_strong_aliases": true,
+    "original_index_unchanged": true,
+    "publication_approved": false
+  },
+  "reviewed_headword_families": [
+    {
+      "lemma_nfc": "σύ",
+      "ubs_main_id": "004674000000000",
+      "rationale": "The pinned Macula SBLGNT original-word lemma is the second-person personal pronoun σύ, irrespective of its grammatical case or alternate Strong code; the pinned UBS 1.0 headword is the same pronoun and the individual original token contains at least one attested UBS Louw–Nida code for this MainId. This approves headword identity only, without selecting a contextual sense."
+    },
+    {
+      "lemma_nfc": "ἐγώ",
+      "ubs_main_id": "001498000000000",
+      "rationale": "The pinned Macula SBLGNT original-word lemma identifies the first-person personal pronoun ἐγώ; the pinned UBS 1.0 headword is that same pronoun. Require exact original token ID, source pronoun class and original LN corroboration; do not collapse distinct Strong inflectional annotations or infer semantic-sense IDs."
+    },
+    {
+      "lemma_nfc": "οὗτος",
+      "ubs_main_id": "003683000000000",
+      "rationale": "The original Greek demonstrative οὗτος is compared only to the single canonically identical UBS Greek 1.0 demonstrative headword; each original-word candidate must have its own exactly attested original Louw–Nida code within this UBS entry and be classified as a pronoun in MACULA. No generic Strong alias or contextual sense is approved."
+    }
+  ],
+  "source_verified_individual_word_counts": {
+    "σύ": 1971,
+    "ἐγώ": 2156,
+    "οὗτος": 906
+  },
+  "original_source_word_approvals_total": 5033,
+  "remaining_5938_source_candidate_words_unapproved": 905
+}
