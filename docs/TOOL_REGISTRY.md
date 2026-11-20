@@ -18,7 +18,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 - HISTORICAL/ARCHIVE: 9
 - KEEP_GENERIC: 26
 - MERGE: 10
-- UNDECIDED: 129
+- UNDECIDED: 127
 
 ## All tracked tools
 
@@ -30,8 +30,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/audit_text.py`](../scripts/audit_text.py) | UNDECIDED | not established | 1 | source/native audit |
 | [`scripts/bible_intake.py`](../scripts/bible_intake.py) | KEEP_GENERIC | not established | 9 | intake |
 | [`scripts/bible_stage_runner.py`](../scripts/bible_stage_runner.py) | KEEP_GENERIC | named test | 6 | not determined |
-| [`scripts/build.py`](../scripts/build.py) | KEEP_GENERIC | not established | 25 | publication/release |
-| [`scripts/build_place_context.py`](../scripts/build_place_context.py) | UNDECIDED | not established | 4 | publication/release |
+| [`scripts/build.py`](../scripts/build.py) | KEEP_GENERIC | not established | 24 | publication/release |
 | [`scripts/catalogue_profiles.py`](../scripts/catalogue_profiles.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/catalogue_release_coverage.py`](../scripts/catalogue_release_coverage.py) | KEEP_GENERIC | named test | 10 | publication/release |
 | [`scripts/check_provider_parity.py`](../scripts/check_provider_parity.py) | UNDECIDED | not established | 4 | not determined |
@@ -125,7 +124,6 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/pilot_runtime.py`](../scripts/pilot_runtime.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/pilot_subprocess.py`](../scripts/pilot_subprocess.py) | UNDECIDED | named test | 15 | not determined |
 | [`scripts/prepare_darby_011_private_release_candidate.py`](../scripts/prepare_darby_011_private_release_candidate.py) | HISTORICAL/ARCHIVE | named test | 3 | publication/release |
-| [`scripts/prepare_place_manifest.py`](../scripts/prepare_place_manifest.py) | UNDECIDED | not established | 1 | not determined |
 | [`scripts/private_sword_bundle.py`](../scripts/private_sword_bundle.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/probe_andbible_android_emulator.py`](../scripts/probe_andbible_android_emulator.py) | UNDECIDED | not established | 6 | source/native audit |
 | [`scripts/probe_andbible_android_private_import.py`](../scripts/probe_andbible_android_private_import.py) | UNDECIDED | named test | 5 | source/native audit |
