@@ -1,6 +1,8 @@
 """Guard local links after documentation reorganization.
 
-This checks maintained project documentation and source/module entrypoints,\nnot the 1,300+ active work-in-progress manuscript records. It validates local\nMarkdown targets, not the correctness of external URLs or the
+This checks maintained project documentation and source/module entrypoints,
+not the 1,300+ active work-in-progress manuscript records. It validates local
+Markdown targets, not the correctness of external URLs or the
 validity of editorial evidence. It does not read copyrighted source payloads.
 """
 from __future__ import annotations
@@ -14,8 +16,11 @@ import unittest
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
-LINK = re.compile(r"(?<!!)\[[^\]\n]+\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
-FENCE = re.compile(r"(?ms)^\s*```[^\n]*\n.*?^\s*```\s*$")
+LINK = re.compile(r"(?<!!)\[[^\]
+]+\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+FENCE = re.compile(r"(?ms)^\s*```[^
+]*
+.*?^\s*```\s*$")
 SKIP = ("http:", "https:", "mailto:", "data:", "#", "//")
 
 
@@ -66,8 +71,10 @@ class DocumentationLinkIntegrityTests(unittest.TestCase):
                 if not dest.is_relative_to(ROOT) or not dest.exists():
                     missing.append(f"{rel}: {url}")
         self.assertGreater(checked, 50)
-        self.assertFalse(missing, "Broken local Markdown links:\n" +
-                         "\n".join(missing[:100]))
+        self.assertFalse(missing, "Broken local Markdown links:
+" +
+                         "
+".join(missing[:100]))
 
 
 if __name__ == "__main__":
