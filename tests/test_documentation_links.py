@@ -16,11 +16,8 @@ import unittest
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
-LINK = re.compile(r"(?<!!)\[[^\]
-]+\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
-FENCE = re.compile(r"(?ms)^\s*```[^
-]*
-.*?^\s*```\s*$")
+LINK = re.compile(r"(?<!!)\[[^\]\n]+\]\(\s*([^\s)]+)(?:\s+\"[^\"]*\")?\s*\)")
+FENCE = re.compile(r"(?ms)^\s*```[^\n]*\n.*?^\s*```\s*$")
 SKIP = ("http:", "https:", "mailto:", "data:", "#", "//")
 
 
@@ -71,10 +68,8 @@ class DocumentationLinkIntegrityTests(unittest.TestCase):
                 if not dest.is_relative_to(ROOT) or not dest.exists():
                     missing.append(f"{rel}: {url}")
         self.assertGreater(checked, 50)
-        self.assertFalse(missing, "Broken local Markdown links:
-" +
-                         "
-".join(missing[:100]))
+        self.assertFalse(missing, "Broken local Markdown links:\n" +
+                         "\n".join(missing[:100]))
 
 
 if __name__ == "__main__":
