@@ -43,7 +43,7 @@ remains unavailable; our reconstructed, version-specific MHCC source is
 
 ## Other working material
 
-- [Historical MHC original-to-cleaned source receipts](../evidence/mhc-285/source-cleanup)
+- [Historical MHC original-to-cleaned source receipts](../../sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/source-cleanup)
 - [HMCC Modern working manuscript index](../../work/commentaries/hmcc-modern/README.md):
   source-bound originals and review history remain under `work/mhcc-modern/`
 - [Historical CCEL private experiment](../../work/commentaries/mhc-crosswire/experiments/ccel-imp/README.md)
