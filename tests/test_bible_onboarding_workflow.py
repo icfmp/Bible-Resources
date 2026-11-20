@@ -28,13 +28,13 @@ class BibleOnboardingWorkflowTests(unittest.TestCase):
         # **1/7** markup. Both documents must enumerate 1-7 exactly once.
         guide_stages = [
             int(n) for n in re.findall(
-                r"^\\|\\s*([1-7])\\.\\s+[^|]+\\|",
+                r"^\|\s*([1-7])\.\s+[^|]+\|",
                 self.guide, flags=re.MULTILINE,
             )
         ]
         form_stages = [
             int(n) for n in re.findall(
-                r"^\\s+- \\[ \\] (\\d)/7 ", self.issue, flags=re.MULTILINE,
+                r"^\s+- \[ \] (\d)/7 ", self.issue, flags=re.MULTILINE,
             )
         ]
         self.assertEqual(guide_stages, list(range(1, 8)))

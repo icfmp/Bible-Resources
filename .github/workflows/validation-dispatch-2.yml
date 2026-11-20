@@ -1,0 +1,34 @@
+# One-time validation dispatcher for this conflicted documentation PR.
+name: Final Bible Resources documentation CI
+on:
+  push:
+    branches:
+      - docs/physical-taxonomy-layout-20261120
+    paths:
+      - '.github/workflows/validation-dispatch-2.yml'
+permissions:
+  contents: write
+  actions: write
+jobs:
+  verify-branch:
+    if: ${{ github.repository == 'icfmp/Bible-Resources' && github.ref == 'refs/heads/docs/physical-taxonomy-layout-20261120' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: true
+      - name: Remove one-off helper and run full verification
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -- .github/workflows/validation-dispatch-2.yml
+          git commit -m 'chore: remove one-time validation dispatcher'
+          git push origin HEAD:refs/heads/docs/physical-taxonomy-layout-20261120
+          gh workflow run validate.yml --ref docs/physical-taxonomy-layout-20261120
+          gh workflow run tool-registry-maintenance.yml --ref docs/physical-taxonomy-layout-20261120
