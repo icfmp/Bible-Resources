@@ -1,139 +1,42 @@
-# Strict SWORD commentary source policy
+# Commentary source policy
 
-Commentaries have the same **fail-closed** source-validation rule as Bibles, but
-their reference mappings require separate validation. This is not a second XML
-dialect: use the **official OSIS 2.1.1 XSD**, with the source-specific commentary
-conventions documented by CrossWire.
+Commentaries obey the same source-identity, rights, official-XSD and fail-closed fidelity rules as Bibles, but **annotated passage scope** is not the same as numbered Scripture text. Use official [CrossWire OSIS commentary conventions](https://wiki.crosswire.org/OSIS_Commentaries), not a custom XML dialect.
 
-Primary reference: [CrossWire — OSIS Commentaries](https://wiki.crosswire.org/OSIS_Commentaries).
+## Entry structure and scope
 
-## Official markup for a commentary entry
+An OSIS commentary entry is a `div` with `annotateType="commentary"` and an authorial `annotateRef` identifying a Bible verse, passage, chapter or reviewed discontinuous set. A `div type` value can describe section hierarchy but does **not** identify commentary coverage; headings, book wrappers and introductions are not implicitly assigned to a verse.
 
-    <div type="section" annotateType="commentary" annotateRef="Gen.1.1">
-      <title>An author's heading</title>
-      <p>The author comments on the passage and quotes it when needed.</p>
-    </div>
+```xml
+<div type="section" annotateType="commentary" annotateRef="Gen.1.1">
+  <title>Authorial section heading</title>
+  <p>Illustrative original commentary content.</p>
+</div>
+```
 
-CrossWire uses \`annotateType="commentary"\` and \`annotateRef\` to map a
-commentary **entry** to a biblical reference. The \`type\` on \`div\` does **not**
-determine entry identity. A section can comment on one verse, an uninterrupted
-range such as \`Gen.1.1-Gen.2.3\`, or several references separated by spaces.
-Non-entry \`div\` elements are legitimate wrappers for book groups, books
-and hierarchy; they are **not** assigned to a verse by proximity.
+This fragment illustrates the mapping only; a real source must pass the official OSIS XSD. Preserve exact original annotation range bounds, order, nested sections, quotations, titles, lists, notes, references, paragraphs and typography. Do not merge two authorial comments just because they address the same passage, or split a chapter-only comment into invented verse comments.
 
-The recorded original reference, its bounds, and the grouping must be retained
-exactly. The checked, intentionally narrow parser handles straightforward book,
-chapter, verse identifiers, in-book ranges and discontinuous lists. Work prefixes
-in commentary \`annotateRef\` are rejected because CrossWire's current
-commentary importer does not support them. Any unusual but legal reference,
-ambiguous range, possible introduction key, or cross-book range is **blocked**
-for standards review rather than guessed or silently truncated.
+The current `scripts/guard_commentary.py` implements an intentionally narrow reviewed subset of ordinary book/chapter/verse identifiers, ranges and lists. Unusual, otherwise legal references, cross-book ranges, introduction keys or ambiguous work prefixes **block for standards review**, rather than being silently simplified.
 
-A line in the source might fail with:
+## Editorial corrections versus formatting
 
-    sources/mhc.osis.xml:812: [COMMENTARY_REFERENCE_UNREVIEWED]
-    Unreviewed commentary reference 'Gen.1.1@special'; do not guess a verse.
+The authorial prose, theological argument, Scripture quotations and original sectioning are content. Do not remove quotations as duplicate Bible text or automatically re-paragraph for readability. A demonstrable wording, citation or annotation defect can be corrected only with attested evidence, reversible recorded change and appropriate approval. A separately identified modernized/translated derivative may follow a different reviewed editorial layout; it must not masquerade as the unchanged original.
 
-## Preservation rules
+## Reader discovery across a passage
 
-- The author's exposition, doctrinal argument, original emphases and division
-  structure are content, not formatting noise.
-- Quoted Scripture **inside** the commentary is not removable boilerplate.
-  It may be essential to the interpretation and may intentionally differ from
-  the reader's currently selected translation. Detect suspected duplicate
-  quotations for **human editorial review only**.
-- Preserve scriptural citations as citations (\`reference osisRef\`), not
-  invented anchors for the commentary entry.
-- Preserve headings, paragraphs, nested citations, lists, notes, quotations,
-  typography and their relationships. Some structures are not yet in our
-  reviewed generic OSIS allowlist; these **stop** processing until a rule and
-  regression tests are agreed upon. No silent flattening of headings, lists
-  or poetic passages is permitted.
-- Never merge, discard or reorder independent commentary entries just because
-  they annotate the same verse. No automatic rearrangement by verse position.
-- Preserve attribution, rights statements, the full original textual content
-  and the exact editorial record.
+Where independent evidence proves an entry covers a full chapter or passage but native SWORD indexes only its first key, a **separate explicitly reviewed corrected edition** may add navigational aliases so users can discover that single authorial entry at its actual covered verses. Do **not** copy the prose into independently authored per-verse entries, assume scope from a first-key shortcut, or overwrite distinct occupied keys.
 
-## Correct errors without redesigning a source edition
+Each alias must be derived from verified source scope and actual source/reader versification, with original and candidate byte hashes, complete link/topology comparison, deduplicated reader behavior and a reversible change receipt. The generic read-only proposal tool is `scripts/commentary_navigation_link_plan.py`. Any individual edition's decisions live in its `sources/cleaned/**/editorial/` folder.
 
-For a correction edition of an existing commentary, **retain the transmitted editorial sectioning and paragraph arrangement**; do not introduce new stylistic breaks, reorganize arguments or merge independent units merely for smoother reading. Long exposition alone is not an error. Readability-led re-paragraphing belongs in a **separately identified modern-language adaptation**, with its own editorial review.
+## Validation and limits
 
-This does **not** make CrossWire, a compiler or even the historical printed edition infallible. **Demonstrable mistakes** in wording, citations, section mapping or markup may be corrected at their actual origin, including defects inherited from a printed edition. Any such change must be specifically supported by evidence, identified as an editorial correction, and reproducible and reversible; never use a general stylistic normalization to conceal it. If an original boundary is *proven corrupt* rather than merely inconvenient, review that specific repair separately.
+First validate the exact source against the pinned OSIS 2.1.1 schema and generic guard. Then:
 
-## Reader-oriented navigation is not source-text alteration
+```sh
+python scripts/guard_commentary.py /private/commentary.osis.xml \
+  --schema /private/approved/osisCore.2.1.1-cw-latest.xsd \
+  --report /private/commentary-validation.json
+```
 
-An upstream SWORD author's section can be indexed at only its first verse,
-even when its actual, independently reviewed editorial scope is a whole
-passage or chapter. Source-byte fidelity is **not** a requirement to perpetuate
-an inferior index/navigation choice in a separately tracked Bible Resources
-correction edition. We prefer discoverability at **every verse actually covered**
-while preserving the **one authorial unit** (and displaying it once, not once per
-verse). This is a navigational/editorial improvement, not proof that the author
-composed distinct comments on each verse.
+The report must bind the original SHA, pinned schema and policy, annotation count and original reference mapping digest. `scripts/validate.py` must refuse an approved commentary with an absent, stale, blocked or Bible-only source report.
 
-- For verified chapter-level commentary, keep the label and semantics
-  **chapter commentary** and make it discoverable from any verse of that chapter.
-- Use **standard OSIS commentary** annotated continuous/discontinuous ranges
-  and native SWORD linked verse keys; do not invent a proprietary format.
-- Preserve discontinuous sets and all separate commentary sections, and refuse
-  to overwrite already occupied, different-payload original keys.
-- If the original scope is ambiguous, **do not** infer it from the presence of
-  only the chapter's first native key or from a citation `scripRef` alone.
-- All alias proposals require reviewed section bounds, independent actual
-  versification keys, immutable raw text hashes, an explicit delta, real
-  reader deduplication verification and a reversible rollback receipt.
-- Keep the exact upstream source and original release untouched; publish any
-  corrected edition only after normal rights, editorial and owner publication
-  gates.
-
-Generic read-only proposal logic is in
-`scripts/commentary_navigation_link_plan.py`; the initial use case,
-limitations, and the owner's approval of this **direction only** are documented
-in `docs/evidence/mhcc-274/reader-oriented-indexing-decision.md`.
-
-## Current gate
-
-The **read-only** command \`scripts/guard_commentary.py\` first uses the
-reviewed-XSD OSIS guard, then checks each annotated section. It records:
-- \`source_kind: commentary\`
-- original source SHA-256, official schema and generic OSIS policy SHA-256
-- commentary policy SHA-256
-- annotation count and ordered reference-mapping SHA-256
-- either \`validated\` or \`blocked\`, with the exact source file and line
-
-Run (when the official OSIS XSD is reviewed and pinned):
-
-    python scripts/guard_commentary.py sources/commentary.osis.xml \
-      --schema path/to/reviewed/osisCore.2.1.1-cw-latest.xsd \
-      --report modules/example/SOURCE_VALIDATION.json
-
-An **approved commentary** is blocked by \`scripts/validate.py\` if the
-report is missing, generated by the generic Bible-only guard, uses a stale
-commentary policy, or includes no reviewed commentary entries.
-
-The official CrossWire OSIS 2.1.1 XSD and its single W3C xml.xsd
-dependency are now SHA-256 pinned and verified with strictly local
-dependency resolution. This makes the schema gate usable for real source
-checks, but **no real MHC source has been validated, normalized or approved**.
-The offline unit tests continue to use synthetic test-only XSD fixtures.
-
-## Boundaries and next work
-
-The script does **not** convert or normalize commentary text. It does not
-inspect compiled \`RawCom\`/\`RawCom4\`/\`zCom\` modules or generate binaries.
-When only compiled SWORD data are available, the future extraction adapter
-must identify provider/module/entry key instead of inventing an original XML
-line number.
-
-SourceType=ThML, plaintext, and TEI are **not** automatically treated as OSIS:
-each needs a standards-based importer and its own rules. The type and exact
-line/entry of an unknown source construct must be reported and its handling
-reviewed before any future normalization.
-
-The eventual production pipeline still needs a source-to-SWORD round-trip
-comparison, reference coverage checks, verified permissions for derivative
-editions, and a real SWORD reader smoke test. Passing the **current** source
-gate is necessary but not sufficient for publication.
-
-See also [NORMALIZATION_POLICY.md](NORMALIZATION_POLICY.md) and
-[EDITORIAL_RULES.md](EDITORIAL_RULES.md).
+**Source validation is not recompilation or publication.** The guard does not extract compiled `RawCom`/`RawCom4`/`zCom`, reconstruct missing authorial XML, verify full native content or certify client rendering. A compiled module has no reliable original XML line numbers; identify any error by provider/module/native key, not an invented source line. Use [production](../PRODUCTION_PIPELINE.md) and [native inspection](../technical/README.md) for subsequent gates.
