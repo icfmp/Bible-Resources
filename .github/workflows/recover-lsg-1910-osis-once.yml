@@ -75,7 +75,7 @@ jobs:
           # Preserve original code and all upstream transformations unmodified
           # except a terminal, SHA-enforcing extraction gate at the precise
           # source-to-compiled boundary.
-          content=content.replace(marker,new+marker)
+          content=content.replace(marker,new.rstrip()+chr(10)+marker)
           p.write_text(content)
           PY
           cd "$RUNNER_TEMP/lsg-historical"
