@@ -15,7 +15,7 @@ This is the navigation entry point. File location does not define authority: a h
 
 1. **[Canonical production chain](PRODUCTION_PIPELINE.md)**: full editorial/technical evidence contract for original source, cleaning, reviews, compilation, reader tests and publication.
 2. [Source-first six-phase policy](SOURCE_FIRST_EDITORIAL_PIPELINE.md): accepted production principles and editorial scope.
-3. [Seven-stage Bible checkpoint workflow](BIBLE_7_STAGE_WORKFLOW.md) and [its GitHub Actions runner guide](BIBLE_STAGE_AUTOMATION.md).
+3. [Seven-stage Bible checkpoint workflow](BIBLE_7_STAGE_WORKFLOW.md) and [its concise GitHub Actions operator guide](BIBLE_STAGE_AUTOMATION.md) (with [historical diagnostic appendix](archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md)).
 4. [Seven-stage commentary checkpoint workflow](COMMENTARY_7_STAGE_WORKFLOW.md) and [commentary pipeline](COMMENTARY_PIPELINE.md).
 5. [Editorial audit execution reference](EDITORIAL_AUDIT_WORKFLOW.md) · [commentary translation from cleaned source](COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md). The older LSG-specific [onboarding playbook is archived](archive/RESOURCE_ONBOARDING_PLAYBOOK.md).
 6. [Publishing](PUBLISHING.md) · [catalogue integration](CATALOGUE_INTEGRATION.md) · [catalogue update protocol](CATALOGUE_UPDATE_PROTOCOL.md) · [upstream updates](UPDATES.md) · [upstream policy](UPSTREAM.md).
