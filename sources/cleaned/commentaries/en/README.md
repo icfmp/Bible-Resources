@@ -17,6 +17,7 @@ including the 24 existing approved aliases and two existing prose errata.
 The SWORD compiler may add wrappers/normalize whitespace; no original prose,
 reference destinations or original structural attributes were dropped in
 full-corpus proof. [Source reconstruction manifest](mhcc-crosswire/CLEANUP_MANIFEST.json)
+and [full native round-trip verification](https://github.com/icfmp/Bible-Resources/actions/runs/44721569022)
 records this explicitly. The approved original native corpus SHA is
 `2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e`. This is **not** the modern-English HMCC.
 
