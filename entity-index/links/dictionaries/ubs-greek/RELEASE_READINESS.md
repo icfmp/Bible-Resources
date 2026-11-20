@@ -1,6 +1,6 @@
 # UBS Greek v1: provenance, license boundary, and publication checklist
 
-**Status:** research index fully tested; **public redistribution not approved**.
+**Status:** the narrowly scoped, identifier-only crosswalk **was published** on 2026-11-20 as [BSI UBS Greek v0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/bsi-ubs-greek-v0.1.0), with source-checked attribution and public field allowlist. **Broader distribution of original source annotation fields, UBS definitions or a SWORD module remains unapproved.**
 This document records the rights evidence available at the original **pinned
 source revisions**, distinguishes upstream datasets from their components,
 and makes no assumption that a passing CI job authorizes publication.
