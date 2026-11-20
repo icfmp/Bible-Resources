@@ -64,7 +64,7 @@ jobs:
             '    source_bytes=labeled.read_bytes()',
             '    verified=hashlib.sha256(source_bytes).hexdigest()',
             '    if verified!="d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0":',
-            '        raise PilotError("Historical cleaned OSIS differs from published source SHA")',
+            '        raise PilotError("Historical cleaned OSIS differs from published source SHA: observed="+verified+" expected=d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0; source stages "+str({k:report.get(k) for k in ("raw_osis_schema","source_attested_spacing","text_only_parallel_heading_review","osis_editorial_range_label")}))',
             '    dest=Path(os.environ["LSG_RECOVERED_OSIS_PATH"])',
             '    if dest.exists():raise PilotError("Refuse to overwrite source")',
             '    dest.parent.mkdir(parents=True)',
