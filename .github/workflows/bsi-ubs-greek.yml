@@ -56,6 +56,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_form_supported_provisional_senses.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_sense_reference_shapes.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_source_verse_witnesses.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_source_verse_provisional_senses.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -933,6 +934,37 @@ jobs:
         with:
           name: bsi-ubs-greek-170-lower-confidence-sole-original-lexid-defaults-NOT-VALIDATED
           path: /tmp/bsi-ubs-greek-170-lower-confidence-provisional-UBS-original-sense-defaults.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Verify and stage 258 uniquely source-verse-supported original Greek UBS provisional sense choices
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_source_verse_provisional_senses.py \
+            --report /tmp/bsi-ubs-greek-original-source-verse-lexid-candidates-PRIVATE.json \
+            --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json \
+            --high /tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json \
+            --low /tmp/bsi-ubs-greek-170-lower-confidence-provisional-UBS-original-sense-defaults.json \
+            --form /tmp/bsi-ubs-greek-223-source-form-provisional-sense-choices-PRIVATE.json \
+            --output /tmp/bsi-ubs-greek-258-original-source-verse-provisional-LEXIDs-PRIVATE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/bsi-ubs-greek-258-original-source-verse-provisional-LEXIDs-PRIVATE.json').read_text())
+          assert x['new_source_verse_supported_provisional_word_count']==258
+          assert len(x['word_id_to_new_UBS_source_verse_provisional_lexid'])==258
+          assert x['all_provisional_original_word_ids_across_disjoint_tiers']==123155
+          assert x['remaining_without_a_unique_provisional_UBS_LEXID']==14586
+          assert x['unresolved_original_multi_lexid_after_form_and_verse']==2247
+          assert x['independently_contextually_validated']==0
+          assert x['previous_private_tiers_modified'] is False
+          assert x['original_UBS_or_MACULA_modified'] is False
+          assert x['published'] is False and x['publication_approved'] is False
+          print('GREEK_258_SOURCE_VERSE_PROVISIONAL_SENSE_CHOICES_NO_CONTEXTUAL_VALIDATION')
+          PY
+      - name: Upload 258 source-verse-supported Greek UBS provisional choices (PRIVATE)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-258-original-source-verse-provisional-lexids-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-258-original-source-verse-provisional-LEXIDs-PRIVATE.json
           if-no-files-found: error
           retention-days: 14
       - name: Upload private original Greek contextual sense unresolved prioritization (NOT published)
