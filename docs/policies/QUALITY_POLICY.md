@@ -26,8 +26,7 @@ The source-level diagnostic `scripts/audit_osis.py` and reviewer-gated
 lossless structural changes to a **separate OSIS output**. The original
 source remains immutable, with a SHA-256-based review plan and optional
 private diff. See [EDITORIAL_AUDIT_WORKFLOW.md](../workflows/EDITORIAL_AUDIT_WORKFLOW.md).
-Do not treat an audit as proof a SWORD module's display is wrong: real
-The current source-to-source normalizer supports only reviewed structural operations; use its documented scope and tests, not edition-specific probes, as an acceptance gate.
+Do not treat an OSIS audit as proof that a SWORD reader's display is wrong. The normalizer supports only explicitly reviewed structural operations; use its documented scope and complete source/native tests rather than edition-specific probes to assess a module.
 
 ## Mandatory SWORD reference-index attestation
 
