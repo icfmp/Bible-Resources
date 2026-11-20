@@ -19,7 +19,9 @@ def fixture():
     report["families"]=[
         {"original_lemma":"Ἰερουσαλήμ","original_strong":"2419",
          "original_word_ids":[f"n{i:011d}" for i in range(456)],
-         "original_words":456,"original_ln_counts":{"93.480a":456},
+         "original_words":456,
+         "original_word_witnesses":[{"original_word_id":f"n{i:011d}","original_ln":"93.480a","original_lemma":"Ἰερουσαλήμ","original_strong":"2419"} for i in range(456)],
+         "original_ln_counts":{"93.480a":456},
          "original_class_counts":{"noun":456}}]
     return report,en,fr
 
@@ -30,6 +32,7 @@ class OriginalBilingualUBSAlternateLemmas(unittest.TestCase):
         self.assertEqual(out["source_evidence_counts"],
                          {"exact_original_ubs_alternate_lemma_and_ln":456})
         self.assertEqual(out["new_source_word_lexical_headwords_approved"],0)
+        self.assertEqual(len(out["source_families"][0]["original_ubs_explicit_alternate_headwords"][0]["original_word_ids_with_bilingual_source_ln"]),456)
         self.assertEqual(out["source_families"][0]["original_ubs_explicit_alternate_headwords"][0]["ubs_original_main_id"],"A")
 
     def test_similar_but_not_original_alternate_is_not_identity(self):
@@ -53,6 +56,7 @@ class OriginalBilingualUBSAlternateLemmas(unittest.TestCase):
     def test_missing_original_ln_keeps_candidate_unapproved(self):
         r,en,fr=fixture()
         r["families"][0]["original_ln_counts"]={}
+        for word in r["families"][0]["original_word_witnesses"]:word["original_ln"]=""
         out=MOD["audit"](r,en,fr)
         self.assertEqual(out["source_evidence_counts"],
                          {"exact_original_ubs_alternate_lemma_NO_corresponding_source_ln":456})
