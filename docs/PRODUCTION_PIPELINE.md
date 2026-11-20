@@ -24,6 +24,7 @@ independently verify editorial content against exact source witnesses
 audit annotations / notes / references / section mapping / word alignment
         ↓
 compile SWORD from the APPROVED cleaned master
+   OR preserve an unchanged, independently audited stock binary
         ↓
 native full-corpus readback + independent readers + reproducibility checks
         ↓
@@ -51,7 +52,7 @@ Perform a **read-only** full inventory: book/chapter/verse or commentary-entry k
 For every cleaned resource, write its **edition-specific editorial decisions** to `sources/cleaned/<type>/<language>/<resource-id>/editorial/README.md` (and link to more detailed evidence under that directory as necessary). Global policies remain in `docs/`; `CLEANUP_MANIFEST.json` stays the machine-readable recovery/hash record. Do not confuse approved historical decisions with authorization to change new text. See [module-local editorial records](../sources/cleaned/README.md).
 
 
-Produce a **new** deterministic candidate under `work/<type>/<language>/<resource-id>/`, then, after review, the curated master under `sources/cleaned/<type>/<language>/<resource-id>/`. Use genuine OSIS or USFM; any adapter must be separately reviewed and preserve source provenance. Prefer standard elements over presentation-only HTML while keeping meaningful distinctions.
+**For a source-derived or corrected rebuild**, produce a **new** deterministic candidate under `work/<type>/<language>/<resource-id>/`, then, after review, the curated master under `sources/cleaned/<type>/<language>/<resource-id>/`. Use the appropriate supported source format (OSIS, USFM/USFX or another reviewed standard adapter) with exact provenance. **For genuinely unchanged upstream compiled SWORD stock**, do not invent authoring XML or require a fictional cleaned source master. Instead pin the exact upstream binary and original metadata, and retain its independent native source/rights evidence. These are two separate verification routes, not exemptions from fidelity. Prefer standard elements over presentation-only HTML while keeping meaningful distinctions.
 
 Allowed candidates include documented repair of invalid markup, removal of objectively redundant display artifacts, and restoration of source-attested paragraphs, poetry or headings. **Not automatically allowed:** wording changes, punctuation changes, translations, textual variants, versification changes, added/deleted notes, inferred cross-reference targets, changes in emphasis that carry meaning, or reshaping commentary ranges for a particular reader.
 
@@ -61,7 +62,7 @@ Record every transformation rule, why it is necessary, how it can be reversed, a
 
 ## 3. Validate the cleaned master and prove fidelity
 
-Run the official pinned OSIS schema where applicable, plus the resource-specific guards. Compare the **entire** original and cleaned corpora at stable reference/entry keys; never rely on text-only aggregate hashes or on representative samples alone. Count preserved, changed, inserted, deleted and remapped entries, and check structure separately from words and punctuation. Verify notes, references, labels, destinations, headings, poetry, paragraphs, introductions, metadata and word-level alignments.
+For a rebuilt source, run the official pinned OSIS schema **where applicable** (or the source's own format validator), plus resource-specific guards. Compare the **entire** original and cleaned corpora at stable reference/entry keys; never rely on text-only aggregate hashes or on representative samples alone. For **unchanged compiled stock**, verify its original published binary/configuration bytes and native content/index identity instead of claiming a nonexistent source-to-cleaned XML comparison. Any claim of independently preserved authorial-source fidelity still needs its own original-authoring witness and proof. Count preserved, changed, inserted, deleted and remapped entries, and check structure separately from words and punctuation. Verify notes, references, labels, destinations, headings, poetry, paragraphs, introductions, metadata and word-level alignments.
 
 Changes must match an approved, reversible ledger; unexplained changes fail closed. Recheck against an **independent, accurately identified edition witness** when correcting an apparent source defect. Do not conflate a modern translation or a later edition with the original edition. Commentary coverage may be by chapter, verse or passage range; respect the author's actual divisions and make any reader fallback explicit at the application layer.
 
@@ -71,9 +72,9 @@ For Bible resources, validate the exact native versification including absent/om
 
 ## 4. Compile and independently inspect SWORD
 
-Build with existing upstream SWORD conventions/tools and the repository's approved build path; preserve metadata, module identity, rights notices, and encoding. Pin compiler version, options, input hash and output native file inventory. Confirm output is reproducible where the existing contract specifies reproducibility; distinguish different ZIP packaging bytes from changed underlying SWORD entries.
+**For a reviewed source-derived rebuild**, compile with existing upstream SWORD conventions/tools and the repository's approved build path. **For unchanged stock**, preserve the original upstream SWORD payload/configuration byte identity and package only through the approved stock route; do not silently recompile it or call it a rebuilt module. In both cases preserve metadata, module identity, rights notices and encoding. Pin compiler version, options, input hash and output native file inventory. Confirm output is reproducible where the existing contract specifies reproducibility; distinguish different ZIP packaging bytes from changed underlying SWORD entries.
 
-Perform **full native readback** (keys, text, markup, metadata, commentary scope, verse mapping, notes and links as applicable) and compare it to the approved cleaned master. Use the native audits and stock SWORD probes already present in the repository. Do not claim a complete round-trip gate unless it has actually been run and passed for this source type.
+Perform **full native readback** (keys, text, markup, metadata, commentary scope, verse mapping, notes and links as applicable) and compare the results to the approved cleaned master **for a rebuild**, or to the exact pinned upstream original SWORD payload and separately proven authorial witnesses **for stock reuse**. Use the native audits and stock SWORD probes already present in the repository. Do not claim a complete round-trip gate unless it has actually been run and passed for this source type.
 
 **Required evidence:** compiler/tool versions, reproducible build manifest, native full-corpus parity/exception report, archive SHA-256 and package inventory. See [native raw witness](technical/NATIVE_SWORD_RAW_WITNESS.md), [whole corpus](technical/NATIVE_SWORD_WHOLE_CORPUS.md), [stable reference audit](technical/STABLE_SWORD_REFERENCE_AUDIT.md).
 
@@ -95,7 +96,7 @@ Before publication, record evidence of rights and editorial approval, source lin
 | --- | --- |
 | Identity/rights | Edition, provenance, license and component-specific permissions |
 | Originals | Source URLs, immutable bytes, file hashes |
-| Transformation | Rule IDs, code revision, input/output hashes, reversible change ledger |
+| Transformation / stock route | For rebuilds: rule IDs, code revision, input/output hashes and reversible ledger; for unchanged stock: proof of original native payload/configuration byte identity and explicit `no conversion` declaration |
 | Content fidelity | Full-corpus entries, semantic/punctuation diffs, approved exceptions |
 | Structure | Paragraphs, headings, poetry, intros, notes, links, versification, alignment |
 | SWORD | Compiler/driver/version, native inventory, parity and archive checksums |
