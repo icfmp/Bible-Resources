@@ -4,6 +4,8 @@
 
 The proposed [BRNP profile](architecture/BRNP.md) is deferred to issue #451 and is **not** a release gate. The existing official XSD, source-fidelity and SWORD/reader acceptance checks remain authoritative.
 
+**Numbering:** Sections 0–6 below explain the *technical dependency order*, starting with the prerequisite source/rights gate (0). The separate seven-stage [Bible checklist](workflows/BIBLE_7_STAGE_WORKFLOW.md) and [commentary checklist](workflows/COMMENTARY_7_STAGE_WORKFLOW.md) are **progress-reporting views**. In particular the Bible checklist calls native index/text auditing stage 4 and full source-to-native semantic/structural parity stage 5. This does not postpone source-to-cleaned fidelity until after compilation: that comparison is required **before** any candidate is approved for the build, and must be verified again against the native output afterwards. No item is waived because two guides group tasks differently.
+
 ## The production chain
 
 ```text
@@ -85,7 +87,7 @@ Reader samples supplement, **never replace**, exhaustive native parity. Do not m
 
 Before publication, record evidence of rights and editorial approval, source lineage, completed/blocked checks, unresolved exceptions, exact module version and proposed release URLs. A reviewer must be able to reproduce outputs from the pinned original and scripts; keep prior versions and proof receipts. Publish only through the repository's existing verified **versioned GitHub Release before Pages catalogue** protocol. Download the public artifacts and independently compare sizes/hashes against the approved release receipts. Do not silently overwrite published bytes or claim publication from a merely staged private artifact.
 
-**Required evidence:** signed-off version manifest, successful required checks, immutable release receipts, live-download parity, updated catalogue and release documentation. See [publishing](workflows/PUBLISHING.md), [catalogue update protocol](workflows/CATALOGUE_UPDATE_PROTOCOL.md), and [releases](../sources/cleaned/bibles/fr/darby-jnd-2024/editorial/releases).
+**Required evidence:** signed-off version manifest, successful required checks, immutable release receipts, live-download parity, updated catalogue and release documentation. See [publishing](workflows/PUBLISHING.md), [catalogue update protocol](workflows/CATALOGUE_UPDATE_PROTOCOL.md), and each resource's own `sources/cleaned/<type>/<language>/<id>/editorial/releases/` directory for edition-specific receipts.
 
 ## Mandatory evidence record for every resource
 
