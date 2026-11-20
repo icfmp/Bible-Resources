@@ -36,6 +36,16 @@ class ContractTests(unittest.TestCase):
         with self.assertRaises((ValueError, KeyError, TypeError)):
             build({"coverage": {"macula_words": 0}}, {}, {}, {}, {}, {}, {}, {})
 
+    def test_release_rights_metadata_contract_is_explicit(self):
+        from pathlib import Path
+        builder = Path(__file__).with_name("build_consolidated_v1_review_index.py").read_text()
+        self.assertIn("Biblica, Inc.", builder)
+        self.assertIn("CC BY-SA 4.0", builder)
+        self.assertIn("CC BY 4.0 dataset", builder)
+        self.assertIn("UBS MARBLE @ln/@domain", builder)
+        self.assertIn("NOT_APPROVED", builder)
+        self.assertIn("RELEASE_READINESS.md", builder)
+
     def test_unpublished_source_evidence_contract(self):
         self.assertEqual(MOD["TOTAL"], 137741)
         self.assertEqual([t[2] for t in MOD["TIERS"]],
