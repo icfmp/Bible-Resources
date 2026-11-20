@@ -4338,6 +4338,30 @@ jobs:
               }
               if unexpected:
                   raise ValueError("A quarantined source hyperlink unexpectedly exposed in GUI")
+          # Xiphos renders source scripture links as sidebar verse-list
+          # selections. Require the actual native X11 click, an independently
+          # attested valid HTML target, and the selected *new* target verse
+          # in a real AT-SPI sidebar row. Never count a mere X11 dispatch.
+          clicked=result.get("real_valid_source_anchor_click_observation",{})
+          valid_link_clicked=(
+              clicked.get("status")==
+                  "REAL_XIPHOS_CLICK_TARGET_VERSE_SELECTED_IN_REAL_SIDEBAR"
+              and clicked.get("source_href_transport_class")=="passagestudy.showRef"
+              and clicked.get("source_valid_HTML_label_sha256")==
+                  "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3"
+              and clicked.get("exact_original_valid_link_GUI_HTML_attested") is True
+              and clicked.get("x11_actual_click_dispatched") is True
+              and clicked.get("real_post_click_target_verse_selected_in_sidebar") is True
+              and clicked.get("real_sidebar_before_click",{}).get(
+                  "target_verse_appeared_in_real_sidebar_list") is False
+              and clicked.get("real_sidebar_after_click",{}).get(
+                  "target_verse_selected_in_real_sidebar_list") is True)
+          if not valid_link_clicked:
+              raise ValueError("Real Xiphos source-backed Gen 12:6 to Heb 11:8 "
+                               "click and selected sidebar target did not validate")
+          print("PRIVATE XIPHOS TRUE CLICK NAVIGATION PASS: a source-verified "
+                "existing Gen 12:6 -> Hebrews 11:8 link opened the expected "
+                "real sidebar verse-list row; other links not yet click-tested")
           receipt={
               "status":(
                   "PRIVATE_MODERN_REAL_XIPHOS_GUI_SUBSTANTIVE_CLIPBOARD_PASS"
@@ -4363,6 +4387,7 @@ jobs:
               "all_book_prefaces_in_GUI_approved":False,
               "sampled_original_wrong_target_link_GUI_markup_observations":link_gui,
               "source_strict_eleven_wrong_target_non_navigable_links_proven_natively":True,
+              "attested_existing_source_link_click_and_sidebar_target_verified":True,
               "all_link_click_navigation_approved":False,
               "actual_GUI_actions_completed":result.get("actual_passage_commands_accepted") is True,
               "xiphos_link_mouse_click_and_target_verified":False,
