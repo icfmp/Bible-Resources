@@ -68,13 +68,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 10,
+      "static_reference_count": 7,
       "static_references": [
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/pilot-source-audit.yml",
-        "docs/archive/RESOURCE_ONBOARDING_PLAYBOOK.md",
-        "docs/evidence/mhc-285/mhc-shared-verse-navigation-2026-11-18.md",
-        "docs/evidence/mhc-285/source-cleanup/CLEANUP_STATUS.md",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/policies/QUALITY_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
@@ -250,11 +247,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "docs/technical/SOURCE_USFX_STRUCTURE.md",
         "docs/workflows/BIBLE_STAGE_AUTOMATION.md",
         "tests/test_bible_stage_runner.py",
@@ -291,7 +287,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 24,
+      "static_reference_count": 22,
       "static_references": [
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
@@ -308,8 +304,6 @@
         ".github/workflows/stage-stock-commentary.yml",
         ".github/workflows/validate.yml",
         "docs/architecture/RESOURCE_PROFILES.md",
-        "docs/evidence/mhcc-274/0.1.1-release-transition-DRAFT.md",
-        "docs/evidence/mhcc-274/publication-provenance-readiness.md",
         "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
         "docs/workflows/COMMENTARY_PIPELINE.md",
         "docs/workflows/PUBLISHING.md",
@@ -505,12 +499,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/reclassify_osis_commentary_introduction.py",
         "scripts/repair_commentary_osis_milestones.py",
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
-        "docs/evidence/mhc-285/source-cleanup/CLEANUP_STATUS.md",
         "tests/test_clean_source_osis.py"
       ]
     },
@@ -975,7 +968,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "intake",
-      "static_reference_count": 20,
+      "static_reference_count": 19,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_andbible_jsword.py",
@@ -991,7 +984,6 @@
         "scripts/commentary_xml_witness.py",
         "scripts/tool_registry.py",
         ".github/workflows/commentary-intake.yml",
-        "docs/evidence/post-mhcc/toolchain-pilot-2026-11-16.md",
         "docs/workflows/COMMENTARY_7_STAGE_WORKFLOW.md",
         "docs/workflows/COMMENTARY_PIPELINE.md",
         "docs/workflows/PUBLISHING.md",
@@ -1054,11 +1046,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/commentary_paragraph_witness_probe.py",
         "scripts/commentary_section_scope_audit.py",
-        "docs/evidence/mhcc-274/edition-first-layout-sweep-2026-11-16.md",
         "tests/test_commentary_layout_census.py"
       ]
     },
@@ -1086,11 +1077,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
-        "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
         "tests/test_commentary_literal_erratum_preflight.py"
       ]
     },
@@ -1430,7 +1420,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 11,
+      "static_reference_count": 10,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_native_raw_inventory.py",
@@ -1439,7 +1429,6 @@
         ".github/workflows/commentary-evidence.yml",
         ".github/workflows/commentary-intake.yml",
         ".github/workflows/commentary-mhc-source-text.yml",
-        "docs/evidence/post-mhcc/toolchain-pilot-2026-11-16.md",
         "docs/workflows/COMMENTARY_PIPELINE.md",
         "tests/test_commentary_stage_evidence.py",
         "tests/test_tool_registry.py"
@@ -1529,11 +1518,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_section_scope_audit.py",
-        "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
         "docs/policies/COMMENTARY_POLICY.md",
         "tests/test_commentary_navigation_link_plan.py"
       ]
@@ -1896,13 +1884,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/commentary_osis_intro_transport_probe.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
-        "docs/evidence/mhcc-274/original-osis-transport-preflight.md",
         "tests/test_commentary_osis_transport_probe.py"
       ]
     },
@@ -1932,10 +1919,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
-        "docs/evidence/mhcc-274/paragraph-witness-pilot-2026-11-16.md",
         "tests/test_commentary_paragraph_witness_probe.py"
       ]
     },
@@ -2127,10 +2113,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_source_erratum_compiled_probe.py",
-        "docs/evidence/mhcc-274/publication-provenance-readiness.md",
         "tests/test_commentary_public_metadata_preflight.py"
       ]
     },
@@ -2225,13 +2210,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_literal_erratum_preflight.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
-        "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
         "tests/test_commentary_reference_registry_triage.py"
       ]
     },
@@ -2299,10 +2283,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         ".github/workflows/commentary-editorial-section-scope.yml",
-        "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
         "tests/test_commentary_section_scope_audit.py"
       ]
     },
@@ -3070,12 +3053,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/tool_registry.py",
         "scripts/validate.py",
         ".github/workflows/stage-stock-commentary.yml",
-        "docs/evidence/mhcc-274/publication-provenance-readiness.md",
         "docs/workflows/COMMENTARY_PIPELINE.md",
         "tests/test_compiled_stock_commentary_proof.py"
       ]
@@ -3269,7 +3251,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 18,
+      "static_reference_count": 17,
       "static_references": [
         "scripts/audit_osis.py",
         "scripts/bible_stage_runner.py",
@@ -3282,7 +3264,6 @@
         "scripts/tool_registry.py",
         ".github/workflows/darby-link-repair-research.yml",
         ".github/workflows/osis-schema-review.yml",
-        "docs/archive/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
         "tests/test_commentary_gate.py",
@@ -3520,11 +3501,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "tests/test_maintext_whitespace_patterns.py"
       ]
     },
@@ -3662,11 +3642,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "tests/test_native_book_intro_screen.py"
       ]
     },
@@ -3699,7 +3678,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 12,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/native_book_intro_screen.py",
         "scripts/probe_private_repaired_darby_sword.py",
@@ -3709,7 +3688,6 @@
         "scripts/source_native_osis_boundary_positions.py",
         "scripts/source_native_word_boundaries.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "tests/test_native_milestone_pair_audit.py",
         "tests/test_publisher_osis_sword_candidate.py",
         "tests/test_source_native_ordered_body.py"
@@ -3740,11 +3718,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "tests/test_native_sword_markup_census.py",
         "tests/test_source_native_layout_anchors.py"
       ]
@@ -3782,12 +3759,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/propose_upstream_edit.py",
         "scripts/tool_registry.py",
         ".github/workflows/pilot-source-audit.yml",
-        "docs/archive/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/policies/QUALITY_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
@@ -3816,12 +3792,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/maintext_whitespace_patterns.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/LSG_AUDIT_RESEARCH_HANDOFF.md",
-        "docs/archive/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "tests/test_note_whitespace_diagnostics.py"
       ]
     },
@@ -3888,7 +3862,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 23,
+      "static_reference_count": 22,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_andbible_jsword.py",
@@ -3911,7 +3885,6 @@
         ".github/workflows/lsg-v11n-probe.yml",
         ".github/workflows/pilot-preflight.yml",
         ".github/workflows/pilot-source-audit.yml",
-        "docs/archive/PILOT_SEGOND_MHC.md",
         "tests/test_pilot_preparation.py"
       ]
     },
@@ -3951,7 +3924,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 94,
+      "static_reference_count": 93,
       "static_references": [
         "scripts/audit_real_pilot.py",
         "scripts/bible_intake.py",
@@ -4006,7 +3979,6 @@
         ".github/workflows/commentary-modern-source-receipt.yml",
         ".github/workflows/lsg-fidelity.yml",
         ".github/workflows/pilot-preflight.yml",
-        "docs/archive/PILOT_SEGOND_MHC.md",
         "tests/test_commentary_anchor_parity.py",
         "tests/test_commentary_andbible_jsword.py",
         "tests/test_commentary_android_text_witness.py",
@@ -4079,11 +4051,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/bible_stage_runner.py",
         ".github/workflows/pilot-preflight.yml",
-        "docs/archive/PILOT_SEGOND_MHC.md",
         "tests/test_pilot_runtime.py"
       ]
     },
@@ -4207,11 +4178,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 2,
       "static_references": [
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
-        "docs/archive/LSG_AUDIT_RESEARCH_HANDOFF.md",
-        "docs/archive/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "tests/test_private_sword_bundle.py"
       ]
     },
@@ -4406,10 +4375,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         ".github/workflows/osis-schema-review.yml",
-        "docs/archive/PILOT_SEGOND_MHC.md",
         "tests/test_pilot_preparation.py"
       ]
     },
@@ -4511,7 +4479,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 11,
+      "static_reference_count": 10,
       "static_references": [
         "scripts/commentary_stock_candidate.py",
         "scripts/materialize_attested_ztext_release.py",
@@ -4521,7 +4489,6 @@
         ".github/workflows/commentary-zcom-private-candidate.yml",
         ".github/workflows/lsg-first-release.yml",
         ".github/workflows/private-sword-promotion-proof.yml",
-        "docs/archive/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "tests/test_promote_sword_preview.py",
         "tests/test_tool_registry.py"
       ]
@@ -5114,10 +5081,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
-        "docs/evidence/mhc-285/source-cleanup/CLEANUP_STATUS.md",
         "tests/test_repair_commentary_osis_milestones.py"
       ]
     },
@@ -5748,11 +5714,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "tests/test_source_native_nonspace_boundaries.py"
       ]
     },
@@ -5854,13 +5819,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "tests/test_source_native_ordered_body.py"
       ]
     },
@@ -5996,7 +5960,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/native_book_intro_screen.py",
         "scripts/source_native_maintext_probe.py",
@@ -6004,7 +5968,6 @@
         "scripts/source_native_word_boundaries.py",
         "scripts/source_usfx_newline_provenance.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "tests/test_source_native_paragraph_counts.py"
       ]
     },
@@ -6035,11 +5998,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "tests/test_source_native_record_scope_triage.py"
       ]
     },
@@ -6107,11 +6069,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "tests/test_source_native_structural_whitespace.py",
         "tests/test_source_usfx_newline_provenance.py"
       ]
@@ -6142,11 +6103,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "tests/test_source_native_structure_topology.py"
       ]
     },
@@ -6182,13 +6142,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/source_native_maintext_probe.py",
         "scripts/source_native_record_scope_triage.py",
         "scripts/source_usfx_newline_provenance.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "tests/test_source_native_nonspace_boundaries.py",
         "tests/test_source_native_structural_whitespace.py",
         "tests/test_source_native_word_boundaries.py",
@@ -6227,7 +6186,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 31,
+      "static_reference_count": 30,
       "static_references": [
         "scripts/audit_omitted_verse_notes.py",
         "scripts/bible_stage_runner.py",
@@ -6249,7 +6208,6 @@
         "scripts/source_native_osis_boundary_positions.py",
         "scripts/source_native_osis_structure_screen.py",
         "scripts/source_osis_note_markup_shape.py",
-        "docs/archive/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "docs/technical/SOURCE_OSIS_INVENTORY.md",
         "tests/test_audit_omitted_verse_notes.py",
@@ -6360,13 +6318,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/bible_stage_runner.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/source_native_structural_whitespace.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
         "tests/test_source_usfx_newline_provenance.py"
       ]
     },
@@ -6750,7 +6707,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 12,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
@@ -6762,8 +6719,7 @@
         ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-modern-source-receipt.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
-        ".github/workflows/commentary-private-text-compare.yml",
-        "docs/evidence/mhcc-274/editorial-section-scope-audit.md"
+        ".github/workflows/commentary-private-text-compare.yml"
       ]
     },
     {
@@ -6829,7 +6785,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 17,
+      "static_reference_count": 16,
       "static_references": [
         "scripts/sword_native_inventory.py",
         "scripts/tool_registry.py",
@@ -6843,7 +6799,6 @@
         ".github/workflows/second-bible-proof.yml",
         ".github/workflows/stage-darby-0.1.1.yml",
         ".github/workflows/validate.yml",
-        "docs/archive/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md",
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
@@ -6882,7 +6837,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 20,
+      "static_reference_count": 19,
       "static_references": [
         "scripts/materialize_attested_ztext_release.py",
         "scripts/native_book_intro_screen.py",
@@ -6900,7 +6855,6 @@
         "scripts/sword_native_raw_corpus_inventory.py",
         "scripts/tool_registry.py",
         ".github/workflows/validate.yml",
-        "docs/archive/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "tests/test_sword_native_inventory.py"
@@ -7084,12 +7038,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         ".github/workflows/commentary-modern-source-receipt.yml",
         ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/tool-registry-maintenance.yml",
-        "docs/README.md",
         "tests/test_tool_registry.py"
       ]
     },
@@ -7170,7 +7123,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 28,
+      "static_reference_count": 27,
       "static_references": [
         "scripts/build.py",
         "scripts/release_preflight.py",
@@ -7186,7 +7139,6 @@
         ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/stage-stock-commentary.yml",
         ".github/workflows/validate.yml",
-        "docs/evidence/mhcc-274/publication-provenance-readiness.md",
         "docs/policies/COMMENTARY_POLICY.md",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
