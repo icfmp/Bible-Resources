@@ -57,6 +57,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_sense_reference_shapes.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_source_verse_witnesses.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_source_verse_provisional_senses.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_token_position_alignment.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -1080,6 +1081,33 @@ jobs:
         with:
           name: bsi-ubs-greek-258-original-source-verse-provisional-lexids-NOT-PUBLISHED
           path: /tmp/bsi-ubs-greek-258-original-source-verse-provisional-LEXIDs-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Calibrate actual UBS Greek source citation word positions without presuming MACULA token alignment
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_ubs_token_position_alignment.py \
+            --high /tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json \
+            --batches /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-original-reference-position-calibration-PRIVATE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/bsi-ubs-greek-original-reference-position-calibration-PRIVATE.json').read_text())
+          assert x['original_source_unique_sense_calibration_words']==122504
+          assert x['original_ambiguous_words']==2728
+          assert len(x['word_id_to_candidate_position_diagnostics'])==2728
+          assert x['new_editorial_source_senses_selected']==0
+          assert x['no_automatic_word_position_equivalence_asserted'] is True
+          assert x['original_sources_modified'] is False and x['published'] is False
+          print('GREEK_UBS_SOURCE_WORD_REFERENCE_POSITION_FACTORS_AUDITED_NO_GUESSES')
+          PY
+      - name: Upload original UBS Greek word-position calibration evidence (PRIVATE)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-original-token-reference-position-calibration-PRIVATE
+          path: /tmp/bsi-ubs-greek-original-reference-position-calibration-PRIVATE.json
           if-no-files-found: error
           retention-days: 14
       - name: Upload Greek 2728 contextual sense review batches (PRIVATE, NO selections)
