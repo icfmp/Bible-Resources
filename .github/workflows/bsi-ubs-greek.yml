@@ -55,6 +55,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_sense_form_witnesses.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_form_supported_provisional_senses.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_sense_reference_shapes.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_source_verse_witnesses.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -1016,6 +1017,37 @@ jobs:
         with:
           name: bsi-ubs-greek-lexreferences-source-shapes-PRIVATE
           path: /tmp/bsi-ubs-greek-sense-lexreferences-structure-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Independently audit UBS LEXID passage witnesses against all original MACULA Greek word IDs
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_ubs_source_verse_witnesses.py \
+            --index entity-index/links/dictionaries/ubs-greek/index.json \
+            --reviewed /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json \
+            --batches /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --form_defaults /tmp/bsi-ubs-greek-223-source-form-provisional-sense-choices-PRIVATE.json \
+            --output /tmp/bsi-ubs-greek-original-source-verse-lexid-candidates-PRIVATE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/bsi-ubs-greek-original-source-verse-lexid-candidates-PRIVATE.json').read_text())
+          assert x['all_initial_original_multi_lexid_words']==2728
+          assert x['previously_staged_source_form_word_ids']==223
+          assert sum(x['source_specific_dispositions'].values())==2728
+          assert x['other_original_multi_lexid_words_still_unresolved']==2505-x['original_reference_witness_candidate_word_count']
+          assert x['independently_contextually_validated']==0
+          assert x['corpus_or_ubs_modified'] is False and x['published'] is False
+          assert x['publication_approved'] is False
+          print('GREEK_UBS_SOURCE_VERSE_WITNESSES_AUDITED_NOT_CONTEXT_VALIDATED')
+          PY
+      - name: Upload Greek UBS original verse/sense candidate witnesses (PRIVATE)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-source-verse-lexid-candidate-audit-PRIVATE
+          path: /tmp/bsi-ubs-greek-original-source-verse-lexid-candidates-PRIVATE.json
           if-no-files-found: error
           retention-days: 14
       - name: Upload Greek 2728 contextual sense review batches (PRIVATE, NO selections)
