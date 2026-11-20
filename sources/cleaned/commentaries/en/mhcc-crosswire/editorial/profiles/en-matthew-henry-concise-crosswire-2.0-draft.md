@@ -52,7 +52,7 @@ These findings establish that the **private candidate** preserves the selected o
 
 ### Provenance and rights for review
 
-**Author/work:** Matthew Henry's concise biblical exposition. **Compiled digital edition reviewed:** CrossWire MHCC 2.0. **Original package:** [CrossWire official module record](https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC) and [official SWORD ZIP](https://crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHCC.zip). **Source and rights evidence:** [exact-edition dossier](../evidence/mhcc-177/crosswire-exact-stock-rights-review.md).
+**Author/work:** Matthew Henry's concise biblical exposition. **Compiled digital edition reviewed:** CrossWire MHCC 2.0. **Original package:** [CrossWire official module record](https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC) and [official SWORD ZIP](https://crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHCC.zip). **Source and rights evidence:** [exact-edition dossier](../evidence/stock-research/crosswire-exact-stock-rights-review.md).
 
 CrossWire's specific public-domain declaration is documented positive distribution evidence. Nevertheless, Bible Resources has **not independently approved the provenance or redistribution status of all potentially separate digital corrections and editorial additions**, nor issued the required owner legal/editorial sign-off. The independently retrieved CCEL transcription has its own rights and transcription concerns and is **not** being republished by this candidate.
 
@@ -60,6 +60,6 @@ CrossWire's specific public-domain declaration is documented positive distributi
 
 ### Review records
 
-The technical evidence for the chosen exact-stock preservation track is in [MHCC import issue #177](https://github.com/icfmp/Bible-Resources/issues/177), especially [private Xiphos candidate verification #224](https://github.com/icfmp/Bible-Resources/pull/224). The independent CCEL-vs-CrossWire lexical comparisons and the five remaining properly comparable cases are documented in the [read-only editorial queue](../evidence/mhcc-177/source-book-identity-five-case-review-queue.md). Those differences **do not constitute proven errors in this exact upstream digital module**.
+The technical evidence for the chosen exact-stock preservation track is in [MHCC import issue #177](https://github.com/icfmp/Bible-Resources/issues/177), especially [private Xiphos candidate verification #224](https://github.com/icfmp/Bible-Resources/pull/224). The independent CCEL-vs-CrossWire lexical comparisons and the five remaining properly comparable cases are documented in the [read-only editorial queue](../evidence/stock-research/source-book-identity-five-case-review-queue.md). Those differences **do not constitute proven errors in this exact upstream digital module**.
 
 This draft is **descriptive material only**. It does not certify any issue as resolved, provide publication permission, change source/licence metadata or modify the SWORD module.
