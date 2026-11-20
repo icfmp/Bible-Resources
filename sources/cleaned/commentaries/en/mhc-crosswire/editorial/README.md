@@ -16,7 +16,7 @@ The source-hash-bound, reversible corrections comprise **11 inert emphasis tags*
 | Need | Record |
 | --- | --- |
 | Original/cleaned exact hashes and patch counts | [Cleaned source manifest](../CLEANUP_MANIFEST.json) |
-| Final edition, legal attribution, native scope | [0.1.0 release](releases/MHC-0.1.0.md) |
+| Final edition, legal attribution, native scope | [0.1.0 release](releases/MHC-0.1.0.md) and [source validation](../../../../../../modules/mhc-crosswire/SOURCE_VALIDATION.json) |
 | Real GUI and residual limitations | [Reader acceptance](evidence/reader-acceptance-scope-2026-11-19.md) |
 | Specific source cleanup details | [Reviewed changes](evidence/source-cleanup/CHANGES.md) |
 | Historical investigation and blocked early candidates | `evidence/` — consult only for a specific contested anomaly |
