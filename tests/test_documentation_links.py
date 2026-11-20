@@ -36,7 +36,7 @@ class DocumentationLinkIntegrityTests(unittest.TestCase):
             self.assertTrue(target.is_file(), str(target))
             raw = target.read_bytes()
             digest = sha1(b"blob " + str(len(raw)).encode() +
-                          b"\\0" + raw).hexdigest()
+                          b"\0" + raw).hexdigest()
             self.assertEqual(digest, receipt["source_git_blob_sha1"])
             pinned.add(target)
         missing = []
