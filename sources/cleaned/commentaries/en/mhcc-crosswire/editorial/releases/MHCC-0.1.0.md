@@ -75,7 +75,7 @@ the project owns rights in that description. The original compiled
 CrossWire content is **not newly relicensed** by Bible Resources.
 
 See [the exact-source editorial and limitations record](
-../../modules/mhcc-crosswire/EDITORIAL.md) and
+../../../../../../../modules/mhcc-crosswire/EDITORIAL.md) and
 [tracking issue #177](https://github.com/icfmp/Bible-Resources/issues/177).
 
 Report real textual or reader issues with the passage/reference,
