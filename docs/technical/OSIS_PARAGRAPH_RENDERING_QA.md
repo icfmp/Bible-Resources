@@ -4,7 +4,7 @@
 
 ## Diagnose before changing
 
-Compare the exact original edition, cleaned OSIS/USFM, compiled native SWORD output and reader rendering. Record all source structures: paragraphs, paragraph spacing, poetic lines, indentation, headings, quotations, notes, milestones, verse labels and literal punctuation. A visual mismatch alone cannot establish a source defect.
+For a rebuilt edition, compare the exact original, cleaned OSIS/USFM, compiled native SWORD output and reader rendering. For byte-identical upstream stock where no source master exists, inspect the original compiled markup and any independently available edition witnesses; **do not invent cleaned OSIS**. Record all source structures: paragraphs, paragraph spacing, poetic lines, indentation, headings, quotations, notes, milestones, verse labels and literal punctuation. A visual mismatch alone cannot establish a source defect.
 
 Do not globally strip leading whitespace, asterisks or unusual punctuation. Determine whether each character is authorial text, an editorial layout convention, an input-format artifact, or a renderer effect. Asterisks may encode legitimate translator annotations, not decorative noise.
 
@@ -25,4 +25,4 @@ Do not globally strip leading whitespace, asterisks or unusual punctuation. Dete
 - Do not silently change published source wording, annotated labels, verse mapping or note destinations.
 - Do not generalize a single publisher's formatting conventions into global cleanup behavior.
 
-The source-specific case study from which this QA grew has been preserved in [its module editorial history](../../sources/cleaned/bibles/fr/darby-jnd-2024/editorial/history/OSIS_PARAGRAPH_RENDERING_QA_LEGACY.md). It is **evidence**, not the general rule.
+The source-specific case study from which this QA grew has been preserved in [the Darby import retrospective](../../sources/cleaned/bibles/fr/darby-jnd-2024/editorial/history/DARBY_2024_IMPORT_POSTMORTEM.md). It is **evidence**, not the general rule.
