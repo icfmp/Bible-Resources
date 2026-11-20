@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class BibleOnboardingWorkflowTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.guide = (ROOT / "docs/BIBLE_7_STAGE_WORKFLOW.md").read_text(encoding="utf-8")
+        cls.guide = (ROOT / "docs/workflows/BIBLE_7_STAGE_WORKFLOW.md").read_text(encoding="utf-8")
         cls.issue = (ROOT / ".github/ISSUE_TEMPLATE/import.yml").read_text(encoding="utf-8")
         cls.readme = (ROOT / "README.md").read_text(encoding="utf-8")
 
