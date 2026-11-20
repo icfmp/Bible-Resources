@@ -124,6 +124,12 @@ def main():
     read=lambda path:json.loads(path.read_text(encoding="utf-8-sig"))
     result=audit(read(a.missing),read(a.english),read(a.french))
     a.output.write_text(json.dumps(result,ensure_ascii=False,sort_keys=True,indent=2)+"\n",encoding="utf-8")
+    print("GREEK_UBS_ORIGINAL_ALTERNATE_LEMMAS_FOR_SOURCE_FAMILIES",json.dumps([
+        {"main_id":entry["MainId"],"lemma":entry["Lemma"],
+         "original_alternate_lemmas":entry.get("AlternateLemmas") or []}
+        for entry in read(a.english)
+        if entry["MainId"] in {"002417000000000","002418000000000","003615000000000"}
+    ],ensure_ascii=False,sort_keys=True))
     print("GREEK_UBS_SOURCE_ALTERNATIVE_METADATA_DIAGNOSTICS",json.dumps([
         {"main_id":mid,"lemma":entry["Lemma"],"source_lexical_ln_codes":sorted(source_codes(entry)),
          "source_original_strong_codes":entry.get("StrongCodes") or [],
