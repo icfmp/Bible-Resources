@@ -58,20 +58,22 @@ jobs:
           marker='        inspector=os.environ.get("LSG_STOCK_RAW_INSPECTOR")'
           if content.count(marker)!=1:
               raise SystemExit("Original pinned LSG pipeline has changed unexpectedly")
-          new='''        # One-off historical SOURCE-only recovery, no binary is altered.
-          if os.environ.get("LSG_RECOVERED_OSIS_PATH"):
-              source_bytes=labeled.read_bytes()
-              verified=hashlib.sha256(source_bytes).hexdigest()
-              if verified!="d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0":
-                  raise PilotError("Historical cleaned OSIS is not the published attested source")
-              dest=Path(os.environ["LSG_RECOVERED_OSIS_PATH"])
-              if dest.exists():raise PilotError("Never overwrite cleaned edition")
-              dest.parent.mkdir(parents=True)
-              dest.write_bytes(source_bytes)
-              report["status"]="exact_historical_published_cleaned_osis_recovered"
-              print("Recovered historical final OSIS SHA256",verified,"bytes",len(source_bytes))
-              return report
-          '''
+          source_lines=[
+            '# Source-only recovery from original verified published compiler input',
+            'if os.environ.get("LSG_RECOVERED_OSIS_PATH"):',
+            '    source_bytes=labeled.read_bytes()',
+            '    verified=hashlib.sha256(source_bytes).hexdigest()',
+            '    if verified!="d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0":',
+            '        raise PilotError("Historical cleaned OSIS differs from published source SHA")',
+            '    dest=Path(os.environ["LSG_RECOVERED_OSIS_PATH"])',
+            '    if dest.exists():raise PilotError("Refuse to overwrite source")',
+            '    dest.parent.mkdir(parents=True)',
+            '    dest.write_bytes(source_bytes)',
+            '    report["status"]="exact_historical_published_cleaned_osis_recovered"',
+            '    print("Recovered LSG source",verified,len(source_bytes))',
+            '    return report',
+          ]
+          new=chr(10).join('        '+line for line in source_lines)+chr(10)
           # Preserve original code and all upstream transformations unmodified
           # except a terminal, SHA-enforcing extraction gate at the precise
           # source-to-compiled boundary.
