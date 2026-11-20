@@ -8,7 +8,7 @@
   "approved_at": "2026-11-10",
   "approved_by": "Bible Resources project owner",
   "approval_url": "https://github.com/icfmp/Bible-Resources/pull/55",
-  "source_path": "docs/profiles/fr-segond-1910.md",
+  "source_path": "sources/cleaned/bibles/fr/lsg-1910/editorial/profiles/fr-segond-1910.md",
   "source_git_blob_sha1": "9d13c0735a079f8853c0169270b2a31493621eab",
   "sections": {
     "short": "## Présentation courte — bibliothèque (texte soumis à validation éditoriale)",
