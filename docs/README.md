@@ -39,8 +39,9 @@ This is the navigation entry point. File location does not define authority: a h
 - Edition profiles: [profiles/](profiles/) — exact source/edition metadata. Similar profile titles are **not** automatically duplicates.
 - Release receipts: [releases/](releases/) — version-specific immutable publication/review history, including drafts when explicitly labeled.
 - Evidence and audit material: [evidence/](evidence/) — retain historical approvals and provenance.
-- Resource narratives: [MHCC Modern](MHCC_MODERN_ENGLISH.md), [Darby postmortem](DARBY_2024_IMPORT_POSTMORTEM.md), [LSG research handoff](LSG_AUDIT_RESEARCH_HANDOFF.md), [LSG/MHC pilot](PILOT_SEGOND_MHC.md), [second Bible probe](SECOND_REAL_BIBLE_PROBE.md). These are **not** general policy.
-- [Roadmap](ROADMAP.md) — historically accumulated proposals; validate against active issues and decisions before acting on it.
+- Historical research is collected in the [archive index](archive/README.md): Darby postmortem, LSG research handoff, the first LSG/MHC pilot and the second Bible probe. Their old paths remain compatibility redirects.
+- [HMCC Modern editorial protocol](../sources/cleaned/commentaries/en/hmcc-modern/editorial/HISTORICAL_PROTOCOL.md) now lives beside its cleaned OSIS; its old `docs/MHCC_MODERN_ENGLISH.md` path redirects there.
+- [Roadmap](ROADMAP.md) — current high-level priorities, with active issues as the status authority.
 
 ## 6. Generated technical inventory
 
@@ -48,6 +49,6 @@ This is the navigation entry point. File location does not define authority: a h
 
 ## Cleanup policy and deferred moves
 
-A later **link-audited relocation** can group policies, workflows, technical references, per-resource history and generated reports into subfolders. Avoid moving these documents solely to make the top-level look cleaner: relative links are used by documentation, code and historical GitHub discussions, and a move would require an evidence-backed full-link audit. The index above establishes navigation immediately without breaking those paths.
+A link-audited first cleanup has archived the clearly historical pilot/research reports and colocated the HMCC Modern edition protocol with its cleaned source. Other workflow guides still in active use remain at their current paths. A later relocation can group policies, workflows, technical references and generated reports into subfolders. Avoid moving these documents solely to make the top-level look cleaner: relative links are used by documentation, code and historical GitHub discussions, and a move would require an evidence-backed full-link audit. The index above establishes navigation immediately without breaking those paths.
 
 **Protected boundary:** `entity-index/` is the independent Bible Semantic Index workstream; documentation cleanup must not change it. The legacy place-context `datasets/` is separately scoped for removal in [#38](https://github.com/icfmp/Bible-Resources/issues/38), with public-endpoint and release parity checks required. These two tasks must not be conflated.
