@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "resource_id": "lsg-1910",
+  "category": "bible",
+  "language": "fr",
+  "format": "USFM",
+  "original_file": "fraLSG_usfm.zip",
+  "edition": "Louis Segond 1910",
+  "provider": "eBible.org",
+  "source_url": "https://ebible.org/Scriptures/fraLSG_usfm.zip",
+  "original_size_bytes": 3474538,
+  "original_sha256": "64c4fe2a84d92f958deb0d1add4247d126a21c8a51e5b3058338f661a42d4900",
+  "identity_contract": "config/catalogue-import-lsg-0.1.0.json",
+  "license_claim": "Public Domain",
+  "rights_witness_url": "https://ebible.org/find/details.php?id=fraLSG",
+  "source_bytes_modified": false,
+  "cleaned_master_committed": false,
+  "compiled_sword_version_not_equivalent_to_original_source": true
+}

@@ -1,28 +1,21 @@
-# Cleaned/maintained source editions
+# Verified cleaned/maintained sources
 
-The new canonical layout is
-`sources/cleaned/<type>/<resource-id>/`, where `<type>` is one of
-`bibles`, `commentaries`, `dictionaries`, `encyclopedias`, `other`.
-Maintain **one versioned, source-faithful structured master** per edition,
-preferably real OSIS or USFM (not a reconstructed pseudo-source).
+Here, and **only here**, maintain real **reproducible and independently
+reviewed** OSIS/USFM masters with paths
+`<category>/<language>/<resource-id>/`.
 
-Apply reviewed **generic**, deterministic, reversible structural cleanup:
-consistent headings, paragraphs, introductions, poetry, references, Unicode
-and nonsemantic presentation wrappers; keep actual words, punctuation, verse
-numbering, deliberate omissions, notes and authored semantic structure.
-Retain every translation note, variant, cross-reference, Strong/morphology tag
-and its **position relative to the correct word** where present.
+An existing published SWORD module does not prove the cleaned editorial source
+has been preserved. Original publisher files belong under `../original/`;
+copyright and source rights must permit any public derivatives.
 
-Each cleaned master needs original source identity/checksum, permissions for
-derivatives and public redistribution, exact cleanup manifest, before/after
-hashes, independent witness comparison and full SWORD round-trip results.
-Do not publish or commit copyrighted source bodies without authorization.
-The original bytes belong in `sources/original/` only if mirroring is allowed.
+No full cleaned OSIS/USFM master for the existing published resources has yet
+been committed at a canonical typed/language location. Historical MHC
+source-cleanup records are correctly archived under
+[`docs/evidence/mhc-285/source-cleanup/`](../../docs/evidence/mhc-285/source-cleanup/)
+and **must not be mistaken for a cleaned source file**.
 
-**Legacy compatibility:** `sources/cleaned/mhc/` currently contains existing
-MHC provenance/cleanup documents, **not an editable OSIS source file**.
-Preserve these URLs and historical receipts until a separately validated
-migration. New cleaned source editions always use the type-specific layout.
+For each real cleaned master, require a SHA-locked original, a reversible
+delta manifest, full text/structure/Strong/notes/reference parity, and a
+native SWORD readback and independent Xiphos acceptance receipt.
 
-See [workspace layout](../../docs/WORKSPACE_LAYOUT.md) and
-[six-phase production policy](../../docs/SOURCE_FIRST_EDITORIAL_PIPELINE.md).
+[Workspace layout](../../docs/WORKSPACE_LAYOUT.md).

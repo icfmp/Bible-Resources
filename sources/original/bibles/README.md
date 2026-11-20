@@ -1,12 +1,12 @@
-# Original Bible witnesses
+# Original Bible sources
 
-Use `sources/original/bibles/<resource-id>/` for the exact original OSIS,
-USFM (or specifically approved other standard) when its redistribution
-rights permit public storage. Preserve source byte identity and manifest
-information (edition, provider, revision, SHA-256, size, note/Strong rights).
+Real originals are grouped by language and edition. The current
+[French originals](fr/) include:
+- `lsg-1910/fraLSG_usfm.zip`: immutable official eBible USFM source;
+- `darby-jnd-2024/bible_jnd_2_0.xml`: immutable BPC OSIS revision 2.0.
 
-For current Segond and Darby, see the
-[verified resource index](../../../docs/RESOURCE_WORKSPACE_INDEX.md) and
-the original-source identities in module metadata/source audit receipts.
-The original texts have **not** been newly copied here; an empty type folder
-is not an original-source archive.
+Each has an adjacent `PROVENANCE.json` with preexisting independently
+verified checksums. **These are not yet our compiled-source normalized
+masters**, and their original note/word markup is unchanged.
+
+[Resource inventory](../../../docs/RESOURCE_WORKSPACE_INDEX.md).

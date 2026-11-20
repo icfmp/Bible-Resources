@@ -1,161 +1,126 @@
 # Source-first workspace layout
 
-**Project-wide convention, adopted 2026-11-20.** This is a workspace policy,
-not a change to the published SWORD installation layout or module identities.
+**Canonical convention (2026-11-20): resource type → ISO 639 language → stable resource ID.**
+This convention applies to original and cleaned source data and new work,
+independently of the compiled SWORD distribution layout.
 
-## Canonical directory tree
+## Real directory structure
 
 ```text
 sources/
   original/
-    bibles/<resource-id>/
-    commentaries/<resource-id>/
-    dictionaries/<resource-id>/
-    encyclopedias/<resource-id>/
-    other/<resource-id>/
+    bibles/
+      fr/
+        lsg-1910/fraLSG_usfm.zip
+        darby-jnd-2024/bible_jnd_2_0.xml
+    commentaries/
+      en/
+        mhc-crosswire/mhc.osis.xml
   cleaned/
-    bibles/<resource-id>/
-    commentaries/<resource-id>/
-    dictionaries/<resource-id>/
-    encyclopedias/<resource-id>/
-    other/<resource-id>/
+    bibles/<language>/<resource-id>/         # only after a vetted clean master exists
+    commentaries/<language>/<resource-id>/
+    dictionaries/<language>/<resource-id>/
+    encyclopedias/<language>/<resource-id>/
+    other/<language>/<resource-id>/
 work/
-  bibles/<resource-id>/{drafts,audits,tests}/
-  commentaries/<resource-id>/{drafts,audits,tests}/
-  dictionaries/<resource-id>/{drafts,audits,tests}/
-  encyclopedias/<resource-id>/{drafts,audits,tests}/
-  other/<resource-id>/{drafts,audits,tests}/
-modules/<resource-id>/              # published/staged SWORD + evidence; unchanged
-scripts/                           # stable command-line interfaces; unchanged
-tests/                             # independent regression tests; unchanged
-docs/                              # cross-resource policy and historical receipts
+  <type>/<language>/<resource-id>/{drafts,audits,tests}/
+modules/<resource-id>/                       # existing SWORD output; unchanged
+scripts/                                     # stable current tool entrypoints
+docs/evidence/                               # historic review, rights and receipts
 ```
 
-The actual resource category in `modules/<resource-id>/metadata.json`
-determines the typed folder; use the same stable resource ID everywhere.
-Use plural directory names, **not** translated spellings, and avoid
-distinguishing directories by provider or language unless two separate curated
-resource IDs genuinely exist.
+The five categories, when populated, are `bibles`, `commentaries`,
+`dictionaries`, `encyclopedias`, and `other`. Use **ISO 639-1** lowercase
+two-letter language IDs (`fr`, `en`, `de`, etc.) when defined; for a
+language without an ISO 639-1 code, use its registered ISO 639-3 identifier.
+Do not invent language identifiers. Multiple independent curated editions in
+the same language must have distinct stable resource IDs.
 
-OSIS and USFM are the preferred source formats. Add another format only if a
-resource requires it and a tested standards-based adapter already exists or is
-approved. Keep the same structure for Greek/Hebrew Strong tags, morphology,
-translation notes, textual variants, cross-references, footnotes, alternate
-readings, poetry and comments; these are **source content/annotations**, not
-compiler decorations.
+**Do not create empty category folders or README-only “source editions”.**
+Git only needs the directories that contain actual original/cleaned source
+bytes. Generic explanations belong here, not in fake editions. Existing
+published SWORD binaries in `modules/` do not automatically imply that a
+reproducible clean OSIS/USFM master is committed.
 
-### Original sources
+## Exact original sources
 
-Under `sources/original/<type>/<resource-id>/`, retain the **exact** acquired
-source bytes when their repository redistribution rights permit it. Never
-silently edit originals, reserialize XML, normalize Unicode, strip annotations,
-or replace one edition with another. Pin origin URL, revision, exact edition,
-size, SHA-256, rights/annotations/licensing and any original companion archive.
+`sources/original/<type>/<language>/<resource-id>/` stores the **unchanged
+actual original** (single OSIS, original USFM archive or approved source
+container) only if exact-edition redistribution rights allow it. Retain a
+resource-specific `PROVENANCE.json` recording edition/revision, official URL,
+observed byte size and cryptographic SHA-256, license witness and identity of
+the separately curated resource. An original PDF/ZIP/SWORD is not silently
+renamed OSIS. Never strip whitespace or correct source markup here.
 
-If mirroring is not permitted, **do not commit the bytes**: keep them in
-controlled storage and retain only permissible metadata/checksums/URLs in the
-resource manifest. Do not create misleading empty source files.
+The initial real files in this tree are:
+- Louis Segond 1910 original eBible **USFM ZIP** (French), SHA-256
+  `64c4fe2a84d92f958deb0d1add4247d126a21c8a51e5b3058338f661a42d4900`
+- BPC Darby **2024 rev. 2.0 OSIS XML** (French), SHA-256
+  `2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3`
+- CrossWire MHC version 2.2 **original authoring OSIS XML** (English), SHA-256
+  `3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6`
 
-### Cleaned sources
+These were independently SHA-verified against preexisting project manifests
+before they were committed. They are **not** necessarily the exact uncommitted
+cleaned-source revisions used to produce earlier releases.
 
-Under `sources/cleaned/<type>/<resource-id>/`, retain our **reviewed,
-reproducible editorial master** as OSIS/USFM or a deliberately approved
-standard. Each source has a reversible source-bound change ledger and
-source/cleaned hashes. Standardize *presentation and machine structure*,
-never authorial content silently. Check whole-corpus preservation of words,
-punctuation, verses, notes, headings, poetry, Strong/morphology, word-level
-alignment and references where present. Track independent edition witnesses
-and rights separately.
+## Reviewed cleaned sources
 
-Only commit a cleaned source if redistribution and modification rights allow
-it; otherwise keep a protected master and document limitations of public
-reproducibility.
+`sources/cleaned/<type>/<language>/<resource-id>/` stores the *actual* vetted
+OSIS/USFM editorial source after structural cleanup and independent
+source-faithfulness verification. A clean source is not just an original file
+copied into a second directory. It needs source/cleaned hashes, approved
+reversible rule-by-rule differences, standard structural checks, complete
+annotation preservation and source-to-native SWORD round-trip evidence.
 
-### Working files
+For Bibles, check words, punctuation, omissions, verse mapping, authorial notes,
+cross-references, **all word-to-Strong/lemma/morphology associations**, and
+translation-note anchors. For commentaries, check authorial commentary bodies,
+paragraphs, introductions, section/range mapping and links. No manually edited
+SWORD data is used as an invented source.
 
-Under `work/<type>/<resource-id>/`, store **unfinished, nonauthoritative**
-drafts, bounded test inputs, unpublished reports, screenshots/reader QA and
-transient build experiments. Prefer disposable local output ignored by Git
-for generated intermediates. Do not duplicate a cleaned canonical source here
-or publish unrestricted raw source text via public Actions artifacts.
-Committed evidence must have a durable provenance role.
+**At this stage, none of the already published modules has a newly committed,
+fully reconstructed clean OSIS/USFM master in these type/language folders.**
+The historical MHC source-cleanup *reports* were moved to
+[`docs/evidence/mhc-285/source-cleanup/`](evidence/mhc-285/source-cleanup/),
+because an audit report is not the cleaned source itself. Maintaining the actual
+verified cleaned sources is a separate source reconstruction task, never
+inferred from a previous green SWORD release.
 
-Canonical draft subdirectories are `drafts/`, `audits/` and `tests/`; create
-a directory only when real content exists. Do not create dozens of empty
-`production/`, `final-final/` or date-specific folders.
+## Work, documentation, release outputs and compatibility
 
-### Distribution and tooling
+Use `work/<type>/<language>/<resource-id>/` for **new** temporary drafts,
+audits and nonauthoritative tests; only commit durable, rights-cleared evidence.
+The preexisting 1,332 HMCC Modern manuscripts under `work/mhcc-modern/`
+remain at their historical locations so previous source-bound GitHub links,
+hash references and active build scripts remain valid. Likewise, the already
+moved MHC CCEL experiment is a historical exception at
+`work/commentaries/mhc-crosswire/experiments/ccel-imp/`. Do not treat
+these existing legacy paths as templates for new work.
 
-`modules/<resource-id>/` retains its **existing stable layout** for verified
-SWORD files and immutable source/release attestations. Do not rearrange
-`payload/mods.d/` or `payload/modules/`: SWORD readers rely on those paths.
-Official release-before-Pages publication remains authoritative.
+The `modules/<resource-id>/payload/` native SWORD paths, release identity,
+release plans, catalogue, signed editorial records and actual published packages
+must **never** be mass-relocated with editorial source organization changes.
+Releases remain reproducible from their explicitly approved source/proof
+contracts; file movements alone are not permission to republish.
 
-Keep stable script entrypoints in `scripts/` until all historical callers,
-GitHub Actions, tests, import statements, user-facing commands and release
-tags have been audited. Distinguish:
-- generic reusable acquisition/validation/normalization/build/reader tooling;
-- resource-specific reviewed recipes and manifests;
-- historical probes or trial scripts necessary to reproduce a past decision.
+Script cleanup is a **different** audited task [#430](https://github.com/icfmp/Bible-Resources/issues/430).
+The existing [tool registry](TOOL_REGISTRY.md) notes 177 script entrypoints
+with real references; archive/merge only once tests, workflows, Python imports,
+historical tags and shared behavior have been checked.
 
-A historical script is **not** safe to delete merely because an inventory
-suggests `HISTORICAL/ARCHIVE`. Archive only after auditing historical tags and
-making all current checks pass; avoid replacing a working tool with a stack of
-compatibility wrappers. See [tool registry](TOOL_REGISTRY.md).
+## New-source acceptance gates
 
-## Existing historical layout: compatibility phase
+1. Identify source edition, actual standard format and legal permissions.
+2. Pin the **original byte source** in the proper type/language directory.
+3. Build the cleaned candidate independently without touching the original.
+4. Validate standard structural markup and full-corpus fidelity, including
+   annotations, translated word alignment and exact source references.
+5. Compile standard SWORD from the reviewed cleaned master and independently
+   read back native content and reference navigation in diatheke/Xiphos.
+6. Keep immutable proofs, seek the mandatory editorial/rights approvals,
+   and publish via the existing GitHub Release-before-Pages process.
 
-The following paths predate this policy and must **not** be renamed or removed
-without a separate, fully tested path-migration PR:
-
-- `sources/cleaned/mhc/`: documentation and provenance of the original MHC
-  experiment, **not a committed cleaned OSIS body**.
-- `work/mhcc-modern/`: ~1,300 historically versioned modern-commentary
-  manuscripts and review receipts. **Do not call this scratch to be deleted**:
-  retain existing references, source-diff hashes and final-release proof.
-- `work/commentaries/mhc-crosswire/experiments/ccel-imp/`: archived historical CCEL
-  feasibility adapter and its tests, **not a supported importer**. This was
-  moved with byte-identical Python source and updated historical workflow.
-
-These are **legacy-compatible paths**, not new locations to target. New
-projects and future versioned source editions follow the typed structure
-immediately. Historical source migrations must preserve Git history, evidence
-identity, and paths referenced by workflows, scripts, tests and prior PRs.
-Do not silently modify sealed receipts or source-bound content hashes to
-make a move appear clean.
-
-## Migration gates for each existing resource
-
-1. Inventory old paths, exact tracked blob hashes and current + historical
-   callers; establish the versioned release and permissions baseline.
-2. Move **one resource at a time** only if old-path references can be migrated
-   without invalidating an immutable proof; otherwise retain legacy paths.
-3. Update tests, workflows, relative imports, links, source manifests, report
-   generators and tool registry together. Archive historical evidence rather
-   than patching its meaning.
-4. Confirm `git diff --summary` identifies expected moves, every tracked
-   source blob is accounted for, no original/cleaned text is lost, and no
-   unexpected large-source data is introduced.
-5. Run complete unit tests, repository validation, registry consistency,
-   deterministic package generation, actual SWORD smoke, and relevant
-   cross-reader tests on affected **compiled modules**.
-6. Never republish an immutable release solely because a workspace path
-   changed. New publication requires the existing explicit approval process.
-
-## Script cleanup: deliberately safe, not cosmetic
-
-The generated registry records 177 top-level scripts (26 KEEP_GENERIC,
-3 GENERALIZE, 10 MERGE, 9 HISTORICAL/ARCHIVE, 129 UNDECIDED) at the
-2026-11-20 inventory baseline. These are **review classifications**, not
-177 currently maintained command-line contracts or a license to remove 151.
-
-The next actual lifecycle consolidation needs independent caller and behavior
-checks; prioritise merge candidates with overlapping tests, archive only after
-a proven replacement, and preserve reproducible release evidence. Never add
-a new script purely to support folder naming. This preparatory migration
-intentionally changes **no executable script** and leaves the MHC, MHCC,
-HMCC Modern, Darby and Segond SWORD payload bytes untouched.
-
-See [six-phase editorial workflow](SOURCE_FIRST_EDITORIAL_PIPELINE.md),
-[editorial rules](EDITORIAL_RULES.md), [rights policy](RIGHTS.md) and
-[publication gates](PUBLISHING.md).
+See [source-first pipeline](SOURCE_FIRST_EDITORIAL_PIPELINE.md),
+[normalization](NORMALIZATION_POLICY.md), [editorial rules](EDITORIAL_RULES.md)
+and [publishing](PUBLISHING.md).
