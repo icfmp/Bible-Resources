@@ -1,220 +1,51 @@
-# Publication — one ordered release workflow
+# Publishing an approved module
 
-**Publishing is one operation, not two independent workflows.** The
-[GitHub Pages publication workflow](../../.github/workflows/pages.yml)
-is the only workflow allowed to **create/verify GitHub Releases and
-then expose the same approved modules through Pages**. The previous
-independently triggered GitHub Release workflow was removed: its push
-trigger allowed an approved module to appear in the catalogue before
-a versioned GitHub Release existed.
+**There is one current publication route:** [`pages.yml`](../../.github/workflows/pages.yml), on reviewed `main`, creates/verifies immutable GitHub Releases **before** advertising approved modules in the static Pages catalogue. The order matters: a visible catalogue without its corresponding versioned release is a failed publication.
 
-## Owner authorization and evidence
+This guide describes the current procedure, not the status of a particular release. Resource-specific receipts, decisions, checksums, incident history and exceptions live beside that resource under `sources/cleaned/**/editorial/releases/` and `editorial/evidence/`.
 
-Human editorial and rights sign-off is required before setting
-`quality.status=approved`. Preserve exact-source evidence, authors'
-words, all notes/annotations/structural markers, licensing, and the
-original-versus-curated SWORD payload provenance. A successful CI result
-is not a substitute for this decision.
+## 1. Accept the exact source and edition
 
-For rebuilt OSIS sources, require the official version-pinned OSIS
-schema and independently verified source-to-SWORD preservation. OSIS
-commentaries additionally require validated commentary annotations.
-For **unchanged, compiled upstream SWORD stock**, require the separate
-full original compiled-data/native-entry identity proof; do not
-fabricate a source OSIS document just to satisfy an XML gate.
+Before setting `quality.status=approved`, confirm the edition identity, original source SHA-256, rights to redistribute all components, source and cleaned comparison, recorded editorial changes, correct versification and annotation coverage, and independent SWORD/reader checks. Owner editorial and publication approvals are separate from CI success.
 
-## Source-corrected compiled SWORD commentaries
+Choose the correct proof route:
 
-An edited or reconstructed `zCom` is **not** original-stock SWORD data.
-It must never be validated through `stock_reader_keys`, which keeps
-requiring exact original CrossWire compressed-member and native-entry identity.
+- **Unchanged stock SWORD:** preserve exact upstream bytes and independently verify the original compiled archive and complete native entry/key identity.
+- **Source-derived Bible/commentary rebuild:** compare source and reviewed master, build and independently read back *all* native entries and metadata. A changed compiled commentary uses the distinct `reviewed_compiled_commentary_rebuild` route and must not impersonate original `stock_reader_keys` identity. Require original-to-candidate I/K/TOP topology, explicit approved corrections and aliases, source-bound comparison SHA-256 and exact driver-appropriate payload-member hashes. See `scripts/reviewed_compiled_commentary_rebuild.py`.
 
-The separate `reviewed_compiled_commentary_rebuild` route requires a
-**versioned, independently reviewed** original-source identity,
-complete libSWORD original-to-rebuilt native I/K/TOP comparison,
-explicit per-source correction and alias sets, an immutable SHA-256
-of that comparison report, and exact SHA-256s of all seven SWORD payload
-members (six zCom data files and one `.conf`). The module's
-`SOURCE_VALIDATION.json` must reference that same independent report
-and source review. A build that merely sets `validated=true` is rejected.
+Neither path authorizes a textual correction by itself. See [editorial policy](../policies/EDITORIAL_RULES.md), [rights](../policies/RIGHTS.md), and [production contract](../PRODUCTION_PIPELINE.md).
 
-**Architecture decision (2026-11-16):** the project owner delegated
-this technical choice and the two separate routes are adopted. This does
-not authorize a particular source correction for public release, a merged PR
-or any public artifact. Independent proof and release gates remain required.
+## 2. Prepare one release identity
 
-The offline validator binds the submitted proofs and actual packaged bytes;
-it **does not itself execute libSWORD or authenticate a human signature**.
-Prior to editorial approval, independently regenerate and review the complete
-native comparison from the SHA-pinned source and real candidate, and confirm
-the GitHub authorization record genuinely comes from the project owner.
-See [generic proof contract](../../sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/rebuilt-commentary-validation-contract.md).
-A synthetic passing unit test does not authorize publication.
+One stable **curated resource ID** identifies the maintained edition; its installed **SWORD module ID** is a separate identity. Renaming the SWORD ID changes the module configuration and installation paths, can collide with another provider's module ID, and is not a transparent client upgrade.
 
-## Upgrading an approved resource, including a changed SWORD identifier
+For a new or updated approved module, require **one active source-pinned release plan** in [`config/release-plans/`](../../config/release-plans) with exact versioned GitHub Release tag, expected deterministic ZIP SHA-256, byte length, module/curated IDs and source/rights authorizations.
 
-There is **one current approved version per stable curated resource ID** in
-`catalog/v1/catalog.json`, backed by exactly one active release plan under
-`config/release-plans/`. The curated ID identifies the maintained edition.
-The **SWORD ID is a separate installation identifier**: renaming it changes
-the native module key, `.conf` header, compiled payload paths and download
-URL. It is **not** an automatic in-place client update.
+A previously approved historical release may use the immutable [legacy binding](../../config/release-legacy-bindings.json), but the historical path **must not** become a loophole for new editions. If old GitHub and Pages packages differ, disclose, independently hash and verify both; never call them identical without proof.
 
-For every change, review the source edition and distribution rights, prepare
-a reversible diff (text, references, notes, annotations and topology), prove
-the complete native reader corpus, and bind the final seven or other
-driver-appropriate member hashes and deterministic versioned ZIP to that
-review. Then update the single current module, plan and catalogue together.
-Never fabricate an old-to-new version relationship across distinct providers.
-A resource's source URL, editable metadata and public catalogue status must
-not serve as authorization on their own.
+A separate optional reader-facing profile requires its own edition/locale/revision-specific editorial approval and pinned source. An approved module does not automatically approve its description.
 
-**MHCC is a completed example, not a recipe with hardcoded identities:**
+## 3. Build and verify locally
 
-- On 2026-11-16 the owner approved corrected **MHCC 0.1.1**, retaining the
-  curated ID `mhcc-crosswire`, changing its SWORD ID from `BRMHCC` to
-  `MHCC`, and publishing under [`mhcc-0.1.1`](
-  https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1).
-- The sole active plan is `config/release-plans/mhcc-0.1.1.json`. The
-  previously active `mhcc-0.1.0.json` is retained in Git history, and the
-  immutable [`mhcc-0.1.0` release](
-  https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.0)
-  remains available and independently hash-verified.
-- The current catalogue download is `sword/packages/MHCC.zip`, the
-  versioned release asset is `MHCC-0.1.1.zip`, and the independently
-  verified old release asset was `BRMHCC-0.1.0.zip`. The main repository
-  already contains the seven 0.1.1 compiled members and their exact full
-  source/native evidence.
-- **CrossWire also distributes a distinct `MHCC` module.** The new
-  Bible Resources SWORD ID therefore collides with the original provider;
-  any client-side choice/replacement must be intentional. An old
-  `BRMHCC` installation can remain installed alongside it. The
-  [source/rights record](../../sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/mhcc-0.1.1-editorial-rights-acceptance.md)
-  and [public release notes](../../sources/cleaned/commentaries/en/mhcc-crosswire/editorial/releases/MHCC-0.1.1.md) explain this boundary.
+Use the repository's established tools (`scripts/validate.py`, `scripts/build.py`, `scripts/catalogue_release_coverage.py`, `scripts/publish_reviewed_release.py`). Check actual CLI arguments in the source/CI rather than inventing a release command.
 
-An optional public reader-description profile is **specific to the exact
-edition, version, source and SWORD identifier**. Never reuse an approval
-from the old identity; omit the optional profile until the new description
-is separately reviewed, as was done for MHCC 0.1.1.
+Before merge, [`validate.yml`](../../.github/workflows/validate.yml) must pass relevant unit/integration tests, native SWORD index/readback, exact compiled package checks, licence/source integrity, catalogue coverage and independent reader smoke tests.
 
-The public publication contract is ordered: verify source and rights,
-validate/build the **exact** compiled bytes, verify/create the immutable
-GitHub Release **before** advertising the new single Pages catalogue URL,
-then fetch and hash the public HTTPS catalogue and all advertised ZIPs.
-Reviewers must also inspect a real reader's actual source/heading layout.
-A test pass is not legal approval, a build is not publication, and a
-published resource may still expose an application-only display issue.
+Check the approved release plan using `scripts/publish_reviewed_release.py --verify-only`. A compiled ZIP, successful `diatheke` probe or green build is not the same as a published and rights-cleared release.
 
-### Historical release orchestrators are not current publishers
+## 4. Publish in the enforced order
 
-The four Darby-specific historical workflows (`release-darby-jnd-2024.yml`,
-`stage-darby-0.1.1.yml`, `finalize-darby-0.1.1.yml` and
-`finalize-darby-release.yml`) are retained for independent
-release-evidence replay only; they no longer trigger on `main`, temporary
-staging branches or pull requests. This prevents one original source
-correction from activating two competing release publication paths.
-Historical GitHub Release assets, original authorizations, logs and tags
-remain unchanged. These workflows are **not** an alternative to
-`pages.yml`, which is the single current Release-before-Pages publisher.
-A deliberate manual historical workflow run is still bound by its original
-fail-closed authorization rules.
+The single publisher must:
+1. Revalidate the exact protected-`main` sources, approvals, metadata and deterministic packages.
+2. Verify release-plan / legacy coverage for **every** approved catalogue entry, including `scripts/catalogue_release_coverage.py --built dist`.
+3. Download and hash-check pinned historical versioned releases; create or verify current immutable release tags/assets, then **download** the resulting versioned assets and compare exact SHA-256 and size. Never overwrite existing tags/assets.
+4. Only after successful release verification, publish the Pages catalogue and SWORD repository/package layout.
+5. Independently download the public HTTPS catalogue and **every advertised** package, verify actual size/hash using `scripts/verify_public_catalogue.py`, and retain the run links.
 
-### Reusable commands and evidence status
+GitHub Releases and Pages are not one atomic transaction. If release creation succeeds but Pages fails, **do not declare the new release available through the catalogue**; preserve the last successful Pages state and repeat verification safely.
 
-Use [`scripts/commentary_intake.py`](../../scripts/commentary_intake.py) for
-read-only source observations; source archives must be pinned before a
-stage-2 claim. For an edited compiled source, the reusable
-[`reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) validates a separate
-fully attested source/native correction manifest, rather than pretending
-the corrected module is byte-identical to the upstream stock. Normal
-production validation and release packaging are already shared across
-Bibles/commentaries in `scripts/validate.py`, `scripts/build.py`,
-`scripts/catalogue_release_coverage.py` and
-`scripts/publish_reviewed_release.py`.
+## 5. Final receipt and failure handling
 
-The full inventory and known edition-specific diagnostics are maintained in
-[generated tool registry](../../reports/tooling/TOOL_REGISTRY.md). Treat the large historic MHCC
-private orchestration as **historical acceptance evidence**, not a generic
-one-button runner for a new edition. A second commentary requires its own
-source pins, authorial edition/rights review and independent native audit.
+Record versioned GitHub release link, catalogue/public package URLs, actual hashes, exact approval/rights evidence, final full-corpus and reader tests, known limitations and next action under the resource's `editorial/releases/`. Never mark a draft, release asset creation, or deployment attempt as public verification.
 
-## Mandatory publication contract
-
-Every **approved** catalogue entry must have exactly one documented
-versioned GitHub Release path:
-
-- **New or updated module:** an authorized,
-  [source-pinned release plan](../../config/release-plans)
-  for the *same* module ID, version, exact deterministic SWORD ZIP
-  SHA-256 and byte length as the official JSON catalogue. The existing
-  source/rights/approval evidence must pass
-  `scripts/publish_reviewed_release.py --verify-only`.
-- **Previously published module:** a frozen,
-  [reviewed historical binding](../../config/release-legacy-bindings.json)
-  with the original GitHub Release tag/asset and independently pinned
-  release and catalogue checksums. This is a historical migration
-  record, **not permission to use exceptions for new modules**.
-  A difference between historical GitHub and Pages ZIPs is disclosed,
-  not silently treated as source equivalence.
-
-Neither a published `mods.d` archive nor a successful local build
-counts as a GitHub Release.
-
-A pull request must pass [Validate](../../.github/workflows/validate.yml),
-including the exact local mapping of all approved catalogue entries
-to their release plans, the generated ZIP checksums and a read-only
-review of every current release authorization. A newly approved
-module without an authorized release plan **fails CI**.
-
-## Single workflow on main
-
-On a reviewed merge to `main`:
-
-1. Install dependencies, run unit tests, validate all module metadata,
-   source and original licence proofs, build the deterministic catalogue
-   and packages, and run a real `diatheke` smoke test.
-2. Verify **complete** plan/legacy coverage for every approved
-   resource with `scripts/catalogue_release_coverage.py --built dist`.
-3. Using approved manifest(s), check each historical GitHub Release
-   by **actually downloading** its pinned versioned ZIP, byte length
-   and SHA-256. Then create or verify each current versioned GitHub
-   Release, and **download** its asset to confirm exact identity with
-   the deterministic catalogue ZIP. Existing release tags/assets are
-   never overwritten. This step must succeed **before Pages upload**.
-4. Only then upload and deploy the Pages catalogue and standard
-   `mods.d/`, `modules/` and `sword/packages/` layout.
-5. Independently download the public HTTPS catalogue and every
-   advertised Pages ZIP; verify their exact SHA-256 and sizes with
-   `scripts/verify_public_catalogue.py`. A failed HTTP verification
-   is a **failed publication check**, not a false success.
-
-This order prevents the observed failure mode **catalogue visible,
-GitHub Release absent**. It is not a literal distributed database
-transaction: GitHub Release creation can succeed and a later Pages
-deployment can fail. In that case the existing Pages catalogue
-remains unchanged until the deployment succeeds; rerunning the
-workflow safely verifies existing versioned assets without replacing
-them.
-
-Manual GitHub Pages deployments must use the same release gates,
-on `main` only. No third-party reader certification is implied.
-
-## Historical Segond packaging caveat
-
-The existing **Louis Segond 0.1.0** versioned GitHub Release
-(`BRLSG1910-0.1.0.zip`, SHA-256
-`af2f80ea84f40a6bf62993c9e65c2e2061e1ec20b34b0772a4eb775dd47723c1`)
-and its current Pages catalogue ZIP (`BRLSG1910.zip`, SHA-256
-`f3f74a1016f708e10263b5628e606a73b727c0e80fbb7e131d195c4b11d86c51`)
-have **different bytes and lengths**. Both are pinned and must be
-verified separately as part of the historical transition. This
-does **not** prove an authorial difference, nor does it prove exact
-native-data equality. Do not silently replace the released 0.1.0
-asset, or claim the two packages are identical without separately
-auditing their content, metadata and source/compiled identity. A
-future source-grounded update requires its own issue and approval.
-
-By contrast, the current approved **Darby 0.1.1** archive and its
-versioned GitHub asset have the same pinned ZIP checksum. **MHCC 0.1.1** now uses the source-corrected rebuilt-commentary route; its
-current release plan/Pages ZIP is independently verified. The old, immutable
-**BRMHCC 0.1.0** GitHub Release remains separately hash-verified.
+Retired resource-specific workflows are historical **replay aids only**, not alternate publishers. The main Pages workflow remains the sole release-before-catalogue path. For client-facing schema see [catalogue integration](CATALOGUE_INTEGRATION.md) and [update protocol](CATALOGUE_UPDATE_PROTOCOL.md). For upstream changes see [updates](UPDATES.md).
