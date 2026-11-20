@@ -30,9 +30,9 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 4,
       "static_references": [
-        "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
+        "scripts/probe_private_repaired_darby_sword.py",
         "tests/test_audit_omitted_verse_notes.py"
       ]
     },
@@ -119,8 +119,8 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/commentary_intake.py",
         ".github/workflows/pilot-source-audit.yml",
+        "scripts/commentary_intake.py",
         "tests/test_real_pilot_audit.py"
       ]
     },
@@ -188,13 +188,13 @@
       "stage_hint": "intake",
       "static_reference_count": 9,
       "static_references": [
+        ".github/workflows/bible-observe-originals.yml",
+        ".github/workflows/bible-staged-audit.yml",
         "scripts/bible_stage_runner.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/publisher_osis_usfx_parity.py",
         "scripts/tool_registry.py",
         "scripts/usfx_schema_gate.py",
-        ".github/workflows/bible-observe-originals.yml",
-        ".github/workflows/bible-staged-audit.yml",
         "tests/test_bible_stage_runner.py",
         "tests/test_stage4_receipt_replay.py"
       ]
@@ -252,10 +252,10 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
-        "scripts/tool_registry.py",
         ".github/workflows/bible-staged-audit.yml",
         "docs/BIBLE_STAGE_AUTOMATION.md",
         "docs/SOURCE_USFX_STRUCTURE.md",
+        "scripts/tool_registry.py",
         "tests/test_bible_stage_runner.py",
         "tests/test_stage4_receipt_replay.py"
       ]
@@ -292,11 +292,6 @@
       "stage_hint": "publication/release",
       "static_reference_count": 24,
       "static_references": [
-        "scripts/publish_reviewed_release.py",
-        "scripts/release_preflight.py",
-        "scripts/stage_darby_011_release.py",
-        "scripts/stage_hmcc_modern_release.py",
-        "scripts/tool_registry.py",
         ".github/workflows/finalize-darby-0.1.1.yml",
         ".github/workflows/finalize-darby-release.yml",
         ".github/workflows/pages.yml",
@@ -313,6 +308,11 @@
         "docs/STABLE_SWORD_REFERENCE_AUDIT.md",
         "docs/evidence/mhcc-274/0.1.1-release-transition-DRAFT.md",
         "docs/evidence/mhcc-274/publication-provenance-readiness.md",
+        "scripts/publish_reviewed_release.py",
+        "scripts/release_preflight.py",
+        "scripts/stage_darby_011_release.py",
+        "scripts/stage_hmcc_modern_release.py",
+        "scripts/tool_registry.py",
         "tests/test_catalogue_update_contract.py",
         "tests/test_repository.py",
         "tests/test_tool_registry.py"
@@ -344,9 +344,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
+        "docs/RESOURCE_PROFILES.md",
         "scripts/build.py",
         "scripts/validate.py",
-        "docs/RESOURCE_PROFILES.md",
         "tests/test_catalogue_profiles.py"
       ]
     },
@@ -376,14 +376,14 @@
       "stage_hint": "publication/release",
       "static_reference_count": 10,
       "static_references": [
-        "scripts/publish_reviewed_release.py",
-        "scripts/release_preflight.py",
-        "scripts/tool_registry.py",
         ".github/workflows/pages.yml",
         ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/validate.yml",
         "docs/COMMENTARY_PIPELINE.md",
         "docs/PUBLISHING.md",
+        "scripts/publish_reviewed_release.py",
+        "scripts/release_preflight.py",
+        "scripts/tool_registry.py",
         "tests/test_catalogue_release_coverage.py",
         "tests/test_commentary_sword_identity_migration.py"
       ]
@@ -461,14 +461,14 @@
       "stage_hint": "not determined",
       "static_reference_count": 12,
       "static_references": [
+        ".github/workflows/upstream-check.yml",
+        "docs/SOURCE_INVENTORY.md",
+        "docs/UPDATES.md",
         "scripts/commentary_intake.py",
         "scripts/diff_sword_snapshots.py",
         "scripts/pilot_preflight.py",
         "scripts/real_second_bible_probe.py",
         "scripts/select_sources.py",
-        ".github/workflows/upstream-check.yml",
-        "docs/SOURCE_INVENTORY.md",
-        "docs/UPDATES.md",
         "tests/test_catalogue_update_contract.py",
         "tests/test_provider_parity.py",
         "tests/test_source_selection.py",
@@ -506,10 +506,10 @@
       "stage_hint": "not determined",
       "static_reference_count": 5,
       "static_references": [
-        "scripts/reclassify_osis_commentary_introduction.py",
-        "scripts/repair_commentary_osis_milestones.py",
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         "docs/evidence/mhc-285/source-cleanup/CLEANUP_STATUS.md",
+        "scripts/reclassify_osis_commentary_introduction.py",
+        "scripts/repair_commentary_osis_milestones.py",
         "tests/test_clean_source_osis.py"
       ]
     },
@@ -664,8 +664,8 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/commentary_stock_andbible_android.py",
         ".github/workflows/commentary-zcom-andbible-android.yml",
+        "scripts/commentary_stock_andbible_android.py",
         "tests/test_commentary_android_text_witness.py"
       ]
     },
@@ -700,8 +700,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/commentary_stock_andbible_android.py",
         ".github/workflows/commentary-zcom-andbible-android.yml",
+        "scripts/commentary_stock_andbible_android.py",
         "tests/test_commentary_android_webview_debug.py"
       ]
     },
@@ -976,6 +976,11 @@
       "stage_hint": "intake",
       "static_reference_count": 20,
       "static_references": [
+        ".github/workflows/commentary-intake.yml",
+        "docs/COMMENTARY_7_STAGE_WORKFLOW.md",
+        "docs/COMMENTARY_PIPELINE.md",
+        "docs/PUBLISHING.md",
+        "docs/evidence/post-mhcc/toolchain-pilot-2026-11-16.md",
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_native_inventory.py",
@@ -989,11 +994,6 @@
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/commentary_xml_witness.py",
         "scripts/tool_registry.py",
-        ".github/workflows/commentary-intake.yml",
-        "docs/COMMENTARY_7_STAGE_WORKFLOW.md",
-        "docs/COMMENTARY_PIPELINE.md",
-        "docs/PUBLISHING.md",
-        "docs/evidence/post-mhcc/toolchain-pilot-2026-11-16.md",
         "tests/test_commentary_intake.py",
         "tests/test_tool_registry.py"
       ]
@@ -1055,9 +1055,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
+        "docs/evidence/mhcc-274/edition-first-layout-sweep-2026-11-16.md",
         "scripts/commentary_paragraph_witness_probe.py",
         "scripts/commentary_section_scope_audit.py",
-        "docs/evidence/mhcc-274/edition-first-layout-sweep-2026-11-16.md",
         "tests/test_commentary_layout_census.py"
       ]
     },
@@ -1087,9 +1087,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
+        "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
-        "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
         "tests/test_commentary_literal_erratum_preflight.py"
       ]
     },
@@ -1117,12 +1117,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
+        ".github/workflows/commentary-modern-source-receipt.yml",
         "scripts/commentary_modern_draft_osis_preview.py",
         "scripts/commentary_modern_reference_gate.py",
-        ".github/workflows/commentary-modern-source-receipt.yml",
-        "docs/MHCC_MODERN_ENGLISH.md",
         "tests/test_commentary_modern_draft_guard.py"
       ]
     },
@@ -1157,14 +1156,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 8,
       "static_references": [
+        ".github/workflows/commentary-modern-source-receipt.yml",
         "scripts/commentary_modern_ionly_preview.py",
         "scripts/commentary_modern_k_scope_preview.py",
         "scripts/commentary_modern_linked_candidate_preview.py",
         "scripts/commentary_modern_reference_gate.py",
-        ".github/workflows/commentary-modern-source-receipt.yml",
-        "docs/MHCC_MODERN_ENGLISH.md",
         "tests/test_commentary_modern_draft_osis_preview.py",
         "tests/test_commentary_modern_ionly_preview.py",
         "tests/test_commentary_modern_reference_gate.py"
@@ -1349,9 +1347,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 5,
       "static_references": [
+        ".github/workflows/commentary-modern-source-receipt.yml",
         "scripts/commentary_modern_draft_osis_preview.py",
         "scripts/commentary_modern_linked_candidate_preview.py",
-        ".github/workflows/commentary-modern-source-receipt.yml",
         "tests/test_commentary_modern_linked_candidate_preview.py",
         "tests/test_commentary_modern_reference_gate.py"
       ]
@@ -1387,10 +1385,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         ".github/workflows/commentary-modern-source-receipt.yml",
-        "docs/MHCC_MODERN_ENGLISH.md",
         "tests/test_commentary_modern_source_receipt.py"
       ]
     },
@@ -1434,15 +1431,15 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 11,
       "static_references": [
-        "scripts/commentary_anchor_parity.py",
-        "scripts/commentary_native_raw_inventory.py",
-        "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-evidence.yml",
         ".github/workflows/commentary-intake.yml",
         ".github/workflows/commentary-mhc-source-text.yml",
         "docs/COMMENTARY_PIPELINE.md",
         "docs/evidence/post-mhcc/toolchain-pilot-2026-11-16.md",
+        "scripts/commentary_anchor_parity.py",
+        "scripts/commentary_native_raw_inventory.py",
+        "scripts/tool_registry.py",
         "tests/test_commentary_stage_evidence.py",
         "tests/test_tool_registry.py"
       ]
@@ -1489,6 +1486,9 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 13,
       "static_references": [
+        ".github/workflows/commentary-mhc-source-text.yml",
+        ".github/workflows/commentary-native-raw-corpus.yml",
+        "docs/COMMENTARY_PIPELINE.md",
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_private_text_compare.py",
@@ -1498,9 +1498,6 @@
         "scripts/commentary_stock_xiphos_smoke.py",
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/tool_registry.py",
-        ".github/workflows/commentary-mhc-source-text.yml",
-        ".github/workflows/commentary-native-raw-corpus.yml",
-        "docs/COMMENTARY_PIPELINE.md",
         "tests/test_commentary_native_raw_inventory.py"
       ]
     },
@@ -1533,10 +1530,10 @@
       "stage_hint": "not determined",
       "static_reference_count": 5,
       "static_references": [
-        "scripts/commentary_anchor_parity.py",
-        "scripts/commentary_section_scope_audit.py",
         "docs/COMMENTARY_POLICY.md",
         "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
+        "scripts/commentary_anchor_parity.py",
+        "scripts/commentary_section_scope_audit.py",
         "tests/test_commentary_navigation_link_plan.py"
       ]
     },
@@ -1596,6 +1593,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 12,
       "static_references": [
+        ".github/workflows/commentary-mhc-source-text.yml",
+        ".github/workflows/commentary-modern-source-receipt.yml",
         "scripts/audit_osis.py",
         "scripts/commentary_intro_chapter_text_review.py",
         "scripts/commentary_near_prose_unicode_review.py",
@@ -1605,8 +1604,6 @@
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_shared_raw_source_units.py",
         "scripts/commentary_unresolved_lexical_triage.py",
-        ".github/workflows/commentary-mhc-source-text.yml",
-        ".github/workflows/commentary-modern-source-receipt.yml",
         "tests/test_commentary_nonlink_word_alignment.py"
       ]
     },
@@ -1635,10 +1632,10 @@
       "stage_hint": "not determined",
       "static_reference_count": 7,
       "static_references": [
+        ".github/workflows/commentary-mhc-source-text.yml",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_prose_cross_slot.py",
         "scripts/commentary_unresolved_lexical_triage.py",
-        ".github/workflows/commentary-mhc-source-text.yml",
         "tests/test_commentary_nonlink_words.py",
         "tests/test_commentary_private_text_compare.py",
         "tests/test_commentary_prose_cross_slot.py"
@@ -1795,11 +1792,11 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 6,
       "static_references": [
+        ".github/workflows/commentary-anchor-parity.yml",
+        ".github/workflows/commentary-mhc-private-jsword.yml",
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
-        ".github/workflows/commentary-anchor-parity.yml",
-        ".github/workflows/commentary-mhc-private-jsword.yml",
         "tests/test_commentary_osis_mixed_transport_probe.py"
       ]
     },
@@ -1900,11 +1897,11 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 6,
       "static_references": [
+        "docs/evidence/mhcc-274/original-osis-transport-preflight.md",
         "scripts/commentary_osis_intro_transport_probe.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
-        "docs/evidence/mhcc-274/original-osis-transport-preflight.md",
         "tests/test_commentary_osis_transport_probe.py"
       ]
     },
@@ -1936,8 +1933,8 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/commentary_section_scope_audit.py",
         "docs/evidence/mhcc-274/paragraph-witness-pilot-2026-11-16.md",
+        "scripts/commentary_section_scope_audit.py",
         "tests/test_commentary_paragraph_witness_probe.py"
       ]
     },
@@ -2131,8 +2128,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/commentary_source_erratum_compiled_probe.py",
         "docs/evidence/mhcc-274/publication-provenance-readiness.md",
+        "scripts/commentary_source_erratum_compiled_probe.py",
         "tests/test_commentary_public_metadata_preflight.py"
       ]
     },
@@ -2229,11 +2226,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
+        "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_literal_erratum_preflight.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
-        "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
         "tests/test_commentary_reference_registry_triage.py"
       ]
     },
@@ -2490,8 +2487,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
-        "scripts/commentary_private_text_compare.py",
         ".github/workflows/commentary-mhc-source-text.yml",
+        "scripts/commentary_private_text_compare.py",
         "tests/test_commentary_shared_raw_source_units.py",
         "tests/test_commentary_source_native_boundaries.py"
       ]
@@ -2589,12 +2586,12 @@
       "stage_hint": "not determined",
       "static_reference_count": 7,
       "static_references": [
+        ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
+        ".github/workflows/commentary-zcom-private-candidate.yml",
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_private_candidate_xiphos_gui.py",
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/stage_verified_stock_commentary.py",
-        ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
-        ".github/workflows/commentary-zcom-private-candidate.yml",
         "tests/test_commentary_stock_candidate.py"
       ]
     },
@@ -2941,6 +2938,10 @@
       "stage_hint": "not determined",
       "static_reference_count": 13,
       "static_references": [
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
+        ".github/workflows/commentary-modern-source-receipt.yml",
+        ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
+        ".github/workflows/commentary-xiphos-dual-reader.yml",
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_android_text_witness.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
@@ -2949,10 +2950,6 @@
         "scripts/commentary_source_erratum_compiled_probe.py",
         "scripts/commentary_stock_andbible_android.py",
         "scripts/commentary_xiphos_heading_probe.py",
-        ".github/workflows/commentary-mhc-technical-rebuild.yml",
-        ".github/workflows/commentary-modern-source-receipt.yml",
-        ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
-        ".github/workflows/commentary-xiphos-dual-reader.yml",
         "tests/test_commentary_xiphos_dual_reader.py"
       ]
     },
@@ -2989,10 +2986,10 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 5,
       "static_references": [
-        "scripts/commentary_private_candidate_xiphos_gui.py",
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-modern-source-receipt.yml",
         ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
+        "scripts/commentary_private_candidate_xiphos_gui.py",
         "tests/test_commentary_xiphos_heading_probe.py"
       ]
     },
@@ -3032,6 +3029,8 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 12,
       "static_references": [
+        ".github/workflows/commentary-anchor-parity.yml",
+        ".github/workflows/commentary-xml-witness.yml",
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_chapter_neighbors.py",
         "scripts/commentary_paragraph_witness_probe.py",
@@ -3041,8 +3040,6 @@
         "scripts/commentary_source_native_boundaries.py",
         "scripts/commentary_stock_prefix_topology.py",
         "scripts/commentary_unmarked_division_coverage.py",
-        ".github/workflows/commentary-anchor-parity.yml",
-        ".github/workflows/commentary-xml-witness.yml",
         "tests/test_commentary_xml_witness.py"
       ]
     },
@@ -3074,11 +3071,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
-        "scripts/tool_registry.py",
-        "scripts/validate.py",
         ".github/workflows/stage-stock-commentary.yml",
         "docs/COMMENTARY_PIPELINE.md",
         "docs/evidence/mhcc-274/publication-provenance-readiness.md",
+        "scripts/tool_registry.py",
+        "scripts/validate.py",
         "tests/test_compiled_stock_commentary_proof.py"
       ]
     },
@@ -3113,9 +3110,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 5,
       "static_references": [
-        "scripts/real_second_bible_probe.py",
         ".github/workflows/validate.yml",
         "docs/UPDATES.md",
+        "scripts/real_second_bible_probe.py",
         "tests/test_diff_sword_snapshots.py",
         "tests/test_real_second_bible_probe.py"
       ]
@@ -3153,8 +3150,8 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/bible_stage_runner.py",
         ".github/workflows/bible-staged-audit.yml",
+        "scripts/bible_stage_runner.py",
         "tests/test_fast_stock_note_probe.py"
       ]
     },
@@ -3229,14 +3226,13 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 6,
       "static_references": [
-        "scripts/normalize_osis.py",
-        "scripts/tool_registry.py",
         "docs/COMMENTARY_7_STAGE_WORKFLOW.md",
         "docs/COMMENTARY_POLICY.md",
         "docs/EDITORIAL_AUDIT_WORKFLOW.md",
-        "docs/MHCC_MODERN_ENGLISH.md",
+        "scripts/normalize_osis.py",
+        "scripts/tool_registry.py",
         "tests/test_commentary_gate.py"
       ]
     },
@@ -3274,6 +3270,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 18,
       "static_references": [
+        ".github/workflows/darby-link-repair-research.yml",
+        ".github/workflows/osis-schema-review.yml",
+        "docs/EDITORIAL_AUDIT_WORKFLOW.md",
+        "docs/NORMALIZATION_POLICY.md",
+        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "scripts/audit_osis.py",
         "scripts/bible_stage_runner.py",
         "scripts/fetch_reviewed_schema.py",
@@ -3283,11 +3284,6 @@
         "scripts/probe_official_osis.py",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/tool_registry.py",
-        ".github/workflows/darby-link-repair-research.yml",
-        ".github/workflows/osis-schema-review.yml",
-        "docs/EDITORIAL_AUDIT_WORKFLOW.md",
-        "docs/NORMALIZATION_POLICY.md",
-        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "tests/test_commentary_gate.py",
         "tests/test_editorial_pipeline.py",
         "tests/test_guard_osis.py",
@@ -3333,9 +3329,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
-        "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-paragraph-rendering.yml",
         "docs/OSIS_PARAGRAPH_RENDERING_QA.md",
+        "scripts/probe_private_repaired_darby_sword.py",
         "tests/test_inspect_paragraph_rendering.py"
       ]
     },
@@ -3377,6 +3373,7 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 10,
       "static_references": [
+        ".github/workflows/lsg-fidelity.yml",
         "scripts/bible_stage_runner.py",
         "scripts/fast_stock_note_probe.py",
         "scripts/lsg_sword_compare.py",
@@ -3385,7 +3382,6 @@
         "scripts/real_second_bible_probe.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/sword_missing_verse_witness.py",
-        ".github/workflows/lsg-fidelity.yml",
         "tests/test_lsg_source_compare.py"
       ]
     },
@@ -3453,9 +3449,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
-        "scripts/bible_stage_runner.py",
         ".github/workflows/bible-staged-audit.yml",
         "docs/MAIN_TEXT_FIDELITY.md",
+        "scripts/bible_stage_runner.py",
         "tests/test_maintext_fidelity_classification.py"
       ]
     },
@@ -3480,11 +3476,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
-        "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/BIBLE_STAGE_AUTOMATION.md",
+        "scripts/source_native_maintext_probe.py",
         "tests/test_maintext_whitespace_patterns.py"
       ]
     },
@@ -3559,8 +3554,8 @@
       "stage_hint": "publication/release",
       "static_reference_count": 4,
       "static_references": [
-        "scripts/tool_registry.py",
         ".github/workflows/release-darby-jnd-2024.yml",
+        "scripts/tool_registry.py",
         "tests/test_materialize_attested_ztext_release.py",
         "tests/test_tool_registry.py"
       ]
@@ -3590,9 +3585,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
-        "scripts/source_native_maintext_probe.py",
         ".github/workflows/second-bible-proof.yml",
         "docs/NATIVE_SWORD_RAW_WITNESS.md",
+        "scripts/source_native_maintext_probe.py",
         "tests/test_native_absorbed_verse_groups.py"
       ]
     },
@@ -3622,11 +3617,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
-        "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/BIBLE_STAGE_AUTOMATION.md",
+        "scripts/source_native_maintext_probe.py",
         "tests/test_native_book_intro_screen.py"
       ]
     },
@@ -3659,8 +3653,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 12,
+      "static_reference_count": 11,
       "static_references": [
+        ".github/workflows/bible-staged-audit.yml",
         "scripts/native_book_intro_screen.py",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
@@ -3668,8 +3663,6 @@
         "scripts/source_native_maintext_probe.py",
         "scripts/source_native_osis_boundary_positions.py",
         "scripts/source_native_word_boundaries.py",
-        ".github/workflows/bible-staged-audit.yml",
-        "docs/BIBLE_STAGE_AUTOMATION.md",
         "tests/test_native_milestone_pair_audit.py",
         "tests/test_publisher_osis_sword_candidate.py",
         "tests/test_source_native_ordered_body.py"
@@ -3700,11 +3693,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
-        "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/BIBLE_STAGE_AUTOMATION.md",
+        "scripts/source_native_maintext_probe.py",
         "tests/test_native_sword_markup_census.py",
         "tests/test_source_native_layout_anchors.py"
       ]
@@ -3744,13 +3736,13 @@
       "stage_hint": "not determined",
       "static_reference_count": 9,
       "static_references": [
-        "scripts/propose_upstream_edit.py",
-        "scripts/tool_registry.py",
         ".github/workflows/pilot-source-audit.yml",
         "docs/EDITORIAL_AUDIT_WORKFLOW.md",
         "docs/NORMALIZATION_POLICY.md",
         "docs/QUALITY_POLICY.md",
         "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
+        "scripts/propose_upstream_edit.py",
+        "scripts/tool_registry.py",
         "tests/test_editorial_pipeline.py",
         "tests/test_propose_upstream_edit.py"
       ]
@@ -3776,12 +3768,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
-        "scripts/maintext_whitespace_patterns.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/LSG_AUDIT_RESEARCH_HANDOFF.md",
         "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
+        "scripts/maintext_whitespace_patterns.py",
         "tests/test_note_whitespace_diagnostics.py"
       ]
     },
@@ -3848,8 +3839,15 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 23,
+      "static_reference_count": 22,
       "static_references": [
+        ".github/workflows/commentary-evidence.yml",
+        ".github/workflows/commentary-intake.yml",
+        ".github/workflows/commentary-xml-witness.yml",
+        ".github/workflows/lsg-fidelity.yml",
+        ".github/workflows/lsg-v11n-probe.yml",
+        ".github/workflows/pilot-preflight.yml",
+        ".github/workflows/pilot-source-audit.yml",
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_intake.py",
@@ -3864,14 +3862,6 @@
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/commentary_xml_witness.py",
         "scripts/tool_registry.py",
-        ".github/workflows/commentary-evidence.yml",
-        ".github/workflows/commentary-intake.yml",
-        ".github/workflows/commentary-xml-witness.yml",
-        ".github/workflows/lsg-fidelity.yml",
-        ".github/workflows/lsg-v11n-probe.yml",
-        ".github/workflows/pilot-preflight.yml",
-        ".github/workflows/pilot-source-audit.yml",
-        "docs/PILOT_SEGOND_MHC.md",
         "tests/test_pilot_preparation.py"
       ]
     },
@@ -3911,8 +3901,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 94,
+      "static_reference_count": 93,
       "static_references": [
+        ".github/workflows/commentary-mhc-source-text.yml",
+        ".github/workflows/commentary-modern-source-receipt.yml",
+        ".github/workflows/lsg-fidelity.yml",
+        ".github/workflows/pilot-preflight.yml",
         "scripts/audit_real_pilot.py",
         "scripts/bible_intake.py",
         "scripts/bible_stage_runner.py",
@@ -3962,11 +3956,6 @@
         "scripts/probe_lsg_v11n.py",
         "scripts/stage_verified_stock_commentary.py",
         "scripts/tool_registry.py",
-        ".github/workflows/commentary-mhc-source-text.yml",
-        ".github/workflows/commentary-modern-source-receipt.yml",
-        ".github/workflows/lsg-fidelity.yml",
-        ".github/workflows/pilot-preflight.yml",
-        "docs/PILOT_SEGOND_MHC.md",
         "tests/test_commentary_anchor_parity.py",
         "tests/test_commentary_andbible_jsword.py",
         "tests/test_commentary_android_text_witness.py",
@@ -4039,11 +4028,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
-        "scripts/bible_stage_runner.py",
         ".github/workflows/pilot-preflight.yml",
-        "docs/PILOT_SEGOND_MHC.md",
+        "scripts/bible_stage_runner.py",
         "tests/test_pilot_runtime.py"
       ]
     },
@@ -4075,6 +4063,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 15,
       "static_references": [
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
+        ".github/workflows/commentary-modern-source-receipt.yml",
+        ".github/workflows/lsg-fidelity.yml",
         "scripts/audit_real_pilot.py",
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
@@ -4086,9 +4077,6 @@
         "scripts/pilot_runtime.py",
         "scripts/private_sword_bundle.py",
         "scripts/probe_lsg_v11n.py",
-        ".github/workflows/commentary-mhc-technical-rebuild.yml",
-        ".github/workflows/commentary-modern-source-receipt.yml",
-        ".github/workflows/lsg-fidelity.yml",
         "tests/test_pilot_subprocess.py"
       ]
     },
@@ -4167,10 +4155,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
-        "docs/LSG_AUDIT_RESEARCH_HANDOFF.md",
         "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "tests/test_private_sword_bundle.py"
       ]
@@ -4207,11 +4194,11 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 6,
       "static_references": [
+        ".github/workflows/andbible-android-import-preflight.yml",
         "scripts/commentary_android_text_witness.py",
         "scripts/commentary_android_webview_debug.py",
         "scripts/commentary_stock_andbible_android.py",
         "scripts/probe_andbible_android_private_import.py",
-        ".github/workflows/andbible-android-import-preflight.yml",
         "tests/test_commentary_android_text_witness.py"
       ]
     },
@@ -4252,10 +4239,10 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 5,
       "static_references": [
-        "scripts/probe_darby_011_final_android.py",
-        "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-andbible-android-private.yml",
+        "scripts/probe_darby_011_final_android.py",
+        "scripts/probe_private_repaired_darby_sword.py",
         "tests/test_probe_andbible_android_private_import.py"
       ]
     },
@@ -4291,10 +4278,10 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 4,
       "static_references": [
+        ".github/workflows/darby-andbible-jsword.yml",
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
-        "scripts/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-andbible-jsword.yml"
+        "scripts/probe_private_repaired_darby_sword.py"
       ]
     },
     {
@@ -4408,10 +4395,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         ".github/workflows/osis-schema-review.yml",
-        "docs/PILOT_SEGOND_MHC.md",
         "tests/test_pilot_preparation.py"
       ]
     },
@@ -4515,15 +4501,15 @@
       "stage_hint": "not determined",
       "static_reference_count": 11,
       "static_references": [
-        "scripts/commentary_stock_candidate.py",
-        "scripts/materialize_attested_ztext_release.py",
-        "scripts/prepare_darby_011_private_release_candidate.py",
-        "scripts/tool_registry.py",
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-zcom-private-candidate.yml",
         ".github/workflows/lsg-first-release.yml",
         ".github/workflows/private-sword-promotion-proof.yml",
         "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
+        "scripts/commentary_stock_candidate.py",
+        "scripts/materialize_attested_ztext_release.py",
+        "scripts/prepare_darby_011_private_release_candidate.py",
+        "scripts/tool_registry.py",
         "tests/test_promote_sword_preview.py",
         "tests/test_tool_registry.py"
       ]
@@ -4593,13 +4579,13 @@
       "stage_hint": "publication/release",
       "static_reference_count": 9,
       "static_references": [
-        "scripts/release_preflight.py",
-        "scripts/tool_registry.py",
         ".github/workflows/pages.yml",
         ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/validate.yml",
         ".github/workflows/verify-previous-sword-release.yml",
         "docs/PUBLISHING.md",
+        "scripts/release_preflight.py",
+        "scripts/tool_registry.py",
         "tests/test_catalogue_release_coverage.py",
         "tests/test_tool_registry.py"
       ]
@@ -4634,8 +4620,8 @@
       "stage_hint": "publication/release",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/validate.py",
         "docs/STABLE_SWORD_REFERENCE_AUDIT.md",
+        "scripts/validate.py",
         "tests/test_published_reference_audit.py"
       ]
     },
@@ -4671,6 +4657,11 @@
       "stage_hint": "publication/release",
       "static_reference_count": 13,
       "static_references": [
+        ".github/workflows/darby-link-repair-research.yml",
+        ".github/workflows/darby-paragraph-rendering.yml",
+        ".github/workflows/publisher-osis-observation.yml",
+        ".github/workflows/publisher-osis-source-parity.yml",
+        ".github/workflows/source-osis-note-links.yml",
         "scripts/inspect_paragraph_rendering.py",
         "scripts/materialize_attested_ztext_release.py",
         "scripts/prepare_darby_011_private_release_candidate.py",
@@ -4678,11 +4669,6 @@
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/publisher_osis_usfx_parity.py",
         "scripts/source_osis_note_link_triage.py",
-        ".github/workflows/darby-link-repair-research.yml",
-        ".github/workflows/darby-paragraph-rendering.yml",
-        ".github/workflows/publisher-osis-observation.yml",
-        ".github/workflows/publisher-osis-source-parity.yml",
-        ".github/workflows/source-osis-note-links.yml",
         "tests/test_publisher_osis_observation.py"
       ]
     },
@@ -4713,11 +4699,11 @@
       "stage_hint": "publication/release",
       "static_reference_count": 6,
       "static_references": [
+        ".github/workflows/publisher-osis-sword-candidate.yml",
         "scripts/probe_andbible_android_private_import.py",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_preview_readback.py",
         "scripts/publisher_osis_sword_candidate.py",
-        ".github/workflows/publisher-osis-sword-candidate.yml",
         "tests/test_publisher_osis_preview_package.py"
       ]
     },
@@ -4808,9 +4794,9 @@
       "stage_hint": "publication/release",
       "static_reference_count": 4,
       "static_references": [
+        ".github/workflows/publisher-osis-sword-candidate.yml",
         "scripts/audit_omitted_verse_notes.py",
         "scripts/probe_private_repaired_darby_sword.py",
-        ".github/workflows/publisher-osis-sword-candidate.yml",
         "tests/test_publisher_osis_sword_candidate.py"
       ]
     },
@@ -4855,6 +4841,8 @@
       "stage_hint": "publication/release",
       "static_reference_count": 12,
       "static_references": [
+        ".github/workflows/publisher-osis-source-parity.yml",
+        ".github/workflows/source-osis-note-links.yml",
         "scripts/inspect_paragraph_rendering.py",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
@@ -4862,8 +4850,6 @@
         "scripts/repair_osis_note_links.py",
         "scripts/repair_osis_paragraph_indentation.py",
         "scripts/source_osis_note_link_triage.py",
-        ".github/workflows/publisher-osis-source-parity.yml",
-        ".github/workflows/source-osis-note-links.yml",
         "tests/test_publisher_osis_usfx_parity.py",
         "tests/test_repair_osis_division_markers.py",
         "tests/test_repair_osis_paragraph_indentation.py"
@@ -4908,13 +4894,13 @@
       "stage_hint": "not determined",
       "static_reference_count": 9,
       "static_references": [
-        "scripts/commentary_stock_xiphos_smoke.py",
-        "scripts/commentary_xiphos_dual_reader.py",
-        "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/commentary-zcom-xiphos-private-smoke.yml",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
         ".github/workflows/xiphos-preview-smoke.yml",
+        "scripts/commentary_stock_xiphos_smoke.py",
+        "scripts/commentary_xiphos_dual_reader.py",
+        "scripts/probe_private_repaired_darby_sword.py",
         "tests/test_reader_xiphos_headless_smoke.py",
         "tests/test_reader_xiphos_reference_navigation.py"
       ]
@@ -4961,11 +4947,11 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 6,
       "static_references": [
+        ".github/workflows/second-bible-proof.yml",
         "scripts/bible_stage_runner.py",
         "scripts/fast_stock_note_probe.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/sword_missing_verse_witness.py",
-        ".github/workflows/second-bible-proof.yml",
         "tests/test_real_second_bible_probe.py"
       ]
     },
@@ -5080,9 +5066,9 @@
       "stage_hint": "publication/release",
       "static_reference_count": 5,
       "static_references": [
+        "docs/COMMENTARY_PIPELINE.md",
         "scripts/materialize_attested_ztext_release.py",
         "scripts/tool_registry.py",
-        "docs/COMMENTARY_PIPELINE.md",
         "tests/test_release_preflight.py",
         "tests/test_tool_registry.py"
       ]
@@ -5157,11 +5143,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
-        "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-paragraph-rendering.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
         "docs/OSIS_PARAGRAPH_RENDERING_QA.md",
+        "scripts/probe_private_repaired_darby_sword.py",
         "tests/test_repair_osis_division_markers.py"
       ]
     },
@@ -5196,11 +5182,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
-        "scripts/probe_private_repaired_darby_sword.py",
-        "scripts/repair_osis_source_bytes.py",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-link-repair-research.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
+        "scripts/probe_private_repaired_darby_sword.py",
+        "scripts/repair_osis_source_bytes.py",
         "tests/test_repair_osis_inline_markup.py"
       ]
     },
@@ -5236,15 +5222,15 @@
       "stage_hint": "not determined",
       "static_reference_count": 12,
       "static_references": [
+        ".github/workflows/darby-0.1.1-preflight.yml",
+        ".github/workflows/darby-link-repair-research.yml",
+        ".github/workflows/darby-private-repaired-sword.yml",
         "scripts/audit_omitted_verse_notes.py",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/repair_osis_inline_markup.py",
         "scripts/repair_osis_source_bytes.py",
         "scripts/repair_osis_unlinked_reference_labels.py",
         "scripts/source_osis_note_markup_shape.py",
-        ".github/workflows/darby-0.1.1-preflight.yml",
-        ".github/workflows/darby-link-repair-research.yml",
-        ".github/workflows/darby-private-repaired-sword.yml",
         "tests/test_audit_omitted_verse_notes.py",
         "tests/test_repair_osis_note_links.py",
         "tests/test_repair_osis_source_bytes.py"
@@ -5280,11 +5266,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
-        "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-paragraph-rendering.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
         "docs/OSIS_PARAGRAPH_RENDERING_QA.md",
+        "scripts/probe_private_repaired_darby_sword.py",
         "tests/test_repair_osis_paragraph_indentation.py"
       ]
     },
@@ -5319,14 +5305,14 @@
       "stage_hint": "not determined",
       "static_reference_count": 10,
       "static_references": [
-        "scripts/probe_private_repaired_darby_sword.py",
-        "scripts/repair_osis_division_markers.py",
-        "scripts/repair_osis_paragraph_indentation.py",
-        "scripts/repair_osis_unlinked_reference_labels.py",
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-andbible-jsword.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
+        "scripts/probe_private_repaired_darby_sword.py",
+        "scripts/repair_osis_division_markers.py",
+        "scripts/repair_osis_paragraph_indentation.py",
+        "scripts/repair_osis_unlinked_reference_labels.py",
         "tests/test_repair_osis_source_bytes.py",
         "tests/test_repair_osis_unlinked_reference_labels.py"
       ]
@@ -5392,13 +5378,13 @@
       "stage_hint": "publication/release",
       "static_reference_count": 12,
       "static_references": [
+        "docs/COMMENTARY_PIPELINE.md",
+        "docs/PUBLISHING.md",
         "scripts/commentary_public_metadata_preflight.py",
         "scripts/commentary_rebuild_attestation_draft.py",
         "scripts/promote_sword_preview.py",
         "scripts/tool_registry.py",
         "scripts/validate.py",
-        "docs/COMMENTARY_PIPELINE.md",
-        "docs/PUBLISHING.md",
         "tests/test_commentary_public_metadata_preflight.py",
         "tests/test_commentary_rebuild_attestation_draft.py",
         "tests/test_promote_sword_preview.py",
@@ -5574,9 +5560,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
-        "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
+        "scripts/probe_private_repaired_darby_sword.py",
         "tests/test_source_native_division_markers.py"
       ]
     },
@@ -5614,8 +5600,8 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/bible_stage_runner.py",
         "docs/SOURCE_NATIVE_INDEX_AUDIT.md",
+        "scripts/bible_stage_runner.py",
         "tests/test_source_native_index_audit.py"
       ]
     },
@@ -5647,8 +5633,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
+        "scripts/source_native_maintext_probe.py",
         "tests/test_source_native_layout_anchors.py"
       ]
     },
@@ -5707,16 +5693,16 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 17,
       "static_references": [
-        "scripts/bible_stage_runner.py",
-        "scripts/inspect_paragraph_rendering.py",
-        "scripts/probe_private_repaired_darby_sword.py",
-        "scripts/publisher_osis_sword_candidate.py",
-        "scripts/publisher_osis_usfx_parity.py",
         ".github/workflows/bible-staged-audit.yml",
         ".github/workflows/second-bible-proof.yml",
         "docs/MAIN_TEXT_FIDELITY.md",
         "docs/SOURCE_NATIVE_MAIN_TEXT.md",
         "docs/SOURCE_NATIVE_NOTES_AUDIT.md",
+        "scripts/bible_stage_runner.py",
+        "scripts/inspect_paragraph_rendering.py",
+        "scripts/probe_private_repaired_darby_sword.py",
+        "scripts/publisher_osis_sword_candidate.py",
+        "scripts/publisher_osis_usfx_parity.py",
         "tests/test_native_sword_markup_census.py",
         "tests/test_source_native_layout_anchors.py",
         "tests/test_source_native_maintext_probe.py",
@@ -5750,11 +5736,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
-        "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/BIBLE_STAGE_AUTOMATION.md",
+        "scripts/source_native_maintext_probe.py",
         "tests/test_source_native_nonspace_boundaries.py"
       ]
     },
@@ -5786,10 +5771,10 @@
       "stage_hint": "not determined",
       "static_reference_count": 5,
       "static_references": [
+        ".github/workflows/bible-staged-audit.yml",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/publisher_osis_usfx_parity.py",
         "scripts/source_native_maintext_probe.py",
-        ".github/workflows/bible-staged-audit.yml",
         "tests/test_source_native_note_positions.py"
       ]
     },
@@ -5821,12 +5806,12 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 7,
       "static_references": [
-        "scripts/fast_stock_note_probe.py",
-        "scripts/publisher_osis_usfx_parity.py",
-        "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
         ".github/workflows/second-bible-proof.yml",
         "docs/SOURCE_NATIVE_NOTES_AUDIT.md",
+        "scripts/fast_stock_note_probe.py",
+        "scripts/publisher_osis_usfx_parity.py",
+        "scripts/source_native_maintext_probe.py",
         "tests/test_source_native_notes_audit.py"
       ]
     },
@@ -5856,13 +5841,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
+        ".github/workflows/bible-staged-audit.yml",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/source_native_maintext_probe.py",
-        ".github/workflows/bible-staged-audit.yml",
-        "docs/BIBLE_STAGE_AUTOMATION.md",
         "tests/test_source_native_ordered_body.py"
       ]
     },
@@ -5897,9 +5881,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
+        ".github/workflows/publisher-osis-sword-candidate.yml",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
-        ".github/workflows/publisher-osis-sword-candidate.yml",
         "tests/test_source_native_osis_boundary_positions.py"
       ]
     },
@@ -5930,9 +5914,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
+        ".github/workflows/publisher-osis-sword-candidate.yml",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
-        ".github/workflows/publisher-osis-sword-candidate.yml",
         "tests/test_source_native_osis_structure_screen.py"
       ]
     },
@@ -5962,11 +5946,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
+        ".github/workflows/publisher-osis-sword-candidate.yml",
+        ".github/workflows/source-osis-note-links.yml",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/repair_osis_note_links.py",
         "scripts/source_osis_note_link_triage.py",
-        ".github/workflows/publisher-osis-sword-candidate.yml",
-        ".github/workflows/source-osis-note-links.yml",
         "tests/test_source_native_osis_target_addressability.py"
       ]
     },
@@ -5998,15 +5982,14 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 7,
       "static_references": [
+        ".github/workflows/bible-staged-audit.yml",
         "scripts/native_book_intro_screen.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/source_native_ordered_body.py",
         "scripts/source_native_word_boundaries.py",
         "scripts/source_usfx_newline_provenance.py",
-        ".github/workflows/bible-staged-audit.yml",
-        "docs/BIBLE_STAGE_AUTOMATION.md",
         "tests/test_source_native_paragraph_counts.py"
       ]
     },
@@ -6037,11 +6020,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
-        "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/BIBLE_STAGE_AUTOMATION.md",
+        "scripts/source_native_maintext_probe.py",
         "tests/test_source_native_record_scope_triage.py"
       ]
     },
@@ -6075,13 +6057,13 @@
       "stage_hint": "not determined",
       "static_reference_count": 8,
       "static_references": [
+        ".github/workflows/second-bible-proof.yml",
+        "docs/SOURCE_NATIVE_BOOK_SCOPE.md",
         "scripts/fast_stock_note_probe.py",
         "scripts/publisher_osis_usfx_parity.py",
         "scripts/real_second_bible_probe.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/sword_missing_verse_witness.py",
-        ".github/workflows/second-bible-proof.yml",
-        "docs/SOURCE_NATIVE_BOOK_SCOPE.md",
         "tests/test_source_native_scope.py"
       ]
     },
@@ -6109,11 +6091,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
-        "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/BIBLE_STAGE_AUTOMATION.md",
+        "scripts/source_native_maintext_probe.py",
         "tests/test_source_native_structural_whitespace.py",
         "tests/test_source_usfx_newline_provenance.py"
       ]
@@ -6144,11 +6125,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
-        "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
-        "docs/BIBLE_STAGE_AUTOMATION.md",
+        "scripts/source_native_maintext_probe.py",
         "tests/test_source_native_structure_topology.py"
       ]
     },
@@ -6184,13 +6164,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 8,
       "static_references": [
+        ".github/workflows/bible-staged-audit.yml",
         "scripts/source_native_maintext_probe.py",
         "scripts/source_native_record_scope_triage.py",
         "scripts/source_usfx_newline_provenance.py",
-        ".github/workflows/bible-staged-audit.yml",
-        "docs/BIBLE_STAGE_AUTOMATION.md",
         "tests/test_source_native_nonspace_boundaries.py",
         "tests/test_source_native_structural_whitespace.py",
         "tests/test_source_native_word_boundaries.py",
@@ -6231,6 +6210,9 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 31,
       "static_references": [
+        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
+        "docs/SOURCE_NATIVE_INDEX_AUDIT.md",
+        "docs/SOURCE_OSIS_INVENTORY.md",
         "scripts/audit_omitted_verse_notes.py",
         "scripts/bible_stage_runner.py",
         "scripts/inspect_paragraph_rendering.py",
@@ -6251,9 +6233,6 @@
         "scripts/source_native_osis_boundary_positions.py",
         "scripts/source_native_osis_structure_screen.py",
         "scripts/source_osis_note_markup_shape.py",
-        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
-        "docs/SOURCE_NATIVE_INDEX_AUDIT.md",
-        "docs/SOURCE_OSIS_INVENTORY.md",
         "tests/test_audit_omitted_verse_notes.py",
         "tests/test_osis_semantic_fidelity.py",
         "tests/test_repair_osis_division_markers.py",
@@ -6362,13 +6341,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
+        ".github/workflows/bible-staged-audit.yml",
         "scripts/bible_stage_runner.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/source_native_structural_whitespace.py",
-        ".github/workflows/bible-staged-audit.yml",
-        "docs/BIBLE_STAGE_AUTOMATION.md",
         "tests/test_source_usfx_newline_provenance.py"
       ]
     },
@@ -6400,14 +6378,14 @@
       "stage_hint": "not determined",
       "static_reference_count": 9,
       "static_references": [
+        ".github/workflows/bible-staged-audit.yml",
+        "docs/SOURCE_USFX_STRUCTURE.md",
         "scripts/bible_stage_runner.py",
         "scripts/source_native_layout_anchors.py",
         "scripts/source_native_ordered_body.py",
         "scripts/source_native_paragraph_counts.py",
         "scripts/source_native_word_boundaries.py",
         "scripts/usfx_schema_gate.py",
-        ".github/workflows/bible-staged-audit.yml",
-        "docs/SOURCE_USFX_STRUCTURE.md",
         "tests/test_source_usfx_structure.py"
       ]
     },
@@ -6441,6 +6419,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 39,
       "static_references": [
+        ".github/workflows/validate.yml",
+        "docs/NATIVE_SWORD_INDEX_INVENTORY.md",
+        "docs/SOURCE_NATIVE_INDEX_AUDIT.md",
+        "docs/SOURCE_OSIS_INVENTORY.md",
+        "docs/STABLE_SWORD_REFERENCE_AUDIT.md",
         "scripts/bible_stage_runner.py",
         "scripts/fast_stock_note_probe.py",
         "scripts/inspect_paragraph_rendering.py",
@@ -6471,11 +6454,6 @@
         "scripts/sword_native_inventory.py",
         "scripts/sword_native_raw_corpus_inventory.py",
         "scripts/validate.py",
-        ".github/workflows/validate.yml",
-        "docs/NATIVE_SWORD_INDEX_INVENTORY.md",
-        "docs/SOURCE_NATIVE_INDEX_AUDIT.md",
-        "docs/SOURCE_OSIS_INVENTORY.md",
-        "docs/STABLE_SWORD_REFERENCE_AUDIT.md",
         "tests/test_source_native_index_audit.py",
         "tests/test_source_osis_inventory.py",
         "tests/test_stable_sword_refs.py",
@@ -6506,8 +6484,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
-        "scripts/bible_stage_runner.py",
         ".github/workflows/bible-staged-audit.yml",
+        "scripts/bible_stage_runner.py",
         "tests/test_stage4_receipt_replay.py",
         "tests/test_stage4_subcheck_receipts.py"
       ]
@@ -6647,8 +6625,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/bible_stage_runner.py",
         ".github/workflows/bible-staged-audit.yml",
+        "scripts/bible_stage_runner.py",
         "tests/test_stock_reuse_preflight.py"
       ]
     },
@@ -6724,9 +6702,9 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 4,
       "static_references": [
-        "scripts/source_native_maintext_probe.py",
         ".github/workflows/second-bible-proof.yml",
         "docs/NATIVE_SWORD_RAW_WITNESS.md",
+        "scripts/source_native_maintext_probe.py",
         "tests/test_sword_missing_verse_witness.py"
       ]
     },
@@ -6754,7 +6732,6 @@
       "stage_hint": "not determined",
       "static_reference_count": 12,
       "static_references": [
-        "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-editorial-section-scope.yml",
         ".github/workflows/commentary-evidence.yml",
@@ -6765,7 +6742,8 @@
         ".github/workflows/commentary-modern-source-receipt.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-text-compare.yml",
-        "docs/evidence/mhcc-274/editorial-section-scope-audit.md"
+        "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
+        "scripts/tool_registry.py"
       ]
     },
     {
@@ -6790,9 +6768,8 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 17,
+      "static_reference_count": 16,
       "static_references": [
-        "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-editorial-section-scope.yml",
         ".github/workflows/commentary-mhc-private-jsword.yml",
@@ -6808,7 +6785,7 @@
         ".github/workflows/commentary-zcom-andbible-jsword.yml",
         ".github/workflows/commentary-zcom-private-candidate.yml",
         ".github/workflows/stage-stock-commentary.yml",
-        "docs/MHCC_MODERN_ENGLISH.md"
+        "scripts/tool_registry.py"
       ]
     },
     {
@@ -6834,8 +6811,6 @@
       "stage_hint": "not determined",
       "static_reference_count": 17,
       "static_references": [
-        "scripts/sword_native_inventory.py",
-        "scripts/tool_registry.py",
         ".github/workflows/bible-staged-audit.yml",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-andbible-android-private.yml",
@@ -6850,7 +6825,9 @@
         "docs/NATIVE_SWORD_WHOLE_CORPUS.md",
         "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "docs/SOURCE_NATIVE_INDEX_AUDIT.md",
-        "docs/SOURCE_NATIVE_MAIN_TEXT.md"
+        "docs/SOURCE_NATIVE_MAIN_TEXT.md",
+        "scripts/sword_native_inventory.py",
+        "scripts/tool_registry.py"
       ]
     },
     {
@@ -6887,6 +6864,10 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 20,
       "static_references": [
+        ".github/workflows/validate.yml",
+        "docs/NATIVE_SWORD_INDEX_INVENTORY.md",
+        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
+        "docs/SOURCE_NATIVE_INDEX_AUDIT.md",
         "scripts/materialize_attested_ztext_release.py",
         "scripts/native_book_intro_screen.py",
         "scripts/native_milestone_pair_audit.py",
@@ -6902,10 +6883,6 @@
         "scripts/sword_missing_verse_witness.py",
         "scripts/sword_native_raw_corpus_inventory.py",
         "scripts/tool_registry.py",
-        ".github/workflows/validate.yml",
-        "docs/NATIVE_SWORD_INDEX_INVENTORY.md",
-        "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
-        "docs/SOURCE_NATIVE_INDEX_AUDIT.md",
         "tests/test_sword_native_inventory.py"
       ]
     },
@@ -6978,6 +6955,15 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 33,
       "static_references": [
+        ".github/workflows/commentary-editorial-section-scope.yml",
+        ".github/workflows/commentary-mhc-source-text.yml",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
+        ".github/workflows/commentary-modern-source-receipt.yml",
+        ".github/workflows/commentary-zcom-andbible-android.yml",
+        ".github/workflows/second-bible-proof.yml",
+        ".github/workflows/validate.yml",
+        "docs/NATIVE_SWORD_WHOLE_CORPUS.md",
+        "docs/SOURCE_NATIVE_MAIN_TEXT.md",
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_android_text_witness.py",
         "scripts/commentary_modern_linked_candidate_preview.py",
@@ -6998,15 +6984,6 @@
         "scripts/rebuild_osis_commentary.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/tool_registry.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
-        ".github/workflows/commentary-mhc-source-text.yml",
-        ".github/workflows/commentary-mhc-technical-rebuild.yml",
-        ".github/workflows/commentary-modern-source-receipt.yml",
-        ".github/workflows/commentary-zcom-andbible-android.yml",
-        ".github/workflows/second-bible-proof.yml",
-        ".github/workflows/validate.yml",
-        "docs/NATIVE_SWORD_WHOLE_CORPUS.md",
-        "docs/SOURCE_NATIVE_MAIN_TEXT.md",
         "tests/test_commentary_native_raw_inventory.py",
         "tests/test_commentary_osis_intro_transport_probe.py",
         "tests/test_source_native_maintext_probe.py",
@@ -7092,7 +7069,7 @@
         ".github/workflows/commentary-modern-source-receipt.yml",
         ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/tool-registry-maintenance.yml",
-        "docs/MHCC_MODERN_ENGLISH.md",
+        "docs/README.md",
         "tests/test_tool_registry.py"
       ]
     },
@@ -7129,8 +7106,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/bible_stage_runner.py",
         ".github/workflows/bible-staged-audit.yml",
+        "scripts/bible_stage_runner.py",
         "tests/test_usfx_schema_gate.py"
       ]
     },
@@ -7175,11 +7152,6 @@
       "stage_hint": "not determined",
       "static_reference_count": 28,
       "static_references": [
-        "scripts/build.py",
-        "scripts/release_preflight.py",
-        "scripts/smoke.py",
-        "scripts/stage_darby_011_release.py",
-        "scripts/tool_registry.py",
         ".github/workflows/finalize-darby-0.1.1.yml",
         ".github/workflows/finalize-darby-release.yml",
         ".github/workflows/pages.yml",
@@ -7196,6 +7168,11 @@
         "docs/SOURCE_FIRST_EDITORIAL_PIPELINE.md",
         "docs/STABLE_SWORD_REFERENCE_AUDIT.md",
         "docs/evidence/mhcc-274/publication-provenance-readiness.md",
+        "scripts/build.py",
+        "scripts/release_preflight.py",
+        "scripts/smoke.py",
+        "scripts/stage_darby_011_release.py",
+        "scripts/tool_registry.py",
         "tests/test_catalogue_update_contract.py",
         "tests/test_commentary_gate.py",
         "tests/test_pilot_preparation.py",
@@ -7233,10 +7210,10 @@
       "stage_hint": "not determined",
       "static_reference_count": 5,
       "static_references": [
-        "scripts/tool_registry.py",
         ".github/workflows/pages.yml",
         "docs/COMMENTARY_PIPELINE.md",
         "docs/PUBLISHING.md",
+        "scripts/tool_registry.py",
         "tests/test_verify_public_catalogue.py"
       ]
     }
