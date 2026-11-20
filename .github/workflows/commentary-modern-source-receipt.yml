@@ -3652,6 +3652,113 @@ jobs:
                 " compiled reference destinations, two restored secondary-witness sections, "+
                 "28792 original numbered keys, no release")
           PY
+      - name: Build independently installable HMCC Modern owner-review ZIP (not a public release)
+        shell: bash
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,subprocess,zipfile
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          base=Path(os.environ["RUNNER_TEMP"])
+          original=base/"mhcc-modern-approved-editorial-DO-NOT-PUBLISH.osis.xml"
+          evidence=base/"mhcc-modern-approved-editorial-receipt.json"
+          source_root=base/"mhcc-modern-approved-private-root"
+          receipt=json.loads(evidence.read_text())
+          if (receipt["status"]!="OWNER_APPROVED_PRIVATE_EDITORIAL_OSIS_OVERLAY_NOT_RELEASE"
+                  or receipt["approved_original_link_cases"]!=15
+                  or receipt["individually_pinned_restored_target_occurrences"]!=28
+                  or receipt["distinct_secondary_witness_sections_restored"]!=2):
+              raise ValueError("Approved editorial source evidence is incomplete")
+          if hashlib.sha256(original.read_bytes()).hexdigest()!=receipt["private_osis_sha256"]:
+              raise ValueError("Private editorial OSIS source checksum drift")
+          ns="http://www.bibletechnologies.net/2003/OSIS/namespace"
+          tree=ET.parse(original)
+          osis=tree.getroot().find("{"+ns+"}osisText")
+          if osis is None or osis.get("osisIDWork")!="MHCCMODAP":
+              raise ValueError("Unexpected candidate OSIS identity")
+          osis.set("osisIDWork","HMCCModern")
+          work=osis.find(".//{"+ns+"}work")
+          if work is None or work.get("osisWork")!="MHCCMODAP":
+              raise ValueError("Source work identity does not match")
+          work.set("osisWork","HMCCModern")
+          identifier=work.find("{"+ns+"}identifier")
+          title=work.find("{"+ns+"}title")
+          if identifier is None or title is None:
+              raise ValueError("OSIS bibliographic work elements missing")
+          identifier.text="HMCCModern"
+          title.text="Henry's Modern Concise Commentary"
+          stage=base/"hmcc-modern-owner-review"
+          out=stage/"modules/comments/zcom/hmccmodern"
+          out.mkdir(parents=True,exist_ok=False)
+          osis_file=base/"hmcc-modern-owner-review.osis.xml"
+          tree.write(osis_file,encoding="utf-8",xml_declaration=True)
+          with (base/"hmcc-modern-owner-review-osis2mod.log").open("wb") as log:
+              p=subprocess.run(["osis2mod",str(out),str(osis_file),"-z","z","-b","3"],
+                               stdout=log,stderr=subprocess.STDOUT,timeout=200)
+          if p.returncode:
+              raise ValueError("Final-identity OSIS failed to compile as real SWORD zCom")
+          conf=stage/"mods.d/hmccmodern.conf"
+          conf.parent.mkdir()
+          conf.write_text("""[HMCCModern]
+          Description=Henry's Modern Concise Commentary
+          Abbreviation=HMCCModern
+          Version=0.1.0
+          DataPath=./modules/comments/zcom/hmccmodern/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Copyrighted; Permission to distribute granted by copyright holder
+          About=Modern-English rendering based on Bible Resources MHCC 0.1.1 (CrossWire public-domain source); two restored historical sections from independent witnesses. Owner-approved editorial corrections, 2026-11-19. Manual reader review pending.
+          """.replace("\n          ","\n"),encoding="utf-8")
+          files=sorted(p for p in stage.rglob("*") if p.is_file())
+          if len(files)!=7:
+              raise ValueError("Unexpected SWORD zCom member count")
+          env=dict(os.environ,SWORD_PATH=str(stage))
+          for passage in ("Gen 12:6","Num 29:1","Ps 95:11","1 Sam 25:39"):
+              p=subprocess.run(["diatheke","-b","HMCCModern","-f","OSIS","-k",passage],
+                               env=env,capture_output=True,timeout=20)
+              if p.returncode or len(p.stdout)<90:
+                  raise ValueError("Final SWORD module reader failed at "+passage)
+          archive=base/"HMCCModern-0.1.0-MANUAL-QA.zip"
+          with zipfile.ZipFile(archive,"w",compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+              for p in files:
+                  info=zipfile.ZipInfo(p.relative_to(stage).as_posix(),(1980,1,1,0,0,0))
+                  info.compress_type=zipfile.ZIP_DEFLATED
+                  info.external_attr=0o100644<<16
+                  z.writestr(info,p.read_bytes(),compress_type=zipfile.ZIP_DEFLATED,compresslevel=9)
+          checks={p.relative_to(stage).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
+                  for p in files}
+          meta={"status":"OWNER_MANUAL_QA_PACKAGE_NOT_PUBLIC_RELEASE",
+                "module_id":"HMCCModern","version":"0.1.0",
+                "source_approved_editorial_osis_sha256":receipt["private_osis_sha256"],
+                "zip_sha256":hashlib.sha256(archive.read_bytes()).hexdigest(),
+                "zip_size_bytes":archive.stat().st_size,
+                "sword_member_sha256":checks,
+                "source_module":"MHCC 0.1.1",
+                "editorial_corrections":15,"corrected_destinations":28,
+                "restored_historical_expositions":2,
+                "public_catalogue_approved":False,"published":False}
+          (base/"hmcc-modern-owner-review-package-receipt.json").write_text(
+              json.dumps(meta,indent=2,sort_keys=True)+"\n")
+          print("HMCC_MODERN_MANUAL_QA_ZIP "+json.dumps({
+              "sword_id":meta["module_id"],"version":meta["version"],
+              "sha256":meta["zip_sha256"],"size":meta["zip_size_bytes"],
+              "members":len(files),"published":False},sort_keys=True))
+          PY
+      - name: Upload installable HMCC Modern private/manual-QA candidate (not a release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: hmcc-modern-owner-manual-qa
+          path: |
+            ${{ runner.temp }}/HMCCModern-0.1.0-MANUAL-QA.zip
+            ${{ runner.temp }}/hmcc-modern-owner-review-package-receipt.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Install real Xiphos GUI in an isolated virtual display for HMCC Modern
         id: xiphos_deps
         timeout-minutes: 14
