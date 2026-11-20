@@ -166,8 +166,10 @@ def build(index, reviewed, high, unresolved, low, forms, verses, positions):
         "status": "PRIVATE_REPRODUCIBLE_UBS_Greek_NT_v1_original_word_candidate_INDEX_NOT_PUBLISHED",
         "source_editions": editions,
         "source_licensing": {
-            "ubs_greek_dictionary": "CC BY-SA 4.0; United Bible Societies; consult pinned source LICENSE.md",
-            "macula_sblgnt": "CC BY 4.0; Clear.Bible; consult pinned source license",
+            "ubs_greek_dictionary": "CC BY-SA 4.0; United Bible Societies; original pinned Greek dictionary README; dictionary copyright UBS 2023",
+            "macula_sblgnt": "CC BY 4.0 dataset; MACULA Greek Linguistic Datasets © 2022–2024 Biblica, Inc.; hosted by Clear-Bible; upstream contains separately originated third-party data",
+            "macula_embedded_ubs_annotation_notice": "UBS MARBLE @ln/@domain annotations described by pinned MACULA LICENSE.md as Used with permission; field-level redistribution clearance required",
+            "release_rights_status": "NOT_APPROVED; see RELEASE_READINESS.md and issue #431",
             "contains_dictionary_definitions": False,
             "contains_original_biblical_verses": False,
         },
