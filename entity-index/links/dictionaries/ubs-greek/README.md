@@ -866,3 +866,48 @@ All semantic overlays are **private, reversible, source-pinned
 publication, no contextual-sense validation claim, and no redistribution
 of UBS definition texts**. Later publication still requires the
 project owner's separate release authorization and license validation.
+
+## Pragmatic review of contextual sense gaps: lower-confidence editorial defaults
+
+The [full original-source 15,237-word priority audit](audit_unresolved_semantic_priorities.py)
+shows how to distinguish genuinely different failure modes:
+
+| Original-word contextual-sense source limitation | Word IDs |
+| --- | ---: |
+| Original MACULA LN **blank**, more than one authentic UBS LEXID in the approved headword | 9,125 |
+| Original MACULA LN **blank**, exactly one authentic UBS LEXID | **120** |
+| Original MACULA LN present but **not attested** under the approved UBS headword, more than one UBS LEXID | 688 |
+| Original MACULA LN present but **not attested**, exactly one UBS LEXID | **50** |
+| Original MACULA LN present but not attested and **no UBS lexical senses with an original LEXID** under the approved headword | 2,475 |
+| More than one UBS LEXID consistent with original source word-specific LN | 2,728 |
+| Historical original Strong still has more than one UBS headword | 4 |
+| No source-supported UBS lexical headword | 47 |
+| **All unresolved source words before lower-confidence provisional review** | **15,237** |
+
+The original `εἰμί` family alone accounts for **2,456** words
+whose original MACULA LN code cannot find any authentic UBS lexical
+sense under its correct lexical headword. This is a **source
+inventory difference**, not a reason to manufacture a `LEXID`
+or rewrite MACULA's original LN annotations.
+
+Under the owner's pragmatic editorial policy, the
+[lower-confidence single-sense stage](build_lower_confidence_single_sense.py)
+**separately** offers a reasonable, explicitly provisional editorial
+default for the **170 original word IDs** where the independently
+supported original UBS headword genuinely has **only one original UBS
+LEXID**, although the word has either **no MACULA LN code (120)** or
+**a nonmatching original MACULA LN code (50)**. This lower-confidence
+layer is never merged with the **122,504 original-LN-corroborated
+single-sense candidates**, and neither is described as
+independently proven contextual meaning. The remaining **15,067**
+original source word IDs still lack a uniquely justified provisional
+`LEXID`. All source code differences are explicit and reversible.
+
+**Current private provisional semantics:** 122,504 stronger
+original-LN-supported word-ID sense candidates, plus **170** separate
+weaker, source-only single-LEXID defaults. **Zero** finished,
+independently verified contextual sense decisions and **zero**
+publicly published resources in this phase. The next quality gate is
+targeted contextual editorial validation, with priority on the
+2,728 cases where original LN evidence is genuinely multi-valued
+and the high-volume particle/preposition families.
