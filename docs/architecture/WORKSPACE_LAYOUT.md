@@ -5,7 +5,7 @@
 ```text
 sources/
   original/<type>/<language>/<resource-id>/          # acquired files, unchanged
-  cleaned/<type>/<language>/<resource-id>/           # reviewed editorial master
+  cleaned/<type>/<language>/<resource-id>/           # reviewed master when rebuilt; edition evidence and decisions
     CLEANUP_MANIFEST.json                            # derivation, hashes and changes
     editorial/
       README.md                                      # current edition decisions
@@ -28,7 +28,7 @@ Preserve original source bytes and identity, archive contents, version, exact ed
 
 ## Reviewed cleaned edition
 
-Create independent candidates outside the original tree. A curated master under `sources/cleaned/` requires its own pinned hashes and reversible transformation ledger. Verify all text, punctuation, verse mappings, notes, citations, headings, paragraphs, poetry, lexical markup and commentary scopes as applicable. Store resource-specific decisions and test receipts in `editorial/` — **not in global `docs/`**.
+Create independent candidates outside the original tree. **A source-derived curated master** under `sources/cleaned/` requires its own pinned hashes and reversible transformation ledger. An edition distributed as **byte-identical upstream stock SWORD** may have edition-specific rights/reader evidence and an editorial index without a reconstructed OSIS master; do not create fictitious source files just to fill the example tree. Verify all text, punctuation, verse mappings, notes, citations, headings, paragraphs, poetry, lexical markup and commentary scopes as applicable. Store resource-specific decisions and test receipts in `editorial/` — **not in global `docs/`**.
 
 Existing historical `work/` layouts may differ. Keep existing paths required to reproduce or resume work until their references have been audited; they are not templates for new resources.
 
