@@ -59,6 +59,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_source_verse_provisional_senses.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_token_position_alignment.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_source_position_provisional_senses.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_consolidated_v1_review_index.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -1141,6 +1142,49 @@ jobs:
         with:
           name: bsi-ubs-greek-40-position-supported-provisional-lexids-NOT-PUBLISHED
           path: /tmp/bsi-ubs-greek-40-original-source-position-provisional-LEXIDs-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Consolidate all 137741 original Greek words into private source-backed lookup
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_consolidated_v1_review_index.py \
+            --index entity-index/links/dictionaries/ubs-greek/index.json \
+            --reviewed /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json \
+            --high /tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json \
+            --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json \
+            --low /tmp/bsi-ubs-greek-170-lower-confidence-provisional-UBS-original-sense-defaults.json \
+            --forms /tmp/bsi-ubs-greek-223-source-form-provisional-sense-choices-PRIVATE.json \
+            --verses /tmp/bsi-ubs-greek-258-original-source-verse-provisional-LEXIDs-PRIVATE.json \
+            --positions /tmp/bsi-ubs-greek-40-original-source-position-provisional-LEXIDs-PRIVATE.json \
+            --output /tmp/bsi-ubs-greek-v1-consolidated-original-word-index-PRIVATE.json
+          python3 - <<'PY'
+          import json,runpy
+          from pathlib import Path
+          p=Path('/tmp/bsi-ubs-greek-v1-consolidated-original-word-index-PRIVATE.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          assert d['original_word_ids']==137741
+          assert len(d['by_original_macula_word_id'])==137741
+          assert d['reviewed_source_lexical_headword_words']==137694
+          assert d['missing_supported_lexical_headword_words']==47
+          assert d['provisional_semantic_word_ids']==123195
+          assert d['not_assigned_a_provisional_sense']==14546
+          assert d['word_status_counts']=={
+              'ambiguous_ubs_headwords':4, 'ambiguous_ubs_senses':2207,
+              'missing_ubs_headword':47, 'provisional_ubs_lexid':123195,
+              'ubs_entry_only':12288}
+          assert d['semantic_context_independently_verified']==0
+          assert d['original_index_and_sources_modified'] is False
+          assert d['publication_approved'] is False
+          mod=runpy.run_path('entity-index/links/dictionaries/ubs-greek/build_consolidated_v1_review_index.py')
+          assert mod['lookup'](d,'unknown')['status']=='unknown_original_word_id'
+          assert all((x['provisional_ubs_lexid'] is None)==(x['status']!='provisional_ubs_lexid')
+                     for x in d['by_original_macula_word_id'].values())
+          print('GREEK_UBS_V1_CONSOLIDATED_137741_WORD_PRIVATE_REVIEW_INDEX_VERIFIED_NO_PUBLICATION')
+          PY
+      - name: Upload consolidated Greek UBS v1 original-word review index (PRIVATE, NOT PUBLISHED)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-v1-137741-word-reproducible-review-index-PRIVATE-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-v1-consolidated-original-word-index-PRIVATE.json
           if-no-files-found: error
           retention-days: 14
       - name: Upload Greek 2728 contextual sense review batches (PRIVATE, NO selections)
