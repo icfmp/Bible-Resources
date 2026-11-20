@@ -145,3 +145,24 @@ This is a narrowly scoped owner-authorized release of an identifier-only
 **derived index**, not a grant to republish MACULA's underlying UBS MARBLE
 semantic annotations or UBS dictionary text. Broader public data exports,
 SWORD packaging and application integration require fresh review.
+
+## Completed narrow-release acceptance record — 2026-11-20
+
+The owner approved proceeding with public publication. A **specific
+identifier-only** output was then tested and published through protected
+main, rather than assuming all MACULA/UBS fields may be redistributed.
+
+- Source-pinned validation: [run #44711949619](https://github.com/icfmp/Bible-Resources/actions/runs/44711949619) — SUCCESS after merge of [PR #435](https://github.com/icfmp/Bible-Resources/pull/435).
+- Publication validation: [run #44712276926](https://github.com/icfmp/Bible-Resources/actions/runs/44712276926) — SUCCESS, checked exact archive entry allowlist and checksums before publishing.
+- Final [public release](https://github.com/icfmp/Bible-Resources/releases/tag/bsi-ubs-greek-v0.1.0) — not draft, not prerelease; published 2026-11-20.
+- `BSI-UBS-Greek-0.1.0.zip`: 1,217,257 bytes, GitHub-verified SHA-256 `eeaf6f1b0dfa7335c522c52374a1d5261412819e074520a455a4822b728eddaf`.
+- `BSI-UBS-Greek-0.1.0.zip.sha256`: published separately alongside the archive.
+- Export scope: exact original MACULA word IDs and UBS entry/sense IDs, candidate lists, source uncertainty statuses and evidence tiers. Original third-party annotation data, verses, dictionary definitions, source prose and original Greek linguistic data fields remain **excluded**.
+- This is an independent, source-attributed, CC BY-SA 4.0 **crosswalk**, not a SWORD module or application integration.
+
+The **complete private source-evidence index** is distinct from this
+published derived identifier-only crosswalk and remains unpublished.
+Any new exported field, original UBS dictionary content, third-party
+annotation, SWORD module or Bible application integration requires a
+new explicit rights/editorial decision.
+
