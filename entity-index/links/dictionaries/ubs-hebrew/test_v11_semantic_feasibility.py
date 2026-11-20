@@ -15,6 +15,7 @@ class OnePassSemanticFeasibilityTest(unittest.TestCase):
         self.assertEqual(verse("o010010010011"), "001001001")
         self.assertEqual(verse("o060190130101"), "006019013")
         self.assertEqual(verse("o090170390072"), "009017039")
+        self.assertEqual(verse("o010010050031ה"), "001001005")
 
     def test_noncanonical_source_word_ids_rejected(self):
         for wid in ("n010010010011", "o400010010011", "o000010010011",
