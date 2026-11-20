@@ -1,0 +1,43 @@
+# Temporary one-time maintenance workflow; removes itself from the branch.
+# Only this same-repository documentation PR is authorized to use it.
+name: Refresh moved documentation registry once
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/registry-sync-once.yml'
+permissions:
+  contents: write
+  actions: write
+jobs:
+  reconcile-generated-metadata:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'docs/physical-taxonomy-layout-20261120' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild metadata-only inventory and remove this helper workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git rm -- .github/workflows/registry-sync-once.yml
+          git commit -m 'chore: regenerate tool registry after documentation reorganization'
+          git push origin HEAD:refs/heads/docs/physical-taxonomy-layout-20261120
+      - name: Run final read-only validation on the reconciled tip
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run validate.yml --ref docs/physical-taxonomy-layout-20261120
+          gh workflow run tool-registry-maintenance.yml --ref docs/physical-taxonomy-layout-20261120

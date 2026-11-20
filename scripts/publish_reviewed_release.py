@@ -100,7 +100,18 @@ def approved_release(root: Path, plan_file: Path, built: Path) -> dict:
         raise ReleaseError("Release conflicts with reviewed source/rights/edition")
     evidence = within_root(root,plan["evidence_path"],f"modules/{module_id}")
     editorial = within_root(root,plan["editorial_path"],f"modules/{module_id}")
-    notes = within_root(root,plan["notes_path"],"docs/releases")
+    # Release notes belong to the source edition, not to a global docs folder.
+    # Require the same reviewed module identity, language and resource type.
+    cleaned_categories = {"bible": "bibles", "commentary": "commentaries"}
+    cleaned_category = cleaned_categories.get(metadata.get("category"))
+    language = metadata.get("language")
+    if (cleaned_category is None or not isinstance(language, str)
+            or not re.fullmatch(r"[a-z]{2,3}", language)):
+        raise ReleaseError("Invalid release notes provenance metadata")
+    notes = within_root(
+        root, plan["notes_path"],
+        f"sources/cleaned/{cleaned_category}/{language}/{module_id}/editorial/releases",
+    )
     proof = json.loads(evidence.read_text(encoding="utf-8"))
     if (not isinstance(proof, dict) or proof.get("status") != "validated"
             or not editorial.read_text(encoding="utf-8").strip()

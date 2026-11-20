@@ -8,7 +8,7 @@
   "zip_name": "MHCC-0.1.1.zip",
   "package_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
   "package_size_bytes": 2449819,
-  "notes_path": "docs/releases/MHCC-0.1.1.md",
+  "notes_path": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/releases/MHCC-0.1.1.md",
   "evidence_path": "modules/mhcc-crosswire/SOURCE_VALIDATION.json",
   "editorial_path": "modules/mhcc-crosswire/EDITORIAL.md",
   "authorization": {
