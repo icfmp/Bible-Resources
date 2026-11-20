@@ -6,12 +6,28 @@
 
 1. Identify and pin the exact source archive, publisher edition/revision, licence, URL and SHA-256.
 2. Independently validate the original against the reviewed, SHA-pinned USFX schema described in `config/usfx-schema-policy.json`. An XML parse alone is insufficient.
-3. Run the read-only `scripts/source_usfx_structure.py` inventory using its currently documented CLI and source path. Never use a test fixture's edition ID as the default for new imports.
+3. Run the read-only `audit_source_usfx(xml: bytes)` function in `scripts/source_usfx_structure.py`. **This module has no standalone CLI**. The following example uses a private original XML file, emits only text-free metadata, and does not claim to validate its official XSD:
 4. Review counts and order of **all** authored books, chapter markers and numbered verses. Record native source-only books or unusual versification explicitly.
 5. Inspect original XML element/attribute occurrence counts; ordered structural hashes; paragraph/poetry/heading markers; note kinds and callers; and explicitly encoded reference destinations.
 6. Classify duplicates, reversed or inconsistent ranges, ambiguous nesting, unknown elements and nonstandard constructs as **BLOCKED**, not automatically corrected.
 
-The emitted receipt must contain metadata, structural digests and bounded reference IDs, not original Scripture, note content, title text or private reference target strings.
+Example, after independently validating the exact original USFX against the pinned official schema:
+
+```sh
+PYTHONPATH=scripts python - <<'PY'
+import json
+from pathlib import Path
+from source_usfx_structure import audit_source_usfx
+
+original = Path("/private/source.usfx.xml")
+report = audit_source_usfx(original.read_bytes())
+Path("/private/source-usfx-inventory.json").write_text(
+    json.dumps(report, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
+print(report["status"], report["source_book_count"])
+PY
+```
+
+The emitted receipt must contain metadata, structural digests and bounded reference IDs, not original Scripture, note content, title text or private reference target strings. The function explicitly reports `official_usfx_schema_validated: false` because XSD validation is a **separate step**; do not promote the inventory result into a schema approval.
 
 ## Source-only and compilation boundaries
 
