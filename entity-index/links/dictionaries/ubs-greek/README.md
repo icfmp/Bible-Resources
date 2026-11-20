@@ -706,3 +706,78 @@ measurement of correct contextual semantic senses**. No contextual
 UBS `LEXID` has been inferred, no original source or historical
 index modified, and no public SWORD or Bible app release has been made.
 Reviewed candidates remain **expiring, private CI artifacts**.
+
+## Authentic UBS AlternateLemmas: 409 original Greek word-ID lexical headwords
+
+A second inspection of the **pinned original UBS Greek Dictionary 1.0
+EN and FR data** established that many of the remaining MACULA source
+lemmas were **not missing from UBS**: they were listed under the
+original dictionary's own `AlternateLemmas` field, rather than under
+a separate `Lemma`. This is qualitatively different from inventing
+a Greek spelling-normalization or Strong alias.
+
+The [exact bilingual source audit](audit_ubs_explicit_alternate_lemmas.py),
+[20-family explicit editorial ledger](v1_reviewed_explicit_ubs_alternates.json)
+and [individual original-word verifier](build_reviewed_explicit_ubs_alternates.py)
+review **409 exact original Greek word IDs**. Every reviewed word has
+one **NFC-identical authentic original `AlternateLemmas`** entry
+in **both** pinned UBS languages and an **individual original MACULA
+LN code corroborated by both UBS editions**. The original Strong,
+Greek spelling, morphology, syntactic class, reference and word ID
+remain unchanged. No contextual `LEXID` or universal Strong alias
+is inferred, even when UBS source Strong differs from MACULA.
+
+Important high-volume examples, each attested directly in UBS source:
+
+| MACULA source Greek | Source words | Exact original UBS main lemma | Original UBS MainId |
+| --- | ---: | --- | --- |
+| `ἰδού` | 200 | `ὁράω` | `003615000000000` |
+| `Ἰερουσαλήμ` | 76 | `Ἱεροσόλυμα` | `002418000000000` |
+| `ἱερόν` | 30 | `ἱερός` | `002417000000000` |
+| `ἴδε` | 30 | `ὁράω` | `003615000000000` |
+| `ἕνεκεν` | 20 | `ἕνεκα` | `001766000000000` |
+| `περισσότερος` | 15 | `περισσός` | `003959000000000` |
+| `Ἰσκαριώτης` | 8 | `Ἰσκαριώθ` | `002468000000000` |
+| `πλατεῖα` | 6 | `πλατύς` | `004022000000000` |
+
+The other 12 reviewed original lexical families account for
+24 word IDs. For example, `ἰδού` and `ἴδε` have original MACULA
+classes `ptcl` or `intj` although UBS associates them as genuine
+lexical alternatives under the verb `ὁράω`. This approves
+**headword/lexeme identity only**, not a claim that the original
+token has verb syntax, nor that an individual UBS contextual
+sense is known. Likewise, `ἱερόν` is recorded as a substantive
+or adjective by MACULA but under the adjectival lexeme `ἱερός`
+by UBS. **Preserve both editorial source analyses**, with no
+rewritten morphological annotation.
+
+Of the earlier 456 source words, **47** have no matching authentic
+original UBS `AlternateLemmas` with an individual original LN
+corroboration and remain **unlinked**. The
+[non-authoritative accentless diagnostics](audit_456_lexical_variants.py)
+found three different Greek spellings that resemble UBS headwords
+and share an LN code, but these **were not automatically linked**;
+similarity is not source-equivalent lexical identity.
+The source-audit records blank values in some authentic UBS
+`AlternateLemmas` lists as source metadata defects and excludes
+them without creating invented entries.
+
+**New independently verified private lexical headword coverage:**
+
+| Distinct original-word metric | Count |
+| --- | ---: |
+| Original MACULA SBLGNT Greek word IDs | 137,741 |
+| Historical unchanged Strong-derived candidate words | 128,090 |
+| Additional **distinct reviewed original-word headwords** | **9,604** |
+| Original words with supported lexical headword candidates | **137,694 (99.966%)** |
+| Original words with no approved UBS Greek 1.0 headword | **47** |
+| Historical multi-headword Strong words unchanged | 224 |
+| Separately original-word source-reviewed ambiguous Strong cases | 220 |
+| Remaining historic word-ID ambiguity decisions | 4 |
+
+This is a **headword/entry coverage measure, not contextual-sense
+accuracy**. The original `index.json`, Greek, source Strong,
+morphology, LN, verse references and both UBS original dictionaries
+remain byte-for-byte unchanged. The new candidate overlay is only
+a **private, expiring CI artifact**. No SWORD resource, public
+redistribution or Bible app integration was performed.
