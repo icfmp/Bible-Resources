@@ -1,6 +1,6 @@
 """Guard local links after documentation reorganization.
 
-This checks local Markdown targets, not the correctness of external URLs or the
+This checks maintained project documentation and source/module entrypoints,\nnot the 1,300+ active work-in-progress manuscript records. It validates local\nMarkdown targets, not the correctness of external URLs or the
 validity of editorial evidence. It does not read copyrighted source payloads.
 """
 from __future__ import annotations
@@ -22,7 +22,10 @@ SKIP = ("http:", "https:", "mailto:", "data:", "#", "//")
 class DocumentationLinkIntegrityTests(unittest.TestCase):
     def test_existing_local_markdown_destinations(self):
         tracked = subprocess.run(
-            ["git", "ls-files", "-z", "--", "docs", "sources/cleaned", "history"],
+            ["git", "ls-files", "-z", "--", "docs", "sources", "history",
+             "modules", "scripts", "README.md", "CONTRIBUTING.md",
+             "INSTALLATION_FR.md", "SECURITY.md",
+             ".github/PULL_REQUEST_TEMPLATE.md"],
             cwd=ROOT, check=True, capture_output=True, timeout=20,
         ).stdout.split(b"\0")
         # A separately approved reader profile has an immutable, signed Git
