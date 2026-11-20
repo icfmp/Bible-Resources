@@ -287,7 +287,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 22,
+      "static_reference_count": 21,
       "static_references": [
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
@@ -305,7 +305,6 @@
         ".github/workflows/validate.yml",
         "docs/architecture/RESOURCE_PROFILES.md",
         "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
-        "docs/workflows/COMMENTARY_PIPELINE.md",
         "docs/workflows/PUBLISHING.md",
         "docs/workflows/SOURCE_FIRST_EDITORIAL_PIPELINE.md",
         "tests/test_catalogue_update_contract.py",
@@ -369,7 +368,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 10,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
@@ -377,7 +376,6 @@
         ".github/workflows/pages.yml",
         ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/validate.yml",
-        "docs/workflows/COMMENTARY_PIPELINE.md",
         "docs/workflows/PUBLISHING.md",
         "tests/test_catalogue_release_coverage.py",
         "tests/test_commentary_sword_identity_migration.py"
@@ -968,7 +966,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "intake",
-      "static_reference_count": 19,
+      "static_reference_count": 18,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_andbible_jsword.py",
@@ -985,7 +983,6 @@
         "scripts/tool_registry.py",
         ".github/workflows/commentary-intake.yml",
         "docs/workflows/COMMENTARY_7_STAGE_WORKFLOW.md",
-        "docs/workflows/COMMENTARY_PIPELINE.md",
         "docs/workflows/PUBLISHING.md",
         "tests/test_commentary_intake.py",
         "tests/test_tool_registry.py"
@@ -1420,7 +1417,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 10,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_native_raw_inventory.py",
@@ -1429,7 +1426,6 @@
         ".github/workflows/commentary-evidence.yml",
         ".github/workflows/commentary-intake.yml",
         ".github/workflows/commentary-mhc-source-text.yml",
-        "docs/workflows/COMMENTARY_PIPELINE.md",
         "tests/test_commentary_stage_evidence.py",
         "tests/test_tool_registry.py"
       ]
@@ -1474,7 +1470,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 13,
+      "static_reference_count": 12,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_andbible_jsword.py",
@@ -1487,7 +1483,6 @@
         "scripts/tool_registry.py",
         ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
-        "docs/workflows/COMMENTARY_PIPELINE.md",
         "tests/test_commentary_native_raw_inventory.py"
       ]
     },
@@ -3053,12 +3048,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/tool_registry.py",
         "scripts/validate.py",
         ".github/workflows/stage-stock-commentary.yml",
-        "docs/workflows/COMMENTARY_PIPELINE.md",
         "tests/test_compiled_stock_commentary_proof.py"
       ]
     },
@@ -5041,11 +5035,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/materialize_attested_ztext_release.py",
         "scripts/tool_registry.py",
-        "docs/workflows/COMMENTARY_PIPELINE.md",
         "tests/test_release_preflight.py",
         "tests/test_tool_registry.py"
       ]
@@ -5350,14 +5343,13 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 12,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/commentary_public_metadata_preflight.py",
         "scripts/commentary_rebuild_attestation_draft.py",
         "scripts/promote_sword_preview.py",
         "scripts/tool_registry.py",
         "scripts/validate.py",
-        "docs/workflows/COMMENTARY_PIPELINE.md",
         "docs/workflows/PUBLISHING.md",
         "tests/test_commentary_public_metadata_preflight.py",
         "tests/test_commentary_rebuild_attestation_draft.py",
@@ -7116,7 +7108,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 27,
+      "static_reference_count": 26,
       "static_references": [
         "scripts/build.py",
         "scripts/release_preflight.py",
@@ -7135,7 +7127,6 @@
         "docs/policies/COMMENTARY_POLICY.md",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
-        "docs/workflows/COMMENTARY_PIPELINE.md",
         "docs/workflows/PUBLISHING.md",
         "docs/workflows/SOURCE_FIRST_EDITORIAL_PIPELINE.md",
         "tests/test_catalogue_update_contract.py",
@@ -7173,11 +7164,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/pages.yml",
-        "docs/workflows/COMMENTARY_PIPELINE.md",
         "docs/workflows/PUBLISHING.md",
         "tests/test_verify_public_catalogue.py"
       ]
