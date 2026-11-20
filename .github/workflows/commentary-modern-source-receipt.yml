@@ -4432,6 +4432,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Match the existing first, successfully AT-SPI-enabled Xiphos GUI.
+          # Without this wrapper _run_real_gui deliberately sets NO_AT_BRIDGE=1.
+          mkdir -p "$RUNNER_TEMP/xiphos-accessible-bin"
+          cat > "$RUNNER_TEMP/xiphos-accessible-bin/xiphos" <<'EOF'
+          #!/bin/sh
+          NO_AT_BRIDGE=0 GTK_A11Y=1 exec /usr/bin/xiphos "$@"
+          EOF
+          chmod 0755 "$RUNNER_TEMP/xiphos-accessible-bin/xiphos"
+          export PATH="$RUNNER_TEMP/xiphos-accessible-bin:$PATH"
           python - <<'PY'
           import json,os,shutil,sys
           from pathlib import Path
@@ -4557,25 +4566,27 @@ jobs:
               # Use the Xiphos application's private child session bus, as
               # required by the previously validated existing-link click test.
               probe_env=dict(env,NO_AT_BRIDGE="0",GTK_A11Y="1")
-              # The first real GUI probe has already run and may leave a
-              # second Xiphos PID briefly visible. Resolve the *current*
-              # test window's owning process, never pgrep's first match.
-              try:
-                  pid=_x11(["xdotool","getwindowpid",win],env).decode().strip()
-              except Exception:
-                  pid=""
+              # Bind the accessibility probe to the exact private zCom
+              # session by the Xiphos process SWORD_PATH and DISPLAY.
+              p=subprocess.run(["pgrep","-x","xiphos"],capture_output=True,
+                               text=True,timeout=4,check=False)
               bound=False
-              if pid.isdecimal():
+              for pid in p.stdout.splitlines():
+                  if not pid.isdecimal(): continue
                   try:
                       parts=Path("/proc/"+pid+"/environ").read_bytes().split(b"\\0")
-                      address=next((v.split(b"=",1)[1] for v in parts
-                                     if v.startswith(b"DBUS_SESSION_BUS_ADDRESS=")),None)
+                      values=dict(v.split(b"=",1) for v in parts if b"=" in v)
+                      if (values.get(b"SWORD_PATH")!=str(root).encode()
+                              or values.get(b"DISPLAY")!=env["DISPLAY"].encode()):
+                          continue
+                      address=values.get(b"DBUS_SESSION_BUS_ADDRESS")
                       if address and len(address)<2048:
                           probe_env["DBUS_SESSION_BUS_ADDRESS"]=address.decode()
                           bound=True
-                  except (OSError,UnicodeError): pass
+                          break
+                  except (OSError,UnicodeError): continue
               if not bound:
-                  return {"status":"REAL_APPROVED_NOTE_GUI_WINDOW_BUS_NOT_ATTESTED"}
+                  return {"status":"REAL_APPROVED_NOTE_GUI_SESSION_BUS_NOT_ATTESTED"}
               script=textwrap.dedent("""
                   import json,sys,re,time,subprocess,pyatspi
                   def compact(value):
