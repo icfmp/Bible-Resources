@@ -125,6 +125,11 @@ jobs:
           ]
           stamp_block=chr(10).join('        '+line for line in stamp_lines)+chr(10)
           content=content.replace(stamp_marker,stamp_block+stamp_marker)
+          accepted='    return int(report["status"] != "authorized_stable_sword_index_compromise_not_published")'
+          updated='    return int(report["status"] not in ("authorized_stable_sword_index_compromise_not_published","exact_historical_published_cleaned_osis_recovered"))'
+          if content.count(accepted)!=1:
+              raise SystemExit("Historical CLI source status guard changed unexpectedly")
+          content=content.replace(accepted,updated)
           p.write_text(content)
           PY
           cd "$RUNNER_TEMP/lsg-historical"
