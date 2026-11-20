@@ -25,7 +25,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | Script | Classification | Tests | Static callers | Stage hint |
 | --- | --- | --- | ---: | --- |
 | [`scripts/audit_omitted_verse_notes.py`](../scripts/audit_omitted_verse_notes.py) | UNDECIDED | named test | 4 | source/native audit |
-| [`scripts/audit_osis.py`](../scripts/audit_osis.py) | UNDECIDED | not established | 9 | source/native audit |
+| [`scripts/audit_osis.py`](../scripts/audit_osis.py) | UNDECIDED | not established | 10 | source/native audit |
 | [`scripts/audit_real_pilot.py`](../scripts/audit_real_pilot.py) | UNDECIDED | not established | 3 | source/native audit |
 | [`scripts/audit_text.py`](../scripts/audit_text.py) | UNDECIDED | not established | 1 | source/native audit |
 | [`scripts/bible_intake.py`](../scripts/bible_intake.py) | KEEP_GENERIC | not established | 9 | intake |
@@ -36,7 +36,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/catalogue_release_coverage.py`](../scripts/catalogue_release_coverage.py) | KEEP_GENERIC | named test | 10 | publication/release |
 | [`scripts/check_provider_parity.py`](../scripts/check_provider_parity.py) | UNDECIDED | not established | 4 | not determined |
 | [`scripts/check_updates.py`](../scripts/check_updates.py) | UNDECIDED | not established | 12 | not determined |
-| [`scripts/clean_source_osis.py`](../scripts/clean_source_osis.py) | UNDECIDED | named test | 4 | not determined |
+| [`scripts/clean_source_osis.py`](../scripts/clean_source_osis.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/commentary_anchor_parity.py`](../scripts/commentary_anchor_parity.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_andbible_jsword.py`](../scripts/commentary_andbible_jsword.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_android_text_witness.py`](../scripts/commentary_android_text_witness.py) | UNDECIDED | named test | 3 | source/native audit |
@@ -148,7 +148,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/rebuild_osis_commentary.py`](../scripts/rebuild_osis_commentary.py) | UNDECIDED | named test | 2 | publication/release |
 | [`scripts/reclassify_osis_commentary_introduction.py`](../scripts/reclassify_osis_commentary_introduction.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/release_preflight.py`](../scripts/release_preflight.py) | KEEP_GENERIC | named test | 5 | publication/release |
-| [`scripts/repair_commentary_osis_milestones.py`](../scripts/repair_commentary_osis_milestones.py) | UNDECIDED | named test | 2 | not determined |
+| [`scripts/repair_commentary_osis_milestones.py`](../scripts/repair_commentary_osis_milestones.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/repair_osis_division_markers.py`](../scripts/repair_osis_division_markers.py) | UNDECIDED | named test | 6 | not determined |
 | [`scripts/repair_osis_inline_markup.py`](../scripts/repair_osis_inline_markup.py) | UNDECIDED | named test | 6 | not determined |
 | [`scripts/repair_osis_note_links.py`](../scripts/repair_osis_note_links.py) | UNDECIDED | named test | 12 | not determined |

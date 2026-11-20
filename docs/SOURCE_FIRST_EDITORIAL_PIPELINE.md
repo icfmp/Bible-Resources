@@ -22,8 +22,8 @@ of those workflows.
 
 ## Stable workspace organization
 
-The canonical source and work directories are grouped by resource type and
-stable curated ID. Originals, reviewed cleaned masters, working drafts/evidence
+The canonical source and work directories are grouped by resource type,
+ISO 639 language identifier and stable curated resource ID. Originals, reviewed cleaned masters, working drafts/evidence
 and compiled SWORD distributions are different artifacts; never mix them.
 Follow [workspace layout and safe migration gates](WORKSPACE_LAYOUT.md).
 Bible translations with Strong/morphology and translator notes retain all
@@ -213,7 +213,7 @@ A sampled Xiphos PASS does **not** imply every hyperlink was clicked.
 - Require distinct recorded **rights**, **editorial** and **technical** approval.
   No green workflow can substitute for necessary human authorization.
 - Commit the maintained source, allowed by its license, under
-  `sources/cleaned/<resource-id>/`, along with its normalizer plans and
+  `sources/cleaned/<type>/<language>/<resource-id>/`, along with its normalizer plans and
   provenance. If rights prevent public source retention, preserve it in
   controlled access storage and commit only non-sensitive provenance,
   receipts and permitted build inputs; **do not claim public reproducibility

@@ -1,11 +1,11 @@
-# Original commentary witnesses
+# Original commentary sources
 
-Keep original authored commentary OSIS/USFM input immutable and rights-cleared.
-CrossWire/CCEL SWORD or alternate digital transcriptions are distinct witnesses
-and are not interchangeable merely because the historic author is in the
-public domain. Preserve commentary introductions, scopes, whole-chapter
-sections and their exact source rights.
+See [English originals](en/), including the exact pinned authoring
+`mhc-crosswire/mhc.osis.xml` for the complete Matthew Henry commentary
+(**not** MHCC nor the modern English derivative).
 
-For MHC, MHCC and HMCC Modern current source provenance, see the
-[resource workspace index](../../../docs/RESOURCE_WORKSPACE_INDEX.md).
-No unlicensed upstream source prose is mirrored by this navigation file.
+Do not treat a provider's compiled SWORD `SourceType=OSIS` claim as the
+original XML. The upstream source itself was fetched from its pinned
+authoring commit and independently SHA-256 verified.
+
+[Resource inventory](../../../docs/RESOURCE_WORKSPACE_INDEX.md).

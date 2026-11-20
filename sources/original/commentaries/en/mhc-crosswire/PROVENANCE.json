@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhc-crosswire",
+  "category": "commentary",
+  "language": "en",
+  "format": "OSIS",
+  "original_file": "mhc.osis.xml",
+  "edition": "CrossWire Matthew Henry Complete Commentary, authoring OSIS revision for SWORD 2.2",
+  "provider": "CrossWire",
+  "source_url": "https://gitlab.com/crosswire-bible-society/mhc/-/raw/537591a94c991941877b47a06666b6a7812e05d8/mhc.osis.xml",
+  "original_commit": "537591a94c991941877b47a06666b6a7812e05d8",
+  "original_size_bytes": 48020985,
+  "original_sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
+  "identity_contract": "config/commentary-intake/mhc-crosswire.json",
+  "license_claim": "Public Domain — Copy Freely (CrossWire MHC 2.2); owner accepted as project rights basis on 2026-11-19",
+  "rights_witness_url": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
+  "source_bytes_modified": false,
+  "cleaned_master_committed": false,
+  "compiled_sword_version_not_equivalent_to_original_source": true
+}

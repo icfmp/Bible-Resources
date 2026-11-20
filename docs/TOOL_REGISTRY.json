@@ -68,7 +68,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/pilot-source-audit.yml",
@@ -77,6 +77,7 @@
         "docs/QUALITY_POLICY.md",
         "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "docs/evidence/mhc-285/mhc-shared-verse-navigation-2026-11-18.md",
+        "docs/evidence/mhc-285/source-cleanup/CLEANUP_STATUS.md",
         "tests/test_commentary_shared_key_retrieval.py",
         "tests/test_editorial_pipeline.py"
       ]
@@ -540,11 +541,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/reclassify_osis_commentary_introduction.py",
         "scripts/repair_commentary_osis_milestones.py",
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
+        "docs/evidence/mhc-285/source-cleanup/CLEANUP_STATUS.md",
         "tests/test_clean_source_osis.py"
       ]
     },
@@ -5181,9 +5183,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 2,
+      "static_reference_count": 3,
       "static_references": [
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
+        "docs/evidence/mhc-285/source-cleanup/CLEANUP_STATUS.md",
         "tests/test_repair_commentary_osis_milestones.py"
       ]
     },

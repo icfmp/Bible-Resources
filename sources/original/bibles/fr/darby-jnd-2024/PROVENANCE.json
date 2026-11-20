@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "resource_id": "darby-jnd-2024",
+  "category": "bible",
+  "language": "fr",
+  "format": "OSIS",
+  "original_file": "bible_jnd_2_0.xml",
+  "edition": "J. N. Darby 2024 revision 2.0",
+  "provider": "Bibles et Publications Chrétiennes",
+  "source_url": "https://cdn.editeurbpc.com/bible/osis/JND/bible_jnd_2_0.xml",
+  "original_size_bytes": 9307610,
+  "original_sha256": "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
+  "identity_contract": "config/publisher-osis/frajnd-2024.json",
+  "license_claim": "Public Domain (exact 2024 edition; not the later 2026 revised edition)",
+  "rights_witness_url": "https://editeurbpc.com/telechargements",
+  "source_bytes_modified": false,
+  "cleaned_master_committed": false,
+  "compiled_sword_version_not_equivalent_to_original_source": true
+}
