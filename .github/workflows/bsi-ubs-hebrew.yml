@@ -43,6 +43,8 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_package_reviewed_v1_candidate.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_promote_verified_ubs_release.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_v11_semantic_feasibility.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_v11_context_pilot.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_v11_context_pilot_screening.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -467,6 +469,62 @@ jobs:
           assert d['published'] is False and d['publication_approved'] is False
           print('UBS_HEBREW_V11_SEMANTIC_FEASIBILITY_FULL_ORIGINAL_CORPUS_CHECKED_PRIVATE')
           PY
+      - name: Build 72 private UBS Hebrew context pilot witnesses stratified by headword frequency
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/build_v11_context_pilot.py \
+            --audit /tmp/bsi-ubs-hebrew-v11-source-only-semantic-feasibility-PRIVATE.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --french ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-hebrew-v11-72-word-contextual-pilot-PRIVATE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/bsi-ubs-hebrew-v11-72-word-contextual-pilot-PRIVATE.json').read_text())
+          assert d['sample_words']==72 and d['sample_family_count']==36
+          assert len(d['source_contextual_evidence'])==72
+          assert {x['tier'] for x in d['source_contextual_evidence']}=={'frequent','middle','rare'}
+          assert all(x['original_wlc_word']['word_id']==x['word_id'] for x in d['source_contextual_evidence'])
+          assert all(not x['editorial_approval'] and not x['independently_context_verified']
+                     for x in d['source_contextual_evidence'])
+          assert d['candidate_lexids_approved']==0 and d['publication_approved'] is False
+          print('HEBREW_V11_72_STRATIFIED_ORIGINAL_CONTEXTS_PREPARED_NO_AUTOMATIC_EDITORIAL_ASSIGNMENT')
+          PY
+      - name: Verify source-matched Hebrew v1.1 72-word contextual screening and abstentions
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_v11_context_pilot_screening.py \
+            --sample /tmp/bsi-ubs-hebrew-v11-72-word-contextual-pilot-PRIVATE.json \
+            --screening entity-index/links/dictionaries/ubs-hebrew/v11_contextual_pilot_screening.json \
+            --output /tmp/bsi-ubs-hebrew-v11-72-contextual-screen-verification-PRIVATE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/bsi-ubs-hebrew-v11-72-contextual-screen-verification-PRIVATE.json')
+          d=json.loads(p.read_text())
+          assert d['sampled_original_words']==72
+          assert d['not_obviously_contradicted_by_excerpt_NOT_independently_semantically_certified']==66
+          assert d['phrase_or_context_uncertain']==3
+          assert d['apparent_contextual_or_granularity_conflict']==3
+          assert d['recommended_automatic_mass_promotion'] is False
+          assert d['independently_contextually_verified']==0
+          assert d['publication_approved'] is False
+          assert d['original_released_v1_changed'] is False
+          print('UBS_HEBREW_V11_SCREENING_VERIFIED_SOURCE_LINKED_0_NEW_CONTEXT_SENSES_APPROVED')
+          PY
+      - name: Upload private source-verified Hebrew pilot screening (NOT PUBLISHED)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-hebrew-v11-72-screened-source-witnesses-PRIVATE-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-hebrew-v11-72-contextual-screen-verification-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload private 72-sample Hebrew UBS semantic context pilot (NOT PUBLISHED)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-hebrew-v11-72-context-samples-PRIVATE-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-hebrew-v11-72-word-contextual-pilot-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload Hebrew v1.1 semantic feasibility audit (PRIVATE, NO choices)
         uses: actions/upload-artifact@v4
         with:
