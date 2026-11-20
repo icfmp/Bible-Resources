@@ -47,6 +47,10 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_explicit_alternate_lemmas.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_explicit_ubs_alternates.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_last_47_lexical_forms.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_contextual_sense_candidates.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_provisional_context_sense_overlay.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_unresolved_semantic_priorities.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_lower_confidence_single_sense.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -816,6 +820,137 @@ jobs:
           assert all('sense_id' not in x for x in r['by_macula_word'].values())
           print('GREEK_409_EXACT_BILINGUAL_UBS_ALTERNATES_SOURCE_REVIEWED_NO_INFERRED_SENSES')
           PY
+      - name: Independently census UBS sense candidate evidence across all 137741 original Greek word IDs
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_contextual_sense_candidates.py \
+            --index entity-index/links/dictionaries/ubs-greek/index.json \
+            --reviewed /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output /tmp/bsi-ubs-greek-original-contextual-sense-candidate-census-PRIVATE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('/tmp/bsi-ubs-greek-original-contextual-sense-candidate-census-PRIVATE.json').read_text())
+          assert c['original_word_ids']==137741
+          assert c['source_ubs_entries']==5507
+          assert c['source_ubs_sense_pairs']==9160
+          assert sum(c['original_word_sense_candidate_outcomes'].values())==137741
+          assert c['original_word_sense_candidate_outcomes']['no_ubs_headword']==47
+          assert c['original_word_sense_candidate_outcomes']['multiple_original_ubs_lexical_headwords']==4
+          assert c['lexical_sense_contextually_verified']==0
+          assert c['automatic_contextual_lexid_assignments']==0
+          assert c['original_index_and_corpus_modified'] is False
+          assert c['publication_approved'] is False
+          print('GREEK_ALL_137741_ORIGINAL_WORDS_SENSE_CANDIDATE_PARTITIONED_NOT_CONTEXT_VALIDATED')
+          PY
+      - name: Stage 122504 original-word UBS LEXID source candidates as provisional, preserving every unresolved word
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_provisional_context_sense_overlay.py \
+            --index entity-index/links/dictionaries/ubs-greek/index.json \
+            --reviewed /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --audit /tmp/bsi-ubs-greek-original-contextual-sense-candidate-census-PRIVATE.json \
+            --accepted /tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json \
+            --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json')
+          u=Path('/tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json')
+          a=json.loads(p.read_text());b=json.loads(u.read_text())
+          assert a['provisional_source_supported_original_word_count']==122504
+          assert b['unresolved_original_word_count']==15237
+          assert len(a['word_id_to_provisional_ubs_lexid'])==122504
+          assert len(b['word_id_to_unresolved_original_source_evidence'])==15237
+          assert not set(a['word_id_to_provisional_ubs_lexid']).intersection(b['word_id_to_unresolved_original_source_evidence'])
+          assert len(set(a['word_id_to_provisional_ubs_lexid'])|set(b['word_id_to_unresolved_original_source_evidence']))==137741
+          assert a['contextual_senses_independently_verified']==0
+          assert b['contextual_senses_independently_verified']==0
+          assert a['public_release_approved'] is False and b['public_release_approved'] is False
+          assert all(x['verse_context_semantically_verified'] is False for x in a['word_id_to_provisional_ubs_lexid'].values())
+          assert all(x['verse_context_semantically_verified'] is False for x in b['word_id_to_unresolved_original_source_evidence'].values())
+          print('GREEK_UBS_LEXID_SOURCE_CANDIDATES_AND_UNRESOLVED_EXHAUSTIVE_REVERSIBLE_PRIVATE')
+          PY
+      - name: Upload privately staged 122504 word-specific provisional UBS source LEXIDs (NOT validated/published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-122504-source-provisional-lexids-NOT-SEMANTICALLY-VALIDATED
+          path: /tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Independently triage all 15237 Greek source word semantic exceptions by authentic original LN evidence
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_unresolved_semantic_priorities.py \
+            --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-15237-original-source-LN-and-UBS-semantic-priorities.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/bsi-ubs-greek-15237-original-source-LN-and-UBS-semantic-priorities.json').read_text())
+          assert x['all_original_unresolved_words']==15237
+          assert sum(x['source_categories'].values())==15237
+          assert x['provisional_new_lexids_selected']==0
+          assert x['contextual_senses_independently_verified']==0
+          assert x['original_UBS_or_MACULA_modified'] is False
+          assert x['published'] is False
+          print('GREEK_UBS_SEMANTIC_PRIORITIES_BLANK_LN_DIFFERENT_FROM_UNMATCHED_LN_NO_FORCED_SENSE')
+          PY
+      - name: Source-review 170 weaker confidence Greek words with only one available original UBS sense
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_lower_confidence_single_sense.py \
+            --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json \
+            --priorities /tmp/bsi-ubs-greek-15237-original-source-LN-and-UBS-semantic-priorities.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-170-lower-confidence-provisional-UBS-original-sense-defaults.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          f=Path('/tmp/bsi-ubs-greek-170-lower-confidence-provisional-UBS-original-sense-defaults.json')
+          r=json.loads(f.read_text())
+          assert r['additional_original_word_ids']==170
+          assert len(r['word_id_to_lower_confidence_provisional_ubs_lexid'])==170
+          assert r['original_source_status_counts']=={'blank_original_macula_ln':120,'original_macula_ln_not_in_authentic_ubs_headword':50}
+          assert r['original_macula_ln_changed'] is False and r['original_ubs_lexical_data_changed'] is False
+          assert r['original_strong_or_greek_changed'] is False
+          assert r['contextual_senses_independently_verified']==0
+          assert r['published'] is False and r['publication_approved'] is False
+          print('GREEK_170_LOWER_CONFIDENCE_SOLE_UBS_LEXID_PROVISIONAL_NOT_CONTEXT_VALIDATED')
+          PY
+      - name: Upload 170 weaker confidence Greek UBS lexical sense decisions (PRIVATE, NOT published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-170-lower-confidence-sole-original-lexid-defaults-NOT-VALIDATED
+          path: /tmp/bsi-ubs-greek-170-lower-confidence-provisional-UBS-original-sense-defaults.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload private original Greek contextual sense unresolved prioritization (NOT published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-original-semantic-review-priorities-15237-PRIVATE
+          path: /tmp/bsi-ubs-greek-15237-original-source-LN-and-UBS-semantic-priorities.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload private all 15237 unresolved original Greek contextual sense witnesses
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-15237-unresolved-original-sense-evidence-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload source-specific UBS sense candidate census (PRIVATE, NOT semantically approved)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-contextual-sense-candidates-census-PRIVATE-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-original-contextual-sense-candidate-census-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload source-reviewed 409 original UBS alternate Greek word heads (PRIVATE, NOT published)
         uses: actions/upload-artifact@v4
         with:
