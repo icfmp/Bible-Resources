@@ -19,7 +19,7 @@ The source-hash-bound, reversible corrections comprise **11 inert emphasis tags*
 | Final edition, legal attribution, native scope | [0.1.0 release](releases/MHC-0.1.0.md) and [source validation](../../../../../../modules/mhc-crosswire/SOURCE_VALIDATION.json) |
 | Real GUI and residual limitations | [Reader acceptance](evidence/reader-acceptance-scope-2026-11-19.md) |
 | Specific source cleanup details | [Reviewed changes](evidence/source-cleanup/CHANGES.md) |
-| Historical investigation and blocked early candidates | `evidence/` — consult only for a specific contested anomaly |
+| Case-specific technical evidence and unresolved print comparisons | [Evidence map](evidence/README.md) — consult only for a specific question |
 
 **Open, distinct research:** [issue #295](https://github.com/icfmp/Bible-Resources/issues/295) concerns exceptional original-authoring-OSIS versus stock/native scope and independent CCEL/print witnesses. Its case-specific source investigations remain under `evidence/` because they may still support or refute a future *separately authorized* editorial correction. They are **not** part of the accepted 0.1.0 correction set.
 
