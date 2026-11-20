@@ -27,9 +27,9 @@ For previously published modules with an **immutable audited release**, use a re
 
 The generic `scripts/published_reference_audit.py` revalidates the entire original source-audit SHA-256 against the release manifest **and source-validation receipt**, the source/output revision, all published SWORD payload member hashes, original verse counts across all books and chapters, classified source-only and empty reader-only entries, exact observed adjacent merges, the original source-bound approval policy and its SHA-256, and the recorded isolated reader reinstallation.
 
-The existing Louis Segond 1910 0.1.0 uses this compatibility path because its exact released asset and real stock-reader/source evidence were validated **before** the modern standard `SWORD_COMPATIBILITY.json` format existed. The approval explicitly merges Mark 10:52–53 in the reader's 52 entry while retaining full source text; Job 34:37 is an unoccupied SWORD registry slot, not added Scripture. No identifiers or verse counts are hardcoded in generic validation.
+This compatibility path exists only for previously released, exact-source-bound approvals. Edition-specific merge and source evidence are recorded with their corresponding release; do not generalize historical special cases into new-edition defaults.
 
-**Limit:** this is a *cryptographically pinned revalidation of a previously executed audit*, **not** a fresh 31,170-verse reread by current CI or a general replacement for new source-to-reader audit execution. The original audit is available alongside the [LSG 0.1.0 GitHub Release](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0) and is only meaningful when the entire identity/approval chain matches. It does not infer that the original source's textual or editorial decisions are infallible.
+**Limit:** this is a *cryptographically pinned revalidation of a previously executed audit*, **not** a fresh 31,170-verse reread by current CI or a general replacement for new source-to-reader audit execution. A historical audit is meaningful only when its entire source, module, release and approval chain still matches.
 
 ## Required validation
 
@@ -48,7 +48,7 @@ The new [source OSIS inventory](SOURCE_OSIS_INVENTORY.md) provides a source-only
 
 ## Independently collected actual native reader index
 
-The [native stable-SWORD inventory producer](NATIVE_SWORD_INDEX_INVENTORY.md) uses the stock `libsword` module's own `VerseKey` and `hasEntry` methods to enumerate **actual populated keys**, the full installed versification chapter ceilings and occupied book/chapter intros. A separate [OSIS source producer](SOURCE_OSIS_INVENTORY.md) outputs the independently authored source key list. Their outputs feed the existing fail-closed comparison, but **do not** by themselves certify source conversion, the full text/notes/layout or editorial approval. The real published LSG RawText module is exercised against its immutable original audit in CI. A second real zText/other edition and complete content preservation remain unverified.
+The [native stable-SWORD inventory producer](NATIVE_SWORD_INDEX_INVENTORY.md) uses the stock `libsword` module's own `VerseKey` and `hasEntry` methods to enumerate **actual populated keys**, the full installed versification chapter ceilings and occupied book/chapter intros. A separate [OSIS source producer](SOURCE_OSIS_INVENTORY.md) outputs the independently authored source key list. Their outputs feed the existing fail-closed comparison, but **do not** by themselves certify source conversion, the full text/notes/layout or editorial approval. Current CI and real source/native evidence must be examined for each target release. A second real zText/other edition and complete content preservation remain unverified.
 
 ## Remaining multi-translation work
 
