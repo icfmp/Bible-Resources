@@ -1,24 +1,22 @@
-# Editorial record — J. N. Darby, BPC 2024 (French)
+# J. N. Darby BPC 2024 — editorial decisions
 
-**Scope:** exact reviewed 0.1.1 cleaned OSIS compiler input, separately identified from the unmodified publisher XML.
+**Release:** `BRJND2024` 0.1.1, independently curated from the identified BPC 2024 revision 2.0. The original publisher XML is unchanged.
 
-## Decisions and boundaries
+## Why this edition differs technically
 
-- Keep the exact 2024 revision 2.0 edition identity and the original textual readings and notes. The pinned original contains **31,166 annotated verse keys** and **6,340 translator notes**, as recorded in the cleaned manifest.
-- Treat note-target repairs, inline semantic repairs, lexical link patches, omitted-verse *labels*, division metadata and paragraph XML indentation as distinct reviewed transformation stages. The approved sequence and each intermediate SHA-256 are recorded in [CLEANUP_MANIFEST.json](../CLEANUP_MANIFEST.json).
-- Three reviewed omitted-verse plain labels are **labels**, not permission to manufacture missing biblical verses.
-- Division/paragraph rendering decisions must not silently modify the translated prose. A reader's paragraph spacing defect must be diagnosed separately from source markup.
-- No cross-reference destination is to be invented from an ambiguous label; preserve unresolved cases and source evidence.
+- The reviewed source contains **31,166 numbered keys** and **6,340 original notes**. Preserve the publisher's text, omitted-verse conventions and authorial apparatus.
+- **521 source-attested division markers** are retained as structural metadata rather than visible asterisks; **4,690 XML indentation artifacts** were removed without rewriting authorial spaces. One genuine text-critical star remains part of the text.
+- Note/link repairs and label treatment are *separate, attested transformations*. Never turn an intentional omitted-verse label into an invented verse or infer an ambiguous reference target.
+- A paragraph or chapter-layout issue in Xiphos/AndBible/Bible needs source-versus-reader diagnosis, not automatic reflow.
 
-## Evidence
+## Where to verify
 
-- [Historical stage-5 editorial review draft](evidence/frajnd-2024-stage5-editorial-review.md) and [final 0.1.1 reader QA](evidence/darby-2024-0.1.1-final-reader-qa.md). The stage-5 draft predates final authorization; do not treat its pending status as the present edition status.
+| Question | Record |
+| --- | --- |
+| Exact source, stages and changed bytes | [Transformation manifest](../CLEANUP_MANIFEST.json) |
+| Approved version and source/payload hashes | [0.1.1 release](releases/DARBY-JND-2024-0.1.1.md) |
+| Actual reader samples | [Final 0.1.1 reader QA](evidence/darby-2024-0.1.1-final-reader-qa.md) |
+| Resource presentation | [Reviewed French profile](profiles/fr-darby-jnd-2024.md) |
+| Earlier processing bottlenecks | [Import retrospective](history/DARBY_2024_IMPORT_POSTMORTEM.md); historical, not an active checklist |
 
-- [Original/cleaned stage manifest](../CLEANUP_MANIFEST.json)
-- [Darby reader profile](profiles/fr-darby-jnd-2024.md)
-- [0.1.1 release receipt](releases/DARBY-JND-2024-0.1.1.md)
-- [Historical stage-4 retrospective](../../../../../../docs/DARBY_2024_IMPORT_POSTMORTEM.md)
-- [0.1.1 editorial authorization](../../../../../../config/darby-0.1.1-release-authorization.json)
-- [Published provenance](../../../../../../modules/darby-jnd-2024/RELEASE_PROVENANCE.json)
-
-**Status:** historical reviewed 0.1.1 source; no new editorial change authorized.
+**Only the release and source-pinned manifest determine the accepted state.** Draft notes and pre-release probes are not independent approvals.
