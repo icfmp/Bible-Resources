@@ -6,6 +6,7 @@ For new or revised editions, use [the canonical production pipeline](../PRODUCTI
 
 ## Preserved records
 
+- [Historical LSG onboarding playbook](RESOURCE_ONBOARDING_PLAYBOOK.md) — dated guidance superseded by the canonical production pipeline.
 - [First LSG/MHC pilot](PILOT_SEGOND_MHC.md) — dated early pipeline experiment, before the published editions.
 - [Second independent Bible probe](SECOND_REAL_BIBLE_PROBE.md) — WEBP feasibility and audit evidence, not publication authorization.
 - [Historical LSG source-to-SWORD handoff](LSG_AUDIT_RESEARCH_HANDOFF.md) — retained research evidence and limitations.
