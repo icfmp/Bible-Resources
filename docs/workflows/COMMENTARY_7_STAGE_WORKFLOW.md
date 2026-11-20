@@ -127,8 +127,7 @@ were changed.
 
 ## Generic native-stock markup census (no source edits)
 
-For a pinned existing SWORD commentary, the [full native raw audit](
-../.github/workflows/commentary-native-raw-corpus.yml) now also inventories
+For a pinned existing SWORD commentary, the [full native raw audit](../../.github/workflows/commentary-native-raw-corpus.yml) now also inventories
 markup **inside the same complete, independently enumerated raw-entry stream**.
 It does not introduce a commentary-specific importer or create a derivative.
 
@@ -202,8 +201,7 @@ downloader, safe ZIP inspector, read-only `diatheke` scanner and content-free
 sample SHA reports. No original bytes or the retrieved commentary text are
 committed, copied to reports, or uploaded as workflow artifacts.
 
-Run [Observe commentary intake (read-only)](
-../.github/workflows/commentary-intake.yml) through Actions, or locally:
+Run [Observe commentary intake (read-only)](../../.github/workflows/commentary-intake.yml) through Actions, or locally:
 
 ```sh
 python scripts/commentary_intake.py --resource-id mhcc-crosswire \
@@ -244,7 +242,7 @@ without excerpting any source content into a log.
 - [CCEL concise commentary](https://www.ccel.org/ccel/henry/mhcc/mhcc)
   supplies a possible independent XML/text witness; its equivalence to
   the CrossWire/Moody edition **has not been demonstrated**.
-- The prior [full MHC pilot](PILOT_SEGOND_MHC.md) is **not** this
+- The prior [full MHC pilot](../PILOT_SEGOND_MHC.md) is **not** this
   resource. In particular do not substitute CCEL's complete MHC or use
   the MHC 2.2 metadata for the concise module.
 

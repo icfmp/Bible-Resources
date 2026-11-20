@@ -104,7 +104,7 @@ All changes require a source SHA-256 bound plan, editorial review and
 derivative-rights evidence, and a private before/after diff. The original
 remains the immutable rollback copy.
 
-Usage and precise limitations: [EDITORIAL_AUDIT_WORKFLOW.md](EDITORIAL_AUDIT_WORKFLOW.md).
+Usage and precise limitations: [EDITORIAL_AUDIT_WORKFLOW.md](../workflows/EDITORIAL_AUDIT_WORKFLOW.md).
 The genuine `LSG` and `MHC` SWORD archives have now been inspected
 **read-only** through bounded per-key SWORD calls, but they have **not**
 been edited, recompilated or visually approved in Bible. Source-to-compiled

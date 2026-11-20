@@ -17,7 +17,7 @@ contains a more recent, more accurate or better-licensed edition.
 5. **AndBible Extra / Xiphos HTTPS mirror** (\`andbible-extra\`)
 
 The authoritative, reviewable order is in
-[\`config/source-priority.json\`](../config/source-priority.json).
+[\`config/source-priority.json\`](../../config/source-priority.json).
 Adding or removing a SWORD provider must explicitly update this list.
 The order applies equally to Bibles and commentaries; it does not override
 copyright, quality review, actual edition identity or publisher provenance.
@@ -47,7 +47,7 @@ SWORD \`.conf\` properties such as \`Description\`, \`Lang\`,
 texts and publication history, as well as byte/content hashes where
 available, before declaring two sources identical. The separate edition
 identity record is
-[\`config/edition-identities.json\`](../config/edition-identities.json).
+[\`config/edition-identities.json\`](../../config/edition-identities.json).
 
 A verified registry entry looks like this **example only** (not an assertion
 that these two modules have been compared):

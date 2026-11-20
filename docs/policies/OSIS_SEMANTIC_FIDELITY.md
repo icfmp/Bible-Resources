@@ -36,6 +36,6 @@ This source-side OSIS comparator **does not** claim:
 
 Tests use two **different synthetic OSIS edition shapes** and intentionally mutate words, punctuation, lemma attributes, note text and caller, moved notes, explicit targets, poetry closing events, introductions, verse IDs and book order. This does NOT constitute validation against a second different, rights-cleared real Bible.
 
-The [native SWORD index evidence](NATIVE_SWORD_INDEX_INVENTORY.md), [authorial reference evidence](SOURCE_OSIS_INVENTORY.md), and original [LSG audit research](LSG_AUDIT_RESEARCH_HANDOFF.md) remain independent sources of proof. Issue #28 stays OPEN until their full content/structure/native reader equivalents and the second real Bible are validated.
+The [native SWORD index evidence](../technical/NATIVE_SWORD_INDEX_INVENTORY.md), [authorial reference evidence](../technical/SOURCE_OSIS_INVENTORY.md), and original [LSG audit research](../LSG_AUDIT_RESEARCH_HANDOFF.md) remain independent sources of proof. Issue #28 stays OPEN until their full content/structure/native reader equivalents and the second real Bible are validated.
 
 No published LSG 0.1.0 content, source file, SWORD payload or rights record changes in this work.

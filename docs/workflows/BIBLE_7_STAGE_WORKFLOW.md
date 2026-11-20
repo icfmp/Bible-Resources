@@ -7,8 +7,7 @@ specialization; do not pretend this Bible checklist certifies them.
 **Goal:** a predictable **7-stage** route from an upstream candidate to a
 verified release. The project owner can always see the current stage,
 the number completed, what is blocked and what comes next. This is the
-operational front door for the detailed [resource onboarding playbook](
-RESOURCE_ONBOARDING_PLAYBOOK.md) and [generalization issue #28](
+operational front door for the detailed [resource onboarding playbook](../RESOURCE_ONBOARDING_PLAYBOOK.md) and [generalization issue #28](
 https://github.com/icfmp/Bible-Resources/issues/28). It **does not**
 claim that the full generic fidelity pipeline is already implemented.
 
@@ -48,7 +47,7 @@ be checked until the **whole gate** is independently evidenced.
 ### Mandatory paragraph-rendering preflight for each Bible
 
 **Cross-reference for stages 3, 4c, 5 and 6:** [reusable OSIS paragraph
-rendering QA](OSIS_PARAGRAPH_RENDERING_QA.md). The Darby 2024 0.1.0
+rendering QA](../technical/OSIS_PARAGRAPH_RENDERING_QA.md). The Darby 2024 0.1.0
 post-release repair demonstrated two independent risks: authorial
 `*`/`**`/`***` division symbols leaked into ordinary displayed verse
 text, and XML pretty-print indentation leaked into native SWORD leading
@@ -93,15 +92,15 @@ reference target addressable. Preserve the printed explanatory note; handle
 its non-existent target without misleading the reader. Whitespace differences
 alone are not blocking when meaning and editorial structure are preserved;
 a demonstrated lost paragraph/poetry/heading boundary or unreadable rendering
-**is** blocking. See [editorial rules](EDITORIAL_RULES.md) for the general
+**is** blocking. See [editorial rules](../policies/EDITORIAL_RULES.md) for the general
 content-versus-technical-repair contract.
 
 Before stage-5 acceptance, record both **machine-complete source/native
 fidelity** and **owner editorial acceptance** as separate decisions. A
 diagnostic triage, draft publisher report, or sample GUI click cannot
 approve a distribution or automatically waive known non-navigable source links.
-See the [BPC Darby stage-5 case study](evidence/frajnd-2024-stage5-editorial-review.md)
-and its [unsubmitted upstream report](evidence/frajnd-2024-upstream-link-report-draft.md).
+See the [BPC Darby stage-5 case study](../evidence/frajnd-2024-stage5-editorial-review.md)
+and its [unsubmitted upstream report](../evidence/frajnd-2024-upstream-link-report-draft.md).
 
 For an already satisfactory **official SWORD module**, stage 3's conversion
 and stage 4's rebuilding can be **N/A** if justified by a verifiable
@@ -161,7 +160,7 @@ separately. No original Bible source or private note content is uploaded.
 ## One progress tracker — no mystery number of steps
 
 Create **one GitHub issue per Bible** using the
-[Import a resource issue template](../.github/ISSUE_TEMPLATE/import.yml).
+[Import a resource issue template](../../.github/ISSUE_TEMPLATE/import.yml).
 The issue body is the **single current status**; a short checkpoint comment
 is added after *each* completed or blocked stage. Example:
 

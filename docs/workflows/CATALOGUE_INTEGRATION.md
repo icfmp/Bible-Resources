@@ -218,8 +218,8 @@ canonical edition IDs and separately approved reader descriptions. It does
   infer redistribution permission for an unrelated original SWORD module.
 
 See [the full v1 update protocol](CATALOGUE_UPDATE_PROTOCOL.md),
-[resource profile editorial policy](RESOURCE_PROFILES.md),
-[architecture](ARCHITECTURE.md) and [publication procedure](PUBLISHING.md).
+[resource profile editorial policy](../architecture/RESOURCE_PROFILES.md),
+[architecture](../architecture/ARCHITECTURE.md) and [publication procedure](PUBLISHING.md).
 Report integration problems via [GitHub issues](https://github.com/icfmp/Bible-Resources/issues),
 including the exact catalogue schema, module ID, reader version and response
 error (not private user data).
