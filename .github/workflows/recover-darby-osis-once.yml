@@ -63,7 +63,8 @@ jobs:
               raise SystemExit("Notes or note anchors changed")
           orig_keys,orig_info=source_inventory(original)
           final_keys,final_info=source_inventory(output)
-          if (orig_keys!=final_keys or orig_info['source_verse_count']!=31166\n              or final_info['source_verse_count']!=31166):
+          if (orig_keys!=final_keys or orig_info['source_verse_count']!=31166
+              or final_info['source_verse_count']!=31166):
               raise SystemExit("Canonical Bible verse keys altered")
           source_v,source_n,_=original_osis_verses_and_notes(original)
           final_v,final_n,_=original_osis_verses_and_notes(output)
