@@ -21,7 +21,7 @@ imports, tests, CI workflows, external documented commands, and historical
 release consumers are all verified. Moving a script can silently break
 source-bound evidence even when it looks like a minor directory tidy-up.
 
-The generated [tool inventory](../docs/TOOL_REGISTRY.md) and its JSON
+The generated [tool inventory](../reports/tooling/TOOL_REGISTRY.md) and its JSON
 counterpart are the canonical per-script index, with documented lifecycle
 categories: KEEP_GENERIC, GENERALIZE, MERGE, HISTORICAL/ARCHIVE, UNDECIDED.
 
