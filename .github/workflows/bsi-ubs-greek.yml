@@ -47,6 +47,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_explicit_alternate_lemmas.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_explicit_ubs_alternates.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_last_47_lexical_forms.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_contextual_sense_candidates.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -816,6 +817,38 @@ jobs:
           assert all('sense_id' not in x for x in r['by_macula_word'].values())
           print('GREEK_409_EXACT_BILINGUAL_UBS_ALTERNATES_SOURCE_REVIEWED_NO_INFERRED_SENSES')
           PY
+      - name: Independently census UBS sense candidate evidence across all 137741 original Greek word IDs
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_contextual_sense_candidates.py \
+            --index entity-index/links/dictionaries/ubs-greek/index.json \
+            --reviewed /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output /tmp/bsi-ubs-greek-original-contextual-sense-candidate-census-PRIVATE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('/tmp/bsi-ubs-greek-original-contextual-sense-candidate-census-PRIVATE.json').read_text())
+          assert c['original_word_ids']==137741
+          assert c['source_ubs_entries']==5507
+          assert c['source_ubs_sense_pairs']==9160
+          assert sum(c['original_word_sense_candidate_outcomes'].values())==137741
+          assert c['original_word_sense_candidate_outcomes']['no_ubs_headword']==47
+          assert c['original_word_sense_candidate_outcomes']['multiple_original_ubs_lexical_headwords']==4
+          assert c['lexical_sense_contextually_verified']==0
+          assert c['automatic_contextual_lexid_assignments']==0
+          assert c['original_index_and_corpus_modified'] is False
+          assert c['publication_approved'] is False
+          print('GREEK_ALL_137741_ORIGINAL_WORDS_SENSE_CANDIDATE_PARTITIONED_NOT_CONTEXT_VALIDATED')
+          PY
+      - name: Upload source-specific UBS sense candidate census (PRIVATE, NOT semantically approved)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-contextual-sense-candidates-census-PRIVATE-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-original-contextual-sense-candidate-census-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload source-reviewed 409 original UBS alternate Greek word heads (PRIVATE, NOT published)
         uses: actions/upload-artifact@v4
         with:
