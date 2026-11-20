@@ -2,7 +2,7 @@ name: Modern commentary source-native receipt (metadata-only)
 on:
   # Scoped push trigger for this PR's fail-closed GUI validation.
   push:
-    branches: [feature/mhcc-modern-english]
+    branches: [feature/mhcc-modern-english, recovery/approved-clean-osis-20261120]
   pull_request:
     paths:
       - '.github/workflows/commentary-modern-source-receipt.yml'
@@ -24,7 +24,7 @@ on:
       - 'work/mhcc-modern/**'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: modern-source-receipt-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -3764,6 +3764,59 @@ jobs:
             ${{ runner.temp }}/hmcc-modern-owner-review-package-receipt.json
           if-no-files-found: error
           retention-days: 30
+      - name: Recover byte-exact approved modern English OSIS source into reviewed workspace
+        if: github.ref == 'refs/heads/recovery/approved-clean-osis-20261120' && github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          source=Path(os.environ["RUNNER_TEMP"])/"mhcc-modern-approved-editorial-DO-NOT-PUBLISH.osis.xml"
+          data=source.read_bytes()
+          digest=hashlib.sha256(data).hexdigest()
+          plan=json.loads(Path("config/commentary-rebuilds/hmcc-modern.json").read_text())
+          if digest!=plan["source_approved_osis_sha256"]:
+              raise SystemExit("Recovered source differs from final published HMCC 0.1.0 source approval")
+          if plan["source_run_id"]!=44695710957 or plan["source_artifact_id"]!=14610990289:
+              raise SystemExit("Source publication identity drift")
+          dest=Path("sources/cleaned/commentaries/en/hmcc-modern")
+          if dest.exists():
+              raise SystemExit("Refusing to overwrite canonical cleaned source")
+          dest.mkdir(parents=True)
+          (dest/"hmcc-modern.osis.xml").write_bytes(data)
+          receipt={
+            "schema_version":1,
+            "status":"exact_approved_editorial_osis_recovered_from_replayed_production_pipeline",
+            "resource_id":"hmcc-modern","type":"commentary","language":"en",
+            "approved_source_sha256":digest,"source_bytes":len(data),
+            "historical_source_run_id":plan["source_run_id"],
+            "source_approved_osis_sha256":plan["source_approved_osis_sha256"],
+            "source_module":"MHCC 0.1.1",
+            "source_native_corpus_sha256":plan["original_native_sha256"],
+            "authorial_modern_manuscripts":"work/mhcc-modern/",
+            "owner_approved_link_cases":15,
+            "owner_approved_destinations":28,
+            "separately_restored_expositions":2,
+            "publication_rights_basis":"modules/hmcc-modern/metadata.json",
+            "published_module_id":"HMCCModern",
+            "published_version":"0.1.0",
+            "editorial_source_work_identifier":"MHCCMODAP",
+            "recovery_process":"Replayed original 2026-11-20 full production workflow; SHA compared to immutable published source attestation.",
+            "original_authored_manuscripts_modified":False
+          }
+          (dest/"CLEANUP_MANIFEST.json").write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\\n")
+          print("Verified owner-approved modern-English OSIS source digest",digest,"size",len(data))
+          PY
+          # Restore unmodified original production workflow to avoid leaving a
+          # permanent special-purpose recovery/publishing mechanism.
+          git restore --source=HEAD^ -- .github/workflows/commentary-modern-source-receipt.yml
+          git add .github/workflows/commentary-modern-source-receipt.yml sources/cleaned/commentaries/en/hmcc-modern/
+          git diff --cached --check -- ':!sources/cleaned/**/*.xml'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Recover exact source-attested HMCC Modern 0.1.0 final editorial OSIS"
+          git push origin HEAD:recovery/approved-clean-osis-20261120
       - name: Install real Xiphos GUI in an isolated virtual display for HMCC Modern
         id: xiphos_deps
         timeout-minutes: 14
