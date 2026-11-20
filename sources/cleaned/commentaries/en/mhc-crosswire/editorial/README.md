@@ -12,7 +12,7 @@
 ## Evidence
 
 - [Original and cleaned stages](../CLEANUP_MANIFEST.json)
-- [MHC 0.1.0 release receipt](../../../../../docs/releases/MHC-0.1.0.md)
+- [MHC 0.1.0 release receipt](../../../../../../docs/releases/MHC-0.1.0.md)
 - [Source attestation workflow](https://github.com/icfmp/Bible-Resources/actions/runs/44554276085)
 
 **Status:** documented historical decisions. Future changes require a new source-backed ledger and review.
