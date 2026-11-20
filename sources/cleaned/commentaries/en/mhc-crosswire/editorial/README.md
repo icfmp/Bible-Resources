@@ -11,6 +11,8 @@
 
 ## Evidence
 
+- [Historical source-cleanup changelog](../../../../../../docs/evidence/mhc-285/source-cleanup/CHANGES.md) and [early source workspace notes](../../../../../../docs/evidence/mhc-285/source-cleanup/README.md). **These are dated preparatory records**: their claims that no release existed are superseded by the separately verified later 0.1.0 release receipt below. Preserve them as provenance, not current status.
+
 - [Original and cleaned stages](../CLEANUP_MANIFEST.json)
 - [MHC 0.1.0 release receipt](../../../../../../docs/releases/MHC-0.1.0.md)
 - [Source attestation workflow](https://github.com/icfmp/Bible-Resources/actions/runs/44554276085)
