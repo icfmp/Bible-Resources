@@ -4571,16 +4571,20 @@ jobs:
                   except (OSError,UnicodeError): continue
               script=textwrap.dedent("""
                   import json,sys,re,time,subprocess,pyatspi
-                  names=set(json.loads(sys.argv[1]))
+                  def compact(value):
+                      return "".join(re.findall(r"[^\\W_]+",value.casefold()))
+                  names=set(compact(n) for n in json.loads(sys.argv[1]))
                   desktop=pyatspi.Registry.getDesktop(0)
                   def scan():
-                      stack=[desktop]; out=[]; selected=False; seen=0
+                      stack=[desktop]; out=[]; selected=False; seen=0; links_found=0
                       while stack and seen<3000:
                           node=stack.pop();seen+=1
                           try:
                               role=node.getRoleName().lower()
                               name=" ".join((node.name or "").split())
-                              if role=="link" and name.casefold() in names:
+                              if role=="link":
+                                  links_found+=1
+                              if role=="link" and compact(name) in names:
                                   state=node.getState()
                                   ext=node.queryComponent().getExtents(pyatspi.DESKTOP_COORDS)
                                   showing=state.contains(pyatspi.STATE_SHOWING)
@@ -4595,11 +4599,12 @@ jobs:
                                               selected=True
                               stack.extend(node[i] for i in range(min(node.childCount,100)))
                           except (LookupError,RuntimeError,AttributeError): continue
-                      return out,selected
-                  links,before=scan()
+                      return out,selected,links_found
+                  links,before,all_roles=scan()
                   result={"status":"REAL_APPROVED_NOTE_NAVIGATION_NOT_PROVEN",
                           "source_note_labels_in_real_html":len(names),
                           "real_matching_accessible_link_roles":len(links),
+                          "all_real_accessible_link_roles":all_roles,
                           "target_selected_before_click":before,
                           "actual_x11_click_count":0,
                           "target_selected_after_click":False}
@@ -4621,7 +4626,7 @@ jobs:
                       if click.returncode:continue
                       result["actual_x11_click_count"]+=1
                       time.sleep(1.2)
-                      _,after=scan()
+                      _,after,_=scan()
                       if after and not before:
                           result["status"]="REAL_APPROVED_NOTE_TARGET_SELECTED_IN_SIDEBAR"
                           result["target_selected_after_click"]=True
