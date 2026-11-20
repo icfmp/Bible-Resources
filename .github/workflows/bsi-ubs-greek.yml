@@ -44,6 +44,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_word_coverage_invariants.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_hopote_headword.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_456_lexical_variants.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_explicit_alternate_lemmas.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -588,6 +589,32 @@ jobs:
           assert x['publication_approved'] is False
           print('GREEK_456_VARIANTS_DIAGNOSTIC_READ_ONLY_NO_AUTOMATIC_LEXICAL_ALIASES')
           PY
+      - name: Independently audit authentic UBS Greek EN/FR AlternateLemmas for 456 source word IDs
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_ubs_explicit_alternate_lemmas.py \
+            --report /tmp/bsi-ubs-greek-456-original-source-variant-evidence.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-456-explicit-original-ubs-alternate-lemmas.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/bsi-ubs-greek-456-explicit-original-ubs-alternate-lemmas.json').read_text())
+          assert x['original_word_count']==456
+          assert sum(x['source_evidence_counts'].values())==456
+          assert x['new_source_word_lexical_headwords_approved']==0
+          assert x['original_strong_or_lemma_modified'] is False
+          assert x['new_contextual_ubs_lexids']==0
+          assert x['publication_approved'] is False
+          print('GREEK_ORIGINAL_UBS_EXPLICIT_ALTERNATE_LEMMA_SOURCE_WITNESSES_UNAPPROVED')
+          PY
+      - name: Upload source UBS Greek explicit alternate lemma evidence (PRIVATE)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-original-explicit-alternate-lemmas-456-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-456-explicit-original-ubs-alternate-lemmas.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload 456 Greek original source-word lexical diagnostic evidence (PRIVATE)
         uses: actions/upload-artifact@v4
         with:
