@@ -45,6 +45,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_hopote_headword.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_456_lexical_variants.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_explicit_alternate_lemmas.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_explicit_ubs_alternates.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -758,6 +759,43 @@ jobs:
           assert all('sense_id' not in row for row in x['by_macula_word'].values())
           print('GREEK_ALL_SOURCE_ATTESTED_HEADWORDS_REVIEWED_456_UBS_V1_0_MISSING_KEPT_UNLINKED')
           PY
+      - name: Source-review 409 individual Greek word heads via original UBS explicit bilingual alternate lemmas
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_explicit_ubs_alternates.py \
+            --candidate /tmp/bsi-ubs-greek-reviewed-hopote-private.json \
+            --report /tmp/bsi-ubs-greek-456-explicit-original-ubs-alternate-lemmas.json \
+            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_explicit_ubs_alternates.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json
+          python3 -I entity-index/links/dictionaries/ubs-greek/validate_word_coverage_invariants.py \
+            --baseline entity-index/links/dictionaries/ubs-greek/index.json \
+            --candidate /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json').read_text())
+          old=json.loads(Path('entity-index/links/dictionaries/ubs-greek/index.json').read_text())
+          assert all(r[k]==v for k,v in old.items())
+          assert len(r['by_macula_word'])==9604
+          assert len(r['by_macula_ambiguous_word'])==220
+          assert r['editorial_candidate']['reviewed_original_headword_words_total']==9604
+          assert r['editorial_candidate']['other_original_words_still_unapproved']==0
+          assert r['word_aware_coverage']['word_aware_entry_candidate_words']==137694
+          assert r['word_aware_coverage']['remaining_no_ubs_headword_candidate_original_words']==47
+          assert r['editorial_candidate']['publication_approved'] is False
+          assert r['editorial_candidate']['new_inferred_contextual_lexical_sense_ids']==0
+          assert len([x for x in r['by_macula_word'].values() if x['match_type']=='source_reviewed_explicit_bilingual_ubs_alternate_lemma_original_word_headword_only'])==409
+          assert all('sense_id' not in x for x in r['by_macula_word'].values())
+          print('GREEK_409_EXACT_BILINGUAL_UBS_ALTERNATES_SOURCE_REVIEWED_NO_INFERRED_SENSES')
+          PY
+      - name: Upload source-reviewed 409 original UBS alternate Greek word heads (PRIVATE, NOT published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-409-explicit-bilingual-ubs-alternate-headwords-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload private Greek temporal word lexical headword review (NOT published)
         uses: actions/upload-artifact@v4
         with:
