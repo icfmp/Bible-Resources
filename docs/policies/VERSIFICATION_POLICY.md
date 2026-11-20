@@ -8,13 +8,13 @@ MT/Leningrad and French Calvin, Darby_fr and Segond, among others.
 Use the official **installed SWORD engine's actual supported registry** as
 the authority. Do not declare a new system simply because a different
 translation exists. Record and preserve each module's actual
-\`mods.d/*.conf\` \`Versification\` value; never infer it from its language,
+`mods.d/*.conf` `Versification` value; never infer it from its language,
 title or publisher.
 
 Official reference: https://wiki.crosswire.org/Alternate_Versification
 
-SWORD's tools include \`osis2mod -v11n\` for explicitly choosing a known
-versification and \`emptyvss\` for enumerating empty entries according to
+SWORD's tools include `osis2mod -v11n` for explicitly choosing a known
+versification and `emptyvss` for enumerating empty entries according to
 the module's own versification.
 
 **No silent reference remapping**: when a Bible and commentary use different
@@ -29,13 +29,15 @@ out-of-range verses (see CrossWire's documentation).
 
 ## Three different reasons a verse may be absent
 
-1. **Editorially intentional absence**: the actual translation/edition
-   deliberately omits a verse or moves it to the apparatus because of a
-   documented textual choice. Preserve the reference slot *if the module's
-   selected SWORD v11n includes that verse*, preserve the absence of body
-   text, and attach a **clearly attributed editorial note** explaining the
-   edition's decision. A note must be based on verifiable edition/source
-   evidence, not an invented explanation.
+1. **Editorially intentional absence**: the identified edition genuinely
+   omits numbered Scripture or places a discussion in its authorial apparatus.
+   Retain the exact source text and **any note that the edition actually
+   contains**. A slot exposed by SWORD's selected versification does not
+   authorize generating an OSIS verse element, a verse body, a footnote, or
+   commentary. If the project proposes a **separately identified editorial
+   explanation** for a derivative, that addition requires its own documented
+   source basis, rights, explicit review and independent checks; it must not
+   masquerade as the source edition's existing note.
 2. **Versification difference**: the passage is numbered or placed
    differently in another v11n. Record the mapping if verified, but **do not**
    create a bogus blank verse in the module or hide content to imitate a
@@ -48,16 +50,19 @@ out-of-range verses (see CrossWire's documentation).
 
 CrossWire documents that an actually empty first verse of a chapter may
 make some SWORD frontends unable to select that chapter. It suggests a
-minimal placeholder or an empty \`<seg/>\` as possible workarounds:
+minimal placeholder or an empty `<seg/>` as possible workarounds:
 https://wiki.crosswire.org/OSIS_Bibles#Empty_verses
 
-For Bible Resources, prefer a **semantic empty slot + separate editorial
-note**, not invented Scripture. The precise standard OSIS encoding and
-SWORD display behavior must be proven on an actual test module with
-\`osis2mod\`, \`emptyvss\`, \`diatheke\`, and the Bible GTK reader (including
+For Bible Resources, **preserve the absence of source-authored content**.
+A SWORD registry's addressable slot and an authorial OSIS verse are not
+equivalent. Any proposed non-text technical representation must be reviewed
+and proven not to create apparent Scripture or an authorial note. The precise
+standard OSIS encoding and SWORD display behavior must be proven on an actual
+test module with
+`osis2mod`, `emptyvss`, `diatheke`, and the Bible GTK reader (including
 the first verse of a chapter), **before** registering a production
 normalization rule. A visually empty verse may still have a deliberate
-structural marker. If \`<seg/>\` or an inline note is discarded or displays
+structural marker. If `<seg/>` or an inline note is discarded or displays
 incorrectly, block that transformation until a compatible encoding is
 verified. Do not ship a misleading literal ellipsis as Scripture.
 
@@ -65,11 +70,12 @@ verified. Do not ship a misleading literal ellipsis as Scripture.
 
 - Preserve the **actual** source reference, SWORD v11n, original text,
   translations, notes, Strong/morph and editor attributions.
-- Treat any \`emptyvss\` report as an **audit candidate**, never definitive
+- Treat any `emptyvss` report as an **audit candidate**, never definitive
   proof of a textual-critical decision.
 - For every confirmed intentional omission, record source edition, verse
-  reference, supporting evidence URL/page, exact editorial note text,
-  reviewer and chosen OSIS encoding.
+  reference, supporting evidence URL/page, whether an **original source
+  note actually exists**, reviewer and any independently reviewed technical
+  encoding. Never invent a source note to complete a report.
 - Verify by compiled-module round trip that the verse slot survives, the
   nearby verses are unchanged and the note remains attached to the
   correct location.
