@@ -18,6 +18,6 @@ The original directories contain actual source bytes and
 No original source should be mistaken for an edition's completed *cleaned*
 master, or for the published compiled SWORD module.
 
-[Workspace policy](../docs/WORKSPACE_LAYOUT.md) ·
-[Source-first editorial process](../docs/SOURCE_FIRST_EDITORIAL_PIPELINE.md) ·
-[Current resources](../docs/RESOURCE_WORKSPACE_INDEX.md).
+[Workspace policy](../docs/architecture/WORKSPACE_LAYOUT.md) ·
+[Source-first editorial process](../docs/PRODUCTION_PIPELINE.md) ·
+[Current resources](../docs/architecture/WORKSPACE_LAYOUT.md).
