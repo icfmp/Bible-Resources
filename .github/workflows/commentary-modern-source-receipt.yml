@@ -4518,13 +4518,140 @@ jobs:
                   "source_verified_editorial_destination":"Lev.23.24",
                   "real_GUI_markup_observations":observed,
                   "mouse_click_of_approved_destination_verified":False}
+          # This acceptance probes the actual Xiphos footnote-marker path, not a
+          # fabricated direct href. A mouse dispatch alone is never a PASS.
+          def actual_approved_note_click(env):
+              import subprocess,time,textwrap,re
+              from commentary_xiphos_dual_reader import (
+                  _main_xiphos_window,_x11,_seed_x11_clipboard,
+                  _optional_real_rich_xiphos_selection,_BoundedMarkupScanner)
+              from html import unescape
+              from urllib.parse import unquote
+              win=_main_xiphos_window(env)
+              if not win:
+                  return {"status":"REAL_APPROVED_NOTE_CLICK_NO_WINDOW"}
+              _x11(["xdotool","windowfocus",win],env)
+              # Check note markers actually exposed in the real selected GUI
+              # rich clipboard before attempting navigation.
+              html=[]
+              for x,y in ((850,370),(1000,520),(700,300)):
+                  _x11(["xdotool","mousemove",str(x),str(y)],env)
+                  _x11(["xdotool","click","1"],env)
+                  _seed_x11_clipboard(env)
+                  _x11(["xdotool","key","--clearmodifiers","ctrl+a"],env)
+                  _x11(["xdotool","key","--clearmodifiers","ctrl+c"],env)
+                  time.sleep(.4)
+                  rich=_optional_real_rich_xiphos_selection(env)
+                  if rich:
+                      parser=_BoundedMarkupScanner()
+                      parser.feed(rich.decode("utf-8",errors="replace"))
+                      html.extend(parser.anchor_destinations)
+              note_labels=sorted(set(
+                  " ".join(label.split()).casefold()
+                  for label,href in html if
+                  "type=x" in unquote(unescape(href)).casefold()
+                  or "shownote" in unquote(unescape(href)).casefold()))
+              if not note_labels:
+                  return {"status":"REAL_APPROVED_NOTE_MARKER_MISSING_IN_GUI_HTML",
+                          "actual_html_anchors":len(html)}
+              # Use the Xiphos application's private child session bus, as
+              # required by the previously validated existing-link click test.
+              probe_env=dict(env,NO_AT_BRIDGE="0",GTK_A11Y="1")
+              p=subprocess.run(["pgrep","-x","xiphos"],capture_output=True,
+                               text=True,timeout=4,check=False)
+              for pid in p.stdout.splitlines():
+                  if not pid.isdecimal(): continue
+                  try:
+                      parts=Path("/proc/"+pid+"/environ").read_bytes().split(b"\\0")
+                      address=next((v.split(b"=",1)[1] for v in parts
+                                     if v.startswith(b"DBUS_SESSION_BUS_ADDRESS=")),None)
+                      if address:
+                          probe_env["DBUS_SESSION_BUS_ADDRESS"]=address.decode()
+                          break
+                  except (OSError,UnicodeError): continue
+              script=textwrap.dedent("""
+                  import json,sys,re,time,subprocess,pyatspi
+                  names=set(json.loads(sys.argv[1]))
+                  desktop=pyatspi.Registry.getDesktop(0)
+                  def scan():
+                      stack=[desktop]; out=[]; selected=False; seen=0
+                      while stack and seen<3000:
+                          node=stack.pop();seen+=1
+                          try:
+                              role=node.getRoleName().lower()
+                              name=" ".join((node.name or "").split())
+                              if role=="link" and name.casefold() in names:
+                                  state=node.getState()
+                                  ext=node.queryComponent().getExtents(pyatspi.DESKTOP_COORDS)
+                                  showing=state.contains(pyatspi.STATE_SHOWING)
+                                  visible=state.contains(pyatspi.STATE_VISIBLE)
+                                  if visible and ext.width>0 and ext.height>0:
+                                      out.append((node,ext.x+ext.width//2,ext.y+ext.height//2,showing))
+                              if role in ("table cell","table row","list item"):
+                                  words=re.findall(r"[^\\W\\d_]+|\\d+",name.casefold())
+                                  for i,w in enumerate(words):
+                                      if w.startswith(("lev","lév")) and words[i+1:i+3]==["23","24"]:
+                                          if node.getState().contains(pyatspi.STATE_SELECTED):
+                                              selected=True
+                              stack.extend(node[i] for i in range(min(node.childCount,100)))
+                          except (LookupError,RuntimeError,AttributeError): continue
+                      return out,selected
+                  links,before=scan()
+                  result={"status":"REAL_APPROVED_NOTE_NAVIGATION_NOT_PROVEN",
+                          "source_note_labels_in_real_html":len(names),
+                          "real_matching_accessible_link_roles":len(links),
+                          "target_selected_before_click":before,
+                          "actual_x11_click_count":0,
+                          "target_selected_after_click":False}
+                  for node,x,y,showing in links[:12]:
+                      if not showing:
+                          try:
+                              node.queryComponent().scrollTo(pyatspi.SCROLL_ANYWHERE)
+                              time.sleep(.5)
+                              ext=node.queryComponent().getExtents(pyatspi.DESKTOP_COORDS)
+                              x,y=ext.x+ext.width//2,ext.y+ext.height//2
+                          except (LookupError,RuntimeError,AttributeError): continue
+                      if not (480<x<1280 and 0<y<800):continue
+                      moved=subprocess.run(["xdotool","mousemove",str(x),str(y)],
+                                            timeout=6,capture_output=True)
+                      if moved.returncode:continue
+                      time.sleep(.8)
+                      click=subprocess.run(["xdotool","click","1"],
+                                            timeout=6,capture_output=True)
+                      if click.returncode:continue
+                      result["actual_x11_click_count"]+=1
+                      time.sleep(1.2)
+                      _,after=scan()
+                      if after and not before:
+                          result["status"]="REAL_APPROVED_NOTE_TARGET_SELECTED_IN_SIDEBAR"
+                          result["target_selected_after_click"]=True
+                          break
+                  print(json.dumps(result,sort_keys=True))
+              """)
+              p=subprocess.run(["/usr/bin/python3","-c",script,
+                               json.dumps(note_labels)],env=probe_env,
+                               capture_output=True,text=True,timeout=65,check=False)
+              if p.returncode or len(p.stdout)>5000:
+                  return {"status":"REAL_APPROVED_NOTE_ATSPI_PROBE_FAILED"}
+              try:return json.loads(p.stdout)
+              except ValueError:return {"status":"REAL_APPROVED_NOTE_INVALID_PROBE_RECEIPT"}
+          def approved_gui_callbacks(env):
+              markup=actual_approved_citation_markup(env)
+              return {**markup,"approved_note_real_click":actual_approved_note_click(env)}
           obs=_run_real_gui(root,cases,seconds=25,
               commentary_module_id="MHCCMODAP",
-              on_gui_ready=actual_approved_citation_markup)
+              on_gui_ready=approved_gui_callbacks)
           found=obs.get("commentary_clipboard_match_by_passage",{})
           if (set(found)!=set(refs) or not all(found.values())
               or obs.get("actual_passage_commands_accepted") is not True):
               raise ValueError("Actual Xiphos did not prove approved modern excerpts")
+          note=obs.get("approved_note_real_click",{})
+          if (note.get("status")!="REAL_APPROVED_NOTE_TARGET_SELECTED_IN_SIDEBAR"
+                  or note.get("target_selected_before_click") is not False
+                  or note.get("target_selected_after_click") is not True
+                  or note.get("actual_x11_click_count",0)<1):
+              print("APPROVED_NOTE_CLICK_DIAGNOSTIC "+json.dumps(note,sort_keys=True))
+              raise ValueError("Approved Num 29:1 to Lev 23:24 note-marker click not proven")
           report={"status":"PRIVATE_APPROVED_EDITORIAL_XIPHOS_EXCERPTS_PASS",
               "module":"MHCCMODAP","pinned_bible":"BRLSG1910",
               "actual_GUI_matched":sum(found.values()),"requested_GUI_samples":len(refs),
