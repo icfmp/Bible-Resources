@@ -1,0 +1,34 @@
+# One-time validation dispatcher; removes itself before running checks.
+name: One-time full source-faithful documentation validation
+on:
+  push:
+    branches:
+      - docs/physical-taxonomy-layout-20261120
+    paths:
+      - '.github/workflows/final-proof-dispatch.yml'
+permissions:
+  contents: write
+  actions: write
+jobs:
+  verify-branch:
+    if: ${{ github.repository == 'icfmp/Bible-Resources' && github.ref == 'refs/heads/docs/physical-taxonomy-layout-20261120' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: true
+      - name: Dispatch complete tests on the cleaned exact branch tip
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -- .github/workflows/final-proof-dispatch.yml
+          git commit -m 'chore: remove one-time final verification dispatcher'
+          git push origin HEAD:refs/heads/docs/physical-taxonomy-layout-20261120
+          gh workflow run validate.yml --ref docs/physical-taxonomy-layout-20261120
+          gh workflow run tool-registry-maintenance.yml --ref docs/physical-taxonomy-layout-20261120

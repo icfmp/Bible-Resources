@@ -65,7 +65,7 @@ class BibleOnboardingWorkflowTests(unittest.TestCase):
         for term in (
             "single authoritative production process", "usfm/usfx",
             "original", "cleaned", "full native readback",
-            "original-source", "required evidence",
+            "source-to-cleaned", "required evidence",
         ):
             with self.subTest(canonical=term):
                 self.assertIn(term, canonical)
