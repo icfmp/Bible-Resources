@@ -13,10 +13,10 @@
 ## Evidence
 
 - [Original/cleaned stage manifest](../CLEANUP_MANIFEST.json)
-- [Darby reader profile](../../../../../docs/profiles/fr-darby-jnd-2024.md)
-- [0.1.1 release receipt](../../../../../docs/releases/DARBY-JND-2024-0.1.1.md)
-- [Historical stage-4 retrospective](../../../../../docs/DARBY_2024_IMPORT_POSTMORTEM.md)
-- [0.1.1 editorial authorization](../../../../../config/darby-0.1.1-release-authorization.json)
-- [Published provenance](../../../../../modules/darby-jnd-2024/RELEASE_PROVENANCE.json)
+- [Darby reader profile](../../../../../../docs/profiles/fr-darby-jnd-2024.md)
+- [0.1.1 release receipt](../../../../../../docs/releases/DARBY-JND-2024-0.1.1.md)
+- [Historical stage-4 retrospective](../../../../../../docs/DARBY_2024_IMPORT_POSTMORTEM.md)
+- [0.1.1 editorial authorization](../../../../../../config/darby-0.1.1-release-authorization.json)
+- [Published provenance](../../../../../../modules/darby-jnd-2024/RELEASE_PROVENANCE.json)
 
 **Status:** historical reviewed 0.1.1 source; no new editorial change authorized.
