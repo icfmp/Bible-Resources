@@ -8,11 +8,22 @@ An existing published SWORD module does not prove the cleaned editorial source
 has been preserved. Original publisher files belong under `../original/`;
 copyright and source rights must permit any public derivatives.
 
-No full cleaned OSIS/USFM master for the existing published resources has yet
-been committed at a canonical typed/language location. Historical MHC
-source-cleanup records are correctly archived under
-[`docs/evidence/mhc-285/source-cleanup/`](../../docs/evidence/mhc-285/source-cleanup/)
-and **must not be mistaken for a cleaned source file**.
+Three **actual, SHA-matching, recovered approved OSIS masters** are now
+committed under the required type/language/resource IDs:
+
+- [Darby 2024, French Bible 0.1.1](bibles/fr/darby-jnd-2024/bible_jnd_2_0.osis.xml)
+- [MHC Complete, English commentary 0.1.0](commentaries/en/mhc-crosswire/mhc.osis.xml)
+- [HMCC Modern, English commentary 0.1.0](commentaries/en/hmcc-modern/hmcc-modern.osis.xml)
+
+Every file includes an adjacent original/source-bound `CLEANUP_MANIFEST.json`
+and its SHA matches its existing, previously authorized release/source proof.
+The original unchanged witnesses are separate under `../original/`.
+The historical MHC cleanup reports remain under
+[`docs/evidence/mhc-285/source-cleanup/`](../../docs/evidence/mhc-285/source-cleanup/).
+
+**LSG 1910** and **original MHCC** remain unfilled because their exact
+published OSIS authoring/cleaned bytes have not yet been recovered. A
+currently compiled SWORD is not a substitute.
 
 For each real cleaned master, require a SHA-locked original, a reversible
 delta manifest, full text/structure/Strong/notes/reference parity, and a

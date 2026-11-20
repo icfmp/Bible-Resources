@@ -17,8 +17,9 @@ sources/
       en/
         mhc-crosswire/mhc.osis.xml
   cleaned/
-    bibles/<language>/<resource-id>/         # only after a vetted clean master exists
-    commentaries/<language>/<resource-id>/
+    bibles/fr/darby-jnd-2024/bible_jnd_2_0.osis.xml
+    commentaries/en/mhc-crosswire/mhc.osis.xml
+    commentaries/en/hmcc-modern/hmcc-modern.osis.xml
     dictionaries/<language>/<resource-id>/
     encyclopedias/<language>/<resource-id>/
     other/<language>/<resource-id>/
@@ -79,13 +80,19 @@ translation-note anchors. For commentaries, check authorial commentary bodies,
 paragraphs, introductions, section/range mapping and links. No manually edited
 SWORD data is used as an invented source.
 
-**At this stage, none of the already published modules has a newly committed,
-fully reconstructed clean OSIS/USFM master in these type/language folders.**
-The historical MHC source-cleanup *reports* were moved to
+**Recovered and committed** approved editorial masters as of 2026-11-20:
+- `sources/cleaned/bibles/fr/darby-jnd-2024/bible_jnd_2_0.osis.xml`
+  (version 0.1.1, exact source SHA `35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d`)
+- `sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml`
+  (version 0.1.0, exact source SHA `c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4`)
+- `sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml`
+  (version 0.1.0, exact source SHA `23f0872a67086d9f659bd96936ab63db63c8c7b8c10eb92e59537c3e6cf16189`)
+
+The historical MHC source-cleanup reports live under
 [`docs/evidence/mhc-285/source-cleanup/`](evidence/mhc-285/source-cleanup/),
-because an audit report is not the cleaned source itself. Maintaining the actual
-verified cleaned sources is a separate source reconstruction task, never
-inferred from a previous green SWORD release.
+not inside the clean source folder. LSG 1910 and original MHCC do **not** yet
+have exact-source-recovered OSIS masters here. Always distinguish a new
+equivalent-looking output from a byte-exact restored authoring source.
 
 ## Work, documentation, release outputs and compatibility
 
