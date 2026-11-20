@@ -911,3 +911,83 @@ publicly published resources in this phase. The next quality gate is
 targeted contextual editorial validation, with priority on the
 2,728 cases where original LN evidence is genuinely multi-valued
 and the high-volume particle/preposition families.
+
+
+## UBS Greek v1 — finalization policy and complete private original-word lookup
+
+**Editorial stopping decision (2026-11-20):** Do not force UBS Greek 1.0 to
+100% word-level sense coverage. Treat source-limited ambiguity as an
+acceptable, documented outcome. The lexical headword index is substantially
+complete, while a UBS contextual `LEXID` remains a provisional candidate
+unless it has undergone independent verse-context semantic validation.
+
+[The consolidated v1 builder](build_consolidated_v1_review_index.py)
+reproduces a complete **137,741-original-word-ID** lookup from pinned,
+separately source-verified artifacts. Its five *disjoint* provisional sense
+tiers are:
+
+| Original UBS/MACULA evidence tier | Original word IDs | Meaning |
+| --- | ---: | --- |
+| Unique UBS LEXID supported by original word's LN | 122,504 | Stronger source-backed provisional candidate |
+| Sole authentic UBS LEXID but source LN absent/mismatched | 170 | Weaker editorial default; preserve mismatch |
+| Distinct source-attested UBS Greek form within shared LN | 223 | Reversible form-based candidate |
+| One authentic UBS LEXID citing the word's verse and only one source-attested lexical headword there | 258 | Verse-citation-supported provisional candidate |
+| Unique authentic UBS source locator after independently calibrated MACULA ordinal | 40 | Lower-confidence locator-supported candidate |
+| **Total provisional unique UBS LEXID suggestions** | **123,195 (89.44%)** | **Not 123,195 independently validated contextual meanings** |
+
+The remaining **14,546** original words are *not* assigned an arbitrarily
+chosen contextual LEXID. The consolidated lookup instead offers:
+
+| Result | Original word IDs | Consumer behavior |
+| --- | ---: | --- |
+| `provisional_ubs_lexid` | 123,195 | Offer UBS entry and source-supported candidate; expose evidence tier and provisional status |
+| `ubs_entry_only` | 12,288 | Offer the source-supported UBS headword, no invented sense |
+| `ambiguous_ubs_senses` | 2,207 | Offer original source UBS LEXID candidates without a forced default |
+| `ambiguous_ubs_headwords` | 4 | Preserve alternative original UBS headword entries |
+| `missing_ubs_headword` | 47 | State that the pinned UBS edition lacks an approved match |
+| **Original Greek word inventory** | **137,741** | One record per original MACULA word ID |
+
+The original **137,694 / 137,741 (99.966%)** source-supported *lexical
+headword coverage* and the historical frozen [index.json](index.json) are
+unchanged. A lexical headword link does **not** imply that the dictionary
+edition contains an appropriate original sense ID; particularly, UBS 1.0
+has no original `LEXMeanings` for `εἰμί` and the correct handling is
+entry-only.
+
+The private v1 result uses:
+
+```python
+from pathlib import Path
+import json
+import runpy
+
+root = Path("entity-index/links/dictionaries/ubs-greek")
+lookup = runpy.run_path(str(root / "build_consolidated_v1_review_index.py"))["lookup"]
+candidate = json.loads(Path("/tmp/bsi-ubs-greek-v1-consolidated-original-word-index-PRIVATE.json").read_text())
+word = lookup(candidate, "n40001001003")
+# word["status"], word["ubs_main_ids"], word["provisional_ubs_lexid"],
+# word["ubs_lexid_candidates_from_original_ln"], word["evidence_tier"]
+```
+
+This is a **private research/provisional review artifact**, not the public
+runtime format. The complete original-word index is reproduced by the
+source-pinned GitHub Actions workflow with original UBS EN/FR Dictionary 1.0,
+MACULA SBLGNT, all previously reviewed word-specific source decisions and
+exact lexical evidence cross-checks. CI uploads it as an **expiring private
+14-day artifact**, not as a tagged release or public downloadable module.
+The original Greek, Strong, Louw–Nida, morphology, verses, and UBS
+dictionary definitions are never rewritten or bundled.
+
+**Licensing and release boundary:** UBS Greek Dictionary source is licensed
+CC BY-SA 4.0 (United Bible Societies); MACULA source is licensed CC BY 4.0
+(Clear.Bible). A later separately approved redistribution must preserve
+applicable attribution, license and share-alike obligations. The review
+index stores identifiers and original MACULA lexical witness metadata,
+**not UBS copyrighted definitions or verse text**. No Bible app integration,
+SWORD publication or public release is authorized merely by completing
+this audit.
+
+**Completion is not publication.** Once the full pinned-source tests pass,
+the v1 *research alignment* may be considered functionally finished with
+documented limits. Owners must separately authorize any public resource or
+downstream integration after rights and editorial acceptance review.
