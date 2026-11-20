@@ -156,7 +156,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/repair_osis_source_bytes.py`](../scripts/repair_osis_source_bytes.py) | UNDECIDED | named test | 10 | not determined |
 | [`scripts/repair_osis_unlinked_reference_labels.py`](../scripts/repair_osis_unlinked_reference_labels.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 12 | publication/release |
-| [`scripts/reviewed_modern_commentary_rebuild.py`](../scripts/reviewed_modern_commentary_rebuild.py) | UNDECIDED | not established | 1 | publication/release |
+| [`scripts/reviewed_modern_commentary_rebuild.py`](../scripts/reviewed_modern_commentary_rebuild.py) | UNDECIDED | named test | 2 | publication/release |
 | [`scripts/reviewed_osis_commentary_rebuild.py`](../scripts/reviewed_osis_commentary_rebuild.py) | UNDECIDED | not established | 1 | publication/release |
 | [`scripts/select_sources.py`](../scripts/select_sources.py) | UNDECIDED | not established | 5 | not determined |
 | [`scripts/smoke.py`](../scripts/smoke.py) | UNDECIDED | named test | 11 | not determined |
@@ -199,7 +199,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/sword_native_raw_entry.cpp`](../scripts/sword_native_raw_entry.cpp) | UNDECIDED | not established | 7 | not determined |
 | [`scripts/tool_registry.py`](../scripts/tool_registry.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/usfx_schema_gate.py`](../scripts/usfx_schema_gate.py) | UNDECIDED | named test | 3 | not determined |
-| [`scripts/validate.py`](../scripts/validate.py) | KEEP_GENERIC | not established | 27 | not determined |
+| [`scripts/validate.py`](../scripts/validate.py) | KEEP_GENERIC | not established | 28 | not determined |
 | [`scripts/verify_public_catalogue.py`](../scripts/verify_public_catalogue.py) | KEEP_GENERIC | named test | 5 | not determined |
 
 ## Safeguards and next steps
