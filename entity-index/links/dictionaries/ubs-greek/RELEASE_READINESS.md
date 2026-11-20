@@ -96,3 +96,52 @@ If the project chooses to retain an internal research resource indefinitely,
 rebuild the ephemeral output from the pinned source revisions and archive it
 in a private controlled location through a separately reviewed workflow.
 Do not silently make private GitHub Actions artifacts public.
+
+
+## Approved narrow distribution — identifier-only crosswalk v0.1.0
+
+On 2026-11-20 the project owner agreed to proceed with publication of the
+completed UBS Greek word index, subject to rights clearance. The selected
+**narrow public candidate** is a standalone ZIP under the release tag
+`bsi-ubs-greek-v0.1.0`, *not* an SWORD dictionary or Bible app integration.
+
+Its exact exported schema is enforced by
+[the public allowlist builder](build_public_identifier_release.py).
+Only these original MACULA word IDs and UBS identifiers/status fields may
+be exported:
+
+| Public field | Exact semantics | Rights/source risk handling |
+| --- | --- | --- |
+| `by_word_id` JSON object key | Pinned MACULA original word identifier | Attribution to Biblica/MACULA; no copied Greek text |
+| `entry_ids` | List of source-authentic UBS MainId identifiers | Attribution to UBS and its CC BY-SA 4.0 source |
+| `provisional_lexid` | Optional source UBS LEXID | Always explicitly provisional, not an independent interpretation |
+| `candidate_lexids` | Authentic source UBS sense identifiers originally consistent with source LN, not definitions | Identifiers only; original LN values/annotations omitted |
+| `status` | Project's transparent editorial confidence/fallback classification | Original project editorial metadata |
+| `evidence_tier` | Which of five source-checked evidence procedures supported a proposal | Original project editorial metadata |
+
+Top-level output contains only schema/version, original upstream source
+commit identifiers, the license, an explicit non-verified semantics flag,
+counts, and the above mapping. **No original MACULA `ln`/`domain`
+values**, no Greek biblical word text, lemma, morphology, Strong annotation,
+verse passage text, English/Chinese gloss, UBS meanings/definitions, UBS
+original prose, or Scripture reference lists appear in the publication.
+The source data used internally for matching is not distributed.
+
+The published index's new editorial selection/arrangement is offered
+under **CC BY-SA 4.0**, with UBS's CC BY-SA 4.0 and MACULA's CC BY 4.0
+source attribution, upstream original license links, authors, original
+version locks, explicit change notice, and notice that MACULA contains
+third-party materials **not included in this release**.
+
+The public release builder is deterministic and is run against the
+independently validated private 137,741-word source index. CI checks
+all five evidence tiers, all 137,741 word IDs, checksum, ZIP contents,
+file allowlists and absence of the original annotation fields. A public
+GitHub Release can be generated **only from a successful source-pinned
+workflow run on protected `main`**, with repository write scope isolated
+to the publisher job. No PR or failed source workflow can publish.
+
+This is a narrowly scoped owner-authorized release of an identifier-only
+**derived index**, not a grant to republish MACULA's underlying UBS MARBLE
+semantic annotations or UBS dictionary text. Broader public data exports,
+SWORD packaging and application integration require fresh review.
