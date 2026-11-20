@@ -30,7 +30,7 @@ application display bugs.
 
 For **translation or modern-English modernization only**, start with the accepted
 structured source and follow [Translation from an accepted clean source](
-COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md). This dedicated procedure covers
+../../docs/workflows/COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md). This dedicated procedure covers
 semantic fidelity and relocating each existing citation/link to the corresponding
 translated words or editorial element. **Do not repeat acquisition, source
 repair, original-link correction or whole upstream reconstruction.** The
