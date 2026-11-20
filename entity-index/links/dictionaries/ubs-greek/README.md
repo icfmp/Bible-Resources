@@ -808,3 +808,61 @@ not a claim that the 47 Greek words lack meaning, nor that another
 independent lexicon cannot authoritatively establish a match. The
 candidate remains private and unpublished, with the original
 index and source text unchanged.
+
+## Contextual UBS Greek LEXID source-candidate phase (private, provisional)
+
+The [independent original-word sense census](audit_contextual_sense_candidates.py)
+reopens **all 137,741 original MACULA SBLGNT Greek word IDs** using the
+pinned UBS Greek v1.0 English/French `MainId`, `LEXID`, and
+`LEXEntryCode` inventories. It preserves every authentic word's
+original Greek spelling, Strong, Louw–Nida code(s), morphology,
+part-of-speech class, reference and immutable word ID. Every
+word's lexeme is drawn from the already reviewed lexical headword
+overlay or original untouched Strong crosswalk. Bilingual source
+identifiers agree exactly; original UBS senses with **blank LN
+codes** remain original source senses but cannot be used as
+word-specific LN evidence.
+
+The fully source-pinned corpus audit classifies original words as:
+
+| Original-word semantic **candidate** disposition | Count |
+| --- | ---: |
+| Exactly **one** source-attested UBS LEXID under the supported headword, with matching original word LN code | **122,504** |
+| More than one original UBS LEXID under a supported headword and original word LN code(s) | **2,728** |
+| No original MACULA LN code matching a UBS sense under the supported headword | **12,458** |
+| No source-supported UBS Greek 1.0 headword | **47** |
+| Original Strong still offers multiple unresolved UBS headwords | **4** |
+| **Total original SBLGNT Greek word IDs** | **137,741** |
+
+The [private, reversible provisional candidate builder](build_provisional_context_sense_overlay.py)
+regenerates two separate ephemeral artifacts. One maps each of the
+**122,504** original word IDs to its single authentic UBS Greek
+`MainId` and `LEXID`, with individual original word-ID
+`LEXEntryCode`/Louw–Nida witnesses and status
+`PROVISIONAL_unique_original_source_attested_LN_and_UBS_LEXID_NOT_contextually_verified`.
+The other retains **all 15,237** original unresolved word IDs, authentic
+source code and available UBS candidates, and grouped priorities for
+independent editorial decisions. Neither artifact modifies the
+historical `index.json`, the 9,604 reviewed lexical headword overlays,
+the MACULA corpus, the UBS original dictionary or the Bible app.
+
+**Crucial distinction:** uniqueness in the original UBS lexeme/LN
+intersection establishes a **particularly strong source-supported
+candidate**, not independently proven correctness of the
+Greek contextual meaning in its verse. These 122,504 private candidates
+are *provisional editorial choices*, **not 122,504 independently
+validated interpretations**. They may be promoted only under a
+documented contextual verification policy and targeted spot-checks.
+The 2,728 ambiguous sense candidates are preserved without choosing
+a particular `LEXID` merely to increase coverage. The 12,458
+original LN mismatches must be triaged into missing original
+source annotation, independent source system differences or genuinely
+non-corresponding senses, **never resolved by inventing LN codes**.
+The remaining 47 source-unsupported headwords and four original
+Strong ambiguities retain their previously documented status.
+
+All semantic overlays are **private, reversible, source-pinned
+14-day GitHub Actions artifacts**. There is **no public SWORD
+publication, no contextual-sense validation claim, and no redistribution
+of UBS definition texts**. Later publication still requires the
+project owner's separate release authorization and license validation.
