@@ -3296,6 +3296,50 @@
       "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
+        "OSIS",
+        "USFM",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/historical/lsg/lsg_sword_compare.py",
+      "proposed_action": "Retain runnable historical evidence; extract shared algorithms only after byte-equivalence tests.",
+      "purpose_first_line": "Compare scoped SWORD chapter output against its eBible USFX authored text.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "json",
+        "lsg_source_compare",
+        "lxml",
+        "pathlib",
+        "pilot_preflight",
+        "pilot_subprocess",
+        "re",
+        "shutil",
+        "sys",
+        "tempfile",
+        "unicodedata",
+        "zipfile"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "00e5f9423fc68989470bb5ffe0e24acd258ce1e6a9e7e8d6bbaec2e4460c1a51",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "source/native audit",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/lsg-fidelity.yml",
+        "tests/test_lsg_sword_compare.py"
+      ]
+    },
+    {
+      "classification": "HISTORICAL/ARCHIVE",
+      "confidence": "medium",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
         "RawText",
         "OSIS",
         "USFX"
@@ -3418,57 +3462,14 @@
       "static_references": [
         "scripts/bible_stage_runner.py",
         "scripts/fast_stock_note_probe.py",
+        "scripts/historical/lsg/lsg_sword_compare.py",
         "scripts/historical/lsg/probe_lsg_v11n.py",
-        "scripts/lsg_sword_compare.py",
         "scripts/publisher_osis_usfx_parity.py",
         "scripts/real_second_bible_probe.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/sword_missing_verse_witness.py",
         ".github/workflows/lsg-fidelity.yml",
         "tests/test_lsg_source_compare.py"
-      ]
-    },
-    {
-      "classification": "HISTORICAL/ARCHIVE",
-      "confidence": "medium",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "OSIS",
-        "USFM",
-        "USFX"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/lsg_sword_compare.py",
-      "proposed_action": "Retain runnable historical evidence; extract shared algorithms only after byte-equivalence tests.",
-      "purpose_first_line": "Compare scoped SWORD chapter output against its eBible USFX authored text.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "collections",
-        "hashlib",
-        "json",
-        "lsg_source_compare",
-        "lxml",
-        "pathlib",
-        "pilot_preflight",
-        "pilot_subprocess",
-        "re",
-        "shutil",
-        "tempfile",
-        "unicodedata",
-        "zipfile"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "84e77c0748796f6171e5792d043b82094beae860aa71b0efa7f1472d8f737c56",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/lsg-fidelity.yml",
-        "tests/test_lsg_sword_compare.py"
       ]
     },
     {
@@ -3992,9 +3993,9 @@
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/commentary_xiphos_heading_probe.py",
         "scripts/commentary_xml_witness.py",
+        "scripts/historical/lsg/lsg_sword_compare.py",
         "scripts/historical/lsg/probe_lsg_v11n.py",
         "scripts/lsg_source_compare.py",
-        "scripts/lsg_sword_compare.py",
         "scripts/pilot_fetch.py",
         "scripts/pilot_runtime.py",
         "scripts/pilot_subprocess.py",
@@ -4121,8 +4122,8 @@
         "scripts/commentary_stock_candidate.py",
         "scripts/commentary_stock_xiphos_smoke.py",
         "scripts/commentary_xiphos_dual_reader.py",
+        "scripts/historical/lsg/lsg_sword_compare.py",
         "scripts/historical/lsg/probe_lsg_v11n.py",
-        "scripts/lsg_sword_compare.py",
         "scripts/pilot_runtime.py",
         "scripts/private_sword_bundle.py",
         ".github/workflows/commentary-mhc-technical-rebuild.yml",

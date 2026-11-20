@@ -105,10 +105,10 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/fetch_reviewed_schema.py`](../scripts/fetch_reviewed_schema.py) | UNDECIDED | not established | 11 | not determined |
 | [`scripts/guard_commentary.py`](../scripts/guard_commentary.py) | KEEP_GENERIC | not established | 6 | not determined |
 | [`scripts/guard_osis.py`](../scripts/guard_osis.py) | KEEP_GENERIC | named test | 18 | not determined |
+| [`scripts/historical/lsg/lsg_sword_compare.py`](../scripts/historical/lsg/lsg_sword_compare.py) | HISTORICAL/ARCHIVE | named test | 2 | source/native audit |
 | [`scripts/historical/lsg/probe_lsg_v11n.py`](../scripts/historical/lsg/probe_lsg_v11n.py) | HISTORICAL/ARCHIVE | not established | 2 | source/native audit |
 | [`scripts/inspect_paragraph_rendering.py`](../scripts/inspect_paragraph_rendering.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/lsg_source_compare.py`](../scripts/lsg_source_compare.py) | HISTORICAL/ARCHIVE | named test | 10 | source/native audit |
-| [`scripts/lsg_sword_compare.py`](../scripts/lsg_sword_compare.py) | HISTORICAL/ARCHIVE | named test | 2 | source/native audit |
 | [`scripts/maintext_fidelity_classification.py`](../scripts/maintext_fidelity_classification.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/maintext_whitespace_patterns.py`](../scripts/maintext_whitespace_patterns.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/materialize_attested_lsg_release.py`](../scripts/materialize_attested_lsg_release.py) | HISTORICAL/ARCHIVE | named test | 1 | publication/release |

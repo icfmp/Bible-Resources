@@ -1,5 +1,11 @@
 # Louis Segond historical research probes
 
+## Full text diagnostic (historical)
+
+- [LSG authored USFX ↔ SWORD comparison](lsg_sword_compare.py) compares source verses to SWORD reader output without modifying or releasing either resource.
+- [Historical fidelity CI](../../../.github/workflows/lsg-fidelity.yml) and [regression test](../../../tests/test_lsg_sword_compare.py) invoke this tool from its nested location.
+- **Status:** retained for reproduction and LSG research; not a general importer or release approval.
+
 ## Synthetic versification probe
 
 - Entrypoint: [`probe_lsg_v11n.py`](probe_lsg_v11n.py)
