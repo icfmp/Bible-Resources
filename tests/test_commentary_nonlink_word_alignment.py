@@ -11,7 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
 from commentary_nonlink_word_alignment import plain_word_alignment
-from commentary_chapter_paragraph_overlap import longest_common_contiguous_word_run
+from research.commentary.commentary_chapter_paragraph_overlap import longest_common_contiguous_word_run
 from commentary_text_delta import longest_contiguous_token_run
 from commentary_private_text_compare import _original_source_markers, compare_private_texts
 from pilot_preflight import PilotError
