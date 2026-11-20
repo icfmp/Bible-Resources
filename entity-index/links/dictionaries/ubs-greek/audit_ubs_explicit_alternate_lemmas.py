@@ -53,6 +53,9 @@ def audit(report,english,french):
         lemma=family["original_lemma"]
         candidates=sorted(set(by_alternate.get(nfc(lemma),[])))
         source_original_ids=family["original_word_ids"]
+        original_witnesses=family["original_word_witnesses"]
+        if {w["original_word_id"] for w in original_witnesses}!=set(source_original_ids):
+            raise ValueError("Original Greek UBS alternate lexical word ID witness inventory incomplete")
         if len(source_original_ids)!=family["original_words"] or set(source_original_ids)&source_word_ids:
             raise ValueError("Duplicate or incomplete Greek original word-ID source witness")
         source_word_ids.update(source_original_ids)
@@ -68,6 +71,8 @@ def audit(report,english,french):
                 "ubs_original_headword_fr":f["Lemma"],
                 "ubs_original_alternate_lemma_nfc":lemma,
                 "original_ln_domain_overlap":shared,
+                "original_word_ids_with_bilingual_source_ln":[w["original_word_id"] for w in original_witnesses if set(w["original_ln"].split()) & source_ln(e) & source_ln(f)],
+                "original_word_ids_without_bilingual_source_ln":[w["original_word_id"] for w in original_witnesses if not (set(w["original_ln"].split()) & source_ln(e) & source_ln(f))],
                 "original_ubs_pos_en":source_pos(e),
                 "original_ubs_pos_fr":source_pos(f),
                 "original_ubs_strong_codes_distinct_from_macula":e.get("StrongCodes") or [],
@@ -83,6 +88,7 @@ def audit(report,english,french):
             "source_original_strong":family["original_strong"],
             "source_original_word_count":family["original_words"],
             "source_original_word_ids":source_original_ids,
+            "source_original_word_witnesses":original_witnesses,
             "source_original_ln_counts":family["original_ln_counts"],
             "source_original_class_counts":family["original_class_counts"],
             "original_ubs_explicit_alternate_headwords":entries,
