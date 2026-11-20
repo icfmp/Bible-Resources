@@ -27,12 +27,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Remove this temporary workflow from Git's index before inventory
+          # generation, so it does not become a phantom static caller.
+          git rm -- .github/workflows/registry-sync-once.yml
           python scripts/tool_registry.py --write
           python scripts/tool_registry.py --check
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
-          git rm -- .github/workflows/registry-sync-once.yml
+          # Generated reports are intentionally under an ignored directory.
+          git add -f -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
           git commit -m 'chore: regenerate tool registry after documentation reorganization'
           git push origin HEAD:refs/heads/docs/physical-taxonomy-layout-20261120
       - name: Run final read-only validation on the reconciled tip
