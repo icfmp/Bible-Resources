@@ -21,4 +21,6 @@ The source-hash-bound, reversible corrections comprise **11 inert emphasis tags*
 | Specific source cleanup details | [Reviewed changes](evidence/source-cleanup/CHANGES.md) |
 | Historical investigation and blocked early candidates | `evidence/` — consult only for a specific contested anomaly |
 
+**Open, distinct research:** [issue #295](https://github.com/icfmp/Bible-Resources/issues/295) concerns exceptional original-authoring-OSIS versus stock/native scope and independent CCEL/print witnesses. Its case-specific source investigations remain under `evidence/` because they may still support or refute a future *separately authorized* editorial correction. They are **not** part of the accepted 0.1.0 correction set.
+
 **Current release status belongs to the final release receipt**, not dated private pre-release or `DRAFT` files.
