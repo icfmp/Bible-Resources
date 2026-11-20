@@ -1,5 +1,7 @@
 # Source-first editorial production: OSIS/USFM → SWORD
 
+**Operational entry point:** [Production pipeline — OSIS/USFM → cleanup → full verification → SWORD → readers → publication](PRODUCTION_PIPELINE.md). This page remains the underlying six-phase editorial policy; the new companion specifies per-step evidence and failure gates. [Documentation index](README.md).
+
 **Status:** project-wide editorial production policy, adopted 2026-11-19.
 **Scope:** Bibles, commentaries and other compatible resources, subject to their
 specific formats and legal rights.
