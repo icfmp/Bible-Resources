@@ -1,0 +1,35 @@
+name: Inspect pinned HMCC source artifact for exact cleaned OSIS recovery
+on:
+  push:
+    branches: [recovery/approved-clean-osis-20261120]
+    paths: [.github/workflows/inspect-hmcc-source-recovery.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch exact pinned existing approved QA artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/hmcc-recovery"
+          gh run download 44695710957 --repo "$GITHUB_REPOSITORY" -n hmcc-modern-owner-manual-qa -D "$RUNNER_TEMP/hmcc-recovery"
+      - name: Show only filenames, sizes and hashes; never print source text
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"hmcc-recovery"
+          files=sorted(p for p in root.rglob("*") if p.is_file())
+          print("Artifact files:",len(files))
+          for p in files:
+              print(str(p.relative_to(root)),p.stat().st_size,hashlib.sha256(p.read_bytes()).hexdigest())
+          cfg=json.loads(Path("config/commentary-rebuilds/hmcc-modern.json").read_text())
+          print("Expected approved OSIS",cfg["source_approved_osis_sha256"])
+          print("Expected source archive",cfg["source_archive_sha256"],cfg["source_archive_size_bytes"])
+          PY
