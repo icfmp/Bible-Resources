@@ -83,7 +83,7 @@ Reader samples supplement, **never replace**, exhaustive native parity. Do not m
 
 Before publication, record evidence of rights and editorial approval, source lineage, completed/blocked checks, unresolved exceptions, exact module version and proposed release URLs. A reviewer must be able to reproduce outputs from the pinned original and scripts; keep prior versions and proof receipts. Publish only through the repository's existing verified **versioned GitHub Release before Pages catalogue** protocol. Download the public artifacts and independently compare sizes/hashes against the approved release receipts. Do not silently overwrite published bytes or claim publication from a merely staged private artifact.
 
-**Required evidence:** signed-off version manifest, successful required checks, immutable release receipts, live-download parity, updated catalogue and release documentation. See [publishing](workflows/PUBLISHING.md), [catalogue update protocol](workflows/CATALOGUE_UPDATE_PROTOCOL.md), and [releases](releases).
+**Required evidence:** signed-off version manifest, successful required checks, immutable release receipts, live-download parity, updated catalogue and release documentation. See [publishing](workflows/PUBLISHING.md), [catalogue update protocol](workflows/CATALOGUE_UPDATE_PROTOCOL.md), and [releases](../sources/cleaned/bibles/fr/darby-jnd-2024/editorial/releases).
 
 ## Mandatory evidence record for every resource
 

@@ -99,8 +99,8 @@ Before stage-5 acceptance, record both **machine-complete source/native
 fidelity** and **owner editorial acceptance** as separate decisions. A
 diagnostic triage, draft publisher report, or sample GUI click cannot
 approve a distribution or automatically waive known non-navigable source links.
-See the [BPC Darby stage-5 case study](../evidence/frajnd-2024-stage5-editorial-review.md)
-and its [unsubmitted upstream report](../evidence/frajnd-2024-upstream-link-report-draft.md).
+See the [BPC Darby stage-5 case study](../../sources/cleaned/bibles/fr/darby-jnd-2024/editorial/evidence/frajnd-2024-stage5-editorial-review.md)
+and its [unsubmitted upstream report](../../sources/cleaned/bibles/fr/darby-jnd-2024/editorial/evidence/frajnd-2024-upstream-link-report-draft.md).
 
 For an already satisfactory **official SWORD module**, stage 3's conversion
 and stage 4's rebuilding can be **N/A** if justified by a verifiable

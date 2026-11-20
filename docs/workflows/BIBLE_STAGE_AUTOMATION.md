@@ -2,7 +2,7 @@
 
 **Current operator quick guide.** The full [source-first production contract](../PRODUCTION_PIPELINE.md) governs original OSIS/USFM preservation, cleanup, full validation, SWORD compilation and publication. Use the [Bible seven-stage workflow](BIBLE_7_STAGE_WORKFLOW.md) for the required checkpoints. This automation **collects read-only evidence**; it does not clean, approve, compile or publish an edition.
 
-The original detailed WEBP research and stage-4/5 diagnostic investigations have been preserved, without deleting their evidence, in the [historical technical research appendix](../archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md). That appendix documents experiments and limitations, not additional mandatory procedures.
+The original detailed WEBP research and stage-4/5 diagnostic investigations have been preserved, without deleting their evidence, in the [historical technical research appendix](../../history/pipeline/BIBLE_STAGE_AUTOMATION_RESEARCH.md). That appendix documents experiments and limitations, not additional mandatory procedures.
 
 ## Prepare the reviewed intake manifest
 
@@ -48,6 +48,6 @@ Stage 1 does not fetch source archives. Later stages perform pinned archive chec
 
 Store the exact commit, pinned source hash, run URL, report summary, pending decisions and next stage in the corresponding GitHub issue. Revalidate the manifest and source pins before replaying a previously completed stage, and **never** tick a stage as complete solely because a diagnostic run finished.
 
-Stage-4 diagnostics of paragraph topology, overlap, whitespace, notes, verse positions, structural milestones and original-vs-compiled native metadata require their own semantic interpretation. See the [full historical diagnostic appendix](../archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md) for accumulated research and limitations; do not silently repair publisher text or change versification to satisfy an individual probe.
+Stage-4 diagnostics of paragraph topology, overlap, whitespace, notes, verse positions, structural milestones and original-vs-compiled native metadata require their own semantic interpretation. See the [full historical diagnostic appendix](../../history/pipeline/BIBLE_STAGE_AUTOMATION_RESEARCH.md) for accumulated research and limitations; do not silently repair publisher text or change versification to satisfy an individual probe.
 
 **Publication boundary:** these Actions do not approve rights, source transformations, native content equivalence, real reader compatibility or a public release. See [publishing](PUBLISHING.md) and the [production contract](../PRODUCTION_PIPELINE.md).

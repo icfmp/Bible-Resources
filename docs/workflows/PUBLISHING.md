@@ -48,7 +48,7 @@ it **does not itself execute libSWORD or authenticate a human signature**.
 Prior to editorial approval, independently regenerate and review the complete
 native comparison from the SHA-pinned source and real candidate, and confirm
 the GitHub authorization record genuinely comes from the project owner.
-See [generic proof contract](../evidence/mhcc-274/rebuilt-commentary-validation-contract.md).
+See [generic proof contract](../../sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/rebuilt-commentary-validation-contract.md).
 A synthetic passing unit test does not authorize publication.
 
 ## Upgrading an approved resource, including a changed SWORD identifier
@@ -89,8 +89,8 @@ not serve as authorization on their own.
   Bible Resources SWORD ID therefore collides with the original provider;
   any client-side choice/replacement must be intentional. An old
   `BRMHCC` installation can remain installed alongside it. The
-  [source/rights record](../evidence/mhcc-274/mhcc-0.1.1-editorial-rights-acceptance.md)
-  and [public release notes](../releases/MHCC-0.1.1.md) explain this boundary.
+  [source/rights record](../../sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/mhcc-0.1.1-editorial-rights-acceptance.md)
+  and [public release notes](../../sources/cleaned/commentaries/en/mhcc-crosswire/editorial/releases/MHCC-0.1.1.md) explain this boundary.
 
 An optional public reader-description profile is **specific to the exact
 edition, version, source and SWORD identifier**. Never reuse an approval
