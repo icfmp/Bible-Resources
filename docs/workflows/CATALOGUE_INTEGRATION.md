@@ -193,11 +193,9 @@ try:
 
     if size != expected_size or digest.hexdigest() != expected_sha:
         raise ValueError("Download failed integrity verification")
-    # This is an example staging operation, NOT a complete secure installer.
-    # Production clients also need exclusive final-file creation and ZIP checks.
-    if destination.exists():
-        raise FileExistsError("Destination appeared during download")
-    os.replace(temporary, destination)
+    # Linux/POSIX: create destination exclusively, without overwriting.
+    # Same-directory hard linking fails if the destination already exists.
+    os.link(temporary, destination)
     temporary = None
     print("Verified download:", destination)
 finally:
@@ -205,7 +203,7 @@ finally:
         temporary.unlink(missing_ok=True)
 ```
 
-This intentionally stops **before archive safety checks, extraction or installation**. A production client must additionally use exclusive final-file creation (not rely on the example's existence check), enforce a maximum allowed package size independently of untrusted catalogue data, verify ZIP members and module metadata, and preserve installed resources until a checked replacement is ready.
+This intentionally stops **before archive safety checks, extraction or installation**. A production client must additionally use an independent download-size ceiling (not trust the catalogue as the only limit), verify ZIP members and module metadata, and preserve installed resources until a checked replacement is ready. The exclusive final-file step shown uses POSIX hard links; clients on other platforms need an equivalently safe staging operation.
 
 ## 5. Alternatively use the standard SWORD repository
 
