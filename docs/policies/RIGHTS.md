@@ -1,99 +1,27 @@
 # Rights and provenance
 
-Each individual edition requires independent permission evidence for redistribution,
-and separately for derivatives. The right to download a CrossWire module does
-**not** necessarily imply the right to mirror, modify, or relicense it. No
-statement inside an unverified user archive is sufficient by itself. No
-unapproved or restricted payload may be committed. Record the upstream provider,
-exact edition/version, licence claim, evidence URL and review decision.
+**Every resource is reviewed independently.** An original work being public domain does not automatically license a particular digitization, translation, modern edition, notes, imagery, typesetting or curated enrichment. The ability to download an upstream SWORD module is not, by itself, authorization to mirror, modify or redistribute it.
 
-## Maximally permissive distribution — owner policy, 2026-11-14
+## Rights evidence required for every edition
 
-The project owner prefers the most permissive Creative Commons option for
-**new non-software materials for which Bible Resources owns or controls the
-relevant copyright and database rights**. Prefer **[CC0 1.0 Universal](
-https://creativecommons.org/publicdomain/zero/1.0/)** (a public-domain
-dedication / rights waiver, rather than a conventional Creative Commons
-licence), where contributors have consented to it and the project has the
-authority to apply it. CC0 does not cancel third-party rights or eliminate
-mandatory moral rights in jurisdictions where they cannot be waived.
+Record the exact author/work/edition, upstream provider, original source URL and SHA-256, upstream distribution statement, attribution, rights for **each component** (text, annotations, enrichments, compiled package), rights for transformations or derivatives, scope of approved redistribution and the person approving it. Preserve an exact copy or permanent reference to the original license evidence.
 
-**Do not put a blanket CC0 declaration on the repository or existing
-third-party modules.** The project's code, scripts and existing repository
-documentation currently use **GPL-3.0-or-later**, as stated in the root
-`COPYING` and README. These rights do not change automatically because of
-the owner's preferred resource-licensing policy. Review any future
-documentation relicensing separately, with the actual copyright holders.
+Do not commit third-party source files when redistribution is uncertain; retain controlled evidence instead. If the rights for the requested publication remain ambiguous, leave the resource blocked. A public-domain claim in a module's `.conf` is evidence of that *provider's claim for that module*, not a blanket license for an unrelated transcription.
 
-For third-party source texts, digitizations, annotations, dictionaries,
-translations and compiled SWORD resources:
+## Project contribution licensing
 
-1. **Keep each original upstream licence or public-domain declaration** in
-   its module metadata and SWORD `.conf`. A curator cannot unilaterally
-   relicense another party's protected contribution.
-2. Preserve specific source attribution, version and digital-edition
-   provenance even when the upstream declares the work public domain.
-3. Where Bible Resources adds its *own* separately copyrightable metadata,
-   explanatory text or enrichment, mark **only that contribution** CC0
-   when the project has the rights to do so; identify other components
-   separately. If the upstream imposes requirements, those still apply.
-4. Do not treat a module's public-domain declaration as proof that
-   an independently obtained alternate digital transcription, modern
-   translation, new editorial notes or added illustrations are also
-   freely redistributable.
-5. Record evidence and sign-off per published resource. No choice of
-   Creative Commons instrument substitutes for source-specific rights review.
+For **new, independently copyrightable non-software materials controlled by Bible Resources**, the owner's preference is the most permissive option: [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) where the project and contributors have authority to use it. CC0 does not remove third-party rights or nonwaivable moral rights.
 
-## CrossWire MHCC 2.0 (original compiled stock)
+**Do not apply CC0 to the entire repository or to upstream content.** Existing code, scripts and repository documentation remain subject to their actual recorded licenses (see root `COPYING`). Retain the original upstream license and attribution in source provenance and SWORD `.conf`, and distinguish any separately licensed project enrichment.
 
-The official [CrossWire MHCC module record](
-https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC) and its
-independently verified original SWORD `.conf` declare
-**`Public Domain` / `Copy Freely`** for the exact CrossWire module.
-Retain **`DistributionLicense=Public Domain`** in any curated SWORD
-configuration, with CrossWire attribution and original release identity.
+## Independent witnesses
 
-The proposed curated module `BRMHCC` does **not** claim that CrossWire's
-own text, compiled payload or prior editorial corrections have been newly
-licensed under CC0 by Bible Resources. Any optional, original Bible
-Resources descriptions should be marked CC0 only when authorized. The
-different CCEL transcription is excluded from the compiled module release.
+A second edition or electronic transcription may help establish whether a specific error is present, but may carry its own protected editorial layer. Do not import its corrected text, annotations or scanned/digitized formatting into a public module without separately establishing permission. Attribution does not substitute for permission.
 
-### CrossWire source versus independently digitized CCEL material
+The edition-specific CrossWire MHCC / CCEL rights assessments, corrections, provider declarations and publication decisions are kept with [the MHCC editorial records](../../sources/cleaned/commentaries/en/mhcc-crosswire/editorial/), **not** in this generic policy. The same rule applies to all future editions.
 
-The actual, SHA-256-pinned source for the planned rebuilt BRMHCC edition is
-the **CrossWire MHCC 2.0 module**, whose [official module page](
-https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC) declares
-**Public Domain — Copy Freely**. This is an original-provider claim for
-that exact digital module, not a project-issued CC0 licence or proof of a
-particular historic printed edition.
+## Publication gate
 
-The separately digitized CCEL witness may help corroborate an isolated
-source error, but its **own files and editorial layers are not the release
-source**. In particular, the [CCEL Concise Commentary PDF](
-https://ccel.org/ccel/h/henry/mhcc/cache/mhcc.pdf) expressly claims
-copyright in its *PDF file* and limits copying to unmodified,
-noncommercial uses without separate permission. That statement does
-**not** determine the copyright status of Henry's original work or of
-every CCEL export. It is reason not to assume unrestricted rights over
-an independent digitization, layout or set of annotations.
+No publication without source identity, original/licensing proofs, reviewer acceptance, validated source fidelity, verified package metadata and explicit release authorization. A green CI run or a registered public-domain work does not waive these requirements.
 
-For BRMHCC 0.1.1, keep the original CrossWire licence wording, attribution
-and archived hash, and document the exact two independently reviewed
-source corrections and 24 linked navigation aliases. Do not import
-CCEL-specific digitization, new markup or source prose into the
-redistributable module without independent permission. The final
-corrected-edition rights and publication decisions remain open.
-
-## Useful primary licence guidance
-
-- [Creative Commons public-domain tools](
-  https://creativecommons.org/public-domain/) — CC0 vs. public-domain
-  materials; use only for rights you own/control.
-- [Creative Commons FAQ](https://creativecommons.org/faq/) — CC0 is
-  a dedication, and Creative Commons terms cannot override third-party
-  rights or restrict existing public-domain uses.
-
-**Publication remains a separate gate:** exact input provenance, approved
-resource-specific rights, content/structure tests and a correct public
-package/catalogue must be recorded before distribution.
+Primary guidance: [Creative Commons public-domain tools](https://creativecommons.org/public-domain/) and [Creative Commons FAQ](https://creativecommons.org/faq/). Also see [production contract](../PRODUCTION_PIPELINE.md) and [publishing](../workflows/PUBLISHING.md).
