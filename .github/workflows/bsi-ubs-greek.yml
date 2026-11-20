@@ -54,6 +54,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_context_review_batches.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_sense_form_witnesses.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_form_supported_provisional_senses.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_sense_reference_shapes.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -1001,6 +1002,20 @@ jobs:
         with:
           name: bsi-ubs-greek-ide-idou-source-sense-forms-PRIVATE
           path: /tmp/bsi-ubs-greek-ide-idou-original-source-form-evidence-PRIVATE.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Inspect actual UBS bilingual LEXReferences fields for all 2728 ambiguous Greek source words
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_sense_reference_shapes.py \
+            --batches /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-sense-lexreferences-structure-PRIVATE.json
+      - name: Upload original UBS Greek LEXReferences shape evidence (PRIVATE)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-lexreferences-source-shapes-PRIVATE
+          path: /tmp/bsi-ubs-greek-sense-lexreferences-structure-PRIVATE.json
           if-no-files-found: error
           retention-days: 14
       - name: Upload Greek 2728 contextual sense review batches (PRIVATE, NO selections)
