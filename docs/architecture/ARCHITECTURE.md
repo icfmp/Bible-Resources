@@ -31,7 +31,7 @@ relax source-fidelity checks, or automatically authorize publication. New
 commentaries must use the appropriate proof contract, not resource-specific
 exceptions. The rebuilt module still requires human editorial and rights
 review, final file/digest verification and an explicitly authorized release
-plan. See [source-attested rebuild contract](../evidence/mhcc-274/rebuilt-commentary-validation-contract.md)
+plan. See [source-attested rebuild contract](../../sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/rebuilt-commentary-validation-contract.md)
 and [publication controls](../workflows/PUBLISHING.md).
 
 This architecture has passed [1,329 regression/unit tests](https://github.com/icfmp/Bible-Resources/actions/runs/43867792317)
