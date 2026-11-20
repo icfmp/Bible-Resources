@@ -291,11 +291,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 23,
+      "static_reference_count": 25,
       "static_references": [
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
         "scripts/stage_darby_011_release.py",
+        "scripts/stage_hmcc_modern_release.py",
         "scripts/tool_registry.py",
         ".github/workflows/finalize-darby-0.1.1.yml",
         ".github/workflows/finalize-darby-release.yml",
@@ -303,6 +304,7 @@
         ".github/workflows/register-lsg-in-catalogue.yml",
         ".github/workflows/release-darby-jnd-2024.yml",
         ".github/workflows/stage-darby-0.1.1.yml",
+        ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/stage-stock-commentary.yml",
         ".github/workflows/validate.yml",
         "docs/COMMENTARY_PIPELINE.md",
@@ -408,12 +410,13 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
         "scripts/tool_registry.py",
         ".github/workflows/pages.yml",
+        ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/validate.yml",
         "docs/COMMENTARY_PIPELINE.md",
         "docs/PUBLISHING.md",
@@ -4653,11 +4656,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 8,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/release_preflight.py",
         "scripts/tool_registry.py",
         ".github/workflows/pages.yml",
+        ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/validate.yml",
         ".github/workflows/verify-previous-sword-release.yml",
         "docs/PUBLISHING.md",
@@ -5472,6 +5476,37 @@
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "zCom",
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/reviewed_modern_commentary_rebuild.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Review a modern-English derivative of an attested historical SWORD commentary.",
+      "python_imports": [
+        "__future__",
+        "hashlib",
+        "json",
+        "pathlib",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "4f99a3600512d98861aa683fbcc358919af3635e34e2c6640a19c711178dabf0",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "publication/release",
+      "static_reference_count": 1,
+      "static_references": [
+        "scripts/validate.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "zCom",
         "zCom4",
         "OSIS"
       ],
@@ -5557,7 +5592,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 10,
+      "static_reference_count": 11,
       "static_references": [
         ".github/workflows/finalize-darby-0.1.1.yml",
         ".github/workflows/finalize-darby-release.yml",
@@ -5565,6 +5600,7 @@
         ".github/workflows/register-lsg-in-catalogue.yml",
         ".github/workflows/release-darby-jnd-2024.yml",
         ".github/workflows/stage-darby-0.1.1.yml",
+        ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/stage-stock-commentary.yml",
         ".github/workflows/validate.yml",
         "docs/STABLE_SWORD_REFERENCE_AUDIT.md",
@@ -6584,6 +6620,42 @@
       "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
+        "zCom"
+      ],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/stage_hmcc_modern_release.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Stage the independently tested HMCC Modern QA binary for reviewed publication.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "build",
+        "hashlib",
+        "json",
+        "pathlib",
+        "shutil",
+        "tempfile",
+        "zipfile"
+      ],
+      "reader_tool_signals": [
+        "xiphos"
+      ],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "45165db5e9c59a97c6d4a5d7209f794c1df9472e4769bbce38aa48372a49d610",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "publication/release",
+      "static_reference_count": 1,
+      "static_references": [
+        ".github/workflows/stage-hmcc-modern-release.yml"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
         "zCom",
         "OSIS",
         "ThML"
@@ -7078,9 +7150,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
         ".github/workflows/commentary-modern-source-receipt.yml",
+        ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/tool-registry-maintenance.yml",
         "docs/MHCC_MODERN_ENGLISH.md",
         "tests/test_tool_registry.py"
@@ -7152,17 +7225,18 @@
         "published_reference_audit",
         "re",
         "reviewed_compiled_commentary_rebuild",
+        "reviewed_modern_commentary_rebuild",
         "reviewed_osis_commentary_rebuild",
         "stable_sword_refs",
         "sys"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "72104c372712a9071857933413da493658c23853635c079d8d95f8ad80fd7739",
+      "sha256_at_inventory": "e19d8cde710851c430c1ef08c500df7acf67f5935db79886cac8d03914c1ea22",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 26,
+      "static_reference_count": 27,
       "static_references": [
         "scripts/build.py",
         "scripts/release_preflight.py",
@@ -7175,6 +7249,7 @@
         ".github/workflows/register-lsg-in-catalogue.yml",
         ".github/workflows/release-darby-jnd-2024.yml",
         ".github/workflows/stage-darby-0.1.1.yml",
+        ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/stage-stock-commentary.yml",
         ".github/workflows/validate.yml",
         "docs/COMMENTARY_PIPELINE.md",

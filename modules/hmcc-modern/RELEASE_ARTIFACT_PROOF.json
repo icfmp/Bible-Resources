@@ -1,0 +1,34 @@
+{
+  "metadata_only_conf_delta": {
+    "added_fields": [
+      "Encoding=UTF-8",
+      "TextSource=https://github.com/icfmp/Bible-Resources/tree/main/work/mhcc-modern/production/accepted"
+    ],
+    "final_sha256": "6140453b6b8eea4c7bcb594cf5f0d9f7cfe4d65e1342ee785a157229811e2ec2",
+    "original_review_conf_sha256": "5336079efd004d8217d985e6281064f672df08fe899d2646089133bfbc011446"
+  },
+  "original_QA_six_data_member_sha256": {
+    "modules/comments/zcom/hmccmodern/nt.czs": "91ddf7185f0897f6c4b33e5015a92c96ab89e217d0be4e9e28786a5d7dc1442f",
+    "modules/comments/zcom/hmccmodern/nt.czv": "820f8d6a68cd48b4cf1f0ad242dd122720eade6cb9e4434102587b82c70dca2f",
+    "modules/comments/zcom/hmccmodern/nt.czz": "b22800b76ea3c3ede4e1c5ca4c3f6ea5acaad356ac39c92c07667027dbccf4fd",
+    "modules/comments/zcom/hmccmodern/ot.czs": "a1bdeb6971da943283f4e76215f68716d8abd5a1f5612f3de9f7bb2f059e926c",
+    "modules/comments/zcom/hmccmodern/ot.czv": "6213b677cef46f8da62947185e2ce2b281ba11de084d1a77fa1f449e7ae3dc21",
+    "modules/comments/zcom/hmccmodern/ot.czz": "1582dc5d52879183e87f42da895cef732a607de209fa6787e05d373f62bb9ac3"
+  },
+  "payload_sha256": {
+    "mods.d/hmccmodern.conf": "6140453b6b8eea4c7bcb594cf5f0d9f7cfe4d65e1342ee785a157229811e2ec2",
+    "modules/comments/zcom/hmccmodern/nt.czs": "91ddf7185f0897f6c4b33e5015a92c96ab89e217d0be4e9e28786a5d7dc1442f",
+    "modules/comments/zcom/hmccmodern/nt.czv": "820f8d6a68cd48b4cf1f0ad242dd122720eade6cb9e4434102587b82c70dca2f",
+    "modules/comments/zcom/hmccmodern/nt.czz": "b22800b76ea3c3ede4e1c5ca4c3f6ea5acaad356ac39c92c07667027dbccf4fd",
+    "modules/comments/zcom/hmccmodern/ot.czs": "a1bdeb6971da943283f4e76215f68716d8abd5a1f5612f3de9f7bb2f059e926c",
+    "modules/comments/zcom/hmccmodern/ot.czv": "6213b677cef46f8da62947185e2ce2b281ba11de084d1a77fa1f449e7ae3dc21",
+    "modules/comments/zcom/hmccmodern/ot.czz": "1582dc5d52879183e87f42da895cef732a607de209fa6787e05d373f62bb9ac3"
+  },
+  "schema_version": 1,
+  "source_approved_osis_sha256": "23f0872a67086d9f659bd96936ab63db63c8c7b8c10eb92e59537c3e6cf16189",
+  "source_archive_sha256": "02751d269081c8b2d1ad1d446774eff94e7ddc2420e38f16f8fbb9075c79a2e3",
+  "source_archive_size_bytes": 2767663,
+  "source_artifact_id": 14610990289,
+  "source_binary_data_identical": true,
+  "source_run_id": 44695710957
+}
