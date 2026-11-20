@@ -245,7 +245,7 @@ def markdown(report: dict) -> str:
               "| --- | --- | --- | ---: | --- |"]
     for r in records:
         lines.append(
-            f"| [`{r['path']}`](../{r['path']}) | "
+            f"| [`{r['path']}`](../../{r['path']}) | "
             f"{r['classification']} | "
             f"{'named test' if r['has_direct_tests_by_filename'] else 'not established'} | "
             f"{r['static_reference_count']} | {r['stage_hint']} |")
@@ -270,10 +270,10 @@ def main() -> int:
     args = parser.parse_args()
     report = generate(ROOT)
     expected = {
-        ROOT / "docs/TOOL_REGISTRY.json":
+        ROOT / "reports/tooling/TOOL_REGISTRY.json":
             json.dumps(report, ensure_ascii=False, indent=2,
                        sort_keys=True) + "\n",
-        ROOT / "docs/TOOL_REGISTRY.md": markdown(report),
+        ROOT / "reports/tooling/TOOL_REGISTRY.md": markdown(report),
     }
     if args.write:
         for path, body in expected.items():
