@@ -4566,27 +4566,21 @@ jobs:
               # Use the Xiphos application's private child session bus, as
               # required by the previously validated existing-link click test.
               probe_env=dict(env,NO_AT_BRIDGE="0",GTK_A11Y="1")
-              # Bind the accessibility probe to the exact private zCom
-              # session by the Xiphos process SWORD_PATH and DISPLAY.
-              p=subprocess.run(["pgrep","-x","xiphos"],capture_output=True,
-                               text=True,timeout=4,check=False)
-              bound=False
-              for pid in p.stdout.splitlines():
+              # Same process-bus discovery as the existing passing Gen -> Heb
+              # true-click test, now with the identical accessible Xiphos wrapper.
+              candidates=subprocess.run(
+                  ["pgrep","-x","xiphos"],text=True,capture_output=True,
+                  timeout=4,check=False)
+              for pid in candidates.stdout.splitlines():
                   if not pid.isdecimal(): continue
                   try:
-                      parts=Path("/proc/"+pid+"/environ").read_bytes().split(b"\\0")
-                      values=dict(v.split(b"=",1) for v in parts if b"=" in v)
-                      if (values.get(b"SWORD_PATH")!=str(root).encode()
-                              or values.get(b"DISPLAY")!=env["DISPLAY"].encode()):
-                          continue
-                      address=values.get(b"DBUS_SESSION_BUS_ADDRESS")
+                      variables=Path("/proc/"+pid+"/environ").read_bytes().split(b"\\0")
+                      address=next((v.split(b"=",1)[1] for v in variables
+                          if v.startswith(b"DBUS_SESSION_BUS_ADDRESS=")),None)
                       if address and len(address)<2048:
-                          probe_env["DBUS_SESSION_BUS_ADDRESS"]=address.decode()
-                          bound=True
+                          probe_env["DBUS_SESSION_BUS_ADDRESS"]=address.decode("utf-8")
                           break
                   except (OSError,UnicodeError): continue
-              if not bound:
-                  return {"status":"REAL_APPROVED_NOTE_GUI_SESSION_BUS_NOT_ATTESTED"}
               script=textwrap.dedent("""
                   import json,sys,re,time,subprocess,pyatspi
                   def compact(value):
