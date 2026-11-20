@@ -2,7 +2,9 @@
 
 **Status:** canonical operational entry point for new or revised resources. This document specifies required evidence, not a claim that all stages are automated. This is the **single authoritative production process**. The [Bible](workflows/BIBLE_7_STAGE_WORKFLOW.md) and [commentary](workflows/COMMENTARY_7_STAGE_WORKFLOW.md) seven-stage checklists track progress but do not define competing acceptance standards. Where policies disagree, stop and resolve the discrepancy in a reviewed PR; do not silently select the weaker rule.
 
-For a common target structure for new cleaned OSIS sources, consult the proposed [BRNP v0.1](architecture/BRNP.md). It is **not yet** a release gate: the existing official XSD, source-fidelity and SWORD/reader acceptance gates remain authoritative.\n\n## The production chain
+For a common target structure for new cleaned OSIS sources, consult the proposed [BRNP v0.1](architecture/BRNP.md). It is **not yet** a release gate: the existing official XSD, source-fidelity and SWORD/reader acceptance gates remain authoritative.
+
+## The production chain
 
 ```text
 identify source, edition, rights
