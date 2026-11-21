@@ -1,0 +1,34 @@
+# One-time same-repository workflow dispatch for a bot-updated draft PR.
+name: Verify script cleanup branch once
+on:
+  push:
+    branches:
+      - maintenance/scripts-commentary-evidence-group-20261121
+    paths:
+      - '.github/workflows/script-cleanup-validate-once.yml'
+permissions:
+  contents: write
+  actions: write
+jobs:
+  dispatch-ci:
+    if: ${{ github.repository == 'icfmp/Bible-Resources' && github.ref == 'refs/heads/maintenance/scripts-commentary-evidence-group-20261121' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: true
+      - name: Remove helper and dispatch full read-only validation
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -- .github/workflows/script-cleanup-validate-once.yml
+          git commit -m 'chore: remove one-time script cleanup verifier'
+          git push origin HEAD:refs/heads/maintenance/scripts-commentary-evidence-group-20261121
+          gh workflow run validate.yml --ref maintenance/scripts-commentary-evidence-group-20261121
+          gh workflow run tool-registry-maintenance.yml --ref maintenance/scripts-commentary-evidence-group-20261121
