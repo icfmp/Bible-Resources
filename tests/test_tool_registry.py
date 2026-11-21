@@ -144,6 +144,10 @@ class ScriptInventoryTests(unittest.TestCase):
         ):
             with self.subTest(workflow=workflow):
                 self.assertFalse((ROOT / ".github/workflows" / workflow).exists())
+        self.assertFalse(
+            (ROOT / "tests/java/org/icfmp/research/"
+             "CommentaryAndBibleJSwordProbeTest.java").exists()
+        )
         # Source identity and true shared readers remain active and tested.
         for name in ("commentary_xiphos_dual_reader.py",
                      "commentary_stock_candidate.py",
