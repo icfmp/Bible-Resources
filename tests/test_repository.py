@@ -5,7 +5,6 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 from validate import validate
 from build import build
-from audit_text import audit
 
 class Tests(unittest.TestCase):
     def setUp(self):
@@ -38,10 +37,6 @@ class Tests(unittest.TestCase):
         self.m["language"]="Not a language"
         self.create()
         self.assertTrue(validate(self.root)[1])
-    def test_scripture_audit_is_read_only(self):
-        text="\n".join("> **1** Verse" for _ in range(6))
-        self.assertIn("scripture_block_candidate",[x["type"] for x in audit(text)])
-        self.assertEqual(len(text.splitlines()),6)
     def test_approved_modules_need_canonical_edition(self):
         self.m["quality"]["status"] = "approved"
         self.m["rights"]["redistribution_allowed"] = True

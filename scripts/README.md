@@ -22,4 +22,15 @@ For a new resource, begin with the [canonical production pipeline](../docs/PRODU
 4. **Change in bounded batches.** Migrate actual consumers, keep established production entrypoints stable, and avoid compatibility stubs that conceal obsolete paths. Do not relocate a script merely to make the root look emptier.
 5. **Verify before merging.** Run `python scripts/tool_registry.py --write` when tracked callers or scripts change, then `--check`, the complete unit suite, source validation, deterministic build, native smoke and relevant real-source/reader workflows. A green test alone never certifies textual fidelity.
 
+## Where a tool belongs
+
+- **Keep in `scripts/`** only a reusable production command, format validator, SWORD reader, or source-neutral research helper with a continuing and demonstrated consumer. A one-time script does not become shared tooling merely because it has its own tests; Git history is sufficient retention unless exact release replay still depends on it.
+- **Keep beside a specific resource** only when edition-specific code is still required for a real maintenance, validation or immutable release-replay contract. Prefer reviewed resource manifests and the canonical pipeline over edition-pinned executable copies. Review and update all callers before relocating it.
+- **Delete** superseded experiments and finished one-off probes when the canonical process or an existing checked tool covers the needed safeguards. Remove orphan tests, workflows and references together. Git history already preserves the retired implementation; do not maintain duplicate archives or compatibility stubs.
+- **Retain historical replay tooling** only when an exact prior published release or source-bound audit still requires it and the replacement has not been proven equivalent. A single old workflow is not automatically evidence of a current production need.
+
+For every retirement, record the surviving replacement, currently known callers, any historical replay constraint and the final verification on [#430](https://github.com/icfmp/Bible-Resources/issues/430). No Bible text, approved module payload or editorial ledger may be changed as a side effect.
+
+
+
 The active audit and migration tracker is [issue #430](https://github.com/icfmp/Bible-Resources/issues/430). Work on the independent Bible Semantic Index is outside this maintenance scope.
