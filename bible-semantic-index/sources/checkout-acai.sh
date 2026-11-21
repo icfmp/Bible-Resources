@@ -2,8 +2,8 @@
 # Obtain an exact frozen upstream ACAI witness without editing it.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-DEST="$ROOT/entity-index/sources/checkouts/acai"
-LOCK="$ROOT/entity-index/source.lock.json"
+DEST="$ROOT/bible-semantic-index/sources/checkouts/acai"
+LOCK="$ROOT/bible-semantic-index/data/source.lock.json"
 readarray -t INFO < <(python3 - "$LOCK" <<'PY'
 import json
 import sys

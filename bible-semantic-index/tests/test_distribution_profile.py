@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 import runpy
 
-exclude_kinds = runpy.run_path(str(Path(__file__).with_name('distribution_profile.py')))['exclude_kinds']
+exclude_kinds = runpy.run_path(str((Path(__file__).resolve().parents[1] / 'scripts' / 'distribution_profile.py')))['exclude_kinds']
 
 
 def entry(entity_id, kind, word):

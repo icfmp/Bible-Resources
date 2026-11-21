@@ -20,7 +20,7 @@ masters, **not newly edited commentary prose**.
 
 Other types — dictionaries, encyclopedias, etc. — are only created in the
 source tree when actual licensed source files are obtained. The independent
-`entity-index/` project data does not automatically constitute an original
+`bible-semantic-index/` project data does not automatically constitute an original
 encyclopedia/dictionary text.
 
 ## Recovery status and limits

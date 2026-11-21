@@ -8,7 +8,7 @@ This directory **owns source acquisition and provenance**, not editorial changes
 - MACULA Hebrew: `https://github.com/Clear-Bible/macula-hebrew`, revision pinned by the same source lock.
 - MACULA Greek: `https://github.com/Clear-Bible/macula-greek`, revision pinned by the same source lock.
 
-Run `./entity-index/sources/checkout-acai.sh` from the repository root to populate `entity-index/sources/checkouts/acai/` with the exact original revision. This local tree is ignored by Git. The existing source-integrity audit checks both the locked commit and SHA-256 fingerprint of original JSON bytes.
+Run `./bible-semantic-index/sources/checkout-acai.sh` from the repository root to populate `bible-semantic-index/sources/checkouts/acai/` with the exact original revision. This local tree is ignored by Git. The existing source-integrity audit checks both the locked commit and SHA-256 fingerprint of original JSON bytes.
 
 The MACULA TSV witnesses are checked out at their exact revisions by the existing GitHub Actions workflow. No original-language Bible text is bundled in the published BSI ZIP.
 

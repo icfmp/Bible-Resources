@@ -35,8 +35,8 @@ jobs:
         run: |
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$SOURCE_SHA"
-          test -f entity-index/links/dictionaries/ubs-greek/build_public_identifier_release.py
-          test -f entity-index/links/dictionaries/ubs-greek/PUBLIC_RELEASE_NOTES.md
+          test -f bible-semantic-index/links/dictionaries/ubs-greek/build_public_identifier_release.py
+          test -f bible-semantic-index/links/dictionaries/ubs-greek/PUBLIC_RELEASE_NOTES.md
       - name: Download only the identifier-only archive from the successful source CI
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -94,4 +94,4 @@ jobs:
             --repo "$GH_REPO" \
             --target "$SOURCE_SHA" \
             --title "Bible Semantic Index — UBS Greek NT lexical crosswalk v0.1.0" \
-            --notes-file entity-index/links/dictionaries/ubs-greek/PUBLIC_RELEASE_NOTES.md
+            --notes-file bible-semantic-index/links/dictionaries/ubs-greek/PUBLIC_RELEASE_NOTES.md

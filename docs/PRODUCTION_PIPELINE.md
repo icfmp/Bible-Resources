@@ -119,4 +119,4 @@ Before publication, record evidence of rights and editorial approval, source lin
 
 The project has stage runners, read-only source audits, schema guards, native tests and release protections, but **the universal OSIS/USFM normalization and full source→SWORD round-trip pipeline is not yet demonstrated for every resource category**. Do not label these aspirational requirements as tests already passed. Track implementation gaps in [#3](https://github.com/icfmp/Bible-Resources/issues/3), [#28](https://github.com/icfmp/Bible-Resources/issues/28) and [#83](https://github.com/icfmp/Bible-Resources/issues/83); tool consolidation in [#430](https://github.com/icfmp/Bible-Resources/issues/430).
 
-**Boundary:** `entity-index/` (Bible Semantic Index) is an independent workstream. No source-pipeline cleanup or documentation reorganization is permission to modify it.
+**Boundary:** `bible-semantic-index/` (Bible Semantic Index) is an independent workstream. No source-pipeline cleanup or documentation reorganization is permission to modify it.

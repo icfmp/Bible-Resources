@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-path = Path(__file__).with_name("resolve.py")
+path = (Path(__file__).resolve().parents[1] / 'scripts' / 'resolve.py')
 spec = importlib.util.spec_from_file_location("entity_index_resolver", path)
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)

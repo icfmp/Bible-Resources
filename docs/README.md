@@ -35,4 +35,4 @@ Do not confuse **source defect**, **editorial convention**, **compiler/index beh
 
 Keep `docs/` short and durable. Document a reusable rule **once**, at its most natural home, with links from entry points. Remove superseded explanations rather than accumulating variants. Place dated tests and module-specific history with the module; preserve cross-project research in `history/` only when its evidence is useful. Do not add execution logs or lists of temporary PR results to general guides.
 
-`entity-index/` is the separate Bible Semantic Index workstream: do not touch it during documentation housekeeping.
+`bible-semantic-index/` is the separate Bible Semantic Index workstream: do not touch it during documentation housekeeping.

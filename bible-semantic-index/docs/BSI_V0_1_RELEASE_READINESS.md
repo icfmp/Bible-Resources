@@ -5,7 +5,7 @@
 ## Identity and scope
 
 - **Public-facing name:** Bible Semantic Index (**BSI**).
-- **Technical workspace (unchanged for compatibility):** `entity-index/`.
+- **Technical workspace (unchanged for compatibility):** `bible-semantic-index/`.
 - **Purpose:** offline, original-language word-ID anchored lookup of biblical people, places, groups, flora, fauna, realia and (when cleared) concepts.
 - Source ACAI is a preserved frozen **historical witness**, not the name or sole authority of BSI.
 - Already validated Macula word IDs should be reused, never reindexed by fuzzy spelling, Strong number or inferred token alignment.
@@ -36,28 +36,28 @@ Key Terms are **not used in BSI v0.1**, are **not shipped**, and may be independ
 Build the projected candidate after a successful original full-index build:
 
 ```bash
-python3 -I entity-index/distribution_profile.py \
-  --input entity-index/dist/index.json \
-  --output entity-index/dist/bsi-v0.1-without-keyterms.json
+python3 -I bible-semantic-index/scripts/distribution_profile.py \
+  --input bible-semantic-index/dist/index.json \
+  --output bible-semantic-index/dist/bsi-v0.1-without-keyterms.json
 ```
 
 The file is a *candidate distribution projection* for reproducible builds; the **published** release is the archived, checked ZIP linked above. The minimal label file comes from the pinned, SHA-verified English `preferred_label` field only:
 
 ```bash
-python3 -I entity-index/minimal_labels.py \
+python3 -I bible-semantic-index/scripts/minimal_labels.py \
   --source /path/to/pinned-ACAI \
-  --index entity-index/dist/bsi-v0.1-without-keyterms.json \
-  --output entity-index/dist/bsi-v0.1-labels-en.json
+  --index bible-semantic-index/dist/bsi-v0.1-without-keyterms.json \
+  --output bible-semantic-index/dist/bsi-v0.1-labels-en.json
 ```
 
 The reproducible candidate ZIP additionally includes the derived index, these labels, the exact source lock, a file-hash manifest and attribution notices:
 
 ```bash
-python3 -I entity-index/package_candidate.py \
-  --index entity-index/dist/bsi-v0.1-without-keyterms.json \
-  --labels entity-index/dist/bsi-v0.1-labels-en.json \
-  --lock entity-index/source.lock.json \
-  --output entity-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip
+python3 -I bible-semantic-index/scripts/package_candidate.py \
+  --index bible-semantic-index/dist/bsi-v0.1-without-keyterms.json \
+  --labels bible-semantic-index/dist/bsi-v0.1-labels-en.json \
+  --lock bible-semantic-index/data/source.lock.json \
+  --output bible-semantic-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip
 ```
 
 A successful artifact upload in CI remains an **internal candidate**, never a GitHub Release. Actual release bytes must be independently verified, attributed and approved for redistribution.

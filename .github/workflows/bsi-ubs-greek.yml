@@ -3,12 +3,12 @@ name: BSI UBS Greek dictionary crosswalk
 on:
   pull_request:
     paths:
-      - "entity-index/links/dictionaries/ubs-greek/**"
+      - "bible-semantic-index/links/dictionaries/ubs-greek/**"
       - ".github/workflows/bsi-ubs-greek.yml"
   push:
     branches: [main]
     paths:
-      - "entity-index/links/dictionaries/ubs-greek/**"
+      - "bible-semantic-index/links/dictionaries/ubs-greek/**"
       - ".github/workflows/bsi-ubs-greek.yml"
   workflow_dispatch:
 
@@ -23,44 +23,44 @@ jobs:
       - uses: actions/checkout@v4
       - name: Offline regression tests
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_index.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_source_gaps.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_private_word_candidate.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_pronoun_candidate.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_remaining_headwords.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_families_batch2.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_eimi_disposition.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_no_ln_headwords.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_families_batch3.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_families_batch4.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_no_ln_batch5.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_224_ambiguities.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_taxonomy_headwords.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_missing_strong_word_headwords.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_missing_exact_headwords.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_alpha_case_only.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_composite_strong_original_words.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_composite_strong_headwords.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_word_coverage_invariants.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_hopote_headword.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_456_lexical_variants.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_explicit_alternate_lemmas.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_explicit_ubs_alternates.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_last_47_lexical_forms.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_contextual_sense_candidates.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_provisional_context_sense_overlay.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_unresolved_semantic_priorities.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_lower_confidence_single_sense.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_context_review_batches.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_sense_form_witnesses.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_form_supported_provisional_senses.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_sense_reference_shapes.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_source_verse_witnesses.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_source_verse_provisional_senses.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_ubs_token_position_alignment.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_source_position_provisional_senses.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_consolidated_v1_review_index.py
-          python3 -I entity-index/links/dictionaries/ubs-greek/test_public_identifier_release.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_index.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_source_gaps.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_private_word_candidate.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_pronoun_candidate.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_remaining_headwords.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_families_batch2.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_eimi_disposition.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_no_ln_headwords.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_families_batch3.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_families_batch4.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_no_ln_batch5.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_224_ambiguities.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_taxonomy_headwords.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_missing_strong_word_headwords.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_missing_exact_headwords.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_alpha_case_only.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_composite_strong_original_words.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_composite_strong_headwords.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_word_coverage_invariants.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_hopote_headword.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_456_lexical_variants.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_ubs_explicit_alternate_lemmas.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_reviewed_explicit_ubs_alternates.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_last_47_lexical_forms.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_contextual_sense_candidates.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_provisional_context_sense_overlay.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_unresolved_semantic_priorities.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_lower_confidence_single_sense.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_context_review_batches.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_sense_form_witnesses.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_form_supported_provisional_senses.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_sense_reference_shapes.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_ubs_source_verse_witnesses.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_source_verse_provisional_senses.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_ubs_token_position_alignment.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_source_position_provisional_senses.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_consolidated_v1_review_index.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_public_identifier_release.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -84,7 +84,7 @@ jobs:
           test "$(git -C macula-greek rev-parse HEAD)" = "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
           test "$(git -C ubs-source hash-object dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON)" = "b6f2535c3ed8988480f479fdaf4f69867a776119"
           test "$(git -C ubs-source hash-object dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON)" = "42b1abeaa7f7f7abaf72f6edd7e45badea42b90f"
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_index.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_index.py \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
@@ -93,7 +93,7 @@ jobs:
           import json
           from pathlib import Path
           actual=json.loads(Path("/tmp/bsi-ubs-greek-index.json").read_text(encoding="utf-8"))
-          pinned=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text(encoding="utf-8"))
+          pinned=json.loads(Path("bible-semantic-index/links/dictionaries/ubs-greek/index.json").read_text(encoding="utf-8"))
           assert actual==pinned, "Generated UBS index differs from committed index"
           assert actual["statistics"]["shared_entries"]==5507
           assert actual["statistics"]["shared_senses"]==9160
@@ -104,17 +104,17 @@ jobs:
           PY
       - name: Census all 9,651 original unlinked Greek words and NFC/UBS-LN witnesses
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_source_gaps.py \
-            --index entity-index/links/dictionaries/ubs-greek/index.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_source_gaps.py \
+            --index bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
             --output /tmp/bsi-ubs-greek-original-gap-review.json
       - name: Audit 1218 non-εἰμί Greek original words without UBS LN corroboration
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_remaining_no_ln.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_remaining_no_ln.py \
             --report /tmp/bsi-ubs-greek-original-gap-review.json \
-            --index entity-index/links/dictionaries/ubs-greek/index.json \
+            --index bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
@@ -128,7 +128,7 @@ jobs:
           retention-days: 14
       - name: Classify original Greek εἰμί source word families without inventing UBS senses
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_eimi_disposition.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_eimi_disposition.py \
             --report /tmp/bsi-ubs-greek-original-gap-review.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -142,8 +142,8 @@ jobs:
           retention-days: 14
       - name: Independently verify all 5,938 original Greek lexical source-word entry candidates
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_private_word_candidate.py \
-            --index entity-index/links/dictionaries/ubs-greek/index.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_private_word_candidate.py \
+            --index bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --report /tmp/bsi-ubs-greek-original-gap-review.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -152,7 +152,7 @@ jobs:
           python3 - <<'PY'
           import json
           from pathlib import Path
-          baseline=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text())
+          baseline=json.loads(Path("bible-semantic-index/links/dictionaries/ubs-greek/index.json").read_text())
           candidate=json.loads(Path("/tmp/bsi-ubs-greek-private-word-candidate.json").read_text())
           assert all(candidate[k]==v for k,v in baseline.items())
           assert len(candidate["by_macula_word"])==5938
@@ -166,11 +166,11 @@ jobs:
           PY
       - name: Review exact Greek first/second-person and demonstrative pronoun headwords
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_pronoun_candidate.py \
-            --baseline entity-index/links/dictionaries/ubs-greek/index.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_pronoun_candidate.py \
+            --baseline bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --source_report /tmp/bsi-ubs-greek-original-gap-review.json \
             --candidate /tmp/bsi-ubs-greek-private-word-candidate.json \
-            --review entity-index/links/dictionaries/ubs-greek/v1_reviewed_pronoun_headwords.json \
+            --review bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_pronoun_headwords.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
@@ -180,7 +180,7 @@ jobs:
           from pathlib import Path
           p=Path("/tmp/bsi-ubs-greek-reviewed-pronoun-private-candidate.json")
           index=json.loads(p.read_text(encoding="utf-8"))
-          old=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text(encoding="utf-8"))
+          old=json.loads(Path("bible-semantic-index/links/dictionaries/ubs-greek/index.json").read_text(encoding="utf-8"))
           assert all(index[k]==v for k,v in old.items())
           assert index["editorial_candidate"]["publication_approved"] is False
           assert index["word_aware_coverage"]["new_inferred_contextual_lexical_sense_ids"] == 0
@@ -205,7 +205,7 @@ jobs:
           PY
       - name: Enumerate all 905 unapproved Greek word witnesses by original lexical family
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_remaining_headwords.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_remaining_headwords.py \
             --candidate /tmp/bsi-ubs-greek-reviewed-pronoun-private-candidate.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -222,19 +222,19 @@ jobs:
           PY
       - name: Source-review ten more exact Greek lexical headword families (private only)
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_families_batch2.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_families_batch2.py \
             --candidate /tmp/bsi-ubs-greek-reviewed-pronoun-private-candidate.json \
             --evidence /tmp/bsi-ubs-greek-905-unapproved-family-evidence.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
-            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch2.json \
+            --ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch2.json \
             --output /tmp/bsi-ubs-greek-reviewed-family-batch2-private.json
           python3 - <<'PY'
           import json
           from pathlib import Path
           p=Path("/tmp/bsi-ubs-greek-reviewed-family-batch2-private.json")
           reviewed=json.loads(p.read_text(encoding="utf-8"))
-          base=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text(encoding="utf-8"))
+          base=json.loads(Path("bible-semantic-index/links/dictionaries/ubs-greek/index.json").read_text(encoding="utf-8"))
           assert all(reviewed[k]==v for k,v in base.items())
           assert reviewed["editorial_candidate"]["reviewed_original_headword_words_total"]==5610
           assert reviewed["editorial_candidate"]["other_original_words_still_unapproved"]==328
@@ -252,13 +252,13 @@ jobs:
           PY
       - name: Source-review exact Greek εἰμί original word IDs as entry-only without UBS LN senses
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_no_ln_headwords.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_no_ln_headwords.py \
             --candidate /tmp/bsi-ubs-greek-reviewed-family-batch2-private.json \
-            --index entity-index/links/dictionaries/ubs-greek/index.json \
+            --index bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --report /tmp/bsi-ubs-greek-original-gap-review.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
-            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_no_ln_headwords.json \
+            --ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_no_ln_headwords.json \
             --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
             --output /tmp/bsi-ubs-greek-eimi-entry-only-private.json
           python3 - <<'PY'
@@ -266,7 +266,7 @@ jobs:
           from collections import Counter
           from pathlib import Path
           c=json.loads(Path("/tmp/bsi-ubs-greek-eimi-entry-only-private.json").read_text())
-          base=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text())
+          base=json.loads(Path("bible-semantic-index/links/dictionaries/ubs-greek/index.json").read_text())
           assert all(c[k]==v for k,v in base.items())
           assert len(c["by_macula_word"]) == 7969
           assert c["editorial_candidate"]["reviewed_original_headword_words_total"] == 7641
@@ -299,18 +299,18 @@ jobs:
           retention-days: 14
       - name: Classify remaining 328 strict original Greek lexical witnesses
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_remaining_328.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_remaining_328.py \
             --evidence /tmp/bsi-ubs-greek-905-unapproved-family-evidence.json \
-            --batch2 entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch2.json \
+            --batch2 bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch2.json \
             --output /tmp/bsi-ubs-greek-328-original-family-evidence.json
       - name: Review 155 original Greek word-ID headwords in 19 exact source-attested families
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_families_batch3.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_families_batch3.py \
             --candidate /tmp/bsi-ubs-greek-eimi-entry-only-private.json \
             --evidence /tmp/bsi-ubs-greek-905-unapproved-family-evidence.json \
-            --batch2 entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch2.json \
+            --batch2 bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch2.json \
             --residual /tmp/bsi-ubs-greek-328-original-family-evidence.json \
-            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch3.json \
+            --ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch3.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --output /tmp/bsi-ubs-greek-reviewed-batch3-private.json
@@ -319,7 +319,7 @@ jobs:
           from collections import Counter
           from pathlib import Path
           c=json.loads(Path("/tmp/bsi-ubs-greek-reviewed-batch3-private.json").read_text())
-          baseline=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text())
+          baseline=json.loads(Path("bible-semantic-index/links/dictionaries/ubs-greek/index.json").read_text())
           assert all(c[k]==v for k,v in baseline.items())
           assert len(c["by_macula_word"]) == 7969
           assert c["editorial_candidate"]["reviewed_original_headword_words_total"] == 7796
@@ -337,18 +337,18 @@ jobs:
           PY
       - name: Audit 173 still-unapproved Greek source tokens after third editorial batch
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_remaining_173.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_remaining_173.py \
             --residual /tmp/bsi-ubs-greek-328-original-family-evidence.json \
-            --batch3 entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch3.json \
+            --batch3 bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch3.json \
             --output /tmp/bsi-ubs-greek-173-original-word-evidence.json
       - name: Review 138 source-attested Greek word IDs in 101 exact lexical families
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_families_batch4.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_families_batch4.py \
             --candidate /tmp/bsi-ubs-greek-reviewed-batch3-private.json \
             --residual328 /tmp/bsi-ubs-greek-328-original-family-evidence.json \
-            --third_ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch3.json \
+            --third_ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch3.json \
             --residual173 /tmp/bsi-ubs-greek-173-original-word-evidence.json \
-            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch4.json \
+            --ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch4.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --output /tmp/bsi-ubs-greek-reviewed-batch4-private.json
@@ -357,7 +357,7 @@ jobs:
           from pathlib import Path
           from collections import Counter
           c=json.loads(Path("/tmp/bsi-ubs-greek-reviewed-batch4-private.json").read_text())
-          base=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text())
+          base=json.loads(Path("bible-semantic-index/links/dictionaries/ubs-greek/index.json").read_text())
           assert all(c[k]==v for k,v in base.items())
           assert len(c["by_macula_word"])==7969
           assert c["editorial_candidate"]["reviewed_original_headword_words_total"]==7934
@@ -377,22 +377,22 @@ jobs:
           PY
       - name: Source-review 1218 individual original Greek lexical entries without LN sense corroboration
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_no_ln_batch5.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_no_ln_batch5.py \
             --candidate /tmp/bsi-ubs-greek-reviewed-batch4-private.json \
             --source_report /tmp/bsi-ubs-greek-original-gap-review.json \
-            --index entity-index/links/dictionaries/ubs-greek/index.json \
+            --index bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
             --report /tmp/bsi-ubs-greek-no-ln-1218-source-review.json \
-            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_no_ln_families_batch5.json \
+            --ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_no_ln_families_batch5.json \
             --output /tmp/bsi-ubs-greek-reviewed-no-ln-batch5-private.json
           python3 - <<'PY'
           import json
           from collections import Counter
           from pathlib import Path
           c=json.loads(Path("/tmp/bsi-ubs-greek-reviewed-no-ln-batch5-private.json").read_text())
-          base=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text())
+          base=json.loads(Path("bible-semantic-index/links/dictionaries/ubs-greek/index.json").read_text())
           assert all(c[k]==v for k,v in base.items())
           assert len(c["by_macula_word"]) == 9187
           assert c["editorial_candidate"]["reviewed_original_headword_words_total"] == 9152
@@ -415,8 +415,8 @@ jobs:
           PY
       - name: Independently audit 499 exceptional Greek original words and 224 source ambiguities
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_final_exceptions.py \
-            --baseline entity-index/links/dictionaries/ubs-greek/index.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_final_exceptions.py \
+            --baseline bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --source_report /tmp/bsi-ubs-greek-original-gap-review.json \
             --reviewed /tmp/bsi-ubs-greek-reviewed-no-ln-batch5-private.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
@@ -441,7 +441,7 @@ jobs:
           PY
       - name: Partition 224 Greek source Strong ambiguities without selecting senses
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_224_ambiguities.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_224_ambiguities.py \
             --source /tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json \
             --output /tmp/bsi-ubs-greek-224-ambiguity-partition.json
           python3 - <<'PY'
@@ -456,11 +456,11 @@ jobs:
           PY
       - name: Source-review 220 original Greek ambiguous word headwords without changing Strong maps
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_224_ambiguities.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_224_ambiguities.py \
             --candidate /tmp/bsi-ubs-greek-reviewed-no-ln-batch5-private.json \
             --source /tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json \
             --classified /tmp/bsi-ubs-greek-224-ambiguity-partition.json \
-            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_ambiguous_headwords.json \
+            --ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_ambiguous_headwords.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --output /tmp/bsi-ubs-greek-reviewed-220-ambiguities-private.json
@@ -468,7 +468,7 @@ jobs:
           import json
           from pathlib import Path
           d=json.loads(Path("/tmp/bsi-ubs-greek-reviewed-220-ambiguities-private.json").read_text())
-          old=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text())
+          old=json.loads(Path("bible-semantic-index/links/dictionaries/ubs-greek/index.json").read_text())
           assert all(d[k]==v for k,v in old.items())
           assert len(d["by_macula_word"]) == 9187
           assert len(d["by_macula_ambiguous_word"]) == 220
@@ -482,11 +482,11 @@ jobs:
           PY
       - name: Review exact Greek numerals, relative pronouns and articles across source POS labels
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_taxonomy_headwords.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_taxonomy_headwords.py \
             --candidate /tmp/bsi-ubs-greek-reviewed-220-ambiguities-private.json \
-            --previous_ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch4.json \
+            --previous_ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch4.json \
             --residual /tmp/bsi-ubs-greek-173-original-word-evidence.json \
-            --taxonomy_ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_taxonomy_headwords.json \
+            --taxonomy_ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_taxonomy_headwords.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --output /tmp/bsi-ubs-greek-32-taxonomy-review-private.json
@@ -495,7 +495,7 @@ jobs:
           from collections import Counter
           from pathlib import Path
           c=json.loads(Path('/tmp/bsi-ubs-greek-32-taxonomy-review-private.json').read_text())
-          base=json.loads(Path('entity-index/links/dictionaries/ubs-greek/index.json').read_text())
+          base=json.loads(Path('bible-semantic-index/links/dictionaries/ubs-greek/index.json').read_text())
           assert all(c[k]==v for k,v in base.items())
           assert len(c['by_macula_word'])==9187
           assert len(c['by_macula_ambiguous_word'])==220
@@ -512,9 +512,9 @@ jobs:
           PY
       - name: Review two Greek source word headwords whose original Strong annotation is missing
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_missing_strong_word_headwords.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_missing_strong_word_headwords.py \
             --candidate /tmp/bsi-ubs-greek-32-taxonomy-review-private.json \
-            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_missing_strong_word_headwords.json \
+            --ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_missing_strong_word_headwords.json \
             --residual /tmp/bsi-ubs-greek-173-original-word-evidence.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -524,7 +524,7 @@ jobs:
           from collections import Counter
           from pathlib import Path
           d=json.loads(Path('/tmp/bsi-ubs-greek-strong-zero-headwords-private.json').read_text())
-          b=json.loads(Path('entity-index/links/dictionaries/ubs-greek/index.json').read_text())
+          b=json.loads(Path('bible-semantic-index/links/dictionaries/ubs-greek/index.json').read_text())
           assert all(d[k]==v for k,v in b.items())
           assert d['editorial_candidate']['reviewed_original_headword_words_total']==9186
           assert d['editorial_candidate']['other_original_words_still_unapproved']==1
@@ -568,7 +568,7 @@ jobs:
           retention-days: 14
       - name: Source-audit 459 Greek words with no exact UBS original Greek headword
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_missing_exact_headwords.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_missing_exact_headwords.py \
             --source /tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -588,7 +588,7 @@ jobs:
           PY
       - name: Read-only source analysis of 456 remaining Greek lexeme spellings
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_456_lexical_variants.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_456_lexical_variants.py \
             --missing /tmp/bsi-ubs-greek-459-lexeme-source-gaps.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -607,7 +607,7 @@ jobs:
           PY
       - name: Independently audit authentic UBS Greek EN/FR AlternateLemmas for 456 source word IDs
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_ubs_explicit_alternate_lemmas.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_ubs_explicit_alternate_lemmas.py \
             --report /tmp/bsi-ubs-greek-456-original-source-variant-evidence.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -626,7 +626,7 @@ jobs:
           PY
       - name: Independently inspect original UBS inflections for the last 47 Greek source words
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_last_47_lexical_forms.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_last_47_lexical_forms.py \
             --alternates /tmp/bsi-ubs-greek-456-explicit-original-ubs-alternate-lemmas.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -666,10 +666,10 @@ jobs:
           retention-days: 14
       - name: Review three authentic Greek Alpha letter-name word headwords without rewriting capitalization
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_alpha_case_only.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_alpha_case_only.py \
             --candidate /tmp/bsi-ubs-greek-strong-zero-headwords-private.json \
             --source /tmp/bsi-ubs-greek-459-lexeme-source-gaps.json \
-            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_case_only_alpha.json \
+            --ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_case_only_alpha.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --output /tmp/bsi-ubs-greek-three-alpha-word-headwords-private.json
@@ -677,7 +677,7 @@ jobs:
           import json
           from pathlib import Path
           c=json.loads(Path('/tmp/bsi-ubs-greek-three-alpha-word-headwords-private.json').read_text())
-          old=json.loads(Path('entity-index/links/dictionaries/ubs-greek/index.json').read_text())
+          old=json.loads(Path('bible-semantic-index/links/dictionaries/ubs-greek/index.json').read_text())
           assert all(c[k]==v for k,v in old.items())
           assert len(c['by_macula_word'])==9190
           assert len(c['by_macula_ambiguous_word'])==220
@@ -705,7 +705,7 @@ jobs:
           retention-days: 14
       - name: Independently audit five original Greek composite Strong word IDs without splitting
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_composite_strong_original_words.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_composite_strong_original_words.py \
             --report /tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -725,11 +725,11 @@ jobs:
           PY
       - name: Review five authentic Greek original-word composite Strong lexical headwords
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_composite_strong_headwords.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_composite_strong_headwords.py \
             --candidate /tmp/bsi-ubs-greek-three-alpha-word-headwords-private.json \
             --raw_source /tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json \
             --report /tmp/bsi-ubs-greek-five-original-composites-review.json \
-            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_composite_strong_headwords.json \
+            --ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_composite_strong_headwords.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --output /tmp/bsi-ubs-greek-reviewed-five-composite-private.json
@@ -737,7 +737,7 @@ jobs:
           import json
           from pathlib import Path
           c=json.loads(Path('/tmp/bsi-ubs-greek-reviewed-five-composite-private.json').read_text())
-          old=json.loads(Path('entity-index/links/dictionaries/ubs-greek/index.json').read_text())
+          old=json.loads(Path('bible-semantic-index/links/dictionaries/ubs-greek/index.json').read_text())
           assert all(c[k]==v for k,v in old.items())
           assert len(c['by_macula_word'])==9195
           assert len(c['by_macula_ambiguous_word'])==220
@@ -758,13 +758,13 @@ jobs:
             /tmp/bsi-ubs-greek-strong-zero-headwords-private.json \
             /tmp/bsi-ubs-greek-three-alpha-word-headwords-private.json \
             /tmp/bsi-ubs-greek-reviewed-five-composite-private.json; do
-            python3 -I entity-index/links/dictionaries/ubs-greek/validate_word_coverage_invariants.py \
-              --baseline entity-index/links/dictionaries/ubs-greek/index.json \
+            python3 -I bible-semantic-index/links/dictionaries/ubs-greek/validate_word_coverage_invariants.py \
+              --baseline bible-semantic-index/links/dictionaries/ubs-greek/index.json \
               --candidate "$path"
           done
       - name: Independently audit exact Greek ὁπότε source word and original UBS bilingual POS
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_hopote_original_word.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_hopote_original_word.py \
             --candidate /tmp/bsi-ubs-greek-reviewed-five-composite-private.json \
             --residual /tmp/bsi-ubs-greek-173-original-word-evidence.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
@@ -772,22 +772,22 @@ jobs:
             --output /tmp/bsi-ubs-greek-hopote-original-word-evidence.json
       - name: Source-review original Greek temporal headword without changing conj or ADV annotations
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_hopote_headword.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_hopote_headword.py \
             --candidate /tmp/bsi-ubs-greek-reviewed-five-composite-private.json \
             --residual /tmp/bsi-ubs-greek-173-original-word-evidence.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --evidence /tmp/bsi-ubs-greek-hopote-original-word-evidence.json \
-            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_hopote_temporal_headword.json \
+            --ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_hopote_temporal_headword.json \
             --output /tmp/bsi-ubs-greek-reviewed-hopote-private.json
-          python3 -I entity-index/links/dictionaries/ubs-greek/validate_word_coverage_invariants.py \
-            --baseline entity-index/links/dictionaries/ubs-greek/index.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/validate_word_coverage_invariants.py \
+            --baseline bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --candidate /tmp/bsi-ubs-greek-reviewed-hopote-private.json
           python3 - <<'PY'
           import json
           from pathlib import Path
           x=json.loads(Path('/tmp/bsi-ubs-greek-reviewed-hopote-private.json').read_text())
-          b=json.loads(Path('entity-index/links/dictionaries/ubs-greek/index.json').read_text())
+          b=json.loads(Path('bible-semantic-index/links/dictionaries/ubs-greek/index.json').read_text())
           assert all(x[k]==v for k,v in b.items())
           assert len(x['by_macula_word'])==9195
           assert len(x['by_macula_ambiguous_word'])==220
@@ -802,21 +802,21 @@ jobs:
           PY
       - name: Source-review 409 individual Greek word heads via original UBS explicit bilingual alternate lemmas
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_explicit_ubs_alternates.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_reviewed_explicit_ubs_alternates.py \
             --candidate /tmp/bsi-ubs-greek-reviewed-hopote-private.json \
             --report /tmp/bsi-ubs-greek-456-explicit-original-ubs-alternate-lemmas.json \
-            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_explicit_ubs_alternates.json \
+            --ledger bible-semantic-index/links/dictionaries/ubs-greek/v1_reviewed_explicit_ubs_alternates.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --output /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json
-          python3 -I entity-index/links/dictionaries/ubs-greek/validate_word_coverage_invariants.py \
-            --baseline entity-index/links/dictionaries/ubs-greek/index.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/validate_word_coverage_invariants.py \
+            --baseline bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --candidate /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json
           python3 - <<'PY'
           import json
           from pathlib import Path
           r=json.loads(Path('/tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json').read_text())
-          old=json.loads(Path('entity-index/links/dictionaries/ubs-greek/index.json').read_text())
+          old=json.loads(Path('bible-semantic-index/links/dictionaries/ubs-greek/index.json').read_text())
           assert all(r[k]==v for k,v in old.items())
           assert len(r['by_macula_word'])==9604
           assert len(r['by_macula_ambiguous_word'])==220
@@ -832,8 +832,8 @@ jobs:
           PY
       - name: Independently census UBS sense candidate evidence across all 137741 original Greek word IDs
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_contextual_sense_candidates.py \
-            --index entity-index/links/dictionaries/ubs-greek/index.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_contextual_sense_candidates.py \
+            --index bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --reviewed /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -857,8 +857,8 @@ jobs:
           PY
       - name: Stage 122504 original-word UBS LEXID source candidates as provisional, preserving every unresolved word
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_provisional_context_sense_overlay.py \
-            --index entity-index/links/dictionaries/ubs-greek/index.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_provisional_context_sense_overlay.py \
+            --index bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --reviewed /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -894,7 +894,7 @@ jobs:
           retention-days: 14
       - name: Independently triage all 15237 Greek source word semantic exceptions by authentic original LN evidence
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_unresolved_semantic_priorities.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_unresolved_semantic_priorities.py \
             --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -913,7 +913,7 @@ jobs:
           PY
       - name: Source-review 170 weaker confidence Greek words with only one available original UBS sense
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_lower_confidence_single_sense.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_lower_confidence_single_sense.py \
             --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json \
             --priorities /tmp/bsi-ubs-greek-15237-original-source-LN-and-UBS-semantic-priorities.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
@@ -949,7 +949,7 @@ jobs:
           retention-days: 14
       - name: Partition 2728 original multi-LEXID words into source-preserving contextual review batches
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_context_review_batches.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_context_review_batches.py \
             --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json \
             --output /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
             --batch-size 100
@@ -971,14 +971,14 @@ jobs:
           PY
       - name: Compare original UBS bilingual form evidence for Greek ἰδού and ἴδε
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_sense_form_witnesses.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_sense_form_witnesses.py \
             --batches /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --output /tmp/bsi-ubs-greek-ide-idou-original-source-form-evidence-PRIVATE.json
       - name: Stage 223 authentic source-form-specific Greek UBS provisional sense choices
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_form_supported_provisional_senses.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_form_supported_provisional_senses.py \
             --batches /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -1012,7 +1012,7 @@ jobs:
           retention-days: 14
       - name: Inspect actual UBS bilingual LEXReferences fields for all 2728 ambiguous Greek source words
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_sense_reference_shapes.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_sense_reference_shapes.py \
             --batches /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
@@ -1026,8 +1026,8 @@ jobs:
           retention-days: 14
       - name: Independently audit UBS LEXID passage witnesses against all original MACULA Greek word IDs
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_ubs_source_verse_witnesses.py \
-            --index entity-index/links/dictionaries/ubs-greek/index.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_ubs_source_verse_witnesses.py \
+            --index bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --reviewed /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json \
             --batches /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
@@ -1057,7 +1057,7 @@ jobs:
           retention-days: 14
       - name: Verify and stage 258 uniquely source-verse-supported original Greek UBS provisional sense choices
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_source_verse_provisional_senses.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_source_verse_provisional_senses.py \
             --report /tmp/bsi-ubs-greek-original-source-verse-lexid-candidates-PRIVATE.json \
             --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json \
             --high /tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json \
@@ -1088,7 +1088,7 @@ jobs:
           retention-days: 14
       - name: Calibrate actual UBS Greek source citation word positions without presuming MACULA token alignment
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/audit_ubs_token_position_alignment.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/audit_ubs_token_position_alignment.py \
             --high /tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json \
             --batches /tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
             --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
@@ -1115,7 +1115,7 @@ jobs:
           retention-days: 14
       - name: Stage 40 extra source-position-confirmed Greek UBS provisional LEXIDs after original calibration
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_source_position_provisional_senses.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_source_position_provisional_senses.py \
             --position /tmp/bsi-ubs-greek-original-reference-position-calibration-PRIVATE.json \
             --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json \
             --high /tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json \
@@ -1147,8 +1147,8 @@ jobs:
           retention-days: 14
       - name: Consolidate all 137741 original Greek words into private source-backed lookup
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_consolidated_v1_review_index.py \
-            --index entity-index/links/dictionaries/ubs-greek/index.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_consolidated_v1_review_index.py \
+            --index bible-semantic-index/links/dictionaries/ubs-greek/index.json \
             --reviewed /tmp/bsi-ubs-greek-409-explicit-ubs-alternate-headwords-private.json \
             --high /tmp/bsi-ubs-greek-122504-provisional-UBS-LEXID-source-candidates-PRIVATE.json \
             --unresolved /tmp/bsi-ubs-greek-15237-unresolved-contextual-LEXID-evidence-PRIVATE.json \
@@ -1175,7 +1175,7 @@ jobs:
           assert d['semantic_context_independently_verified']==0
           assert d['original_index_and_sources_modified'] is False
           assert d['publication_approved'] is False
-          mod=runpy.run_path('entity-index/links/dictionaries/ubs-greek/build_consolidated_v1_review_index.py')
+          mod=runpy.run_path('bible-semantic-index/links/dictionaries/ubs-greek/build_consolidated_v1_review_index.py')
           assert mod['lookup'](d,'unknown')['status']=='unknown_original_word_id'
           assert all((x['provisional_ubs_lexid'] is None)==(x['status']!='provisional_ubs_lexid')
                      for x in d['by_original_macula_word_id'].values())
@@ -1183,7 +1183,7 @@ jobs:
           PY
       - name: Build rights-minimized public UBS Greek v0.1.0 identifier-only archive
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-greek/build_public_identifier_release.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_public_identifier_release.py \
             --private-index /tmp/bsi-ubs-greek-v1-consolidated-original-word-index-PRIVATE.json \
             --output /tmp/BSI-UBS-Greek-0.1.0.zip
           python3 - <<'PY'

@@ -10,7 +10,7 @@ review, not an assertion of exclusive copyright ownership or legal advice.
   (the **JSON and Markdown release is CC BY-SA 4.0**, copyright 2025
   Mission Mutual; its LICENSE.md credits BiblioNexus 2024).
 - Source license: https://github.com/icfmp/ACAI/blob/e80a874e8282f996199c595378a3b3b9a43aac22/LICENSE.md
-- MACULA Hebrew and Greek pinned editions are recorded in `source.lock.json`;
+- MACULA Hebrew and Greek pinned editions are recorded in `../data/source.lock.json`;
   their dataset LICENSE files declare CC BY 4.0. BSI does **not** package
   their original biblical text, glosses or source TSV data; it retains
   edition-qualified original-word IDs verified against the pinned inventories.

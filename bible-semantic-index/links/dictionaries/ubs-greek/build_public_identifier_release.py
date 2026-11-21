@@ -118,7 +118,7 @@ unsupported cases instead of inventing semantic identities. No
 source definitions or Greek verse text were copied. Sense links are
 labeled provisional; they were not semantically verified one by one.
 See the reconstruction scripts and tests under
-https://github.com/icfmp/Bible-Resources/tree/main/entity-index/links/dictionaries/ubs-greek
+https://github.com/icfmp/Bible-Resources/tree/main/bible-semantic-index/links/dictionaries/ubs-greek
 
 No upstream organization endorses this independently prepared index.
 """

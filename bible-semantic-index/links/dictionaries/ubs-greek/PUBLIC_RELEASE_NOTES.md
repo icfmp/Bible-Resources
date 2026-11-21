@@ -54,4 +54,4 @@ sources or their definitions.
 - MACULA Greek SBLGNT:
   `8423afe47b9e8f24b7772e808af45c7159a6fe7e`
 
-See the [reproducible source-pinned builder and documentation](https://github.com/icfmp/Bible-Resources/tree/main/entity-index/links/dictionaries/ubs-greek).
+See the [reproducible source-pinned builder and documentation](https://github.com/icfmp/Bible-Resources/tree/main/bible-semantic-index/links/dictionaries/ubs-greek).

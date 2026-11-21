@@ -497,16 +497,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, required=True,
                         help="Local immutable snapshot of the ACAI repository")
-    parser.add_argument("--lock", type=Path, default=Path(__file__).with_name("source.lock.json"))
-    parser.add_argument("--decisions", type=Path, default=Path(__file__).with_name("editorial-decisions.json"))
+    parser.add_argument("--lock", type=Path, default=(Path(__file__).resolve().parents[1] / "data" / "source.lock.json"))
+    parser.add_argument("--decisions", type=Path, default=(Path(__file__).resolve().parents[1] / "data" / "editorial-decisions.json"))
     parser.add_argument("--source-absences", type=Path,
-                        default=Path(__file__).with_name("source-unattested-words.json"),
+                        default=(Path(__file__).resolve().parents[1] / "data" / "source-unattested-words.json"),
                         help="Pinned source-word audit evidence; only affects derived lookup")
     parser.add_argument("--source-verse-absences", type=Path,
-                        default=Path(__file__).with_name("source-unattested-verses.json"),
+                        default=(Path(__file__).resolve().parents[1] / "data" / "source-unattested-verses.json"),
                         help="Edition-specific pinned original-word verse inventory evidence")
     parser.add_argument("--reference-qualifications", type=Path,
-                        default=Path(__file__).with_name("source-reference-qualifications.json"),
+                        default=(Path(__file__).resolve().parents[1] / "data" / "source-reference-qualifications.json"),
                         help="Pinned source-specific textual variant/subscription claim receipts")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--verify-source-commit", action="store_true",

@@ -3,12 +3,12 @@ name: BSI UBS Hebrew dictionary crosswalk
 on:
   pull_request:
     paths:
-      - "entity-index/links/dictionaries/ubs-hebrew/**"
+      - "bible-semantic-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
   push:
     branches: [main]
     paths:
-      - "entity-index/links/dictionaries/ubs-hebrew/**"
+      - "bible-semantic-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
   workflow_dispatch:
 
@@ -23,28 +23,28 @@ jobs:
       - uses: actions/checkout@v4
       - name: Offline regression tests
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_index.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_lexical_gaps.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_strong_reconciliation.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_word_anchored.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_dictionary_scope.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_family_register.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_editorial_scope_dispositions.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_lexical_nonidentity.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_multi_headword_abstentions.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_reviewed_headwords.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_source_morpheme_abstentions.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_v1_disposition_coverage.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_single_candidate_abstentions.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_reviewed_word_anchor_preview.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_positive_family_unwitnessed.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_additional_word_headwords.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_private_reviewed_candidate.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_package_reviewed_v1_candidate.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_promote_verified_ubs_release.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_v11_semantic_feasibility.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_v11_context_pilot.py
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_v11_context_pilot_screening.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_index.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_lexical_gaps.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_strong_reconciliation.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_word_anchored.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_dictionary_scope.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_family_register.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_editorial_scope_dispositions.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_lexical_nonidentity.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_multi_headword_abstentions.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_reviewed_headwords.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_source_morpheme_abstentions.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_v1_disposition_coverage.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_single_candidate_abstentions.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_reviewed_word_anchor_preview.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_positive_family_unwitnessed.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_additional_word_headwords.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_private_reviewed_candidate.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_package_reviewed_v1_candidate.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_promote_verified_ubs_release.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_v11_semantic_feasibility.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_v11_context_pilot.py
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/test_v11_context_pilot_screening.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -71,27 +71,27 @@ jobs:
           test "$(wc -c < macula-hebrew/WLC/tsv/macula-hebrew.tsv)" -gt 80000000
       - name: Analyze exact bilingual sense IDs and WLC source links
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/analyze_alignment.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/analyze_alignment.py \
             ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
             macula-hebrew/WLC/tsv/macula-hebrew.tsv
       - name: Build full bilingual lexical crosswalk
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/build_index.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/build_index.py \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --french ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-index.json
       - name: Audit every unresolved dictionary link against pinned originals
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_unmatched.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/audit_unmatched.py \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-unmatched-audit.json
       - name: Diagnose unresolved Strong suffix families by original lemma and morphology
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_variants.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/audit_variants.py \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
@@ -99,7 +99,7 @@ jobs:
             --expected-rows 475911
       - name: Rank every unresolved lexical occurrence by original language and lemma
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_lexical_gaps.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/audit_lexical_gaps.py \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
@@ -107,14 +107,14 @@ jobs:
 
       - name: Investigate ten high-frequency unresolved Hebrew lexemes
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_top_lemmas.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/audit_top_lemmas.py \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-top-lemmas.json
       - name: Audit source-grounded Strong numeric-family reconciliation candidates
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_strong_reconciliation.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/audit_strong_reconciliation.py \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
@@ -129,7 +129,7 @@ jobs:
           assert actual["counts"]["dual_evidence_candidate_occurrences"] == 7588
           assert actual["distinct_candidate_lexemes"] == 508
           assert all(x["verification_state"] == "candidate_only_not_accepted_link" for x in actual["candidates"])
-          dest=Path("entity-index/links/dictionaries/ubs-hebrew/reconciliation_candidates.json")
+          dest=Path("bible-semantic-index/links/dictionaries/ubs-hebrew/reconciliation_candidates.json")
           if dest.exists():
               assert json.loads(dest.read_text(encoding="utf-8")) == actual, "Candidate report differs from current pinned original sources"
               print("RECONCILIATION_CANDIDATE_REPORT_VERIFIED")
@@ -138,80 +138,80 @@ jobs:
           PY
       - name: Audit SDBH exact sense identity against independent lexical evidence
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_direct_sense_fidelity.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/audit_direct_sense_fidelity.py \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-sdbh-id-integrity.json
       - name: Examine remaining Hebrew orthographic differences without inferring links
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_orthography_gaps.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/audit_orthography_gaps.py \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-orthography-gaps.json
       - name: Audit full UBS dictionary headword scope for remaining lexical words
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_dictionary_scope.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/audit_dictionary_scope.py \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-scope.json
       - name: Build complete source-traceable v1 unresolved lexical family register
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/build_family_register.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/build_family_register.py \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-family-register.json
       - name: Verify editorial nonidentity judgments against pinned UBS and MACULA originals
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_lexical_nonidentity.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/verify_lexical_nonidentity.py \
             --register /tmp/bsi-ubs-hebrew-family-register.json \
-            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_lexical_nonidentity_dispositions.json \
+            --decisions bible-semantic-index/links/dictionaries/ubs-hebrew/v1_lexical_nonidentity_dispositions.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
       - name: Verify all frozen multiple-headword abstentions from pinned UBS and MACULA sources
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_multi_headword_abstentions.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/verify_multi_headword_abstentions.py \
             --register /tmp/bsi-ubs-hebrew-family-register.json \
-            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_multi_headword_abstentions.json \
+            --decisions bible-semantic-index/links/dictionaries/ubs-hebrew/v1_multi_headword_abstentions.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
       - name: Source-verify source-reviewed UBS entry-only identities
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_reviewed_headwords.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/verify_reviewed_headwords.py \
             --register /tmp/bsi-ubs-hebrew-family-register.json \
-            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
+            --decisions bible-semantic-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
       - name: Source-verify grammatical morphemes kept unlinked from inherited UBS headwords
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_source_morpheme_abstentions.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/verify_source_morpheme_abstentions.py \
             --register /tmp/bsi-ubs-hebrew-family-register.json \
-            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_source_morpheme_abstentions.json \
+            --decisions bible-semantic-index/links/dictionaries/ubs-hebrew/v1_source_morpheme_abstentions.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
       - name: Verify source-keyed sole-candidate lexical abstentions without word links
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_single_candidate_abstentions.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/verify_single_candidate_abstentions.py \
             --register /tmp/bsi-ubs-hebrew-family-register.json \
-            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_single_candidate_abstentions.json \
+            --decisions bible-semantic-index/links/dictionaries/ubs-hebrew/v1_single_candidate_abstentions.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
       - name: Stage only exact reviewed WLC word witnesses as entry-only candidate overlay
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/stage_reviewed_word_anchors.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/stage_reviewed_word_anchors.py \
             --register /tmp/bsi-ubs-hebrew-family-register.json \
             --index /tmp/bsi-ubs-hebrew-index.json \
-            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
+            --decisions bible-semantic-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-reviewed-word-preview.json
           python3 - <<'PY'
           import json
           from pathlib import Path
-          rel = Path("entity-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json")
+          rel = Path("bible-semantic-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json")
           observed = json.loads(Path("/tmp/bsi-ubs-reviewed-word-preview.json").read_text(encoding="utf-8"))
           expected = json.loads(rel.read_text(encoding="utf-8"))
           assert observed == expected, "Reviewed anchor preview differs from pinned WLC"
@@ -225,29 +225,29 @@ jobs:
           PY
       - name: Enumerate every pending original WLC word inside source-reviewed headword families
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_positive_family_unwitnessed.py \
-            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
-            --preview entity-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/audit_positive_family_unwitnessed.py \
+            --decisions bible-semantic-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
+            --preview bible-semantic-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-positive-family-pending-original-words.json
-          if [ -f entity-index/links/dictionaries/ubs-hebrew/positive_family_pending_original_words.json ]; then
+          if [ -f bible-semantic-index/links/dictionaries/ubs-hebrew/positive_family_pending_original_words.json ]; then
             python3 - <<'PY'
           import json
           from pathlib import Path
           generated=json.loads(Path("/tmp/bsi-ubs-positive-family-pending-original-words.json").read_text(encoding="utf-8"))
-          committed=json.loads(Path("entity-index/links/dictionaries/ubs-hebrew/positive_family_pending_original_words.json").read_text(encoding="utf-8"))
+          committed=json.loads(Path("bible-semantic-index/links/dictionaries/ubs-hebrew/positive_family_pending_original_words.json").read_text(encoding="utf-8"))
           assert generated == committed, "Original MACULA word-level positive-family audit has drifted"
           print("UBS_135_PENDING_WORDS_EXACT_SOURCE_PIN_VERIFIED")
           PY
           fi
       - name: Verify 134 additional exact original WLC headwords and one source uncertainty
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_additional_word_headwords.py \
-            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_additional_word_headword_dispositions.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/verify_additional_word_headwords.py \
+            --decisions bible-semantic-index/links/dictionaries/ubs-hebrew/v1_additional_word_headword_dispositions.json \
             --audit /tmp/bsi-ubs-positive-family-pending-original-words.json \
-            --ledger entity-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
-            --preview entity-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json \
+            --ledger bible-semantic-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
+            --preview bible-semantic-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
@@ -256,7 +256,7 @@ jobs:
           import json
           from pathlib import Path
           observed=json.loads(Path("/tmp/bsi-ubs-reviewed-additional-word-headwords.json").read_text(encoding="utf-8"))
-          expected=json.loads(Path("entity-index/links/dictionaries/ubs-hebrew/reviewed_additional_word_anchor_preview.json").read_text(encoding="utf-8"))
+          expected=json.loads(Path("bible-semantic-index/links/dictionaries/ubs-hebrew/reviewed_additional_word_anchor_preview.json").read_text(encoding="utf-8"))
           assert observed == expected, "Original WLC word-specific editorial overlay differs from source-verified output"
           assert observed["summary"] == {
               "new_individually_approved_original_words": 134,
@@ -289,28 +289,28 @@ jobs:
           assert sum(g["occurrences"] for g in register["families"]) == 8582
           assert summary["families_with_editorial_decision"] == 0
           assert all(g["review_decision"] == "not_editorially_validated" for g in register["families"])
-          dest=Path("entity-index/links/dictionaries/ubs-hebrew/family_register.json")
+          dest=Path("bible-semantic-index/links/dictionaries/ubs-hebrew/family_register.json")
           if dest.is_file():
               assert json.loads(dest.read_text(encoding="utf-8")) == register, "Family register does not match pinned sources"
           print("UBS_FAMILY_REGISTER_REPRODUCIBLE", summary)
           PY
       - name: Audit the entire independent UBS v1 editorial disposition partition
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_v1_disposition_coverage.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/audit_v1_disposition_coverage.py \
             --register /tmp/bsi-ubs-hebrew-family-register.json \
-            --scope entity-index/links/dictionaries/ubs-hebrew/v1_scope_dispositions.json \
-            --nonidentity entity-index/links/dictionaries/ubs-hebrew/v1_lexical_nonidentity_dispositions.json \
-            --ambiguous entity-index/links/dictionaries/ubs-hebrew/v1_multi_headword_abstentions.json \
-            --morphemes entity-index/links/dictionaries/ubs-hebrew/v1_source_morpheme_abstentions.json \
-            --single entity-index/links/dictionaries/ubs-hebrew/v1_single_candidate_abstentions.json \
-            --positive entity-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
+            --scope bible-semantic-index/links/dictionaries/ubs-hebrew/v1_scope_dispositions.json \
+            --nonidentity bible-semantic-index/links/dictionaries/ubs-hebrew/v1_lexical_nonidentity_dispositions.json \
+            --ambiguous bible-semantic-index/links/dictionaries/ubs-hebrew/v1_multi_headword_abstentions.json \
+            --morphemes bible-semantic-index/links/dictionaries/ubs-hebrew/v1_source_morpheme_abstentions.json \
+            --single bible-semantic-index/links/dictionaries/ubs-hebrew/v1_single_candidate_abstentions.json \
+            --positive bible-semantic-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --output /tmp/bsi-ubs-v1-disposition-coverage.json
           python3 - <<'PY'
           import json
           from pathlib import Path
           actual=json.loads(Path("/tmp/bsi-ubs-v1-disposition-coverage.json").read_text(encoding="utf-8"))
-          snapshot=json.loads(Path("entity-index/links/dictionaries/ubs-hebrew/v1_disposition_coverage.json").read_text(encoding="utf-8"))
+          snapshot=json.loads(Path("bible-semantic-index/links/dictionaries/ubs-hebrew/v1_disposition_coverage.json").read_text(encoding="utf-8"))
           assert actual == snapshot, "UBS v1 ledger partition differs from pinned original source inventory"
           counts=actual["counts"]
           assert (counts["in_scope_occurrences_with_any_disposition"]
@@ -328,7 +328,7 @@ jobs:
           import json
           from pathlib import Path
           generated=Path("/tmp/bsi-ubs-hebrew-index.json")
-          target=Path("entity-index/links/dictionaries/ubs-hebrew/index.json")
+          target=Path("bible-semantic-index/links/dictionaries/ubs-hebrew/index.json")
           actual=json.loads(generated.read_text(encoding="utf-8"))
           assert actual["format"]=="bsi-ubs-hebrew-lexical-crosswalk"
           assert actual["languages"]==["en","fr"]
@@ -368,7 +368,7 @@ jobs:
               "no_entry_match","no_verified_lexical_link"))==475911
           assert actual["by_sdbh"]["006653001001000"]==["006653000000000"]
           import runpy
-          lookup=runpy.run_path("entity-index/links/dictionaries/ubs-hebrew/build_index.py")["lookup"]
+          lookup=runpy.run_path("bible-semantic-index/links/dictionaries/ubs-hebrew/build_index.py")["lookup"]
           direct=lookup(actual,"006653001001000","7225","H")
           assert "006653000000000" not in direct["entry_ids"] and direct["sense_ids"]==[]
           fallback=lookup(actual,"001156001002000","1254","H")
@@ -382,9 +382,9 @@ jobs:
           PY
       - name: Audit all 26 final lexically uncertain source words, read-only
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_final_lexical_uncertainties.py \
-            --single entity-index/links/dictionaries/ubs-hebrew/v1_single_candidate_abstentions.json \
-            --additional entity-index/links/dictionaries/ubs-hebrew/v1_additional_word_headword_dispositions.json \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/audit_final_lexical_uncertainties.py \
+            --single bible-semantic-index/links/dictionaries/ubs-hebrew/v1_single_candidate_abstentions.json \
+            --additional bible-semantic-index/links/dictionaries/ubs-hebrew/v1_additional_word_headword_dispositions.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --french ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
@@ -398,10 +398,10 @@ jobs:
           retention-days: 7
       - name: Rebuild private source-word-verified v1 candidate without touching original index
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/build_private_reviewed_candidate.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/build_private_reviewed_candidate.py \
             --index /tmp/bsi-ubs-hebrew-index.json \
-            --first entity-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json \
-            --additional entity-index/links/dictionaries/ubs-hebrew/reviewed_additional_word_anchor_preview.json \
+            --first bible-semantic-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json \
+            --additional bible-semantic-index/links/dictionaries/ubs-hebrew/reviewed_additional_word_anchor_preview.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-v1-private-reviewed-candidate.json
@@ -419,7 +419,7 @@ jobs:
           assert candidate["editorial_candidate"]["status"] == "private_v1_candidate_not_published_or_approved"
           assert candidate["editorial_candidate"]["inferred_contextual_sense_ids"] == 0
           assert candidate["editorial_candidate"]["original_index_sha256"] == hashlib.sha256(original.read_bytes()).hexdigest()
-          manifest=Path("entity-index/links/dictionaries/ubs-hebrew/v1_private_candidate_manifest.json")
+          manifest=Path("bible-semantic-index/links/dictionaries/ubs-hebrew/v1_private_candidate_manifest.json")
           if manifest.is_file():
               expected=json.loads(manifest.read_text(encoding="utf-8"))
               assert expected["source_editions"] == candidate["editorial_candidate"]["index_source_revisions"]
@@ -435,17 +435,17 @@ jobs:
           PY
       - name: Rebuild 275-word final reviewed private candidate, preserve 24 source abstentions
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/build_final_reviewed_candidate.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/build_final_reviewed_candidate.py \
             --index /tmp/bsi-ubs-v1-private-reviewed-candidate.json \
-            --source_manifest entity-index/links/dictionaries/ubs-hebrew/v1_private_candidate_manifest.json \
-            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_final_word_specific_approvals.json \
+            --source_manifest bible-semantic-index/links/dictionaries/ubs-hebrew/v1_private_candidate_manifest.json \
+            --decisions bible-semantic-index/links/dictionaries/ubs-hebrew/v1_final_word_specific_approvals.json \
             --source_evidence /tmp/bsi-ubs-last-26-original-wlc-evidence.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-v1-final-275-word-candidate.json
       - name: Measure one-pass Hebrew v1.1 semantic evidence on pinned original UBS and complete WLC
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_v11_semantic_feasibility.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/audit_v11_semantic_feasibility.py \
             --index /tmp/bsi-ubs-v1-final-275-word-candidate.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --french ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
@@ -471,7 +471,7 @@ jobs:
           PY
       - name: Build 72 private UBS Hebrew context pilot witnesses stratified by headword frequency
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/build_v11_context_pilot.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/build_v11_context_pilot.py \
             --audit /tmp/bsi-ubs-hebrew-v11-source-only-semantic-feasibility-PRIVATE.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --french ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
@@ -492,9 +492,9 @@ jobs:
           PY
       - name: Verify source-matched Hebrew v1.1 72-word contextual screening and abstentions
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_v11_context_pilot_screening.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/verify_v11_context_pilot_screening.py \
             --sample /tmp/bsi-ubs-hebrew-v11-72-word-contextual-pilot-PRIVATE.json \
-            --screening entity-index/links/dictionaries/ubs-hebrew/v11_contextual_pilot_screening.json \
+            --screening bible-semantic-index/links/dictionaries/ubs-hebrew/v11_contextual_pilot_screening.json \
             --output /tmp/bsi-ubs-hebrew-v11-72-contextual-screen-verification-PRIVATE.json
           python3 - <<'PY'
           import json
@@ -540,9 +540,9 @@ jobs:
           retention-days: 14
       - name: Verify reproducible, attributed UBS v1.0 technical RC package (NOT a release)
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/package_reviewed_v1_candidate.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/package_reviewed_v1_candidate.py \
             --index /tmp/bsi-ubs-v1-final-275-word-candidate.json \
-            --release_manifest entity-index/links/dictionaries/ubs-hebrew/v1_final_candidate_manifest.json \
+            --release_manifest bible-semantic-index/links/dictionaries/ubs-hebrew/v1_final_candidate_manifest.json \
             --output /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc2.zip
           cd /tmp
           sha256sum -c BSI-UBSHebrew-0.9.4-v1.0-rc2.zip.sha256
@@ -570,9 +570,9 @@ jobs:
           PY
       - name: Stage exact owner-authorized, source-verified public ZIP for PR validation
         run: |
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/promote_verified_ubs_release.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/promote_verified_ubs_release.py \
             --technical-rc /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc2.zip \
-            --approval entity-index/links/dictionaries/ubs-hebrew/v1_publication_authorization.json \
+            --approval bible-semantic-index/links/dictionaries/ubs-hebrew/v1_publication_authorization.json \
             --output /tmp/BSI-UBSHebrew-0.9.4-v1.0.0.zip \
             --preview
           (cd /tmp && sha256sum --check BSI-UBSHebrew-0.9.4-v1.0.0.zip.sha256)
@@ -637,9 +637,9 @@ jobs:
       - name: Re-derive and verify the owner-authorized public ZIP bytes, no rebuild guesses
         run: |
           set -euo pipefail
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/promote_verified_ubs_release.py \
+          python3 -I bible-semantic-index/links/dictionaries/ubs-hebrew/promote_verified_ubs_release.py \
             --technical-rc review-stage/BSI-UBSHebrew-0.9.4-v1.0-rc2.zip \
-            --approval entity-index/links/dictionaries/ubs-hebrew/v1_publication_authorization.json \
+            --approval bible-semantic-index/links/dictionaries/ubs-hebrew/v1_publication_authorization.json \
             --output release-stage/BSI-UBSHebrew-0.9.4-v1.0.0.zip \
             --verify-only
           (cd review-stage && sha256sum --check BSI-UBSHebrew-0.9.4-v1.0-rc2.zip.sha256)
