@@ -17,7 +17,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 - GENERALIZE: 3
 - HISTORICAL/ARCHIVE: 9
 - KEEP_GENERIC: 26
-- MERGE: 11
+- MERGE: 10
 - UNDECIDED: 129
 
 ## All tracked tools
@@ -56,8 +56,6 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_native_raw_inventory.py`](../../scripts/commentary_native_raw_inventory.py) | KEEP_GENERIC | named test | 12 | source/native audit |
 | [`scripts/commentary_navigation_link_plan.py`](../../scripts/commentary_navigation_link_plan.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_near_prose_unicode_review.py`](../../scripts/commentary_near_prose_unicode_review.py) | UNDECIDED | named test | 2 | not determined |
-| [`scripts/commentary_nonlink_word_alignment.py`](../../scripts/commentary_nonlink_word_alignment.py) | MERGE | named test | 13 | not determined |
-| [`scripts/commentary_nonlink_words.py`](../../scripts/commentary_nonlink_words.py) | MERGE | named test | 7 | not determined |
 | [`scripts/commentary_original_bookcode_repair.py`](../../scripts/commentary_original_bookcode_repair.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/commentary_original_div1_book_consistency.py`](../../scripts/commentary_original_div1_book_consistency.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_osis_intro_transport_probe.py`](../../scripts/commentary_osis_intro_transport_probe.py) | UNDECIDED | named test | 2 | source/native audit |
@@ -66,7 +64,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_osis_transport_probe.py`](../../scripts/commentary_osis_transport_probe.py) | UNDECIDED | named test | 5 | source/native audit |
 | [`scripts/commentary_private_candidate_xiphos_gui.py`](../../scripts/commentary_private_candidate_xiphos_gui.py) | GENERALIZE | named test | 2 | not determined |
 | [`scripts/commentary_private_text_compare.py`](../../scripts/commentary_private_text_compare.py) | UNDECIDED | named test | 22 | source/native audit |
-| [`scripts/commentary_prose_cross_slot.py`](../../scripts/commentary_prose_cross_slot.py) | MERGE | named test | 4 | not determined |
+| [`scripts/commentary_prose_cross_slot.py`](../../scripts/commentary_prose_cross_slot.py) | MERGE | named test | 5 | not determined |
 | [`scripts/commentary_public_metadata_preflight.py`](../../scripts/commentary_public_metadata_preflight.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_rebuild_attestation_draft.py`](../../scripts/commentary_rebuild_attestation_draft.py) | UNDECIDED | named test | 3 | publication/release |
 | [`scripts/commentary_reference_cross_slot.py`](../../scripts/commentary_reference_cross_slot.py) | MERGE | named test | 4 | not determined |
@@ -82,9 +80,9 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_stock_prefix_topology.py`](../../scripts/commentary_stock_prefix_topology.py) | UNDECIDED | named test | 7 | not determined |
 | [`scripts/commentary_stock_xiphos_smoke.py`](../../scripts/commentary_stock_xiphos_smoke.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_sword_identity_migration.py`](../../scripts/commentary_sword_identity_migration.py) | UNDECIDED | named test | 2 | not determined |
-| [`scripts/commentary_text_delta.py`](../../scripts/commentary_text_delta.py) | KEEP_GENERIC | named test | 13 | not determined |
+| [`scripts/commentary_text_delta.py`](../../scripts/commentary_text_delta.py) | KEEP_GENERIC | named test | 12 | not determined |
 | [`scripts/commentary_unmarked_division_coverage.py`](../../scripts/commentary_unmarked_division_coverage.py) | UNDECIDED | named test | 1 | not determined |
-| [`scripts/commentary_unresolved_lexical_triage.py`](../../scripts/commentary_unresolved_lexical_triage.py) | MERGE | named test | 10 | not determined |
+| [`scripts/commentary_unresolved_lexical_triage.py`](../../scripts/commentary_unresolved_lexical_triage.py) | MERGE | named test | 11 | not determined |
 | [`scripts/commentary_usfm_title_witness.py`](../../scripts/commentary_usfm_title_witness.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/commentary_witness.py`](../../scripts/commentary_witness.py) | UNDECIDED | not established | 2 | source/native audit |
 | [`scripts/commentary_xiphos_dual_reader.py`](../../scripts/commentary_xiphos_dual_reader.py) | GENERALIZE | named test | 13 | not determined |
@@ -112,7 +110,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/note_whitespace_diagnostics.py`](../../scripts/note_whitespace_diagnostics.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/osis_semantic_fidelity.py`](../../scripts/osis_semantic_fidelity.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/pilot_fetch.py`](../../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 22 | not determined |
-| [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | named test | 95 | not determined |
+| [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | named test | 94 | not determined |
 | [`scripts/pilot_runtime.py`](../../scripts/pilot_runtime.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/pilot_subprocess.py`](../../scripts/pilot_subprocess.py) | UNDECIDED | named test | 15 | not determined |
 | [`scripts/prepare_darby_011_private_release_candidate.py`](../../scripts/prepare_darby_011_private_release_candidate.py) | HISTORICAL/ARCHIVE | named test | 3 | publication/release |
@@ -153,6 +151,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/commentary/commentary_editorial_topology.py`](../../scripts/research/commentary/commentary_editorial_topology.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/research/commentary/commentary_intro_chapter_text_review.py`](../../scripts/research/commentary/commentary_intro_chapter_text_review.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/research/commentary/commentary_lexical_overlap.py`](../../scripts/research/commentary/commentary_lexical_overlap.py) | UNDECIDED | not established | 3 | not determined |
+| [`scripts/research/commentary/commentary_nonlink_analysis.py`](../../scripts/research/commentary/commentary_nonlink_analysis.py) | MERGE | not established | 17 | not determined |
 | [`scripts/research/commentary/commentary_original_link_identity.py`](../../scripts/research/commentary/commentary_original_link_identity.py) | UNDECIDED | not established | 4 | not determined |
 | [`scripts/research/commentary/commentary_osis_rebuild_preflight.py`](../../scripts/research/commentary/commentary_osis_rebuild_preflight.py) | UNDECIDED | named test | 2 | publication/release |
 | [`scripts/research/commentary/commentary_paragraph_witness_probe.py`](../../scripts/research/commentary/commentary_paragraph_witness_probe.py) | UNDECIDED | named test | 2 | source/native audit |
