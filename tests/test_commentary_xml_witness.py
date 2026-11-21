@@ -88,6 +88,24 @@ class CommentaryXMLSourceTests(unittest.TestCase):
         self.assertNotIn('Unmarked source still contains', json.dumps(result))
         self.assertNotIn('Jude', json.dumps(result))
         self.assertTrue(result['source_division_text_stream_sha_is_not_original_file_byte_hash'])
+    def test_unmarked_division_without_chapter_remains_counted_not_assigned(self):
+        source = (
+            b'<?xml version="1.0" encoding="UTF-8"?>'
+            b'<ThML><div1 title="Unmarked document section">'
+            b'<p>Original material outside a numbered chapter.</p></div1>'
+            b'<div1 title="Chapter section"><div2>'
+            b'<p>Original unmarked chapter material.</p></div2></div1></ThML>'
+            + b" " * 1100
+        )
+        report = xml_structure(source)
+        self.assertEqual(report["element_counts"]["div1"], 2)
+        self.assertEqual(report["source_div1_with_direct_chapters"], 1)
+        self.assertEqual(report["source_direct_chapters_inside_div1"], 1)
+        self.assertEqual(len(report["source_chapter_bearing_div1_without_scripCom"]), 1)
+        self.assertFalse(report["authored_ranges_verified"])
+        self.assertNotIn("Unmarked document section", json.dumps(report))
+        self.assertNotIn("Original unmarked chapter material", json.dumps(report))
+
     def test_unmarked_division_neighbors_are_evidence_not_inferred_identity(self):
         source = (
             b'<?xml version="1.0" encoding="UTF-8"?>'
