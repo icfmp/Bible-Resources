@@ -118,6 +118,17 @@ class ScriptInventoryTests(unittest.TestCase):
                 self.assertIn(caller, entries[name]["static_references"])
         self.assertNotIn("scripts/commentary_original_link_identity.py", entries)
 
+    def test_link_disposition_review_keeps_real_cli_and_test_imports(self):
+        """Original link proposal checking remains pinned and read-only."""
+        entries = {entry["path"]: entry for entry in self.result["files"]}
+        helper = ("scripts/research/commentary/"
+                  "commentary_link_disposition_review.py")
+        self.assertIn(helper, entries)
+        for caller in ("scripts/commentary_modern_reference_gate.py",
+                       "tests/test_commentary_modern_reference_gate.py"):
+            self.assertIn(caller, entries[helper]["static_references"])
+        self.assertNotIn("scripts/commentary_link_disposition_review.py", entries)
+
     def test_nonlink_analyses_share_one_reviewed_research_module(self):
         """Check all substantive imports after retiring two root module paths."""
         entries = {row["path"]: row for row in self.result["files"]}
