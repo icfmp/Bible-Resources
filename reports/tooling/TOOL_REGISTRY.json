@@ -871,7 +871,7 @@
       "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_modern_draft_osis_preview.py",
-        "scripts/commentary_modern_reference_gate.py",
+        "scripts/research/commentary/commentary_link_disposition_review.py",
         ".github/workflows/commentary-modern-source-receipt.yml",
         "tests/test_commentary_modern_draft_guard.py"
       ]
@@ -1076,7 +1076,6 @@
         "argparse",
         "bisect",
         "collections",
-        "commentary_modern_draft_guard",
         "commentary_modern_draft_osis_preview",
         "difflib",
         "hashlib",
@@ -1094,15 +1093,16 @@
         "andbible"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "36987eb2d5ad0813d081b12346abb912334d81e3ff6b4e131c49dae33a73c5c0",
+      "sha256_at_inventory": "0a4d8353b95ae9291f41244ba6604c0f8da08bf06387603105fe50946b5f5e36",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/commentary_modern_draft_osis_preview.py",
         "scripts/research/commentary/commentary_original_link_identity.py",
         ".github/workflows/commentary-modern-source-receipt.yml",
+        ".github/workflows/maintenance-refresh-link-disposition-registry.yml",
         "tests/test_commentary_modern_linked_candidate_preview.py",
         "tests/test_commentary_modern_reference_gate.py",
         "tests/test_tool_registry.py"
@@ -5247,6 +5247,38 @@
       ]
     },
     {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_link_disposition_review.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Read-only gate for documented MHCC Modern original-link correction proposals.",
+      "python_imports": [
+        "__future__",
+        "commentary_modern_draft_guard",
+        "hashlib",
+        "pathlib",
+        "re",
+        "research"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "e09f882c1be2346575c5aed86a0d9fe25fce9d693273c5e9a5425e4107fd3479",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 4,
+      "static_references": [
+        "scripts/commentary_modern_reference_gate.py",
+        ".github/workflows/maintenance-refresh-link-disposition-registry.yml",
+        "tests/test_commentary_modern_reference_gate.py",
+        "tests/test_tool_registry.py"
+      ]
+    },
+    {
       "classification": "MERGE",
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
@@ -5312,10 +5344,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/commentary_modern_linked_candidate_preview.py",
         "scripts/commentary_modern_reference_gate.py",
+        "scripts/research/commentary/commentary_link_disposition_review.py",
         "tests/test_commentary_modern_reference_gate.py",
         "tests/test_tool_registry.py"
       ]
@@ -7085,9 +7118,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
         ".github/workflows/commentary-modern-source-receipt.yml",
+        ".github/workflows/maintenance-refresh-link-disposition-registry.yml",
         ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/tool-registry-maintenance.yml",
         "tests/test_tool_registry.py"
