@@ -1338,7 +1338,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 12,
+      "static_reference_count": 13,
       "static_references": [
         "scripts/audit_osis.py",
         "scripts/commentary_near_prose_unicode_review.py",
@@ -1349,6 +1349,7 @@
         "scripts/commentary_shared_raw_source_units.py",
         "scripts/commentary_unresolved_lexical_triage.py",
         "scripts/research/commentary/commentary_intro_chapter_text_review.py",
+        "scripts/research/commentary/commentary_lexical_overlap.py",
         ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-modern-source-receipt.yml",
         "tests/test_commentary_nonlink_word_alignment.py"
@@ -1968,7 +1969,7 @@
         "xiphos"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "43fc0cce4476e5958087bdc989867939812f9f51f3d8a25e81ee30082414758d",
+      "sha256_at_inventory": "50911a0849a26293e17682c816c4e70aa7b4f2df281c02ab0d3e4aa53fb75c2b",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -2043,12 +2044,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/commentary_original_bookcode_repair.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_identity_lexical_gate.py",
+        "scripts/research/commentary/commentary_chapter_body_evidence.py",
         "tests/test_commentary_source_english_osis_alias.py"
       ]
     },
@@ -2295,11 +2297,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_unresolved_lexical_triage.py",
+        "scripts/research/commentary/commentary_lexical_overlap.py",
         "tests/test_commentary_prefixed_suffix.py",
         "tests/test_commentary_stock_prefix_topology.py",
         "tests/test_commentary_stock_source_context.py"
@@ -2481,7 +2484,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_near_prose_unicode_review.py",
@@ -2490,6 +2493,7 @@
         "scripts/commentary_prose_cross_slot.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_shared_raw_source_units.py",
+        "scripts/research/commentary/commentary_chapter_body_evidence.py",
         "tests/test_commentary_osis_paragraph_presence.py",
         "tests/test_commentary_unresolved_lexical_triage.py"
       ]
@@ -2701,7 +2705,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 12,
+      "static_reference_count": 13,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_private_text_compare.py",
@@ -2710,6 +2714,7 @@
         "scripts/commentary_source_native_boundaries.py",
         "scripts/commentary_stock_prefix_topology.py",
         "scripts/commentary_unmarked_division_coverage.py",
+        "scripts/research/commentary/commentary_chapter_body_evidence.py",
         "scripts/research/commentary/commentary_chapter_neighbors.py",
         "scripts/research/commentary/commentary_paragraph_witness_probe.py",
         ".github/workflows/commentary-anchor-parity.yml",
@@ -3610,7 +3615,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 93,
+      "static_reference_count": 95,
       "static_references": [
         "scripts/audit_real_pilot.py",
         "scripts/bible_intake.py",
@@ -3654,11 +3659,13 @@
         "scripts/pilot_runtime.py",
         "scripts/pilot_subprocess.py",
         "scripts/private_sword_bundle.py",
+        "scripts/research/commentary/commentary_chapter_body_evidence.py",
         "scripts/research/commentary/commentary_chapter_cross_slot.py",
         "scripts/research/commentary/commentary_chapter_neighbors.py",
         "scripts/research/commentary/commentary_chapter_p_boundaries.py",
         "scripts/research/commentary/commentary_chapter_paragraph_overlap.py",
         "scripts/research/commentary/commentary_chapter_ref_labels.py",
+        "scripts/research/commentary/commentary_lexical_overlap.py",
         "scripts/stage_verified_stock_commentary.py",
         "scripts/tool_registry.py",
         ".github/workflows/commentary-mhc-source-text.yml",
@@ -5015,6 +5022,43 @@
       "classification": "MERGE",
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "OSIS",
+        "ThML"
+      ],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_chapter_body_evidence.py",
+      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
+      "purpose_first_line": "Source-bound chapter/body coverage research, not commentary rewriting.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "commentary_source_english_osis_alias",
+        "commentary_unresolved_lexical_triage",
+        "commentary_xml_witness",
+        "hashlib",
+        "pilot_preflight",
+        "re",
+        "research"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "57b1ac31d3ba3d52d633ddc30dab569c85e6864b0c93f5b7d0632fb68f564cbd",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/commentary_section_scope_audit.py",
+        "tests/test_commentary_section_scope_audit.py",
+        "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "MERGE",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
@@ -5172,11 +5216,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/commentary_reference_cross_slot.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_unresolved_lexical_triage.py",
+        "scripts/research/commentary/commentary_chapter_body_evidence.py",
         "scripts/research/commentary/commentary_chapter_p_boundaries.py",
         "tests/test_commentary_chapter_ref_labels.py"
       ]
@@ -5242,6 +5287,38 @@
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
         "tests/test_commentary_intro_chapter_text_review.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_lexical_overlap.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Read-only source/stock lexical-overlap diagnostics, without prose export.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "commentary_nonlink_word_alignment",
+        "commentary_stock_prefix_topology",
+        "lxml",
+        "pilot_preflight",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "9707fb00d89da834c663bcb7c98f6bf9e0cafe47e154af0b619b36f602e80848",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/research/commentary/commentary_chapter_body_evidence.py",
+        "tests/test_commentary_section_scope_audit.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {

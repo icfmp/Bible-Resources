@@ -12,9 +12,12 @@ from lxml import etree
 from commentary_section_scope_audit import (
     heading_extent, classify, compare_independent_thml_witness,
     describe_unrecognized_heading, audit_unrecognized_slots,
-    independent_chapter_scope_evidence, independent_div2_chapter_body_evidence,
-    independent_lexical_overlap, inspect_independent_leading_range_citations,
+    independent_chapter_scope_evidence, inspect_independent_leading_range_citations,
 )
+from research.commentary.commentary_chapter_body_evidence import (
+    independent_div2_chapter_body_evidence,
+)
+from research.commentary.commentary_lexical_overlap import independent_lexical_overlap
 
 
 class HeadingTests(unittest.TestCase):

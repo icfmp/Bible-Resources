@@ -89,6 +89,21 @@ class ScriptInventoryTests(unittest.TestCase):
                 self.assertIn("scripts/commentary_section_scope_audit.py", callers)
                 self.assertIn(f"tests/test_{stem}.py", callers)
 
+    def test_extracted_section_evidence_has_real_import_callers(self):
+        """Both extracted helpers retain their precise source-bound callers."""
+        entries = {entry["path"]: entry for entry in self.result["files"]}
+        lexical = "scripts/research/commentary/commentary_lexical_overlap.py"
+        chapter = "scripts/research/commentary/commentary_chapter_body_evidence.py"
+        self.assertIn(lexical, entries)
+        self.assertIn(chapter, entries)
+        self.assertIn("scripts/commentary_section_scope_audit.py",
+                      entries[chapter]["static_references"])
+        self.assertIn("tests/test_commentary_section_scope_audit.py",
+                      entries[chapter]["static_references"])
+        self.assertIn(chapter, entries[lexical]["static_references"])
+        self.assertIn("tests/test_commentary_section_scope_audit.py",
+                      entries[lexical]["static_references"])
+
     def test_registry_has_no_promoted_editorial_or_publication_claims(self):
         for entry in self.result["files"]:
             self.assertEqual(entry["release_approval"],
