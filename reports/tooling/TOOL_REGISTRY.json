@@ -1097,12 +1097,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/commentary_modern_draft_osis_preview.py",
         "scripts/research/commentary/commentary_original_link_identity.py",
         ".github/workflows/commentary-modern-source-receipt.yml",
-        ".github/workflows/maintenance-refresh-link-disposition-registry.yml",
         "tests/test_commentary_modern_linked_candidate_preview.py",
         "tests/test_commentary_modern_reference_gate.py",
         "tests/test_tool_registry.py"
@@ -5270,10 +5269,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/commentary_modern_reference_gate.py",
-        ".github/workflows/maintenance-refresh-link-disposition-registry.yml",
         "tests/test_commentary_modern_reference_gate.py",
         "tests/test_tool_registry.py"
       ]
@@ -7118,10 +7116,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         ".github/workflows/commentary-modern-source-receipt.yml",
-        ".github/workflows/maintenance-refresh-link-disposition-registry.yml",
         ".github/workflows/stage-hmcc-modern-release.yml",
         ".github/workflows/tool-registry-maintenance.yml",
         "tests/test_tool_registry.py"
