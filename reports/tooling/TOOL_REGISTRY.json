@@ -724,174 +724,6 @@
       ]
     },
     {
-      "classification": "MERGE",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_chapter_cross_slot.py",
-      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
-      "purpose_first_line": "Private same-book alternative-slot witness for source chapter-adjacent text.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "commentary_text_delta",
-        "hashlib",
-        "pilot_preflight",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "e85adbea02855da200ddea70b01c5a2abcd5a66ba25874c5990ff9ddf0789bcf",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        "scripts/commentary_private_text_compare.py",
-        "tests/test_commentary_chapter_cross_slot.py"
-      ]
-    },
-    {
-      "classification": "MERGE",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "ThML"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_chapter_neighbors.py",
-      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
-      "purpose_first_line": "Private, source-neutral ThML chapter-marker ↔ native intro witness.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "commentary_text_delta",
-        "commentary_xml_witness",
-        "hashlib",
-        "lxml",
-        "pilot_preflight",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "2f99bf3ec7976f7fb346b343c89a757e5dcefd6a9ddada643a923272c12a9a21",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 5,
-      "static_references": [
-        "scripts/commentary_private_text_compare.py",
-        "tests/test_commentary_chapter_cross_slot.py",
-        "tests/test_commentary_chapter_neighbors.py",
-        "tests/test_commentary_chapter_p_boundaries.py",
-        "tests/test_commentary_chapter_paragraph_overlap.py"
-      ]
-    },
-    {
-      "classification": "MERGE",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_chapter_p_boundaries.py",
-      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
-      "purpose_first_line": "Bounded private chapter-paragraph anchor and leftover-word diagnostics.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "commentary_chapter_paragraph_overlap",
-        "commentary_chapter_ref_labels",
-        "hashlib",
-        "pilot_preflight",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "ec3c684b81f18ecb5b068de142ac3a47692077c066f69684112bea2cf521ffff",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        "scripts/commentary_private_text_compare.py",
-        "tests/test_commentary_chapter_p_boundaries.py"
-      ]
-    },
-    {
-      "classification": "MERGE",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "ThML"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_chapter_paragraph_overlap.py",
-      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
-      "purpose_first_line": "Private bounded chapter-adjacent paragraph word-span research.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "commentary_text_delta",
-        "hashlib",
-        "pilot_preflight",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "c7ba3d578f02f5e0f326a82c030932f494ed7873ef820e7c05fbcc95ce401c50",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 4,
-      "static_references": [
-        "scripts/commentary_chapter_p_boundaries.py",
-        "scripts/commentary_private_text_compare.py",
-        "tests/test_commentary_chapter_paragraph_overlap.py",
-        "tests/test_commentary_nonlink_word_alignment.py"
-      ]
-    },
-    {
-      "classification": "MERGE",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "OSIS",
-        "ThML"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_chapter_ref_labels.py",
-      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
-      "purpose_first_line": "Read-only original ThML scripRef text ↔ stock raw XML reference witness.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "commentary_text_delta",
-        "lxml",
-        "pilot_preflight",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "8b033c197ffae2ed529279678cad747ff4a342205c6a4db596f7ee6a80a59a7f",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 5,
-      "static_references": [
-        "scripts/commentary_chapter_p_boundaries.py",
-        "scripts/commentary_reference_cross_slot.py",
-        "scripts/commentary_section_scope_audit.py",
-        "scripts/commentary_unresolved_lexical_triage.py",
-        "tests/test_commentary_chapter_ref_labels.py"
-      ]
-    },
-    {
       "classification": "UNDECIDED",
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
@@ -1969,10 +1801,6 @@
         "__future__",
         "argparse",
         "collections",
-        "commentary_chapter_cross_slot",
-        "commentary_chapter_neighbors",
-        "commentary_chapter_p_boundaries",
-        "commentary_chapter_paragraph_overlap",
         "commentary_intake",
         "commentary_native_raw_inventory",
         "commentary_near_prose_unicode_review",
@@ -1998,6 +1826,7 @@
         "pilot_fetch",
         "pilot_preflight",
         "re",
+        "research",
         "subprocess",
         "sword_native_raw_corpus_inventory",
         "tempfile",
@@ -2006,11 +1835,11 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "6250e91ab85ef89c8aaa67a6847713afa2eedccd06df03051c8f02d013631688",
+      "sha256_at_inventory": "c4a4873c9ef5e6f7af01e570110b94cad950958e4e76017cf7cf3e645919d9e6",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 21,
+      "static_reference_count": 22,
       "static_references": [
         ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-modern-source-receipt.yml",
@@ -2032,7 +1861,8 @@
         "tests/test_commentary_stock_prefix_topology.py",
         "tests/test_commentary_stock_source_context.py",
         "tests/test_commentary_text_delta.py",
-        "tests/test_commentary_unresolved_lexical_triage.py"
+        "tests/test_commentary_unresolved_lexical_triage.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -2154,15 +1984,15 @@
       "python_imports": [
         "__future__",
         "collections",
-        "commentary_chapter_ref_labels",
         "hashlib",
         "lxml",
         "pilot_preflight",
-        "re"
+        "re",
+        "research"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "939a0f54916e5786db225badc898482af7be1eb113a0b02019c66a98770c603c",
+      "sha256_at_inventory": "0b91b05d4c35deb979ac3a4bf2210bab8f26ca43a42e9d2154699d157ff10564",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -2227,7 +2057,6 @@
         "__future__",
         "argparse",
         "collections",
-        "commentary_chapter_ref_labels",
         "commentary_editorial_topology",
         "commentary_intake",
         "commentary_intro_chapter_text_review",
@@ -2256,6 +2085,7 @@
         "pilot_fetch",
         "pilot_preflight",
         "re",
+        "research",
         "shutil",
         "subprocess",
         "sword_native_raw_corpus_inventory",
@@ -2268,7 +2098,7 @@
         "xiphos"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "16dae162cae9cfb6d83a25d5c5c47284b320c2fa217c6ad9d6ccfb24d5b5b583",
+      "sha256_at_inventory": "81ebf70188f12fe005b4d3d982423f816856e605a69985071f9891f5f185f324",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -2705,14 +2535,14 @@
       "static_reference_count": 13,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
-        "scripts/commentary_chapter_cross_slot.py",
-        "scripts/commentary_chapter_neighbors.py",
-        "scripts/commentary_chapter_paragraph_overlap.py",
-        "scripts/commentary_chapter_ref_labels.py",
         "scripts/commentary_nonlink_word_alignment.py",
         "scripts/commentary_nonlink_words.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_stock_prefix_topology.py",
+        "scripts/research/commentary/commentary_chapter_cross_slot.py",
+        "scripts/research/commentary/commentary_chapter_neighbors.py",
+        "scripts/research/commentary/commentary_chapter_paragraph_overlap.py",
+        "scripts/research/commentary/commentary_chapter_ref_labels.py",
         "scripts/tool_registry.py",
         "tests/test_commentary_nonlink_word_alignment.py",
         "tests/test_commentary_text_delta.py",
@@ -2763,7 +2593,6 @@
       "python_imports": [
         "__future__",
         "collections",
-        "commentary_chapter_ref_labels",
         "commentary_nonlink_word_alignment",
         "commentary_nonlink_words",
         "commentary_stock_prefix_topology",
@@ -2772,11 +2601,12 @@
         "lxml",
         "pilot_preflight",
         "re",
+        "research",
         "unicodedata"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "37ab280929961de81a72cb939fe133d78db5de90a50d5ccbeead6aef36434ff3",
+      "sha256_at_inventory": "7ec7964109531ef0102af213704f471c9c5c119118d401c6cf1775011210a821",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -3003,7 +2833,6 @@
       "static_reference_count": 12,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
-        "scripts/commentary_chapter_neighbors.py",
         "scripts/commentary_paragraph_witness_probe.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
@@ -3011,6 +2840,7 @@
         "scripts/commentary_source_native_boundaries.py",
         "scripts/commentary_stock_prefix_topology.py",
         "scripts/commentary_unmarked_division_coverage.py",
+        "scripts/research/commentary/commentary_chapter_neighbors.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-xml-witness.yml",
         "tests/test_commentary_xml_witness.py"
@@ -3524,9 +3354,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 1,
+      "static_reference_count": 2,
       "static_references": [
-        ".github/workflows/register-lsg-in-catalogue.yml"
+        ".github/workflows/register-lsg-in-catalogue.yml",
+        "tests/test_materialize_attested_lsg_release.py"
       ]
     },
     {
@@ -3918,11 +3749,6 @@
         "scripts/commentary_android_text_witness.py",
         "scripts/commentary_android_webview_debug.py",
         "scripts/commentary_bookcode_repair_receipt_guard.py",
-        "scripts/commentary_chapter_cross_slot.py",
-        "scripts/commentary_chapter_neighbors.py",
-        "scripts/commentary_chapter_p_boundaries.py",
-        "scripts/commentary_chapter_paragraph_overlap.py",
-        "scripts/commentary_chapter_ref_labels.py",
         "scripts/commentary_intake.py",
         "scripts/commentary_native_inventory.py",
         "scripts/commentary_native_raw_inventory.py",
@@ -3957,6 +3783,11 @@
         "scripts/pilot_runtime.py",
         "scripts/pilot_subprocess.py",
         "scripts/private_sword_bundle.py",
+        "scripts/research/commentary/commentary_chapter_cross_slot.py",
+        "scripts/research/commentary/commentary_chapter_neighbors.py",
+        "scripts/research/commentary/commentary_chapter_p_boundaries.py",
+        "scripts/research/commentary/commentary_chapter_paragraph_overlap.py",
+        "scripts/research/commentary/commentary_chapter_ref_labels.py",
         "scripts/stage_verified_stock_commentary.py",
         "scripts/tool_registry.py",
         ".github/workflows/commentary-mhc-source-text.yml",
@@ -5307,6 +5138,176 @@
       "static_references": [
         "scripts/probe_private_repaired_darby_sword.py",
         "tests/test_repair_osis_unlinked_reference_labels.py"
+      ]
+    },
+    {
+      "classification": "MERGE",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_chapter_cross_slot.py",
+      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
+      "purpose_first_line": "Private same-book alternative-slot witness for source chapter-adjacent text.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "commentary_text_delta",
+        "hashlib",
+        "pilot_preflight",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "e85adbea02855da200ddea70b01c5a2abcd5a66ba25874c5990ff9ddf0789bcf",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 2,
+      "static_references": [
+        "scripts/commentary_private_text_compare.py",
+        "tests/test_commentary_chapter_cross_slot.py"
+      ]
+    },
+    {
+      "classification": "MERGE",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "ThML"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_chapter_neighbors.py",
+      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
+      "purpose_first_line": "Private, source-neutral ThML chapter-marker ↔ native intro witness.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "commentary_text_delta",
+        "commentary_xml_witness",
+        "hashlib",
+        "lxml",
+        "pilot_preflight",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "2f99bf3ec7976f7fb346b343c89a757e5dcefd6a9ddada643a923272c12a9a21",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 6,
+      "static_references": [
+        "scripts/commentary_private_text_compare.py",
+        "tests/test_commentary_chapter_cross_slot.py",
+        "tests/test_commentary_chapter_neighbors.py",
+        "tests/test_commentary_chapter_p_boundaries.py",
+        "tests/test_commentary_chapter_paragraph_overlap.py",
+        "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "MERGE",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_chapter_p_boundaries.py",
+      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
+      "purpose_first_line": "Bounded private chapter-paragraph anchor and leftover-word diagnostics.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "hashlib",
+        "pilot_preflight",
+        "re",
+        "research"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "94189f35c53302408c350902f9155a72052c4201a8951ccdbcde71b571687b0c",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/commentary_private_text_compare.py",
+        "tests/test_commentary_chapter_p_boundaries.py",
+        "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "MERGE",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "ThML"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_chapter_paragraph_overlap.py",
+      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
+      "purpose_first_line": "Private bounded chapter-adjacent paragraph word-span research.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "commentary_text_delta",
+        "hashlib",
+        "pilot_preflight",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "c7ba3d578f02f5e0f326a82c030932f494ed7873ef820e7c05fbcc95ce401c50",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 5,
+      "static_references": [
+        "scripts/commentary_private_text_compare.py",
+        "scripts/research/commentary/commentary_chapter_p_boundaries.py",
+        "tests/test_commentary_chapter_paragraph_overlap.py",
+        "tests/test_commentary_nonlink_word_alignment.py",
+        "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "MERGE",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "OSIS",
+        "ThML"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_chapter_ref_labels.py",
+      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
+      "purpose_first_line": "Read-only original ThML scripRef text ↔ stock raw XML reference witness.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "commentary_text_delta",
+        "lxml",
+        "pilot_preflight",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "8b033c197ffae2ed529279678cad747ff4a342205c6a4db596f7ee6a80a59a7f",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 5,
+      "static_references": [
+        "scripts/commentary_reference_cross_slot.py",
+        "scripts/commentary_section_scope_audit.py",
+        "scripts/commentary_unresolved_lexical_triage.py",
+        "scripts/research/commentary/commentary_chapter_p_boundaries.py",
+        "tests/test_commentary_chapter_ref_labels.py"
       ]
     },
     {
@@ -7007,7 +7008,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "eafe71cba6d5a8d3330189733bfee2f8a20e9b440055e0c2d0448164421c7a64",
+      "sha256_at_inventory": "2bcaad069647ade77524b03bb934c3bcffe817bc837e1aaa41e4a9d6078950ba",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
