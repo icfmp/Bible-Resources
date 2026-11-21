@@ -590,7 +590,7 @@ def compare_source_overlap_native_bodies(
     alone cannot prove full notes/markup fidelity or printed edition identity.
     """
     from lxml import etree
-    from commentary_nonlink_word_alignment import exact_unicode_source_ordered_subsequence
+    from research.commentary.commentary_nonlink_analysis import exact_unicode_source_ordered_subsequence
     if (not isinstance(overlapping,dict) or not overlapping
             or not isinstance(native_raw,dict) or not native_raw):
         raise ValueError("No source/native overlap evidence")
