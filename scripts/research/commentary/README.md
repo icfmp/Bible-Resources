@@ -16,6 +16,7 @@ This package contains **read-only, non-CLI** evidence-gathering functions. They 
 | [`commentary_lexical_overlap.py`](commentary_lexical_overlap.py) | Bounded source-versus-stock lexical overlap without exporting text |
 | [`commentary_nonlink_analysis.py`](commentary_nonlink_analysis.py) | Bounded plain-word accounting and separate Unicode word alignment, both unchanged |
 | [`commentary_chapter_body_evidence.py`](commentary_chapter_body_evidence.py) | Chapter-unit boundaries, book identity and native coverage evidence |
+| [`commentary_link_disposition_review.py`](commentary_link_disposition_review.py) | Source-pinned MHCC Modern link-correction proposal checks against original link hashes; no edits or release approval |
 | [`commentary_original_link_identity.py`](commentary_original_link_identity.py) | Byte-pinned native original link identities, targets and link-label hashes; no text export or publication |
 
 Imported by the existing source-neutral section-scope audit and individually tested with invented fixtures. The lexical/chapter-body diagnostics and original link identity gate were extracted without changing their algorithms. The former two unlinked-word root helpers are now grouped into one import-only research module; all eight original functions remain distinct and verbatim. Import via `research.commentary.<module>` with `scripts/` on `PYTHONPATH`. No root-level import shims, duplicate modules or executables are provided.
