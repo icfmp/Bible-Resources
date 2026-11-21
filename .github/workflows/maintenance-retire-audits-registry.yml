@@ -1,9 +1,9 @@
 name: One-shot retired-audit tool inventory refresh
 on:
-  push:
-    branches: [maintenance/retire-unconsumed-oneoff-audits-20261121]
+  pull_request:
     paths:
       - '.github/workflows/maintenance-retire-audits-registry.yml'
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
