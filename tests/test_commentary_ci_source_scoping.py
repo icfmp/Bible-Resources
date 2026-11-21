@@ -1,4 +1,4 @@
-"""Keep MHCC-only reader CI from misreporting an unrelated MHC intake PR.
+"""Keep surviving MHCC source/reader CI from misreporting an unrelated MHC intake PR.
 
 No external YAML parser needed: verify the narrow GitHub Actions path-filter
 contract directly, including the continued generic-code and manual triggers.
@@ -13,10 +13,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 MHCC_ONLY_WORKFLOWS = (
-    "commentary-private-candidate-xiphos-gui.yml",
     "commentary-zcom-private-candidate.yml",
-    "commentary-zcom-andbible-android.yml",
-    "commentary-zcom-xiphos-private-smoke.yml",
     "commentary-evidence.yml",
 )
 ORIGINAL_MANIFEST = "config/commentary-intake/mhcc-crosswire.json"
