@@ -1,15 +1,19 @@
-# Commentary chapter research modules
+# Commentary research helpers
 
-These five modules are **non-CLI, source-bound research helpers** previously scattered across the top-level `scripts/` directory. Grouped here to make chapter/section topology investigations discoverable without mistaking them for general release or editorial approval procedures.
+This package contains **read-only, non-CLI** evidence-gathering functions. They do not alter commentary content, infer an author's intended scope, or authorize a SWORD release. The source identity and native key are still checked by the invoking audit.
 
-| Module | Research responsibility |
+| Helper | What it examines |
 | --- | --- |
-| [`commentary_chapter_cross_slot.py`](commentary_chapter_cross_slot.py) | Alternative native-record locations for chapter-scoped content |
-| [`commentary_chapter_neighbors.py`](commentary_chapter_neighbors.py) | Neighboring chapter/verse structures and comparison |
-| [`commentary_chapter_p_boundaries.py`](commentary_chapter_p_boundaries.py) | Paragraph boundary and source scope anchors |
-| [`commentary_chapter_paragraph_overlap.py`](commentary_chapter_paragraph_overlap.py) | Paragraph overlap topology |
-| [`commentary_chapter_ref_labels.py`](commentary_chapter_ref_labels.py) | Cross-reference label location |
+| [`commentary_chapter_cross_slot.py`](commentary_chapter_cross_slot.py) | Alternate native slots for chapter-adjacent material |
+| [`commentary_chapter_neighbors.py`](commentary_chapter_neighbors.py) | Neighboring chapter and verse structures |
+| [`commentary_chapter_p_boundaries.py`](commentary_chapter_p_boundaries.py) | Paragraph boundaries and source scope anchors |
+| [`commentary_chapter_paragraph_overlap.py`](commentary_chapter_paragraph_overlap.py) | Candidate overlapping paragraph spans |
+| [`commentary_chapter_ref_labels.py`](commentary_chapter_ref_labels.py) | Original reference-label locations |
+| [`commentary_editorial_topology.py`](commentary_editorial_topology.py) | Numeric native headings, occupied verse slots and shared raw bodies |
+| [`commentary_intro_chapter_text_review.py`](commentary_intro_chapter_text_review.py) | Introduction text relative to numbered commentary entries |
+| [`commentary_paragraph_witness_probe.py`](commentary_paragraph_witness_probe.py) | Paragraph anchors across independent digital witnesses |
+| [`commentary_osis_rebuild_preflight.py`](commentary_osis_rebuild_preflight.py) | Whether original native frames can be wrapped as *test-only* OSIS without changing inner XML |
 
-Callers now use `from research.commentary.commentary_chapter_neighbors import …` and related package-qualified imports, with the existing `scripts/` root on the Python import path. No redundant compatibility shims or executable entrypoints were added. The generic script registry is tested to recognize qualified imports; its output remains an *inventory of candidates*, not proof of program execution.
+Imported by the existing source-neutral section-scope audit and individually tested with invented fixtures. Import via `research.commentary.<module>` with `scripts/` on `PYTHONPATH`. No root-level import shims, duplicate modules or executables are provided.
 
-This move **does not merge their algorithms**: semantically distinct full-corpus research outputs must be compared and proven equivalent before deleting or merging functions, tracked in [maintenance issue #430](https://github.com/icfmp/Bible-Resources/issues/430). For new Bible/commentary production follow the [source-first production contract](../../../docs/PRODUCTION_PIPELINE.md) and authorial scope rules.
+**Separate observations from decisions.** Similar-sounding helpers have different inputs, outputs and evidence limits. None is removable or interchangeable without a source-bound equivalence review. [Script maintenance #430](https://github.com/icfmp/Bible-Resources/issues/430) tracks this work; the [production contract](../../../docs/PRODUCTION_PIPELINE.md) remains authoritative.

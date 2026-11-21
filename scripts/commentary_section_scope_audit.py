@@ -26,7 +26,7 @@ import zipfile
 from lxml import etree
 
 from commentary_intake import load_manifest
-from commentary_osis_rebuild_preflight import (
+from research.commentary.commentary_osis_rebuild_preflight import (
     NativeOSISRebuildPreflight, compare_opaque_top_with_standard_compiler_fixture,
 )
 from commentary_osis_transport_probe import (
@@ -38,7 +38,7 @@ from commentary_osis_mixed_transport_probe import (
     private_rekey_sword_commentary_conf,
 )
 from commentary_osis_intro_transport_probe import probe_original_intro_transport
-from commentary_intro_chapter_text_review import (
+from research.commentary.commentary_intro_chapter_text_review import (
     review_original_intro_against_numbered_chapter,
     independent_thml_chapter_intro_witness,
 )
@@ -58,9 +58,9 @@ from commentary_stock_prefix_topology import (
     single_word_stock_markup_diagnostic, stock_prefix_context_correspondence,
 )
 from research.commentary.commentary_chapter_ref_labels import link_label_location
-from commentary_editorial_topology import NativeCommentaryEditorialTopology
+from research.commentary.commentary_editorial_topology import NativeCommentaryEditorialTopology
 from commentary_layout_census import NativeCommentaryLayoutCensus
-from commentary_paragraph_witness_probe import compare_paragraph_witness
+from research.commentary.commentary_paragraph_witness_probe import compare_paragraph_witness
 from commentary_reference_registry_triage import OriginalCommentaryReferenceRegistryTriage
 from commentary_literal_erratum_preflight import (
     preview_exact_reversible_commentary_reference_erratum,

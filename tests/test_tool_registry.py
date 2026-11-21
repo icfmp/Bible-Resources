@@ -72,6 +72,23 @@ class ScriptInventoryTests(unittest.TestCase):
                     "commentary_chapter_paragraph_overlap.py"]["static_references"],
         )
 
+    def test_source_neutral_section_probes_are_package_scoped(self):
+        """Every moved non-CLI helper retains its real consumer and direct test."""
+        entries = {item["path"]: item for item in self.result["files"]}
+        for stem in (
+            "commentary_editorial_topology",
+            "commentary_intro_chapter_text_review",
+            "commentary_paragraph_witness_probe",
+            "commentary_osis_rebuild_preflight",
+        ):
+            with self.subTest(helper=stem):
+                new_path = f"scripts/research/commentary/{stem}.py"
+                self.assertIn(new_path, entries)
+                self.assertNotIn(f"scripts/{stem}.py", entries)
+                callers = entries[new_path]["static_references"]
+                self.assertIn("scripts/commentary_section_scope_audit.py", callers)
+                self.assertIn(f"tests/test_{stem}.py", callers)
+
     def test_registry_has_no_promoted_editorial_or_publication_claims(self):
         for entry in self.result["files"]:
             self.assertEqual(entry["release_approval"],

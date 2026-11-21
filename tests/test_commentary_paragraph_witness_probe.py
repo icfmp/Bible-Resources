@@ -8,7 +8,7 @@ import unittest
 from lxml import etree
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_paragraph_witness_probe import compare_paragraph_witness
+from research.commentary.commentary_paragraph_witness_probe import compare_paragraph_witness
 
 
 def document(body: bytes):

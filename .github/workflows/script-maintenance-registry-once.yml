@@ -1,0 +1,36 @@
+# One-time inventory synchronization on a tightly scoped scripts maintenance branch.
+name: Reconcile source-bound tool registry once
+on:
+  push:
+    branches:
+      - maintenance/scripts-commentary-evidence-group-20261121
+    paths:
+      - '.github/workflows/script-maintenance-registry-once.yml'
+permissions:
+  contents: write
+  actions: write
+jobs:
+  regenerate:
+    if: ${{ github.repository == 'icfmp/Bible-Resources' && github.ref == 'refs/heads/maintenance/scripts-commentary-evidence-group-20261121' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Drop this temporary workflow and refresh registry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm -- .github/workflows/script-maintenance-registry-once.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git commit -m 'chore: refresh source-bound inventory for grouped commentary probes'
+          git push origin HEAD:refs/heads/maintenance/scripts-commentary-evidence-group-20261121
