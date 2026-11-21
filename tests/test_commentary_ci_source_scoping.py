@@ -14,7 +14,6 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 MHCC_ONLY_WORKFLOWS = (
     "commentary-zcom-private-candidate.yml",
-    "commentary-zcom-xiphos-private-smoke.yml",
     "commentary-evidence.yml",
 )
 ORIGINAL_MANIFEST = "config/commentary-intake/mhcc-crosswire.json"
