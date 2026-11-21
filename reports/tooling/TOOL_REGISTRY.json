@@ -1002,25 +1002,26 @@
         "__future__",
         "argparse",
         "commentary_modern_draft_osis_preview",
-        "commentary_modern_reference_gate",
         "json",
         "os",
         "pathlib",
         "re",
+        "research",
         "subprocess",
         "sword_native_raw_corpus_inventory",
         "xml"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "3f0002b9592abf5e087faaa9b2645d868451a6de8fc5156b37df82ec3eaef403",
+      "sha256_at_inventory": "07866c0e52f2ded2466e5ee987976aedb025b6b8715d401ddc8d249ce2bfd0ab",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 2,
+      "static_reference_count": 3,
       "static_references": [
         ".github/workflows/commentary-modern-source-receipt.yml",
-        "tests/test_commentary_modern_linked_candidate_preview.py"
+        "tests/test_commentary_modern_linked_candidate_preview.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -1083,6 +1084,7 @@
         "os",
         "pathlib",
         "re",
+        "research",
         "subprocess",
         "sword_native_raw_corpus_inventory",
         "xml"
@@ -1092,17 +1094,18 @@
         "andbible"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "1c14cc078631f7d02b5ebb72e4d9447e2f93d0c70a27e322db0c0233a0bef422",
+      "sha256_at_inventory": "36987eb2d5ad0813d081b12346abb912334d81e3ff6b4e131c49dae33a73c5c0",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/commentary_modern_draft_osis_preview.py",
-        "scripts/commentary_modern_linked_candidate_preview.py",
+        "scripts/research/commentary/commentary_original_link_identity.py",
         ".github/workflows/commentary-modern-source-receipt.yml",
         "tests/test_commentary_modern_linked_candidate_preview.py",
-        "tests/test_commentary_modern_reference_gate.py"
+        "tests/test_commentary_modern_reference_gate.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -5318,6 +5321,36 @@
       "static_references": [
         "scripts/research/commentary/commentary_chapter_body_evidence.py",
         "tests/test_commentary_section_scope_audit.py",
+        "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_original_link_identity.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Read-only, source-pinned original commentary SWORD reference identities.",
+      "python_imports": [
+        "__future__",
+        "hashlib",
+        "re",
+        "xml"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "cfb35bb76a9bf6de41f79c71390293ebf6805e1fd511a36a4e558a36f4b6f29a",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 4,
+      "static_references": [
+        "scripts/commentary_modern_linked_candidate_preview.py",
+        "scripts/commentary_modern_reference_gate.py",
+        "tests/test_commentary_modern_reference_gate.py",
         "tests/test_tool_registry.py"
       ]
     },
