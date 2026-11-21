@@ -122,9 +122,9 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertIn("usage:", result.stdout)
         self.assertIn("--division-overlay", result.stdout)
 
-    def test_mhcc_reader_research_is_resource_owned_with_real_workflows(self):
-        """Original stock reader QA is not a shared publication entrypoint."""
-        entries = {row["path"]: row for row in self.result["files"]}
+    def test_completed_original_mhcc_stock_reader_harnesses_are_retired(self):
+        """Current source/reader infrastructure remains; old stock ZIP is not re-pinned."""
+        paths = {row["path"] for row in self.result["files"]}
         for name, workflow in (
             ("commentary_private_candidate_xiphos_gui.py",
              "commentary-private-candidate-xiphos-gui.yml"),
@@ -132,28 +132,15 @@ class ScriptInventoryTests(unittest.TestCase):
              "commentary-zcom-andbible-android.yml"),
         ):
             with self.subTest(name=name):
-                local = "modules/mhcc-crosswire/tools/" + name
-                self.assertIn(local, entries)
-                self.assertNotIn("scripts/" + name, entries)
-                self.assertEqual(entries[local]["classification"], "MODULE_LOCAL")
-                self.assertIn(".github/workflows/" + workflow,
-                              entries[local]["static_references"])
-                self.assertIn("tests/test_" + name,
-                              entries[local]["static_references"])
-
-    def test_mhcc_original_reader_commands_still_start_safely(self):
-        for name in ("commentary_private_candidate_xiphos_gui.py",
-                     "commentary_stock_andbible_android.py"):
-            with self.subTest(name=name):
-                command = ROOT / "modules/mhcc-crosswire/tools" / name
-                result = subprocess.run(
-                    [sys.executable, str(command), "--help"],
-                    cwd=ROOT,
-                    env=dict(os.environ, PYTHONPATH=str(ROOT / "scripts")),
-                    capture_output=True, text=True, check=False, timeout=15,
-                )
-                self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertIn("usage:", result.stdout)
+                self.assertNotIn("scripts/" + name, paths)
+                self.assertNotIn("modules/mhcc-crosswire/tools/" + name, paths)
+                self.assertFalse((ROOT / ".github/workflows" / workflow).exists())
+        # Actual common readers and source-identity guards are not retired.
+        for name in ("commentary_xiphos_dual_reader.py",
+                     "commentary_stock_candidate.py",
+                     "commentary_android_text_witness.py",
+                     "probe_andbible_android_private_import.py"):
+            self.assertIn("scripts/" + name, paths)
 
     def test_nested_package_imports_count_as_real_static_callers(self):
         entries = {item["path"]: item for item in self.result["files"]}
