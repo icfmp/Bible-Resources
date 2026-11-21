@@ -20,7 +20,7 @@ import subprocess
 from xml.etree import ElementTree as ET
 
 from commentary_modern_draft_osis_preview import generate,NS
-from commentary_modern_reference_gate import SourceReferenceGate
+from research.commentary.commentary_original_link_identity import SourceReferenceGate
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus
 
 _REF_MARKER = re.compile(r"^[^\x00-\x1f]+$")
