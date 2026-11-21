@@ -1,0 +1,31 @@
+name: One-shot final retirement of obsolete original MHCC GUI tools
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/maintenance-retire-mhcc-original-gui-registry.yml'
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: maintenance/module-own-mhcc-original-readers-20261121
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate final inventory without disposable runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/maintenance-retire-mhcc-original-gui-registry.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git add -f reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore: refresh inventory after retiring unused original MHCC GUI harnesses'
+          git push origin HEAD:maintenance/module-own-mhcc-original-readers-20261121
