@@ -122,6 +122,39 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertIn("usage:", result.stdout)
         self.assertIn("--division-overlay", result.stdout)
 
+    def test_mhcc_reader_research_is_resource_owned_with_real_workflows(self):
+        """Original stock reader QA is not a shared publication entrypoint."""
+        entries = {row["path"]: row for row in self.result["files"]}
+        for name, workflow in (
+            ("commentary_private_candidate_xiphos_gui.py",
+             "commentary-private-candidate-xiphos-gui.yml"),
+            ("commentary_stock_andbible_android.py",
+             "commentary-zcom-andbible-android.yml"),
+        ):
+            with self.subTest(name=name):
+                local = "modules/mhcc-crosswire/tools/" + name
+                self.assertIn(local, entries)
+                self.assertNotIn("scripts/" + name, entries)
+                self.assertEqual(entries[local]["classification"], "MODULE_LOCAL")
+                self.assertIn(".github/workflows/" + workflow,
+                              entries[local]["static_references"])
+                self.assertIn("tests/test_" + name,
+                              entries[local]["static_references"])
+
+    def test_mhcc_original_reader_commands_still_start_safely(self):
+        for name in ("commentary_private_candidate_xiphos_gui.py",
+                     "commentary_stock_andbible_android.py"):
+            with self.subTest(name=name):
+                command = ROOT / "modules/mhcc-crosswire/tools" / name
+                result = subprocess.run(
+                    [sys.executable, str(command), "--help"],
+                    cwd=ROOT,
+                    env=dict(os.environ, PYTHONPATH=str(ROOT / "scripts")),
+                    capture_output=True, text=True, check=False, timeout=15,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn("usage:", result.stdout)
+
     def test_nested_package_imports_count_as_real_static_callers(self):
         entries = {item["path"]: item for item in self.result["files"]}
         module = ("scripts/research/commentary/"
