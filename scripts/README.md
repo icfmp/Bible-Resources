@@ -18,6 +18,7 @@ For a new resource, begin with the [canonical production pipeline](../docs/PRODU
 1. **Identify its contract.** Is it an invoked CLI, an imported helper, a read-only probe or immutable historical reproduction? Record exact inputs, outputs, failure behavior and relevant rights/source constraints.
 2. **Trace real dependencies.** Inspect Python imports, GitHub Actions, tests, documentation, pinned release/tag callers and external commands. The static inventory is incomplete for dynamic imports or historical revisions.
 3. **Prefer consolidation over renaming.** Extract genuinely shared behavior only after demonstrating output equivalence; preserve source- or edition-specific evidence in reviewed manifests, not hardcoded exceptions.
+   For import-only Python helpers, update package-qualified imports and their direct tests together; the caller must still place `scripts/` on the Python import path.
 4. **Change in bounded batches.** Migrate actual consumers, keep established production entrypoints stable, and avoid compatibility stubs that conceal obsolete paths. Do not relocate a script merely to make the root look emptier.
 5. **Verify before merging.** Run `python scripts/tool_registry.py --write` when tracked callers or scripts change, then `--check`, the complete unit suite, source validation, deterministic build, native smoke and relevant real-source/reader workflows. A green test alone never certifies textual fidelity.
 
