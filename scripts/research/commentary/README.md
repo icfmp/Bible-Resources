@@ -19,4 +19,6 @@ This package contains **read-only, non-CLI** evidence-gathering functions. They 
 
 Imported by the existing source-neutral section-scope audit and individually tested with invented fixtures. The lexical/chapter-body diagnostics and original link identity gate were extracted without changing their algorithms. Import via `research.commentary.<module>` with `scripts/` on `PYTHONPATH`. No root-level import shims, duplicate modules or executables are provided.
 
+Original native-link identity checks remain private observations: an authenticated destination or label digest is not evidence that a translated manuscript preserves the reference. The parent runner remains responsible for source-pinned native streaming and editorial/release gatekeeping.
+
 **Separate observations from decisions.** Similar-sounding helpers have different inputs, outputs and evidence limits. None is removable or interchangeable without a source-bound equivalence review. [Script maintenance #430](https://github.com/icfmp/Bible-Resources/issues/430) tracks this work; the [production contract](../../../docs/PRODUCTION_PIPELINE.md) remains authoritative.
