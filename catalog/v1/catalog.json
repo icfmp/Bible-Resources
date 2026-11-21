@@ -69,7 +69,7 @@
           "revision": "2026-11-10.1",
           "short_markdown": "### Louis Segond 1910\n\n**Bible · Français · 66 livres · Domaine public**\n\nLa Bible Louis Segond 1910 est une traduction protestante historique des Écritures, réalisée à partir des textes hébreu et grec. Publiée dans une édition révisée en 1910, après la mort de Louis Segond, elle conserve le style caractéristique du français biblique de son époque.\n\nCette édition, préparée par Bible Resources à partir de la source eBible, est proposée au format SWORD pour la lecture et l'étude biblique.\n\n**Points forts**\n\n- Traduction réalisée à partir des langues originales.\n- Traduction historique permettant d'étudier le vocabulaire biblique traditionnel.\n- Texte libre de droits, accessible gratuitement.\n\n**Points d'attention**\n\n- Certaines expressions et tournures appartiennent au français du XIXᵉ siècle.\n- L'édition de 1910 est une révision de la traduction originale de Louis Segond.\n- Certains choix de variantes du Nouveau Testament retiennent des formulations moins explicites concernant la divinité de Jésus-Christ que d'autres lectures manuscrites, notamment en 1 Timothée 3.16 et Actes 20.28 (voir les références et précautions de méthode ci-dessous).\n\n**Source :** eBible · **Version Bible Resources :** 0.1.0",
           "source_git_blob_sha1": "9d13c0735a079f8853c0169270b2a31493621eab",
-          "source_path": "docs/profiles/fr-segond-1910.md"
+          "source_path": "sources/cleaned/bibles/fr/lsg-1910/editorial/profiles/fr-segond-1910.md"
         }
       },
       "sword_id": "BRLSG1910",

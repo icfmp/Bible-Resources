@@ -1,217 +1,71 @@
 # Bible Resources
 
-**A curated, reproducible SWORD resource repository for Bible and other compatible readers.**
+**Source-faithful biblical texts, commentaries and other study resources in standard SWORD format.** Bible Resources is an independent curation and distribution project; it is not an official CrossWire repository or a replacement Bible text format.
 
-Bible Resources is an **independent community project**, not an official CrossWire repository. Its goal is to provide one reliable catalogue of biblical texts, commentaries, dictionaries and related resources, with clear provenance and consistent editorial quality. Improvements suitable for the original upstream project should be offered back to their maintainers.
+The project maintains preserved original source evidence, reviewed cleaned editorial masters, reproducible SWORD packages and a [versioned public catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json). Compatible readers, including the [Bible application](https://github.com/icfmp/Bible), may consume approved modules.
 
-The retired experimental offline `place-context` dataset has been removed.
-Any future Wikipedia/Wikidata enrichment belongs to
-[Bible-Resources-Wikipedia](https://github.com/icfmp/Bible-Resources-Wikipedia)
-and **must use the independently reviewed Bible Semantic Index (BSI) entity
-identifiers**, not the discarded OpenBible-only place-data prototype. The BSI
-work under `entity-index/` is independent and is not altered by this cleanup.
+## Start here
+
+- **[Documentation for new contributors](docs/README.md)** — start here for architecture, source ownership, rules and workflows.
+- **[One production process](docs/PRODUCTION_PIPELINE.md)** — source identification and rights → immutable original → reviewed cleaned master → full fidelity check → SWORD compilation and readback → independent readers → approved release.
+- **[Editorial and legal policies](docs/policies/README.md)** — immutable authorship, notes, original versification, editorial decisions, redistribution.
+- **[Architecture and resource paths](docs/architecture/README.md)** — where things belong.
+- **[Task-oriented workflows](docs/workflows/README.md)** — import, translation, review, update and publication.
+- **[Technical verification methods](docs/technical/README.md)** — schema, OSIS/USFX, native reference index and complete-text/annotation audits.
+- **[Contribution guide](CONTRIBUTING.md)** — how to prepare a reproducible change.
+- **[BRNP tracking issue #451](https://github.com/icfmp/Bible-Resources/issues/451)** — future common structural normalization profile; the draft is *not yet* a production gate.
+
+Current editorial decisions, approvals, source/archive hashes, and issues belong to each resource's own `sources/cleaned/<type>/<language>/<resource-id>/editorial/`, not to the general manuals.
 
 ## Principles
 
-1. **SWORD first.** Preserve standard module drivers, versification systems and layout. Never introduce a Bible-only binary format.
-2. **Be faithful to the work, not a distributor's formatting.** The identified author's work, translation, abridgment and edition are our editorial reference; CrossWire, eBible and other providers supply independently preserved digital witnesses, not an untouchable editorial layout. Improve demonstrated markup, sectioning, indexing, references and reader presentation where justified; preserve authorial meaning and edition-specific textual choices, keep original digital inputs immutable, and document every change.
-3. **Rights before release.** Permission to download from CrossWire does *not* imply permission to mirror or modify. Release only after affirmative rights review, recorded evidence and human approval.
-4. **Predictable quality.** Validate metadata, module layout, Unicode, references, transformations and artefact checksums; smoke-test with a real SWORD reader before release.
-5. **Reproducibility.** Build published packages and catalogues from reviewed versioned inputs; record all editorial changes.
-6. **Interoperability.** Publish the standard `mods.d/`, `modules/`, `mods.d.tar.gz`, and `packages/` layout as well as a versioned JSON catalogue.
+1. **Preserve the work, not an accidental encoding.** The identified work and exact edition govern words, punctuation, source-attested layout, notes, reference relationships and meaning. Improve proved technical defects only by documented, reversible, independent review; never invent content.
+2. **Originals are immutable.** Record exact edition/source identity, provenance, rights and SHA-256, and retain input bytes without silent modifications.
+3. **Use official standards.** OSIS/USFM/TEI and existing SWORD drivers/versifications take priority over proprietary representations; a schema-valid file still needs independent content and reader checks.
+4. **Rights before release.** A publicly accessible upstream archive does not automatically authorize republication or modifications.
+5. **Evidence before claims.** Distinguish source integrity, native module fidelity, reader compatibility, human editorial approval and actual public publication.
+6. **Reuse and contribute upstream.** Improve existing generic tools and report attested upstream errors to maintainers when appropriate.
 
-This applies equally to **Bibles, commentaries, dictionaries, encyclopedias and other resources**. See [editorial authority and transformation rules](docs/EDITORIAL_RULES.md) for the distinction between a work/edition, an immutable upstream witness, and our verified curated digital edition. An exact-source mirror is one possible result, not the project's universal goal.
+## Public distribution
 
-## Source-first editorial production
+The current published package and its hash must be taken from the actual [v1 catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json). The repository also serves a [standard SWORD file repository](https://icfmp.github.io/Bible-Resources/sword/). Use the [catalogue integration guide](docs/workflows/CATALOGUE_INTEGRATION.md) for identities, safe downloads and updates.
 
-The standard practical workflow is **acquire original OSIS/USFM → normalize
-structure and eliminate nonsemantic editorial formatting → compare the entire
-curated source with a reliable witness → verify and correct references →
-compile standard SWORD and test actual Xiphos/readers → approve and publish**.
+Previously published editions include:
 
-We preserve authors' substantive content and exact-edition identity; the
-curated source is the preferred maintained master, and SWORD is its
-reproducible distribution package. This six-phase production path operates
-**inside** the existing seven-stage source/rights/evidence checkpoints.
-See [the source-first OSIS/USFM production policy](docs/SOURCE_FIRST_EDITORIAL_PIPELINE.md).
+- [Louis Segond 1910 — BRLSG1910 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0)
+- [Darby — BRJND2024 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.1)
+- [Matthew Henry Concise Commentary — MHCC 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1)
+- [Matthew Henry Complete Commentary — MHC 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/mhc-0.1.0)
 
-## Workspace organization
+These links are historical release references, not a substitute for checking the current public catalogue and its live package bytes. SWORD IDs may collide between providers; installing or updating a module is a deliberate client choice.
 
-Actual original sources are organized by **type → language → stable resource ID**:
-`sources/original/bibles/fr/lsg-1910/`,
-`sources/original/bibles/fr/darby-jnd-2024/`, and
-`sources/original/commentaries/en/mhc-crosswire/`.
-`sources/cleaned/` is reserved for the independently reviewed OSIS/USFM
-masters, which must not be misrepresented by README placeholders. Compiled SWORD packages remain in `modules/`, and the existing
-script entrypoints remain stable until verified lifecycle consolidation.
-See [canonical workspace layout and migration rules](docs/WORKSPACE_LAYOUT.md).
-Historical MHC cleanup reports now live under `docs/evidence/mhc-285/source-cleanup/`; the HMCC Modern historical manuscripts remain intact at their proven source-bound paths.
+## Verify a checkout
 
-## Status
+Requires Python and the repository's pinned Python dependencies; native SWORD inspection additionally needs a suitable stable libSWORD toolchain and `diatheke`.
 
-**Published and verified resources:** [Louis Segond 1910 `BRLSG1910` 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0), [Darby `BRJND2024` 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.1), and [Matthew Henry Concise Commentary `MHCC` 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1), plus [Matthew Henry Complete Commentary `MHC` 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/mhc-0.1.0). Their [source-reviewed files](modules/) and current catalogue entries are in `main`. The [public JSON catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json) and standard [SWORD repository](https://icfmp.github.io/Bible-Resources/sword/) are deployed and verified through the ordered GitHub Release-before-Pages workflow. Historic release ZIPs remain immutable, including the original `BRMHCC` 0.1.0; the newer `MHCC` SWORD ID may collide with CrossWire's original `MHCC` and does **not** automatically remove an old `BRMHCC` installation.
-
-A French Matthew Henry translation is **not** licensed for republication merely because a supplied JSON archive advertises CC0. Source attribution, rights and approvals remain edition-specific.
-
-## What lives here?
-
-```text
-modules/<slug>/metadata.json       reviewed manifest and rights
-modules/<slug>/payload/mods.d/     exactly one SWORD .conf file
-modules/<slug>/payload/modules/    compiled SWORD module files
-modules/<slug>/EDITORIAL.md        transformation / review record
-schemas/module.schema.json         machine-readable format contract
-sources/cleaned/<type>/<language>/<resource-id>/   maintained OSIS/USFM source (rights-cleared only)
-scripts/validate.py               metadata and structure checks
-scripts/audit_text.py              non-destructive editorial warnings
-scripts/guard_osis.py               schema-pinned OSIS structure gate; no rewrites
-scripts/guard_commentary.py         strict OSIS commentary entry-reference guard
-scripts/select_sources.py           prioritized SWORD catalogue deduplication (read-only)
-scripts/build.py                   deterministic repo + catalogue builder
-scripts/smoke.py                   actual SWORD runtime smoke test
-.github/workflows/                 CI and GitHub Pages publication
-```
-
-Only modules whose `quality.status` is **`approved`** are published, and only if redistribution rights have been affirmatively verified. Other entries remain source-side records and are excluded from distributable output.
-
-## Track each new Bible in seven resumable stages
-
-**One Bible = one tracking issue, seven visible checkpoints** (not a single
-enormous prompt or PR). Use the existing [resource import issue
-template](.github/ISSUE_TEMPLATE/import.yml) and the
-[seven-stage onboarding workflow](docs/BIBLE_7_STAGE_WORKFLOW.md).
-Each checkpoint records: progress `X/7`, last verified PR/commit and test
-run, unresolved issues and the **next specific action**. A blocked step
-is never silently skipped; completed work is saved on GitHub before
-moving on. Publication still requires separate rights/editorial approval.
-
-## Seven-stage commentary onboarding (source → publication)
-
-Commentaries have a **separate seven-stage evidence process**, based on the
-Bible workflow but preserving commentary entry/range semantics, quotations,
-original editorial divisions and licence distinctions. See the
-[commentary onboarding guide](docs/COMMENTARY_7_STAGE_WORKFLOW.md) and the
-[initial MHCC issue #177](https://github.com/icfmp/Bible-Resources/issues/177).
-The read-only [commentary intake Action](.github/workflows/commentary-intake.yml)
-observes the exact original CrossWire SWORD ZIP and produces metadata-only
-fingerprints. The [compact reusable tool guide](docs/COMMENTARY_PIPELINE.md)
-maps existing commands and publication checks to the same seven stages; it is
-**not a competing process**. The
-[tool registry](docs/TOOL_REGISTRY.md) documents retained source-bound
-diagnostics, approved reusable interfaces and legacy workflows. Intake does
-**not** constitute textual, editorial or legal approval; only the separately
-approved final release pipeline can publish a resource.
-
-## Automated, resumable Bible source audits
-
-Bible Resources runs the seven fixed [onboarding checkpoints](docs/BIBLE_7_STAGE_WORKFLOW.md)
-on **independent GitHub Actions runs**. Stage 1 can start with an explicit
-unverified research manifest (no download). Stages 2–6 require SHA-pinned
-original Bible source/official SWORD archives and independently inspected
-module identity before network acquisition. Run just one stage at a
-time and use its metadata-only report to resume safely after interruptions;
-the original archives are never uploaded or published.
-
-**[How to run the staged GitHub Action](docs/BIBLE_STAGE_AUTOMATION.md)** —
-including the current supported source formats, real SWORD checks, the
-remaining blocked/partial fidelity gates and mandatory owner approval.
-The runner is *not* an automated permission to publish.
-
-## Getting started
-
-Requires Python 3.11+ and `jsonschema` (`python -m pip install -r requirements.txt`).
-
-```bash
+```sh
+python -m pip install -r requirements.txt
 python -m unittest discover -s tests -v
 python scripts/validate.py
 python scripts/build.py --output dist --base-url https://icfmp.github.io/Bible-Resources/
+python scripts/smoke.py
 ```
 
-The generated `dist/` contains a stable machine catalogue at `catalog/v1/catalog.json`, and a SWORD repository under `sword/`. To test actual SWORD-module behaviour, install `diatheke`, then run `python scripts/smoke.py --dist dist`. CI performs this before deploying when modules exist.
+Do not interpret a local build as rights clearance, complete source fidelity or public deployment.
 
-## Integrate the catalogue in another application
+## Repository ownership
 
-The public catalogue is a **static, versioned JSON feed** designed for any
-SWORD-compatible client; it does **not** require credentials or a custom API.
+- `sources/original/`: unchanged upstream sources where redistribution is permitted.
+- `sources/cleaned/`: curated source masters, manifests and edition-specific editorial records.
+- `modules/`: SWORD payload, metadata and approved module records.
+- `catalog/v1/`, `sword/`: versioned public interfaces and compiled package distribution.
+- `scripts/`, `tests/`: reusable verification and production tooling.
+- `docs/`: lasting architecture, policies, procedures and technical methods.
+- `history/`: historical cross-resource research retained for provenance.
+- `entity-index/`: **independent Bible Semantic Index workstream**, outside resource housekeeping.
 
-```sh
-curl -fLsS https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json \
-  | python3 -m json.tool
-```
+The retired place-context dataset is not a source of truth; future Wikipedia-related enrichment is a separate [Bible-Resources-Wikipedia](https://github.com/icfmp/Bible-Resources-Wikipedia) concern dependent on validated entity identities.
 
-For each approved `modules[]` entry, use `sword_id` to identify the
-SWORD module, `version` to identify its curated release, and
-`download.url`, `download.size_bytes` and `download.sha256` to
-download and **verify the exact ZIP before installation**.
-An optional `profiles.<locale>` object provides separately approved
-`short_markdown` and `long_markdown` descriptions, citations and its
-own `revision` independent of the SWORD module version.
-`schema_version: 1` is the current feed contract.
+## Licensing
 
-**Developer documentation:** [Catalogue integration guide (v1)](docs/CATALOGUE_INTEGRATION.md)
-covers a JSON response example, all fields, example code, safe ZIP handling,
-standard SWORD repository endpoints, backwards compatibility and updates.
-[Update/identity semantics](docs/CATALOGUE_UPDATE_PROTOCOL.md) documents
-what a changed version or digest means. The app is responsible for its
-own UI, local installation, offline storage and rollback.
-
-## Curated module update discovery
-
-The stable [public HTTPS catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json) provides the current, **approved** Bible Resources release for each curated module, including its stable package identity, reviewed canonical edition lineage, exact SWORD module ID and version, download URL, package size and SHA-256. The generated ZIP contains a SWORD `Version` value that the publication validator requires to match the curated catalogue version. No private server or custom update protocol is needed. The public JSON is the discovery contract; an upstream publisher's newer source is not advertised as a curated update until its own edition has been approved and published.
-
-See the [v1 catalogue update contract](docs/CATALOGUE_UPDATE_PROTOCOL.md) for version semantics, checksum validation, caching and the limits of the current mutable latest-package URLs.
-
-## Upstream version monitoring
-
-Bible Resources monitors the **original upstream** editions and their correspondence to our **curated published** editions. Its optional local CLI also reads an installed SWORD configuration for diagnostics; actual installation state and user-facing updating remain outside this repository. The daily read-only GitHub Action checks all five SWORD catalogues declared by Bible: CrossWire, AndBible Extra, AndBible, STEP and eBible. YouVersion and the two OpenBible datasets are documented separately as inventory-only sources, not SWORD catalogues. The same Action compares the registered providers and endpoint URLs with Bible's current source declarations and fails on drift. The checker never automatically republishes a module. See [Updating resources](docs/UPDATES.md).
-
-To check a local installation: `python scripts/check_updates.py --installed-root ~/.sword`.
-
-**Duplicate upstream editions:** the operational source order is CrossWire → eBible → STEP → AndBible → AndBible Extra. Only *verified same-edition* aliases are automatically consolidated; possible matches block import for human identity review. Run `python scripts/select_sources.py --report-only --output reports/source-selection.json`. This is a read-only candidate report; the future importer is not yet connected. See [SWORD source priority and deduplication](docs/SOURCE_PRIORITY.md).
-
-## LSG + full MHC pilot (manual, read-only)
-
-The preparation scripts and manual GitHub Actions workflow are described in
-[pilot #1](docs/PILOT_SEGOND_MHC.md). The registered `lsg` source is
-eBible `fraLSG1910eb`; `mhc` means CrossWire **full MHC**, not
-`MHCC`. The preflight checks ZIP safety, source hashes, SWORD metadata
-and representative `diatheke` keys **without publishing or normalizing
-any module**. The separate official OSIS schema probe records provenance
-but does not approve the schema by itself.
-
-## GitHub Pages and branch rules
-
-For repository creation, push, Pages activation and branch rules, see [INSTALLATION_FR.md](INSTALLATION_FR.md). The source repository is live at https://github.com/icfmp/Bible-Resources. GitHub Pages must be activated in the repository Settings before the public catalogue endpoint will work.
-
-## Documentation
-
-- [Integrate the public JSON catalogue in a SWORD-compatible application](docs/CATALOGUE_INTEGRATION.md)
-- [Architecture & distribution](docs/ARCHITECTURE.md)
-- [SWORD source priority and duplicate-edition policy](docs/SOURCE_PRIORITY.md)
-- [Official versification and omitted verses](docs/VERSIFICATION_POLICY.md)
-- [Pilot: Louis Segond 1910 and Matthew Henry Complete](docs/PILOT_SEGOND_MHC.md)
-- [Reversible editorial source audit and normalizer](docs/EDITORIAL_AUDIT_WORKFLOW.md)
-- [Resource onboarding playbook and LSG pilot lessons](docs/RESOURCE_ONBOARDING_PLAYBOOK.md)
-- [Quality policy](docs/QUALITY_POLICY.md)
-- [Evidence-backed resource profiles and reader-facing cautions](docs/RESOURCE_PROFILES.md)
-- [Louis Segond 1910 profile (approved, published independently in catalogue)](docs/profiles/fr-segond-1910.md)
-- [Editorial rules](docs/EDITORIAL_RULES.md)
-- [Strict OSIS source normalization contract](docs/NORMALIZATION_POLICY.md)
-- [Strict commentary annotation and reference rules](docs/COMMENTARY_POLICY.md)
-- [SWORD and metadata conventions](docs/FORMATS.md)
-- [Licensing & provenance](docs/RIGHTS.md)
-- [Upstream contribution](docs/UPSTREAM.md)
-- [Release procedure](docs/PUBLISHING.md)
-- [Import roadmap](docs/ROADMAP.md)
-- [Upstream version tracking and updates](docs/UPDATES.md)
-- [Complete Bible source inventory and drift checks](docs/SOURCE_INVENTORY.md)
-
-## Licenses
-
-Code, tooling and existing documentation: **GPL-3.0-or-later** (see `COPYING`). **Modules and their source texts retain their own upstream rights**, as recorded in module metadata; the repository code licence does not relicense their contents. For newly created, separately owned *non-code* contributions, the owner's preferred public-domain dedication is **CC0 1.0** where the project has the necessary rights and contributor consent. This is not a blanket CC0 grant for third-party resources or the existing GPL repository. See [Rights and provenance](docs/RIGHTS.md).
-
-## Source and compatibility references
-
-- [CrossWire module repository structure](https://wiki.crosswire.org/Creating_and_Maintaining_a_Module_Repository)
-- [SWORD module configuration fields](https://wiki.crosswire.org/DevTools:conf_Files)
-- [CrossWire module submission](https://wiki.crosswire.org/Module_Submission)
+Code, scripts and existing documentation: **GPL-3.0-or-later** (see [`COPYING`](COPYING)). Each source text, original digitization, annotation and compiled module retains its own rights and attribution. For new independent non-software contributions controlled by the project, CC0 may be used where legally authorized, never by re-licensing third-party material. See [rights policy](docs/policies/RIGHTS.md).

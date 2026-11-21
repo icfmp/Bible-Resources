@@ -1,20 +1,26 @@
-# Editorial record — Matthew Henry's Commentary (complete, English)
+# Matthew Henry Complete Commentary — editorial decisions
 
-**Scope:** source-attested corrected MHC OSIS used for the existing 0.1.0 release; not a generic rule for commentary remapping.
+**Release:** `MHC` 0.1.0, based on the exact CrossWire MHC 2.2 authoring OSIS. Not the concise MHCC edition.
 
-## Decisions and boundaries
+## Why changes were accepted
 
-- Preserve Matthew Henry's prose and division structure; do not silently rewrite or truncate it.
-- The approved reconstruction ledger distinguishes **11 empty inert emphasis tags**, **3 invalid range endpoints**, **25 cross-reference destinations**, **6 overlap reindex groups** and **one chapter-introduction reclassification**. Those are edition-specific repairs, not universal assumptions about source content.
-- Keep chapter introductions, passage/verse scopes and overlapping entries semantically distinguishable. Do not duplicate one chapter-level authorial comment across verse entries merely to accommodate a reader.
-- Each stage from original through cosmetic/endpoints/cross-references/chapter intro is pinned by its own SHA-256 in [CLEANUP_MANIFEST.json](../CLEANUP_MANIFEST.json). Do not extrapolate these repairs to unrelated editions.
+The source-hash-bound, reversible corrections comprise **11 inert emphasis tags**, **3 invalid range endpoints**, **25 machine-readable reference destinations**, **6 overlap/navigation groups**, and **1 chapter-introduction reclassification**. The authorial prose, headings and substantive commentary were not freely rewritten.
 
-## Evidence
+- The **2 Chronicles 1** preface remains genuine *chapter-introduction* content, distinct from verse 1 exposition. Xiphos exposes it through the chapter-heading menu, not necessarily the verse clipboard. Do not paste it into verse 1 to work around a reader.
+- Preserve all **4,256 original authored commentary bodies**, section groupings, notes and reference labels. A shared native key does not imply that two distinct sections are identical.
+- CrossWire's `Public Domain — Copy Freely` claim is the owner's recorded rights basis for this specific edition; retain the source attribution and recognize that CCEL alternative digital text is not automatically the same licensed source.
+- SWORD ID `MHC` also belongs to CrossWire's module; a client must choose the installed provider.
 
-- [Historical source-cleanup changelog](../../../../../../docs/evidence/mhc-285/source-cleanup/CHANGES.md) and [early source workspace notes](../../../../../../docs/evidence/mhc-285/source-cleanup/README.md). **These are dated preparatory records**: their claims that no release existed are superseded by the separately verified later 0.1.0 release receipt below. Preserve them as provenance, not current status.
+## Source of truth
 
-- [Original and cleaned stages](../CLEANUP_MANIFEST.json)
-- [MHC 0.1.0 release receipt](../../../../../../docs/releases/MHC-0.1.0.md)
-- [Source attestation workflow](https://github.com/icfmp/Bible-Resources/actions/runs/44554276085)
+| Need | Record |
+| --- | --- |
+| Original/cleaned exact hashes and patch counts | [Cleaned source manifest](../CLEANUP_MANIFEST.json) |
+| Final edition, legal attribution, native scope | [0.1.0 release](releases/MHC-0.1.0.md) and [source validation](../../../../../../modules/mhc-crosswire/SOURCE_VALIDATION.json) |
+| Real GUI and residual limitations | [Reader acceptance](evidence/reader-acceptance-scope-2026-11-19.md) |
+| Specific source cleanup details | [Reviewed changes](evidence/source-cleanup/CHANGES.md) |
+| Case-specific technical evidence and unresolved print comparisons | [Evidence map](evidence/README.md) — consult only for a specific question |
 
-**Status:** documented historical decisions. Future changes require a new source-backed ledger and review.
+**Open, distinct research:** [issue #295](https://github.com/icfmp/Bible-Resources/issues/295) concerns exceptional original-authoring-OSIS versus stock/native scope and independent CCEL/print witnesses. Its case-specific source investigations remain under `evidence/` because they may still support or refute a future *separately authorized* editorial correction. They are **not** part of the accepted 0.1.0 correction set.
+
+**Current release status belongs to the final release receipt**, not dated private pre-release or `DRAFT` files.

@@ -15,4 +15,4 @@ No fake empty dictionary/encyclopedia folders are created. If the exact
 digital source rights are unclear, keep the bytes outside the public repository
 and commit only legally permissible metadata.
 
-[Workspace layout](../../docs/WORKSPACE_LAYOUT.md).
+[Workspace layout](../../docs/architecture/WORKSPACE_LAYOUT.md).

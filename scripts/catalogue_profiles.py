@@ -73,7 +73,16 @@ def _read_one(root: Path, file: Path, module: dict) -> tuple[str, dict]:
     if not _https_url(declaration["approval_url"]):
         raise ProfileError(f"{file}: valid HTTPS approval reference required")
     source = declaration["source_path"]
-    if not isinstance(source, str) or not re.fullmatch(r"docs/profiles/[a-z0-9-]+\.md", source):
+    # Edition-specific approved text lives beside its reviewed cleaned master.
+    # Require a bounded path and the exact module ID; never accept arbitrary
+    # repository paths or allow approval from an unrelated module.
+    source_pattern = (
+        r"sources/cleaned/(?:bibles|commentaries|dictionaries|"
+        r"encyclopedias|other)/[a-z]{2,3}(?:-[A-Za-z0-9]+)?/"
+        + re.escape(module["id"])
+        + r"/editorial/profiles/[a-z0-9.-]+\.md"
+    )
+    if not isinstance(source, str) or not re.fullmatch(source_pattern, source):
         raise ProfileError(f"{file}: source must be an approved repository profile document")
     source_file = root / source
     if (source_file.is_symlink() or not source_file.is_file()

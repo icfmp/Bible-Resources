@@ -8,7 +8,7 @@
   "zip_name": "MHC-0.1.0.zip",
   "package_sha256": "d0d401220ffba3de98dd9e9cab5dfe58030ca38ac7b196291838a472f3f6e07a",
   "package_size_bytes": 16409148,
-  "notes_path": "docs/releases/MHC-0.1.0.md",
+  "notes_path": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/releases/MHC-0.1.0.md",
   "evidence_path": "modules/mhc-crosswire/SOURCE_VALIDATION.json",
   "editorial_path": "modules/mhc-crosswire/EDITORIAL.md",
   "authorization": {

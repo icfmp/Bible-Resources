@@ -9,4 +9,4 @@ Each has an adjacent `PROVENANCE.json` with preexisting independently
 verified checksums. **These are not yet our compiled-source normalized
 masters**, and their original note/word markup is unchanged.
 
-[Resource inventory](../../../docs/RESOURCE_WORKSPACE_INDEX.md).
+[Resource inventory](../../../docs/architecture/WORKSPACE_LAYOUT.md).

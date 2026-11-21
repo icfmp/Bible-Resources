@@ -1,0 +1,842 @@
+{
+  "schema_version": 1,
+  "purpose": "Historical document location lineage, not a current procedure or editorial approval",
+  "source_commit": "ec9e5d139c8218c3da2d7a3a2b26eeb697f95d8f",
+  "created_for": "pull/450",
+  "entries": [
+    {
+      "from": "docs/ARCHITECTURE.md",
+      "to": "docs/architecture/ARCHITECTURE.md",
+      "original_git_blob_sha1": "4707f600bd0c832c934a101c0f3433b523ca831b",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/BIBLE_7_STAGE_WORKFLOW.md",
+      "to": "docs/workflows/BIBLE_7_STAGE_WORKFLOW.md",
+      "original_git_blob_sha1": "3cf03d940a04f986dd1269cf93ebd57442546e22",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/BIBLE_STAGE_AUTOMATION.md",
+      "to": "docs/workflows/BIBLE_STAGE_AUTOMATION.md",
+      "original_git_blob_sha1": "b1d6a50bcf3855a074eaaaea0e96dd0151f4ccd4",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/CATALOGUE_INTEGRATION.md",
+      "to": "docs/workflows/CATALOGUE_INTEGRATION.md",
+      "original_git_blob_sha1": "32e520a5b71365409ff7c77b8bdfb394c6385220",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/CATALOGUE_UPDATE_PROTOCOL.md",
+      "to": "docs/workflows/CATALOGUE_UPDATE_PROTOCOL.md",
+      "original_git_blob_sha1": "afadec446a1db416b20202d25d3568f67c91c567",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/COMMENTARY_7_STAGE_WORKFLOW.md",
+      "to": "docs/workflows/COMMENTARY_7_STAGE_WORKFLOW.md",
+      "original_git_blob_sha1": "994a4206060dc05b911414cc4dc36b8d1f00c699",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/COMMENTARY_PIPELINE.md",
+      "to": "docs/workflows/COMMENTARY_PIPELINE.md",
+      "original_git_blob_sha1": "141eaba4d4880c707c614b57fbe895bf2c9e90e1",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/COMMENTARY_POLICY.md",
+      "to": "docs/policies/COMMENTARY_POLICY.md",
+      "original_git_blob_sha1": "66278669e786c67911e0d8fa8c8f2c7fc259714a",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md",
+      "to": "docs/workflows/COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md",
+      "original_git_blob_sha1": "93e4fb654a99d7d7acdc94ee3d40a23e6688c3b9",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/EDITORIAL_AUDIT_WORKFLOW.md",
+      "to": "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
+      "original_git_blob_sha1": "46599a687e48e5e0c1ccca446a69cc43e951f7c0",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/EDITORIAL_RULES.md",
+      "to": "docs/policies/EDITORIAL_RULES.md",
+      "original_git_blob_sha1": "16bcd814dde51b5bc16ad375e97192adf5743c9c",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/FORMATS.md",
+      "to": "docs/architecture/FORMATS.md",
+      "original_git_blob_sha1": "22cad62bb15f3ddfac04a904c8508dd94afb5485",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/MAIN_TEXT_FIDELITY.md",
+      "to": "docs/policies/MAIN_TEXT_FIDELITY.md",
+      "original_git_blob_sha1": "3266ecfddd4a9c7ab198f96d5d955cb57d715b7e",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/NATIVE_SWORD_INDEX_INVENTORY.md",
+      "to": "docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md",
+      "original_git_blob_sha1": "d9aff605b3e8d620339ff2a0a0108681c6dcc0b6",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/NATIVE_SWORD_RAW_WITNESS.md",
+      "to": "docs/technical/NATIVE_SWORD_RAW_WITNESS.md",
+      "original_git_blob_sha1": "f3685c8837ce1d08086a35686ffbf5534d71f4fc",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/NATIVE_SWORD_WHOLE_CORPUS.md",
+      "to": "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
+      "original_git_blob_sha1": "7356c3c119145eb34f5e52f580f7b97f807a4806",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/NORMALIZATION_POLICY.md",
+      "to": "docs/policies/NORMALIZATION_POLICY.md",
+      "original_git_blob_sha1": "5dd6ba01548c08087a782e7b154be99d7c217d6b",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/OSIS_PARAGRAPH_RENDERING_QA.md",
+      "to": "docs/technical/OSIS_PARAGRAPH_RENDERING_QA.md",
+      "original_git_blob_sha1": "6ffae19f367e70ea538ff71a237e2b5ca7837ded",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/OSIS_SEMANTIC_FIDELITY.md",
+      "to": "docs/policies/OSIS_SEMANTIC_FIDELITY.md",
+      "original_git_blob_sha1": "61740af81c20a52b11a2015b2700c20f3dbb476c",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/PUBLISHING.md",
+      "to": "docs/workflows/PUBLISHING.md",
+      "original_git_blob_sha1": "fc703b271053cdf453245d390fbb4ad13cb1f994",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/QUALITY_POLICY.md",
+      "to": "docs/policies/QUALITY_POLICY.md",
+      "original_git_blob_sha1": "2a7352e316ca1358c4a87436d607c850a8cca57c",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/RESOURCE_PROFILES.md",
+      "to": "docs/architecture/RESOURCE_PROFILES.md",
+      "original_git_blob_sha1": "b782f855d6c6c07ac7d654d78e04c73c99828d7e",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/RESOURCE_WORKSPACE_INDEX.md",
+      "to": "docs/architecture/RESOURCE_WORKSPACE_INDEX.md",
+      "original_git_blob_sha1": "9cab2ca156b1d743a9cf25d26bdfcd65889a4930",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/RIGHTS.md",
+      "to": "docs/policies/RIGHTS.md",
+      "original_git_blob_sha1": "583234bfd81584c97bbc6662bd5c6898e76eac72",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/SOURCE_FIRST_EDITORIAL_PIPELINE.md",
+      "to": "docs/workflows/SOURCE_FIRST_EDITORIAL_PIPELINE.md",
+      "original_git_blob_sha1": "f0406c06486921e81eb8e3b01a6aa8abc7ee2b08",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/SOURCE_INVENTORY.md",
+      "to": "docs/technical/SOURCE_INVENTORY.md",
+      "original_git_blob_sha1": "8b3f6a9fc0bf5b8cac821aaa9cde897c55822416",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/SOURCE_NATIVE_BOOK_SCOPE.md",
+      "to": "docs/technical/SOURCE_NATIVE_BOOK_SCOPE.md",
+      "original_git_blob_sha1": "006bdb48d33e28ecc64853bc15472197f03cc9da",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/SOURCE_NATIVE_INDEX_AUDIT.md",
+      "to": "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
+      "original_git_blob_sha1": "4aae5f5401a2f14f54ed869b8424cb4515889b1e",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/SOURCE_NATIVE_MAIN_TEXT.md",
+      "to": "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
+      "original_git_blob_sha1": "dad8ea172a3de413290d97581a7e6095a163e9f5",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/SOURCE_NATIVE_NOTES_AUDIT.md",
+      "to": "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
+      "original_git_blob_sha1": "b617d29cf16c938df567d2ef607adaef73b084b6",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/SOURCE_OSIS_INVENTORY.md",
+      "to": "docs/technical/SOURCE_OSIS_INVENTORY.md",
+      "original_git_blob_sha1": "bafd6707e2319b408b004376ca8ca1bd5b0dc3f0",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/SOURCE_PRIORITY.md",
+      "to": "docs/policies/SOURCE_PRIORITY.md",
+      "original_git_blob_sha1": "36a385df677b17f315a4f76f361c9d042732c546",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/SOURCE_USFX_STRUCTURE.md",
+      "to": "docs/technical/SOURCE_USFX_STRUCTURE.md",
+      "original_git_blob_sha1": "aaadde6b8860a3fd3316d45d3d72edd308b9a3bf",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/STABLE_SWORD_REFERENCE_AUDIT.md",
+      "to": "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
+      "original_git_blob_sha1": "0947448f3c6f36db24c016e5525e64dbe600d17f",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/UPDATES.md",
+      "to": "docs/workflows/UPDATES.md",
+      "original_git_blob_sha1": "26cd279b6be96769489dcfe1e96ee5f6210ce718",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/UPSTREAM.md",
+      "to": "docs/workflows/UPSTREAM.md",
+      "original_git_blob_sha1": "b9ba6876d1f8c375e2d1a023d99c314fcd9e8f4d",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/VERSIFICATION_POLICY.md",
+      "to": "docs/policies/VERSIFICATION_POLICY.md",
+      "original_git_blob_sha1": "068bb3b9042b2a02a9625e996e71460f884115cb",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/WORKSPACE_LAYOUT.md",
+      "to": "docs/architecture/WORKSPACE_LAYOUT.md",
+      "original_git_blob_sha1": "9376baacab114c5170fb9861189968a287f46f52",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/archive/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
+      "to": "history/pipeline/BIBLE_STAGE_AUTOMATION_RESEARCH.md",
+      "original_git_blob_sha1": "7c63e36b451b8899f9d9cf125da2601c42a77de5",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/archive/DARBY_2024_IMPORT_POSTMORTEM.md",
+      "to": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/history/DARBY_2024_IMPORT_POSTMORTEM.md",
+      "original_git_blob_sha1": "9c0b9136fcdb567af1430039eb1b22b73d8536a6",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/archive/EDITORIAL_AUDIT_INITIAL_2026-11-07.md",
+      "to": "history/pipeline/EDITORIAL_AUDIT_INITIAL_2026-11-07.md",
+      "original_git_blob_sha1": "a0c414de1bb6e9af7742c468f5fa53abc3adddc6",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/archive/LSG_AUDIT_RESEARCH_HANDOFF.md",
+      "to": "sources/cleaned/bibles/fr/lsg-1910/editorial/history/LSG_AUDIT_RESEARCH_HANDOFF.md",
+      "original_git_blob_sha1": "a4ca63fcf26db124ba0babf3de6af3b7e3e94eb9",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/archive/PILOT_SEGOND_MHC.md",
+      "to": "history/pilots/PILOT_SEGOND_MHC.md",
+      "original_git_blob_sha1": "46eb2fc427e618fc85854d8da88370d165f78a7c",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/archive/README.md",
+      "to": "history/README.md",
+      "original_git_blob_sha1": "28fcb28a5434d3da95feb5353a0e2f8f05e3d7a4",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/archive/RESOURCE_ONBOARDING_PLAYBOOK.md",
+      "to": "history/pilots/RESOURCE_ONBOARDING_PLAYBOOK.md",
+      "original_git_blob_sha1": "2980986b78a57d1afe04641fdb36f3f6e9bf5506",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/archive/SECOND_REAL_BIBLE_PROBE.md",
+      "to": "history/pilots/SECOND_REAL_BIBLE_PROBE.md",
+      "original_git_blob_sha1": "79be6dbe9d3479c68204d944ba8136e43c941ac3",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/evidence/darby-2024-0.1.1-final-reader-qa.md",
+      "to": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/evidence/darby-2024-0.1.1-final-reader-qa.md",
+      "original_git_blob_sha1": "b7bb6d97ea0108d70c64d4ee0e42230f6b9cab4a",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/darby-2024-paragraph-postrelease-qa.md",
+      "to": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/evidence/darby-2024-paragraph-postrelease-qa.md",
+      "original_git_blob_sha1": "ea046de8c6ced1f49ff7d74900059aea4a6cc129",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/frajnd-2024-stage5-editorial-review.md",
+      "to": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/evidence/frajnd-2024-stage5-editorial-review.md",
+      "original_git_blob_sha1": "d51c5ccb82f34a440e6198c7b554a70687b395bb",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/frajnd-2024-upstream-link-report-draft.md",
+      "to": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/evidence/frajnd-2024-upstream-link-report-draft.md",
+      "original_git_blob_sha1": "328ee0b9e24cb973da3f6b37abc881489d9b4bbd",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/acts17-printed-page-target-and-electronic-witness-2026-11-17.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/acts17-printed-page-target-and-electronic-witness-2026-11-17.md",
+      "original_git_blob_sha1": "626ebc772ed339b229778e50ebad6ebed69d8cef",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/ccel-long-expository-gaps-partial-native-word-runs-2026-11-17.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/ccel-long-expository-gaps-partial-native-word-runs-2026-11-17.md",
+      "original_git_blob_sha1": "9fe7002886f76dad150f3e965bdc5b97d624bbd3",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/ccel-long-expository-gaps-same-book-native-location-2026-11-17.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/ccel-long-expository-gaps-same-book-native-location-2026-11-17.md",
+      "original_git_blob_sha1": "697288a5a33a06ffb68694419a6d8e340615ac17",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/ccel-six-volume-lexical-subtypes-2026-11-17.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/ccel-six-volume-lexical-subtypes-2026-11-17.md",
+      "original_git_blob_sha1": "9ef680a5ec972f0fc80d7661504d0fea6fa31624",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/ccel-six-volume-original-text-census-2026-11-17.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/ccel-six-volume-original-text-census-2026-11-17.md",
+      "original_git_blob_sha1": "34e2a1c75240f13d64f2352d9950dff43012f15b",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/ccel-six-volumes-xml-2026-11-16.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/ccel-six-volumes-xml-2026-11-16.md",
+      "original_git_blob_sha1": "5010812a9e0b4b47b54b98b1f90082619e772abe",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/crosswire-mhc-stock-native-audit-2026-11-16.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/crosswire-mhc-stock-native-audit-2026-11-16.md",
+      "original_git_blob_sha1": "f7d18373918ff32b1e212ddbe14a883a8a0a1803",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/mhc-0.1.0-final-release-package-checkpoint.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/mhc-0.1.0-final-release-package-checkpoint.md",
+      "original_git_blob_sha1": "031601545b92244e166ab702abcbe365abefc5cd",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/mhc-first-candidate-decisions-2026-11-18.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/mhc-first-candidate-decisions-2026-11-18.md",
+      "original_git_blob_sha1": "bac64e45ce9a1c79d31a57e4f21c26408cc98dd3",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/mhc-shared-verse-navigation-2026-11-18.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/mhc-shared-verse-navigation-2026-11-18.md",
+      "original_git_blob_sha1": "7c1d7a82c05474d60a4f6f2520d745b0378480d1",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/posthumous-completion-attribution-2026-11-17.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/posthumous-completion-attribution-2026-11-17.md",
+      "original_git_blob_sha1": "91c29e6085d56314897e45e55da133c51f90148d",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/private-release-readiness-2026-11-19.json",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/private-release-readiness-2026-11-19.json",
+      "original_git_blob_sha1": "dfaf0e6b9827711c47e0668a91dc39b23a286b3c",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/psalm7-1828-independent-expository-witness-2026-11-17.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/psalm7-1828-independent-expository-witness-2026-11-17.md",
+      "original_git_blob_sha1": "b1fc45dd5fe30ec92e1284b9992e89fd785777d9",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/psalm7-printed-facsimile-visual-collation-2026-11-17.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/psalm7-printed-facsimile-visual-collation-2026-11-17.md",
+      "original_git_blob_sha1": "0b69c10e1b0c6dc7f5208bd2f6626d58caaab2bb",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/psalm8-public-edition-wording-collation-2026-11-17.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/psalm8-public-edition-wording-collation-2026-11-17.md",
+      "original_git_blob_sha1": "2cfa11e4ac5b43026e22f4598d61d5942e6bceed",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/reader-acceptance-scope-2026-11-19.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/reader-acceptance-scope-2026-11-19.md",
+      "original_git_blob_sha1": "65800a9b7e8a5943624673a7e19c0023798c5153",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/remaining-cross-reference-triage-2026-11-18.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/remaining-cross-reference-triage-2026-11-18.md",
+      "original_git_blob_sha1": "072b949b386ee73fb7328b6a5af9495aa21b9637",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/rights-clarification-letters-UNSENT.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/rights-clarification-letters-UNSENT.md",
+      "original_git_blob_sha1": "fb13f9c6d5b295c608410e6b7958789a1a97f6ef",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/rights-review-2026-11-19.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/rights-review-2026-11-19.md",
+      "original_git_blob_sha1": "230805af3f2cc2bb5864c2778fc7083f8c681346",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/source-cleanup/CHANGES.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/source-cleanup/CHANGES.md",
+      "original_git_blob_sha1": "e285343f360b2936c9efe35ccd0d94ef68d65d6b",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/source-cleanup/CLEANUP_STATUS.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/source-cleanup/CLEANUP_STATUS.md",
+      "original_git_blob_sha1": "18934e6e7ea8a7dcbcfbee1328afd0dc8e10acd4",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/source-cleanup/README.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/source-cleanup/README.md",
+      "original_git_blob_sha1": "7ca6f90ec74e603bc53e23764c2aa88a6c78edae",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/technical-closeout-2026-11-19.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/technical-closeout-2026-11-19.md",
+      "original_git_blob_sha1": "963e62cc14655143f87f7be5de23ba35a8cd6f19",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhc-285/xiphos-corrected-reader-qa-2026-11-18.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/xiphos-corrected-reader-qa-2026-11-18.md",
+      "original_git_blob_sha1": "fe40958ecfaa5d5e775510f5165ba7f599562033",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/all-unmarked-original-div1-structural-coverage.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/all-unmarked-original-div1-structural-coverage.json",
+      "original_git_blob_sha1": "24c6140a3a5cd13bbfd2cf058956836ff9aa8770",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/body-suffix-and-unexplained-word-boundaries.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/body-suffix-and-unexplained-word-boundaries.json",
+      "original_git_blob_sha1": "5a77e53f1e862da7585ca3bd81e0378f5cab3ab0",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/ccel-source-body-siblings.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/ccel-source-body-siblings.json",
+      "original_git_blob_sha1": "7c3b213e6e6382cc0029d7a069aa4b40cb521fd2",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/ccel-xml-structure.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/ccel-xml-structure.json",
+      "original_git_blob_sha1": "4702386386e60b7ec327f98a8045ed4b5298f56f",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/chapter-marker-adjacent-stock-intro.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/chapter-marker-adjacent-stock-intro.json",
+      "original_git_blob_sha1": "fa3e1954cf26e88e1d0925f40c925170cc259b7d",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/chapter-neighbor-numbered-slot-location.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/chapter-neighbor-numbered-slot-location.json",
+      "original_git_blob_sha1": "ede8ae9a23832adbc65df952b7f0c1c07e685ca6",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/chapter-p-partial-word-span-witness.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/chapter-p-partial-word-span-witness.json",
+      "original_git_blob_sha1": "082313f4f11713716d54e2d97af3880ebeabbc39",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/chapter-p-scripref-target-label-correspondence.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/chapter-p-scripref-target-label-correspondence.json",
+      "original_git_blob_sha1": "87325413399f9e4ea8adbeeb0b865667b1c60a95",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/chapter-p-word-anchors-and-source-markup.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/chapter-p-word-anchors-and-source-markup.json",
+      "original_git_blob_sha1": "e7cbbae27a997f5f69b358c7cbb34b5272d70c52",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/chapter-sibling-alternative-same-book-locations.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/chapter-sibling-alternative-same-book-locations.json",
+      "original_git_blob_sha1": "2a2ea9d86d775bc235a7c17fab501edacd7438a2",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/crosswire-exact-stock-rights-review.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/crosswire-exact-stock-rights-review.md",
+      "original_git_blob_sha1": "b16ec7f2b31d1ab9354ce6f83b57ca574f839fb0",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/four-original-source-units-two-div1-in-one-native-raw-run.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/four-original-source-units-two-div1-in-one-native-raw-run.json",
+      "original_git_blob_sha1": "426faea8e6c63553e0bd11c73a7ed74ae2ad98b7",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/full-stock-native-raw-content.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/full-stock-native-raw-content.json",
+      "original_git_blob_sha1": "6cffec1e23045227dff053b4728840539bd67126",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/initial-source-native.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/initial-source-native.json",
+      "original_git_blob_sha1": "f827a0604c809a5157a67e81e2122704d64591b5",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/one-original-title-jude-vs-judg-osis-conflict.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/one-original-title-jude-vs-judg-osis-conflict.json",
+      "original_git_blob_sha1": "88b1fee7079e2f87b3f4ee95409929401f5220a7",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/original-div1-bookcode-and-repeated-start-collision-census.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/original-div1-bookcode-and-repeated-start-collision-census.json",
+      "original_git_blob_sha1": "f32fe35e6f59a3d1d2fd791163f0cf2245d0e812",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/outside-scripture-reference-156-prose-word-sequences.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/outside-scripture-reference-156-prose-word-sequences.json",
+      "original_git_blob_sha1": "634671e9a3f95d5208a3aed0c0959f4f046f6034",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/seven-declared-range-vs-occupied-native-run-endpoints.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/seven-declared-range-vs-occupied-native-run-endpoints.json",
+      "original_git_blob_sha1": "47daf914333ec484f890cf38be95f7818d0215ad",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/seven-large-prose-alternative-native-slot-anchor-census.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/seven-large-prose-alternative-native-slot-anchor-census.json",
+      "original_git_blob_sha1": "866c1864ac65397c3d2271bd0569645c190ab837",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/seven-original-marker-native-run-boundaries.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/seven-original-marker-native-run-boundaries.json",
+      "original_git_blob_sha1": "853bbacc038c440e1eb04502e4d4624dadc6f2c2",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/source-book-identity-five-case-review-queue.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/source-book-identity-five-case-review-queue.md",
+      "original_git_blob_sha1": "e61b59aff816b52f63b8e9e5975fde04645d9c3e",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/evidence/mhcc-177/source-native-anchors.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/source-native-anchors.json",
+      "original_git_blob_sha1": "7e6627e7b8742a29cf3c60108e40729611e592e7",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/source-stock-lexical-mismatch-classes.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/source-stock-lexical-mismatch-classes.json",
+      "original_git_blob_sha1": "fa6baa063d5df96addafc69ac78c6671740b4322",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/source-stock-text-diagnostics.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/source-stock-text-diagnostics.json",
+      "original_git_blob_sha1": "68f1f73e5eba0ea375619528031bdd3267f265fb",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/stock-prefix-and-punctuation-glyphs.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/stock-prefix-and-punctuation-glyphs.json",
+      "original_git_blob_sha1": "5e4eb8ab67dcb3c82d52d10c298bc8f6d9e7a706",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/stock-reuse-release-decision-queue.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/stock-reuse-release-decision-queue.md",
+      "original_git_blob_sha1": "c2ab63ffff611ec33c7a7f4cfa3e1bd00b7e6a8c",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/evidence/mhcc-177/stock-title-source-neighbor-correspondence.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/stock-title-source-neighbor-correspondence.json",
+      "original_git_blob_sha1": "5ed477f6dab7a840a689af7fcd7120f1f6e3fdaa",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/stock-xml-prefix-and-aligned-glyphs.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/stock-xml-prefix-and-aligned-glyphs.json",
+      "original_git_blob_sha1": "c410c7d9de848d775f0c157e4cb97b9b233cc232",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/target-status-vs-display-label-correlation.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/target-status-vs-display-label-correlation.json",
+      "original_git_blob_sha1": "8cc1d4e2aae644123bacedb1ed6b7ecdd6b07a6f",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/ten-nonlink-prose-ordered-alignment-and-native-repetition.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/ten-nonlink-prose-ordered-alignment-and-native-repetition.json",
+      "original_git_blob_sha1": "80bde91af5e54e0ba8a2c4acfbcf943bfc44c62c",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/unpaired-reference-same-book-native-topology.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/unpaired-reference-same-book-native-topology.json",
+      "original_git_blob_sha1": "a8686fe94c5b7dcd604c19398320853b682b0abc",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/unresolved-156-lexical-source-reference-spans.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/unresolved-156-lexical-source-reference-spans.json",
+      "original_git_blob_sha1": "dbed7bfd113e81d290e79b6173b2e461b07ad352",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-177/unresolved-156-reference-target-and-label-census.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/stock-research/unresolved-156-reference-target-and-label-census.json",
+      "original_git_blob_sha1": "1b08a17ef1a85170d2ada99438173dae98bbf1ff",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-274/0.1.1-editorial-disposition.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/0.1.1-editorial-disposition.md",
+      "original_git_blob_sha1": "c9612ea6c31fbb96cfcb1bd0375987b997603b89",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/evidence/mhcc-274/0.1.1-reader-profile-DRAFT.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/0.1.1-reader-profile-DRAFT.md",
+      "original_git_blob_sha1": "8f793926db4915265ae8dd4f28d66efb463ccc18",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-274/0.1.1-release-notes-DRAFT.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/0.1.1-release-notes-DRAFT.md",
+      "original_git_blob_sha1": "cbdf1316dcddf988af922c610dc31f3ec10357e2",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-274/0.1.1-release-notes-PUBLIC-DRAFT.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/0.1.1-release-notes-PUBLIC-DRAFT.md",
+      "original_git_blob_sha1": "3efaca34f3cb00720f002cfd8e8e82235a33cd76",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-274/0.1.1-release-transition-DRAFT.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/0.1.1-release-transition-DRAFT.md",
+      "original_git_blob_sha1": "7db02c3a9fca8be0b3d4b5b8ae41d8d50b1bc367",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/evidence/mhcc-274/edition-first-layout-sweep-2026-11-16.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/edition-first-layout-sweep-2026-11-16.md",
+      "original_git_blob_sha1": "03c0c276aa83dcda9bdd0b9945ac39e475a7ec55",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/editorial-section-scope-audit.md",
+      "original_git_blob_sha1": "e19f71a87b56407eed4d3e6d500831fabb6c1229",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/evidence/mhcc-274/mhcc-0.1.1-2026-11-16-private-dated-candidate-DRAFT.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/mhcc-0.1.1-2026-11-16-private-dated-candidate-DRAFT.json",
+      "original_git_blob_sha1": "6adf7f2294e8ed4149ca52a84e317a20e9a54026",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-274/mhcc-0.1.1-editorial-rights-acceptance.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/mhcc-0.1.1-editorial-rights-acceptance.md",
+      "original_git_blob_sha1": "638d3b71ac70977c214dff3d0f10908b12b205c5",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-274/mhcc-0.1.1-private-six-zcom-hashes-DRAFT.json",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/mhcc-0.1.1-private-six-zcom-hashes-DRAFT.json",
+      "original_git_blob_sha1": "30d435df13a3cdad06aaea04c4d63f3c89161e0a",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-274/native-intro-text-ownership.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/native-intro-text-ownership.md",
+      "original_git_blob_sha1": "d77cae215302f231215e2308a87712ff5389d238",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-274/original-osis-transport-preflight.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/original-osis-transport-preflight.md",
+      "original_git_blob_sha1": "4216b76fc216db943d12f8255c9aaa4af9d4c6ee",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-274/paragraph-witness-pilot-2026-11-16.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/paragraph-witness-pilot-2026-11-16.md",
+      "original_git_blob_sha1": "dc6328e263280d06b1704382b268e6a96bde1a21",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-274/publication-provenance-readiness.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/publication-provenance-readiness.md",
+      "original_git_blob_sha1": "a6078f7b0c56a4bd98e5acedaccb56f93dd8cd2a",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/evidence/mhcc-274/reader-oriented-indexing-decision.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/reader-oriented-indexing-decision.md",
+      "original_git_blob_sha1": "91c5a50337f8729e21709c7102ccd2cc88bf5a76",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/mhcc-274/rebuilt-commentary-validation-contract.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/evidence/release-0.1.1/rebuilt-commentary-validation-contract.md",
+      "original_git_blob_sha1": "a0d27133bc1eabe27fd0f9735cf6141ee88b8900",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/normalizer-3/lsg-versification-canonical-reference-probe.json",
+      "to": "history/pipeline/normalizer-3/lsg-versification-canonical-reference-probe.json",
+      "original_git_blob_sha1": "e57ca5f3a70b6c431903d14b4e7c41dde7d9c854",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/normalizer-3/real-pilot-source-signals.json",
+      "to": "history/pipeline/normalizer-3/real-pilot-source-signals.json",
+      "original_git_blob_sha1": "70affbcc2eeda25a79044b557aca6694537c4338",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/evidence/post-mhcc/toolchain-pilot-2026-11-16.md",
+      "to": "history/pipeline/post-mhcc/toolchain-pilot-2026-11-16.md",
+      "original_git_blob_sha1": "5d223faa27f07bb3cf0bafe4cf4ca80b87b6d58c",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/profiles/en-matthew-henry-concise-crosswire-2-0.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/profiles/en-matthew-henry-concise-crosswire-2-0.md",
+      "original_git_blob_sha1": "5d2ceaddc926d873487899ee45445a5bc24553bf",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/profiles/en-matthew-henry-concise-crosswire-2.0-draft.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/profiles/en-matthew-henry-concise-crosswire-2.0-draft.md",
+      "original_git_blob_sha1": "e5f0acf3c4b778e6d3082747d671ea37beb0e6a0",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/profiles/fr-darby-jnd-2024.md",
+      "to": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/profiles/fr-darby-jnd-2024.md",
+      "original_git_blob_sha1": "a6767e53058a9a4434c1119b3c92fc7796a40ca3",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/profiles/fr-segond-1910.md",
+      "to": "sources/cleaned/bibles/fr/lsg-1910/editorial/profiles/fr-segond-1910.md",
+      "original_git_blob_sha1": "9d13c0735a079f8853c0169270b2a31493621eab",
+      "preserved_bytes": false
+    },
+    {
+      "from": "docs/releases/DARBY-JND-2024-0.1.0.md",
+      "to": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/releases/DARBY-JND-2024-0.1.0.md",
+      "original_git_blob_sha1": "5477711c725d27c23117996f29d7b12fd10a0be4",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/releases/DARBY-JND-2024-0.1.1-DRAFT.md",
+      "to": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/releases/DARBY-JND-2024-0.1.1-DRAFT.md",
+      "original_git_blob_sha1": "fc3dfe68462e461c56e6611c444470c05cf88713",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/releases/DARBY-JND-2024-0.1.1.md",
+      "to": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/releases/DARBY-JND-2024-0.1.1.md",
+      "original_git_blob_sha1": "c3960935c44066093a4d8355e4e5b9ebd998f046",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/releases/HMCC-Modern-0.1.0.md",
+      "to": "sources/cleaned/commentaries/en/hmcc-modern/editorial/releases/HMCC-Modern-0.1.0.md",
+      "original_git_blob_sha1": "a520d5a6cd76eb82642bc943c9b1bb854f58f816",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/releases/LSG-0.1.0.md",
+      "to": "sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-0.1.0.md",
+      "original_git_blob_sha1": "6db82e7726a8d561ee22f5b5657ad8fdada43b8e",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/releases/MHC-0.1.0-DRAFT.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/releases/MHC-0.1.0-DRAFT.md",
+      "original_git_blob_sha1": "4df43ac00cfeae49f8818d12d5442eb6b680a087",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/releases/MHC-0.1.0.md",
+      "to": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/releases/MHC-0.1.0.md",
+      "original_git_blob_sha1": "4b6e81b6f55c04c46c4f83c3602adfaa774df5f5",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/releases/MHCC-0.1.0.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/releases/MHCC-0.1.0.md",
+      "original_git_blob_sha1": "1aae88edcd55de16bf22d792de5b2b9b5bf4715c",
+      "preserved_bytes": true
+    },
+    {
+      "from": "docs/releases/MHCC-0.1.1.md",
+      "to": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/releases/MHCC-0.1.1.md",
+      "original_git_blob_sha1": "63c5575dd039fd63539d3f277b92f84cf2dd6c8e",
+      "preserved_bytes": true
+    }
+  ]
+}

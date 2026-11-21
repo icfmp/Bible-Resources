@@ -1,79 +1,43 @@
 # Contributing to Bible Resources
 
-Open an issue before importing or substantially rewriting a module. For each new **Bible**, start with the [7-stage resource onboarding workflow](docs/BIBLE_7_STAGE_WORKFLOW.md) and its [read-only GitHub Actions runner](docs/BIBLE_STAGE_AUTOMATION.md) and [import issue template](.github/ISSUE_TEMPLATE/import.yml). Complete and record one audited checkpoint at a time; resume from the issue after any interruption, never from a partially remembered chat. The seven stages govern progress, not the maximum number of small, focused PRs. Contributions must preserve original source data and supply provenance and evidence of redistribution rights. Do **not** upload copyrighted texts based only on their presence in a publicly accessible SWORD mirror.
+Begin with the [documentation guide](docs/README.md), the [production contract](docs/PRODUCTION_PIPELINE.md) and an existing issue. Check related open PRs and current source manifests **before starting a duplicate import or tool**. For a Bible use the [seven-stage checklist](docs/workflows/BIBLE_7_STAGE_WORKFLOW.md); for a commentary use [its own checklist](docs/workflows/COMMENTARY_7_STAGE_WORKFLOW.md). One resource has one issue with exact checkpoints, evidence, blockers and next action.
 
-For a module submission, provide:
+## What to submit
 
-1. `modules/<slug>/metadata.json` conforming to `schemas/module.schema.json`.
-2. One standard SWORD `.conf` and the corresponding compiled module files in `payload/`.
-3. `EDITORIAL.md`: source revision, exact transformations, anomalies remaining, reviewer, upstream feedback status.
-4. Evidence of redistribution and modification permissions; if rights are unclear, mark `restricted` and do not submit compiled content.
-5. A real-reader smoke-test key and screenshots or logs for any formatting-sensitive module.
+1. Exact work/edition and upstream provider; original source path, version, URL, SHA-256 and evidence of **redistribution and derivative rights** (including editorial layers).
+2. Original immutable archive in the proper source workspace **only if** it may legally be committed, and an independently reviewed cleaned master with an explicit reversible change ledger.
+3. `modules/<slug>/metadata.json` under [`schemas/module.schema.json`](schemas/module.schema.json), native SWORD `payload/mods.d/` configuration and `payload/modules/` content when rights and source gates permit.
+4. A module-local `EDITORIAL.md` and `sources/cleaned/**/editorial/` evidence covering fidelity, script transformations, independent key/content/notes/reference comparisons and reader QA.
+5. An explicit editorial and release decision **separate** from machine test results. Never expose restricted publisher text, private notes or credentials in CI output.
 
-Run the full local tests and audit any source text before opening a PR:
+If evidence is missing, mark the resource `BLOCKED`/`restricted` as applicable; do not publish an approximate replacement.
 
-```bash
+## Verify before requesting review
+
+```sh
 python -m pip install -r requirements.txt
 python -m unittest discover -s tests -v
 python scripts/validate.py
-python scripts/audit_text.py path/to/text.md
+python scripts/build.py --output dist
+python scripts/smoke.py --dist dist
 ```
 
-Automated normalization must be deterministic and reviewable. Do not remove scripture quotations by regex; retain the faithful text and publish any shortened reading edition as a separate, explicitly derived variant **only if modification rights permit**.
+Add format-specific official-XSD/USFM validation, whole-source-to-cleaned and source-to-native checks, plus real Xiphos and another applicable reader test for any relevant editorial changes. A successful synthetic unit test or smoke test does not establish original edition fidelity.
 
-Use an issue or pull request to propose upstream fixes. Never force upstream to accept our reader-specific editorial choices.
+Document exact commands and run IDs in the resource's issue/PR. Do not merge while required source, reader, legal or editorial approvals are missing.
 
-## Reuse-first script and review policy (post-MHCC)
+## Reuse-first tool policy
 
-Before adding a tool or workflow, inspect the generated [tool registry](
-docs/TOOL_REGISTRY.md), the current 7-stage process, relevant open issues/PRs,
-and existing standards-based SWORD/OSIS/USFM libraries. Reuse `validate.py`,
-`build.py`, `commentary_intake.py`, the native SWORD inspectors and the
-reviewed release preflight rather than creating a new importer, raw SWORD
-decoder, private packaging format or parallel publication channel.
+Consult the [generated tool inventory](reports/tooling/TOOL_REGISTRY.md), [script guide](scripts/README.md) and current issues before adding code. Prefer existing generic intake, source validators, `normalize_osis.py`, independent native SWORD readers, catalogue builder and release verifier. Do not add one script per textual correction or create a second publisher.
 
-**Do not add a permanent script merely to repair one bad sentence, title or
-verse label.** A direct, independently reviewed, reversible patch is often
-better, provided the source archive remains immutable and the patch is
-recorded with its source SHA, exact before/after edit, reason, affected native
-references and sections, rights, independent check and owner approval.
-Run the complete source→native fidelity checks after any editorial change.
-Keep source-specific identities, known alias counts, verse samples, approval
-and release-day hashes in reviewed manifests/evidence, not generic algorithms.
+Every tool needs bounded inputs, a reviewed output contract, reproducible tests, clear failure codes and safeguards against leaking publisher content. Distinguish `observed`, `technically verified`, `editorially approved` and `publicly published`.
 
-Every retained tool must have a precise purpose, bounded inputs, a CLI or
-importable interface, source/output provenance, detectable errors, and a
-clear distinction between **observed**, **verified on one edition**,
-**verified across editions**, **editorially/legally approved**, and
-**actually published**. A unit test on a synthetic fixture is not an
-independent live-reader test. An upstream `Public Domain` claim is
-a rights *witness*, not proof that separately edited third-party material
-may be republished. No copyrighted source text/notes, unpublished module
-payload, credentials or personal data should appear in public CI artifacts.
+When moving tools, first audit CLI callers, Python imports, workflows, documentation, external consumers and historical tags; test equivalent behavior on representative real sources. Source-specific exceptions must be manifested and reversible, never coded solely to make tests pass.
 
-Use **Python 3.12** and PEP 8-compatible code for new tools; prefer type
-hints at public boundaries, clear public docstrings, and comments explaining
-the SWORD/OSIS invariant or safety boundary instead of narrating syntax.
-Propose targeted Ruff checks with a reviewed incremental configuration
-rather than mass-reformatting historical scripts. C++ SWORD helpers should
-own their memory safely, bound native output/inputs and expose explicit
-nonzero errors. Error reports should identify a path and line/entry
-when known, with stable categories and no invented corrections.
+## Editorial and upstream responsibilities
 
-Script lifecycle decisions use `KEEP_GENERIC`, `GENERALIZE`, `MERGE`,
-`HISTORICAL/ARCHIVE` and `UNDECIDED`. **The generated registry is a
-conservative static inventory, not approval to delete anything.** Check
-workflows, subprocesses, documentation, external tooling and **historical
-tags/releases** before moving an allegedly unused script. Preserve
-previous GitHub Actions receipts, exact source/compiled checksums, immutable
-release assets and rollback evidence. Test behavior equivalence with
-independent source/native data on at least two different resources before
-extracting a reusable implementation. No change is merged with failing
-acceptance gates.
+Never silently rewrite Scripture, fill intentional omissions, merge commentary sections, change versification, add guessed lexical links, or strip existing notes/quotations. Any justified correction must have original/source-bound evidence, exact old/new text or markup, reviewer acceptance and independent full-corpus checks.
 
-For worked commands and decision points, see
-[the reusable commentary workflow](docs/COMMENTARY_PIPELINE.md),
-[publication process](docs/PUBLISHING.md), and
-[tool inventory](docs/TOOL_REGISTRY.md). Work through small auditable PRs;
-use the relevant issues as checkpoints. **Codex review or delegation must
-not be initiated without the project owner's request.**
+Offer clear source/metadata corrections to upstream maintainers with reproducible evidence. CrossWire or eBible accepting a patch does not automatically mean that the fix is in their current compiled module. See [upstream contribution workflow](docs/workflows/UPSTREAM.md).
+
+The proposed [BRNP profile](docs/architecture/BRNP.md) is experimental and its full implementation is deferred to [issue #451](https://github.com/icfmp/Bible-Resources/issues/451). It is not currently mandatory for publication.

@@ -6,6 +6,7 @@ on:
       - 'scripts/**'
       - 'tests/**'
       - 'docs/**'
+      - 'reports/tooling/**'
       - '.github/workflows/**'
       - 'CONTRIBUTING.md'
   workflow_dispatch:
@@ -36,7 +37,7 @@ jobs:
           import json
           from pathlib import Path
           from scripts.tool_registry import generate
-          actual = json.loads(Path("docs/TOOL_REGISTRY.json").read_text())
+          actual = json.loads(Path("reports/tooling/TOOL_REGISTRY.json").read_text())
           # JSON arrays from checked-in metadata must compare to JSON arrays,
           # not Python tuples: avoid false import inventory drift reports.
           expected = json.loads(json.dumps(generate()))
