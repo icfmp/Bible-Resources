@@ -11,12 +11,12 @@ from collections import Counter, defaultdict
 from hashlib import sha256
 import re
 
-from commentary_chapter_paragraph_overlap import (
+from research.commentary.commentary_chapter_paragraph_overlap import (
     MAX_SOURCE_P_WORDS, MAX_STOCK_ENTRY_WORDS,
     SOURCE_WORD_RE, longest_common_contiguous_word_run,
 )
 from pilot_preflight import PilotError
-from commentary_chapter_ref_labels import link_label_location
+from research.commentary.commentary_chapter_ref_labels import link_label_location
 
 MAX_SAFE_SOURCE_P = 1000
 MAX_REVIEW_CASES = 12

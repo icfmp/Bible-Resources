@@ -14,7 +14,7 @@ import re
 from lxml import etree
 
 from pilot_preflight import PilotError
-from commentary_chapter_ref_labels import link_label_location
+from research.commentary.commentary_chapter_ref_labels import link_label_location
 
 MAX_NATIVE_STOCK_KEYS = 45000
 MAX_XML_BYTES = 2 * 1024 * 1024

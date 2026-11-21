@@ -11,7 +11,8 @@
 | `native/` (future) | SWORD native readback, mapping, text and link parity | `sword_native_inventory.py`, `source_native_*`; C++ compiler paths require care |
 | `readers/` (future) | Xiphos, JSword and Android compatibility probes | Migrate only after integration tests and runner setup parity |
 | `release/` (future) | Deterministic package, signing, catalogue and publication | `build.py`, `validate.py`, `release_preflight.py`; public entrypoints stay stable until explicitly migrated |
-| [`historical/`](historical/README.md) | Exact source-pinned reproduction and superseded experiments | Begin with relocated LSG synthetic versification probe; no deletion without replay |
+| [`research/commentary/`](research/commentary/README.md) | Reusable chapter/section topology research (not publication) | Five non-CLI helpers grouped under one namespace; consumer imports explicitly updated |
+| [`historical/`](historical/README.md) | Exact source-pinned reproduction and superseded experiments | LSG historical probes, no deletion without replay |
 
 **These future category names are a target design, not folders claimed as already populated.** Create them incrementally when their actual callers and import contracts pass tests. A bare mass move or hundreds of compatibility wrappers would conceal, not solve, the maintenance problem.
 
@@ -33,8 +34,9 @@ Use the single [production contract](../docs/PRODUCTION_PIPELINE.md); avoid new 
 are not the preferred production pipeline. Relocate only after the real
 workflow/caller/test/historical-tag audit and behavior-equivalence proof.
 
-**No cosmetic mass move:** this workspace cleanup deliberately leaves
-original script locations callable. Classifications alone do not prove
+**Audited moves only:** five commentary research helpers are now grouped under
+`research/commentary/`, with their consumers and tests migrated; other
+script entrypoints remain at their established locations. Classifications alone do not prove
 that a file is dead code; the nine historical/archivable flags have active
 script, test or workflow references. Reorganization is not an authorization
 to delete or silently change their outputs.

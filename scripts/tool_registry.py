@@ -139,8 +139,12 @@ def generate(root: Path = ROOT) -> dict:
         # evidence. Every reference is recorded with its exact caller path.
         literal = re.compile(r"(?<![A-Za-z0-9_])"
                              + re.escape(path.name) + r"(?![A-Za-z0-9_])")
-        import_pat = re.compile(r"(?m)^\s*(?:from\s+" + re.escape(stem)
-                                + r"(?:\s+import|\.)|import\s+"
+        # Detect both direct and package-qualified imports, including
+        # research.commentary.<module>, without assuming a fixed package name.
+        namespace = r"(?:[A-Za-z_][A-Za-z_0-9]*\.)*"
+        import_pat = re.compile(r"(?m)^\s*(?:from\s+" + namespace
+                                + re.escape(stem) + r"(?:\s+import|\.)"
+                                + r"|import\s+" + namespace
                                 + re.escape(stem) + r"(?:\s|$|,))")
         callers = [
             other for other, content in texts.items()
