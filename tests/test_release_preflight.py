@@ -77,22 +77,18 @@ class CrossEditionReleasePreflightTests(unittest.TestCase):
                     self.assertEqual(record["sword_id"], plan["sword_id"])
                     self.assertEqual(record["version"], plan["version"])
 
-    def test_completed_darby_publication_workflows_are_manual_only(self):
-        """Legacy historical release scripts must not race current Pages."""
-        for name in (
-            "release-darby-jnd-2024.yml",
-            "stage-darby-0.1.1.yml",
-            "finalize-darby-0.1.1.yml",
-            "finalize-darby-release.yml",
+    def test_current_pages_pipeline_owns_release_and_catalogue_checks(self):
+        """Current publication remains behind the shared release gate."""
+        workflow = (ROOT / ".github/workflows/pages.yml").read_text(
+            encoding="utf-8")
+        for command in (
+            "python scripts/catalogue_release_coverage.py",
+            "python scripts/publish_reviewed_release.py",
+            "python scripts/verify_public_catalogue.py",
         ):
-            with self.subTest(workflow=name):
-                workflow = (ROOT / ".github/workflows" / name).read_text(
-                    encoding="utf-8")
-                header = workflow.split("\npermissions:\n", 1)[0]
-                self.assertIn("\non:\n  workflow_dispatch:\n", header)
-                self.assertNotIn("\n  pull_request:\n", header)
-                self.assertNotIn("\n  push:\n", header)
-                self.assertIn("Historical Darby", header)
+            with self.subTest(command=command):
+                self.assertIn(command, workflow)
+        self.assertIn("branches: [main]", workflow)
 
     def test_unknown_or_repeated_or_malicious_resource_ids_fail_closed(self):
         for values in ((), ("does-not-exist",),

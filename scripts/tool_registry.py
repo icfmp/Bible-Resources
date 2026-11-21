@@ -37,19 +37,13 @@ CORE = {
     "sword_native_commentary_index.cpp",
     "sword_native_commentary_raw_corpus.cpp",
 }
-HISTORICAL_ADAPTERS = {
-    # Immutable approved old-release recreation, not a current generic
-    # importer or authority for changing rights, versions or source text.
-    "materialize_attested_ztext_release.py",
-}
 EXPERIMENTS = (
     "commentary_chapter_", "commentary_nonlink_",
     "commentary_prose_cross_slot", "commentary_reference_cross_slot",
     "commentary_unresolved_lexical_triage",
 )
 EDITION_PREFIXES = (
-    "stage_darby_", "prepare_darby_", "probe_darby_",
-    "materialize_attested_lsg_", "lsg_", "darby_",
+    "prepare_darby_", "probe_darby_", "lsg_", "darby_",
 )
 READER_NAMES = ("xiphos", "andbible", "android", "jsword", "webview")
 PIN = re.compile(r"[a-f0-9]{64}")
@@ -86,8 +80,6 @@ def _code(source: str) -> tuple[str, bool, tuple[str, ...]]:
 def classify(name: str, source: str, *, core=CORE) -> tuple[str, str]:
     if name in core:
         return "KEEP_GENERIC", "high"
-    if name in HISTORICAL_ADAPTERS:
-        return "HISTORICAL/ARCHIVE", "high"
     if name.startswith(EDITION_PREFIXES) or (
             any(token in name.lower() for token in ("darby", "mhcc", "lsg"))
             and name != "commentary_sword_identity_migration.py"):
