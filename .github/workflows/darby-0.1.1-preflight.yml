@@ -14,9 +14,9 @@ on:
       - "scripts/repair_osis_division_markers.py"
       - "tests/test_repair_osis_division_markers.py"
       - "config/darby-0.1.1.conf"
-      - "scripts/prepare_darby_011_private_release_candidate.py"
+      - "modules/darby-jnd-2024/tools/prepare_darby_011_private_release_candidate.py"
       - "tests/test_prepare_darby_011_private_release_candidate.py"
-      - "scripts/probe_darby_011_final_android.py"
+      - "modules/darby-jnd-2024/tools/probe_darby_011_final_android.py"
       - "tests/test_probe_darby_011_final_android.py"
       - "scripts/probe_andbible_android_private_import.py"
       - "scripts/reader_xiphos_headless_smoke.py"
@@ -132,7 +132,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/prepare_darby_011_private_release_candidate.py \
+          python modules/darby-jnd-2024/tools/prepare_darby_011_private_release_candidate.py \
             --audit "$RUNNER_TEMP/darby-private-native/report.json" \
             --private-research-zip "$RUNNER_TEMP/darby-private-native/private-source-audited.zip" \
             --old-release-provenance modules/darby-jnd-2024/RELEASE_PROVENANCE.json \
@@ -199,7 +199,7 @@ jobs:
           heap-size: 512M
           disable-animations: true
           emulator-boot-timeout: 600
-          script: python scripts/probe_darby_011_final_android.py --final-zip "$RUNNER_TEMP/darby-private-native/final-011-candidate/BRJND2024-0.1.1.zip" --metadata "$RUNNER_TEMP/darby-private-native/final-011-candidate/metadata-only-report.json" --apk "$RUNNER_TEMP/darby-private-native/andbible-production-1117.apk" --evidence-dir "$RUNNER_TEMP/darby-private-native/android-final-review" --report "$RUNNER_TEMP/darby-private-native/android-final-review/safe-report.json"
+          script: python modules/darby-jnd-2024/tools/probe_darby_011_final_android.py --final-zip "$RUNNER_TEMP/darby-private-native/final-011-candidate/BRJND2024-0.1.1.zip" --metadata "$RUNNER_TEMP/darby-private-native/final-011-candidate/metadata-only-report.json" --apk "$RUNNER_TEMP/darby-private-native/andbible-production-1117.apk" --evidence-dir "$RUNNER_TEMP/darby-private-native/android-final-review" --report "$RUNNER_TEMP/darby-private-native/android-final-review/safe-report.json"
       - name: Upload research-only Xiphos and Android reader screenshots (never SWORD ZIP)
         if: always()
         uses: actions/upload-artifact@v4
