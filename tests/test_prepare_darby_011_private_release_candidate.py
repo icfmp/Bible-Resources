@@ -7,6 +7,8 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] /
+                       "modules/darby-jnd-2024/tools"))
 from prepare_darby_011_private_release_candidate import (
     ORIGINAL, CORRECTED, RESEARCH_NATIVE, PRIOR_RELEASE_SHA,
     Darby011PreflightError, verify_proofs,
