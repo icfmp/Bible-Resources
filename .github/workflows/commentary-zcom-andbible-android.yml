@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/commentary-zcom-andbible-android.yml'
-      - 'scripts/commentary_stock_andbible_android.py'
+      - 'modules/mhcc-crosswire/tools/commentary_stock_andbible_android.py'
       - 'tests/test_commentary_stock_andbible_android.py'
       - 'scripts/commentary_android_text_witness.py'
       - 'scripts/commentary_android_webview_debug.py'
@@ -35,6 +35,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
+      PYTHONPATH: scripts
       RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
     steps:
       - uses: actions/checkout@v4
@@ -92,7 +93,7 @@ jobs:
           heap-size: 512M
           disable-animations: true
           emulator-boot-timeout: 600
-          script: python scripts/commentary_stock_andbible_android.py --resource-id "$RESOURCE_ID" --apk "$RUNNER_TEMP/commentary-private-android/andbible-production-1117.apk" --native-raw-key-binary "$RUNNER_TEMP/commentary-private-android/stock-raw-key" --native-full-raw-binary "$RUNNER_TEMP/commentary-private-android/stock-full-native" --report "$RUNNER_TEMP/commentary-private-android/android-stock-import-proof.json"
+          script: python modules/mhcc-crosswire/tools/commentary_stock_andbible_android.py --resource-id "$RESOURCE_ID" --apk "$RUNNER_TEMP/commentary-private-android/andbible-production-1117.apk" --native-raw-key-binary "$RUNNER_TEMP/commentary-private-android/stock-raw-key" --native-full-raw-binary "$RUNNER_TEMP/commentary-private-android/stock-full-native" --report "$RUNNER_TEMP/commentary-private-android/android-stock-import-proof.json"
       - name: Enforce exact pinned stock and honest Android observation limitations
         shell: bash
         run: |
