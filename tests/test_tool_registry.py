@@ -55,19 +55,22 @@ class ScriptInventoryTests(unittest.TestCase):
     def test_lsg_source_probes_are_edition_owned_and_still_invoked(self):
         """LSG-specific diagnostics are not generic, yet retain their real callers."""
         entries = {entry["path"]: entry for entry in self.result["files"]}
-        for name, workflow in (
-            ("lsg_sword_compare.py", "lsg-fidelity.yml"),
-            ("probe_lsg_v11n.py", "lsg-v11n-probe.yml"),
+        for name, workflow, test_name in (
+            ("lsg_sword_compare.py", "lsg-fidelity.yml",
+             "test_lsg_sword_compare.py"),
+            ("probe_lsg_v11n.py", "lsg-v11n-probe.yml",
+             "test_lsg_v11n_probe.py"),
         ):
             with self.subTest(name=name):
                 local = "modules/lsg-1910/tools/" + name
                 self.assertNotIn("scripts/historical/lsg/" + name, entries)
                 self.assertIn(local, entries)
                 self.assertEqual(entries[local]["classification"], "MODULE_LOCAL")
-                self.assertTrue(entries[local]["has_direct_tests_by_filename"])
+                # A filename heuristic can miss a real differently named test.
+                # Verify the actual imported test rather than the hint.
                 self.assertIn(".github/workflows/" + workflow,
                               entries[local]["static_references"])
-                self.assertIn("tests/test_" + name,
+                self.assertIn("tests/" + test_name,
                               entries[local]["static_references"])
 
     def test_lsg_module_tools_remain_real_command_line_entrypoints(self):
