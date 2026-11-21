@@ -50,7 +50,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_modern_k_scope_preview.py`](../../scripts/commentary_modern_k_scope_preview.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_modern_linked_candidate_preview.py`](../../scripts/commentary_modern_linked_candidate_preview.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/commentary_modern_native_witness_probe.py`](../../scripts/commentary_modern_native_witness_probe.py) | UNDECIDED | named test | 2 | source/native audit |
-| [`scripts/commentary_modern_reference_gate.py`](../../scripts/commentary_modern_reference_gate.py) | UNDECIDED | named test | 7 | not determined |
+| [`scripts/commentary_modern_reference_gate.py`](../../scripts/commentary_modern_reference_gate.py) | UNDECIDED | named test | 6 | not determined |
 | [`scripts/commentary_modern_source_receipt.py`](../../scripts/commentary_modern_source_receipt.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_native_inventory.py`](../../scripts/commentary_native_inventory.py) | KEEP_GENERIC | not established | 9 | source/native audit |
 | [`scripts/commentary_native_raw_inventory.py`](../../scripts/commentary_native_raw_inventory.py) | KEEP_GENERIC | named test | 12 | source/native audit |
@@ -151,7 +151,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/commentary/commentary_editorial_topology.py`](../../scripts/research/commentary/commentary_editorial_topology.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/research/commentary/commentary_intro_chapter_text_review.py`](../../scripts/research/commentary/commentary_intro_chapter_text_review.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/research/commentary/commentary_lexical_overlap.py`](../../scripts/research/commentary/commentary_lexical_overlap.py) | UNDECIDED | not established | 3 | not determined |
-| [`scripts/research/commentary/commentary_link_disposition_review.py`](../../scripts/research/commentary/commentary_link_disposition_review.py) | UNDECIDED | not established | 4 | not determined |
+| [`scripts/research/commentary/commentary_link_disposition_review.py`](../../scripts/research/commentary/commentary_link_disposition_review.py) | UNDECIDED | not established | 3 | not determined |
 | [`scripts/research/commentary/commentary_nonlink_analysis.py`](../../scripts/research/commentary/commentary_nonlink_analysis.py) | MERGE | not established | 17 | not determined |
 | [`scripts/research/commentary/commentary_original_link_identity.py`](../../scripts/research/commentary/commentary_original_link_identity.py) | UNDECIDED | not established | 5 | not determined |
 | [`scripts/research/commentary/commentary_osis_rebuild_preflight.py`](../../scripts/research/commentary/commentary_osis_rebuild_preflight.py) | UNDECIDED | named test | 2 | publication/release |
@@ -198,7 +198,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/sword_native_raw_corpus.cpp`](../../scripts/sword_native_raw_corpus.cpp) | UNDECIDED | not established | 12 | not determined |
 | [`scripts/sword_native_raw_corpus_inventory.py`](../../scripts/sword_native_raw_corpus_inventory.py) | KEEP_GENERIC | named test | 32 | source/native audit |
 | [`scripts/sword_native_raw_entry.cpp`](../../scripts/sword_native_raw_entry.cpp) | UNDECIDED | not established | 6 | not determined |
-| [`scripts/tool_registry.py`](../../scripts/tool_registry.py) | KEEP_GENERIC | named test | 5 | not determined |
+| [`scripts/tool_registry.py`](../../scripts/tool_registry.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/usfx_schema_gate.py`](../../scripts/usfx_schema_gate.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/validate.py`](../../scripts/validate.py) | KEEP_GENERIC | not established | 24 | not determined |
 | [`scripts/verify_public_catalogue.py`](../../scripts/verify_public_catalogue.py) | KEEP_GENERIC | named test | 4 | not determined |
