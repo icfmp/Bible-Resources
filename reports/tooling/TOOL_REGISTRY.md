@@ -1,6 +1,6 @@
-# Tool registry — source-bound post-MHCC inventory
+# Tool registry — shared and module-owned source-bound tools
 
-This generated list covers every tracked `scripts/*.py`, `*.cpp` and `*.sh`. It lists static callers and review recommendations, **not** a licence to delete scripts or proof that they are exercised.
+This generated list covers shared scripts plus edition-owned tools under `modules/<resource-id>/tools/`. It lists callers/review recommendations, **not** a licence to delete scripts or proof that they are exercised.
 Generate/check: `python scripts/tool_registry.py --write` / `python scripts/tool_registry.py --check`.
 The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). No publishing credentials or raw commentary content enter the inventory.
 
@@ -10,20 +10,24 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 - **GENERALIZE:** extract known edition-specific logic into a reviewed manifest, preserving existing proofs.
 - **MERGE:** candidate overlapping research functions; only merge after comparing outputs and historical dependencies.
 - **HISTORICAL/ARCHIVE:** retain for immutable proof/replay; archive only after evidence-based replacement, never by deleting blindly.
+- **MODULE_LOCAL:** pinned resource-specific maintenance/replay; not a shared entrypoint or a new publication route.
 - **UNDECIDED:** source/caller audit required; no inferred deletion.
 
 ## Baseline counts
 
 - GENERALIZE: 3
-- HISTORICAL/ARCHIVE: 6
+- HISTORICAL/ARCHIVE: 4
 - KEEP_GENERIC: 26
 - MERGE: 10
+- MODULE_LOCAL: 2
 - UNDECIDED: 128
 
 ## All tracked tools
 
 | Script | Classification | Tests | Static callers | Stage hint |
 | --- | --- | --- | ---: | --- |
+| [`modules/darby-jnd-2024/tools/prepare_darby_011_private_release_candidate.py`](../../modules/darby-jnd-2024/tools/prepare_darby_011_private_release_candidate.py) | MODULE_LOCAL | named test | 3 | publication/release |
+| [`modules/darby-jnd-2024/tools/probe_darby_011_final_android.py`](../../modules/darby-jnd-2024/tools/probe_darby_011_final_android.py) | MODULE_LOCAL | named test | 3 | source/native audit |
 | [`scripts/audit_omitted_verse_notes.py`](../../scripts/audit_omitted_verse_notes.py) | UNDECIDED | named test | 4 | source/native audit |
 | [`scripts/audit_osis.py`](../../scripts/audit_osis.py) | UNDECIDED | not established | 7 | source/native audit |
 | [`scripts/audit_real_pilot.py`](../../scripts/audit_real_pilot.py) | UNDECIDED | not established | 3 | source/native audit |
@@ -109,12 +113,10 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | named test | 92 | not determined |
 | [`scripts/pilot_runtime.py`](../../scripts/pilot_runtime.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/pilot_subprocess.py`](../../scripts/pilot_subprocess.py) | UNDECIDED | named test | 15 | not determined |
-| [`scripts/prepare_darby_011_private_release_candidate.py`](../../scripts/prepare_darby_011_private_release_candidate.py) | HISTORICAL/ARCHIVE | named test | 2 | publication/release |
 | [`scripts/private_sword_bundle.py`](../../scripts/private_sword_bundle.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/probe_andbible_android_emulator.py`](../../scripts/probe_andbible_android_emulator.py) | UNDECIDED | not established | 6 | source/native audit |
 | [`scripts/probe_andbible_android_private_import.py`](../../scripts/probe_andbible_android_private_import.py) | UNDECIDED | named test | 5 | source/native audit |
 | [`scripts/probe_andbible_jsword.py`](../../scripts/probe_andbible_jsword.py) | UNDECIDED | not established | 4 | source/native audit |
-| [`scripts/probe_darby_011_final_android.py`](../../scripts/probe_darby_011_final_android.py) | HISTORICAL/ARCHIVE | named test | 2 | source/native audit |
 | [`scripts/probe_official_osis.py`](../../scripts/probe_official_osis.py) | UNDECIDED | not established | 2 | source/native audit |
 | [`scripts/probe_private_repaired_darby_sword.py`](../../scripts/probe_private_repaired_darby_sword.py) | HISTORICAL/ARCHIVE | not established | 4 | source/native audit |
 | [`scripts/promote_sword_preview.py`](../../scripts/promote_sword_preview.py) | KEEP_GENERIC | named test | 9 | not determined |

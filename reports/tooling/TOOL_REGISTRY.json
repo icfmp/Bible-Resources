@@ -1,6 +1,87 @@
 {
   "files": [
     {
+      "classification": "MODULE_LOCAL",
+      "confidence": "high",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "zText",
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "modules/darby-jnd-2024/tools/prepare_darby_011_private_release_candidate.py",
+      "proposed_action": "Keep with the owning module only while its pinned maintenance/replay workflow and regression checks remain necessary.",
+      "purpose_first_line": "Privately materialize and independently audit a Darby 0.1.1 ZIP candidate.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "hashlib",
+        "json",
+        "pathlib",
+        "promote_sword_preview",
+        "publisher_osis_observation",
+        "re",
+        "source_osis_inventory",
+        "stable_sword_refs",
+        "sword_native_inventory",
+        "zipfile"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "e819c001f7f4876be1acd3e971b296b14f43f82f74becd16ca6547d22c0cf849",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "publication/release",
+      "static_reference_count": 3,
+      "static_references": [
+        ".github/workflows/darby-0.1.1-preflight.yml",
+        "tests/test_prepare_darby_011_private_release_candidate.py",
+        "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "MODULE_LOCAL",
+      "confidence": "high",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "zText"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "modules/darby-jnd-2024/tools/probe_darby_011_final_android.py",
+      "proposed_action": "Keep with the owning module only while its pinned maintenance/replay workflow and regression checks remain necessary.",
+      "purpose_first_line": "Actual stable AndBible Android UI probe on the exact PRIVATE Darby 0.1.1 ZIP.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "hashlib",
+        "json",
+        "pathlib",
+        "probe_andbible_android_private_import",
+        "re",
+        "shutil",
+        "time",
+        "urllib",
+        "zipfile"
+      ],
+      "reader_tool_signals": [
+        "andbible",
+        "android"
+      ],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "bb77123d8c3811f94237d0b0acdd8b2fb054f08ddf6842140d2c203583be7922",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "source/native audit",
+      "static_reference_count": 3,
+      "static_references": [
+        ".github/workflows/darby-0.1.1-preflight.yml",
+        "tests/test_probe_darby_011_final_android.py",
+        "tests/test_tool_registry.py"
+      ]
+    },
+    {
       "classification": "UNDECIDED",
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
@@ -3575,45 +3656,6 @@
       ]
     },
     {
-      "classification": "HISTORICAL/ARCHIVE",
-      "confidence": "medium",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "zText",
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/prepare_darby_011_private_release_candidate.py",
-      "proposed_action": "Retain runnable historical evidence; extract shared algorithms only after byte-equivalence tests.",
-      "purpose_first_line": "Privately materialize and independently audit a Darby 0.1.1 ZIP candidate.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "hashlib",
-        "json",
-        "pathlib",
-        "promote_sword_preview",
-        "publisher_osis_observation",
-        "re",
-        "source_osis_inventory",
-        "stable_sword_refs",
-        "sword_native_inventory",
-        "zipfile"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "e819c001f7f4876be1acd3e971b296b14f43f82f74becd16ca6547d22c0cf849",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "publication/release",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/darby-0.1.1-preflight.yml",
-        "tests/test_prepare_darby_011_private_release_candidate.py"
-      ]
-    },
-    {
       "classification": "UNDECIDED",
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
@@ -3731,7 +3773,7 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 5,
       "static_references": [
-        "scripts/probe_darby_011_final_android.py",
+        "modules/darby-jnd-2024/tools/probe_darby_011_final_android.py",
         "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-andbible-android-private.yml",
@@ -3774,46 +3816,6 @@
         "scripts/commentary_osis_mixed_transport_probe.py",
         "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-andbible-jsword.yml"
-      ]
-    },
-    {
-      "classification": "HISTORICAL/ARCHIVE",
-      "confidence": "medium",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "zText"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/probe_darby_011_final_android.py",
-      "proposed_action": "Retain runnable historical evidence; extract shared algorithms only after byte-equivalence tests.",
-      "purpose_first_line": "Actual stable AndBible Android UI probe on the exact PRIVATE Darby 0.1.1 ZIP.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "hashlib",
-        "json",
-        "pathlib",
-        "probe_andbible_android_private_import",
-        "re",
-        "shutil",
-        "time",
-        "urllib",
-        "zipfile"
-      ],
-      "reader_tool_signals": [
-        "andbible",
-        "android"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "bb77123d8c3811f94237d0b0acdd8b2fb054f08ddf6842140d2c203583be7922",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/darby-0.1.1-preflight.yml",
-        "tests/test_probe_darby_011_final_android.py"
       ]
     },
     {
@@ -3949,8 +3951,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 9,
       "static_references": [
+        "modules/darby-jnd-2024/tools/prepare_darby_011_private_release_candidate.py",
         "scripts/commentary_stock_candidate.py",
-        "scripts/prepare_darby_011_private_release_candidate.py",
         "scripts/tool_registry.py",
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-zcom-private-candidate.yml",
@@ -4104,8 +4106,8 @@
       "stage_hint": "publication/release",
       "static_reference_count": 12,
       "static_references": [
+        "modules/darby-jnd-2024/tools/prepare_darby_011_private_release_candidate.py",
         "scripts/inspect_paragraph_rendering.py",
-        "scripts/prepare_darby_011_private_release_candidate.py",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/publisher_osis_usfx_parity.py",
@@ -6114,11 +6116,11 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 29,
       "static_references": [
+        "modules/darby-jnd-2024/tools/prepare_darby_011_private_release_candidate.py",
         "scripts/audit_omitted_verse_notes.py",
         "scripts/bible_stage_runner.py",
         "scripts/inspect_paragraph_rendering.py",
         "scripts/osis_semantic_fidelity.py",
-        "scripts/prepare_darby_011_private_release_candidate.py",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/publisher_osis_usfx_parity.py",
@@ -6321,12 +6323,12 @@
       "stage_hint": "not determined",
       "static_reference_count": 36,
       "static_references": [
+        "modules/darby-jnd-2024/tools/prepare_darby_011_private_release_candidate.py",
         "scripts/bible_stage_runner.py",
         "scripts/fast_stock_note_probe.py",
         "scripts/inspect_paragraph_rendering.py",
         "scripts/native_absorbed_verse_groups.py",
         "scripts/native_milestone_pair_audit.py",
-        "scripts/prepare_darby_011_private_release_candidate.py",
         "scripts/published_reference_audit.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/publisher_osis_usfx_parity.py",
@@ -6718,10 +6720,10 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 18,
       "static_references": [
+        "modules/darby-jnd-2024/tools/prepare_darby_011_private_release_candidate.py",
         "scripts/native_book_intro_screen.py",
         "scripts/native_milestone_pair_audit.py",
         "scripts/native_sword_markup_census.py",
-        "scripts/prepare_darby_011_private_release_candidate.py",
         "scripts/publisher_osis_preview_readback.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/real_second_bible_probe.py",
@@ -6908,7 +6910,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "4aa4bdf2a57541af9cff226dc2a2f6596612c533285f0a9dcb8ac67b18b31c94",
+      "sha256_at_inventory": "5b93f88bbe2c7ac62f2f6c55ad29ed5bc1efd2e9aa6e4a320a9ac5963c8ddd42",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
