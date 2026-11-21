@@ -18,7 +18,7 @@ than copying them.
   using [the reviewed case configuration](../../../config/lsg-v11n-probes.json)
   and [`test_lsg_v11n_probe.py`](../../../tests/test_lsg_v11n_probe.py).
 
-Run either command from the repository root with `--help`. The scripts
+Run either command from the repository root with `--help` (for example, `python modules/lsg-1910/tools/probe_lsg_v11n.py --help`). The scripts
 resolve `scripts/` for shared imports and `config/` from the repository
 root; no root-level duplicate or compatibility stub remains.
 
