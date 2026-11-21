@@ -27,7 +27,7 @@ jobs:
           python scripts/tool_registry.py --write
           python scripts/tool_registry.py --check
           git rm .github/workflows/maintenance-refresh-link-disposition-registry.yml
-          git add reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git add -f reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git commit -m 'chore: refresh deterministic tool registry after proposal-gate extraction'
