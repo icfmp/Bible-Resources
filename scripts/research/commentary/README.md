@@ -22,4 +22,6 @@ Imported by the existing source-neutral section-scope audit and individually tes
 
 Original native-link identity checks remain private observations: an authenticated destination or label digest is not evidence that a translated manuscript preserves the reference. The parent runner remains responsible for source-pinned native streaming and editorial/release gatekeeping.
 
+The unified nonlink library deliberately keeps different bounds for each calculation: large-input accounting must never be mistaken for bounded longest-common-subsequence alignment. Existing tests continue to verify these differences.
+
 **Separate observations from decisions.** Similar-sounding helpers have different inputs, outputs and evidence limits. None is removable or interchangeable without a source-bound equivalence review. [Script maintenance #430](https://github.com/icfmp/Bible-Resources/issues/430) tracks this work; the [production contract](../../../docs/PRODUCTION_PIPELINE.md) remains authoritative.
