@@ -682,137 +682,6 @@
     {
       "classification": "UNDECIDED",
       "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "zCom",
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_andbible_jsword.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Independent pinned Android AndBible-stable JSword ENGINE test of stock zCom.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "commentary_intake",
-        "commentary_native_raw_inventory",
-        "commentary_reference_cross_slot",
-        "commentary_stock_candidate",
-        "commentary_xiphos_dual_reader",
-        "hashlib",
-        "json",
-        "os",
-        "pathlib",
-        "pilot_fetch",
-        "pilot_preflight",
-        "pilot_subprocess",
-        "probe_andbible_jsword",
-        "re",
-        "shutil",
-        "subprocess",
-        "tempfile",
-        "xml",
-        "zipfile"
-      ],
-      "reader_tool_signals": [
-        "xiphos",
-        "andbible",
-        "android",
-        "jsword"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "a24f9d3ada52d3d3b1207d90a3bfaece03bcb9c086de95159fb34f4e1dfa33bd",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/commentary-zcom-andbible-jsword.yml",
-        "tests/test_commentary_andbible_jsword.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "zCom",
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_android_text_witness.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "PRIVATE exact-original MHCC prose vs actual Android WebView accessibility witness.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "commentary_xiphos_dual_reader",
-        "lxml",
-        "os",
-        "pathlib",
-        "pilot_preflight",
-        "probe_andbible_android_emulator",
-        "re",
-        "subprocess",
-        "sword_native_raw_corpus_inventory",
-        "xml"
-      ],
-      "reader_tool_signals": [
-        "xiphos",
-        "andbible",
-        "android",
-        "webview"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "44b732c1d470269d59d3a3775567c8f789ed08b1d67cfcdd9b9b51809f1b0a5f",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 2,
-      "static_references": [
-        "tests/test_commentary_android_text_witness.py",
-        "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_android_webview_debug.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "PRIVATE read-only DOM text from the official AndBible WebView debug socket.",
-      "python_imports": [
-        "__future__",
-        "json",
-        "pilot_preflight",
-        "probe_andbible_android_emulator",
-        "re",
-        "urllib",
-        "websocket"
-      ],
-      "reader_tool_signals": [
-        "andbible",
-        "android",
-        "webview"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "d3b48501613e7fed7f396d9d2c80d6e74088bc72fd11010f10e6ab9b3e1c08c5",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 1,
-      "static_references": [
-        "tests/test_commentary_android_webview_debug.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "ThML"
@@ -880,16 +749,14 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "intake",
-      "static_reference_count": 15,
+      "static_reference_count": 13,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
-        "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_native_inventory.py",
         "scripts/commentary_native_raw_inventory.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_stock_candidate.py",
-        "scripts/commentary_stock_xiphos_smoke.py",
         "scripts/commentary_witness.py",
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/commentary_xml_witness.py",
@@ -1351,14 +1218,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 11,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
-        "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_stock_candidate.py",
-        "scripts/commentary_stock_xiphos_smoke.py",
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/tool_registry.py",
         ".github/workflows/commentary-mhc-source-text.yml",
@@ -1877,9 +1742,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
-        "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_xiphos_dual_reader.py",
         "tests/test_commentary_reference_cross_slot.py"
@@ -2215,9 +2079,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
-        "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/stage_verified_stock_commentary.py",
         ".github/workflows/commentary-zcom-private-candidate.yml",
@@ -2260,53 +2123,6 @@
         "tests/test_commentary_prefixed_suffix.py",
         "tests/test_commentary_stock_prefix_topology.py",
         "tests/test_commentary_stock_source_context.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "zCom"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_stock_xiphos_smoke.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Private actual Xiphos GTK startup against an exact SHA-pinned stock zCom.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "commentary_intake",
-        "commentary_native_raw_inventory",
-        "hashlib",
-        "json",
-        "os",
-        "pathlib",
-        "pilot_fetch",
-        "pilot_preflight",
-        "pilot_subprocess",
-        "reader_xiphos_headless_smoke",
-        "shutil",
-        "subprocess",
-        "tempfile",
-        "time",
-        "zipfile"
-      ],
-      "reader_tool_signals": [
-        "xiphos",
-        "andbible",
-        "android"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "ebf23676deea22aa550778a4b41ad89006fad51a12b640590957687d3db4b484",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/commentary-zcom-xiphos-private-smoke.yml",
-        "tests/test_commentary_stock_xiphos_smoke.py"
       ]
     },
     {
@@ -2535,10 +2351,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 11,
+      "static_reference_count": 9,
       "static_references": [
-        "scripts/commentary_andbible_jsword.py",
-        "scripts/commentary_android_text_witness.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
@@ -3302,17 +3116,15 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 21,
+      "static_reference_count": 19,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
-        "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_intake.py",
         "scripts/commentary_native_inventory.py",
         "scripts/commentary_native_raw_inventory.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_stock_candidate.py",
-        "scripts/commentary_stock_xiphos_smoke.py",
         "scripts/commentary_witness.py",
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/commentary_xml_witness.py",
@@ -3363,7 +3175,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 88,
+      "static_reference_count": 80,
       "static_references": [
         "modules/lsg-1910/tools/lsg_sword_compare.py",
         "modules/lsg-1910/tools/probe_lsg_v11n.py",
@@ -3371,9 +3183,6 @@
         "scripts/bible_intake.py",
         "scripts/bible_stage_runner.py",
         "scripts/commentary_anchor_parity.py",
-        "scripts/commentary_andbible_jsword.py",
-        "scripts/commentary_android_text_witness.py",
-        "scripts/commentary_android_webview_debug.py",
         "scripts/commentary_bookcode_repair_receipt_guard.py",
         "scripts/commentary_intake.py",
         "scripts/commentary_native_inventory.py",
@@ -3391,7 +3200,6 @@
         "scripts/commentary_source_identity_lexical_gate.py",
         "scripts/commentary_source_native_boundaries.py",
         "scripts/commentary_stock_candidate.py",
-        "scripts/commentary_stock_xiphos_smoke.py",
         "scripts/commentary_unresolved_lexical_triage.py",
         "scripts/commentary_witness.py",
         "scripts/commentary_xiphos_dual_reader.py",
@@ -3417,9 +3225,6 @@
         ".github/workflows/lsg-fidelity.yml",
         ".github/workflows/pilot-preflight.yml",
         "tests/test_commentary_anchor_parity.py",
-        "tests/test_commentary_andbible_jsword.py",
-        "tests/test_commentary_android_text_witness.py",
-        "tests/test_commentary_android_webview_debug.py",
         "tests/test_commentary_bookcode_repair_receipt_guard.py",
         "tests/test_commentary_chapter_neighbors.py",
         "tests/test_commentary_chapter_p_boundaries.py",
@@ -3441,7 +3246,6 @@
         "tests/test_commentary_source_native_boundaries.py",
         "tests/test_commentary_stage_evidence.py",
         "tests/test_commentary_stock_candidate.py",
-        "tests/test_commentary_stock_xiphos_smoke.py",
         "tests/test_commentary_unresolved_lexical_triage.py",
         "tests/test_commentary_xiphos_dual_reader.py",
         "tests/test_commentary_xiphos_heading_probe.py",
@@ -3518,16 +3322,14 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 15,
+      "static_reference_count": 13,
       "static_references": [
         "modules/lsg-1910/tools/lsg_sword_compare.py",
         "modules/lsg-1910/tools/probe_lsg_v11n.py",
         "scripts/audit_real_pilot.py",
-        "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
         "scripts/commentary_stock_candidate.py",
-        "scripts/commentary_stock_xiphos_smoke.py",
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/pilot_runtime.py",
         "scripts/private_sword_bundle.py",
@@ -3608,13 +3410,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 5,
+      "static_reference_count": 2,
       "static_references": [
-        "scripts/commentary_android_text_witness.py",
-        "scripts/commentary_android_webview_debug.py",
         "scripts/probe_andbible_android_private_import.py",
-        ".github/workflows/andbible-android-import-preflight.yml",
-        "tests/test_commentary_android_text_witness.py"
+        ".github/workflows/andbible-android-import-preflight.yml"
       ]
     },
     {
@@ -3693,9 +3492,9 @@
       "static_reference_count": 4,
       "static_references": [
         "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
-        ".github/workflows/darby-andbible-jsword.yml"
+        ".github/workflows/darby-andbible-jsword.yml",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -4153,16 +3952,15 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 7,
       "static_references": [
         "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        "scripts/commentary_stock_xiphos_smoke.py",
         "scripts/commentary_xiphos_dual_reader.py",
-        ".github/workflows/commentary-zcom-xiphos-private-smoke.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
         ".github/workflows/xiphos-preview-smoke.yml",
         "tests/test_reader_xiphos_headless_smoke.py",
-        "tests/test_reader_xiphos_reference_navigation.py"
+        "tests/test_reader_xiphos_reference_navigation.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -6317,10 +6115,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 2,
+      "static_reference_count": 1,
       "static_references": [
-        ".github/workflows/commentary-xiphos-dual-reader.yml",
-        ".github/workflows/commentary-zcom-andbible-jsword.yml"
+        ".github/workflows/commentary-xiphos-dual-reader.yml"
       ]
     },
     {
@@ -6429,7 +6226,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 14,
+      "static_reference_count": 13,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
@@ -6442,7 +6239,6 @@
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-text-compare.yml",
         ".github/workflows/commentary-xiphos-dual-reader.yml",
-        ".github/workflows/commentary-zcom-andbible-jsword.yml",
         ".github/workflows/commentary-zcom-private-candidate.yml",
         ".github/workflows/stage-stock-commentary.yml"
       ]
@@ -6602,10 +6398,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 31,
+      "static_reference_count": 30,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
-        "scripts/commentary_android_text_witness.py",
         "scripts/commentary_modern_linked_candidate_preview.py",
         "scripts/commentary_modern_native_witness_probe.py",
         "scripts/commentary_modern_reference_gate.py",
