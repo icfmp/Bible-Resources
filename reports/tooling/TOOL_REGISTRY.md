@@ -16,16 +16,17 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 ## Baseline counts
 
 - GENERALIZE: 3
-- HISTORICAL/ARCHIVE: 2
+- HISTORICAL/ARCHIVE: 1
 - KEEP_GENERIC: 26
 - MERGE: 10
-- MODULE_LOCAL: 2
+- MODULE_LOCAL: 3
 - UNDECIDED: 128
 
 ## All tracked tools
 
 | Script | Classification | Tests | Static callers | Stage hint |
 | --- | --- | --- | ---: | --- |
+| [`modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py`](../../modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py) | MODULE_LOCAL | not established | 4 | source/native audit |
 | [`modules/lsg-1910/tools/lsg_sword_compare.py`](../../modules/lsg-1910/tools/lsg_sword_compare.py) | MODULE_LOCAL | named test | 3 | source/native audit |
 | [`modules/lsg-1910/tools/probe_lsg_v11n.py`](../../modules/lsg-1910/tools/probe_lsg_v11n.py) | MODULE_LOCAL | not established | 3 | source/native audit |
 | [`scripts/audit_omitted_verse_notes.py`](../../scripts/audit_omitted_verse_notes.py) | UNDECIDED | named test | 3 | source/native audit |
@@ -116,7 +117,6 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/probe_andbible_android_private_import.py`](../../scripts/probe_andbible_android_private_import.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/probe_andbible_jsword.py`](../../scripts/probe_andbible_jsword.py) | UNDECIDED | not established | 4 | source/native audit |
 | [`scripts/probe_official_osis.py`](../../scripts/probe_official_osis.py) | UNDECIDED | not established | 2 | source/native audit |
-| [`scripts/probe_private_repaired_darby_sword.py`](../../scripts/probe_private_repaired_darby_sword.py) | HISTORICAL/ARCHIVE | not established | 3 | source/native audit |
 | [`scripts/promote_sword_preview.py`](../../scripts/promote_sword_preview.py) | KEEP_GENERIC | named test | 8 | not determined |
 | [`scripts/propose_upstream_edit.py`](../../scripts/propose_upstream_edit.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/publish_reviewed_release.py`](../../scripts/publish_reviewed_release.py) | KEEP_GENERIC | not established | 10 | publication/release |

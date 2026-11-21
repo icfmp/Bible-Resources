@@ -95,6 +95,33 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertNotIn("scripts/probe_darby_011_final_android.py", entries)
         self.assertFalse((ROOT / ".github/workflows/darby-0.1.1-preflight.yml").exists())
 
+    def test_darby_source_native_replay_is_owned_by_the_approved_module(self):
+        """A real 3-reader private QA caller is not shared production tooling."""
+        entries = {item["path"]: item for item in self.result["files"]}
+        local = ("modules/darby-jnd-2024/tools/"
+                 "probe_private_repaired_darby_sword.py")
+        self.assertIn(local, entries)
+        self.assertNotIn("scripts/probe_private_repaired_darby_sword.py", entries)
+        self.assertEqual(entries[local]["classification"], "MODULE_LOCAL")
+        for workflow in ("darby-private-repaired-sword.yml",
+                         "darby-andbible-jsword.yml",
+                         "darby-andbible-android-private.yml"):
+            with self.subTest(workflow=workflow):
+                self.assertIn(".github/workflows/" + workflow,
+                              entries[local]["static_references"])
+
+    def test_darby_private_source_probe_still_starts_from_repository_root(self):
+        command = (ROOT / "modules/darby-jnd-2024/tools/"
+                   "probe_private_repaired_darby_sword.py")
+        result = subprocess.run(
+            [sys.executable, str(command), "--help"],
+            cwd=ROOT, env=dict(os.environ, PYTHONPATH=str(ROOT / "scripts")),
+            capture_output=True, text=True, check=False, timeout=15,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("usage:", result.stdout)
+        self.assertIn("--division-overlay", result.stdout)
+
     def test_nested_package_imports_count_as_real_static_callers(self):
         entries = {item["path"]: item for item in self.result["files"]}
         module = ("scripts/research/commentary/"

@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - ".github/workflows/darby-private-repaired-sword.yml"
-      - "scripts/probe_private_repaired_darby_sword.py"
+      - "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py"
       - "scripts/reader_xiphos_headless_smoke.py"
       - "scripts/repair_osis_note_links.py"
       - "scripts/repair_osis_inline_markup.py"
@@ -101,7 +101,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/probe_private_repaired_darby_sword.py \
+          python modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py \
             --osis2mod "$PINNED_COMPILER" \
             --native-index "$RUNNER_TEMP/darby-private-native/native-index" \
             --native-raw "$RUNNER_TEMP/darby-private-native/native-raw" \

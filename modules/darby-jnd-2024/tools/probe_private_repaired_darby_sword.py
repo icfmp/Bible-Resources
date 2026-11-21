@@ -172,7 +172,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
     # Independently verify notes that discuss deliberately omitted verses:
     # their explanatory prose remains, but a dead machine target must not.
     omitted_source_checks = source_cases(original, corrected, a)
-    policy = json.loads((Path(__file__).resolve().parents[1] / "config/osis-policy.json").read_text(encoding="utf-8"))
+    policy = json.loads((Path(__file__).resolve().parents[3] / "config/osis-policy.json").read_text(encoding="utf-8"))
     validator, schema_sha = _schema(policy, schema)
     with tempfile.TemporaryDirectory(prefix="private-darby-repaired-sword-") as root:
         scratch = Path(root)
