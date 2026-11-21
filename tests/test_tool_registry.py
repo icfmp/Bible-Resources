@@ -118,6 +118,26 @@ class ScriptInventoryTests(unittest.TestCase):
                 self.assertIn(caller, entries[name]["static_references"])
         self.assertNotIn("scripts/commentary_original_link_identity.py", entries)
 
+    def test_nonlink_analyses_share_one_reviewed_research_module(self):
+        """Check all substantive imports after retiring two root module paths."""
+        entries = {row["path"]: row for row in self.result["files"]}
+        new = "scripts/research/commentary/commentary_nonlink_analysis.py"
+        self.assertIn(new, entries)
+        self.assertNotIn("scripts/commentary_nonlink_words.py", entries)
+        self.assertNotIn("scripts/commentary_nonlink_word_alignment.py", entries)
+        for caller in (
+            "scripts/commentary_private_text_compare.py",
+            "scripts/commentary_prose_cross_slot.py",
+            "scripts/commentary_unresolved_lexical_triage.py",
+            "scripts/commentary_section_scope_audit.py",
+            "scripts/research/commentary/commentary_lexical_overlap.py",
+            "tests/test_commentary_nonlink_words.py",
+            "tests/test_commentary_nonlink_word_alignment.py",
+            ".github/workflows/commentary-modern-source-receipt.yml",
+        ):
+            with self.subTest(caller=caller):
+                self.assertIn(caller, entries[new]["static_references"])
+
     def test_registry_has_no_promoted_editorial_or_publication_claims(self):
         for entry in self.result["files"]:
             self.assertEqual(entry["release_approval"],
