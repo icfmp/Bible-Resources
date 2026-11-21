@@ -10,7 +10,7 @@ import re
 
 from lxml import etree
 
-from commentary_nonlink_word_alignment import plain_word_alignment
+from research.commentary.commentary_nonlink_analysis import plain_word_alignment
 from commentary_stock_prefix_topology import (
     source_word_prefix_topology, stock_prefixed_source_body_concordance,
     single_word_stock_markup_diagnostic, stock_prefix_context_correspondence,

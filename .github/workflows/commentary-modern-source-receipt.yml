@@ -2354,7 +2354,7 @@ jobs:
           sys.path.insert(0,"scripts")
           from commentary_private_text_compare import (
               _original_source_markers,raw_as_strict_xml_text)
-          from commentary_nonlink_word_alignment import plain_word_alignment
+          from research.commentary.commentary_nonlink_analysis import plain_word_alignment
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
 
           temp=Path(os.environ["RUNNER_TEMP"])
@@ -2473,7 +2473,7 @@ jobs:
           from lxml import etree
           sys.path.insert(0,"scripts")
           from commentary_private_text_compare import _original_source_markers
-          from commentary_nonlink_word_alignment import plain_word_alignment
+          from research.commentary.commentary_nonlink_analysis import plain_word_alignment
           from commentary_modern_draft_osis_preview import (
               _CANON,_modern_front,_SOURCE_CORPUS,
               same_scripture_reference_book_word)

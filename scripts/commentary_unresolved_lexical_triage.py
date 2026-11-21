@@ -17,8 +17,8 @@ from lxml import etree
 
 from commentary_stock_prefix_topology import unexplained_word_boundary_census
 from research.commentary.commentary_chapter_ref_labels import link_label_location
-from commentary_nonlink_words import compare_words_outside_links
-from commentary_nonlink_word_alignment import plain_word_alignment
+from research.commentary.commentary_nonlink_analysis import compare_words_outside_links
+from research.commentary.commentary_nonlink_analysis import plain_word_alignment
 from pilot_preflight import PilotError
 
 WORD = re.compile(r"\w+", flags=re.UNICODE)

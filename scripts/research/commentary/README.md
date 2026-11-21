@@ -14,11 +14,14 @@ This package contains **read-only, non-CLI** evidence-gathering functions. They 
 | [`commentary_paragraph_witness_probe.py`](commentary_paragraph_witness_probe.py) | Paragraph anchors across independent digital witnesses |
 | [`commentary_osis_rebuild_preflight.py`](commentary_osis_rebuild_preflight.py) | Whether original native frames can be wrapped as *test-only* OSIS without changing inner XML |
 | [`commentary_lexical_overlap.py`](commentary_lexical_overlap.py) | Bounded source-versus-stock lexical overlap without exporting text |
+| [`commentary_nonlink_analysis.py`](commentary_nonlink_analysis.py) | Bounded plain-word accounting and separate Unicode word alignment, both unchanged |
 | [`commentary_chapter_body_evidence.py`](commentary_chapter_body_evidence.py) | Chapter-unit boundaries, book identity and native coverage evidence |
 | [`commentary_original_link_identity.py`](commentary_original_link_identity.py) | Byte-pinned native original link identities, targets and link-label hashes; no text export or publication |
 
-Imported by the existing source-neutral section-scope audit and individually tested with invented fixtures. The lexical/chapter-body diagnostics and original link identity gate were extracted without changing their algorithms. Import via `research.commentary.<module>` with `scripts/` on `PYTHONPATH`. No root-level import shims, duplicate modules or executables are provided.
+Imported by the existing source-neutral section-scope audit and individually tested with invented fixtures. The lexical/chapter-body diagnostics and original link identity gate were extracted without changing their algorithms. The former two unlinked-word root helpers are now grouped into one import-only research module; all eight original functions remain distinct and verbatim. Import via `research.commentary.<module>` with `scripts/` on `PYTHONPATH`. No root-level import shims, duplicate modules or executables are provided.
 
 Original native-link identity checks remain private observations: an authenticated destination or label digest is not evidence that a translated manuscript preserves the reference. The parent runner remains responsible for source-pinned native streaming and editorial/release gatekeeping.
+
+The unified nonlink library deliberately keeps different bounds for each calculation: large-input accounting must never be mistaken for bounded longest-common-subsequence alignment. Existing tests continue to verify these differences.
 
 **Separate observations from decisions.** Similar-sounding helpers have different inputs, outputs and evidence limits. None is removable or interchangeable without a source-bound equivalence review. [Script maintenance #430](https://github.com/icfmp/Bible-Resources/issues/430) tracks this work; the [production contract](../../../docs/PRODUCTION_PIPELINE.md) remains authoritative.

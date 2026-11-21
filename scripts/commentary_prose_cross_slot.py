@@ -18,7 +18,7 @@ import re
 
 from lxml import etree
 
-from commentary_nonlink_word_alignment import plain_word_alignment
+from research.commentary.commentary_nonlink_analysis import plain_word_alignment
 from commentary_unresolved_lexical_triage import WORD, marked_word_token_indices
 from pilot_preflight import PilotError
 
@@ -418,7 +418,7 @@ class OriginalExtraGapNativeChapterProbe:
     MAX_NATIVE_REPLAY_KEYS = 50_000
 
     def __init__(self, cases: list[tuple[str,dict,bytes,dict]]):
-        from commentary_nonlink_words import _private_unique_original_gap_spans
+        from research.commentary.commentary_nonlink_analysis import _private_unique_original_gap_spans
         if not 1 <= len(cases) <= self.MAX_OUTLIER_CASES:
             raise PilotError("Source-extra native outlier research exceeds bounded cases")
         self.units = []
@@ -499,7 +499,7 @@ class OriginalExtraGapNativeChapterProbe:
         A CCEL paragraph is *digital source structure*, not independent proof
         of the historic author's original editorial divisions.
         """
-        from commentary_nonlink_words import _private_unique_original_gap_windows
+        from research.commentary.commentary_nonlink_analysis import _private_unique_original_gap_windows
         from commentary_unresolved_lexical_triage import marked_word_token_indices
         if (not isinstance(xml_bytes,bytes) or len(xml_bytes)>64*1024*1024
                 or not SHA_RE.fullmatch(expected_source_sha256)

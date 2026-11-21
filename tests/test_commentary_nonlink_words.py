@@ -9,7 +9,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
-from commentary_nonlink_words import compare_words_outside_links, _private_unique_original_gap_spans
+from research.commentary.commentary_nonlink_analysis import compare_words_outside_links, _private_unique_original_gap_spans
 from commentary_private_text_compare import _original_source_markers, compare_private_texts
 from pilot_preflight import PilotError
 

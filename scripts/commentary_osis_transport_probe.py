@@ -171,7 +171,7 @@ def build_numbered_transport_sample(entries: list[tuple[str, bytes]],
 def classify_native_osis_roundtrip_delta(original_raw: bytes, compiled_raw: bytes) -> dict:
     """Bounded metadata-only classification of an osis2mod transport delta."""
     from collections import Counter
-    from commentary_nonlink_word_alignment import plain_word_alignment
+    from research.commentary.commentary_nonlink_analysis import plain_word_alignment
 
     original_text = _source_visible_text(original_raw)
     compiled_text = _source_visible_text(compiled_raw)

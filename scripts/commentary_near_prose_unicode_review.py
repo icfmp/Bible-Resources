@@ -18,7 +18,7 @@ from lxml import etree
 import re
 import unicodedata
 
-from commentary_nonlink_word_alignment import plain_word_alignment
+from research.commentary.commentary_nonlink_analysis import plain_word_alignment
 from commentary_unresolved_lexical_triage import WORD, marked_word_token_indices
 from pilot_preflight import PilotError
 

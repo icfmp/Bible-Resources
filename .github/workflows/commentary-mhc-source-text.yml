@@ -7,9 +7,9 @@ on:
       - 'tests/test_commentary_private_text_compare.py'
       - 'scripts/commentary_source_native_boundaries.py'
       - 'tests/test_commentary_source_native_boundaries.py'
-      - 'scripts/commentary_nonlink_word_alignment.py'
+      - 'scripts/research/commentary/commentary_nonlink_analysis.py'
       - 'tests/test_commentary_nonlink_word_alignment.py'
-      - 'scripts/commentary_nonlink_words.py'
+
       - 'tests/test_commentary_nonlink_words.py'
       - 'scripts/commentary_usfm_title_witness.py'
       - 'tests/test_commentary_usfm_title_witness.py'

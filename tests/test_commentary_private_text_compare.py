@@ -16,7 +16,7 @@ from pilot_preflight import PilotError
 class CommentaryOriginalStockTextTests(unittest.TestCase):
     def test_real_compiled_reference_markup_exclusion_is_independent_of_text(self):
         from commentary_private_text_compare import private_actual_native_reference_word_positions
-        from commentary_nonlink_words import compare_words_outside_links
+        from research.commentary.commentary_nonlink_analysis import compare_words_outside_links
         raw=b"<p>Alpha <reference osisRef='Gen.2.1'>quoted citation</reference> omega.</p>"
         visible=raw_as_strict_xml_text(raw)
         self.assertEqual(visible,"Alpha quoted citation omega.")
