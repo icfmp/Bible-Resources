@@ -12,6 +12,8 @@ from unittest import TestCase
 from zipfile import ZipFile, ZIP_DEFLATED
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] /
+                       "modules/darby-jnd-2024/tools"))
 from probe_darby_011_final_android import (
     EXPECTED, FinalDarbyAndroidError, verify_final_candidate,
 )
