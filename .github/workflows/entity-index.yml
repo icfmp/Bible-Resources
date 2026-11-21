@@ -659,7 +659,7 @@ jobs:
           import csv
           import json
           from pathlib import Path
-          root=Path("entity-index")
+          root=Path("bible-semantic-index")
           index=json.loads((root/"dist/index.json").read_text())
           reports={
               "wlc":json.loads((root/"dist/macula-hebrew-existence.json").read_text()),
