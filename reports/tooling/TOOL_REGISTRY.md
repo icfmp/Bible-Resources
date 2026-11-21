@@ -41,9 +41,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_android_text_witness.py`](../../scripts/commentary_android_text_witness.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/commentary_android_webview_debug.py`](../../scripts/commentary_android_webview_debug.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/commentary_bookcode_repair_receipt_guard.py`](../../scripts/commentary_bookcode_repair_receipt_guard.py) | UNDECIDED | named test | 2 | not determined |
-| [`scripts/commentary_editorial_topology.py`](../../scripts/commentary_editorial_topology.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_intake.py`](../../scripts/commentary_intake.py) | KEEP_GENERIC | named test | 16 | intake |
-| [`scripts/commentary_intro_chapter_text_review.py`](../../scripts/commentary_intro_chapter_text_review.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_layout_census.py`](../../scripts/commentary_layout_census.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/commentary_literal_erratum_preflight.py`](../../scripts/commentary_literal_erratum_preflight.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/commentary_modern_draft_guard.py`](../../scripts/commentary_modern_draft_guard.py) | UNDECIDED | named test | 4 | not determined |
@@ -65,9 +63,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_osis_intro_transport_probe.py`](../../scripts/commentary_osis_intro_transport_probe.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/commentary_osis_mixed_transport_probe.py`](../../scripts/commentary_osis_mixed_transport_probe.py) | UNDECIDED | named test | 6 | source/native audit |
 | [`scripts/commentary_osis_paragraph_presence.py`](../../scripts/commentary_osis_paragraph_presence.py) | UNDECIDED | named test | 2 | not determined |
-| [`scripts/commentary_osis_rebuild_preflight.py`](../../scripts/commentary_osis_rebuild_preflight.py) | UNDECIDED | named test | 2 | publication/release |
 | [`scripts/commentary_osis_transport_probe.py`](../../scripts/commentary_osis_transport_probe.py) | UNDECIDED | named test | 5 | source/native audit |
-| [`scripts/commentary_paragraph_witness_probe.py`](../../scripts/commentary_paragraph_witness_probe.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/commentary_private_candidate_xiphos_gui.py`](../../scripts/commentary_private_candidate_xiphos_gui.py) | GENERALIZE | named test | 2 | not determined |
 | [`scripts/commentary_private_text_compare.py`](../../scripts/commentary_private_text_compare.py) | UNDECIDED | named test | 22 | source/native audit |
 | [`scripts/commentary_prose_cross_slot.py`](../../scripts/commentary_prose_cross_slot.py) | MERGE | named test | 4 | not determined |
@@ -75,7 +71,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_rebuild_attestation_draft.py`](../../scripts/commentary_rebuild_attestation_draft.py) | UNDECIDED | named test | 3 | publication/release |
 | [`scripts/commentary_reference_cross_slot.py`](../../scripts/commentary_reference_cross_slot.py) | MERGE | named test | 4 | not determined |
 | [`scripts/commentary_reference_registry_triage.py`](../../scripts/commentary_reference_registry_triage.py) | UNDECIDED | named test | 5 | not determined |
-| [`scripts/commentary_section_scope_audit.py`](../../scripts/commentary_section_scope_audit.py) | UNDECIDED | named test | 2 | source/native audit |
+| [`scripts/commentary_section_scope_audit.py`](../../scripts/commentary_section_scope_audit.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/commentary_shared_raw_source_units.py`](../../scripts/commentary_shared_raw_source_units.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_source_english_osis_alias.py`](../../scripts/commentary_source_english_osis_alias.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/commentary_source_erratum_compiled_probe.py`](../../scripts/commentary_source_erratum_compiled_probe.py) | UNDECIDED | named test | 2 | source/native audit |
@@ -153,6 +149,10 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/commentary/commentary_chapter_p_boundaries.py`](../../scripts/research/commentary/commentary_chapter_p_boundaries.py) | MERGE | named test | 3 | not determined |
 | [`scripts/research/commentary/commentary_chapter_paragraph_overlap.py`](../../scripts/research/commentary/commentary_chapter_paragraph_overlap.py) | MERGE | named test | 5 | not determined |
 | [`scripts/research/commentary/commentary_chapter_ref_labels.py`](../../scripts/research/commentary/commentary_chapter_ref_labels.py) | MERGE | named test | 5 | not determined |
+| [`scripts/research/commentary/commentary_editorial_topology.py`](../../scripts/research/commentary/commentary_editorial_topology.py) | UNDECIDED | named test | 2 | not determined |
+| [`scripts/research/commentary/commentary_intro_chapter_text_review.py`](../../scripts/research/commentary/commentary_intro_chapter_text_review.py) | UNDECIDED | named test | 2 | not determined |
+| [`scripts/research/commentary/commentary_osis_rebuild_preflight.py`](../../scripts/research/commentary/commentary_osis_rebuild_preflight.py) | UNDECIDED | named test | 2 | publication/release |
+| [`scripts/research/commentary/commentary_paragraph_witness_probe.py`](../../scripts/research/commentary/commentary_paragraph_witness_probe.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 11 | publication/release |
 | [`scripts/reviewed_modern_commentary_rebuild.py`](../../scripts/reviewed_modern_commentary_rebuild.py) | UNDECIDED | named test | 2 | publication/release |
 | [`scripts/reviewed_osis_commentary_rebuild.py`](../../scripts/reviewed_osis_commentary_rebuild.py) | UNDECIDED | not established | 1 | publication/release |
