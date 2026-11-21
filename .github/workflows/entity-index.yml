@@ -665,7 +665,7 @@ jobs:
               "wlc":json.loads((root/"dist/macula-hebrew-existence.json").read_text()),
               "sblgnt":json.loads((root/"dist/macula-greek-existence.json").read_text()),
           }
-          manifest=json.loads((root/"source-unattested-words.json").read_text())
+          manifest=json.loads((root/"data/source-unattested-words.json").read_text())
           missing_hebrew={r["id"] for r in reports["wlc"]["missing_id_details"]}
           assert missing_hebrew == set(manifest["word_ids"]), (missing_hebrew,manifest["word_ids"])
           assert reports["wlc"]["summary"]["missing_from_pinned_macula"] == 18
@@ -674,7 +674,7 @@ jobs:
           assert reports["sblgnt"]["summary"]["unique_mentioned_source_ids"] == 36867
           nt=json.loads((root/"dist/nt-source-verse-compatibility.json").read_text())
           ot=json.loads((root/"dist/ot-source-verse-compatibility.json").read_text())
-          verse_manifest=json.loads((root/"source-unattested-verses.json").read_text())
+          verse_manifest=json.loads((root/"data/source-unattested-verses.json").read_text())
           assert nt["summary"]["record_reference_entries_absent_from_source"] == 22
           assert nt["summary"]["distinct_referenced_verses_absent_from_source"] == 8
           assert ot["summary"]["record_reference_entries_absent_from_source"] == 0
