@@ -1,6 +1,6 @@
 # Segond 1910 — edition-only source and versification diagnostics
 
-These scripts serve the **existing LSG 0.1.0 source/reader audit**.
+These scripts serve the **existing LSG 0.1.0 source/reader audit**. Their results can inform later editorial review, but they do not change the accepted module or create a release candidate.
 They are not generic SWORD importers, publication tools, or authorization to
 add missing Bible verses. Both remain read-only toward the original source
 and the approved module. They use common helpers from `scripts/` rather
