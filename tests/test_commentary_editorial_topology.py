@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_editorial_topology import (
+from research.commentary.commentary_editorial_topology import (
     NativeCommentaryEditorialTopology, _heading_span
 )
 

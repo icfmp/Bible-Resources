@@ -5,7 +5,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from commentary_intro_chapter_text_review import (
+from research.commentary.commentary_intro_chapter_text_review import (
     review_original_intro_against_numbered_chapter,
     independent_thml_chapter_intro_witness,
 )
