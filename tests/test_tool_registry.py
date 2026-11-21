@@ -89,6 +89,22 @@ class ScriptInventoryTests(unittest.TestCase):
                 self.assertIn("scripts/commentary_section_scope_audit.py", callers)
                 self.assertIn(f"tests/test_{stem}.py", callers)
 
+    def test_extracted_section_evidence_has_real_import_callers(self):
+        """Refactored analyses are still used by the existing CLI audit."""
+        entries = {entry["path"]: entry for entry in self.result["files"]}
+        for stem in ("commentary_lexical_overlap",
+                     "commentary_chapter_body_evidence"):
+            with self.subTest(stem=stem):
+                path = f"scripts/research/commentary/{stem}.py"
+                self.assertIn(path, entries)
+                self.assertIn("scripts/commentary_section_scope_audit.py",
+                              entries["scripts/research/commentary/"
+                                      "commentary_chapter_body_evidence.py"]["static_references"])
+        self.assertIn(
+            "scripts/research/commentary/commentary_chapter_body_evidence.py",
+            entries["scripts/research/commentary/"
+                    "commentary_lexical_overlap.py"]["static_references"])
+
     def test_registry_has_no_promoted_editorial_or_publication_claims(self):
         for entry in self.result["files"]:
             self.assertEqual(entry["release_approval"],
