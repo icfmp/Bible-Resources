@@ -15,11 +15,11 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 
 ## Baseline counts
 
-- GENERALIZE: 3
+- GENERALIZE: 1
 - HISTORICAL/ARCHIVE: 1
 - KEEP_GENERIC: 26
 - MERGE: 10
-- MODULE_LOCAL: 3
+- MODULE_LOCAL: 5
 - UNDECIDED: 128
 
 ## All tracked tools
@@ -29,6 +29,8 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py`](../../modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py) | MODULE_LOCAL | not established | 4 | source/native audit |
 | [`modules/lsg-1910/tools/lsg_sword_compare.py`](../../modules/lsg-1910/tools/lsg_sword_compare.py) | MODULE_LOCAL | named test | 3 | source/native audit |
 | [`modules/lsg-1910/tools/probe_lsg_v11n.py`](../../modules/lsg-1910/tools/probe_lsg_v11n.py) | MODULE_LOCAL | not established | 3 | source/native audit |
+| [`modules/mhcc-crosswire/tools/commentary_private_candidate_xiphos_gui.py`](../../modules/mhcc-crosswire/tools/commentary_private_candidate_xiphos_gui.py) | MODULE_LOCAL | named test | 3 | not determined |
+| [`modules/mhcc-crosswire/tools/commentary_stock_andbible_android.py`](../../modules/mhcc-crosswire/tools/commentary_stock_andbible_android.py) | MODULE_LOCAL | named test | 3 | not determined |
 | [`scripts/audit_omitted_verse_notes.py`](../../scripts/audit_omitted_verse_notes.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/audit_osis.py`](../../scripts/audit_osis.py) | UNDECIDED | not established | 7 | source/native audit |
 | [`scripts/audit_real_pilot.py`](../../scripts/audit_real_pilot.py) | UNDECIDED | not established | 3 | source/native audit |
@@ -66,7 +68,6 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_osis_mixed_transport_probe.py`](../../scripts/commentary_osis_mixed_transport_probe.py) | UNDECIDED | named test | 6 | source/native audit |
 | [`scripts/commentary_osis_paragraph_presence.py`](../../scripts/commentary_osis_paragraph_presence.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_osis_transport_probe.py`](../../scripts/commentary_osis_transport_probe.py) | UNDECIDED | named test | 5 | source/native audit |
-| [`scripts/commentary_private_candidate_xiphos_gui.py`](../../scripts/commentary_private_candidate_xiphos_gui.py) | GENERALIZE | named test | 2 | not determined |
 | [`scripts/commentary_private_text_compare.py`](../../scripts/commentary_private_text_compare.py) | UNDECIDED | named test | 22 | source/native audit |
 | [`scripts/commentary_prose_cross_slot.py`](../../scripts/commentary_prose_cross_slot.py) | MERGE | named test | 5 | not determined |
 | [`scripts/commentary_public_metadata_preflight.py`](../../scripts/commentary_public_metadata_preflight.py) | UNDECIDED | named test | 2 | not determined |
@@ -79,7 +80,6 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_source_erratum_compiled_probe.py`](../../scripts/commentary_source_erratum_compiled_probe.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/commentary_source_identity_lexical_gate.py`](../../scripts/commentary_source_identity_lexical_gate.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_source_native_boundaries.py`](../../scripts/commentary_source_native_boundaries.py) | UNDECIDED | named test | 4 | not determined |
-| [`scripts/commentary_stock_andbible_android.py`](../../scripts/commentary_stock_andbible_android.py) | GENERALIZE | named test | 2 | not determined |
 | [`scripts/commentary_stock_candidate.py`](../../scripts/commentary_stock_candidate.py) | UNDECIDED | named test | 7 | not determined |
 | [`scripts/commentary_stock_prefix_topology.py`](../../scripts/commentary_stock_prefix_topology.py) | UNDECIDED | named test | 7 | not determined |
 | [`scripts/commentary_stock_xiphos_smoke.py`](../../scripts/commentary_stock_xiphos_smoke.py) | UNDECIDED | named test | 2 | not determined |
