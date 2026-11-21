@@ -18,7 +18,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 - HISTORICAL/ARCHIVE: 9
 - KEEP_GENERIC: 26
 - MERGE: 10
-- UNDECIDED: 130
+- UNDECIDED: 128
 
 ## All tracked tools
 
@@ -27,7 +27,6 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/audit_omitted_verse_notes.py`](../../scripts/audit_omitted_verse_notes.py) | UNDECIDED | named test | 4 | source/native audit |
 | [`scripts/audit_osis.py`](../../scripts/audit_osis.py) | UNDECIDED | not established | 7 | source/native audit |
 | [`scripts/audit_real_pilot.py`](../../scripts/audit_real_pilot.py) | UNDECIDED | not established | 3 | source/native audit |
-| [`scripts/audit_text.py`](../../scripts/audit_text.py) | UNDECIDED | not established | 1 | source/native audit |
 | [`scripts/bible_intake.py`](../../scripts/bible_intake.py) | KEEP_GENERIC | not established | 9 | intake |
 | [`scripts/bible_stage_runner.py`](../../scripts/bible_stage_runner.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/build.py`](../../scripts/build.py) | KEEP_GENERIC | not established | 20 | publication/release |
@@ -81,13 +80,12 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_stock_xiphos_smoke.py`](../../scripts/commentary_stock_xiphos_smoke.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_sword_identity_migration.py`](../../scripts/commentary_sword_identity_migration.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_text_delta.py`](../../scripts/commentary_text_delta.py) | KEEP_GENERIC | named test | 12 | not determined |
-| [`scripts/commentary_unmarked_division_coverage.py`](../../scripts/commentary_unmarked_division_coverage.py) | UNDECIDED | named test | 1 | not determined |
 | [`scripts/commentary_unresolved_lexical_triage.py`](../../scripts/commentary_unresolved_lexical_triage.py) | MERGE | named test | 11 | not determined |
 | [`scripts/commentary_usfm_title_witness.py`](../../scripts/commentary_usfm_title_witness.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/commentary_witness.py`](../../scripts/commentary_witness.py) | UNDECIDED | not established | 2 | source/native audit |
 | [`scripts/commentary_xiphos_dual_reader.py`](../../scripts/commentary_xiphos_dual_reader.py) | GENERALIZE | named test | 13 | not determined |
 | [`scripts/commentary_xiphos_heading_probe.py`](../../scripts/commentary_xiphos_heading_probe.py) | UNDECIDED | named test | 5 | source/native audit |
-| [`scripts/commentary_xml_witness.py`](../../scripts/commentary_xml_witness.py) | UNDECIDED | named test | 13 | source/native audit |
+| [`scripts/commentary_xml_witness.py`](../../scripts/commentary_xml_witness.py) | UNDECIDED | named test | 12 | source/native audit |
 | [`scripts/compiled_stock_commentary_proof.py`](../../scripts/compiled_stock_commentary_proof.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/diff_sword_snapshots.py`](../../scripts/diff_sword_snapshots.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/fast_stock_note_probe.py`](../../scripts/fast_stock_note_probe.py) | UNDECIDED | named test | 3 | source/native audit |
@@ -110,7 +108,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/note_whitespace_diagnostics.py`](../../scripts/note_whitespace_diagnostics.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/osis_semantic_fidelity.py`](../../scripts/osis_semantic_fidelity.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/pilot_fetch.py`](../../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 22 | not determined |
-| [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | named test | 94 | not determined |
+| [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | named test | 92 | not determined |
 | [`scripts/pilot_runtime.py`](../../scripts/pilot_runtime.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/pilot_subprocess.py`](../../scripts/pilot_subprocess.py) | UNDECIDED | named test | 15 | not determined |
 | [`scripts/prepare_darby_011_private_release_candidate.py`](../../scripts/prepare_darby_011_private_release_candidate.py) | HISTORICAL/ARCHIVE | named test | 3 | publication/release |

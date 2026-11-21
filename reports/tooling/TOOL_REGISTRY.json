@@ -122,33 +122,6 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": false,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/audit_text.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Flag potential editorial problems; NEVER rewrite content automatically.",
-      "python_imports": [
-        "argparse",
-        "json",
-        "pathlib",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "c0cac48eb089129b361b486deb7b132961e5ea5ffa35681c771a531afdc6530f",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 1,
-      "static_references": [
-        "tests/test_repository.py"
-      ]
-    },
-    {
       "classification": "KEEP_GENERIC",
       "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
@@ -2350,37 +2323,6 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "ThML"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_unmarked_division_coverage.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Unmodified ThML source div1 coverage, especially divisions without scripCom.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "commentary_xml_witness",
-        "hashlib",
-        "lxml",
-        "pilot_preflight"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "428afa7f859e656628b806cb718c1a2bc8b3bc75250b55e2facbfda52b81ef10",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 1,
-      "static_references": [
-        "tests/test_commentary_unmarked_division_coverage.py"
-      ]
-    },
-    {
       "classification": "MERGE",
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
@@ -2630,7 +2572,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 13,
+      "static_reference_count": 12,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_private_text_compare.py",
@@ -2638,7 +2580,6 @@
         "scripts/commentary_shared_raw_source_units.py",
         "scripts/commentary_source_native_boundaries.py",
         "scripts/commentary_stock_prefix_topology.py",
-        "scripts/commentary_unmarked_division_coverage.py",
         "scripts/research/commentary/commentary_chapter_body_evidence.py",
         "scripts/research/commentary/commentary_chapter_neighbors.py",
         "scripts/research/commentary/commentary_paragraph_witness_probe.py",
@@ -3540,7 +3481,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 94,
+      "static_reference_count": 92,
       "static_references": [
         "scripts/audit_real_pilot.py",
         "scripts/bible_intake.py",
@@ -3569,7 +3510,6 @@
         "scripts/commentary_stock_andbible_android.py",
         "scripts/commentary_stock_candidate.py",
         "scripts/commentary_stock_xiphos_smoke.py",
-        "scripts/commentary_unmarked_division_coverage.py",
         "scripts/commentary_unresolved_lexical_triage.py",
         "scripts/commentary_witness.py",
         "scripts/commentary_xiphos_dual_reader.py",
@@ -3624,7 +3564,6 @@
         "tests/test_commentary_stock_andbible_android.py",
         "tests/test_commentary_stock_candidate.py",
         "tests/test_commentary_stock_xiphos_smoke.py",
-        "tests/test_commentary_unmarked_division_coverage.py",
         "tests/test_commentary_unresolved_lexical_triage.py",
         "tests/test_commentary_xiphos_dual_reader.py",
         "tests/test_commentary_xiphos_heading_probe.py",
