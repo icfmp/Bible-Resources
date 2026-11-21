@@ -61,7 +61,7 @@ reviewed word-ID-specific lexical distinctions.
 This package has been independently source checked; it reuses a previously
 verified technical candidate without changing any lexical links. For full
 source review, limitations, source attestations and regeneration pipeline:
-https://github.com/icfmp/Bible-Resources/tree/main/bible-semantic-index/links/dictionaries/ubs-hebrew
+https://github.com/icfmp/Bible-Resources/tree/main/entity-index/links/dictionaries/ubs-hebrew
 
 The source lexicon and WLC remain separately owned/licensed. Retain the
 original publisher attribution and CC BY-SA 4.0 terms in this archive.

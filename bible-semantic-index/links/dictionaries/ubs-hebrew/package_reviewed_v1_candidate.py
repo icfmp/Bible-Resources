@@ -58,7 +58,7 @@ Do not publish this RC as v1.0 or integrate it into the Bible application
 before separate editorial, legal/source-rights and consumer approval.
 
 Source and reproducible verification:
-https://github.com/icfmp/Bible-Resources/tree/main/bible-semantic-index/links/dictionaries/ubs-hebrew
+https://github.com/icfmp/Bible-Resources/tree/main/entity-index/links/dictionaries/ubs-hebrew
 """
 
 ATTRIBUTION = """# Attribution, upstream editions, license and changes
