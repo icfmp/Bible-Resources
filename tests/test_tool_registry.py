@@ -1,5 +1,7 @@
 """Safeguards for the checked-in script lifecycle/usage inventory."""
+import os
 from pathlib import Path
+import subprocess
 import sys
 import unittest
 
@@ -65,6 +67,21 @@ class ScriptInventoryTests(unittest.TestCase):
                               entries[local]["static_references"])
                 self.assertIn("tests/test_" + name,
                               entries[local]["static_references"])
+
+    def test_darby_module_tools_remain_real_command_line_entrypoints(self):
+        """The workflow invokes the local file directly, not just an import."""
+        for name in ("prepare_darby_011_private_release_candidate.py",
+                     "probe_darby_011_final_android.py"):
+            with self.subTest(name=name):
+                command = ROOT / "modules/darby-jnd-2024/tools" / name
+                result = subprocess.run(
+                    [sys.executable, str(command), "--help"],
+                    cwd=ROOT,
+                    env=dict(os.environ, PYTHONPATH=str(ROOT / "scripts")),
+                    capture_output=True, text=True, check=False, timeout=15,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn("usage:", result.stdout)
 
     def test_nested_package_imports_count_as_real_static_callers(self):
         entries = {item["path"]: item for item in self.result["files"]}
