@@ -1,0 +1,31 @@
+name: One-shot LSG-owned / retired Darby tooling registry refresh
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/maintenance-refresh-lsg-and-retired-darby-registry.yml'
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: maintenance/module-own-darby-011-replay-20261121
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Remove disposable workflow before deterministic registry refresh
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/maintenance-refresh-lsg-and-retired-darby-registry.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git add -f reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore: sync tool inventory after retiring obsolete Darby and localizing LSG'
+          git push origin HEAD:maintenance/module-own-darby-011-replay-20261121
