@@ -123,23 +123,33 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertIn("--division-overlay", result.stdout)
 
     def test_completed_original_mhcc_stock_reader_harnesses_are_retired(self):
-        """Current source/reader infrastructure remains; old stock ZIP is not re-pinned."""
+        """Keep source identity and generic readers, not old one-off GUI adapters."""
         paths = {row["path"] for row in self.result["files"]}
-        for name, workflow in (
-            ("commentary_private_candidate_xiphos_gui.py",
-             "commentary-private-candidate-xiphos-gui.yml"),
-            ("commentary_stock_andbible_android.py",
-             "commentary-zcom-andbible-android.yml"),
+        for name in (
+            "commentary_private_candidate_xiphos_gui.py",
+            "commentary_stock_andbible_android.py",
+            "commentary_android_text_witness.py",
+            "commentary_android_webview_debug.py",
+            "commentary_stock_xiphos_smoke.py",
+            "commentary_andbible_jsword.py",
         ):
             with self.subTest(name=name):
                 self.assertNotIn("scripts/" + name, paths)
                 self.assertNotIn("modules/mhcc-crosswire/tools/" + name, paths)
+        for workflow in (
+            "commentary-private-candidate-xiphos-gui.yml",
+            "commentary-zcom-andbible-android.yml",
+            "commentary-zcom-xiphos-private-smoke.yml",
+            "commentary-zcom-andbible-jsword.yml",
+        ):
+            with self.subTest(workflow=workflow):
                 self.assertFalse((ROOT / ".github/workflows" / workflow).exists())
-        # Actual common readers and source-identity guards are not retired.
+        # Source identity and true shared readers remain active and tested.
         for name in ("commentary_xiphos_dual_reader.py",
                      "commentary_stock_candidate.py",
-                     "commentary_android_text_witness.py",
-                     "probe_andbible_android_private_import.py"):
+                     "probe_andbible_android_private_import.py",
+                     "probe_andbible_jsword.py",
+                     "reader_xiphos_headless_smoke.py"):
             self.assertIn("scripts/" + name, paths)
 
     def test_nested_package_imports_count_as_real_static_callers(self):
