@@ -7,6 +7,8 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] /
+                       "modules/mhcc-crosswire/tools"))
 
 from commentary_stock_andbible_android import (
     safe_controls, _tap, _reference_uri, _screenshot_sha256, _app_foreground,
