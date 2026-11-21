@@ -7,6 +7,8 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] /
+                       "modules/mhcc-crosswire/tools"))
 from commentary_private_candidate_xiphos_gui import (
     PRIVATE_ID, _gate_real_candidate_gui, private_candidate_xiphos_review,
 )
