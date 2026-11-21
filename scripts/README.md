@@ -24,7 +24,7 @@ For a new resource, begin with the [canonical production pipeline](../docs/PRODU
 
 ## Where a tool belongs
 
-- **Keep in `scripts/`** only a reusable production command, format validator, SWORD reader, or source-neutral research helper with a continuing and demonstrated consumer. A one-time script does not become shared tooling merely because it has its own tests.
+- **Keep in `scripts/`** only a reusable production command, format validator, SWORD reader, or source-neutral research helper with a continuing and demonstrated consumer. A one-time script does not become shared tooling merely because it has its own tests; Git history is sufficient retention unless exact release replay still depends on it.
 - **Keep beside a specific resource** only when edition-specific code is still required for a real maintenance, validation or immutable release-replay contract. Prefer reviewed resource manifests and the canonical pipeline over edition-pinned executable copies. Review and update all callers before relocating it.
 - **Delete** superseded experiments and finished one-off probes when the canonical process or an existing checked tool covers the needed safeguards. Remove orphan tests, workflows and references together. Git history already preserves the retired implementation; do not maintain duplicate archives or compatibility stubs.
 - **Retain historical replay tooling** only when an exact prior published release or source-bound audit still requires it and the replacement has not been proven equivalent. A single old workflow is not automatically evidence of a current production need.
