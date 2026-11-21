@@ -15,6 +15,7 @@ sources/
       history/                                       # edition-specific historical decisions
 work/<type>/<language>/<resource-id>/                # new drafts and local investigations
 modules/<resource-id>/                              # native SWORD and approved metadata
+  tools/                                             # only still-needed edition-specific QA/replay scripts
 catalog/v1/                                         # client-facing catalogue
 sword/                                              # distributed module packages
 docs/                                               # durable, generic documentation
