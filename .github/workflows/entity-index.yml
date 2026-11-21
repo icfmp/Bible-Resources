@@ -1,14 +1,14 @@
-name: Independent biblical entity index
+name: Bible Semantic Index source integrity and build
 
 on:
   pull_request:
     paths:
-      - "entity-index/**"
+      - "bible-semantic-index/**"
       - ".github/workflows/entity-index.yml"
   push:
     branches: [main]
     paths:
-      - "entity-index/**"
+      - "bible-semantic-index/**"
       - ".github/workflows/entity-index.yml"
   workflow_dispatch:
 
@@ -24,11 +24,11 @@ jobs:
 
       - name: Regression tests (offline, no data download)
         run: |
-          python3 -I entity-index/test_workspace_layout.py
-          python3 -I entity-index/test_distribution_profile.py
-          python3 -I entity-index/test_build.py
-          python3 -I entity-index/test_resolve.py
-          python3 -I entity-index/test_audit_person_overlaps.py
+          python3 -I bible-semantic-index/tests/test_workspace_layout.py
+          python3 -I bible-semantic-index/tests/test_distribution_profile.py
+          python3 -I bible-semantic-index/tests/test_build.py
+          python3 -I bible-semantic-index/tests/test_resolve.py
+          python3 -I bible-semantic-index/tests/test_audit_person_overlaps.py
 
       - name: Check out frozen self-hosted ACAI source
         shell: bash
@@ -67,21 +67,21 @@ jobs:
 
       - name: Build complete local-only resource
         run: |
-          python3 -I entity-index/compile_index.py \
+          python3 -I bible-semantic-index/scripts/compile_index.py \
             --source /tmp/acai-frozen \
             --verify-source-commit \
-            --output entity-index/dist/index.json
+            --output bible-semantic-index/dist/index.json
 
       - name: Verify restricted keyterms are absent from projected BSI distribution
         run: |
-          python3 -I entity-index/distribution_profile.py \
-            --input entity-index/dist/index.json \
-            --output entity-index/dist/bsi-v0.1-without-keyterms.json
+          python3 -I bible-semantic-index/scripts/distribution_profile.py \
+            --input bible-semantic-index/dist/index.json \
+            --output bible-semantic-index/dist/bsi-v0.1-without-keyterms.json
           python3 - <<'PY'
           import json
           from pathlib import Path
-          full = json.loads(Path("entity-index/dist/index.json").read_text())
-          public = json.loads(Path("entity-index/dist/bsi-v0.1-without-keyterms.json").read_text())
+          full = json.loads(Path("bible-semantic-index/dist/index.json").read_text())
+          public = json.loads(Path("bible-semantic-index/dist/bsi-v0.1-without-keyterms.json").read_text())
           assert any(e["kind"] == "keyterm" for e in full["entities"])
           assert all(e["kind"] != "keyterm" for e in public["entities"])
           assert public["distribution_profile"]["excluded_kinds"] == ["keyterm"]
@@ -99,15 +99,15 @@ jobs:
 
       - name: Verify minimal labels without descriptions or excluded categories
         run: |
-          python3 -I entity-index/minimal_labels.py \
+          python3 -I bible-semantic-index/scripts/minimal_labels.py \
             --source /tmp/acai-frozen \
-            --index entity-index/dist/bsi-v0.1-without-keyterms.json \
-            --output entity-index/dist/bsi-v0.1-labels-en.json
+            --index bible-semantic-index/dist/bsi-v0.1-without-keyterms.json \
+            --output bible-semantic-index/dist/bsi-v0.1-labels-en.json
           python3 - <<'PY'
           import json
           from pathlib import Path
-          index=json.loads(Path("entity-index/dist/bsi-v0.1-without-keyterms.json").read_text())
-          labels=json.loads(Path("entity-index/dist/bsi-v0.1-labels-en.json").read_text())
+          index=json.loads(Path("bible-semantic-index/dist/bsi-v0.1-without-keyterms.json").read_text())
+          labels=json.loads(Path("bible-semantic-index/dist/bsi-v0.1-labels-en.json").read_text())
           assert set(labels["labels"]) <= {e["id"] for e in index["entities"]}
           assert not any(k.startswith("keyterm:") for k in labels["labels"])
           assert labels["source_snapshot_sha256"] == index["provenance"]["source_snapshot_sha256"]
@@ -123,9 +123,9 @@ jobs:
           import importlib.util
           import json
           from pathlib import Path
-          index = json.loads(Path("entity-index/dist/index.json").read_text(encoding="utf-8"))
+          index = json.loads(Path("bible-semantic-index/dist/index.json").read_text(encoding="utf-8"))
           spec = importlib.util.spec_from_file_location(
-              "entity_reader", "entity-index/resolve.py")
+              "entity_reader", "bible-semantic-index/scripts/resolve.py")
           module = importlib.util.module_from_spec(spec)
           spec.loader.exec_module(module)
           resolver = module.EntityResolver(index)
@@ -170,11 +170,11 @@ jobs:
           python3 - <<'PY'
           import json
           from pathlib import Path
-          path=Path("entity-index/dist/index.json")
+          path=Path("bible-semantic-index/dist/index.json")
           index=json.loads(path.read_text(encoding="utf-8"))
           stats=index["statistics"]
           original_digest=index["provenance"]["source_snapshot_sha256"]
-          lock=json.loads(Path("entity-index/source.lock.json").read_text())
+          lock=json.loads(Path("bible-semantic-index/data/source.lock.json").read_text())
           assert len(original_digest) == 64, original_digest
           assert original_digest == lock["source_snapshot_sha256"], (original_digest,lock)
           assert original_digest == "e46fa575d6d9946afe9b63a4ed64f4202cbe50f5a61bf855fad655d33259c084"
@@ -283,7 +283,7 @@ jobs:
           assert index["provenance"]["source_license"] == "CC BY-SA 4.0"
           import importlib.util
           spec=importlib.util.spec_from_file_location("entity_query",
-               "entity-index/resolve.py")
+               "bible-semantic-index/scripts/resolve.py")
           module=importlib.util.module_from_spec(spec)
           spec.loader.exec_module(module)
           resolver=module.EntityResolver(index)
@@ -522,14 +522,14 @@ jobs:
       - name: Audit competing canonical people on the same exact word
         shell: bash
         run: |
-          python3 -I entity-index/audit_person_overlaps.py \
-            --index entity-index/dist/index.json \
-            --output entity-index/dist/person-overlaps.json \
+          python3 -I bible-semantic-index/scripts/audit_person_overlaps.py \
+            --index bible-semantic-index/dist/index.json \
+            --output bible-semantic-index/dist/person-overlaps.json \
             --sample 30
           python3 - <<'PY'
           import json
           from pathlib import Path
-          report=json.loads(Path("entity-index/dist/person-overlaps.json").read_text())
+          report=json.loads(Path("bible-semantic-index/dist/person-overlaps.json").read_text())
           stats=report["statistics"]
           assert stats["distinct_person_original_word_overlap_candidates"] == len(report["findings"])
           assert stats["multiple_explicit_names"] == 8, stats
@@ -549,11 +549,11 @@ jobs:
           import importlib.util
           import json
           from pathlib import Path
-          script=Path("entity-index/audit_person_overlaps.py")
+          script=Path("bible-semantic-index/scripts/audit_person_overlaps.py")
           spec=importlib.util.spec_from_file_location("person_source_forms",script)
           module=importlib.util.module_from_spec(spec)
           spec.loader.exec_module(module)
-          report=json.loads(Path("entity-index/dist/person-overlaps.json").read_text())
+          report=json.loads(Path("bible-semantic-index/dist/person-overlaps.json").read_text())
           reviewed=module.audit_indirect_source_forms(report,{
               "wlc":Path("macula-hebrew/WLC/tsv/macula-hebrew.tsv"),
               "sblgnt":Path("macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv"),
@@ -564,7 +564,7 @@ jobs:
           assert sum(stats["source_word_number_buckets"].values())==2332
           assert sum(stats["different_canonical_people_per_word"].values())==2332
           assert len({(x["corpus"],x["word_id"]) for x in reviewed["cases"]})==2332
-          output=Path("entity-index/dist/indirect-person-source-forms.json")
+          output=Path("bible-semantic-index/dist/indirect-person-source-forms.json")
           output.write_text(json.dumps(reviewed,ensure_ascii=False,indent=2,
                                        sort_keys=True)+"\n",encoding="utf-8")
           print("ENTITY_INDIRECT_SOURCE_FORM_AUDIT",
@@ -578,19 +578,19 @@ jobs:
           import importlib.util
           import json
           from pathlib import Path
-          source=Path("entity-index/audit_person_overlaps.py")
+          source=Path("bible-semantic-index/scripts/audit_person_overlaps.py")
           spec=importlib.util.spec_from_file_location("person_name_review",source)
           module=importlib.util.module_from_spec(spec)
           spec.loader.exec_module(module)
-          audit=json.loads(Path("entity-index/dist/person-overlaps.json").read_text())
-          manifest=json.loads(Path("entity-index/reviewed-person-word-overlaps.json").read_text())
+          audit=json.loads(Path("bible-semantic-index/dist/person-overlaps.json").read_text())
+          manifest=json.loads(Path("bible-semantic-index/data/reviewed-person-word-overlaps.json").read_text())
           reviewed=module.verify_explicit_name_reviews(audit,manifest)
           stats=reviewed["statistics"]
           assert stats["reviewed_explicit_name_word_overlaps"]==8, stats
           assert stats["shared_genealogical_name_component"]==6, stats
           assert stats["unresolved_patronymic_name_variant"]==0, stats
           assert stats["unresolved_person_identity"]==2, stats
-          Path("entity-index/dist/reviewed-person-overlaps.json").write_text(
+          Path("bible-semantic-index/dist/reviewed-person-overlaps.json").write_text(
               json.dumps(reviewed,ensure_ascii=False,indent=2,sort_keys=True)+"\n")
           print("ENTITY_EXPLICIT_NAME_OVERLAP_REVIEW",
                 json.dumps(stats,sort_keys=True))
@@ -603,14 +603,14 @@ jobs:
           # maintaining a second competing implementation in this repository.
           python3 -I /tmp/acai-frozen/.github/scripts/audit_duplicate_word_groups.py \
             --root /tmp/acai-frozen \
-            --output entity-index/dist/source-multiplicity.json \
+            --output bible-semantic-index/dist/source-multiplicity.json \
             --top 15
           python3 - <<'PY'
           import collections
           import json
           from pathlib import Path
-          report=json.loads(Path("entity-index/dist/source-multiplicity.json").read_text())
-          index=json.loads(Path("entity-index/dist/index.json").read_text())
+          report=json.loads(Path("bible-semantic-index/dist/source-multiplicity.json").read_text())
+          index=json.loads(Path("bible-semantic-index/dist/index.json").read_text())
           summary=report["summary"]
           findings=report["findings"]
           assert summary["occurrence_fields_with_any_repeat"] == len(findings)
@@ -642,30 +642,30 @@ jobs:
           python3 -I /tmp/acai-frozen/.github/scripts/audit_macula_hebrew_ids.py \
             --root /tmp/acai-frozen \
             --tsv macula-hebrew/WLC/tsv/macula-hebrew.tsv \
-            --output entity-index/dist/macula-hebrew-existence.json
+            --output bible-semantic-index/dist/macula-hebrew-existence.json
           python3 -I /tmp/acai-frozen/.github/scripts/audit_macula_greek_ids.py \
             --root /tmp/acai-frozen \
             --tsv macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
-            --output entity-index/dist/macula-greek-existence.json
+            --output bible-semantic-index/dist/macula-greek-existence.json
           python3 -I /tmp/acai-frozen/.github/scripts/audit_nt_source_verses.py \
             --root /tmp/acai-frozen \
             --source macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
-            --corpus nt --output entity-index/dist/nt-source-verse-compatibility.json
+            --corpus nt --output bible-semantic-index/dist/nt-source-verse-compatibility.json
           python3 -I /tmp/acai-frozen/.github/scripts/audit_nt_source_verses.py \
             --root /tmp/acai-frozen \
             --source macula-hebrew/WLC/tsv/macula-hebrew.tsv \
-            --corpus ot --output entity-index/dist/ot-source-verse-compatibility.json
+            --corpus ot --output bible-semantic-index/dist/ot-source-verse-compatibility.json
           python3 - <<'PY'
           import csv
           import json
           from pathlib import Path
-          root=Path("entity-index")
+          root=Path("bible-semantic-index")
           index=json.loads((root/"dist/index.json").read_text())
           reports={
               "wlc":json.loads((root/"dist/macula-hebrew-existence.json").read_text()),
               "sblgnt":json.loads((root/"dist/macula-greek-existence.json").read_text()),
           }
-          manifest=json.loads((root/"source-unattested-words.json").read_text())
+          manifest=json.loads((root/"data/source-unattested-words.json").read_text())
           missing_hebrew={r["id"] for r in reports["wlc"]["missing_id_details"]}
           assert missing_hebrew == set(manifest["word_ids"]), (missing_hebrew,manifest["word_ids"])
           assert reports["wlc"]["summary"]["missing_from_pinned_macula"] == 18
@@ -674,7 +674,7 @@ jobs:
           assert reports["sblgnt"]["summary"]["unique_mentioned_source_ids"] == 36867
           nt=json.loads((root/"dist/nt-source-verse-compatibility.json").read_text())
           ot=json.loads((root/"dist/ot-source-verse-compatibility.json").read_text())
-          verse_manifest=json.loads((root/"source-unattested-verses.json").read_text())
+          verse_manifest=json.loads((root/"data/source-unattested-verses.json").read_text())
           assert nt["summary"]["record_reference_entries_absent_from_source"] == 22
           assert nt["summary"]["distinct_referenced_verses_absent_from_source"] == 8
           assert ot["summary"]["record_reference_entries_absent_from_source"] == 0
@@ -740,12 +740,12 @@ jobs:
           python3 -I /tmp/acai-frozen/.github/scripts/audit_epistle_endings.py \
             --root /tmp/acai-frozen \
             --greek macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
-            --output entity-index/dist/epistle-ending-review.json
+            --output bible-semantic-index/dist/epistle-ending-review.json
           python3 - <<'PY'
           import json
           from pathlib import Path
-          report=json.loads(Path("entity-index/dist/epistle-ending-review.json").read_text())
-          manifest=json.loads(Path("entity-index/source-reference-qualifications.json").read_text())
+          report=json.loads(Path("bible-semantic-index/dist/epistle-ending-review.json").read_text())
+          manifest=json.loads(Path("bible-semantic-index/data/source-reference-qualifications.json").read_text())
           finales=report["source_defined_final_verses"]
           assert len(finales)==21, finales
           assert report["records_referencing_any_final_verse"]==79, report
@@ -803,11 +803,11 @@ jobs:
             --root /tmp/acai-frozen \
             --hebrew macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --greek macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
-            --output entity-index/dist/lemma-alignment-candidates.json --top 20
+            --output bible-semantic-index/dist/lemma-alignment-candidates.json --top 20
           python3 - <<'PY'
           import json
           from pathlib import Path
-          report=json.loads(Path("entity-index/dist/lemma-alignment-candidates.json").read_text())
+          report=json.loads(Path("bible-semantic-index/dist/lemma-alignment-candidates.json").read_text())
           summary=report["summary"]
           findings=report["findings"]
           expected={
@@ -838,14 +838,14 @@ jobs:
           # investigation-only and never rewrites an original word ID.
           python3 -I /tmp/acai-frozen/.github/scripts/triage_missing_hebrew_subjects.py \
             --tsv macula-hebrew/WLC/tsv/macula-hebrew.tsv \
-            --missing entity-index/dist/macula-hebrew-existence.json \
-            > entity-index/dist/hebrew-missing-neighbor-source.log
+            --missing bible-semantic-index/dist/macula-hebrew-existence.json \
+            > bible-semantic-index/dist/hebrew-missing-neighbor-source.log
           python3 - <<'PY'
           import json
           from pathlib import Path
-          out=Path("entity-index/dist")
+          out=Path("bible-semantic-index/dist")
           missing=json.loads((out/"macula-hebrew-existence.json").read_text())
-          manifest=json.loads(Path("entity-index/source-unattested-words.json").read_text())
+          manifest=json.loads(Path("bible-semantic-index/data/source-unattested-words.json").read_text())
           expected=set(manifest["word_ids"])
           assert expected=={row["id"] for row in missing["missing_id_details"]}
           entries={}
@@ -903,22 +903,22 @@ jobs:
 
       - name: Build and verify offline BSI v0.1 release candidate
         run: |
-          python3 -I entity-index/package_candidate.py \
-            --index entity-index/dist/bsi-v0.1-without-keyterms.json \
-            --labels entity-index/dist/bsi-v0.1-labels-en.json \
-            --lock entity-index/source.lock.json \
-            --output entity-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip
-          sha256sum entity-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip
+          python3 -I bible-semantic-index/scripts/package_candidate.py \
+            --index bible-semantic-index/dist/bsi-v0.1-without-keyterms.json \
+            --labels bible-semantic-index/dist/bsi-v0.1-labels-en.json \
+            --lock bible-semantic-index/data/source.lock.json \
+            --output bible-semantic-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip
+          sha256sum bible-semantic-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip
           python3 - <<'PY'
           import importlib.util
           from pathlib import Path
           import json
           import zipfile
-          path = Path("entity-index/package_candidate.py")
+          path = Path("bible-semantic-index/scripts/package_candidate.py")
           spec = importlib.util.spec_from_file_location("bsi_package", path)
           mod = importlib.util.module_from_spec(spec)
           spec.loader.exec_module(mod)
-          raw = Path("entity-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip").read_bytes()
+          raw = Path("bible-semantic-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip").read_bytes()
           manifest = mod.verify_archive(raw)
           assert manifest["status"] == "versioned_distribution"
           assert manifest["excluded_categories"] == ["keyterm"]
@@ -934,7 +934,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bsi-0.1.0-release-candidate-internal
-          path: entity-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip
+          path: bible-semantic-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip
           if-no-files-found: error
           retention-days: 14
 
@@ -943,18 +943,18 @@ jobs:
         with:
           name: independent-entity-index-qa
           path: |
-            entity-index/dist/index.json
-            entity-index/dist/person-overlaps.json
-            entity-index/dist/reviewed-person-overlaps.json
-            entity-index/dist/indirect-person-source-forms.json
-            entity-index/dist/source-multiplicity.json
-            entity-index/dist/macula-hebrew-existence.json
-            entity-index/dist/macula-greek-existence.json
-            entity-index/dist/nt-source-verse-compatibility.json
-            entity-index/dist/ot-source-verse-compatibility.json
-            entity-index/dist/epistle-ending-review.json
-            entity-index/dist/lemma-alignment-candidates.json
-            entity-index/dist/hebrew-missing-neighbor-review.json
+            bible-semantic-index/dist/index.json
+            bible-semantic-index/dist/person-overlaps.json
+            bible-semantic-index/dist/reviewed-person-overlaps.json
+            bible-semantic-index/dist/indirect-person-source-forms.json
+            bible-semantic-index/dist/source-multiplicity.json
+            bible-semantic-index/dist/macula-hebrew-existence.json
+            bible-semantic-index/dist/macula-greek-existence.json
+            bible-semantic-index/dist/nt-source-verse-compatibility.json
+            bible-semantic-index/dist/ot-source-verse-compatibility.json
+            bible-semantic-index/dist/epistle-ending-review.json
+            bible-semantic-index/dist/lemma-alignment-candidates.json
+            bible-semantic-index/dist/hebrew-missing-neighbor-review.json
           if-no-files-found: error
           retention-days: 14
 
@@ -977,7 +977,7 @@ jobs:
           python3 - <<'PY'
           import importlib.util
           from pathlib import Path
-          spec=importlib.util.spec_from_file_location('bsi_pack','entity-index/package_candidate.py')
+          spec=importlib.util.spec_from_file_location('bsi_pack','bible-semantic-index/scripts/package_candidate.py')
           mod=importlib.util.module_from_spec(spec)
           spec.loader.exec_module(mod)
           source=Path('bsi-release/BSI-0.1.0-RELEASE-CANDIDATE.zip')

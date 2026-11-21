@@ -5,7 +5,7 @@ Tracked by [#338](https://github.com/icfmp/Bible-Resources/issues/338). This doc
 ## Frozen source scope
 
 - ACAI original source: `icfmp/ACAI@e80a874e8282f996199c595378a3b3b9a43aac22` (unchanged original records).
-- Original word corpus: pinned Macula WLC and SBLGNT editions from [source.lock.json](source.lock.json).
+- Original word corpus: pinned Macula WLC and SBLGNT editions from [source.lock.json](../data/source.lock.json).
 - Source JSON file inventory at this exact ACAI revision: **flora 104**, **fauna 97**, **realia 345**, **keyterms 868**. These are file counts, **not** counts of independently reviewed entries nor guaranteed current consumer coverage.
 - All active original-word IDs in the derived index are independently verified source-present by the existing complete-corpus CI. The examples below are separately asserted in real **reader-facing** exact-word lookups.
 
@@ -46,6 +46,6 @@ These are documented source-level semantic scope questions. No blind deletions, 
 
 ## Reader-facing acceptance
 
-Use `EntityResolver.resolve_for_reader` from [resolve.py](resolve.py). Keep only explicit original-word candidates; preserve any direct ambiguity, original corpus/verse guards, and `review_status`. **Do not display participant lists for pronouns.** The full raw index remains available unchanged for future study, audits and deeper contextual enrichment.
+Use `EntityResolver.resolve_for_reader` from [resolve.py](../scripts/resolve.py). Keep only explicit original-word candidates; preserve any direct ambiguity, original corpus/verse guards, and `review_status`. **Do not display participant lists for pronouns.** The full raw index remains available unchanged for future study, audits and deeper contextual enrichment.
 
 Acceptance is limited to the sixteen source-backed examples, with no presumption of whole-corpus lexical accuracy. Full release and redistribution remain gated separately by [#339](https://github.com/icfmp/Bible-Resources/issues/339).

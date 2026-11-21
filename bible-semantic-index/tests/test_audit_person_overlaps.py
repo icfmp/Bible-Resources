@@ -6,7 +6,7 @@ import unittest
 import tempfile
 from pathlib import Path
 
-script = Path(__file__).with_name("audit_person_overlaps.py")
+script = (Path(__file__).resolve().parents[1] / 'scripts' / 'audit_person_overlaps.py')
 spec = importlib.util.spec_from_file_location("identity_overlap_audit", script)
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)

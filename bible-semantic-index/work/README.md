@@ -4,7 +4,7 @@ This directory is reserved for **our** editorial work, audits and versioned corr
 
 ## Current v0.1 compatibility layout
 
-The existing, validated implementation and its declarative files remain **temporarily at the parent `entity-index/` root**, because CI, reproducible builds, review receipts and the published v0.1 source contract refer to their stable paths:
+The existing, validated implementation and its declarative files remain **temporarily at the parent `bible-semantic-index/` root**, because CI, reproducible builds, review receipts and the published v0.1 source contract refer to their stable paths:
 
 - `../compile_index.py`, `../resolve.py`, `../distribution_profile.py`, `../minimal_labels.py`, `../package_candidate.py`
 - `../editorial-decisions.json`, `../reviewed-person-word-overlaps.json`

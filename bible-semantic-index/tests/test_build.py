@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-SCRIPT = Path(__file__).with_name("compile_index.py")
+SCRIPT = (Path(__file__).resolve().parents[1] / 'scripts' / 'compile_index.py')
 spec = importlib.util.spec_from_file_location("entity_index_builder", SCRIPT)
 builder = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(builder)
@@ -458,7 +458,7 @@ class EntityIndexTests(unittest.TestCase):
                           explicit_instances={"wlc": [["o130030150101"]]})
         source_before = path.read_bytes()
         all_decisions = json.loads(
-            Path(__file__).with_name("editorial-decisions.json").read_text()
+            (Path(__file__).resolve().parents[1] / 'data' / 'editorial-decisions.json').read_text()
         )["decisions"]
         # This existing historical pilot fixture covers only its own source
         # records. Other editorial decisions have independent regressions,
@@ -562,7 +562,7 @@ class EntityIndexTests(unittest.TestCase):
             explicit_instances={"wlc":[["o110040080031","o110040080041"]]})
         original = (father.read_bytes(), son.read_bytes())
         review = next(row for row in json.loads(
-            Path(__file__).with_name("editorial-decisions.json").read_text()
+            (Path(__file__).resolve().parents[1] / 'data' / 'editorial-decisions.json').read_text()
         )["decisions"] if row["source_id"]=="person:Hur")
         index = self.build(decisions=[review])
         by_id={entry["id"]:entry for entry in index["entities"]}
@@ -592,7 +592,7 @@ class EntityIndexTests(unittest.TestCase):
                 ["o150080110021"],["o150080110051"]]})
         source_before = (ancestor.read_bytes(), father.read_bytes())
         editorial = json.loads(
-            Path(__file__).with_name("editorial-decisions.json").read_text()
+            (Path(__file__).resolve().parents[1] / 'data' / 'editorial-decisions.json').read_text()
         )["decisions"]
         decisions = [row for row in editorial
                      if row["source_id"] in ("person:Bebai", "person:Bebai.2")]
@@ -629,7 +629,7 @@ class EntityIndexTests(unittest.TestCase):
         unchanged = (elder.read_bytes(), younger.read_bytes())
         decision = next(
             d for d in json.loads(
-                Path(__file__).with_name("editorial-decisions.json").read_text()
+                (Path(__file__).resolve().parents[1] / 'data' / 'editorial-decisions.json').read_text()
             )["decisions"]
             if d["source_id"] == "person:Dishon"
         )

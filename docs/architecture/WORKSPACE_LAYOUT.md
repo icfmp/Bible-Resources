@@ -43,6 +43,6 @@ The generated [script registry](../../reports/tooling/TOOL_REGISTRY.md) document
 
 Each `editorial/README.md` should fit on one readable page: **what was decided, why, what is still uncertain, and the authoritative proof to consult**. Keep the actual signed profiles, original rights/approval witnesses, immutable source/release hashes, reproducible transformation plans and native-reader validation receipts. Do **not** keep repeated draft release notes, unsubmitted correspondence, private candidate status logs or iterative machine snapshots once final evidence supersedes them. Historical research is recoverable from Git when needed; remove files from the active tree only after checking they are not referenced by current plans, workflows or approved artifact hashes. Never rewrite a signed/hashed profile merely to tidy wording or links.
 
-The independent `entity-index/` Bible Semantic Index must not be changed during this cleanup.
+The independent `bible-semantic-index/` Bible Semantic Index must not be changed during this cleanup.
 
 See the [architecture](ARCHITECTURE.md), [production contract](../PRODUCTION_PIPELINE.md), [normalization policy](../policies/NORMALIZATION_POLICY.md) and [publishing](../workflows/PUBLISHING.md).

@@ -4,11 +4,11 @@ import json
 import unittest
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 
 class WorkspaceTests(unittest.TestCase):
     def test_partition_and_immutable_source_lock(self):
-        lock = json.loads((ROOT / "source.lock.json").read_text(encoding="utf-8"))
+        lock = json.loads((ROOT / "data" / "source.lock.json").read_text(encoding="utf-8"))
         self.assertEqual(lock["source_records_expected"], 6644)
         self.assertEqual(len(lock["source_snapshot_sha256"]), 64)
         self.assertEqual(len(lock["source_commit"]), 40)
@@ -16,8 +16,8 @@ class WorkspaceTests(unittest.TestCase):
         self.assertIn("/checkouts/", (ROOT / "sources" / ".gitignore").read_text())
         for sub in ("work", "links/dictionaries", "links/encyclopedias"):
             self.assertTrue((ROOT / sub / "README.md").is_file(), sub)
-        self.assertTrue((ROOT / "compile_index.py").is_file())
-        self.assertTrue((ROOT / "editorial-decisions.json").is_file())
+        self.assertTrue((ROOT / "scripts" / "compile_index.py").is_file())
+        self.assertTrue((ROOT / "data" / "editorial-decisions.json").is_file())
 
     def test_crosswalk_schema_is_narrow_and_review_based(self):
         schema = json.loads((ROOT / "links" / "schema.v1.json").read_text(encoding="utf-8"))

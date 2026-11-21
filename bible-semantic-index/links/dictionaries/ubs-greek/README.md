@@ -91,12 +91,12 @@ Encyclopedia crosswalks remain separate under `links/encyclopedias/`.
 With separately pinned original sources checked out:
 
 ```bash
-python3 -I entity-index/links/dictionaries/ubs-greek/build_index.py \
+python3 -I bible-semantic-index/links/dictionaries/ubs-greek/build_index.py \
   --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
   --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
   --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
   --output /tmp/ubs-greek-rebuilt.json
-python3 -I entity-index/links/dictionaries/ubs-greek/test_index.py
+python3 -I bible-semantic-index/links/dictionaries/ubs-greek/test_index.py
 ```
 
 The [automated workflow](../../../../.github/workflows/bsi-ubs-greek.yml)
@@ -967,7 +967,7 @@ from pathlib import Path
 import json
 import runpy
 
-root = Path("entity-index/links/dictionaries/ubs-greek")
+root = Path("bible-semantic-index/links/dictionaries/ubs-greek")
 lookup = runpy.run_path(str(root / "build_consolidated_v1_review_index.py"))["lookup"]
 candidate = json.loads(Path("/tmp/bsi-ubs-greek-v1-consolidated-original-word-index-PRIVATE.json").read_text())
 word = lookup(candidate, "n40001001003")
