@@ -17,7 +17,7 @@ from collections import Counter, defaultdict
 from hashlib import sha256
 import re
 
-from commentary_nonlink_word_alignment import plain_word_alignment
+from research.commentary.commentary_nonlink_analysis import plain_word_alignment
 from commentary_prose_cross_slot import strict_native_stock_plain_words
 from commentary_unresolved_lexical_triage import WORD
 from commentary_xml_witness import OSIS_LOC

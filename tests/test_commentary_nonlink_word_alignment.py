@@ -10,7 +10,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
-from commentary_nonlink_word_alignment import plain_word_alignment
+from research.commentary.commentary_nonlink_analysis import plain_word_alignment
 from research.commentary.commentary_chapter_paragraph_overlap import longest_common_contiguous_word_run
 from commentary_text_delta import longest_contiguous_token_run
 from commentary_private_text_compare import _original_source_markers, compare_private_texts
@@ -19,7 +19,7 @@ from pilot_preflight import PilotError
 
 class OriginalPlainWordsAlignmentTests(unittest.TestCase):
     def test_source_longer_full_difference_explained_by_actual_scripture_ref_label(self):
-        from commentary_nonlink_word_alignment import (
+        from research.commentary.commentary_nonlink_analysis import (
             classify_original_link_label_effect_on_source_longer_words as inspect)
         a=inspect(["Start","cited","verse","End"],["Start","End"],[1,2])
         self.assertEqual(a["source_original_link_label_exclusion_class"],
@@ -29,7 +29,7 @@ class OriginalPlainWordsAlignmentTests(unittest.TestCase):
         self.assertFalse(a["full_original_source_or_native_text_modified"])
 
     def test_original_extra_nonlink_words_remain_unexplained_by_link_labels(self):
-        from commentary_nonlink_word_alignment import (
+        from research.commentary.commentary_nonlink_analysis import (
             classify_original_link_label_effect_on_source_longer_words as inspect)
         a=inspect(["Start","extra","End"],["Start","End"],[])
         self.assertEqual(a["source_original_link_label_exclusion_class"],
@@ -42,7 +42,7 @@ class OriginalPlainWordsAlignmentTests(unittest.TestCase):
         self.assertNotIn('"extra"',json.dumps(b))
 
     def test_source_link_label_classification_never_guesses_order_or_indexes(self):
-        from commentary_nonlink_word_alignment import (
+        from research.commentary.commentary_nonlink_analysis import (
             classify_original_link_label_effect_on_source_longer_words as inspect)
         with self.assertRaises(PilotError):
             inspect(["source","middle","end"],["end","source"],[])

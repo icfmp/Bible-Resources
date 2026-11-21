@@ -124,7 +124,7 @@ def independent_thml_chapter_intro_witness(
     Cross-edition word agreement does not prove original print identity or
     authorize moving original native I text into numbered K slots.
     """
-    from commentary_nonlink_word_alignment import plain_word_alignment
+    from research.commentary.commentary_nonlink_analysis import plain_word_alignment
 
     if not isinstance(original_intro_raw_by_chapter, dict):
         raise ValueError("Unreviewed native introduction source registry")

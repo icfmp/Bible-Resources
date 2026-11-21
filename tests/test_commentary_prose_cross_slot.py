@@ -153,7 +153,7 @@ class OriginalLargeProseAlternativeSlotTests(unittest.TestCase):
 
 class OriginalExtraGapChapterNativeTests(unittest.TestCase):
     def _original_case(self):
-        from commentary_nonlink_words import compare_words_outside_links
+        from research.commentary.commentary_nonlink_analysis import compare_words_outside_links
         first=[f"secretFirst{i}" for i in range(105)]
         second=[f"secretSecond{i}" for i in range(12)]
         source=["opening"]+first+["middle"]+second+["closing"]
