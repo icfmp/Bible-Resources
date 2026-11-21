@@ -18,7 +18,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 - HISTORICAL/ARCHIVE: 9
 - KEEP_GENERIC: 26
 - MERGE: 11
-- UNDECIDED: 128
+- UNDECIDED: 129
 
 ## All tracked tools
 
@@ -48,9 +48,9 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_modern_draft_osis_preview.py`](../../scripts/commentary_modern_draft_osis_preview.py) | UNDECIDED | named test | 8 | not determined |
 | [`scripts/commentary_modern_ionly_preview.py`](../../scripts/commentary_modern_ionly_preview.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_modern_k_scope_preview.py`](../../scripts/commentary_modern_k_scope_preview.py) | UNDECIDED | named test | 2 | not determined |
-| [`scripts/commentary_modern_linked_candidate_preview.py`](../../scripts/commentary_modern_linked_candidate_preview.py) | UNDECIDED | named test | 2 | not determined |
+| [`scripts/commentary_modern_linked_candidate_preview.py`](../../scripts/commentary_modern_linked_candidate_preview.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/commentary_modern_native_witness_probe.py`](../../scripts/commentary_modern_native_witness_probe.py) | UNDECIDED | named test | 2 | source/native audit |
-| [`scripts/commentary_modern_reference_gate.py`](../../scripts/commentary_modern_reference_gate.py) | UNDECIDED | named test | 5 | not determined |
+| [`scripts/commentary_modern_reference_gate.py`](../../scripts/commentary_modern_reference_gate.py) | UNDECIDED | named test | 6 | not determined |
 | [`scripts/commentary_modern_source_receipt.py`](../../scripts/commentary_modern_source_receipt.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_native_inventory.py`](../../scripts/commentary_native_inventory.py) | KEEP_GENERIC | not established | 9 | source/native audit |
 | [`scripts/commentary_native_raw_inventory.py`](../../scripts/commentary_native_raw_inventory.py) | KEEP_GENERIC | named test | 12 | source/native audit |
@@ -153,6 +153,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/commentary/commentary_editorial_topology.py`](../../scripts/research/commentary/commentary_editorial_topology.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/research/commentary/commentary_intro_chapter_text_review.py`](../../scripts/research/commentary/commentary_intro_chapter_text_review.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/research/commentary/commentary_lexical_overlap.py`](../../scripts/research/commentary/commentary_lexical_overlap.py) | UNDECIDED | not established | 3 | not determined |
+| [`scripts/research/commentary/commentary_original_link_identity.py`](../../scripts/research/commentary/commentary_original_link_identity.py) | UNDECIDED | not established | 4 | not determined |
 | [`scripts/research/commentary/commentary_osis_rebuild_preflight.py`](../../scripts/research/commentary/commentary_osis_rebuild_preflight.py) | UNDECIDED | named test | 2 | publication/release |
 | [`scripts/research/commentary/commentary_paragraph_witness_probe.py`](../../scripts/research/commentary/commentary_paragraph_witness_probe.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 11 | publication/release |

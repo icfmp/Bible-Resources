@@ -104,6 +104,20 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertIn("tests/test_commentary_section_scope_audit.py",
                       entries[lexical]["static_references"])
 
+    def test_original_link_identity_gate_is_a_scoped_import_only_helper(self):
+        """Check all real module and regression-test consumers after extraction."""
+        entries = {entry["path"]: entry for entry in self.result["files"]}
+        name = "scripts/research/commentary/commentary_original_link_identity.py"
+        self.assertIn(name, entries)
+        for caller in (
+            "scripts/commentary_modern_reference_gate.py",
+            "scripts/commentary_modern_linked_candidate_preview.py",
+            "tests/test_commentary_modern_reference_gate.py",
+        ):
+            with self.subTest(caller=caller):
+                self.assertIn(caller, entries[name]["static_references"])
+        self.assertNotIn("scripts/commentary_original_link_identity.py", entries)
+
     def test_registry_has_no_promoted_editorial_or_publication_claims(self):
         for entry in self.result["files"]:
             self.assertEqual(entry["release_approval"],

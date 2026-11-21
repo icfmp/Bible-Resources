@@ -7,8 +7,11 @@ import unittest
 from xml.etree import ElementTree as ET
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from commentary_modern_reference_gate import (SourceReferenceGate,
-    WholeCanonOriginalLinkIdentityReceipt, canonical_only_for_comparison,
+from research.commentary.commentary_original_link_identity import (
+    SourceReferenceGate, WholeCanonOriginalLinkIdentityReceipt,
+    canonical_only_for_comparison,
+)
+from commentary_modern_reference_gate import (
     validate_proposed_link_dispositions, _wrap_exact_authored_modern_text,
     _unambiguous_explicit_modern_verse, _auto_single_verse_placements,
     _unrecognized_original_ref_class, _source_same_chapter_verse_range,
