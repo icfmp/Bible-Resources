@@ -1,5 +1,7 @@
 """Safeguards for the checked-in script lifecycle/usage inventory."""
+import os
 from pathlib import Path
+import subprocess
 import sys
 import unittest
 
@@ -49,6 +51,49 @@ class ScriptInventoryTests(unittest.TestCase):
             with self.subTest(shared=name):
                 self.assertEqual(entries[name]["classification"], "KEEP_GENERIC")
                 self.assertTrue(entries[name]["has_direct_tests_by_filename"])
+
+    def test_lsg_source_probes_are_edition_owned_and_still_invoked(self):
+        """LSG-specific diagnostics are not generic, yet retain their real callers."""
+        entries = {entry["path"]: entry for entry in self.result["files"]}
+        for name, workflow, test_name in (
+            ("lsg_sword_compare.py", "lsg-fidelity.yml",
+             "test_lsg_sword_compare.py"),
+            ("probe_lsg_v11n.py", "lsg-v11n-probe.yml",
+             "test_lsg_v11n_probe.py"),
+        ):
+            with self.subTest(name=name):
+                local = "modules/lsg-1910/tools/" + name
+                self.assertNotIn("scripts/historical/lsg/" + name, entries)
+                self.assertIn(local, entries)
+                self.assertEqual(entries[local]["classification"], "MODULE_LOCAL")
+                # A filename heuristic can miss a real differently named test.
+                # Verify the actual imported test rather than the hint.
+                self.assertIn(".github/workflows/" + workflow,
+                              entries[local]["static_references"])
+                self.assertIn("tests/" + test_name,
+                              entries[local]["static_references"])
+
+    def test_lsg_module_tools_remain_real_command_line_entrypoints(self):
+        """Direct workflow commands still start, without old-path wrappers."""
+        for name in ("lsg_sword_compare.py", "probe_lsg_v11n.py"):
+            with self.subTest(name=name):
+                command = ROOT / "modules/lsg-1910/tools" / name
+                result = subprocess.run(
+                    [sys.executable, str(command), "--help"],
+                    cwd=ROOT,
+                    env=dict(os.environ, PYTHONPATH=str(ROOT / "scripts")),
+                    capture_output=True, text=True, check=False, timeout=15,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn("usage:", result.stdout)
+
+    def test_retired_darby_011_preflight_does_not_leave_live_entrypoints(self):
+        """The historical 0.1.0 baseline is no longer in the approved 0.1.1 module."""
+        entries = {entry["path"] for entry in self.result["files"]}
+        self.assertNotIn("scripts/prepare_darby_011_private_release_candidate.py",
+                         entries)
+        self.assertNotIn("scripts/probe_darby_011_final_android.py", entries)
+        self.assertFalse((ROOT / ".github/workflows/darby-0.1.1-preflight.yml").exists())
 
     def test_nested_package_imports_count_as_real_static_callers(self):
         entries = {item["path"]: item for item in self.result["files"]}

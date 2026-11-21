@@ -9,7 +9,7 @@ import zipfile
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-sys.path.insert(0,str(ROOT/"scripts"/"historical"/"lsg"))
+sys.path.insert(0,str(ROOT/"modules"/"lsg-1910"/"tools"))
 from probe_lsg_v11n import make_fixture, compile_probe, run
 from pilot_preflight import PilotError
 

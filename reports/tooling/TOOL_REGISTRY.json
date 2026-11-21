@@ -1,6 +1,94 @@
 {
   "files": [
     {
+      "classification": "MODULE_LOCAL",
+      "confidence": "high",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "OSIS",
+        "USFM",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "modules/lsg-1910/tools/lsg_sword_compare.py",
+      "proposed_action": "Keep with the owning module only while its pinned maintenance/replay workflow and regression checks remain necessary.",
+      "purpose_first_line": "Compare scoped SWORD chapter output against its eBible USFX authored text.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "json",
+        "lsg_source_compare",
+        "lxml",
+        "pathlib",
+        "pilot_preflight",
+        "pilot_subprocess",
+        "re",
+        "shutil",
+        "sys",
+        "tempfile",
+        "unicodedata",
+        "zipfile"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "06414e2cf2226b06901be7ce852cb3b972327bf4d591c32810faa9d7e6b8e753",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "source/native audit",
+      "static_reference_count": 3,
+      "static_references": [
+        ".github/workflows/lsg-fidelity.yml",
+        "tests/test_lsg_sword_compare.py",
+        "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "MODULE_LOCAL",
+      "confidence": "high",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "RawText",
+        "OSIS",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "modules/lsg-1910/tools/probe_lsg_v11n.py",
+      "proposed_action": "Keep with the owning module only while its pinned maintenance/replay workflow and regression checks remain necessary.",
+      "purpose_first_line": "Read-only comparison of source verse keys against official SWORD versifications.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "json",
+        "lsg_source_compare",
+        "pathlib",
+        "pilot_preflight",
+        "pilot_subprocess",
+        "re",
+        "subprocess",
+        "sys",
+        "tempfile",
+        "xml"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "f36631e69722b316e089bcecdb5584a7866388a375f1885015d39ece26a6d38a",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "source/native audit",
+      "static_reference_count": 3,
+      "static_references": [
+        ".github/workflows/lsg-v11n-probe.yml",
+        "tests/test_lsg_v11n_probe.py",
+        "tests/test_tool_registry.py"
+      ]
+    },
+    {
       "classification": "UNDECIDED",
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
@@ -28,10 +116,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
         "tests/test_audit_omitted_verse_notes.py"
       ]
@@ -2719,10 +2806,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 8,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-andbible-android-private.yml",
         ".github/workflows/darby-andbible-jsword.yml",
         ".github/workflows/darby-link-repair-research.yml",
@@ -2825,92 +2911,6 @@
       ]
     },
     {
-      "classification": "HISTORICAL/ARCHIVE",
-      "confidence": "medium",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "OSIS",
-        "USFM",
-        "USFX"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/historical/lsg/lsg_sword_compare.py",
-      "proposed_action": "Retain runnable historical evidence; extract shared algorithms only after byte-equivalence tests.",
-      "purpose_first_line": "Compare scoped SWORD chapter output against its eBible USFX authored text.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "collections",
-        "hashlib",
-        "json",
-        "lsg_source_compare",
-        "lxml",
-        "pathlib",
-        "pilot_preflight",
-        "pilot_subprocess",
-        "re",
-        "shutil",
-        "sys",
-        "tempfile",
-        "unicodedata",
-        "zipfile"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "00e5f9423fc68989470bb5ffe0e24acd258ce1e6a9e7e8d6bbaec2e4460c1a51",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/lsg-fidelity.yml",
-        "tests/test_lsg_sword_compare.py"
-      ]
-    },
-    {
-      "classification": "HISTORICAL/ARCHIVE",
-      "confidence": "medium",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "RawText",
-        "OSIS",
-        "USFX"
-      ],
-      "has_direct_tests_by_filename": false,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/historical/lsg/probe_lsg_v11n.py",
-      "proposed_action": "Retain runnable historical evidence; extract shared algorithms only after byte-equivalence tests.",
-      "purpose_first_line": "Read-only comparison of source verse keys against official SWORD versifications.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "collections",
-        "hashlib",
-        "json",
-        "lsg_source_compare",
-        "pathlib",
-        "pilot_preflight",
-        "pilot_subprocess",
-        "re",
-        "subprocess",
-        "sys",
-        "tempfile",
-        "xml"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "4c7de171fb7c5aa5aa4ec0c0b474847a7482cdcfb2f8efa66ac703e66c0caf70",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/lsg-v11n-probe.yml",
-        "tests/test_lsg_v11n_probe.py"
-      ]
-    },
-    {
       "classification": "UNDECIDED",
       "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
@@ -2992,10 +2992,10 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 10,
       "static_references": [
+        "modules/lsg-1910/tools/lsg_sword_compare.py",
+        "modules/lsg-1910/tools/probe_lsg_v11n.py",
         "scripts/bible_stage_runner.py",
         "scripts/fast_stock_note_probe.py",
-        "scripts/historical/lsg/lsg_sword_compare.py",
-        "scripts/historical/lsg/probe_lsg_v11n.py",
         "scripts/publisher_osis_usfx_parity.py",
         "scripts/real_second_bible_probe.py",
         "scripts/source_native_maintext_probe.py",
@@ -3398,6 +3398,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 92,
       "static_references": [
+        "modules/lsg-1910/tools/lsg_sword_compare.py",
+        "modules/lsg-1910/tools/probe_lsg_v11n.py",
         "scripts/audit_real_pilot.py",
         "scripts/bible_intake.py",
         "scripts/bible_stage_runner.py",
@@ -3430,8 +3432,6 @@
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/commentary_xiphos_heading_probe.py",
         "scripts/commentary_xml_witness.py",
-        "scripts/historical/lsg/lsg_sword_compare.py",
-        "scripts/historical/lsg/probe_lsg_v11n.py",
         "scripts/lsg_source_compare.py",
         "scripts/pilot_fetch.py",
         "scripts/pilot_runtime.py",
@@ -3557,6 +3557,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 15,
       "static_references": [
+        "modules/lsg-1910/tools/lsg_sword_compare.py",
+        "modules/lsg-1910/tools/probe_lsg_v11n.py",
         "scripts/audit_real_pilot.py",
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
@@ -3564,53 +3566,12 @@
         "scripts/commentary_stock_candidate.py",
         "scripts/commentary_stock_xiphos_smoke.py",
         "scripts/commentary_xiphos_dual_reader.py",
-        "scripts/historical/lsg/lsg_sword_compare.py",
-        "scripts/historical/lsg/probe_lsg_v11n.py",
         "scripts/pilot_runtime.py",
         "scripts/private_sword_bundle.py",
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-modern-source-receipt.yml",
         ".github/workflows/lsg-fidelity.yml",
         "tests/test_pilot_subprocess.py"
-      ]
-    },
-    {
-      "classification": "HISTORICAL/ARCHIVE",
-      "confidence": "medium",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "zText",
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/prepare_darby_011_private_release_candidate.py",
-      "proposed_action": "Retain runnable historical evidence; extract shared algorithms only after byte-equivalence tests.",
-      "purpose_first_line": "Privately materialize and independently audit a Darby 0.1.1 ZIP candidate.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "hashlib",
-        "json",
-        "pathlib",
-        "promote_sword_preview",
-        "publisher_osis_observation",
-        "re",
-        "source_osis_inventory",
-        "stable_sword_refs",
-        "sword_native_inventory",
-        "zipfile"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "e819c001f7f4876be1acd3e971b296b14f43f82f74becd16ca6547d22c0cf849",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "publication/release",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/darby-0.1.1-preflight.yml",
-        "tests/test_prepare_darby_011_private_release_candidate.py"
       ]
     },
     {
@@ -3729,11 +3690,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 5,
+      "static_reference_count": 3,
       "static_references": [
-        "scripts/probe_darby_011_final_android.py",
         "scripts/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-andbible-android-private.yml",
         "tests/test_probe_andbible_android_private_import.py"
       ]
@@ -3774,46 +3733,6 @@
         "scripts/commentary_osis_mixed_transport_probe.py",
         "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-andbible-jsword.yml"
-      ]
-    },
-    {
-      "classification": "HISTORICAL/ARCHIVE",
-      "confidence": "medium",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "zText"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/probe_darby_011_final_android.py",
-      "proposed_action": "Retain runnable historical evidence; extract shared algorithms only after byte-equivalence tests.",
-      "purpose_first_line": "Actual stable AndBible Android UI probe on the exact PRIVATE Darby 0.1.1 ZIP.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "hashlib",
-        "json",
-        "pathlib",
-        "probe_andbible_android_private_import",
-        "re",
-        "shutil",
-        "time",
-        "urllib",
-        "zipfile"
-      ],
-      "reader_tool_signals": [
-        "andbible",
-        "android"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "bb77123d8c3811f94237d0b0acdd8b2fb054f08ddf6842140d2c203583be7922",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/darby-0.1.1-preflight.yml",
-        "tests/test_probe_darby_011_final_android.py"
       ]
     },
     {
@@ -3908,9 +3827,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-andbible-android-private.yml",
         ".github/workflows/darby-andbible-jsword.yml",
         ".github/workflows/darby-private-repaired-sword.yml"
@@ -3947,10 +3865,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/commentary_stock_candidate.py",
-        "scripts/prepare_darby_011_private_release_candidate.py",
         "scripts/tool_registry.py",
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-zcom-private-candidate.yml",
@@ -4102,10 +4019,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 12,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/inspect_paragraph_rendering.py",
-        "scripts/prepare_darby_011_private_release_candidate.py",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/publisher_osis_usfx_parity.py",
@@ -4338,13 +4254,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/commentary_stock_xiphos_smoke.py",
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/commentary-zcom-xiphos-private-smoke.yml",
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
         ".github/workflows/xiphos-preview-smoke.yml",
         "tests/test_reader_xiphos_headless_smoke.py",
@@ -4584,10 +4499,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-paragraph-rendering.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
         "tests/test_repair_osis_division_markers.py"
@@ -4622,11 +4536,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/repair_osis_source_bytes.py",
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-link-repair-research.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
         "tests/test_repair_osis_inline_markup.py"
@@ -4662,7 +4575,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 12,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/audit_omitted_verse_notes.py",
         "scripts/probe_private_repaired_darby_sword.py",
@@ -4670,7 +4583,6 @@
         "scripts/repair_osis_source_bytes.py",
         "scripts/repair_osis_unlinked_reference_labels.py",
         "scripts/source_osis_note_markup_shape.py",
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-link-repair-research.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
         "tests/test_audit_omitted_verse_notes.py",
@@ -4706,10 +4618,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-paragraph-rendering.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
         "tests/test_repair_osis_paragraph_indentation.py"
@@ -4744,14 +4655,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 10,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/repair_osis_division_markers.py",
         "scripts/repair_osis_paragraph_indentation.py",
         "scripts/repair_osis_unlinked_reference_labels.py",
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-andbible-jsword.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
         "tests/test_repair_osis_source_bytes.py",
@@ -5464,10 +5374,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
         "tests/test_source_native_division_markers.py"
       ]
@@ -6112,13 +6021,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 29,
+      "static_reference_count": 28,
       "static_references": [
         "scripts/audit_omitted_verse_notes.py",
         "scripts/bible_stage_runner.py",
         "scripts/inspect_paragraph_rendering.py",
         "scripts/osis_semantic_fidelity.py",
-        "scripts/prepare_darby_011_private_release_candidate.py",
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/publisher_osis_usfx_parity.py",
@@ -6319,14 +6227,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 36,
+      "static_reference_count": 35,
       "static_references": [
         "scripts/bible_stage_runner.py",
         "scripts/fast_stock_note_probe.py",
         "scripts/inspect_paragraph_rendering.py",
         "scripts/native_absorbed_verse_groups.py",
         "scripts/native_milestone_pair_audit.py",
-        "scripts/prepare_darby_011_private_release_candidate.py",
         "scripts/published_reference_audit.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/publisher_osis_usfx_parity.py",
@@ -6666,12 +6573,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 14,
+      "static_reference_count": 13,
       "static_references": [
         "scripts/sword_native_inventory.py",
         "scripts/tool_registry.py",
         ".github/workflows/bible-staged-audit.yml",
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-andbible-android-private.yml",
         ".github/workflows/darby-andbible-jsword.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
@@ -6716,12 +6622,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 18,
+      "static_reference_count": 17,
       "static_references": [
         "scripts/native_book_intro_screen.py",
         "scripts/native_milestone_pair_audit.py",
         "scripts/native_sword_markup_census.py",
-        "scripts/prepare_darby_011_private_release_candidate.py",
         "scripts/publisher_osis_preview_readback.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/real_second_bible_probe.py",
@@ -6758,10 +6663,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 10,
+      "static_reference_count": 9,
       "static_references": [
         ".github/workflows/bible-staged-audit.yml",
-        ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-andbible-android-private.yml",
         ".github/workflows/darby-andbible-jsword.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
@@ -6908,7 +6812,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "4aa4bdf2a57541af9cff226dc2a2f6596612c533285f0a9dcb8ac67b18b31c94",
+      "sha256_at_inventory": "5b93f88bbe2c7ac62f2f6c55ad29ed5bc1efd2e9aa6e4a320a9ac5963c8ddd42",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",

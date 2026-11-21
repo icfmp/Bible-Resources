@@ -17,7 +17,8 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 ROLES = frozenset({
-    "KEEP_GENERIC", "GENERALIZE", "MERGE", "HISTORICAL/ARCHIVE", "UNDECIDED"
+    "KEEP_GENERIC", "GENERALIZE", "MERGE", "HISTORICAL/ARCHIVE",
+    "MODULE_LOCAL", "UNDECIDED"
 })
 # Narrow, verified entry points. The rest are conservatively classified by
 # explicit edition coupling or as pending review, never silently archived.
@@ -105,6 +106,12 @@ def generate(root: Path = ROOT) -> dict:
     root = Path(root).resolve()
     sources = [p for p in tracked(root, "scripts")
                if p.is_file() and p.suffix in {".py", ".cpp", ".sh"}]
+    # Module-local code is inventoried, without scanning SWORD payloads.
+    sources += [p for p in tracked(root, "modules")
+                if len(p.relative_to(root).parts) >= 4
+                and p.relative_to(root).parts[2] == "tools"
+                and p.is_file() and p.suffix in {".py", ".cpp", ".sh"}]
+    sources.sort()
     others = [p for p in tracked(root, ".github/workflows", "tests", "docs")
               if p.is_file() and p.name != "TOOL_REGISTRY.md"
               and p.suffix in {".py", ".cpp", ".sh",
@@ -125,7 +132,11 @@ def generate(root: Path = ROOT) -> dict:
         purpose, cli, imports = _code(source) if path.suffix == ".py" else (
             next((ln.strip("/ *")[:220] for ln in source.splitlines()
                   if ln.strip("/ *")), ""), False, ())
-        role, confidence = classify(path.name, source)
+        role, confidence = (
+            ("MODULE_LOCAL", "high")
+            if rel.startswith("modules/") and "/tools/" in rel
+            else classify(path.name, source)
+        )
         stem = path.stem
         # Treat both qualified imports and literal filenames as static
         # evidence. Every reference is recorded with its exact caller path.
@@ -144,7 +155,10 @@ def generate(root: Path = ROOT) -> dict:
                                  or (path.suffix == ".py"
                                      and import_pat.search(content)))
         ]
-        if path.name in CORE:
+        if role == "MODULE_LOCAL":
+            next_step = ("Keep with the owning module only while its pinned "
+                         "maintenance/replay workflow and regression checks remain necessary.")
+        elif path.name in CORE:
             next_step = "Retain stable verified interface; extend test fixtures."
         elif role == "HISTORICAL/ARCHIVE":
             next_step = ("Retain runnable historical evidence; extract shared "
@@ -208,10 +222,10 @@ def generate(root: Path = ROOT) -> dict:
 def markdown(report: dict) -> str:
     records = report["files"]
     lines = [
-        "# Tool registry — source-bound post-MHCC inventory",
+        "# Tool registry — shared and module-owned source-bound tools",
         "",
-        "This generated list covers every tracked `scripts/*.py`, `*.cpp` "
-        "and `*.sh`. It lists static callers and review recommendations, "
+        "This generated list covers shared scripts plus edition-owned tools under "
+        "`modules/<resource-id>/tools/`. It lists callers/review recommendations, "
         "**not** a licence to delete scripts or proof that they are exercised.",
         "Generate/check: `python scripts/tool_registry.py --write` / "
         "`python scripts/tool_registry.py --check`.",
@@ -228,6 +242,8 @@ def markdown(report: dict) -> str:
         "comparing outputs and historical dependencies.",
         "- **HISTORICAL/ARCHIVE:** retain for immutable proof/replay; archive "
         "only after evidence-based replacement, never by deleting blindly.",
+        "- **MODULE_LOCAL:** pinned resource-specific maintenance/replay; "
+        "not a shared entrypoint or a new publication route.",
         "- **UNDECIDED:** source/caller audit required; no inferred deletion.",
         "",
         "## Baseline counts",
