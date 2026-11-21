@@ -4,7 +4,7 @@ on:
     paths:
       - 'scripts/lsg_source_compare.py'
       - '.github/workflows/lsg-fidelity.yml'
-      - 'scripts/historical/lsg/lsg_sword_compare.py'
+      - 'modules/lsg-1910/tools/lsg_sword_compare.py'
       - 'tests/test_lsg_source_compare.py'
       - 'tests/test_lsg_sword_compare.py'
   workflow_dispatch:
@@ -56,7 +56,7 @@ jobs:
           PY
       - name: Compare ALL 66 books / 1189 chapters of LSG SWORD to USFX
         run: |
-          python scripts/historical/lsg/lsg_sword_compare.py \
+          python modules/lsg-1910/tools/lsg_sword_compare.py \
             --sword-zip "${{ runner.temp }}/lsg/sword.zip" \
             --usfx-zip "${{ runner.temp }}/lsg/usfx.zip" \
             --report reports/lsg-usfx-sword-verse-parity.json \
@@ -67,7 +67,7 @@ jobs:
           import json,shutil,sys,tempfile,zipfile
           from pathlib import Path,PurePosixPath
           sys.path.insert(0,'scripts')
-          sys.path.insert(0,'scripts/historical/lsg')
+          sys.path.insert(0,'modules/lsg-1910/tools')
           from lsg_source_compare import read_source_xml
           from lsg_sword_compare import usfx_text_by_verse,parse_sword_chapter
           from pilot_preflight import inspect_archive
