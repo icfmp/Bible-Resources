@@ -50,6 +50,22 @@ class ScriptInventoryTests(unittest.TestCase):
                 self.assertEqual(entries[name]["classification"], "KEEP_GENERIC")
                 self.assertTrue(entries[name]["has_direct_tests_by_filename"])
 
+    def test_darby_private_replay_is_owned_by_module_and_not_shared(self):
+        """Edition-pinned replay remains checked without a root-level CLI."""
+        entries = {entry["path"]: entry for entry in self.result["files"]}
+        for name in ("prepare_darby_011_private_release_candidate.py",
+                     "probe_darby_011_final_android.py"):
+            with self.subTest(name=name):
+                local = "modules/darby-jnd-2024/tools/" + name
+                self.assertNotIn("scripts/" + name, entries)
+                self.assertIn(local, entries)
+                self.assertEqual(entries[local]["classification"], "MODULE_LOCAL")
+                self.assertTrue(entries[local]["has_direct_tests_by_filename"])
+                self.assertIn(".github/workflows/darby-0.1.1-preflight.yml",
+                              entries[local]["static_references"])
+                self.assertIn("tests/test_" + name,
+                              entries[local]["static_references"])
+
     def test_nested_package_imports_count_as_real_static_callers(self):
         entries = {item["path"]: item for item in self.result["files"]}
         module = ("scripts/research/commentary/"
