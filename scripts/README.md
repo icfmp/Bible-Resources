@@ -8,7 +8,8 @@ The `scripts/` directory contains **production commands**, reusable libraries, i
 | --- | --- |
 | `scripts/*.py`, `scripts/*.cpp`, `scripts/*.sh` | Existing production entrypoints, shared validators, native inspectors and research commands whose callers have not yet been migrated |
 | [`research/commentary/`](research/commentary/README.md) | Non-CLI, read-only commentary chapter, section, introduction, paragraph and native-scope diagnostics; **not** publication or editorial approval |
-| [`historical/`](historical/README.md) | Source-pinned reproduction of older decisions and modules; preserve exact inputs and existing historical tests |
+| [`historical/`](historical/README.md) | Only genuinely necessary cross-module historical research and replay; not a second publication process |
+| `modules/<resource-id>/tools/` | Version-pinned CLI/replay scripts owned by one released resource; see [Darby 0.1.1](../modules/darby-jnd-2024/tools/README.md) |
 | [Generated tool inventory](../reports/tooling/TOOL_REGISTRY.md) | Every tracked tool's classification, source hash, imports and static callers; review evidence, **not** proof that a script is unused |
 
 For a new resource, begin with the [canonical production pipeline](../docs/PRODUCTION_PIPELINE.md). Do not improvise a second importer or add a script for each individual verse or edition correction.
