@@ -17,7 +17,12 @@ source/reader evidence workflows remain active:
 - [private Android emulator](../../../.github/workflows/darby-andbible-android-private.yml)
 
 They run from the repository root with `PYTHONPATH=scripts` and invoke the
-module-local command directly. The one required path adjustment compared with
+module-local command directly. To verify the entrypoint without rebuilding
+private source data, run:
+
+```sh
+PYTHONPATH=scripts python modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py --help
+``` The one required path adjustment compared with
 its previous root-level location is locating the common
 `config/osis-policy.json` relative to the repository root.
 
