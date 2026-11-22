@@ -19,7 +19,7 @@ import re
 from lxml import etree
 
 from research.commentary.commentary_nonlink_analysis import plain_word_alignment
-from commentary_unresolved_lexical_triage import WORD, marked_word_token_indices
+from research.commentary.commentary_unresolved_lexical_triage import WORD, marked_word_token_indices
 from pilot_preflight import PilotError
 
 MAX_REVIEW_CASES = 12
@@ -500,7 +500,7 @@ class OriginalExtraGapNativeChapterProbe:
         of the historic author's original editorial divisions.
         """
         from research.commentary.commentary_nonlink_analysis import _private_unique_original_gap_windows
-        from commentary_unresolved_lexical_triage import marked_word_token_indices
+        from research.commentary.commentary_unresolved_lexical_triage import marked_word_token_indices
         if (not isinstance(xml_bytes,bytes) or len(xml_bytes)>64*1024*1024
                 or not SHA_RE.fullmatch(expected_source_sha256)
                 or sha256(xml_bytes).hexdigest()!=expected_source_sha256):
