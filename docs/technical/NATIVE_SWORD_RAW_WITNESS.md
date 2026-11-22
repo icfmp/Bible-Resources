@@ -15,4 +15,4 @@
 
 A raw witness does not prove original text and punctuation fidelity, note coverage, paragraph/poetry semantics, rights clearance or publication readiness. Unusual verse indexing is not permission to add missing verses. A private research probe is not a universal reader guarantee; follow [the complete native corpus audit](NATIVE_SWORD_WHOLE_CORPUS.md) and [production process](../PRODUCTION_PIPELINE.md).
 
-Historic, edition-specific raw-entry experiments are retained in [the project research history](../../history/pilots/WEBP_NATIVE_RAW_WITNESS_2026-11-20.md).
+Historic, edition-specific raw-entry experiments are retained in [the project research history](https://github.com/icfmp/Bible-Resources/blob/2271b6c4473dda6dedf321463e4ffc6b250fd701/history/pilots/WEBP_NATIVE_RAW_WITNESS_2026-11-20.md).
