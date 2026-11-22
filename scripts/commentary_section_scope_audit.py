@@ -29,7 +29,7 @@ from commentary_intake import load_manifest
 from research.commentary.commentary_osis_rebuild_preflight import (
     NativeOSISRebuildPreflight, compare_opaque_top_with_standard_compiler_fixture,
 )
-from commentary_osis_transport_probe import (
+from research.commentary.commentary_osis_transport_probe import (
     isolated_osis2mod_original_sample_roundtrip, _source_visible_text,
 )
 from commentary_osis_mixed_transport_probe import (
@@ -37,7 +37,7 @@ from commentary_osis_mixed_transport_probe import (
     privately_stage_versioned_zcom_zip,
     private_rekey_sword_commentary_conf,
 )
-from commentary_osis_intro_transport_probe import probe_original_intro_transport
+from research.commentary.commentary_osis_intro_transport_probe import probe_original_intro_transport
 from research.commentary.commentary_intro_chapter_text_review import (
     review_original_intro_against_numbered_chapter,
     independent_thml_chapter_intro_witness,
@@ -69,7 +69,7 @@ from research.commentary.commentary_literal_erratum_preflight import (
     preview_exact_reversible_commentary_reference_erratum,
     preview_exact_reversible_commentary_prose_erratum,
 )
-from commentary_source_erratum_compiled_probe import probe_private_compiled_source_erratum
+from research.commentary.commentary_source_erratum_compiled_probe import probe_private_compiled_source_erratum
 from research.commentary.commentary_rebuild_attestation_draft import PUBLIC_REBUILD_ATTESTATION_ERROR_CODES
 from research.commentary.commentary_unresolved_lexical_triage import marked_word_token_indices
 from commentary_xml_witness import _parse_reference, WORK_REF
