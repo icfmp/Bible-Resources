@@ -14,8 +14,8 @@ remain under [`modules/hmcc-modern/`](../../../modules/hmcc-modern/).
 Useful locations in the existing historical folder:
 
 - [1,189 accepted chapter manuscripts](../../mhcc-modern/production/accepted/)
-- First-pass chapter drafts and pilot experiments are recoverable at [the immutable pre-cleanup revision](https://github.com/icfmp/Bible-Resources/tree/ccf422270a2e42eaa1200e0341d8d7d3886747ff/work/mhcc-modern/)
-- [Unresolved original book-introduction drafts](../../mhcc-modern/chapters/)
+- First-pass chapter and book-introduction drafts, along with pilot experiments, are recoverable at [the immutable pre-cleanup revision](https://github.com/icfmp/Bible-Resources/tree/ccf422270a2e42eaa1200e0341d8d7d3886747ff/work/mhcc-modern/)
+- [Unresolved source-anchored book-introduction candidates](../../mhcc-modern/production/)
 - [Audits, editorial decisions and production receipts](../../mhcc-modern/production/)
 - [Release/source validation records](../../../modules/hmcc-modern/)
 
