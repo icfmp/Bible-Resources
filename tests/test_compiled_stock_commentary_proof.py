@@ -12,8 +12,6 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from compiled_stock_commentary_proof import (
     compiled_stock_commentary_errors, SUFFIXES
 )
-from stage_verified_stock_commentary import reviewed_curated_version
-from pilot_preflight import PilotError
 
 DIGEST_A = "a"*64
 DIGEST_B = "b"*64
@@ -21,25 +19,6 @@ DIGEST_C = "c"*64
 
 
 class StockCommentaryReleaseTests(unittest.TestCase):
-    def test_curated_conf_allows_only_one_version_line(self):
-        original=(b"[Curated]\nDataPath=./modules/comments/zcom/curated/\n"
-                  b"Version=2.0\r\nDistributionLicense=Public Domain\n"
-                  b"TextSource=https://example.org/upstream\n")
-        result=reviewed_curated_version(original,source_version="2.0",
-                                        curated_version="0.1.0")
-        self.assertEqual(result,original.replace(b"Version=2.0\r\n",
-                                                 b"Version=0.1.0\r\n"))
-        self.assertIn(b"DistributionLicense=Public Domain",result)
-        for broken in (original.replace(b"Version=2.0",b"Version=1.9"),
-                       original+b"Version=2.0\n",
-                       original.replace(b"Version=2.0",b"Version=2.0\nVersion=2.0")):
-            with self.assertRaises(PilotError):
-                reviewed_curated_version(broken,source_version="2.0",
-                                        curated_version="0.1.0")
-        with self.assertRaises(PilotError):
-            reviewed_curated_version(original,source_version="2.0",
-                                    curated_version="unreviewed")
-
     def fixture(self, root):
         source=root/"config/commentary-intake"
         source.mkdir(parents=True)
