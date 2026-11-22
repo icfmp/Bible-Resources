@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_source_identity_lexical_gate import classify_lexical_source_identity
+from research.commentary.commentary_source_identity_lexical_gate import classify_lexical_source_identity
 from pilot_preflight import PilotError
 
 
@@ -53,7 +53,7 @@ class SourceLexicalIdentityGuardTests(unittest.TestCase):
         matched = original(8, "Judges")
         source = {"Judg.1.1": [disputed, matched]}
         with patch(
-            "commentary_source_identity_lexical_gate.read_existing_66_book_english_aliases",
+            "research.commentary.commentary_source_identity_lexical_gate.read_existing_66_book_english_aliases",
             return_value=({"Judg": "Judges", "Jude": "Jude"}, {
                 "comparison_uses_exact_existing_66_book_registry_without_edits": True,
             }),
@@ -74,7 +74,7 @@ class SourceLexicalIdentityGuardTests(unittest.TestCase):
     def test_unknown_original_heading_is_never_implicitly_assigned_to_stock_book(self):
         unreviewed = original(12, "Chapter Notes")
         with patch(
-            "commentary_source_identity_lexical_gate.read_existing_66_book_english_aliases",
+            "research.commentary.commentary_source_identity_lexical_gate.read_existing_66_book_english_aliases",
             return_value=({"Gen": "Genesis"}, {}),
         ):
             result = classify_lexical_source_identity(
@@ -87,7 +87,7 @@ class SourceLexicalIdentityGuardTests(unittest.TestCase):
     def test_rejects_wrong_source_line_reference_or_body_hash_join(self):
         item = original(1, "Genesis")
         with patch(
-            "commentary_source_identity_lexical_gate.read_existing_66_book_english_aliases",
+            "research.commentary.commentary_source_identity_lexical_gate.read_existing_66_book_english_aliases",
             return_value=({"Gen": "Genesis"}, {}),
         ):
             bad = case(item)
@@ -102,7 +102,7 @@ class SourceLexicalIdentityGuardTests(unittest.TestCase):
         unit = original(1, "Genesis")
         unit["private_original_div1_heading_text"] = "Jude"
         with patch(
-            "commentary_source_identity_lexical_gate.read_existing_66_book_english_aliases",
+            "research.commentary.commentary_source_identity_lexical_gate.read_existing_66_book_english_aliases",
             return_value=({"Gen":"Genesis","Jude":"Jude"}, {}),
         ):
             with self.assertRaisesRegex(PilotError, "SHA-attested"):
@@ -115,7 +115,7 @@ class SourceLexicalIdentityGuardTests(unittest.TestCase):
             "original_plain_words_not_matched_in_exact_order"
         ] = 0
         with patch(
-            "commentary_source_identity_lexical_gate.read_existing_66_book_english_aliases",
+            "research.commentary.commentary_source_identity_lexical_gate.read_existing_66_book_english_aliases",
             return_value=({"Gen":"Genesis"}, {}),
         ):
             with self.assertRaisesRegex(PilotError, "exact-matching"):
