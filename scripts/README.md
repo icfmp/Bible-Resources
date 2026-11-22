@@ -8,7 +8,7 @@ The `scripts/` directory is for **maintained, reusable production and verificati
 | --- | --- |
 | `scripts/*.py`, `scripts/*.cpp`, `scripts/*.sh` | Maintained OSIS-first commands, generic validators and independently checked native SWORD tools |
 | [`research/bible/`](research/bible/README.md) | Shared strict source-OSIS readers, SWORD markup/verse inspectors and source/native structural evidence; no CLI, source edits or editorial approval |
-| `modules/<resource-id>/tools/` | Maintained edition-only diagnostics/replay, never a second publisher; see [Darby](../modules/darby-jnd-2024/tools/README.md) |
+| `modules/<resource-id>/tools/` | Only proven, still-needed edition-specific maintenance tools, never a second publisher |
 | [Generated tool inventory](../reports/tooling/TOOL_REGISTRY.md) | Every tracked tool's classification, source hash, imports and static callers; review evidence, **not** proof that a script is unused |
 
 For a new resource, begin with the [canonical production pipeline](../docs/PRODUCTION_PIPELINE.md). Do not improvise a second importer or add a script for each individual verse or edition correction.
