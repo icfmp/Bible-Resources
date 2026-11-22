@@ -26,6 +26,21 @@ def zcom_member_suffixes(block_type: str) -> tuple[str, ...]:
         for suffix in ("s", "v", "z")
     )
 
+def zcom_payload_paths(sword_id: str, block_type: str) -> frozenset[str]:
+    """Exact relative seven-member payload of a native zCom commentary.
+
+    Validate identifiers before constructing paths; never use an arbitrary
+    source-supplied filename in an approved release integrity check.
+    """
+    if not isinstance(sword_id, str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9]{0,31}", sword_id):
+        raise ValueError("Unsafe SWORD module identifier for native payload")
+    folder = sword_id.lower()
+    return frozenset({"mods.d/" + folder + ".conf"} | {
+        "modules/comments/zcom/" + folder + "/" + member
+        for member in zcom_member_suffixes(block_type)
+    })
+
+
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 ORIGINAL = re.compile(r"config/commentary-intake/[a-z0-9-]+\.json\Z")
 REVIEW = re.compile(r"config/commentary-rebuilds/[a-z0-9-]+\.json\Z")
