@@ -171,7 +171,7 @@ jobs:
             const data=JSON.parse(fs.readFileSync(process.env.REPORT,'utf8'));
             const lines=[
               "### Pinned OSIS → standard native SWORD research — NOT RELEASED",
-              `Compiler witness: \\`${process.env.CANDIDATE_COMPILER || 'distro'}\\``,
+              "Compiler witness: " + (process.env.CANDIDATE_COMPILER || "distro"),
               `Resource: \`${data.resource_id}\``,
               `Research source SHA-256: \`${data.research_source_sha256}\``,
               `Source kind: \`${data.research_source_kind}\``,
