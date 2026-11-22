@@ -19,7 +19,7 @@ import re
 import unicodedata
 
 from research.commentary.commentary_nonlink_analysis import plain_word_alignment
-from commentary_unresolved_lexical_triage import WORD, marked_word_token_indices
+from research.commentary.commentary_unresolved_lexical_triage import WORD, marked_word_token_indices
 from pilot_preflight import PilotError
 
 SHA = re.compile(r"[a-f0-9]{64}\Z")
