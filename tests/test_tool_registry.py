@@ -250,6 +250,41 @@ class ScriptInventoryTests(unittest.TestCase):
             with self.subTest(caller=caller):
                 self.assertIn(caller, entries[new]["static_references"])
 
+    def test_native_milestone_and_whitespace_evidence_is_packaged(self):
+        """No duplicate top-level libraries; real edition witnesses retain callers."""
+        entries = {row["path"]: row for row in self.result["files"]}
+        helpers = {
+            "native_milestone_pair_audit": (
+                "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
+                "tests/test_native_milestone_pair_audit.py"),
+            "native_sword_markup_census": (
+                "scripts/source_native_maintext_probe.py",
+                "tests/test_native_sword_markup_census.py"),
+            "note_whitespace_diagnostics": (
+                "scripts/research/bible/maintext_whitespace_patterns.py",
+                "tests/test_note_whitespace_diagnostics.py"),
+            "maintext_whitespace_patterns": (
+                "scripts/source_native_maintext_probe.py",
+                "tests/test_maintext_whitespace_patterns.py"),
+            "source_native_ordered_body": (
+                "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
+                "tests/test_source_native_ordered_body.py"),
+            "source_native_word_boundaries": (
+                "scripts/source_native_maintext_probe.py",
+                "tests/test_source_native_word_boundaries.py"),
+        }
+        for name, callers in helpers.items():
+            with self.subTest(name=name):
+                old_path = f"scripts/{name}.py"
+                package_path = f"scripts/research/bible/{name}.py"
+                self.assertNotIn(old_path, entries)
+                self.assertFalse((ROOT / old_path).exists())
+                self.assertIn(package_path, entries)
+                self.assertTrue((ROOT / package_path).is_file())
+                self.assertTrue(entries[package_path]["has_direct_tests_by_filename"])
+                for caller in callers:
+                    self.assertIn(caller, entries[package_path]["static_references"])
+
     def test_bible_source_native_evidence_has_one_packaged_library_each(self):
         """Real production consumers must follow six non-CLI Bible helpers."""
         entries = {row["path"]: row for row in self.result["files"]}
@@ -264,7 +299,7 @@ class ScriptInventoryTests(unittest.TestCase):
                 "scripts/source_native_maintext_probe.py",
                 "tests/test_source_native_notes_audit.py"),
             "source_native_paragraph_counts": (
-                "scripts/source_native_word_boundaries.py",
+                "scripts/research/bible/source_native_word_boundaries.py",
                 "tests/test_source_native_paragraph_counts.py"),
             "source_native_note_positions": (
                 "scripts/publisher_osis_usfx_parity.py",
