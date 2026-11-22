@@ -192,8 +192,21 @@ class ScriptInventoryTests(unittest.TestCase):
                 self.assertIn("tests/test_" + stem + ".py",
                               entries[relocated]["static_references"])
 
+    def test_osis_boundary_evidence_is_a_shared_import_only_library(self):
+        entries = {row["path"]: row for row in self.result["files"]}
+        stem = "source_native_osis_boundary_positions"
+        expected = "scripts/research/bible/" + stem + ".py"
+        self.assertIn(expected, entries)
+        self.assertNotIn("scripts/" + stem + ".py", entries)
+        self.assertIn("scripts/publisher_osis_sword_candidate.py",
+                      entries[expected]["static_references"])
+        self.assertIn("modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
+                      entries[expected]["static_references"])
+        self.assertIn("tests/test_" + stem + ".py",
+                      entries[expected]["static_references"])
+
     def test_native_raw_reader_is_shared_not_hidden_in_usfx_cli(self):
-        """OSIS code must not import the original-USFX-only command for native text."""
+        """OSIS code must not import original-USFX-only command for native text."""
         entries = {row["path"]: row for row in self.result["files"]}
         shared = "scripts/research/bible/native_raw_main_text.py"
         self.assertIn(shared, entries)

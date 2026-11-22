@@ -4,7 +4,7 @@ from pathlib import Path
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from source_native_osis_boundary_positions import (
+from research.bible.source_native_osis_boundary_positions import (
     authorial_book_streams, authorial_outside_book_titles, NativeBookStreams,
     compare_book_boundary_positions, BoundaryScreenError,
 )

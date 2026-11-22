@@ -14,7 +14,7 @@ on:
       - "tests/test_publisher_osis_preview_package.py"
       - "scripts/research/bible/native_raw_main_text.py"
       - "scripts/research/bible/source_native_osis_structure_screen.py"
-      - "scripts/source_native_osis_boundary_positions.py"
+      - "scripts/research/bible/source_native_osis_boundary_positions.py"
       - "tests/test_source_native_osis_boundary_positions.py"
       - "tests/test_source_native_osis_structure_screen.py"
       - "tests/test_publisher_osis_sword_candidate.py"
