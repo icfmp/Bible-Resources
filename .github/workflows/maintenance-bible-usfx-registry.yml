@@ -1,0 +1,32 @@
+name: One-shot Bible USFX/native helper registry refresh
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/maintenance-bible-usfx-registry.yml'
+permissions:
+  contents: write
+jobs:
+  refresh:
+    if: github.repository == 'icfmp/Bible-Resources'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: maintenance/bible-usfx-source-native-libraries-20261122
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Remove temporary CI and generate exact source-native helper inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/maintenance-bible-usfx-registry.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git add -f reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore: update registry for six Bible USFX/native libraries'
+          git push origin HEAD:maintenance/bible-usfx-source-native-libraries-20261122
