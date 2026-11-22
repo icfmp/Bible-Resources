@@ -25,12 +25,12 @@ SHA = re.compile(r"[0-9a-f]{64}\Z")
 # separate editorial approval and an explicit reviewed pin change.
 REVIEWED_MODERN_WITNESSES = {
     "hmcc-modern": {
-        "plan_sha256": "1fed89b3916d32d1e726346889247acc7f75b04af5b4377f00c48a64123f476a",
+        "plan_sha256": "9a705aeae3ef4765b9a965ce13ac7e2531d48b7e8e25af83258d316ac09ee958",
         "decisions_path": (
             "work/hmcc-modern/production/"
             "OWNER_EDITORIAL_DECISIONS_2026-11-19.json"
         ),
-        "decisions_sha256": "cdb206a1d3760ee7f7a096ffd596069e1589df4c0820c033747521b07f1eeee4",
+        "decisions_sha256": "b828124fcfb9825bdcb581e79d9edf9579fdac27f441199c12a309fda21a3101",
     },
 }
 
