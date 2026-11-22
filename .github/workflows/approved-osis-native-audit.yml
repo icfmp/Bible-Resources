@@ -51,7 +51,6 @@ jobs:
       issues: write
     env:
       RESOURCE_ID: ${{ inputs.resource_id || 'darby-jnd-2024' }}
-      CANDIDATE_V11N: ""
       CANDIDATE_COMPILER: ${{ inputs.compiler || 'distro' }}
       REPORT: /tmp/bible-source-rebuild-probe/candidate-report.json
     steps:
@@ -136,9 +135,6 @@ jobs:
                 --native-index /tmp/native-probe-binaries/native-index
                 --native-raw /tmp/native-probe-binaries/native-raw
                 --report "$REPORT")
-          if [[ -n "${CANDIDATE_V11N:-}" ]]; then
-            args+=(--versification "$CANDIDATE_V11N")
-          fi
           python scripts/approved_osis_sword_candidate.py "${args[@]}"
       - name: Upload metadata-only evidence (never original OSIS or compiled SWORD)
         if: github.event_name != 'pull_request'
