@@ -4,7 +4,7 @@
 
 ## Source and native evidence
 
-`scripts/source_native_notes_audit.py` inventories source note markers `f`, `fe`, `x`, `ef`, `ex` and `note`. It identifies notes inside mapped numbered verses, separately counts notes outside those verses, and flags ambiguous verse/note nesting. Its companion `scripts/source_native_maintext_probe.py` inspects actual compiled `RawText` or `zText` entries in an isolated SWORD installation.
+`scripts/research/bible/source_native_notes_audit.py` inventories source note markers `f`, `fe`, `x`, `ef`, `ex` and `note`. It identifies notes inside mapped numbered verses, separately counts notes outside those verses, and flags ambiguous verse/note nesting. Its companion `scripts/source_native_maintext_probe.py` inspects actual compiled `RawText` or `zText` entries in an isolated SWORD installation.
 
 Record the exact source edition, archives, SHA-256, native driver and versification, and the independently reviewed book crosswalk before comparing. Source-only verses, additional books and unaddressable native entries must remain explicit.
 
