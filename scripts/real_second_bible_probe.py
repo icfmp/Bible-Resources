@@ -22,7 +22,7 @@ from lsg_source_compare import read_source_xml, scan_usfx
 from sword_native_inventory import collect_native_inventory, NativeIndexError
 from sword_native_raw_corpus_inventory import inspect_native_raw_corpus
 from stable_sword_refs import parse_keys, parse_registry, module_payload_digest
-from source_native_scope import compare_mapped_scope, read_crosswalk
+from research.bible.source_native_scope import compare_mapped_scope, read_crosswalk
 
 
 class SecondBibleError(ValueError):
