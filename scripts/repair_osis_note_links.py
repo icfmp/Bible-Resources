@@ -17,7 +17,7 @@ from lxml import etree
 
 from publisher_osis_usfx_parity import original_osis_verses_and_notes
 from source_osis_inventory import OSIS, _source_tree, source_inventory
-from source_native_osis_target_addressability import _classify_one
+from research.bible.source_native_osis_target_addressability import _classify_one
 
 HEX = re.compile(r"[a-f0-9]{64}\Z")
 KEY = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*\Z")

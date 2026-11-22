@@ -6,7 +6,7 @@ import unittest
 from lxml import etree
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from source_native_osis_structure_screen import (
+from research.bible.source_native_osis_structure_screen import (
     NativeStructuralCensus, OSISStructureScreenError, _markup_elements,
     authorial_body_opening_sequences,
 )

@@ -174,6 +174,24 @@ class ScriptInventoryTests(unittest.TestCase):
                 self.assertIn("tests/test_" + name + ".py",
                               entries[current]["static_references"])
 
+
+    def test_osis_source_native_helpers_are_package_owned(self):
+        """Generic OSIS reference and markup screens are import-only and tested."""
+        entries = {row["path"]: row for row in self.result["files"]}
+        for stem, caller in (
+            ("source_native_osis_target_addressability",
+             "scripts/repair_osis_note_links.py"),
+            ("source_native_osis_structure_screen",
+             "scripts/publisher_osis_sword_candidate.py"),
+        ):
+            with self.subTest(helper=stem):
+                relocated = "scripts/research/bible/" + stem + ".py"
+                self.assertIn(relocated, entries)
+                self.assertNotIn("scripts/" + stem + ".py", entries)
+                self.assertIn(caller, entries[relocated]["static_references"])
+                self.assertIn("tests/test_" + stem + ".py",
+                              entries[relocated]["static_references"])
+
     def test_nested_package_imports_count_as_real_static_callers(self):
         entries = {item["path"]: item for item in self.result["files"]}
         module = ("scripts/research/commentary/"

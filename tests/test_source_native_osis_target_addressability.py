@@ -4,7 +4,7 @@ from pathlib import Path
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from source_native_osis_target_addressability import (
+from research.bible.source_native_osis_target_addressability import (
     audit_explicit_targets, OSISTargetAuditError, _resolve_endpoint,
 )
 
