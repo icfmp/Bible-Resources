@@ -1,6 +1,6 @@
 # MHC original-source cleanup — historical evidence locator
 
-**Superseded working report.** This file remains because the original, explicitly research-only [source correction plan](../../../../../../../../config/commentary-osis-repair-plans/mhc-endpoints-private-preview.json) names it as its source witness. It does not describe the current publication state or authorize a new correction. The original detailed investigation is still available from this file's Git history.
+**Superseded working report.** This file remains because the original, explicitly research-only [source correction plan](historical-plans/mhc-endpoints-private-preview.json) names it as its source witness. It does not describe the current publication state or authorize a new correction. The original detailed investigation is still available from this file's Git history.
 
 ## Verified source identity
 
