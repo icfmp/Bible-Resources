@@ -6,7 +6,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
-from note_whitespace_diagnostics import classify_note_whitespace
+from research.bible.note_whitespace_diagnostics import classify_note_whitespace
 
 
 class NoteWhitespaceClassificationTests(unittest.TestCase):
