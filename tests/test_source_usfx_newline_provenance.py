@@ -6,7 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from source_native_maintext_probe import authored_usfx_main_text
-from source_native_word_boundaries import original_usfx_body_boundaries
+from research.bible.source_native_word_boundaries import original_usfx_body_boundaries
 from source_native_structural_whitespace import (
     MainTextStructuralWhitespaceTriage, StructuralWhitespaceError,
 )

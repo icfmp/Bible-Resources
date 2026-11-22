@@ -14,6 +14,12 @@ remain in `scripts/` and use these exact checked helpers.
 | [`source_native_paragraph_counts.py`](source_native_paragraph_counts.py) | Source paragraph and poetry structure vs installed native entry signatures |
 | [`source_native_note_positions.py`](source_native_note_positions.py) | Exact authored note-caller positions vs raw native SWORD structures |
 | [`source_native_layout_anchors.py`](source_native_layout_anchors.py) | Source/native paragraph, poetry and heading anchor comparisons |
+| [`native_milestone_pair_audit.py`](native_milestone_pair_audit.py) | Strict compiled SWORD verse milestone sID/eID pairing without inserting a verse |
+| [`native_sword_markup_census.py`](native_sword_markup_census.py) | Metadata-only original native XML markup census |
+| [`note_whitespace_diagnostics.py`](note_whitespace_diagnostics.py) | Read-only note whitespace difference categories, preserving literal source |
+| [`maintext_whitespace_patterns.py`](maintext_whitespace_patterns.py) | Source/native main-text whitespace topology, not editorial normalization |
+| [`source_native_ordered_body.py`](source_native_ordered_body.py) | Original authored opening-event order against native entry shapes |
+| [`source_native_word_boundaries.py`](source_native_word_boundaries.py) | Source vs native paragraph/poetry boundary word anchor evidence |
 
 Do not infer a missing verse, new reference destination or a source error
 from a SWORD reader's available address space. Mark source-only, unaddressable

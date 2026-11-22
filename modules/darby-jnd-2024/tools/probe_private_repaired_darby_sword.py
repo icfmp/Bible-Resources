@@ -41,8 +41,8 @@ from guard_osis import _schema, parse_xml
 from publisher_osis_preview_package import package_preview
 from reader_xiphos_headless_smoke import smoke as xiphos_smoke
 from source_osis_inventory import _source_tree
-from source_native_ordered_body import compare_ordered_body_openings
-from native_milestone_pair_audit import NativeMilestonePairAudit
+from research.bible.source_native_ordered_body import compare_ordered_body_openings
+from research.bible.native_milestone_pair_audit import NativeMilestonePairAudit
 from lxml import etree
 
 SOURCE_HASH = "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3"

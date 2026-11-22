@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections import Counter
 
-from note_whitespace_diagnostics import classify_note_whitespace
+from research.bible.note_whitespace_diagnostics import classify_note_whitespace
 
 MAX_SAMPLES = 12
 NUMERIC_FIELDS = (

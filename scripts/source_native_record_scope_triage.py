@@ -17,7 +17,7 @@ import json
 
 from stable_sword_refs import KEY
 from sword_native_inventory import INTRO
-from source_native_word_boundaries import WORD
+from research.bible.source_native_word_boundaries import WORD
 
 MAX_SAMPLES = 32
 MAX_PER_KIND = 3

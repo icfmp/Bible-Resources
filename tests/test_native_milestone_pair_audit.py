@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from native_milestone_pair_audit import NativeMilestonePairAudit, NativeMilestoneAuditError
+from research.bible.native_milestone_pair_audit import NativeMilestonePairAudit, NativeMilestoneAuditError
 
 
 class NativeMilestonePairTests(unittest.TestCase):
