@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_public_metadata_preflight import (
+from research.commentary.commentary_public_metadata_preflight import (
     prepare_provisional_public_commentary_conf,
 )
 
@@ -123,7 +123,7 @@ class PrivateCommentaryZipRehearsalTests(unittest.TestCase):
         )
 
     def rehearse(self, folder=None, **updates):
-        from commentary_public_metadata_preflight import (
+        from research.commentary.commentary_public_metadata_preflight import (
             rehearse_private_versioned_commentary_package,
         )
         return rehearse_private_versioned_commentary_package(
@@ -269,7 +269,7 @@ class PrivateCommentaryZipRehearsalTests(unittest.TestCase):
         }
 
     def _reconcile(self, attestation, rehearsal):
-        from commentary_public_metadata_preflight import (
+        from research.commentary.commentary_public_metadata_preflight import (
             reconcile_private_rebuild_package_evidence,
         )
         return reconcile_private_rebuild_package_evidence(
