@@ -1,101 +1,6 @@
 {
   "files": [
     {
-      "classification": "MODULE_LOCAL",
-      "confidence": "high",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": false,
-      "owner": "Bible Resources maintainers",
-      "path": "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-      "proposed_action": "Keep with the owning module only while its pinned maintenance/replay workflow and regression checks remain necessary.",
-      "purpose_first_line": "Compile repaired private publisher OSIS with pinned SWORD; NEVER release.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "audit_omitted_verse_notes",
-        "guard_osis",
-        "hashlib",
-        "inspect_paragraph_rendering",
-        "json",
-        "lxml",
-        "os",
-        "pathlib",
-        "probe_andbible_android_private_import",
-        "probe_andbible_jsword",
-        "publisher_osis_observation",
-        "publisher_osis_preview_package",
-        "publisher_osis_sword_candidate",
-        "reader_xiphos_headless_smoke",
-        "repair_osis_division_markers",
-        "repair_osis_inline_markup",
-        "repair_osis_note_links",
-        "repair_osis_paragraph_indentation",
-        "repair_osis_source_bytes",
-        "repair_osis_unlinked_reference_labels",
-        "research",
-        "source_native_division_markers",
-        "source_osis_inventory",
-        "subprocess",
-        "tempfile"
-      ],
-      "reader_tool_signals": [
-        "xiphos",
-        "andbible",
-        "android",
-        "jsword"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "a6a6ccd42e0d550a7765c0703817b6b8987f9232afd26ccb02d523873b304299",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 4,
-      "static_references": [
-        ".github/workflows/darby-andbible-android-private.yml",
-        ".github/workflows/darby-andbible-jsword.yml",
-        ".github/workflows/darby-private-repaired-sword.yml",
-        "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/audit_omitted_verse_notes.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Verify that omitted-verse editorial notes survive without dead navigation.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "lxml",
-        "publisher_osis_sword_candidate",
-        "repair_osis_note_links",
-        "source_osis_inventory"
-      ],
-      "reader_tool_signals": [
-        "andbible"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "54194867dd67fcf1f1c89f2398d1c2921ce9f1265026cb3c10386a0ce7adf41c",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 3,
-      "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-private-repaired-sword.yml",
-        "tests/test_audit_omitted_verse_notes.py"
-      ]
-    },
-    {
       "classification": "UNDECIDED",
       "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
@@ -615,12 +520,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 3,
       "static_references": [
-        ".github/workflows/darby-andbible-android-private.yml",
-        ".github/workflows/darby-andbible-jsword.yml",
-        ".github/workflows/darby-link-repair-research.yml",
-        ".github/workflows/darby-private-repaired-sword.yml",
         ".github/workflows/osis-schema-review.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md"
@@ -697,16 +598,14 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 16,
+      "static_reference_count": 14,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
         "scripts/audit_osis.py",
         "scripts/fetch_reviewed_schema.py",
         "scripts/guard_commentary.py",
         "scripts/normalize_osis.py",
         "scripts/probe_official_osis.py",
         "scripts/tool_registry.py",
-        ".github/workflows/darby-link-repair-research.yml",
         ".github/workflows/osis-schema-review.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
@@ -715,50 +614,6 @@
         "tests/test_editorial_pipeline.py",
         "tests/test_guard_osis.py",
         "tests/test_schema_dependencies.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/inspect_paragraph_rendering.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Compare paragraph-leading markers in pinned original OSIS and real SWORD.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "collections",
-        "hashlib",
-        "json",
-        "lxml",
-        "os",
-        "pathlib",
-        "publisher_osis_observation",
-        "re",
-        "research",
-        "source_osis_inventory",
-        "stable_sword_refs",
-        "subprocess"
-      ],
-      "reader_tool_signals": [
-        "andbible"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "13a8c4fd0f4a8c6f872d31c5294a5a820ea272425ee15ac01d0fd131cb2240f8",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 4,
-      "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-paragraph-rendering.yml",
-        "tests/test_inspect_paragraph_rendering.py",
-        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -963,120 +818,6 @@
       "classification": "UNDECIDED",
       "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": false,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/probe_andbible_android_emulator.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Read-only stable AndBible 5.1.1117 Android emulator import-UI reconnaissance.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "hashlib",
-        "json",
-        "pathlib",
-        "re",
-        "subprocess",
-        "time",
-        "xml"
-      ],
-      "reader_tool_signals": [
-        "andbible",
-        "android"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "b8d3265469a0770a96a84cf3fd4d0612c3e885556ccc45b8c610f1b2a796d643",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 2,
-      "static_references": [
-        "scripts/probe_andbible_android_private_import.py",
-        ".github/workflows/andbible-android-import-preflight.yml"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/probe_andbible_android_private_import.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Attempt native stable AndBible 5.1.1117 Android import of exact audited SWORD ZIP.",
-      "python_imports": [
-        "__future__",
-        "hashlib",
-        "json",
-        "pathlib",
-        "probe_andbible_android_emulator",
-        "publisher_osis_preview_package",
-        "re",
-        "struct",
-        "subprocess",
-        "time",
-        "urllib",
-        "xml"
-      ],
-      "reader_tool_signals": [
-        "andbible",
-        "android"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "cfd02394cee37ca34bc7e98c263c44318442d96e6cb25b0a952cc73a39a3c274",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 3,
-      "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-andbible-android-private.yml",
-        "tests/test_probe_andbible_android_private_import.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": false,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/probe_andbible_jsword.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Run an exact AndBible-stable JSword fork against the PRIVATE audited SWORD.",
-      "python_imports": [
-        "__future__",
-        "json",
-        "os",
-        "pathlib",
-        "re",
-        "shutil",
-        "subprocess",
-        "xml"
-      ],
-      "reader_tool_signals": [
-        "andbible",
-        "android",
-        "jsword"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "d72d9a4c3c9eba22bc15b019e6dfd1e3cc32a6c278fe5bc5fe8a0a96ccc1a2fa",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 2,
-      "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-andbible-jsword.yml"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS"
       ],
@@ -1255,14 +996,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 9,
+      "static_reference_count": 5,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        "scripts/inspect_paragraph_rendering.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/source_osis_note_link_triage.py",
-        ".github/workflows/darby-link-repair-research.yml",
-        ".github/workflows/darby-paragraph-rendering.yml",
         ".github/workflows/publisher-osis-observation.yml",
         ".github/workflows/source-osis-note-links.yml",
         "tests/test_publisher_osis_observation.py"
@@ -1293,10 +1030,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 6,
+      "static_reference_count": 4,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        "scripts/probe_andbible_android_private_import.py",
         "scripts/publisher_osis_preview_readback.py",
         "scripts/publisher_osis_sword_candidate.py",
         ".github/workflows/publisher-osis-sword-candidate.yml",
@@ -1381,10 +1116,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 7,
+      "static_reference_count": 5,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        "scripts/audit_omitted_verse_notes.py",
         ".github/workflows/publisher-osis-sword-candidate.yml",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
@@ -1429,10 +1162,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 3,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-private-repaired-sword.yml",
         ".github/workflows/xiphos-preview-smoke.yml",
         "tests/test_reader_xiphos_headless_smoke.py",
         "tests/test_reader_xiphos_reference_navigation.py"
@@ -1484,84 +1215,6 @@
     {
       "classification": "UNDECIDED",
       "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/repair_osis_division_markers.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Reversibly encode verified leading editorial divisions as OSIS milestones.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "hashlib",
-        "lxml",
-        "re",
-        "repair_osis_source_bytes",
-        "research",
-        "source_osis_inventory",
-        "xml"
-      ],
-      "reader_tool_signals": [
-        "andbible",
-        "jsword"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "022c34163e0ea5852b6f1bdae005241680a8b0c20ee4650b323f1fd9e9383236",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 4,
-      "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-paragraph-rendering.yml",
-        ".github/workflows/darby-private-repaired-sword.yml",
-        "tests/test_repair_osis_division_markers.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/repair_osis_inline_markup.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Research-only repair of explicitly pinned invalid *inline* OSIS tag names.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "hashlib",
-        "json",
-        "lxml",
-        "pathlib",
-        "re",
-        "repair_osis_note_links",
-        "source_osis_inventory"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "69d80b4f081d70f07700654aebb512030dc7cb4a7319c083ff8bc119618100d5",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 5,
-      "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        "scripts/repair_osis_source_bytes.py",
-        ".github/workflows/darby-link-repair-research.yml",
-        ".github/workflows/darby-private-repaired-sword.yml",
-        "tests/test_repair_osis_inline_markup.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -1588,130 +1241,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 12,
-      "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        "scripts/audit_omitted_verse_notes.py",
-        "scripts/repair_osis_inline_markup.py",
-        "scripts/repair_osis_source_bytes.py",
-        "scripts/repair_osis_unlinked_reference_labels.py",
-        "scripts/source_osis_note_markup_shape.py",
-        ".github/workflows/darby-link-repair-research.yml",
-        ".github/workflows/darby-private-repaired-sword.yml",
-        "tests/test_audit_omitted_verse_notes.py",
-        "tests/test_repair_osis_note_links.py",
-        "tests/test_repair_osis_source_bytes.py",
-        "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/repair_osis_paragraph_indentation.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Remove XML pretty-print indentation after the first verse milestone of p.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "hashlib",
-        "re",
-        "repair_osis_source_bytes",
-        "research",
-        "source_osis_inventory",
-        "xml"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "2ca9c641da91f6bf33ce106c279d5f619e2d26c972bd3d46c3fcba172920b729",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 4,
-      "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-paragraph-rendering.yml",
-        ".github/workflows/darby-private-repaired-sword.yml",
-        "tests/test_repair_osis_paragraph_indentation.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/repair_osis_source_bytes.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Patch only reviewed machine attributes/tags in exact ORIGINAL OSIS bytes.",
-      "python_imports": [
-        "__future__",
-        "hashlib",
-        "json",
-        "lxml",
-        "re",
-        "repair_osis_inline_markup",
-        "repair_osis_note_links",
-        "source_osis_inventory",
-        "xml"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "f411a1c6ea58a45cdb463af6db562d20b48d3b27a998d9428a83dfa0b302d384",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 8,
-      "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        "scripts/repair_osis_division_markers.py",
-        "scripts/repair_osis_paragraph_indentation.py",
-        "scripts/repair_osis_unlinked_reference_labels.py",
-        ".github/workflows/darby-andbible-jsword.yml",
-        ".github/workflows/darby-private-repaired-sword.yml",
-        "tests/test_repair_osis_source_bytes.py",
-        "tests/test_repair_osis_unlinked_reference_labels.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/repair_osis_unlinked_reference_labels.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Render authored references to intentionally absent verses as plain note text.",
-      "python_imports": [
-        "__future__",
-        "hashlib",
-        "re",
-        "repair_osis_note_links",
-        "repair_osis_source_bytes",
-        "source_osis_inventory",
-        "xml"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "dc13e1ed20d17e9a55685ace497d08b855dc1ed9a85bfff147717e87ec0720e1",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
       "static_reference_count": 2,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        "tests/test_repair_osis_unlinked_reference_labels.py"
+        "tests/test_repair_osis_note_links.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -1765,12 +1298,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 7,
+      "static_reference_count": 5,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
-        "scripts/source_native_division_markers.py",
         "tests/test_native_milestone_pair_audit.py",
         "tests/test_publisher_osis_sword_candidate.py",
         "tests/test_source_native_ordered_body.py"
@@ -1801,10 +1332,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 6,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        "scripts/inspect_paragraph_rendering.py",
         "scripts/publisher_osis_sword_candidate.py",
         ".github/workflows/publisher-osis-sword-candidate.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
@@ -1900,9 +1429,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
         "tests/test_source_native_ordered_body.py"
       ]
@@ -1936,9 +1464,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
         ".github/workflows/publisher-osis-sword-candidate.yml",
         "tests/test_source_native_osis_boundary_positions.py"
@@ -1969,9 +1496,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
         "scripts/publisher_osis_sword_candidate.py",
         ".github/workflows/publisher-osis-sword-candidate.yml",
         "tests/test_source_native_osis_structure_screen.py"
@@ -2037,25 +1563,15 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 18,
+      "static_reference_count": 8,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        "scripts/inspect_paragraph_rendering.py",
         "scripts/publisher_osis_sword_candidate.py",
-        "scripts/repair_osis_division_markers.py",
         "scripts/repair_osis_note_links.py",
-        "scripts/repair_osis_paragraph_indentation.py",
         "scripts/source_osis_note_link_triage.py",
-        ".github/workflows/darby-andbible-android-private.yml",
-        ".github/workflows/darby-andbible-jsword.yml",
-        ".github/workflows/darby-paragraph-rendering.yml",
-        ".github/workflows/darby-private-repaired-sword.yml",
         ".github/workflows/publisher-osis-sword-candidate.yml",
         ".github/workflows/source-osis-note-links.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
-        "tests/test_repair_osis_division_markers.py",
-        "tests/test_repair_osis_paragraph_indentation.py",
         "tests/test_source_osis_verse_notes.py"
       ]
     },
@@ -2230,41 +1746,6 @@
     {
       "classification": "UNDECIDED",
       "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/source_native_division_markers.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Full source-to-native audit of non-displayed editorial division metadata.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "hashlib",
-        "json",
-        "lxml",
-        "research",
-        "source_osis_inventory",
-        "stable_sword_refs"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "50f1e984f637e05bcfc67b056c16587e3534fb34bac63ec47269199bffce7a66",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 3,
-      "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-private-repaired-sword.yml",
-        "tests/test_source_native_division_markers.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS",
@@ -2294,33 +1775,18 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 26,
+      "static_reference_count": 11,
       "static_references": [
-        "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        "scripts/audit_omitted_verse_notes.py",
-        "scripts/inspect_paragraph_rendering.py",
         "scripts/osis_semantic_fidelity.py",
         "scripts/publisher_osis_sword_candidate.py",
-        "scripts/repair_osis_division_markers.py",
-        "scripts/repair_osis_inline_markup.py",
         "scripts/repair_osis_note_links.py",
-        "scripts/repair_osis_paragraph_indentation.py",
-        "scripts/repair_osis_source_bytes.py",
-        "scripts/repair_osis_unlinked_reference_labels.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
         "scripts/research/bible/source_native_osis_structure_screen.py",
         "scripts/research/bible/source_osis_verse_notes.py",
-        "scripts/source_native_division_markers.py",
-        "scripts/source_osis_note_markup_shape.py",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "docs/technical/SOURCE_OSIS_INVENTORY.md",
-        "tests/test_audit_omitted_verse_notes.py",
         "tests/test_osis_semantic_fidelity.py",
-        "tests/test_repair_osis_division_markers.py",
-        "tests/test_repair_osis_inline_markup.py",
         "tests/test_repair_osis_note_links.py",
-        "tests/test_repair_osis_source_bytes.py",
-        "tests/test_repair_osis_unlinked_reference_labels.py",
         "tests/test_source_osis_inventory.py"
       ]
     },
@@ -2366,41 +1832,6 @@
       "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/source_osis_note_markup_shape.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Inspect original OSIS note markup shape without emitting authorial prose.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "hashlib",
-        "json",
-        "lxml",
-        "pathlib",
-        "re",
-        "repair_osis_note_links",
-        "source_osis_inventory"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "7b29d33ebb931e0c00167191bd4219cc09f4b6dd4690bc14693a3879fc05c9c6",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/darby-link-repair-research.yml",
-        "tests/test_source_osis_note_markup_shape.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
         "OSIS",
         "USFX"
       ],
@@ -2424,9 +1855,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 21,
+      "static_reference_count": 19,
       "static_references": [
-        "scripts/inspect_paragraph_rendering.py",
         "scripts/published_reference_audit.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
@@ -2435,7 +1865,6 @@
         "scripts/research/bible/source_native_osis_structure_screen.py",
         "scripts/research/bible/source_native_osis_target_addressability.py",
         "scripts/research/bible/source_osis_verse_notes.py",
-        "scripts/source_native_division_markers.py",
         "scripts/source_osis_inventory.py",
         "scripts/source_osis_note_link_triage.py",
         "scripts/sword_native_inventory.py",
@@ -2527,13 +1956,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 11,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/sword_native_inventory.py",
         "scripts/tool_registry.py",
-        ".github/workflows/darby-andbible-android-private.yml",
-        ".github/workflows/darby-andbible-jsword.yml",
-        ".github/workflows/darby-private-repaired-sword.yml",
         ".github/workflows/publisher-osis-sword-candidate.yml",
         ".github/workflows/validate.yml",
         "docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md",
@@ -2609,11 +2035,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 4,
       "static_references": [
-        ".github/workflows/darby-andbible-android-private.yml",
-        ".github/workflows/darby-andbible-jsword.yml",
-        ".github/workflows/darby-private-repaired-sword.yml",
         ".github/workflows/publisher-osis-sword-candidate.yml",
         ".github/workflows/validate.yml",
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
@@ -2681,9 +2104,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
-        ".github/workflows/darby-paragraph-rendering.yml",
         ".github/workflows/validate.yml",
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md"
