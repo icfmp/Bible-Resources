@@ -267,10 +267,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 10,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/commentary_intake.py",
-        "scripts/diff_sword_snapshots.py",
         "scripts/pilot_preflight.py",
         "scripts/select_sources.py",
         ".github/workflows/upstream-check.yml",
@@ -456,41 +455,6 @@
         "scripts/tool_registry.py",
         "scripts/validate.py",
         "tests/test_compiled_stock_commentary_proof.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/diff_sword_snapshots.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Read-only, text-free comparison of two snapshots of the SAME SWORD module.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "check_updates",
-        "hashlib",
-        "json",
-        "os",
-        "pathlib",
-        "re",
-        "stat",
-        "tempfile",
-        "zipfile"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "08662ca5978f9658884ea08f60a0a5b22e0bc279675fbcc825d9630b27f99678",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/validate.yml",
-        "tests/test_diff_sword_snapshots.py"
       ]
     },
     {
