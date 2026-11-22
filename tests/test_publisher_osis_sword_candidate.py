@@ -6,7 +6,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from native_milestone_pair_audit import NativeMilestonePairAudit
+from research.bible.native_milestone_pair_audit import NativeMilestonePairAudit
 from publisher_osis_sword_candidate import (
     PublisherSWORDResearchError, _create_candidate_layout, _native_notes,
     _read_native_frames, _compile_osis, config_for, safe_failure_code,
