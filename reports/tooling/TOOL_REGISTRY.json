@@ -1317,8 +1317,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
+        "scripts/reviewed_modern_commentary_rebuild.py",
         "scripts/tool_registry.py",
         "scripts/validate.py",
         "docs/workflows/PUBLISHING.md",
