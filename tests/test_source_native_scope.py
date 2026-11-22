@@ -11,7 +11,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from source_native_scope import (
+from research.bible.source_native_scope import (
     read_crosswalk, compare_mapped_scope, BookScopeError
 )
 
