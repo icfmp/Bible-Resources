@@ -940,78 +940,6 @@
     {
       "classification": "UNDECIDED",
       "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "zText"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/publisher_osis_preview_package.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Deterministic, disposable stock-SWORD zText preview ZIP for *reader testing*.",
-      "python_imports": [
-        "__future__",
-        "hashlib",
-        "pathlib",
-        "re",
-        "zipfile"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "4e30daa46ee6cb4e2c937c56b8fd72fa176dd9587832c00c11ccfa2ac54fe9f0",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "publication/release",
-      "static_reference_count": 4,
-      "static_references": [
-        "scripts/publisher_osis_preview_readback.py",
-        "scripts/publisher_osis_sword_candidate.py",
-        ".github/workflows/publisher-osis-sword-candidate.yml",
-        "tests/test_publisher_osis_preview_package.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "zText"
-      ],
-      "has_direct_tests_by_filename": false,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/publisher_osis_preview_readback.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Independently reinstall a tested zText ZIP and read it through stock SWORD.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "hashlib",
-        "json",
-        "os",
-        "pathlib",
-        "publisher_osis_preview_package",
-        "subprocess",
-        "sword_native_inventory",
-        "tempfile",
-        "zipfile"
-      ],
-      "reader_tool_signals": [
-        "xiphos"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "59c18f885aead947dabcf42062953737df422e5560b8541e399bd82d40bafa50",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "publication/release",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/publisher-osis-sword-candidate.yml",
-        "tests/test_publisher_osis_preview_package.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "zText",
@@ -1033,7 +961,6 @@
         "os",
         "pathlib",
         "publisher_osis_observation",
-        "publisher_osis_preview_package",
         "re",
         "research",
         "source_osis_inventory",
@@ -1044,7 +971,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "fe9935f1021741c7e59d0364e5b71f5fd7331df1c9ea65159de14509e3ef292e",
+      "sha256_at_inventory": "b41dce9f7ff4331f58614199750e6f85f9ead01dc4a0a9a44c4f8fd5123e1553",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
@@ -1894,9 +1821,8 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 11,
+      "static_reference_count": 10,
       "static_references": [
-        "scripts/publisher_osis_preview_readback.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
         "scripts/research/bible/native_sword_markup_census.py",

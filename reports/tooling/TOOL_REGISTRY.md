@@ -20,7 +20,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 - KEEP_GENERIC: 24
 - MERGE: 0
 - MODULE_LOCAL: 0
-- UNDECIDED: 32
+- UNDECIDED: 30
 
 ## All tracked tools
 
@@ -49,8 +49,6 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/publish_reviewed_release.py`](../../scripts/publish_reviewed_release.py) | KEEP_GENERIC | not established | 9 | publication/release |
 | [`scripts/published_reference_audit.py`](../../scripts/published_reference_audit.py) | UNDECIDED | named test | 3 | publication/release |
 | [`scripts/publisher_osis_observation.py`](../../scripts/publisher_osis_observation.py) | UNDECIDED | named test | 5 | publication/release |
-| [`scripts/publisher_osis_preview_package.py`](../../scripts/publisher_osis_preview_package.py) | UNDECIDED | named test | 4 | publication/release |
-| [`scripts/publisher_osis_preview_readback.py`](../../scripts/publisher_osis_preview_readback.py) | UNDECIDED | not established | 2 | publication/release |
 | [`scripts/publisher_osis_sword_candidate.py`](../../scripts/publisher_osis_sword_candidate.py) | UNDECIDED | named test | 5 | publication/release |
 | [`scripts/reader_xiphos_headless_smoke.py`](../../scripts/reader_xiphos_headless_smoke.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/release_preflight.py`](../../scripts/release_preflight.py) | KEEP_GENERIC | named test | 3 | publication/release |
@@ -75,7 +73,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/sword_native_commentary_index.cpp`](../../scripts/sword_native_commentary_index.cpp) | KEEP_GENERIC | not established | 3 | not determined |
 | [`scripts/sword_native_commentary_raw_corpus.cpp`](../../scripts/sword_native_commentary_raw_corpus.cpp) | KEEP_GENERIC | not established | 2 | not determined |
 | [`scripts/sword_native_index.cpp`](../../scripts/sword_native_index.cpp) | KEEP_GENERIC | not established | 8 | not determined |
-| [`scripts/sword_native_inventory.py`](../../scripts/sword_native_inventory.py) | KEEP_GENERIC | named test | 11 | source/native audit |
+| [`scripts/sword_native_inventory.py`](../../scripts/sword_native_inventory.py) | KEEP_GENERIC | named test | 10 | source/native audit |
 | [`scripts/sword_native_raw_corpus.cpp`](../../scripts/sword_native_raw_corpus.cpp) | UNDECIDED | not established | 4 | not determined |
 | [`scripts/sword_native_raw_corpus_inventory.py`](../../scripts/sword_native_raw_corpus_inventory.py) | KEEP_GENERIC | named test | 6 | source/native audit |
 | [`scripts/sword_native_raw_entry.cpp`](../../scripts/sword_native_raw_entry.cpp) | UNDECIDED | not established | 3 | not determined |
