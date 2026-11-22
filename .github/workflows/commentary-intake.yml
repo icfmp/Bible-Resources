@@ -32,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       resources: ${{ steps.select.outputs.resources }}
+      has_resources: ${{ steps.select.outputs.has_resources }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -68,17 +69,19 @@ jobs:
                   ["git", "diff", "--name-only", "HEAD^1", "HEAD"],
                   text=True).splitlines())
               resources = sorted(set(registered[path] for path in changed if path in registered))
-              if not resources:
-                  # Preserve the historical default when only reusable code or
-                  # a corrections plan changes; no fabricated MHC acceptance.
-                  resources = ["mhcc-crosswire"]
+              # Library-only changes must not select an arbitrary live
+              # upstream ZIP: its mutable bytes are not regression fixtures.
+              # The independently pinned source remains checked on explicit
+              # dispatch or a change to its own manifest.
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
               out.write("resources=" + json.dumps(resources) + "\n")
-          print("Selected source identities:", ", ".join(resources))
+              out.write("has_resources=" + str(bool(resources)).lower() + "\n")
+          print("Selected source identities:", ", ".join(resources) or "(none: library-only PR)")
           PY
 
   intake:
     needs: select-source
+    if: ${{ needs.select-source.outputs.has_resources == 'true' }}
     strategy:
       fail-fast: false
       matrix:
