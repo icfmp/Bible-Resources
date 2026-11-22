@@ -1,0 +1,651 @@
+#!/usr/bin/env python3
+"""Propose safe, source-preserving commentary links; never mutate any module.
+
+Generic to SWORD/OSIS commentary indexing. All inputs must be independently
+audited: this accepts a reviewed *section scope*, not a prose citation or a
+heuristic first-verse guess. Exact target references are constrained by the
+actual module versification supplied by an independent native registry.
+"""
+from __future__ import annotations
+
+from collections import defaultdict
+import re
+
+KEY = re.compile(r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9]\d*)\.([1-9]\d*)$")
+CHAPTER = re.compile(r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9]\d*)$")
+SHA256 = re.compile(r"^[0-9a-f]{64}$")
+
+
+class UnsafeCommentaryLinkPlan(ValueError):
+    """A proposed scope cannot safely become a non-destructive SWORD link."""
+
+
+def propose_commentary_links(*, occupied: dict[str, str],
+                             valid_verse_keys: set[str],
+                             reviewed_sections: list[dict]) -> dict:
+    """Create deterministic proposed aliases into unchanged existing raw bodies.
+
+    occupied: exact original occupied native numbered keys -> original raw SHA.
+    valid_verse_keys: complete independently enumerated native versification
+        registry; do *not* infer from a chapter's highest occupied comment key.
+    reviewed_sections: sections with master_key, raw_sha256, source_scope_reviewed,
+        evidence_ids and `segments` made of same-chapter
+        {"chapter":"Gen.1","from":1,"through":5} objects. Noncontiguous
+        segments are legal, but gaps are never expanded.
+
+    Does not compile, create, duplicate, overwrite, publish, or even produce
+    original source words. All deltas remain PROPOSED until independent review.
+    """
+    if not occupied or not valid_verse_keys or not reviewed_sections:
+        raise UnsafeCommentaryLinkPlan("Missing stock keys, verse registry, or reviewed scopes")
+    if any(KEY.fullmatch(k) is None or SHA256.fullmatch(h) is None
+           for k, h in occupied.items()):
+        raise UnsafeCommentaryLinkPlan("Invalid original stock key or original raw digest")
+    if any(KEY.fullmatch(k) is None for k in valid_verse_keys):
+        raise UnsafeCommentaryLinkPlan("Unreviewed canonical native versification key")
+
+    additions: dict[str, dict] = {}
+    no_ops = set()
+    processed_master_keys = set()
+    row_counts = defaultdict(int)
+    for section in reviewed_sections:
+        master = section.get("master_key")
+        digest = section.get("raw_sha256")
+        evidence = section.get("evidence_ids")
+        segments = section.get("segments")
+        if (not isinstance(master, str) or not KEY.fullmatch(master)
+                or master in processed_master_keys or occupied.get(master) != digest
+                or not isinstance(digest, str) or not SHA256.fullmatch(digest)):
+            raise UnsafeCommentaryLinkPlan("Missing/nonunique master or raw-body digest mismatch")
+        if section.get("source_scope_reviewed") is not True:
+            raise UnsafeCommentaryLinkPlan("Section scope not independently editor-reviewed")
+        if (not isinstance(evidence, list) or not evidence or
+                any(not isinstance(item, str) or not item.strip() or len(item) > 256
+                    for item in evidence)):
+            raise UnsafeCommentaryLinkPlan("Missing bounded section-level evidence IDs")
+        if not isinstance(segments, list) or not segments:
+            raise UnsafeCommentaryLinkPlan("No reviewed passage segments")
+        processed_master_keys.add(master)
+        targets = set()
+        for span in segments:
+            if not isinstance(span, dict):
+                raise UnsafeCommentaryLinkPlan("Passage segment is not structured")
+            chapter, start, end = span.get("chapter"), span.get("from"), span.get("through")
+            if (not isinstance(chapter, str) or not CHAPTER.fullmatch(chapter)
+                    or type(start) is not int or type(end) is not int
+                    or start < 1 or end < start or end > 1000):
+                raise UnsafeCommentaryLinkPlan("Invalid same-chapter range")
+            for verse in range(start, end + 1):
+                key = f"{chapter}.{verse}"
+                if key not in valid_verse_keys:
+                    raise UnsafeCommentaryLinkPlan("Proposed link escapes actual module versification")
+                if key in targets:
+                    raise UnsafeCommentaryLinkPlan("Duplicate/overlapping segment")
+                targets.add(key)
+        if master not in targets:
+            raise UnsafeCommentaryLinkPlan("Master key outside reviewed section scope")
+        for key in sorted(targets):
+            if key in occupied:
+                if occupied[key] != digest:
+                    raise UnsafeCommentaryLinkPlan("Would overwrite a different original commentary section")
+                no_ops.add(key)
+                continue
+            if key in additions:
+                raise UnsafeCommentaryLinkPlan("Two distinct sections claim one missing verse key")
+            additions[key] = {"link_to": master, "source_raw_sha256": digest}
+            row_counts[master] += 1
+    return {
+        "status": "PROPOSED_ONLY_NOT_AN_EDITORIAL_APPROVAL",
+        "new_native_aliases": dict(sorted(additions.items())),
+        "original_occupied_keys_to_preserve": len(occupied),
+        "already_occupied_identical_body_keys": sorted(no_ops),
+        "added_alias_count": len(additions),
+        "source_master_addition_counts": dict(sorted(row_counts.items())),
+        "original_text_rewritten": False,
+        "original_keys_overwritten": False,
+        "original_source_modified": False,
+        "candidate_built_or_reader_tested": False,
+    }
+
+
+def triage_missing_native_section_links(*, occupied: dict[str, str],
+                                        valid_verse_keys: set[str],
+                                        source_heading_anomalies: list[dict]) -> dict:
+    """Safely inventory original indexed-section gaps before editorial approval.
+
+    A source heading parsed from the compiled module is not equivalent to a
+    reviewed authorial section scope. This produces **no** build-ready link
+    plan: unlike propose_commentary_links, every candidate is pending
+    independent source review and subsequent explicit editorial acceptance.
+    """
+    if (not occupied or not valid_verse_keys
+            or not isinstance(source_heading_anomalies, list)
+            or len(source_heading_anomalies) > 10000):
+        raise UnsafeCommentaryLinkPlan("Empty or unbounded original index-gap audit")
+    if any(KEY.fullmatch(key) is None or SHA256.fullmatch(digest) is None
+           for key, digest in occupied.items()):
+        raise UnsafeCommentaryLinkPlan("Original native index keys/digests are unverified")
+    if any(KEY.fullmatch(key) is None for key in valid_verse_keys):
+        raise UnsafeCommentaryLinkPlan("Original native versification is unverified")
+    candidates = []
+    claimed = set()
+    blocked = []
+    for row in source_heading_anomalies:
+        if not isinstance(row, dict):
+            raise UnsafeCommentaryLinkPlan("Unstructured native section anomaly")
+        master = row.get("start")
+        missing = row.get("missing_slots")
+        other_payload = row.get("different_payload_slots")
+        if (not isinstance(master, str) or KEY.fullmatch(master) is None
+                or master not in occupied or master not in valid_verse_keys
+                or not isinstance(missing, list) or not isinstance(other_payload, list)
+                or not all(isinstance(k, str) and KEY.fullmatch(k) for k in missing+other_payload)):
+            raise UnsafeCommentaryLinkPlan("Index gap does not authenticate a native master/target")
+        if not missing and not other_payload:
+            raise UnsafeCommentaryLinkPlan("Claimed anomaly has no missing or different original native target")
+        if len(set(missing)) != len(missing):
+            raise UnsafeCommentaryLinkPlan("A purported original gap appears more than once")
+        if any(k in claimed for k in missing):
+            raise UnsafeCommentaryLinkPlan("A missing target belongs to multiple candidate sections")
+        for key in missing:
+            if key in occupied or key not in valid_verse_keys:
+                raise UnsafeCommentaryLinkPlan("Original missing slot is occupied or outside native versification")
+        claimed.update(missing)
+        if other_payload:
+            blocked.append({
+                "original_master_key": master,
+                "status": "BLOCKED_DIFFERENT_EXISTING_COMMENTARY",
+                "occupied_different_original_keys": sorted(set(other_payload)),
+                "no_content_or_index_mutated": True,
+            })
+            continue
+        candidates.append({
+            "original_master_key": master,
+            "original_master_raw_sha256": occupied[master],
+            "unoccupied_native_target_keys": sorted(
+                missing,
+                key=lambda ref: (
+                    ref.rsplit(".", 1)[0], int(ref.rsplit(".", 1)[1])
+                )
+            ),
+            "origin": "PARSED_COMPILED_NATIVE_HEADING_NOT_AUTHORIAL_APPROVAL",
+            "source_scope_editorially_reviewed": False,
+            "standards_based_sword_links_built": False,
+        })
+    return {
+        "status": "PRELIMINARY_NATIVE_INDEX_GAPS_REVIEW_REQUIRED",
+        "candidate_section_count": len(candidates),
+        "candidate_additional_native_target_keys": sum(
+            len(row["unoccupied_native_target_keys"]) for row in candidates
+        ),
+        "blocked_sections_with_different_existing_original_payload": blocked,
+        "candidate_sections": sorted(candidates, key=lambda x: x["original_master_key"]),
+        "original_occupied_keys_preserved": len(occupied),
+        "source_prose_modified": False,
+        "compiled_binary_modified": False,
+        "editorial_approval": False,
+        "release_authorized": False,
+    }
+
+
+
+
+def corroborate_reviewed_commentary_link_plan(
+        *, review: dict, resource_id: str, original_archive_sha256: str,
+        witness_sha256: str, occupied: dict[str,str],
+        valid_verse_keys: set[str], original_candidate_preflight: dict,
+        independent_leading_range_citations: dict) -> dict:
+    """Cross-check a separately recorded section decision against real sources.
+
+    The review data fixes *scope only*. The SHA-pinned original SWORD stock
+    supplies current raw-body digests and actual vacant native verse keys.
+    Independent source checks establish evidence strength; neither an original
+    display heading nor another digital edition authorizes rewriting commentary,
+    extending unmarked chapters, copying annotations, or publishing a module.
+    """
+    if (not isinstance(review,dict) or review.get("schema_version")!=1
+            or review.get("resource_id")!=resource_id
+            or review.get("source_archive_sha256")!=original_archive_sha256
+            or review.get("independent_digital_witness_sha256")!=witness_sha256
+            or not SHA256.fullmatch(original_archive_sha256)
+            or not SHA256.fullmatch(witness_sha256)
+            or review.get("scope")!="ONLY_EXPLICIT_ORIGINAL_AUTHORED_RANGE_INDEX_OMISSIONS"
+            or any(review.get(k) is not False for k in (
+                "source_text_changes_authorized",
+                "cross_edition_annotation_changes_authorized",
+                "chapter_expansion_changes_authorized", "release_authorized"))):
+        raise UnsafeCommentaryLinkPlan("Unpinned or out-of-scope editorial link review")
+    sections=review.get("reviewed_source_scopes")
+    preflight=original_candidate_preflight.get("candidate_sections")
+    leads=independent_leading_range_citations.get("case_rows")
+    if (not isinstance(sections,list) or not 0<len(sections)<=500
+            or not isinstance(preflight,list) or not isinstance(leads,list)
+            or len(sections)!=len(preflight) or len(leads)!=len(preflight)):
+        raise UnsafeCommentaryLinkPlan("Incomplete original section review census")
+    original={r.get("original_master_key"):r for r in preflight}
+    independent={r.get("original_section_start"):r for r in leads}
+    if (len(original)!=len(preflight) or len(independent)!=len(leads)
+            or set(original)!=set(independent)):
+        raise UnsafeCommentaryLinkPlan("Original native and independent source inventory conflict")
+    chosen=[]
+    review_classes=defaultdict(int)
+    for row in sections:
+        if not isinstance(row,dict):
+            raise UnsafeCommentaryLinkPlan("Unstructured source section decision")
+        master=row.get("master_key")
+        evidence_class=row.get("evidence_class")
+        evidence_ids=row.get("evidence_ids")
+        if (master not in original or master not in independent
+                or master not in occupied
+                or row.get("review_decision")!="PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+                or not isinstance(evidence_ids,list) or len(evidence_ids)<2
+                or len(set(evidence_ids))!=len(evidence_ids)
+                or any(not isinstance(x,str) or not x.strip() or len(x)>256
+                       for x in evidence_ids)):
+            raise UnsafeCommentaryLinkPlan("Missing independent, bounded review evidence")
+        lead=independent[master]
+        sections_segments=row.get("segments")
+        if not isinstance(sections_segments,list) or not sections_segments:
+            raise UnsafeCommentaryLinkPlan("Missing explicit authorial passage segments")
+        if evidence_class=="EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION":
+            if (len(sections_segments)!=1
+                    or lead.get("independent_exact_range_citation_count",0)<1
+                    or lead.get(
+                        "independent_leading_reference_and_matching_original_stock_exposition",
+                        0)<1
+                    or not any(witness_sha256 in x for x in evidence_ids)):
+                raise UnsafeCommentaryLinkPlan("Original range lacks matching independent exposition")
+        elif evidence_class=="EXACT_DISCONTIGUOUS_ORIGINAL_HEADING_AND_INDEPENDENT_DIGITAL_PRESENTATIONS":
+            # Secondary digital presentations were reviewed and recorded
+            # separately, not silently elevated to exact CCEL/print equivalence.
+            if (len(sections_segments)<2 or len(evidence_ids)<3
+                    or lead.get("independent_exact_range_citation_count")!=0):
+                raise UnsafeCommentaryLinkPlan("Discontinuous scope requires explicit independent editorial evidence")
+        else:
+            raise UnsafeCommentaryLinkPlan("Unknown editorial section evidence type")
+        candidate=original[master]
+        chapter=master.rsplit(".",1)[0]
+        targets=set()
+        for segment in sections_segments:
+            if (not isinstance(segment,dict)
+                    or segment.get("chapter")!=chapter
+                    or type(segment.get("from")) is not int
+                    or type(segment.get("through")) is not int
+                    or segment["from"]<1
+                    or segment["through"]<segment["from"]
+                    or segment["through"]>1000):
+                raise UnsafeCommentaryLinkPlan("Different chapter or unreviewed section extent")
+            targets.update(
+                f'{chapter}.{i}' for i in range(segment["from"],segment["through"]+1)
+            )
+        if (master not in targets or
+                sorted(targets-occupied.keys())!=
+                sorted(candidate.get("unoccupied_native_target_keys",[]))):
+            raise UnsafeCommentaryLinkPlan("Reviewed segments do not match exact original index omissions")
+        if (candidate.get("original_master_raw_sha256")!=occupied[master]
+                or candidate.get("source_scope_editorially_reviewed") is not False):
+            raise UnsafeCommentaryLinkPlan("Original preflight changed or was prematurely approved")
+        chosen.append({
+            "master_key":master,
+            "raw_sha256":occupied[master],
+            "segments":sections_segments,
+            "source_scope_reviewed":True,
+            "evidence_ids":evidence_ids,
+        })
+        review_classes[evidence_class]+=1
+    if len({r["master_key"] for r in chosen})!=len(preflight):
+        raise UnsafeCommentaryLinkPlan("Original section excluded, duplicated or replaced")
+    proposed=propose_commentary_links(
+        occupied=occupied,valid_verse_keys=valid_verse_keys,
+        reviewed_sections=chosen
+    )
+    if proposed["added_alias_count"] != sum(
+            len(row["unoccupied_native_target_keys"]) for row in preflight):
+        raise UnsafeCommentaryLinkPlan("Approved review and original index gap counts differ")
+    if (set(proposed["new_native_aliases"])!=
+            {target for row in preflight
+             for target in row["unoccupied_native_target_keys"]}):
+        raise UnsafeCommentaryLinkPlan("Reviewed plan adds unsupported or omits original gap")
+    return {
+        **proposed,
+        "status":"SOURCE_SCOPE_CORROBORATED_CANDIDATE_NOT_RELEASE_AUTHORIZED",
+        "independent_source_evidence_classes":dict(sorted(review_classes.items())),
+        "original_source_archive_sha256":original_archive_sha256,
+        "independent_digital_witness_sha256":witness_sha256,
+        "one_reviewed_authorial_body_per_master":True,
+        "all_source_omission_candidate_scopes_correspond_to_reviewed_source":True,
+        "original_ccel_annotation_values_copied":False,
+        "unmarked_first_verse_chapter_aliases_added":False,
+        "release_authorized":False,
+    }
+
+
+def triage_single_key_chapter_navigation(
+        *, occupied: dict[str, str],
+        chapter_verse_maximums: dict[str, int],
+        independent_chapter_cases: list[dict],
+        original_chapter_intro_has_visible_prose: dict[str, bool] | None = None
+        ) -> dict:
+    """Classify chapter-first index anchors without implying text loss.
+
+    This deliberately emits *no aliases*: one original K at verse 1 plus
+    an undivided corroborating chapter exposition justifies a source review,
+    not automatic chapter-wide expansion. Protect any original I text as
+    separate independently authored chapter-introduction material.
+    """
+    if (not isinstance(occupied, dict) or not occupied
+            or not isinstance(chapter_verse_maximums, dict)
+            or not chapter_verse_maximums
+            or not isinstance(independent_chapter_cases, list)
+            or len(independent_chapter_cases) > 250
+            or not isinstance(original_chapter_intro_has_visible_prose, (dict, type(None)))):
+        raise UnsafeCommentaryLinkPlan("Invalid source chapter candidate inventory")
+    if any(KEY.fullmatch(k) is None or SHA256.fullmatch(v) is None
+           for k, v in occupied.items()):
+        raise UnsafeCommentaryLinkPlan("Unverified native source K keys")
+    if any(CHAPTER.fullmatch(k) is None or type(v) is not int
+           or not 1 <= v <= 1000 for k,v in chapter_verse_maximums.items()):
+        raise UnsafeCommentaryLinkPlan("Unverified native chapter maximums")
+    intros = original_chapter_intro_has_visible_prose or {}
+    if (any(CHAPTER.fullmatch(k) is None or type(v) is not bool
+            for k,v in intros.items())):
+        raise UnsafeCommentaryLinkPlan("Unverified original native I chapter diagnostics")
+    by_chapter = defaultdict(list)
+    for key in occupied:
+        by_chapter[key.rsplit(".",1)[0]].append(key)
+    seen = set()
+    classes = defaultdict(int)
+    total_potential_new = 0
+    cases = []
+    for case in independent_chapter_cases:
+        if not isinstance(case, dict):
+            raise UnsafeCommentaryLinkPlan("Unstructured source chapter case")
+        master = case.get("native_start")
+        if (not isinstance(master, str) or KEY.fullmatch(master) is None
+                or master in seen or master not in occupied):
+            raise UnsafeCommentaryLinkPlan("Nonunique or missing original chapter master")
+        seen.add(master)
+        chapter = master.rsplit(".",1)[0]
+        limit = chapter_verse_maximums.get(chapter)
+        if (not isinstance(limit,int) or limit < 1
+                or master != chapter+".1"
+                or by_chapter[chapter] != [master]):
+            raise UnsafeCommentaryLinkPlan("Chapter-first candidate has an existing separate section")
+        lexical = case.get("independent_lexical_comparison")
+        structure = case.get("source_div2_structure_class")
+        if not isinstance(structure, str):
+            raise UnsafeCommentaryLinkPlan("Missing chapter-source structure classification")
+        references = case.get("independent_reference_target_comparison")
+        link_disagreement = (
+            references is not None and
+            references.get("original_scripRef_with_nonempty_osisRef_target_count",0)
+            > (references.get(
+                "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock",0)
+               + references.get(
+                "original_scripRef_osisRef_work_qualifier_only_matches_in_stock",0))
+        )
+        source_missing = structure not in {
+            "SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE",
+            "SOURCE_DIV2_UNDIVIDED_EXPLICIT_HEADING_CANDIDATE",
+            "SOURCE_BOOK_PREFIX_FIRST_CHAPTER_UNDIVIDED_CANDIDATE",
+        }
+        lexical_alignment = (
+            lexical.get("ordered_word_alignment",{})
+            if isinstance(lexical,dict) else {}
+        )
+        original_unmatched = lexical_alignment.get(
+            "original_plain_words_not_matched_in_exact_order")
+        stock_unmatched = lexical_alignment.get(
+            "stock_plain_words_not_matched_in_exact_order")
+        high_similarity = (
+            isinstance(lexical,dict)
+            and lexical.get("overlap_class") == "HIGH_95_PLUS"
+            and type(original_unmatched) is int
+            and original_unmatched <= 2
+        )
+        intro_prose = intros.get(chapter)
+        source_prefix = case.get(
+            "source_book_prefix_first_chapter_structural_witness"
+        )
+        cross_edition_title = (
+            lexical.get("stock_prefix_independent_source_neighbor_correspondence")
+            if isinstance(lexical,dict) else None
+        )
+        topo = (
+            lexical.get("stock_extra_prefix_xml_topology")
+            if isinstance(lexical,dict) else None
+        )
+        original_book_heading_is_separate = (
+            isinstance(cross_edition_title,dict)
+            and isinstance(topo,dict)
+            and "title" in topo.get("prefix_text_top_level_owner_types",[])
+            and cross_edition_title.get(
+                "source_neighbor_to_stock_element_correspondence_classes",{}
+            ).get("exact_unicode:title:source_div1_title_attribute",0) >= 1
+        )
+        prose_source_fully_present_with_heading = (
+            isinstance(lexical,dict)
+            and lexical.get("overlap_class") in ("HIGH_80_PLUS","HIGH_95_PLUS")
+            and original_unmatched == 0
+            and type(stock_unmatched) is int and stock_unmatched > 0
+            and isinstance(topo,dict)
+            and topo.get("full_original_source_word_sequence_inside_stock") is True
+            and original_book_heading_is_separate
+        )
+        if source_missing:
+            classification = "NO_SAFE_INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE"
+        elif (structure=="SOURCE_BOOK_PREFIX_FIRST_CHAPTER_UNDIVIDED_CANDIDATE"
+              and not (
+                  isinstance(source_prefix,dict)
+                  and source_prefix.get(
+                    "all_source_book_identity_and_chapter_order_guards_pass") is True
+                  and source_prefix.get(
+                    "source_book_prefix_prose_is_complete_in_original_K") is True)):
+            classification = "SOURCE_BOOK_PREFIX_STRUCTURAL_EVIDENCE_UNVERIFIED"
+        elif not high_similarity and not prose_source_fully_present_with_heading:
+            classification = "INDEPENDENT_SOURCE_AND_NATIVE_TEXT_NEED_WORD_REVIEW"
+        elif intro_prose is None:
+            classification = "ORIGINAL_NATIVE_CHAPTER_INTRO_NOT_CHECKED"
+        elif intro_prose:
+            classification = "ADDITIONAL_NATIVE_CHAPTER_INTRO_PROSE_NEEDS_OWNERSHIP_REVIEW"
+        elif structure == "SOURCE_BOOK_PREFIX_FIRST_CHAPTER_UNDIVIDED_CANDIDATE":
+            classification = "SOURCE_FIRST_CHAPTER_PROSE_PRESERVED_OUTSIDE_DIV2"
+        elif prose_source_fully_present_with_heading:
+            classification = "SOURCE_PROSE_PRESERVED_WITH_EXTRA_STOCK_BOOK_HEADING"
+        else:
+            classification = "INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE_STRONGLY_CORROBORATED"
+        classes[classification] += 1
+        total_potential_new += limit-1
+        cases.append({
+            "master_key":master,
+            "original_master_raw_sha256":occupied[master],
+            "classification":classification,
+            "native_chapter_verse_count":limit,
+            "original_numbered_K_count":1,
+            "potential_additional_links_if_explicitly_editorially_approved":limit-1,
+            "independent_structure_class":structure,
+            "source_book_prefix_structural_evidence":
+                source_prefix if isinstance(source_prefix,dict) else None,
+            "source_corresponding_original_stock_prefixed_book_title":
+                original_book_heading_is_separate,
+            "complete_independent_source_prose_with_original_stock_heading":
+                prose_source_fully_present_with_heading,
+            "independent_original_unmatched_words":original_unmatched,
+            "independent_stock_unmatched_words":stock_unmatched,
+            "independent_source_reference_target_disagreement_requires_review":
+                bool(link_disagreement),
+            "original_native_chapter_intro_contains_visible_prose":intro_prose,
+            "independent_chapter_scope_expansion_editorially_approved":False,
+        })
+    return {
+        "status":"COMPLETE_SINGLE_KEY_CHAPTER_SCOPE_TRIAGE_NOT_APPROVAL",
+        "original_single_key_chapter_candidates":len(cases),
+        "classes":dict(sorted(classes.items())),
+        "potential_total_new_chapter_aliases_if_every_scope_approved":total_potential_new,
+        "source_reference_differences_needing_separate_review":sum(
+            row["independent_source_reference_target_disagreement_requires_review"]
+            for row in cases
+        ),
+        "chapter_intro_owner_unchecked_count":sum(
+            row["original_native_chapter_intro_contains_visible_prose"] is None
+            for row in cases
+        ),
+        "chapter_intro_prose_needing_independent_ownership_review":sum(
+            row["original_native_chapter_intro_contains_visible_prose"] is True
+            for row in cases
+        ),
+        "case_rows":cases,
+        "any_new_aliases_created":False,
+        "source_prose_or_index_mutated":False,
+        "all_scopes_explicitly_unapproved":True,
+        "publication_authorized":False,
+    }
+
+
+
+def verify_original_native_adjacent_section_boundaries(
+        raw: bytes, *, expected_module: str,
+        original_occupied_sha256: dict[str,str]) -> dict:
+    """Compare ALL adjacent native entry identities with raw-body grouping.
+
+    The OSIS reconstruction may group equal adjacent K payloads only when
+    original native SWORD also says those exact positions were linked. Equal
+    authorial wording is never alone permission to collapse distinct sections.
+    This is a complete coverage check, not a sample or content adaptation.
+    """
+    if (not isinstance(raw,bytes) or not 0 < len(raw) <= 12*1024*1024
+            or b"\0" in raw or not isinstance(expected_module,str)
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}",expected_module)
+            or not isinstance(original_occupied_sha256,dict)
+            or not original_occupied_sha256 or len(original_occupied_sha256)>300000
+            or any(KEY.fullmatch(k) is None or SHA256.fullmatch(d) is None
+                   for k,d in original_occupied_sha256.items())):
+        raise UnsafeCommentaryLinkPlan("Untrusted complete native adjacency data")
+    try:
+        lines=raw.decode("ascii").splitlines()
+    except UnicodeError:
+        raise UnsafeCommentaryLinkPlan("Non-ASCII native linked adjacency") from None
+    if len(lines)<3 or len(lines)>300000:
+        raise UnsafeCommentaryLinkPlan("Missing/oversize native adjacency framing")
+    header=lines[0].split("\t")
+    if (len(header)!=5 or header[0]!="M" or header[1]!=expected_module
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9]{0,31}",header[2])
+            or not re.fullmatch(r"\d+\.\d+\.\d+",header[3])
+            or header[4] not in {"RawCom","RawCom4","zCom","zCom4"}):
+        raise UnsafeCommentaryLinkPlan("Unknown original native linked-index identity")
+    footer=lines[-1].split("\t")
+    if (len(footer)!=4 or footer[0]!="S"
+            or any(not re.fullmatch(r"\d{1,9}",x) for x in footer[1:])):
+        raise UnsafeCommentaryLinkPlan("Missing native linked pair totals")
+    counts=list(map(int,footer[1:]))
+    if counts[0]!=counts[1]+counts[2] or counts[0]!=len(lines)-2:
+        raise UnsafeCommentaryLinkPlan("Native linked adjacency accounting changed")
+    occupied=original_occupied_sha256
+    by_chapter=defaultdict(set)
+    for key in occupied:
+        chapter,verse=key.rsplit(".",1)
+        by_chapter[chapter].add(int(verse))
+    expected={
+        (f"{chapter}.{n}",f"{chapter}.{n+1}")
+        for chapter,verses in by_chapter.items()
+        for n in verses if n+1 in verses
+    }
+    reported=set()
+    linked=0
+    unlinked=0
+    same_raw_but_not_linked=[]
+    different_raw_but_linked=[]
+    for line in lines[1:-1]:
+        parts=line.split("\t")
+        if len(parts)!=4 or parts[0]!="L" or parts[3] not in {"0","1"}:
+            raise UnsafeCommentaryLinkPlan("Unreviewed native linked-pair frame")
+        first,second=parts[1],parts[2]
+        if (first,second) not in expected or (first,second) in reported:
+            raise UnsafeCommentaryLinkPlan("Missing/duplicated/nonadjacent native linked pair")
+        reported.add((first,second))
+        identically_compressed=occupied[first]==occupied[second]
+        is_linked=parts[3]=="1"
+        linked+=int(is_linked)
+        unlinked+=int(not is_linked)
+        if identically_compressed and not is_linked:
+            same_raw_but_not_linked.append([first,second])
+        if is_linked and not identically_compressed:
+            different_raw_but_linked.append([first,second])
+    if reported!=expected or counts!=[len(expected),linked,unlinked]:
+        raise UnsafeCommentaryLinkPlan("Incomplete native linked section boundary scan")
+    return {
+        "status":"COMPLETE_ORIGINAL_NATIVE_LINKED_SECTION_BOUNDARY_AUDIT",
+        "original_native_linked_pair_count":linked,
+        "original_native_separate_adjacent_pair_count":unlinked,
+        "original_adjacent_occupied_K_pair_count":len(expected),
+        "same_original_raw_payload_but_independently_unlinked_pair_count":
+            len(same_raw_but_not_linked),
+        "distinct_original_raw_payload_but_native_linked_pair_count":
+            len(different_raw_but_linked),
+        "same_original_raw_unlinked_first_ten":same_raw_but_not_linked[:10],
+        "distinct_original_raw_linked_first_ten":different_raw_but_linked[:10],
+        "all_original_adjacent_native_section_identities_proven":True,
+        "raw_payload_based_osis_grouping_is_native_identity_faithful":
+            not (same_raw_but_not_linked or different_raw_but_linked),
+        "original_source_text_copied_or_mutated":False,
+        "original_edited_sections_or_releases":0,
+    }
+
+
+def parse_native_commentary_verse_registry(raw: bytes, expected_module: str) -> dict:
+    """Parse read-only released-libSWORD chapter bounds, never manuscript data.
+
+    Expected framing from sword_native_commentary_index --chapter-registry:
+    M<TAB>module<TAB>v11n<TAB>engine<TAB>driver
+    R<TAB>book.chapter<TAB>native_verse_max
+    S<TAB>chapter_count<TAB>total_verse_count
+    """
+    if (not isinstance(raw, bytes) or len(raw) > 256 * 1024
+            or b"\x00" in raw):
+        raise UnsafeCommentaryLinkPlan("Oversize or invalid native registry stream")
+    try:
+        lines = raw.decode("ascii").splitlines()
+    except UnicodeError as exc:
+        raise UnsafeCommentaryLinkPlan("Non-ASCII native registry") from exc
+    if len(lines) < 3:
+        raise UnsafeCommentaryLinkPlan("Missing native registry framing")
+    header = lines[0].split("\t")
+    if (len(header) != 5 or header[0] != "M"
+            or header[1] != expected_module
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}", expected_module)
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9]{0,31}", header[2])
+            or not re.fullmatch(r"\d+\.\d+\.\d+", header[3])
+            or header[4] not in {"RawCom", "RawCom4", "zCom", "zCom4"}):
+        raise UnsafeCommentaryLinkPlan("Unknown native registry module/version/driver")
+    chapters = {}
+    verse_keys = set()
+    for line in lines[1:-1]:
+        parts = line.split("\t")
+        if (len(parts) != 3 or parts[0] != "R"
+                or CHAPTER.fullmatch(parts[1]) is None
+                or not re.fullmatch(r"[1-9]\d{0,3}", parts[2])):
+            raise UnsafeCommentaryLinkPlan("Unreviewed native chapter registry row")
+        chapter = parts[1]
+        limit = int(parts[2])
+        if limit > 1000 or chapter in chapters or len(chapters) >= 2500:
+            raise UnsafeCommentaryLinkPlan("Duplicated/unsupported native chapter bounds")
+        chapters[chapter] = limit
+        verse_keys.update(f"{chapter}.{verse}" for verse in range(1, limit + 1))
+        if len(verse_keys) > 300000:
+            raise UnsafeCommentaryLinkPlan("Oversize native verse registry")
+    footer = lines[-1].split("\t")
+    if (len(footer) != 3 or footer[0] != "S"
+            or not all(re.fullmatch(r"[1-9]\d{0,8}", x) for x in footer[1:])
+            or int(footer[1]) != len(chapters)
+            or int(footer[2]) != len(verse_keys)):
+        raise UnsafeCommentaryLinkPlan("Incomplete native chapter/verse registry")
+    if not chapters:
+        raise UnsafeCommentaryLinkPlan("Empty native chapter registry")
+    return {
+        "module_id": expected_module, "versification": header[2],
+        "engine_version": header[3], "driver": header[4],
+        "chapter_maximums": chapters,
+        "verse_keys": verse_keys,
+        "chapter_count": len(chapters), "canonical_verse_count": len(verse_keys),
+        "registry_is_original_sword_engine_not_source_text": True
+    }
