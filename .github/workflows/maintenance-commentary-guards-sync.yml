@@ -1,0 +1,35 @@
+name: One-shot source guard package sync and inventory
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/maintenance-commentary-guards-sync.yml'
+permissions:
+  contents: write
+jobs:
+  refresh:
+    if: github.repository == 'icfmp/Bible-Resources'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: maintenance/commentary-editorial-guards-package-20261122
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Retire temporary job, merge latest main and verify real tracked registry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main
+          git merge --no-edit --no-ff origin/main
+          git rm .github/workflows/maintenance-commentary-guards-sync.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git add -f reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git commit -m 'chore: sync main and registry for source-authenticity research helpers'
+          git push origin HEAD:maintenance/commentary-editorial-guards-package-20261122
