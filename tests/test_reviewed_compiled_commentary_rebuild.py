@@ -15,7 +15,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from reviewed_compiled_commentary_rebuild import reviewed_rebuilt_commentary_errors
-from reviewed_compiled_commentary_rebuild import zcom_member_suffixes, zcom_payload_paths
+from reviewed_compiled_commentary_rebuild import zcom_member_suffixes, zcom_payload_paths, checked_zcom_payload_files
 from jsonschema import Draft202012Validator
 
 
@@ -35,6 +35,36 @@ class NativeZcomPayloadPathTests(unittest.TestCase):
                     {"modules/comments/zcom/review2026/" + part + "." + infix + suffix
                      for part in ("nt", "ot") for suffix in ("s", "v", "z")},
                 )
+
+    def test_exact_inventory_rejects_extra_missing_and_symlinked_files(self):
+        with TemporaryDirectory() as tmp:
+            payload = Path(tmp) / "payload"
+            names = zcom_payload_paths("Fixture", "CHAPTER")
+            for name in names:
+                p = payload / name
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_bytes(b"non-Scripture test data")
+            actual = checked_zcom_payload_files(payload, "Fixture", "CHAPTER")
+            self.assertEqual(set(actual), names)
+            extra = payload / "extra.txt"
+            extra.write_bytes(b"unreviewed")
+            with self.assertRaisesRegex(ValueError, "inventory"):
+                checked_zcom_payload_files(payload, "Fixture", "CHAPTER")
+            extra.unlink()
+            missing = payload / "modules/comments/zcom/fixture/ot.czz"
+            missing.unlink()
+            with self.assertRaisesRegex(ValueError, "Added or omitted"):
+                checked_zcom_payload_files(payload, "Fixture", "CHAPTER")
+            missing.write_bytes(b"restored synthetic data")
+            alias = payload / "alias"
+            alias.symlink_to(payload / "mods.d/fixture.conf")
+            with self.assertRaisesRegex(ValueError, "Symlink"):
+                checked_zcom_payload_files(payload, "Fixture", "CHAPTER")
+            alias.unlink()
+            other = Path(tmp) / "alias-dir"
+            other.symlink_to(payload, target_is_directory=True)
+            with self.assertRaisesRegex(ValueError, "unsafe"):
+                checked_zcom_payload_files(other, "Fixture", "CHAPTER")
 
     def test_module_path_or_unknown_block_mode_is_rejected(self):
         for bad in ("../outside", "/absolute", "", "with-hyphen", "ab/../../x"):
