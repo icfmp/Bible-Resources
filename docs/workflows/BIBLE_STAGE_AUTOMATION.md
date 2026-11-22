@@ -25,10 +25,10 @@ The [original source observation workflow](../../.github/workflows/bible-observe
 Recommended: in an open repository `[Import]` issue, post an owner-authored top-level comment:
 
 ```text
-/bible-audit webp-research 4
+/bible-audit frajnd-2024 4
 ```
 
-Here `webp-research` is an **example** reviewed resource ID, and `4` is the requested stage (1–7). The workflow parses the owner comment and posts a metadata-only evidence receipt to the issue.
+Here `frajnd-2024` is an **existing** research resource ID, and `4` is the requested stage (1–7). The workflow parses the owner comment and posts a metadata-only evidence receipt to the issue.
 
 Alternatively, use [Actions → Audit one Bible onboarding stage](https://github.com/icfmp/Bible-Resources/actions/workflows/bible-staged-audit.yml), select `main`, and specify `resource_id`, `stage` (1–7) and optionally the `issue_number`. It records `stage-report.json` and `stage-summary.md` as metadata-only artifacts (retention may be limited), alongside the run summary. Original full texts must not be put in logs or public artifacts.
 
@@ -39,7 +39,7 @@ python -m pip install -r requirements.txt
 python -m unittest discover -s tests -p 'test_bible_stage_runner.py' -v
 mkdir -p /tmp/bible-report
 python scripts/bible_stage_runner.py \
-  --resource-id webp-research --stage 1 --report-dir /tmp/bible-report
+  --resource-id frajnd-2024 --stage 1 --report-dir /tmp/bible-report
 ```
 
 Stage 1 does not fetch source archives. Later stages perform pinned archive checks, and applicable native SWORD and official OSIS inspections. Do not treat a green workflow as approval: `PARTIAL`, `BLOCKED` or `REVIEW_REQUIRED` findings can still accompany a successful job.
