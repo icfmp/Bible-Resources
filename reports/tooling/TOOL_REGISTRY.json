@@ -542,7 +542,7 @@
         ".github/workflows/osis-schema-review.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
-        "tests/test_pilot_preparation.py"
+        "tests/test_source_acquisition_and_schema.py"
       ]
     },
     {
@@ -744,7 +744,7 @@
         "scripts/commentary_native_raw_inventory.py",
         "scripts/tool_registry.py",
         ".github/workflows/commentary-intake.yml",
-        "tests/test_pilot_preparation.py"
+        "tests/test_source_acquisition_and_schema.py"
       ]
     },
     {
@@ -759,7 +759,7 @@
         "zCom",
         "zCom4"
       ],
-      "has_direct_tests_by_filename": true,
+      "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/pilot_preflight.py",
       "proposed_action": "Retain stable verified interface; extend test fixtures.",
@@ -788,8 +788,8 @@
         "scripts/tool_registry.py",
         "tests/test_commentary_intake.py",
         "tests/test_commentary_native_raw_inventory.py",
-        "tests/test_pilot_preflight.py",
-        "tests/test_pilot_subprocess.py"
+        "tests/test_source_archive_preflight.py",
+        "tests/test_bounded_sword_reader.py"
       ]
     },
     {
@@ -797,7 +797,7 @@
       "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
+      "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/pilot_subprocess.py",
       "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
@@ -822,7 +822,7 @@
       "static_references": [
         "scripts/commentary_intake.py",
         "scripts/tool_registry.py",
-        "tests/test_pilot_subprocess.py"
+        "tests/test_bounded_sword_reader.py"
       ]
     },
     {
@@ -1854,7 +1854,7 @@
         "docs/workflows/PUBLISHING.md",
         "tests/test_catalogue_update_contract.py",
         "tests/test_commentary_gate.py",
-        "tests/test_pilot_preparation.py",
+        "tests/test_source_acquisition_and_schema.py",
         "tests/test_repository.py",
         "tests/test_reviewed_modern_commentary_rebuild.py",
         "tests/test_source_gate.py",
