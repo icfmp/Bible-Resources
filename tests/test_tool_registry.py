@@ -250,6 +250,27 @@ class ScriptInventoryTests(unittest.TestCase):
             current,
         )
 
+    def test_approved_osis_native_audit_has_no_publisher_original_rebuild_path(self):
+        """Preserve native corpus checks without a second source/import pipeline."""
+        current = {row["path"] for row in self.result["files"]}
+        self.assertIn("scripts/approved_osis_sword_candidate.py", current)
+        self.assertNotIn("scripts/publisher_osis_sword_candidate.py", current)
+        self.assertTrue(
+            (ROOT / ".github/workflows/approved-osis-native-audit.yml").is_file()
+        )
+        self.assertFalse(
+            (ROOT / ".github/workflows/publisher-osis-sword-candidate.yml").exists()
+        )
+        self.assertFalse(
+            (ROOT / "config/publisher-sword-research/frajnd-2024.json").exists()
+        )
+        source = (ROOT / "scripts/approved_osis_sword_candidate.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("approved_source_for(resource_id)", source)
+        self.assertNotIn("read_pinned_publisher_osis", source)
+        self.assertNotIn("config_for(resource_id)", source)
+
     def test_completed_hmcc_modern_staging_is_not_an_active_publisher(self):
         """Version-pinned first-release bootstraps belong to Git history only."""
         entries = {row["path"] for row in self.result["files"]}
