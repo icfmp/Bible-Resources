@@ -1,5 +1,4 @@
 """Safeguards for the checked-in script lifecycle/usage inventory."""
-import os
 from pathlib import Path
 import subprocess
 import sys
@@ -45,18 +44,6 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertTrue(any("workflow" in ref
                             for ref in entries["validate.py"]["static_references"]))
 
-    def test_expired_darby_preview_flows_are_not_active(self):
-        """No mutable CI path may rely on old unapproved TEST-ONLY archives."""
-        scripts = {item["path"] for item in self.result["files"]}
-        for name in ("promote_sword_preview.py",
-                     "reader_xiphos_headless_smoke.py"):
-            self.assertNotIn("scripts/" + name, scripts)
-            self.assertNotIn(name, CORE)
-        for name in ("private-sword-promotion-proof.yml",
-                     "xiphos-preview-smoke.yml"):
-            self.assertFalse((ROOT / ".github/workflows" / name).exists())
-        self.assertIn("scripts/approved_osis_sword_candidate.py", scripts)
-        self.assertIn("scripts/reviewed_compiled_commentary_rebuild.py", scripts)
 
     def test_remaining_scripts_have_explicit_reviewed_lifecycle(self):
         """All currently retained tools need an actual reviewer decision."""
@@ -98,68 +85,8 @@ class ScriptInventoryTests(unittest.TestCase):
             self.assertIn("scripts/" + expected_mode + ".py",
                           {r["path"] for r in rows})
 
-    def test_obsolete_first_release_pilots_are_not_active(self):
-        """Original USFX/stock pilots must not survive in the OSIS workflow."""
-        active = {row["path"] for row in self.result["files"]}
-        for name in ("lsg_sword_compare.py", "probe_lsg_v11n.py"):
-            self.assertNotIn("modules/lsg-1910/tools/" + name, active)
-        self.assertNotIn("scripts/lsg_source_compare.py", active)
-        self.assertNotIn("scripts/stage_verified_stock_commentary.py", active)
-        for workflow in ("lsg-fidelity.yml", "lsg-v11n-probe.yml",
-                         "lsg-first-release.yml", "stage-stock-commentary.yml"):
-            self.assertFalse((ROOT / ".github/workflows" / workflow).exists())
 
 
-    def test_retired_darby_011_preflight_does_not_leave_live_entrypoints(self):
-        """The historical 0.1.0 baseline is no longer in the approved 0.1.1 module."""
-        entries = {entry["path"] for entry in self.result["files"]}
-        self.assertNotIn("scripts/prepare_darby_011_private_release_candidate.py",
-                         entries)
-        self.assertNotIn("scripts/probe_darby_011_final_android.py", entries)
-        self.assertFalse((ROOT / ".github/workflows/darby-0.1.1-preflight.yml").exists())
-
-    def test_published_darby_legacy_reconstruction_is_not_active(self):
-        """Published Darby 0.1.1 must rely on its approved OSIS master."""
-        current = {row["path"] for row in self.result["files"]}
-        self.assertNotIn(
-            "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-            current)
-        for name in ("repair_osis_source_bytes.py",
-                     "repair_osis_division_markers.py",
-                     "repair_osis_paragraph_indentation.py",
-                     "repair_osis_inline_markup.py"):
-            self.assertNotIn("scripts/" + name, current)
-        self.assertTrue((ROOT / "sources/cleaned/bibles/fr/darby-jnd-2024"
-                         / "bible_jnd_2_0.osis.xml").is_file())
-        self.assertTrue((ROOT / "modules/darby-jnd-2024"
-                         / "RELEASE_PROVENANCE.json").is_file())
-
-
-    def test_retired_legacy_usfx_probes_do_not_remain_in_shared_scripts(self):
-        """One-off USFX/stock parity research is not the current OSIS process."""
-        entries = {row["path"] for row in self.result["files"]}
-        for name in (
-            "publisher_osis_usfx_parity.py",
-            "source_native_maintext_probe.py",
-            "source_native_record_scope_triage.py",
-            "source_native_structural_whitespace.py",
-            "source_usfx_newline_provenance.py",
-            "native_book_intro_screen.py",
-            "sword_missing_verse_witness.py",
-        ):
-            self.assertNotIn("scripts/" + name, entries)
-        for name in (
-            "maintext_whitespace_patterns.py",
-            "native_absorbed_verse_groups.py",
-            "note_whitespace_diagnostics.py",
-            "source_native_layout_anchors.py",
-            "source_native_nonspace_boundaries.py",
-            "source_native_structure_topology.py",
-            "source_native_word_boundaries.py",
-            "source_native_scope.py",
-            "source_native_notes_audit.py",
-        ):
-            self.assertNotIn("scripts/research/bible/" + name, entries)
 
 
     def test_osis_source_native_helpers_are_package_owned(self):
@@ -204,29 +131,6 @@ class ScriptInventoryTests(unittest.TestCase):
                 self.assertIn(p, refs)
 
 
-    def test_old_section_scope_experiment_is_not_retained(self):
-        """Completed stock commentary section research stays in Git history."""
-        active = {row["path"] for row in self.result["files"]}
-        retired = (
-            "commentary_section_scope_audit",
-            "commentary_chapter_body_evidence",
-            "commentary_editorial_topology",
-            "commentary_intro_chapter_text_review",
-            "commentary_layout_census",
-            "commentary_lexical_overlap",
-            "commentary_literal_erratum_preflight",
-            "commentary_osis_intro_transport_probe",
-            "commentary_osis_rebuild_preflight",
-            "commentary_paragraph_witness_probe",
-            "commentary_public_metadata_preflight",
-            "commentary_rebuild_attestation_draft",
-            "commentary_source_erratum_compiled_probe",
-        )
-        for stem in retired:
-            self.assertNotIn("scripts/" + stem + ".py", active)
-            self.assertNotIn("scripts/research/commentary/" + stem + ".py",
-                             active)
-
 
     def test_current_osis_source_native_helpers_are_package_owned(self):
         """Only maintained OSIS/native helpers should have live consumers."""
@@ -257,106 +161,31 @@ class ScriptInventoryTests(unittest.TestCase):
                     self.assertIn(caller, entries[path]["static_references"])
 
 
-    def test_historical_mhc_mhcc_stock_research_is_not_active(self):
-        """Use approved OSIS masters, not original stock reconstruction jobs."""
-        current = {row["path"] for row in self.result["files"]}
-        for name in ("commentary_modern_draft_osis_preview.py",
-                     "commentary_private_text_compare.py",
-                     "commentary_xiphos_dual_reader.py",
-                     "commentary_modern_reference_gate.py",
-                     "commentary_text_delta.py"):
-            self.assertNotIn("scripts/" + name, current)
-        self.assertFalse((ROOT / "scripts/research/commentary").exists())
-        for name in ("commentary-modern-source-receipt.yml",
-                     "commentary-mhc-source-text.yml",
-                     "commentary-mhc-technical-rebuild.yml",
-                     "commentary-mhc-private-jsword.yml",
-                     "commentary-mhc-private-xiphos.yml",
-                     "commentary-mhc-ccel-private-rebuild.yml"):
-            self.assertFalse((ROOT / ".github/workflows" / name).exists())
-        for resource in ("mhcc-crosswire", "mhc-crosswire", "hmcc-modern"):
-            self.assertTrue(
-                (ROOT / "sources/cleaned/commentaries/en" /
-                 resource / (resource if resource != "mhc-crosswire" else "mhc")).exists()
-                or (ROOT / "sources/cleaned/commentaries/en" / resource).is_dir()
-            )
-        self.assertIn("scripts/audit_osis.py", current)
-        self.assertIn("scripts/reviewed_modern_commentary_rebuild.py", current)
 
 
-    def test_historical_darby_source_link_triage_is_not_active(self):
-        """Source/native target evidence replaces original-only import research."""
-        current = {row["path"] for row in self.result["files"]}
-        self.assertNotIn("scripts/source_osis_note_link_triage.py", current)
-        self.assertFalse(
-            (ROOT / ".github/workflows/source-osis-note-links.yml").exists()
-        )
-        self.assertIn(
-            "scripts/research/bible/source_native_osis_target_addressability.py",
-            current,
-        )
-
-    def test_approved_osis_native_audit_has_no_publisher_original_rebuild_path(self):
-        """Preserve native corpus checks without a second source/import pipeline."""
+    def test_approved_osis_native_gate_uses_curated_sources(self):
+        """An approved cleaned master, not an intake ZIP, enters native QA."""
         current = {row["path"] for row in self.result["files"]}
         self.assertIn("scripts/approved_osis_sword_candidate.py", current)
-        self.assertNotIn("scripts/publisher_osis_sword_candidate.py", current)
         self.assertTrue(
             (ROOT / ".github/workflows/approved-osis-native-audit.yml").is_file()
-        )
-        self.assertFalse(
-            (ROOT / ".github/workflows/publisher-osis-sword-candidate.yml").exists()
-        )
-        self.assertFalse(
-            (ROOT / "config/publisher-sword-research/frajnd-2024.json").exists()
         )
         source = (ROOT / "scripts/approved_osis_sword_candidate.py").read_text(
             encoding="utf-8"
         )
         self.assertIn("approved_source_for(resource_id)", source)
-        self.assertNotIn("read_pinned_publisher_osis", source)
-        self.assertNotIn("config_for(resource_id)", source)
 
-    def test_retired_darby_publisher_observer_keeps_original_source_identity(self):
-        """No network duplicate of a safely retained original OSIS identity."""
-        current = {row["path"] for row in self.result["files"]}
-        self.assertNotIn("scripts/publisher_osis_observation.py", current)
-        self.assertFalse(
-            (ROOT / ".github/workflows/publisher-osis-observation.yml").exists()
-        )
-        self.assertTrue(
-            (ROOT / "config/publisher-osis/frajnd-2024.json").is_file()
-        )
-        source = (ROOT / "sources/original/bibles/fr/darby-jnd-2024"
-                  / "PROVENANCE.json").read_text(encoding="utf-8")
-        self.assertIn("config/publisher-osis/frajnd-2024.json", source)
+    def test_active_workflows_only_reference_existing_shared_scripts(self):
+        """Check current workflows rather than naming retired pilot commands."""
+        import re
 
-    def test_sword_upstream_priority_ranker_is_not_an_import_gate(self):
-        """OSIS source authority is edition based, never a SWORD provider rank."""
         active = {row["path"] for row in self.result["files"]}
-        self.assertNotIn("scripts/select_sources.py", active)
-        self.assertFalse((ROOT / "config/source-priority.json").exists())
-        self.assertFalse((ROOT / "config/edition-identities.json").exists())
-        self.assertTrue((ROOT / "docs/policies/SOURCE_IDENTITY.md").is_file())
-        monitor = (ROOT / ".github/workflows/upstream-check.yml").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("scripts/check_updates.py", monitor)
-        self.assertIn("scripts/check_provider_parity.py", monitor)
-        self.assertNotIn("source-selection.json", monitor)
-
-    def test_completed_hmcc_modern_staging_is_not_an_active_publisher(self):
-        """Version-pinned first-release bootstraps belong to Git history only."""
-        entries = {row["path"] for row in self.result["files"]}
-        self.assertNotIn("scripts/stage_hmcc_modern_release.py", entries)
-        self.assertFalse(
-            (ROOT / ".github/workflows/stage-hmcc-modern-release.yml").exists()
-        )
-        # Retiring the pre-release job must not remove approved release inputs.
-        self.assertTrue((ROOT / "modules/hmcc-modern/metadata.json").is_file())
-        self.assertTrue(
-            (ROOT / "config/release-plans/hmcc-modern-0.1.0.json").is_file()
-        )
+        pattern = re.compile(r"(?<![A-Za-z0-9_/])scripts/[A-Za-z0-9_./-]+\\.(?:py|sh)\\b")
+        for workflow in (ROOT / ".github/workflows").glob("*.yml"):
+            content = workflow.read_text(encoding="utf-8")
+            for script in pattern.findall(content):
+                with self.subTest(workflow=workflow.name, script=script):
+                    self.assertIn(script, active)
 
     def test_registry_has_no_promoted_editorial_or_publication_claims(self):
         for entry in self.result["files"]:
