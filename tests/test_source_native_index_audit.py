@@ -1,7 +1,8 @@
 """Independent OSIS -> SWORD combined index command; synthetic tests only.
 
-The native producer is mocked here. Its real stock-libsword path is already
-exercised independently on released LSG RawText and original WEBP zText in CI.
+The native producer is mocked here. Actual native stock-SWORD execution,
+edition/source identity and authorial parity require separate reviewed evidence;
+synthetic fixtures are not a second independently verified source edition.
 """
 from hashlib import sha256
 from pathlib import Path
