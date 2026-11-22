@@ -947,7 +947,7 @@
       "owner": "Bible Resources maintainers",
       "path": "scripts/publisher_osis_sword_candidate.py",
       "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Build two isolated SWORD research candidates from exact official OSIS.",
+      "purpose_first_line": "Build isolated SWORD research candidates from pinned official or approved OSIS.",
       "python_imports": [
         "__future__",
         "argparse",
