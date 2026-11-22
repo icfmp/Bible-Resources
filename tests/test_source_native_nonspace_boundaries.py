@@ -10,7 +10,7 @@ from research.bible.source_native_word_boundaries import (
     original_usfx_body_boundaries, NativeBodyBoundaries,
     compare_body_boundary_word_positions,
 )
-from source_native_nonspace_boundaries import (
+from research.bible.source_native_nonspace_boundaries import (
     compare_punctuation_sensitive_boundaries, NonspaceBoundaryError,
 )
 

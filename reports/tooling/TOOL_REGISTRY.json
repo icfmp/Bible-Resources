@@ -1973,35 +1973,6 @@
       "classification": "UNDECIDED",
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/native_absorbed_verse_groups.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Text-free generic witness for authored verses absorbed into native SWORD slots.",
-      "python_imports": [
-        "__future__",
-        "hashlib",
-        "re",
-        "stable_sword_refs",
-        "unicodedata"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "6031e619901f9a214c2a5db23922ada23e378c84ad18282d213aae10bfdca650",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        "scripts/source_native_maintext_probe.py",
-        "tests/test_native_absorbed_verse_groups.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "USFX"
       ],
@@ -3421,6 +3392,35 @@
       "classification": "UNDECIDED",
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/bible/native_absorbed_verse_groups.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Text-free generic witness for authored verses absorbed into native SWORD slots.",
+      "python_imports": [
+        "__future__",
+        "hashlib",
+        "re",
+        "stable_sword_refs",
+        "unicodedata"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "6031e619901f9a214c2a5db23922ada23e378c84ad18282d213aae10bfdca650",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 2,
+      "static_references": [
+        "scripts/source_native_maintext_probe.py",
+        "tests/test_native_absorbed_verse_groups.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "OSIS",
         "USFX"
@@ -3590,6 +3590,37 @@
         "scripts/source_native_maintext_probe.py",
         ".github/workflows/bible-staged-audit.yml",
         "tests/test_source_native_layout_anchors.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/bible/source_native_nonspace_boundaries.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Check source/native p/q structure relative to punctuation-bearing text.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "hashlib",
+        "json"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "3ddbba78e4f5011b88c93ecdaf6c11c1c5e2baf0be7d38a6f6583e4f9f176a62",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/source_native_maintext_probe.py",
+        ".github/workflows/bible-staged-audit.yml",
+        "tests/test_source_native_nonspace_boundaries.py"
       ]
     },
     {
@@ -3771,6 +3802,39 @@
         "scripts/source_native_maintext_probe.py",
         "scripts/sword_missing_verse_witness.py",
         "tests/test_source_native_scope.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "OSIS",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/bible/source_native_structure_topology.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Source/native p/q opening AND closing topology, using private word anchors.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "hashlib",
+        "json",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "56373fed34fc0d5c263c96cb607db979a9ac775ccf6a0ca0e1da8630d9b1a5be",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/source_native_maintext_probe.py",
+        ".github/workflows/bible-staged-audit.yml",
+        "tests/test_source_native_structure_topology.py"
       ]
     },
     {
@@ -5399,15 +5463,12 @@
         "json",
         "lsg_source_compare",
         "lxml",
-        "native_absorbed_verse_groups",
         "native_book_intro_screen",
         "pathlib",
         "re",
         "research",
-        "source_native_nonspace_boundaries",
         "source_native_record_scope_triage",
         "source_native_structural_whitespace",
-        "source_native_structure_topology",
         "source_usfx_newline_provenance",
         "stable_sword_refs",
         "sword_missing_verse_witness",
@@ -5417,7 +5478,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "56d4a12cd5175df0c8a830d18ddd66637c87d1b8163d1e356bc1abdeb1be6d21",
+      "sha256_at_inventory": "0d81a24bf0cb1fccacf03aa071c5657ae31a9443344afa142cb2a11f9492fb85",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -5439,37 +5500,6 @@
         "tests/test_source_native_word_boundaries.py",
         "tests/test_source_usfx_newline_provenance.py",
         "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "USFX"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/source_native_nonspace_boundaries.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Check source/native p/q structure relative to punctuation-bearing text.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "hashlib",
-        "json"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "3ddbba78e4f5011b88c93ecdaf6c11c1c5e2baf0be7d38a6f6583e4f9f176a62",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 3,
-      "static_references": [
-        "scripts/source_native_maintext_probe.py",
-        ".github/workflows/bible-staged-audit.yml",
-        "tests/test_source_native_nonspace_boundaries.py"
       ]
     },
     {
@@ -5640,39 +5670,6 @@
         ".github/workflows/bible-staged-audit.yml",
         "tests/test_source_native_structural_whitespace.py",
         "tests/test_source_usfx_newline_provenance.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "OSIS",
-        "USFX"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/source_native_structure_topology.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Source/native p/q opening AND closing topology, using private word anchors.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "hashlib",
-        "json",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "56373fed34fc0d5c263c96cb607db979a9ac775ccf6a0ca0e1da8630d9b1a5be",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 3,
-      "static_references": [
-        "scripts/source_native_maintext_probe.py",
-        ".github/workflows/bible-staged-audit.yml",
-        "tests/test_source_native_structure_topology.py"
       ]
     },
     {
@@ -5878,10 +5875,10 @@
         "scripts/bible_stage_runner.py",
         "scripts/fast_stock_note_probe.py",
         "scripts/inspect_paragraph_rendering.py",
-        "scripts/native_absorbed_verse_groups.py",
         "scripts/published_reference_audit.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/publisher_osis_usfx_parity.py",
+        "scripts/research/bible/native_absorbed_verse_groups.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
         "scripts/research/bible/private_sword_install.py",
         "scripts/research/bible/source_native_note_positions.py",

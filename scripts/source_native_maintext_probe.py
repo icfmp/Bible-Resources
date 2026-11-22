@@ -21,7 +21,7 @@ from lxml import etree
 
 from lsg_source_compare import read_source_xml, scan_usfx
 from research.bible.private_sword_install import _safe_single_module
-from native_absorbed_verse_groups import inspect_absorbed_source_verse_groups
+from research.bible.native_absorbed_verse_groups import inspect_absorbed_source_verse_groups
 from research.bible.source_native_notes_audit import collect_usfx_numbered_notes, NoteAudit
 from research.bible.source_native_note_positions import (
     original_usfx_note_anchors, NumberedNoteAnchorAudit, NoteAnchorError)
@@ -40,10 +40,10 @@ from research.bible.source_native_word_boundaries import (
 from source_native_record_scope_triage import (
     ScopeTriageError, compare_body_record_scopes,
 )
-from source_native_nonspace_boundaries import (
+from research.bible.source_native_nonspace_boundaries import (
     NonspaceBoundaryError, compare_punctuation_sensitive_boundaries,
 )
-from source_native_structure_topology import (
+from research.bible.source_native_structure_topology import (
     StructureTopologyError, compare_structural_event_topology,
 )
 from source_native_structural_whitespace import (
