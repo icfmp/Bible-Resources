@@ -1,6 +1,13 @@
 name: Probe publisher OSIS to native SWORD candidates (research only)
 
 on:
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: "Repository module ID with approved cleaned OSIS"
+        required: true
+        type: string
+        default: darby-jnd-2024
   issue_comment:
     types: [created]
   pull_request:
@@ -31,7 +38,7 @@ jobs:
       contents: read
       issues: write
     env:
-      RESOURCE_ID: frajnd-2024
+      RESOURCE_ID: ${{ inputs.resource_id || 'frajnd-2024' }}
       CANDIDATE_V11N: ""
       REPORT: /tmp/bible-source-rebuild-probe/candidate-report.json
     steps:
@@ -93,6 +100,9 @@ jobs:
                 --report "$REPORT")
           if [[ -n "${CANDIDATE_V11N:-}" ]]; then
             args+=(--versification "$CANDIDATE_V11N")
+          fi
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            args+=(--approved)
           fi
           python scripts/publisher_osis_sword_candidate.py "${args[@]}"
       - name: Upload metadata-only evidence (never original OSIS or compiled SWORD)
