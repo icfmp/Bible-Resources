@@ -16,7 +16,8 @@ def create_sword(path, *, module="SyntheticBible", driver="zText",
     with zipfile.ZipFile(path, "w") as z:
         z.writestr(conf_name, f"[{module}]\nVersion=1.0\nModDrv={driver}\n"
                   "SourceType=OSIS\nVersification=KJV\nLang=fr\nEncoding=UTF-8\n")
-        z.writestr("modules/texts/ztext/ls/file.bdt", b"test payload")
+        subtree = "texts" if driver in {"RawText", "zText", "RawText4", "zText4"} else "comments"
+        z.writestr(f"modules/{subtree}/synthetic/file.bdt", b"test payload")
         for name, value in extra or []:
             z.writestr(name, value)
 
@@ -50,6 +51,31 @@ class SourceArchivePreflightTests(unittest.TestCase):
         with self.assertRaisesRegex(PilotError, "module ID mismatch"):
             inspect_archive(path, source_kind="sword", expected_module_id="OtherCom",
                             expected_category="commentary")
+
+    def test_sword_archive_with_wrong_category_payload_is_rejected(self):
+        # A declared zCom4 commentary with only Bible data used to pass.
+        # Archive and .conf inspection must not claim a usable module.
+        path = self.root / "mismatched-payload.zip"
+        # A ZIP with a valid commentary .conf but no commentary content.
+        with zipfile.ZipFile(path, "w") as archive:
+            archive.writestr("mods.d/syntheticcom.conf",
+                             "[SyntheticCom]\\nModDrv=zCom4\\nLang=en\\n")
+            archive.writestr("modules/texts/ztext/synthetic/ot.bdt", b"not commentary")
+        with self.assertRaisesRegex(PilotError, "no modules/comments/"):
+            inspect_archive(path, source_kind="sword",
+                            expected_module_id="SyntheticCom",
+                            expected_category="commentary")
+
+    def test_sword_archive_does_not_accept_placeholder_modules_directory(self):
+        path = self.root / "placeholder.zip"
+        with zipfile.ZipFile(path, "w") as archive:
+            archive.writestr("mods.d/syntheticbible.conf",
+                             "[SyntheticBible]\\nModDrv=zText\\nLang=en\\n")
+            archive.writestr("modules/README.txt", "not an indexed SWORD payload")
+        with self.assertRaisesRegex(PilotError, "no modules/texts/"):
+            inspect_archive(path, source_kind="sword",
+                            expected_module_id="SyntheticBible",
+                            expected_category="bible")
 
     def test_generic_authored_zip_inspection_does_not_assume_source_format(self):
         path = self.root / "original.zip"
