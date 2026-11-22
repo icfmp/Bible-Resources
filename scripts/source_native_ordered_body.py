@@ -12,8 +12,8 @@ from collections import Counter
 from hashlib import sha256
 from lxml import etree
 
-from source_usfx_structure import audit_source_usfx
-from source_native_paragraph_counts import (
+from research.bible.source_usfx_structure import audit_source_usfx
+from research.bible.source_native_paragraph_counts import (
     IGNORE_CONTAINER, classify_prefatory_p_sfm,
 )
 
