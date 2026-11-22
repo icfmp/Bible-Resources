@@ -65,26 +65,23 @@
         "collections",
         "guard_osis",
         "hashlib",
-        "json",
         "lxml",
         "pathlib",
         "re",
-        "sys",
-        "unicodedata"
+        "sys"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "9fb68595e90240a8e6149a2020ff9ddd3084ece9b11121095ac46fabc026802f",
+      "sha256_at_inventory": "9d67ee87182ac1b9ddcc5df4dc339e7882c0a996bd72bf4f9fd4d902dc53c344",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 7,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/tool_registry.py",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/policies/QUALITY_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
-        "tests/test_commentary_shared_key_retrieval.py",
         "tests/test_editorial_pipeline.py",
         "tests/test_tool_registry.py"
       ]
