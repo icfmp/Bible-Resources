@@ -250,6 +250,42 @@ class ScriptInventoryTests(unittest.TestCase):
             with self.subTest(caller=caller):
                 self.assertIn(caller, entries[new]["static_references"])
 
+    def test_private_transport_and_reader_probes_are_packaged(self):
+        """Do not present imported diagnostic functions as separate CLIs."""
+        entries = {row["path"]: row for row in self.result["files"]}
+        helpers = {
+            "commentary_bookcode_repair_receipt_guard": (
+                ".github/workflows/commentary-private-text-compare.yml",
+                "tests/test_commentary_bookcode_repair_receipt_guard.py"),
+            "commentary_osis_intro_transport_probe": (
+                "scripts/commentary_section_scope_audit.py",
+                "tests/test_commentary_osis_intro_transport_probe.py"),
+            "commentary_osis_paragraph_presence": (
+                ".github/workflows/commentary-mhc-source-text.yml",
+                "tests/test_commentary_osis_paragraph_presence.py"),
+            "commentary_osis_transport_probe": (
+                "scripts/commentary_osis_mixed_transport_probe.py",
+                "tests/test_commentary_osis_transport_probe.py"),
+            "commentary_xiphos_heading_probe": (
+                ".github/workflows/commentary-mhc-technical-rebuild.yml",
+                ".github/workflows/commentary-modern-source-receipt.yml",
+                "tests/test_commentary_xiphos_heading_probe.py"),
+            "commentary_source_erratum_compiled_probe": (
+                "scripts/commentary_section_scope_audit.py",
+                "tests/test_commentary_source_erratum_compiled_probe.py"),
+        }
+        for name, callers in helpers.items():
+            with self.subTest(name=name):
+                root_file = f"scripts/{name}.py"
+                packaged = f"scripts/research/commentary/{name}.py"
+                self.assertNotIn(root_file, entries)
+                self.assertFalse((ROOT / root_file).exists())
+                self.assertIn(packaged, entries)
+                self.assertTrue((ROOT / packaged).is_file())
+                self.assertTrue(entries[packaged]["has_direct_tests_by_filename"])
+                for caller in callers:
+                    self.assertIn(caller, entries[packaged]["static_references"])
+
     def test_source_authenticity_and_editorial_preflights_are_libraries(self):
         """Six conservative original/source checks are import-only and tested."""
         entries = {row["path"]: row for row in self.result["files"]}
