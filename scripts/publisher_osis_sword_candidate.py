@@ -31,7 +31,7 @@ from research.bible.source_native_osis_structure_screen import (
 )
 from research.bible.source_native_ordered_body import compare_ordered_body_openings
 from research.bible.source_native_osis_target_addressability import audit_explicit_targets
-from source_native_osis_boundary_positions import (
+from research.bible.source_native_osis_boundary_positions import (
     authorial_book_streams,authorial_outside_book_titles,
     NativeBookStreams,compare_book_boundary_positions,
 )

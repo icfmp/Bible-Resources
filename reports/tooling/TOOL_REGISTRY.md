@@ -73,7 +73,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/maintext_fidelity_classification.py`](../../scripts/maintext_fidelity_classification.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/native_book_intro_screen.py`](../../scripts/native_book_intro_screen.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/normalize_osis.py`](../../scripts/normalize_osis.py) | KEEP_GENERIC | not established | 8 | not determined |
-| [`scripts/osis_semantic_fidelity.py`](../../scripts/osis_semantic_fidelity.py) | UNDECIDED | named test | 2 | not determined |
+| [`scripts/osis_semantic_fidelity.py`](../../scripts/osis_semantic_fidelity.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/pilot_fetch.py`](../../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 19 | not determined |
 | [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | named test | 80 | not determined |
 | [`scripts/pilot_runtime.py`](../../scripts/pilot_runtime.py) | UNDECIDED | named test | 3 | not determined |
@@ -115,6 +115,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/bible/source_native_note_positions.py`](../../scripts/research/bible/source_native_note_positions.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/research/bible/source_native_notes_audit.py`](../../scripts/research/bible/source_native_notes_audit.py) | UNDECIDED | named test | 6 | source/native audit |
 | [`scripts/research/bible/source_native_ordered_body.py`](../../scripts/research/bible/source_native_ordered_body.py) | UNDECIDED | named test | 5 | not determined |
+| [`scripts/research/bible/source_native_osis_boundary_positions.py`](../../scripts/research/bible/source_native_osis_boundary_positions.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_osis_structure_screen.py`](../../scripts/research/bible/source_native_osis_structure_screen.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_osis_target_addressability.py`](../../scripts/research/bible/source_native_osis_target_addressability.py) | UNDECIDED | named test | 6 | not determined |
 | [`scripts/research/bible/source_native_paragraph_counts.py`](../../scripts/research/bible/source_native_paragraph_counts.py) | UNDECIDED | named test | 7 | not determined |
@@ -167,10 +168,9 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/source_native_division_markers.py`](../../scripts/source_native_division_markers.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/source_native_index_audit.py`](../../scripts/source_native_index_audit.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/source_native_maintext_probe.py`](../../scripts/source_native_maintext_probe.py) | UNDECIDED | named test | 16 | source/native audit |
-| [`scripts/source_native_osis_boundary_positions.py`](../../scripts/source_native_osis_boundary_positions.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/source_native_record_scope_triage.py`](../../scripts/source_native_record_scope_triage.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/source_native_structural_whitespace.py`](../../scripts/source_native_structural_whitespace.py) | UNDECIDED | named test | 4 | not determined |
-| [`scripts/source_osis_inventory.py`](../../scripts/source_osis_inventory.py) | UNDECIDED | named test | 28 | source/native audit |
+| [`scripts/source_osis_inventory.py`](../../scripts/source_osis_inventory.py) | UNDECIDED | named test | 29 | source/native audit |
 | [`scripts/source_osis_note_link_triage.py`](../../scripts/source_osis_note_link_triage.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/source_osis_note_markup_shape.py`](../../scripts/source_osis_note_markup_shape.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/source_usfx_newline_provenance.py`](../../scripts/source_usfx_newline_provenance.py) | UNDECIDED | named test | 5 | not determined |

@@ -34,7 +34,7 @@ from source_osis_inventory import source_inventory
 from research.bible.source_native_osis_structure_screen import (
     authorial_structures, authorial_body_opening_sequences,
 )
-from source_native_osis_boundary_positions import (
+from research.bible.source_native_osis_boundary_positions import (
     authorial_book_streams, authorial_outside_book_titles,
 )
 from guard_osis import _schema, parse_xml
