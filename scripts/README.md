@@ -13,7 +13,7 @@ The `scripts/` directory contains **production commands**, reusable libraries, i
 
 For a new resource, begin with the [canonical production pipeline](../docs/PRODUCTION_PIPELINE.md). Do not improvise a second importer or add a script for each individual verse or edition correction.
 
-The commentary lexical, original-source book identity, Unicode, cross-slot, layout-census and source/native boundary witnesses — along with the source-scoped link-plan library — are **import-only** helpers under [`research/commentary/`](research/commentary/README.md). Their diagnostic results never authorize commentary movement, Scripture reference rewriting, or publication. Run the existing audited entrypoints and tests rather than treating an internal research function as an independent source-correction command.
+The commentary lexical, original-source book identity, Unicode, cross-slot, layout-census, source/native boundary and reference-registry witnesses — together with bounded erratum, metadata and rebuild-attestation **proposals** — are **import-only** helpers under [`research/commentary/`](research/commentary/README.md). Their diagnostic results never authorize commentary movement, Scripture reference rewriting, or publication. Run the existing audited entrypoints and tests rather than treating an internal research function as an independent source-correction command.
 
 ## Changing a script
 
