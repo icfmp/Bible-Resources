@@ -65,7 +65,6 @@
         "collections",
         "guard_osis",
         "hashlib",
-        "lxml",
         "pathlib",
         "re",
         "sys"
