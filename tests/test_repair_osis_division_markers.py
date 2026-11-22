@@ -8,7 +8,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from repair_osis_division_markers import patch_divisions, DivisionRepairError
-from publisher_osis_usfx_parity import original_osis_verses_and_notes
+from research.bible.source_osis_verse_notes import original_osis_verses_and_notes
 from source_osis_inventory import OSIS, _source_tree
 
 SOURCE = b"""<?xml version='1.0' encoding='utf-8'?>
