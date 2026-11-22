@@ -128,7 +128,7 @@ def main(argv=None):
     original["no_bible_text_validated"] = True
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
-        args.report.write_text(json.dumps(original, indent=2, ensure_ascii=False) + "\\n", encoding="utf-8")
+        args.report.write_text(json.dumps(original, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps({
         "status": "reviewed_XSD_and_dependency_verified",
         "source": OFFICIAL_MAIN,
