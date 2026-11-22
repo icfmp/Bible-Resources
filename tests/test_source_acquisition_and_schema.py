@@ -81,7 +81,7 @@ class SourceAcquisitionAndSchemaTests(unittest.TestCase):
     def test_fetch_rejects_final_redirect_and_preserves_destination(self):
         with tempfile.TemporaryDirectory() as root:
             path = Path(root) / "sword.zip"
-            url = "https://ebible.org/sword/zip/fraLSG1910eb.zip"
+            url = "https://ebible.org/sword/zip/synthetic-bible.zip"
             with self.assertRaises(PilotError):
                 fetch(url, path, "ebible",
                       opener=FakeOpener("https://untrusted.example.com/a.zip", b"no"))

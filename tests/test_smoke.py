@@ -9,19 +9,20 @@ from smoke import reader_failure_class
 
 class ReaderSmokeDiagnostics(unittest.TestCase):
     def test_original_commentary_natural_language_is_not_reader_error(self):
-        original="Genesis 1:1: Matthew Henry explains something was not found, but God created."
+        original="Genesis 1:1: Synthetic author says something was not found, but kept speaking."
         self.assertIsNone(reader_failure_class(0,original))
         self.assertIsNone(reader_failure_class(0,"Genesis 1:1: This error: of men was recorded."))
         self.assertIsNone(reader_failure_class(0,"Genesis 1:1: No modules were found in their houses."))
+        self.assertIsNone(reader_failure_class(0,"Genesis 1:1: Module SyntheticCom not found is a quotation."))
 
     def test_true_missing_module_and_reader_failures_are_blocked(self):
         for actual_error in (
-            "Module BRMHCC not found.",
-            "Module 'BRMHCC' not found",
+            "Module SyntheticCom not found.",
+            "Module 'SyntheticCom' not found",
             "ERROR: No suitable SWORD module",
             "Usage: diatheke -b <module>",
             "No modules found",
-            "Unable to find module BRMHCC",
+            "Unable to find module SyntheticCom",
             "Not a valid reference",
         ):
             with self.subTest(actual_error=actual_error):
