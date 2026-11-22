@@ -23,7 +23,7 @@ ROLES = frozenset({
 # Narrow, verified entry points. The rest are conservatively classified by
 # explicit edition coupling or as pending review, never silently archived.
 CORE = {
-    "bible_intake.py", "bible_stage_runner.py", "guard_osis.py",
+    "bible_intake.py", "guard_osis.py",
     "normalize_osis.py", "pilot_fetch.py", "pilot_preflight.py",
     "sword_native_index.cpp", "sword_native_inventory.py",
     "promote_sword_preview.py", "commentary_text_delta.py",

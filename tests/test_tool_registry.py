@@ -356,7 +356,7 @@ class ScriptInventoryTests(unittest.TestCase):
         entries = {row["path"]: row for row in self.result["files"]}
         helpers = {
             "source_usfx_structure": (
-                "scripts/bible_stage_runner.py",
+                "scripts/usfx_schema_gate.py",
                 "tests/test_source_usfx_structure.py"),
             "source_native_scope": (
                 "scripts/fast_stock_note_probe.py",
