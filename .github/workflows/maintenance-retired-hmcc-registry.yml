@@ -1,0 +1,31 @@
+name: One-shot retirement registry refresh
+on:
+  pull_request:
+    paths:
+      - .github/workflows/maintenance-retired-hmcc-registry.yml
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: maintenance/retire-hmcc-modern-staging-20261122
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate exact registry without this temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/maintenance-retired-hmcc-registry.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git add -f reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore: sync inventory after retiring HMCC Modern first-release staging'
+          git push origin HEAD:maintenance/retire-hmcc-modern-staging-20261122
