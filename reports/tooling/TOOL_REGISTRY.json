@@ -271,11 +271,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         ".github/workflows/upstream-check.yml",
         "docs/technical/SOURCE_INVENTORY.md",
-        "tests/test_provider_parity.py"
+        "tests/test_provider_parity.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -313,7 +314,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/commentary_intake.py",
         "scripts/pilot_preflight.py",
@@ -321,6 +322,7 @@
         "docs/technical/SOURCE_INVENTORY.md",
         "tests/test_catalogue_update_contract.py",
         "tests/test_provider_parity.py",
+        "tests/test_tool_registry.py",
         "tests/test_updates.py"
       ]
     },
