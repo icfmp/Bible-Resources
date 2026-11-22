@@ -3824,7 +3824,7 @@ jobs:
           sys.path.insert(0,"scripts")
           from commentary_xiphos_dual_reader import (
               _run_real_gui,verify_and_install_reviewed_bible)
-          from commentary_xiphos_heading_probe import (
+          from research.commentary.commentary_xiphos_heading_probe import (
               probe_real_xiphos_commentary_heading_menu)
           from pilot_subprocess import present_key,query
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
