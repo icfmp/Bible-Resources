@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections import Counter
 from lxml import etree
 
-from source_native_paragraph_counts import audit_usfx_book_prefaces, IGNORE_CONTAINER
+from research.bible.source_native_paragraph_counts import audit_usfx_book_prefaces, IGNORE_CONTAINER
 from native_milestone_pair_audit import _strict_root, NativeMilestoneAuditError
 from sword_native_inventory import INTRO
 
