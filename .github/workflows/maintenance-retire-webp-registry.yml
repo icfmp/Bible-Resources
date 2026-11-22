@@ -19,8 +19,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/tool_registry.py --write
           git rm .github/workflows/maintenance-retire-webp-registry.yml
+          python scripts/tool_registry.py --write
           git add -f reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
           python scripts/tool_registry.py --check
           git config user.name "github-actions[bot]"
