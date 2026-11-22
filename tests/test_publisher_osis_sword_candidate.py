@@ -1,6 +1,8 @@
 """Synthetic safety tests for disposable official OSIS SWORD research builds."""
 import os
 from pathlib import Path
+import json
+from hashlib import sha256
 import sys
 import tempfile
 import unittest
@@ -11,7 +13,7 @@ from publisher_osis_sword_candidate import (
     PublisherSWORDResearchError, _create_candidate_layout, _native_notes,
     _read_native_frames, _compile_osis, config_for, safe_failure_code,
     compiler_output_metrics,
-    select_candidate_versifications,
+    select_candidate_versifications, approved_source_for,
 )
 
 
@@ -33,6 +35,59 @@ class PublisherSwordProbeTests(unittest.TestCase):
         for invalid in ("KJV","../evil","","DarbyFr/evil"):
             with self.assertRaises(PublisherSWORDResearchError):
                 select_candidate_versifications(cfg,invalid)
+
+    def test_approved_cleaned_osis_uses_exact_published_source_pins(self):
+        for name, scheme in (("darby-jnd-2024", "Luther"),
+                             ("lsg-1910", "Segond")):
+            with self.subTest(resource=name):
+                cfg, raw = approved_source_for(name)
+                self.assertEqual(cfg["candidate_versifications"], [scheme])
+                self.assertEqual(cfg["language"], "fr")
+                self.assertGreater(len(raw), 1_000_000)
+                meta = json.loads((Path(__file__).resolve().parents[1] /
+                                   "modules" / name /
+                                   "SOURCE_VALIDATION.json").read_text())
+                self.assertEqual(sha256(raw).hexdigest(), meta["source_sha256"])
+
+    def test_approved_source_rejects_tampering_before_compilation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            module = root / "modules" / "fixture"
+            module.mkdir(parents=True)
+            cleaned = root / "sources/cleaned/bibles/en/fixture"
+            cleaned.mkdir(parents=True)
+            xml = cleaned / "fixture.osis.xml"
+            xml.write_bytes(b"<osis>approved bytes</osis>")
+            digest = sha256(xml.read_bytes()).hexdigest()
+            meta = {"id":"fixture", "category":"bible", "language":"en",
+                    "sword_id":"TestFixture", "versification":"KJV",
+                    "quality":{"status":"approved"}}
+            receipt = {"status":"validated", "source_kind":"bible",
+                       "source_sha256":digest}
+            manifest = {"resource_id":"fixture", "type":"bible",
+                        "language":"en", "source_format":"OSIS",
+                        "cleaned_source_sha256":digest}
+            (module / "metadata.json").write_text(json.dumps(meta))
+            (module / "SOURCE_VALIDATION.json").write_text(json.dumps(receipt))
+            (cleaned / "CLEANUP_MANIFEST.json").write_text(json.dumps(manifest))
+            cfg, raw = approved_source_for("fixture", root=root)
+            self.assertEqual(raw, xml.read_bytes())
+            self.assertEqual(cfg["language"], "en")
+            self.assertEqual(cfg["candidate_versifications"], ["KJV"])
+            xml.write_bytes(raw + b"changed")
+            with self.assertRaises(PublisherSWORDResearchError):
+                approved_source_for("fixture", root=root)
+            xml.write_bytes(raw)
+            manifest["cleaned_source_sha256"] = "0" * 64
+            (cleaned / "CLEANUP_MANIFEST.json").write_text(json.dumps(manifest))
+            with self.assertRaises(PublisherSWORDResearchError):
+                approved_source_for("fixture", root=root)
+            manifest["cleaned_source_sha256"] = digest
+            (cleaned / "CLEANUP_MANIFEST.json").write_text(json.dumps(manifest))
+            meta["quality"]["status"] = "pending"
+            (module / "metadata.json").write_text(json.dumps(meta))
+            with self.assertRaises(PublisherSWORDResearchError):
+                approved_source_for("fixture", root=root)
 
     def test_layout_is_separate_nonpublishing_standard_sword(self):
         with tempfile.TemporaryDirectory() as folder:
