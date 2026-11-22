@@ -278,7 +278,10 @@ class ScriptInventoryTests(unittest.TestCase):
                 old_path = "scripts/" + name + ".py"
                 new_path = "scripts/research/commentary/" + name + ".py"
                 self.assertNotIn(old_path, entries)
+                self.assertFalse((ROOT / old_path).exists())
                 self.assertIn(new_path, entries)
+                self.assertTrue((ROOT / new_path).is_file())
+                self.assertTrue(entries[new_path]["has_direct_tests_by_filename"])
                 self.assertEqual(entries[new_path]["entrypoint_hint"],
                                  "library, native helper or workflow-invoked")
                 for caller in consumers:
