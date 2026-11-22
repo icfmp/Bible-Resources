@@ -17,8 +17,8 @@ import re
 from lxml import etree
 
 from native_milestone_pair_audit import _strict_root, NativeMilestoneAuditError, TOP
-from source_native_paragraph_counts import classify_prefatory_p_sfm
-from source_usfx_structure import audit_source_usfx
+from research.bible.source_native_paragraph_counts import classify_prefatory_p_sfm
+from research.bible.source_usfx_structure import audit_source_usfx
 from stable_sword_refs import KEY
 from sword_native_inventory import INTRO
 
