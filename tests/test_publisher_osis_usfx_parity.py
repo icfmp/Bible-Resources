@@ -5,10 +5,10 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
+from research.bible.source_osis_verse_notes import original_osis_verses_and_notes
 from publisher_osis_usfx_parity import (
-    original_osis_verses_and_notes, compare_original_sources,
-    PublisherSourceParityError, _bounded_priority_findings,
-    _note_body_difference_shape,
+    compare_original_sources, PublisherSourceParityError,
+    _bounded_priority_findings, _note_body_difference_shape,
 )
 
 ROOT="""<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">
