@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_rebuild_attestation_draft import private_rebuild_attestation_draft, _native_map_digest
+from research.commentary.commentary_rebuild_attestation_draft import private_rebuild_attestation_draft, _native_map_digest
 from reviewed_compiled_commentary_rebuild import zcom_member_suffixes
 from reviewed_compiled_commentary_rebuild import reviewed_rebuilt_commentary_errors
 
