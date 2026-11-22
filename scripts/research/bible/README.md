@@ -13,6 +13,7 @@ remain in `scripts/` and use these exact checked helpers.
 | [`source_native_nonspace_boundaries.py`](source_native_nonspace_boundaries.py) | Compare source/native punctuation-relative paragraph and poetry boundaries without rewriting words |
 | [`source_native_structure_topology.py`](source_native_structure_topology.py) | Compare structural open/close anchors while preserving authored scope and order |
 | [`source_native_osis_target_addressability.py`](source_native_osis_target_addressability.py) | Check authored OSIS reference targets against actual native SWORD keys without creating verses |
+| [`source_native_osis_boundary_positions.py`](source_native_osis_boundary_positions.py) | Compare OSIS-authored and native SWORD book/verse structural boundaries without exporting source text |
 | [`source_native_osis_structure_screen.py`](source_native_osis_structure_screen.py) | Read-only OSIS to native markup structure census with text excluded from reports |
 | [`source_native_scope.py`](source_native_scope.py) | Compare independently attested verse-key scope with the native SWORD keys |
 | [`source_native_notes_audit.py`](source_native_notes_audit.py) | Source/native numbered and non-numbered note identity and completeness evidence |

@@ -2,6 +2,8 @@
 
 Use `scripts/source_native_maintext_probe.py` to compare publisher **USFX numbered-verse text** with actual compiled stock-SWORD text. This is a **read-only diagnostic**, not a general OSIS conversion validator or a release approval.
 
+**Current OSIS-first workflow:** when the reviewed edition has an OSIS authoring master, audit that exact OSIS directly using `scripts/source_osis_inventory.py`, `scripts/osis_semantic_fidelity.py` and the OSIS-to-native candidate and boundary checks. Do **not** convert an approved OSIS master to USFX merely to run the USFX-only probe. Keep this older USFX probe only to verify a genuinely USFX-authored original or independently pinned historical source witness. The source bytes and edition provenance remain authoritative, regardless of the working format.
+
 ## Inputs and execution
 
 Pin independently acquired USFX and native SWORD ZIP archives, exact edition identities, their hashes, the reviewed USFM-to-OSIS book crosswalk and the native inspectors. Install the SWORD development library for the C++ inspectors.
