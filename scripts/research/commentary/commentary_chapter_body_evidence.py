@@ -12,7 +12,7 @@ import re
 from commentary_source_english_osis_alias import (
     read_existing_66_book_english_aliases, _canon_name,
 )
-from commentary_unresolved_lexical_triage import marked_word_token_indices
+from research.commentary.commentary_unresolved_lexical_triage import marked_word_token_indices
 from commentary_xml_witness import _parse_reference, WORK_REF
 from pilot_preflight import PilotError
 
