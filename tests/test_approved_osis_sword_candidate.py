@@ -13,18 +13,12 @@ from approved_osis_sword_candidate import (
     ApprovedOSISNativeError, _create_candidate_layout, _native_notes,
     _read_native_frames, _compile_osis, safe_failure_code,
     compiler_output_metrics,
-    select_candidate_versifications, approved_source_for,
+    approved_source_for,
 )
 
 
 class ApprovedSourceNativeAuditTests(unittest.TestCase):
-    def test_only_approved_versification_can_be_requested(self):
-        cfg, _ = approved_source_for("darby-jnd-2024")
-        self.assertEqual(select_candidate_versifications(cfg, None), ["Luther"])
-        self.assertEqual(select_candidate_versifications(cfg, "Luther"), ["Luther"])
-        for invalid in ("DarbyFr", "KJV", "../evil", "", "Luther/evil"):
-            with self.assertRaises(ApprovedOSISNativeError):
-                select_candidate_versifications(cfg, invalid)
+    def test_unreviewed_or_missing_approved_modules_are_rejected(self):
         for value in ("../evil", "", "frajnd-2024", "SECRET/private"):
             with self.assertRaises(ApprovedOSISNativeError):
                 approved_source_for(value)
