@@ -1,8 +1,8 @@
 {
   "files": [
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "zText",
@@ -11,7 +11,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/approved_osis_sword_candidate.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Build isolated SWORD research candidates from approved cleaned OSIS masters.",
       "python_imports": [
         "__future__",
@@ -47,8 +47,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -56,7 +56,7 @@
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/audit_osis.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Read-only OSIS editorial audit; structural diagnostics are NOT proposed edits.",
       "python_imports": [
         "__future__",
@@ -176,14 +176,14 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/catalogue_profiles.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Publish only separately approved, source-pinned reader profile descriptions.",
       "python_imports": [
         "__future__",
@@ -244,14 +244,14 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [],
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/check_provider_parity.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Verify that Bible Resources tracks every declared Bible content source.",
       "python_imports": [
         "__future__",
@@ -281,8 +281,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "RawText",
@@ -295,7 +295,7 @@
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/check_updates.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Read-only comparison of local, curated and upstream SWORD module versions.",
       "python_imports": [
         "__future__",
@@ -506,8 +506,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -515,7 +515,7 @@
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/fetch_reviewed_schema.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Fetch the two exactly pinned official XSDs into a disposable local directory.",
       "python_imports": [
         "__future__",
@@ -674,8 +674,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -683,7 +683,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/osis_semantic_fidelity.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Edition-neutral, read-only OSIS source→candidate semantic fidelity audit.",
       "python_imports": [
         "__future__",
@@ -798,14 +798,14 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/pilot_subprocess.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Bounded, timeout-safe diatheke query runner shared by pilot diagnostics.",
       "python_imports": [
         "__future__",
@@ -873,8 +873,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -882,7 +882,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/published_reference_audit.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Verify an immutable, already-approved source→stock-SWORD index audit.",
       "python_imports": [
         "__future__",
@@ -951,8 +951,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "USFX"
@@ -960,7 +960,7 @@
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/research/bible/__init__.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Import-only, source-neutral Bible USFX/source-to-native research evidence.",
       "python_imports": [],
       "reader_tool_signals": [],
@@ -973,8 +973,8 @@
       "static_references": []
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "OSIS",
@@ -983,7 +983,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/research/bible/native_milestone_pair_audit.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Validate *compiled* SWORD sID/eID pairing across occupied native entries.",
       "python_imports": [
         "__future__",
@@ -1011,8 +1011,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "OSIS",
@@ -1021,7 +1021,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/research/bible/native_raw_main_text.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Source-format-independent, strict private SWORD raw main-text reader.",
       "python_imports": [
         "__future__",
@@ -1046,8 +1046,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -1055,7 +1055,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/research/bible/native_sword_markup_census.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Metadata-only census of structural tags in original SWORD raw XML entries.",
       "python_imports": [
         "__future__",
@@ -1077,8 +1077,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "USFX"
@@ -1086,7 +1086,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/research/bible/source_native_note_positions.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Exact numbered-note caller *positions* in original USFX and stock SWORD.",
       "python_imports": [
         "__future__",
@@ -1110,8 +1110,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -1119,7 +1119,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/research/bible/source_native_ordered_body.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Compare already inventoried OSIS/native paragraph and poetry opening events.",
       "python_imports": [
         "__future__",
@@ -1139,8 +1139,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -1148,7 +1148,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/research/bible/source_native_osis_boundary_positions.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Private original OSIS vs native SWORD structural nonspace-boundary screen.",
       "python_imports": [
         "__future__",
@@ -1175,8 +1175,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -1184,7 +1184,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/research/bible/source_native_osis_structure_screen.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Metadata-only original OSIS vs compiled raw-SWORD structural census.",
       "python_imports": [
         "__future__",
@@ -1207,8 +1207,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -1216,7 +1216,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/research/bible/source_native_osis_target_addressability.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Read-only OSIS reference target addressability against native SWORD keys.",
       "python_imports": [
         "__future__",
@@ -1240,8 +1240,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -1249,7 +1249,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/research/bible/source_osis_verse_notes.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Strict, read-only original OSIS verse/note parser shared by source-native checks.",
       "python_imports": [
         "__future__",
@@ -1310,8 +1310,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "GENERALIZE",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "zCom",
@@ -1320,7 +1320,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/reviewed_modern_commentary_rebuild.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
       "purpose_first_line": "Review a modern-English derivative of an attested historical SWORD commentary.",
       "python_imports": [
         "__future__",
@@ -1343,8 +1343,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "zCom",
@@ -1354,7 +1354,7 @@
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/reviewed_osis_commentary_rebuild.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Verify pinned authorial-OSIS rebuilds distributed as native SWORD commentaries.",
       "python_imports": [
         "hashlib",
@@ -1374,14 +1374,14 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/smoke.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Check genuine SWORD interoperability with diatheke for every approved module.",
       "python_imports": [
         "os",
@@ -1406,8 +1406,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS",
@@ -1417,7 +1417,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/source_osis_inventory.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Independent, text-free authorial verse-key inventory from original OSIS.",
       "python_imports": [
         "__future__",
@@ -1451,8 +1451,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS",
@@ -1461,7 +1461,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/stable_sword_refs.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Fail-closed reference-index screening for stock, released SWORD engines.",
       "python_imports": [
         "__future__",
@@ -1637,8 +1637,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "RawText",
@@ -1647,7 +1647,7 @@
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/sword_native_raw_corpus.cpp",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Full native stock-SWORD raw-entry stream, PRIVATE framing only.",
       "python_imports": [],
       "reader_tool_signals": [],
@@ -1706,8 +1706,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "RawText",
@@ -1716,7 +1716,7 @@
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/sword_native_raw_entry.cpp",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "purpose_first_line": "Private native SWORD unfiltered raw-entry probe.",
       "python_imports": [],
       "reader_tool_signals": [],
@@ -1771,7 +1771,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "92b76348ae7e235ab800b5e704873bd09feb54bf838a317b00524bfb910ff9f9",
+      "sha256_at_inventory": "e133443c18c6b27b9a6e782f2284f72b450e8d6ae5f0182b0c4490762c176813",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
