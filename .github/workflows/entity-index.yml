@@ -959,6 +959,19 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Verify complete entity snapshot against actual pinned-source output (runner-local only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="/tmp/bsi-work-entity-${GITHUB_SHA}.tar.gz"
+          python3 -I bible-semantic-index/scripts/work_snapshot.py pack \
+            --kind entity \
+            --source-commit "$GITHUB_SHA" \
+            --file complete-entity-index.json=bible-semantic-index/dist/index.json \
+            --file public-projection.json=bible-semantic-index/dist/bsi-v0.1-without-keyterms.json \
+            --file public-labels-en.json=bible-semantic-index/dist/bsi-v0.1-labels-en.json \
+            --output "$output"
+          python3 -I bible-semantic-index/scripts/work_snapshot.py verify --archive "$output"
       - name: Archive complete entity working state in PRIVATE repository (main only)
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
@@ -972,13 +985,6 @@ jobs:
             exit 0
           fi
           output="/tmp/bsi-work-entity-${GITHUB_SHA}.tar.gz"
-          python3 -I bible-semantic-index/scripts/work_snapshot.py pack \
-            --kind entity \
-            --source-commit "$GITHUB_SHA" \
-            --file complete-entity-index.json=bible-semantic-index/dist/index.json \
-            --file public-projection.json=bible-semantic-index/dist/bsi-v0.1-without-keyterms.json \
-            --file public-labels-en.json=bible-semantic-index/dist/bsi-v0.1-labels-en.json \
-            --output "$output"
           bash bible-semantic-index/scripts/publish_private_work_snapshot.sh "$output" "$GITHUB_SHA"
 
   publish-bsi:
