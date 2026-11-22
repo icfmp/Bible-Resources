@@ -16,6 +16,9 @@ sources/
 work/<type>/<language>/<resource-id>/                # new drafts and local investigations
 modules/<resource-id>/                              # native SWORD and approved metadata
   tools/                                             # only still-needed edition-specific QA/replay scripts
+scripts/                                            # reusable production and audit commands
+  research/bible/                                    # non-CLI USFX/source/native evidence libraries
+  research/commentary/                               # non-CLI commentary evidence libraries
 catalog/v1/                                         # client-facing catalogue
 sword/                                              # distributed module packages
 docs/                                               # durable, generic documentation
@@ -32,6 +35,8 @@ Preserve original source bytes and identity, archive contents, version, exact ed
 Create independent candidates outside the original tree. **A source-derived curated master** under `sources/cleaned/` requires its own pinned hashes and reversible transformation ledger. An edition distributed as **byte-identical upstream stock SWORD** may have edition-specific rights/reader evidence and an editorial index without a reconstructed OSIS master; do not create fictitious source files just to fill the example tree. Verify all text, punctuation, verse mappings, notes, citations, headings, paragraphs, poetry, lexical markup and commentary scopes as applicable. Store resource-specific decisions and test receipts in `editorial/` — **not in global `docs/`**.
 
 Existing historical `work/` layouts may differ. Keep existing paths required to reproduce or resume work until their references have been audited; they are not templates for new resources.
+
+Shared read-only evidence code that has **no independent CLI** belongs in the relevant `scripts/research/` package; source/native USFX and note witnesses are under [`scripts/research/bible/`](../../scripts/research/bible/README.md), and commentary evidence under [`scripts/research/commentary/`](../../scripts/research/commentary/README.md). These are not alternate source formats or approval authorities. Keep the actual stable producer/validator commands in `scripts/` and edition-owned scripts under `modules/<resource-id>/tools/`, after verifying real workflow and test consumers.
 
 ## Compiled and published output
 

@@ -5,7 +5,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from source_native_notes_audit import (
+from research.bible.source_native_notes_audit import (
     collect_usfx_numbered_notes, parse_native_numbered_notes,
     NoteAudit, NoteEvidenceError,
 )

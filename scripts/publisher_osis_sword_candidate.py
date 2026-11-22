@@ -25,7 +25,7 @@ from publisher_osis_usfx_parity import (
     original_osis_verses_and_notes, _nonspace, _fold,
 )
 from source_native_maintext_probe import native_raw_main_text
-from source_native_note_positions import native_note_anchor_positions
+from research.bible.source_native_note_positions import native_note_anchor_positions
 from source_native_osis_structure_screen import (
     authorial_structures, NativeStructuralCensus, authorial_body_opening_sequences,
 )

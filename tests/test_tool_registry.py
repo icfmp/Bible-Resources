@@ -250,6 +250,41 @@ class ScriptInventoryTests(unittest.TestCase):
             with self.subTest(caller=caller):
                 self.assertIn(caller, entries[new]["static_references"])
 
+    def test_bible_source_native_evidence_has_one_packaged_library_each(self):
+        """Real production consumers must follow six non-CLI Bible helpers."""
+        entries = {row["path"]: row for row in self.result["files"]}
+        helpers = {
+            "source_usfx_structure": (
+                "scripts/bible_stage_runner.py",
+                "tests/test_source_usfx_structure.py"),
+            "source_native_scope": (
+                "scripts/fast_stock_note_probe.py",
+                "tests/test_source_native_scope.py"),
+            "source_native_notes_audit": (
+                "scripts/source_native_maintext_probe.py",
+                "tests/test_source_native_notes_audit.py"),
+            "source_native_paragraph_counts": (
+                "scripts/source_native_word_boundaries.py",
+                "tests/test_source_native_paragraph_counts.py"),
+            "source_native_note_positions": (
+                "scripts/publisher_osis_usfx_parity.py",
+                "tests/test_source_native_note_positions.py"),
+            "source_native_layout_anchors": (
+                "scripts/source_native_maintext_probe.py",
+                "tests/test_source_native_layout_anchors.py"),
+        }
+        for name, callers in helpers.items():
+            with self.subTest(name=name):
+                old_path = f"scripts/{name}.py"
+                package_path = f"scripts/research/bible/{name}.py"
+                self.assertNotIn(old_path, entries)
+                self.assertFalse((ROOT / old_path).exists())
+                self.assertIn(package_path, entries)
+                self.assertTrue((ROOT / package_path).is_file())
+                self.assertTrue(entries[package_path]["has_direct_tests_by_filename"])
+                for caller in callers:
+                    self.assertIn(caller, entries[package_path]["static_references"])
+
     def test_private_transport_and_reader_probes_are_packaged(self):
         """Do not present imported diagnostic functions as separate CLIs."""
         entries = {row["path"]: row for row in self.result["files"]}

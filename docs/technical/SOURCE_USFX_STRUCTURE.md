@@ -6,7 +6,7 @@
 
 1. Identify and pin the exact source archive, publisher edition/revision, licence, URL and SHA-256.
 2. Independently validate the original against the reviewed, SHA-pinned USFX schema described in `config/usfx-schema-policy.json`. An XML parse alone is insufficient.
-3. Run the read-only `audit_source_usfx(xml: bytes)` function in `scripts/source_usfx_structure.py`. **This module has no standalone CLI**. The example below uses a private original XML file, emits only text-free metadata, and does not claim to validate its official XSD.
+3. Run the read-only `audit_source_usfx(xml: bytes)` function in `scripts/research/bible/source_usfx_structure.py`. **This module has no standalone CLI**. The example below uses a private original XML file, emits only text-free metadata, and does not claim to validate its official XSD.
 4. Review counts and order of **all** authored books, chapter markers and numbered verses. Record native source-only books or unusual versification explicitly.
 5. Inspect original XML element/attribute occurrence counts; ordered structural hashes; paragraph/poetry/heading markers; note kinds and callers; and explicitly encoded reference destinations.
 6. Classify duplicates, reversed or inconsistent ranges, ambiguous nesting, unknown elements and nonstandard constructs as **BLOCKED**, not automatically corrected.
@@ -17,7 +17,7 @@ Example, after independently validating the exact original USFX against the pinn
 PYTHONPATH=scripts python - <<'PY'
 import json
 from pathlib import Path
-from source_usfx_structure import audit_source_usfx
+from research.bible.source_usfx_structure import audit_source_usfx
 
 original = Path("/private/source.usfx.xml")
 report = audit_source_usfx(original.read_bytes())

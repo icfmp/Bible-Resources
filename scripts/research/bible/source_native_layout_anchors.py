@@ -13,7 +13,7 @@ import re
 
 from lxml import etree
 
-from source_usfx_structure import audit_source_usfx
+from research.bible.source_usfx_structure import audit_source_usfx
 
 MAX_MARKERS = 300_000
 MAX_EXAMPLES = 18

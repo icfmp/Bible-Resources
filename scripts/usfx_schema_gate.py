@@ -93,7 +93,7 @@ def validate_source_with_pinned_schema(xml: bytes, schema: bytes, policy: dict) 
             or sha256(schema).hexdigest() != policy["sha256"]):
         raise USFXSchemaError("Unapproved or drifting official USFX XSD")
     compiled, evidence = examine_schema(schema)
-    from source_usfx_structure import audit_source_usfx
+    from research.bible.source_usfx_structure import audit_source_usfx
     # Basic XML structural checks independently reject DTD and invalid content.
     inventory = audit_source_usfx(xml)
     if inventory["source_structural_issues"]:

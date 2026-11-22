@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from source_native_note_positions import (
+from research.bible.source_native_note_positions import (
     NoteAnchorError, NumberedNoteAnchorAudit,
     native_note_anchor_positions, original_usfx_note_anchors,
 )

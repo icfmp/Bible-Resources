@@ -8,6 +8,7 @@ The `scripts/` directory contains **production commands**, reusable libraries, i
 | --- | --- |
 | `scripts/*.py`, `scripts/*.cpp`, `scripts/*.sh` | Existing production entrypoints, shared validators, native inspectors and research commands whose callers have not yet been migrated |
 | [`research/commentary/`](research/commentary/README.md) | Non-CLI, read-only commentary chapter, section, introduction, paragraph and native-scope diagnostics; **not** publication or editorial approval |
+| [`research/bible/`](research/bible/README.md) | Shared read-only USFX, authored note, source/native scope and structural anchor libraries; no CLI, source edits, or editorial approval |
 | `modules/<resource-id>/tools/` | Maintained edition-only diagnostics/replay, never a second publisher; see [LSG 1910](../modules/lsg-1910/tools/README.md) and [Darby](../modules/darby-jnd-2024/tools/README.md) |
 | [Generated tool inventory](../reports/tooling/TOOL_REGISTRY.md) | Every tracked tool's classification, source hash, imports and static callers; review evidence, **not** proof that a script is unused |
 

@@ -66,7 +66,7 @@ def _run_source(manifest: dict, archives: dict, work: Path, *, schema: Path | No
     source_format = manifest["source"]["format"]
     if source_format == "USFX":
         from lsg_source_compare import read_source_xml, scan_usfx
-        from source_usfx_structure import audit_source_usfx
+        from research.bible.source_usfx_structure import audit_source_usfx
         raw, receipt = read_source_xml(archives["source"], source_format="usfx")
         counts, refs = scan_usfx(raw)
         inventory = audit_source_usfx(raw)

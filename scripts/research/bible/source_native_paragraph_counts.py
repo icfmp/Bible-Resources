@@ -12,7 +12,7 @@ import json
 import re
 from lxml import etree
 
-from source_usfx_structure import audit_source_usfx
+from research.bible.source_usfx_structure import audit_source_usfx
 
 MAX_EXAMPLES = 24
 IGNORE_CONTAINER = frozenset({"f", "fe", "x", "ef", "ex", "note"})

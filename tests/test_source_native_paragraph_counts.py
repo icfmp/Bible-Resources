@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from source_native_paragraph_counts import compare_authored_native_paragraphs, ParagraphAuditError
+from research.bible.source_native_paragraph_counts import compare_authored_native_paragraphs, ParagraphAuditError
 
 MAPPING=[("GEN","Gen"),("EXO","Exod")]
 
@@ -103,7 +103,7 @@ class TypedParagraphBookTests(unittest.TestCase):
 
 
     def test_prefatory_p_textful_empty_and_notes_are_distinguished_without_leaks(self):
-        from source_native_paragraph_counts import audit_usfx_book_prefaces
+        from research.bible.source_native_paragraph_counts import audit_usfx_book_prefaces
         xml=(b'<usfx><book id="GEN"><p>PRIVATE INTRODUCTION</p><c id="1"/>'
              b'<p><v id="1"/>VERSE</p></book>'
              b'<book id="EXO"><p sfm="p"><f>PRIVATE NOTE</f></p>'
@@ -121,7 +121,7 @@ class TypedParagraphBookTests(unittest.TestCase):
         self.assertNotIn("PRIVATE",str(receipt))
 
     def test_empty_prefatory_p_and_missing_book_are_visible(self):
-        from source_native_paragraph_counts import audit_usfx_book_prefaces
+        from research.bible.source_native_paragraph_counts import audit_usfx_book_prefaces
         xml=(b'<usfx><book id="GEN"><p/><c id="1"/><v id="1"/>A</book>'
              b'<book id="EXO"><c id="1"/><v id="1"/>B</book></usfx>')
         r=audit_usfx_book_prefaces(xml,MAPPING)
@@ -132,7 +132,7 @@ class TypedParagraphBookTests(unittest.TestCase):
             audit_usfx_book_prefaces(xml,[("GEN","Gen"),("LEV","Lev")])
 
     def test_source_preface_explicit_title_style_never_conflated_with_plain_p(self):
-        from source_native_paragraph_counts import audit_usfx_book_prefaces
+        from research.bible.source_native_paragraph_counts import audit_usfx_book_prefaces
         xml=(b'<usfx>'
              b'<book id="GEN"><p sfm="mt1">PRIVATE BOOK TITLE</p>'
              b'<c id="1"/><v id="1"/>VERSE</book>'
@@ -151,7 +151,7 @@ class TypedParagraphBookTests(unittest.TestCase):
         self.assertNotIn("PRIVATE",str(result))
 
     def test_unknown_sfm_and_private_css_values_are_never_disclosed(self):
-        from source_native_paragraph_counts import audit_usfx_book_prefaces
+        from research.bible.source_native_paragraph_counts import audit_usfx_book_prefaces
         xml=(b'<usfx><book id="GEN">'
              b'<p sfm="PRIVATE_UNKNOWN_SFM" style="PRIVATE_CSS_CLASS" level="3">'
              b'PRIVATE ORIGINAL TITLE</p><c id="1"/><v id="1"/>VERSE'
@@ -170,7 +170,7 @@ class TypedParagraphBookTests(unittest.TestCase):
             self.assertNotIn(value,str(receipt))
 
     def test_known_style_codes_and_unreviewed_values_classify_conservatively(self):
-        from source_native_paragraph_counts import classify_prefatory_p_sfm
+        from research.bible.source_native_paragraph_counts import classify_prefatory_p_sfm
         self.assertEqual(classify_prefatory_p_sfm("mt"),("book_title_style","mt"))
         self.assertEqual(classify_prefatory_p_sfm("imt2"),("book_title_style","imt2"))
         self.assertEqual(classify_prefatory_p_sfm("s1"),("section_heading_style","s1"))
