@@ -532,6 +532,27 @@ jobs:
           path: /tmp/bsi-ubs-hebrew-v11-source-only-semantic-feasibility-PRIVATE.json
           if-no-files-found: error
           retention-days: 14
+      - name: Archive complete ubs-hebrew working state in PRIVATE repository (main only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          BSI_PRIVATE_SNAPSHOT_REPO: ${{ vars.BSI_PRIVATE_SNAPSHOT_REPO }}
+          GH_TOKEN: ${{ secrets.BSI_PRIVATE_SNAPSHOT_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$BSI_PRIVATE_SNAPSHOT_REPO" || -z "$GH_TOKEN" ]]; then
+            echo "::warning::PRIVATE BSI ubs-hebrew working snapshot NOT saved durably: configure BSI_PRIVATE_SNAPSHOT_REPO and BSI_PRIVATE_SNAPSHOT_TOKEN. Existing 14-day CI artifact is NOT a substitute."
+            exit 0
+          fi
+          output="/tmp/bsi-work-ubs-hebrew-${GITHUB_SHA}.tar.gz"
+          python3 -I bible-semantic-index/scripts/work_snapshot.py pack \
+            --kind ubs-hebrew \
+            --source-commit "$GITHUB_SHA" \
+            --file reviewed-lexical-candidate.json=/tmp/bsi-ubs-v1-final-275-word-candidate.json \
+            --file semantic-feasibility-audit.json=/tmp/bsi-ubs-hebrew-v11-source-only-semantic-feasibility-PRIVATE.json \
+            --file contextual-pilot-witnesses.json=/tmp/bsi-ubs-hebrew-v11-72-word-contextual-pilot-PRIVATE.json \
+            --output "$output"
+          bash bible-semantic-index/scripts/publish_private_work_snapshot.sh "$output" "$GITHUB_SHA"
       - name: Upload private final UBS v1 original-word-specific candidate (NOT released)
         uses: actions/upload-artifact@v4
         with:
