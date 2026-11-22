@@ -1,7 +1,5 @@
 """Synthetic, fully offline ZIP preflight tests; no real Bible text needed."""
-import json
 from pathlib import Path
-import shutil
 import sys
 import tempfile
 import unittest
@@ -9,7 +7,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from pilot_preflight import PilotError, inspect_archive, inspect_pilot, main
+from pilot_preflight import PilotError, inspect_archive
 
 
 def create_sword(path, *, module="fraLSG1910eb", driver="zText",
@@ -28,7 +26,6 @@ class PilotPreflightTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
-        self.config = json.loads((ROOT / "config/pilot-sources.json").read_text())
 
     def test_lsg_without_text_mutation_and_with_metadata(self):
         path = self.root / "lsg.zip"
@@ -43,33 +40,34 @@ class PilotPreflightTests(unittest.TestCase):
         self.assertEqual(report["member_count"], 2)
         self.assertEqual(path.read_bytes(), before)
 
-    def test_full_mhc_zcom4_accepted_and_distinct_from_mhcc(self):
-        path = self.root / "mhc.zip"
+    def test_zcom4_commentary_is_accepted_but_not_misidentified_as_mhcc(self):
+        path = self.root / "commentary.zip"
         create_sword(path, module="MHC", driver="zCom4")
-        report = inspect_pilot("mhc", path, config=self.config)
-        self.assertEqual(report["sword"]["sword_conf"]["driver"], "zCom4")
-        self.assertFalse(report["approved_for_publication"])
+        report = inspect_archive(
+            path, source_kind="sword", expected_module_id="MHC",
+            expected_category="commentary")
+        self.assertEqual(report["sword_conf"]["driver"], "zCom4")
         with self.assertRaisesRegex(PilotError, "module ID mismatch"):
             inspect_archive(path, source_kind="sword", expected_module_id="MHCC",
                             expected_category="commentary")
 
-    def test_source_zip_optional_only_for_mhc_and_required_for_lsg(self):
-        path = self.root / "lsg.zip"
-        create_sword(path)
-        with self.assertRaisesRegex(PilotError, "Source archive must"):
-            inspect_pilot("lsg", path, config=self.config)
-        source = self.root / "usfm.zip"
-        with zipfile.ZipFile(source, "w") as z:
-            z.writestr("fraLSG/GEN.usfm", b"\\id GEN\n")
-        report = inspect_pilot("lsg", path, source, config=self.config)
-        self.assertEqual(report["authored"]["format_claim"], "USFM")
-        self.assertFalse(report["source_to_sword_text_verified"])
+    def test_generic_authored_zip_inspection_does_not_assume_source_format(self):
+        path = self.root / "original.zip"
+        with zipfile.ZipFile(path, "w") as archive:
+            archive.writestr("original/GEN.usfm", b"\\\\id GEN\\n")
+        before = path.read_bytes()
+        report = inspect_archive(path, source_kind="authored")
+        self.assertEqual(report["source_kind"], "authored")
+        self.assertEqual(report["member_count"], 1)
+        self.assertEqual(path.read_bytes(), before)
+        self.assertNotIn("sword_conf", report)
 
-    def test_cannot_silently_accept_mhc_with_wrong_category(self):
-        path = self.root / "mhc.zip"
+    def test_commentary_driver_is_rejected_for_wrong_module_category(self):
+        path = self.root / "commentary.zip"
         create_sword(path, module="MHC", driver="zText")
         with self.assertRaisesRegex(PilotError, "category or driver"):
-            inspect_pilot("mhc", path, config=self.config)
+            inspect_archive(path, source_kind="sword", expected_module_id="MHC",
+                            expected_category="commentary")
 
     def test_rejects_traversal_absolute_and_windows_paths(self):
         for i, unsafe in enumerate(("../outside.txt", "/tmp/path",
@@ -117,17 +115,6 @@ class PilotPreflightTests(unittest.TestCase):
             inspect_archive(missing, source_kind="sword",
                             expected_module_id="fraLSG1910eb", expected_category="bible")
 
-    def test_blocked_report_replaces_old_success(self):
-        file = self.root / "bad.zip"
-        file.write_text("no ZIP")
-        report = self.root / "report.json"
-        report.write_text('{"status":"inspected_not_approved"}')
-        status = main(["--pilot", "lsg", "--sword-zip", str(file),
-                       "--report", str(report)])
-        self.assertEqual(status, 1)
-        content = json.loads(report.read_text())
-        self.assertEqual(content["status"], "blocked")
-        self.assertFalse(content["approved_for_publication"])
 
 
 if __name__ == "__main__":

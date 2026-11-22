@@ -85,6 +85,19 @@ editorial proof. All edition-specific link corrections, restorations,
 authorizations and SHA-256 evidence remain frozen and are **not** inferred
 from a generic validator or revised on the basis of the format helper.
 
+## First-pilot download path retirement
+
+The former hand-picked Segond/MHC stock SWORD ZIP source manifest and
+its edition-specific executable download/preflight reporting modes were
+retired. Both were preliminary research paths, not the approved source
+master or publication process. The **provider-allowlisted HTTPS downloader**
+remains as a library for real commentary intake and native archive probes;
+the bounded ZIP safety/SWORD metadata inspector remains a library for Bible
+and commentary source checks. Their existing anti-redirect, size, overwrite,
+archive traversal, duplicate name and symlink protections remain testable
+offline. No CLI now implies that a stock SWORD archive is a preferred
+source or authorizes an edition publication.
+
 ## Next maintenance boundary
 
 Further reduction now requires a **proved functional consolidation**:

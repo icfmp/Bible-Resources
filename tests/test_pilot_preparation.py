@@ -10,7 +10,7 @@ import urllib.error
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from pilot_fetch import PilotError, SafeRedirect, fetch, validate_url
+from pilot_fetch import ALLOWED_HOSTS, PilotError, SafeRedirect, fetch, validate_url
 from fetch_reviewed_schema import inspect_bytes, main as schema_main, OFFICIAL_MAIN, OFFICIAL_DEP
 from validate import DRIVERS, ALLOWED
 
@@ -52,24 +52,30 @@ class PreparationTests(unittest.TestCase):
                     "https://evil.example.net@bad.test/x"):
             with self.subTest(url=url):
                 with self.assertRaises(PilotError):
-                    validate_url(url, "lsg")
-        validate_url("https://ebible.org/Scriptures/fraLSG_usfm.zip", "lsg")
-        validate_url("https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHC.zip", "mhc")
+                    validate_url(url, "ebible")
+        validate_url("https://ebible.org/Scriptures/fraLSG_usfm.zip", "ebible")
+        validate_url("https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHC.zip", "crosswire")
         with self.assertRaises(PilotError):
-            SafeRedirect("lsg").redirect_request(
+            SafeRedirect("ebible").redirect_request(
                 None, None, 302, "moved", {}, "http://ebible.org/sword/zip/test.zip"
             )
+
+    def test_legacy_edition_pilots_cannot_be_used_as_download_providers(self):
+        self.assertEqual(set(ALLOWED_HOSTS), {"ebible", "crosswire", "ccel"})
+        for legacy in ("lsg", "mhc", "not-reviewed"):
+            with self.subTest(provider=legacy), self.assertRaises(PilotError):
+                validate_url("https://ebible.org/example.zip", legacy)
 
     def test_fetch_does_not_overwrite_or_leave_temp_artifacts(self):
         with tempfile.TemporaryDirectory() as root:
             path = Path(root) / "sword.zip"
             url = "https://ebible.org/sword/zip/fraLSG1910eb.zip"
             payload = b"demo zip bytes"
-            result = fetch(url, path, "lsg", opener=FakeOpener(url, payload))
+            result = fetch(url, path, "ebible", opener=FakeOpener(url, payload))
             self.assertEqual(result["sha256"], hashlib.sha256(payload).hexdigest())
             self.assertEqual(path.read_bytes(), payload)
             with self.assertRaisesRegex(PilotError, "overwrite"):
-                fetch(url, path, "lsg", opener=FakeOpener(url, b"replacement"))
+                fetch(url, path, "ebible", opener=FakeOpener(url, b"replacement"))
             self.assertEqual(list(Path(root).glob(".pilot-*")), [])
 
     def test_fetch_rejects_final_redirect_and_preserves_destination(self):
@@ -77,7 +83,7 @@ class PreparationTests(unittest.TestCase):
             path = Path(root) / "sword.zip"
             url = "https://ebible.org/sword/zip/fraLSG1910eb.zip"
             with self.assertRaises(PilotError):
-                fetch(url, path, "lsg",
+                fetch(url, path, "ebible",
                       opener=FakeOpener("https://untrusted.example.com/a.zip", b"no"))
             self.assertFalse(path.exists())
             self.assertEqual(list(Path(root).iterdir()), [])
