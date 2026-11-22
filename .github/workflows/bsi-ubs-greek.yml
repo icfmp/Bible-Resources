@@ -1233,6 +1233,26 @@ jobs:
             /tmp/BSI-UBS-Greek-0.1.0.zip.sha256
           if-no-files-found: error
           retention-days: 14
+      - name: Archive complete ubs-greek working state in PRIVATE repository (main only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          BSI_PRIVATE_SNAPSHOT_REPO: ${{ vars.BSI_PRIVATE_SNAPSHOT_REPO }}
+          GH_TOKEN: ${{ secrets.BSI_PRIVATE_SNAPSHOT_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$BSI_PRIVATE_SNAPSHOT_REPO" || -z "$GH_TOKEN" ]]; then
+            echo "::warning::PRIVATE BSI ubs-greek working snapshot NOT saved durably: configure BSI_PRIVATE_SNAPSHOT_REPO and BSI_PRIVATE_SNAPSHOT_TOKEN. Existing 14-day CI artifact is NOT a substitute."
+            exit 0
+          fi
+          output="/tmp/bsi-work-ubs-greek-${GITHUB_SHA}.tar.gz"
+          python3 -I bible-semantic-index/scripts/work_snapshot.py pack \
+            --kind ubs-greek \
+            --source-commit "$GITHUB_SHA" \
+            --file complete-word-review-index.json=/tmp/bsi-ubs-greek-v1-consolidated-original-word-index-PRIVATE.json \
+            --file context-review-batches.json=/tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
+            --output "$output"
+          bash bible-semantic-index/scripts/publish_private_work_snapshot.sh "$output" "$GITHUB_SHA"
       - name: Upload consolidated Greek UBS v1 original-word review index (PRIVATE, NOT PUBLISHED)
         uses: actions/upload-artifact@v4
         with:
