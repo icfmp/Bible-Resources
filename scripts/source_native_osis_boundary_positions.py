@@ -13,7 +13,7 @@ import re
 
 from lxml import etree
 
-from native_milestone_pair_audit import _strict_root
+from research.bible.native_milestone_pair_audit import _strict_root
 from source_osis_inventory import _source_tree, OSIS
 from stable_sword_refs import KEY
 from sword_native_inventory import INTRO
