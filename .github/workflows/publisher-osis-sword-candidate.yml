@@ -82,9 +82,9 @@ jobs:
           if not approved and not legacy:
               raise SystemExit("Invalid source/native research command")
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as out:
-              out.write("RESOURCE_ID="+(approved or legacy).group(1)+"\\n")
-              out.write("CANDIDATE_V11N="+((legacy.group(2) or "") if legacy else "")+"\\n")
-              out.write("CANDIDATE_APPROVED="+("true" if approved else "false")+"\\n")
+              out.write("RESOURCE_ID="+(approved or legacy).group(1)+"\n")
+              out.write("CANDIDATE_V11N="+((legacy.group(2) or "") if legacy else "")+"\n")
+              out.write("CANDIDATE_APPROVED="+("true" if approved else "false")+"\n")
           print("Authorized private source/native research:", (approved or legacy).group(1))
           PY
       - name: Install standard SWORD compiler and independent native inspectors
