@@ -266,7 +266,7 @@ class ScriptInventoryTests(unittest.TestCase):
                  "tests/test_commentary_source_identity_lexical_gate.py"),
             "commentary_prose_cross_slot":
                 ("scripts/commentary_anchor_parity.py",
-                 "scripts/commentary_shared_raw_source_units.py",
+                 "scripts/research/commentary/commentary_shared_raw_source_units.py",
                  "tests/test_commentary_prose_cross_slot.py"),
             "commentary_unresolved_lexical_triage":
                 ("scripts/commentary_section_scope_audit.py",
