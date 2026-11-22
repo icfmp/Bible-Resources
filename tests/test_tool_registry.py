@@ -247,37 +247,29 @@ class ScriptInventoryTests(unittest.TestCase):
                     "commentary_chapter_paragraph_overlap.py"]["static_references"],
         )
 
-    def test_source_neutral_section_probes_are_package_scoped(self):
-        """Every moved non-CLI helper retains its real consumer and direct test."""
-        entries = {item["path"]: item for item in self.result["files"]}
-        for stem in (
+    def test_old_section_scope_experiment_is_not_retained(self):
+        """Completed stock commentary section research stays in Git history."""
+        active = {row["path"] for row in self.result["files"]}
+        retired = (
+            "commentary_section_scope_audit",
+            "commentary_chapter_body_evidence",
             "commentary_editorial_topology",
             "commentary_intro_chapter_text_review",
-            "commentary_paragraph_witness_probe",
+            "commentary_layout_census",
+            "commentary_lexical_overlap",
+            "commentary_literal_erratum_preflight",
+            "commentary_osis_intro_transport_probe",
             "commentary_osis_rebuild_preflight",
-        ):
-            with self.subTest(helper=stem):
-                new_path = f"scripts/research/commentary/{stem}.py"
-                self.assertIn(new_path, entries)
-                self.assertNotIn(f"scripts/{stem}.py", entries)
-                callers = entries[new_path]["static_references"]
-                self.assertIn("scripts/commentary_section_scope_audit.py", callers)
-                self.assertIn(f"tests/test_{stem}.py", callers)
+            "commentary_paragraph_witness_probe",
+            "commentary_public_metadata_preflight",
+            "commentary_rebuild_attestation_draft",
+            "commentary_source_erratum_compiled_probe",
+        )
+        for stem in retired:
+            self.assertNotIn("scripts/" + stem + ".py", active)
+            self.assertNotIn("scripts/research/commentary/" + stem + ".py",
+                             active)
 
-    def test_extracted_section_evidence_has_real_import_callers(self):
-        """Both extracted helpers retain their precise source-bound callers."""
-        entries = {entry["path"]: entry for entry in self.result["files"]}
-        lexical = "scripts/research/commentary/commentary_lexical_overlap.py"
-        chapter = "scripts/research/commentary/commentary_chapter_body_evidence.py"
-        self.assertIn(lexical, entries)
-        self.assertIn(chapter, entries)
-        self.assertIn("scripts/commentary_section_scope_audit.py",
-                      entries[chapter]["static_references"])
-        self.assertIn("tests/test_commentary_section_scope_audit.py",
-                      entries[chapter]["static_references"])
-        self.assertIn(chapter, entries[lexical]["static_references"])
-        self.assertIn("tests/test_commentary_section_scope_audit.py",
-                      entries[lexical]["static_references"])
 
     def test_original_link_identity_gate_is_a_scoped_import_only_helper(self):
         """Check all real module and regression-test consumers after extraction."""
@@ -315,8 +307,6 @@ class ScriptInventoryTests(unittest.TestCase):
             "scripts/commentary_private_text_compare.py",
             "scripts/research/commentary/commentary_prose_cross_slot.py",
             "scripts/research/commentary/commentary_unresolved_lexical_triage.py",
-            "scripts/commentary_section_scope_audit.py",
-            "scripts/research/commentary/commentary_lexical_overlap.py",
             "tests/test_commentary_nonlink_words.py",
             "tests/test_commentary_nonlink_word_alignment.py",
             ".github/workflows/commentary-modern-source-receipt.yml",
@@ -360,9 +350,6 @@ class ScriptInventoryTests(unittest.TestCase):
             "commentary_bookcode_repair_receipt_guard": (
                 ".github/workflows/commentary-private-text-compare.yml",
                 "tests/test_commentary_bookcode_repair_receipt_guard.py"),
-            "commentary_osis_intro_transport_probe": (
-                "scripts/commentary_section_scope_audit.py",
-                "tests/test_commentary_osis_intro_transport_probe.py"),
             "commentary_osis_paragraph_presence": (
                 ".github/workflows/commentary-mhc-source-text.yml",
                 "tests/test_commentary_osis_paragraph_presence.py"),
@@ -373,9 +360,6 @@ class ScriptInventoryTests(unittest.TestCase):
                 ".github/workflows/commentary-mhc-technical-rebuild.yml",
                 ".github/workflows/commentary-modern-source-receipt.yml",
                 "tests/test_commentary_xiphos_heading_probe.py"),
-            "commentary_source_erratum_compiled_probe": (
-                "scripts/commentary_section_scope_audit.py",
-                "tests/test_commentary_source_erratum_compiled_probe.py"),
         }
         for name, callers in helpers.items():
             with self.subTest(name=name):
@@ -393,18 +377,9 @@ class ScriptInventoryTests(unittest.TestCase):
         """Six conservative original/source checks are import-only and tested."""
         entries = {row["path"]: row for row in self.result["files"]}
         helpers = {
-            "commentary_literal_erratum_preflight": (
-                "scripts/commentary_section_scope_audit.py",
-                "tests/test_commentary_literal_erratum_preflight.py"),
             "commentary_reference_registry_triage": (
                 "scripts/commentary_anchor_parity.py",
                 "tests/test_commentary_reference_registry_triage.py"),
-            "commentary_public_metadata_preflight": (
-                "scripts/research/commentary/commentary_source_erratum_compiled_probe.py",
-                "tests/test_commentary_public_metadata_preflight.py"),
-            "commentary_rebuild_attestation_draft": (
-                "scripts/commentary_section_scope_audit.py",
-                "tests/test_commentary_rebuild_attestation_draft.py"),
             "commentary_original_bookcode_repair": (
                 "scripts/commentary_private_text_compare.py",
                 "tests/test_commentary_original_bookcode_repair.py"),
@@ -428,9 +403,6 @@ class ScriptInventoryTests(unittest.TestCase):
         """Six independently useful non-CLI helpers retain real consumers."""
         entries = {row["path"]: row for row in self.result["files"]}
         helpers = {
-            "commentary_layout_census": (
-                "scripts/commentary_section_scope_audit.py",
-                "tests/test_commentary_layout_census.py"),
             "commentary_original_div1_book_consistency": (
                 "scripts/commentary_private_text_compare.py",
                 "tests/test_commentary_original_div1_book_consistency.py"),
@@ -479,8 +451,7 @@ class ScriptInventoryTests(unittest.TestCase):
                  "scripts/research/commentary/commentary_shared_raw_source_units.py",
                  "tests/test_commentary_prose_cross_slot.py"),
             "commentary_unresolved_lexical_triage":
-                ("scripts/commentary_section_scope_audit.py",
-                 "scripts/research/commentary/commentary_chapter_body_evidence.py",
+                ("scripts/commentary_private_text_compare.py",
                  "tests/test_commentary_unresolved_lexical_triage.py"),
         }
         for name, consumers in helpers.items():
