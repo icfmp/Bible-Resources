@@ -13,7 +13,7 @@ on:
       - 'tests/test_commentary_nonlink_words.py'
       - 'scripts/commentary_usfm_title_witness.py'
       - 'tests/test_commentary_usfm_title_witness.py'
-      - 'scripts/commentary_osis_paragraph_presence.py'
+      - 'scripts/research/commentary/commentary_osis_paragraph_presence.py'
       - 'tests/test_commentary_osis_paragraph_presence.py'
       - 'config/commentary-intake/mhc-crosswire.json'
   workflow_dispatch:
@@ -218,7 +218,7 @@ jobs:
                 json.dumps(dict(sorted(types.items())),sort_keys=True))
           import sys
           sys.path.insert(0,str(Path.cwd()/"scripts"))
-          from commentary_osis_paragraph_presence import (
+          from research.commentary.commentary_osis_paragraph_presence import (
               original_authoring_chapter_scope_metadata,
               original_authoring_native_chapter_index_receipt,
           )
@@ -431,7 +431,7 @@ jobs:
           # reports only bounded token lengths and presence/absence, never
           # original CrossWire/CCEL XML words or native verse strings.
           sys.path.insert(0,str(Path.cwd()/"scripts"))
-          from commentary_osis_paragraph_presence import (
+          from research.commentary.commentary_osis_paragraph_presence import (
               original_ccel_paragraph_words,
               exact_original_paragraph_runs_in_osis,
           )
@@ -474,7 +474,7 @@ jobs:
           # de-duplicated original compiled K payloads in the same chapter.
           # No raw content, native key or editorial correction leaves runner.
           from tempfile import TemporaryDirectory
-          from commentary_osis_paragraph_presence import (
+          from research.commentary.commentary_osis_paragraph_presence import (
               PrivateOriginalChapterNativeAnchorCoverage,
               PrivateOriginalNativeWholeCorpusGapSearch,
           )
@@ -663,7 +663,7 @@ jobs:
               # Independent digital witness: all SIX unchanged original
               # SHA-pinned CCEL volumes; never silently treat their digital
               # wording as an edition/redistribution authorization.
-              from commentary_osis_paragraph_presence import (
+              from research.commentary.commentary_osis_paragraph_presence import (
                   private_original_osis_gap_against_pinned_ccel_volume)
               original_ccel_gap_reports=[]
               for original_ccel_volume in sorted(volumes):
