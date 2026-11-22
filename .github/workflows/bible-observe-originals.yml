@@ -53,7 +53,7 @@ jobs:
           DISPATCH_RESOURCE_ID: ${{ inputs.resource_id }}
         run: |
           set -euo pipefail
-          python -m unittest discover -s tests -p 'test_bible_stage_runner.py' -v
+          python -m unittest discover -s tests -p 'test_bible_intake.py' -v
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             printf 'RESOURCE_ID=%s\n' "$DISPATCH_RESOURCE_ID" >> "$GITHUB_ENV"
           fi

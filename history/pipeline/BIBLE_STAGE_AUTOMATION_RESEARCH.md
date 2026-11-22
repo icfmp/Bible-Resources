@@ -1,6 +1,6 @@
 # Bible stage automation — historical findings worth retaining
 
-**Archive, not an operator manual.** This is the concise record of decisions learned while testing real USFX/OSIS/SWORD sources in November 2026. Consult the [current stage runner workflow](../../docs/workflows/BIBLE_STAGE_AUTOMATION.md), [single production contract](../../docs/PRODUCTION_PIPELINE.md) and [source/native technical guidance](../../docs/technical/README.md) for new work. The original 1,127-line investigation, including intermediate sample hashes and all experiments, is recoverable from Git history at pre-condensation commit `d17d41088eea269e879cbfe46f37a17779ea0ef9`.
+**Archive, not an operator manual.** This is the concise record of decisions learned while testing real USFX/OSIS/SWORD sources in November 2026. Consult the [current Bible checkpoints](../../docs/workflows/BIBLE_7_STAGE_WORKFLOW.md), [single production contract](../../docs/PRODUCTION_PIPELINE.md) and [source/native technical guidance](../../docs/technical/README.md) for new work. The original 1,127-line investigation, including intermediate sample hashes and all experiments, is recoverable from Git history at pre-condensation commit `d17d41088eea269e879cbfe46f37a17779ea0ef9`.
 
 ## 1. Upstream changes must invalidate pinned inputs
 
