@@ -9,7 +9,7 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from commentary_prose_cross_slot import (
+from research.commentary.commentary_prose_cross_slot import (
     OriginalProseAlternativeNativeSlotProbe,
     strict_native_stock_plain_words,
     longest_contiguous_original_word_run,
