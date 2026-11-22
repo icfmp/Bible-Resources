@@ -76,7 +76,7 @@ class ProviderParityTests(unittest.TestCase):
     def test_new_bible_provider_is_detected(self):
         sources = dict(self.sources)
         sources["bible/providers.py"] = sources["bible/providers.py"].replace(
-            "PROVIDERS = (*DEFAULT_PROVIDERS, BIBLE_RESOURCES)", "NEW = Provider('new','New','https://new.test/', 'https://new.test/mods.d.tar.gz','https://new.test/zip/')\nPROVIDERS = (NEW, CROSSWIRE, EXTRA"
+            "PROVIDERS = (*DEFAULT_PROVIDERS, BIBLE_RESOURCES)", "NEW = Provider('new','New','https://new.test/', 'https://new.test/mods.d.tar.gz','https://new.test/zip/')\nPROVIDERS = (*DEFAULT_PROVIDERS, BIBLE_RESOURCES, NEW)"
         )
         report = compare(self.config, sources)
         self.assertIn("SWORD: Bible declares missing source new", report["errors"])
