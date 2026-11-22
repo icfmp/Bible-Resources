@@ -52,40 +52,17 @@ class ScriptInventoryTests(unittest.TestCase):
                 self.assertEqual(entries[name]["classification"], "KEEP_GENERIC")
                 self.assertTrue(entries[name]["has_direct_tests_by_filename"])
 
-    def test_lsg_source_probes_are_edition_owned_and_still_invoked(self):
-        """LSG-specific diagnostics are not generic, yet retain their real callers."""
-        entries = {entry["path"]: entry for entry in self.result["files"]}
-        for name, workflow, test_name in (
-            ("lsg_sword_compare.py", "lsg-fidelity.yml",
-             "test_lsg_sword_compare.py"),
-            ("probe_lsg_v11n.py", "lsg-v11n-probe.yml",
-             "test_lsg_v11n_probe.py"),
-        ):
-            with self.subTest(name=name):
-                local = "modules/lsg-1910/tools/" + name
-                self.assertNotIn("scripts/historical/lsg/" + name, entries)
-                self.assertIn(local, entries)
-                self.assertEqual(entries[local]["classification"], "MODULE_LOCAL")
-                # A filename heuristic can miss a real differently named test.
-                # Verify the actual imported test rather than the hint.
-                self.assertIn(".github/workflows/" + workflow,
-                              entries[local]["static_references"])
-                self.assertIn("tests/" + test_name,
-                              entries[local]["static_references"])
-
-    def test_lsg_module_tools_remain_real_command_line_entrypoints(self):
-        """Direct workflow commands still start, without old-path wrappers."""
+    def test_obsolete_first_release_pilots_are_not_active(self):
+        """Original USFX/stock pilots must not survive in the OSIS workflow."""
+        active = {row["path"] for row in self.result["files"]}
         for name in ("lsg_sword_compare.py", "probe_lsg_v11n.py"):
-            with self.subTest(name=name):
-                command = ROOT / "modules/lsg-1910/tools" / name
-                result = subprocess.run(
-                    [sys.executable, str(command), "--help"],
-                    cwd=ROOT,
-                    env=dict(os.environ, PYTHONPATH=str(ROOT / "scripts")),
-                    capture_output=True, text=True, check=False, timeout=15,
-                )
-                self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertIn("usage:", result.stdout)
+            self.assertNotIn("modules/lsg-1910/tools/" + name, active)
+        self.assertNotIn("scripts/lsg_source_compare.py", active)
+        self.assertNotIn("scripts/stage_verified_stock_commentary.py", active)
+        for workflow in ("lsg-fidelity.yml", "lsg-v11n-probe.yml",
+                         "lsg-first-release.yml", "stage-stock-commentary.yml"):
+            self.assertFalse((ROOT / ".github/workflows" / workflow).exists())
+
 
     def test_retired_darby_011_preflight_does_not_leave_live_entrypoints(self):
         """The historical 0.1.0 baseline is no longer in the approved 0.1.1 module."""
@@ -347,9 +324,6 @@ class ScriptInventoryTests(unittest.TestCase):
         """Do not present imported diagnostic functions as separate CLIs."""
         entries = {row["path"]: row for row in self.result["files"]}
         helpers = {
-            "commentary_bookcode_repair_receipt_guard": (
-                ".github/workflows/commentary-private-text-compare.yml",
-                "tests/test_commentary_bookcode_repair_receipt_guard.py"),
             "commentary_osis_paragraph_presence": (
                 ".github/workflows/commentary-mhc-source-text.yml",
                 "tests/test_commentary_osis_paragraph_presence.py"),
