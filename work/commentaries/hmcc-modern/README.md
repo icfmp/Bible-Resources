@@ -2,8 +2,8 @@
 
 **Canonical typed category:** `work/commentaries/hmcc-modern/`.
 
-The actual 1,332 committed manuscripts, editorial draft checkpoints, review
-reports and source-bound receipts remain **unmoved** under
+The accepted chapter manuscripts, source-bound editorial decisions,
+review evidence and production receipts remain **unmoved** under
 [`work/mhcc-modern/`](../../mhcc-modern/) to preserve historical links,
 repository paths used by tests and source-attestation references.
 
@@ -13,8 +13,9 @@ remain under [`modules/hmcc-modern/`](../../../modules/hmcc-modern/).
 
 Useful locations in the existing historical folder:
 
-- [Chapter drafts](../../mhcc-modern/chapters/)
-- [Pilots](../../mhcc-modern/pilots/)
+- [1,189 accepted chapter manuscripts](../../mhcc-modern/production/accepted/)
+- First-pass chapter drafts and pilot experiments are recoverable at [the immutable pre-cleanup revision](https://github.com/icfmp/Bible-Resources/tree/ccf422270a2e42eaa1200e0341d8d7d3886747ff/work/mhcc-modern/)
+- [Unresolved original book-introduction drafts](../../mhcc-modern/chapters/)
 - [Audits, editorial decisions and production receipts](../../mhcc-modern/production/)
 - [Release/source validation records](../../../modules/hmcc-modern/)
 
