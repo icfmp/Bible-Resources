@@ -2,7 +2,7 @@
 
 **2026-11-17. Result: SECONDARY CCEL WITNESS SECOND PASS COMPLETE FOR ALL 69 CHAPTERS. THIS IS NOT ORIGINAL-NATIVE OR INDEPENDENT EDITORIAL ACCEPTANCE.**
 
-**Exact subset:** all **69 historically unchecked `[ ]`** chapter rows preserved in [the unrevised issue #270 snapshot](checkpoints/issue-270-body-2026-11-17-pre-reconciliation.md). They cover **1–2 Timothy, Titus, Hebrews, James, 1–2 Peter, 1–3 John, Jude, Revelation** (12 books). Not inferred from the now-checked issue.
+**Exact subset:** all **69 historically unchecked `[ ]`** chapter rows preserved in [the unrevised issue #270 snapshot](https://github.com/icfmp/Bible-Resources/blob/888d9c6a852da161aa93e9ed151909ba32a4773d/work/mhcc-modern/production/checkpoints/issue-270-body-2026-11-17-pre-reconciliation.md). They cover **1–2 Timothy, Titus, Hebrews, James, 1–2 Peter, 1–3 John, Jude, Revelation** (12 books). Not inferred from the now-checked issue.
 
 **Original authoritative published baseline:** corrected MHCC **0.1.1** (ZIP SHA256 `a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746`; full original native raw corpus SHA256 `2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e`). This exact original module was **not changed**.
 

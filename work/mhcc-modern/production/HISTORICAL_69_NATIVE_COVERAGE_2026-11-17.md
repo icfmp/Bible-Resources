@@ -1,6 +1,6 @@
 # Historical 69 unchecked chapters — native structural translation-coverage audit
 
-**Scope:** the precise **69** chapter rows still marked `[ ]` in the [immutable issue #270 historical snapshot](checkpoints/issue-270-body-2026-11-17-pre-reconciliation.md). The old checklist status was not treated as either evidence of absence or proof of completion.
+**Scope:** the precise **69** chapter rows still marked `[ ]` in the [immutable issue #270 historical snapshot](https://github.com/icfmp/Bible-Resources/blob/888d9c6a852da161aa93e9ed151909ba32a4773d/work/mhcc-modern/production/checkpoints/issue-270-body-2026-11-17-pre-reconciliation.md). The old checklist status was not treated as either evidence of absence or proof of completion.
 
 **Published authoritative source:** corrected SWORD `MHCC` **0.1.1**. SHA-256 of immutable released ZIP: `a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746`. SHA-256 of ordered native corpus: `2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e`.
 
