@@ -947,7 +947,7 @@
       "owner": "Bible Resources maintainers",
       "path": "scripts/publisher_osis_sword_candidate.py",
       "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Build two isolated SWORD research candidates from exact official OSIS.",
+      "purpose_first_line": "Build isolated SWORD research candidates from pinned official or approved OSIS.",
       "python_imports": [
         "__future__",
         "argparse",
@@ -969,7 +969,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "b41dce9f7ff4331f58614199750e6f85f9ead01dc4a0a9a44c4f8fd5123e1553",
+      "sha256_at_inventory": "a5c0a3db0a834aaaa2628f11cd2cb6a1c679f0829685e5360817f979ad1f1443",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
