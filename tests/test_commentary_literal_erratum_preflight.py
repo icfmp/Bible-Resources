@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_literal_erratum_preflight import (
+from research.commentary.commentary_literal_erratum_preflight import (
     preview_exact_reversible_commentary_reference_erratum,
     preview_exact_reversible_commentary_prose_erratum,
 )
