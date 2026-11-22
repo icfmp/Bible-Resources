@@ -56,20 +56,42 @@ class BibleIntakeTests(unittest.TestCase):
                 "DataPath=./modules/texts/rawtext/testmod/\n",
             "modules/texts/rawtext/testmod/ot":"data"
         })
-        self.cfg=load_manifest("webp-research")
-        self.cfg["source"]["sha256"]=sha256(self.source).hexdigest()
-        self.cfg["sword"]["sha256"]=sha256(self.sword).hexdigest()
-        self.cfg["sword"]["module_id"]="TestMod"
-        self.cfg["sword"]["driver"]="RawText"
+        # Test-only edition: real manifest validation without active intake.
+        self.resource_id = "synthetic-research"
+        self.fixture_root = self.folder / "fixture-root"
+        (self.fixture_root / "config/bible-intake").mkdir(parents=True)
+        (self.fixture_root / "schemas").mkdir()
+        shutil.copyfile(ROOT / "schemas/bible-intake.schema.json",
+                        self.fixture_root / "schemas/bible-intake.schema.json")
+        shutil.copyfile(ROOT / "config/standard_usfm_osis_66.json",
+                        self.fixture_root / "config/standard_usfm_osis_66.json")
+        fixture = {
+            "schema_version": 1, "resource_id": self.resource_id,
+            "category": "bible", "title": "Synthetic research Bible",
+            "language": "en", "edition": "Test-only source and native sample",
+            "provider": "ebible", "purpose": "research_only",
+            "rights": {"status": "pending", "evidence_url": "https://ebible.org/"},
+            "source": {"format": "USFX",
+                       "url": "https://ebible.org/Scriptures/synthetic-usfx.zip",
+                       "sha256": sha256(self.source).hexdigest()},
+            "sword": {"url": "https://ebible.org/sword/zip/synthetic-sword.zip",
+                      "sha256": sha256(self.sword).hexdigest(),
+                      "module_id": "TestMod", "driver": "RawText",
+                      "sample_references": ["Gen 1:1", "John 3:16"]},
+            "crosswalk": "config/standard_usfm_osis_66.json",
+        }
+        (self.fixture_root / "config/bible-intake" /
+         (self.resource_id + ".json")).write_text(json.dumps(fixture))
+        self.cfg = load_manifest(self.resource_id, root=self.fixture_root)
         self.opener=_Opener({self.cfg["source"]["url"]:self.source,
                              self.cfg["sword"]["url"]:self.sword})
 
-    def test_exact_manifest_is_research_not_publication(self):
-        m=load_manifest("webp-research")
+    def test_synthetic_manifest_is_research_not_publication(self):
+        m=load_manifest(self.resource_id,root=self.fixture_root)
         self.assertEqual(m["purpose"],"research_only")
         self.assertEqual(m["rights"]["status"],"pending")
         self.assertEqual(m["source"]["format"],"USFX")
-        self.assertEqual(m["sword"]["driver"],"zText")
+        self.assertEqual(m["sword"]["driver"],"RawText")
 
     def test_reject_unknown_or_traversal_resource_id(self):
         for identifier in ("../etc/passwd","no.json","", "X", "a/"+"x"*100):
@@ -114,7 +136,7 @@ class BibleIntakeTests(unittest.TestCase):
 
     def test_observe_upstream_hashes_without_authorizing_revision(self):
         with patch("bible_intake.load_manifest",return_value=self.cfg):
-            report=observe_current_upstream("webp-research",opener=self.opener)
+            report=observe_current_upstream(self.resource_id,opener=self.opener)
         self.assertFalse(report["published"])
         self.assertTrue(report["source_zip_not_retained"])
         self.assertTrue(report["archives"]["source"]["still_pinned"])
@@ -339,9 +361,10 @@ class BibleIntakeTests(unittest.TestCase):
             "evidence": {"stock_reuse_preflight":
                          original["evidence"]["stock_reuse_preflight"]},
         }
-        with patch("bible_stage_runner.run_stage_four_and_five",
-                   return_value=(original,five)) as combined:
-            exit_code=main(["--resource-id","webp-research","--stage","4-5",
+        with patch("bible_stage_runner.load_manifest", return_value=self.cfg), patch(
+                "bible_stage_runner.run_stage_four_and_five",
+                return_value=(original,five)) as combined:
+            exit_code=main(["--resource-id",self.resource_id,"--stage","4-5",
                             "--report-dir",str(self.folder)])
         self.assertEqual(exit_code,0)  # Audit BLOCKED is a valid diagnostic
         combined.assert_called_once()
@@ -424,11 +447,11 @@ class BibleIntakeTests(unittest.TestCase):
         (newroot/"config").mkdir(exist_ok=True)
         shutil.copyfile(ROOT/"schemas/bible-intake.schema.json",
                         newroot/"schemas/bible-intake.schema.json")
-        manifest=load_manifest("webp-research")
+        manifest=load_manifest(self.resource_id,root=self.fixture_root)
         manifest["unexpected_authorization"]="published"
-        (newroot/"config/bible-intake/webp-research.json").write_text(json.dumps(manifest))
+        (newroot/"config/bible-intake"/(self.resource_id+".json")).write_text(json.dumps(manifest))
         with self.assertRaisesRegex(IntakeError,"Invalid reviewed manifest"):
-            load_manifest("webp-research",root=newroot)
+            load_manifest(self.resource_id,root=newroot)
 
 
 if __name__=="__main__":
