@@ -126,20 +126,16 @@ required gates. No unverified report can authorize distribution.
 
 ## Stage D — Prepare source corrections for upstream maintainers
 
-Once an editorial plan has passed source and output validation, generate a
-**private, text-free** proposed correction message containing provider/module,
-reference keys, exact edit reasons, editor evidence and the checked before/
-after/diff hashes:
+Once an editorial plan has passed source and output validation,
+prepare a **private, text-free** upstream correction proposal directly from
+the reviewed plan and normalization receipt. Include the provider, exact
+source edition/revision, affected references, reasons, independently checked
+editorial evidence and original/candidate/diff SHA-256 fingerprints. Verify
+the plan and receipt hashes before sending; never include licensed source
+text unless explicitly permitted.
 
-    python scripts/propose_upstream_edit.py \
-      --plan reviewed-plan.json \
-      --normalization-report reports/normalization.json \
-      --provider eBible --module fraLSG1910eb --source-revision 100.0 \
-      --output pilot-work/upstream-proposal.md
-
-The generator refuses mismatched plan/report fingerprints and does **not**
-submit anything to CrossWire/eBible. The actual patch/diff requires source
-rights review and the upstream's own contribution process. This prevents
+The actual patch/diff requires source rights review and the upstream's own
+contribution process. This prevents
 reimporting our own corrections later as a false update; see
 [UPDATES.md](UPDATES.md) for the provenance reconciliation mechanism.
 

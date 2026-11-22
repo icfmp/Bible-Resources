@@ -2032,16 +2032,14 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 6,
       "static_references": [
-        "scripts/propose_upstream_edit.py",
         "scripts/tool_registry.py",
         ".github/workflows/pilot-source-audit.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/policies/QUALITY_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
-        "tests/test_editorial_pipeline.py",
-        "tests/test_propose_upstream_edit.py"
+        "tests/test_editorial_pipeline.py"
       ]
     },
     {
@@ -2565,39 +2563,6 @@
         ".github/workflows/private-sword-promotion-proof.yml",
         "tests/test_promote_sword_preview.py",
         "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/propose_upstream_edit.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Prepare a text-free upstream correction request from a verified OSIS diff.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "hashlib",
-        "json",
-        "normalize_osis",
-        "pathlib",
-        "sys"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "90487fe31923ef9937669541cec33a6cb8c2661c352142186c9a9245462ac66d",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
-        "tests/test_propose_upstream_edit.py"
       ]
     },
     {
