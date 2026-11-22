@@ -24,7 +24,7 @@ from lxml import etree
 
 from lsg_source_compare import read_source_xml, scan_usfx
 from real_second_bible_probe import _safe_single_module
-from source_native_scope import compare_mapped_scope, read_crosswalk
+from research.bible.source_native_scope import compare_mapped_scope, read_crosswalk
 from stable_sword_refs import KEY, parse_keys, module_payload_digest
 from sword_native_inventory import collect_native_inventory
 
