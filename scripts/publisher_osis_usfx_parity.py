@@ -14,9 +14,6 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import tempfile
-import unicodedata
-
-from lxml import etree
 
 from bible_intake import ROOT, acquire, load_manifest
 from lsg_source_compare import read_source_xml
@@ -25,12 +22,13 @@ from source_native_maintext_probe import authored_usfx_main_text
 from research.bible.source_native_notes_audit import collect_usfx_numbered_notes
 from research.bible.source_native_note_positions import original_usfx_note_anchors
 from research.bible.source_native_scope import read_crosswalk
-from source_osis_inventory import source_inventory, _source_tree, OSIS
 from stable_sword_refs import KEY
+from research.bible.source_osis_verse_notes import (
+    OSISSourceReaderError as PublisherSourceParityError,
+    original_osis_verses_and_notes, _nonspace, _fold,
+)
 
 MAX_SAMPLE = 18
-MAX_NOTE_TEXT = 2 * 1024 * 1024
-EXCLUDED_MAIN = frozenset({"note", "title", "header"})
 
 # Report hard source-identity failures before prolific stylistic note deltas.
 # A global flat first-N sample can otherwise mask the *only* missing verse.
@@ -53,18 +51,6 @@ def _bounded_priority_findings(findings: dict, limit: int = MAX_SAMPLE * 4):
     return [row for kind in sorted(findings,
                                    key=lambda name: (order.get(name, len(order)), name))
             for row in findings[kind]][:limit]
-
-
-class PublisherSourceParityError(ValueError):
-    """Untrusted, contradictory or unsafe original source evidence."""
-
-
-def _nonspace(value: str) -> str:
-    return "".join(c for c in value if not c.isspace())
-
-
-def _fold(value: str) -> str:
-    return " ".join(unicodedata.normalize("NFC",value).split())
 
 
 def _note_body_difference_shape(original: str, publisher: str) -> str:
@@ -102,131 +88,6 @@ def _caller_class(value: str | None):
     if len(value)==1 and not value.isalnum():
         return "single_symbol"
     return "other_unreviewed_literal"
-
-
-def original_osis_verses_and_notes(xml: bytes):
-    """Independently reconstruct verse prose, note bodies and note anchors.
-
-    Only explicit verse IDs are used. Verse milestones must pair exactly;
-    neither malformed tags nor unknown source text is silently discarded.
-    """
-    # This already rejects wrong namespace, DTD and duplicate/out-of-order
-    # verse milestones under the approved original-source OSIS grammar.
-    source_keys, structural = source_inventory(xml)
-    root = _source_tree(xml)
-    books = root.findall(".//" + OSIS + "div[@type='book']")
-    if not books or len(books)>250:
-        raise PublisherSourceParityError("Unrecognized publisher OSIS book divisions")
-    text = {}
-    notes = {}
-    extra = Counter()
-    seen_books = set()
-    for book in books:
-        book_id = book.get("osisID")
-        if (not isinstance(book_id,str) or not book_id
-                or book_id in seen_books):
-            raise PublisherSourceParityError("Duplicate or unreviewed OSIS book ID")
-        seen_books.add(book_id)
-        current = None
-        codepoints = 0
-        verse_container = []
-
-        def append(fragment):
-            nonlocal codepoints
-            if current is not None and fragment:
-                text[current].append(fragment)
-                codepoints += sum(not character.isspace() for character in fragment)
-
-        def visit(node, depth=0):
-            nonlocal current, codepoints
-            if depth > 256:
-                raise PublisherSourceParityError("Excessive official OSIS nesting")
-            if not isinstance(node.tag,str):
-                return
-            local=etree.QName(node).localname
-            if local in EXCLUDED_MAIN:
-                if any(x.tag == OSIS+"verse" for x in node.iterdescendants()):
-                    raise PublisherSourceParityError(
-                        "Publisher heading/note encloses verse numbering")
-                if local == "note":
-                    body="".join(node.itertext())
-                    if len(body.encode("utf-8")) > MAX_NOTE_TEXT:
-                        raise PublisherSourceParityError("Oversized official source note")
-                    if current is None:
-                        extra["notes_outside_numbered_verses"] += 1
-                    else:
-                        # Preserve original labels and linked explicit targets
-                        # privately; only safe aggregates leave this module.
-                        notes[current].append({
-                            "body":body,
-                            "caller":node.get("n"),
-                            "type":node.get("type"),
-                            "point":codepoints,
-                            "targets":tuple(
-                                x.get("osisRef") for x in node.iterdescendants()
-                                if x.tag == OSIS+"reference" and x.get("osisRef")
-                            ),
-                        })
-                return
-
-            is_container=False
-            if node.tag == OSIS+"verse":
-                closing=node.get("eID")
-                start=node.get("sID")
-                reference=node.get("osisID")
-                if closing:
-                    if current != closing or start or reference:
-                        raise PublisherSourceParityError(
-                            "Mispaired publisher OSIS verse milestone")
-                    current=None
-                    return
-                if not reference or KEY.fullmatch(reference) is None:
-                    raise PublisherSourceParityError(
-                        "Invalid publisher OSIS numbered verse identifier")
-                if (start and start != reference) or current is not None:
-                    raise PublisherSourceParityError(
-                        "Overlapping publisher OSIS verse scope")
-                if reference in text or not reference.startswith(book_id+"."):
-                    raise PublisherSourceParityError(
-                        "Publisher OSIS verse duplicates or leaves its book")
-                text[reference]=[]
-                notes[reference]=[]
-                current=reference
-                codepoints=0
-                is_container=not bool(start)
-                if is_container:
-                    verse_container.append(reference)
-            append(node.text)
-            for child in node:
-                visit(child, depth+1)
-                append(child.tail)
-            if is_container:
-                if current != verse_container.pop():
-                    raise PublisherSourceParityError(
-                        "Publisher OSIS container verse cannot be closed")
-                current=None
-
-        visit(book)
-        if current is not None or verse_container:
-            raise PublisherSourceParityError("Unclosed publisher OSIS verse/book boundary")
-    if set(text)!=set(source_keys.splitlines()):
-        raise PublisherSourceParityError(
-            "Independent source inventory and text reader disagree on verse scope")
-    if len(seen_books)!=structural["source_book_count"]:
-        raise PublisherSourceParityError(
-            "Original OSIS book metadata disagrees with independent inspector")
-    strings={ref:"".join(parts) for ref,parts in text.items()}
-    if any(len(s.encode("utf-8"))>MAX_NOTE_TEXT for s in strings.values()):
-        raise PublisherSourceParityError("Oversized publisher Bible verse")
-    return strings,notes,{
-        "publisher_book_count":len(seen_books),
-        "publisher_numbered_verse_count":len(strings),
-        "publisher_numbered_note_count":sum(map(len,notes.values())),
-        "publisher_notes_outside_numbered_verses":
-            extra["notes_outside_numbered_verses"],
-        "source_osis_verse_key_sha256":structural["source_keys_sha256"],
-        "source_osis_schema_version":1,
-    }
 
 
 def compare_original_sources(
