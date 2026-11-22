@@ -11,7 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
 from commentary_private_text_compare import _original_source_markers
-from commentary_source_english_osis_alias import (
+from research.commentary.commentary_source_english_osis_alias import (
     _classify, original_div1_english_alias_vs_declared_osis,
     read_existing_66_book_english_aliases,
 )
