@@ -1365,6 +1365,18 @@ jobs:
           name: bsi-ubs-greek-unapproved-5938-source-word-preview
           path: /tmp/bsi-ubs-greek-original-gap-review.json
           retention-days: 14
+      - name: Verify complete ubs-greek snapshot against actual pinned-source output (runner-local only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="/tmp/bsi-work-ubs-greek-${GITHUB_SHA}.tar.gz"
+          python3 -I bible-semantic-index/scripts/work_snapshot.py pack \
+            --kind ubs-greek \
+            --source-commit "$GITHUB_SHA" \
+            --file complete-word-review-index.json=/tmp/bsi-ubs-greek-v1-consolidated-original-word-index-PRIVATE.json \
+            --file context-review-batches.json=/tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
+            --output "$output"
+          python3 -I bible-semantic-index/scripts/work_snapshot.py verify --archive "$output"
       - name: Archive complete ubs-greek working state in PRIVATE repository (main only)
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
@@ -1378,10 +1390,4 @@ jobs:
             exit 0
           fi
           output="/tmp/bsi-work-ubs-greek-${GITHUB_SHA}.tar.gz"
-          python3 -I bible-semantic-index/scripts/work_snapshot.py pack \
-            --kind ubs-greek \
-            --source-commit "$GITHUB_SHA" \
-            --file complete-word-review-index.json=/tmp/bsi-ubs-greek-v1-consolidated-original-word-index-PRIVATE.json \
-            --file context-review-batches.json=/tmp/bsi-ubs-greek-2728-contextual-review-batches-PRIVATE.json \
-            --output "$output"
           bash bible-semantic-index/scripts/publish_private_work_snapshot.sh "$output" "$GITHUB_SHA"
