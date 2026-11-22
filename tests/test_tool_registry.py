@@ -332,7 +332,7 @@ class ScriptInventoryTests(unittest.TestCase):
                 "scripts/commentary_anchor_parity.py",
                 "tests/test_commentary_reference_registry_triage.py"),
             "commentary_public_metadata_preflight": (
-                "scripts/commentary_source_erratum_compiled_probe.py",
+                "scripts/research/commentary/commentary_source_erratum_compiled_probe.py",
                 "tests/test_commentary_public_metadata_preflight.py"),
             "commentary_rebuild_attestation_draft": (
                 "scripts/commentary_section_scope_audit.py",
