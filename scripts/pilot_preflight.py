@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
-"""Read-only ZIP and SWORD metadata preflight for the two approved pilot IDs.
+"""Read-only generic ZIP and SWORD metadata preflight for source intake.
 
 No texts are normalized, patched, committed or published. Safe ZIP inspection
 does not extract untrusted archive members to disk.
 """
 from __future__ import annotations
 
-import argparse
 import hashlib
-import json
 from pathlib import Path, PurePosixPath
-import re
-import sys
 import zipfile
 
 from check_updates import parse_conf
@@ -113,73 +109,3 @@ def inspect_archive(path: Path, *, source_kind: str, expected_module_id: str | N
     return report
 
 
-def inspect_pilot(pilot: str, sword_archive: Path, authored_archive: Path | None = None,
-                  *, config: dict) -> dict:
-    if config.get("schema_version") != 1 or pilot not in config.get("pilots", {}):
-        raise PilotError("Invalid pilot source configuration or unknown pilot")
-    entry = config["pilots"][pilot]
-    if bool(authored_archive) != bool(entry.get("authored_zip_url")):
-        raise PilotError("Source archive must be supplied exactly when this pilot declares one")
-    result = {
-        "schema_version": 1,
-        "pilot": pilot,
-        "provider": entry["provider"],
-        "module_id": entry["module_id"],
-        "category": entry["category"],
-        "source_page": entry["source_url"],
-        "reference_urls": {
-            "sword": entry["sword_zip_url"],
-            "authored": entry.get("authored_zip_url"),
-        },
-        "approved_for_publication": False,
-        "original_bytes_preserved": True,
-        "inspection_only": True,
-        "sword": inspect_archive(sword_archive, source_kind="sword",
-                                 expected_module_id=entry["module_id"],
-                                 expected_category=entry["category"]),
-    }
-    if authored_archive:
-        result["authored"] = inspect_archive(authored_archive, source_kind="authored")
-        result["authored"]["format_claim"] = entry["authored_format"]
-        # Merely having both ZIPs does not prove an actual verse-level match.
-        result["source_to_sword_text_verified"] = False
-    result["remaining_gates"] = [
-        "license and exact edition review",
-        "official pinned OSIS/USFM source validation",
-        "source-to-SWORD complete text, notes and reference fidelity",
-        "versification and missing-verses audit",
-        "real diatheke and Bible GTK before/after review",
-        "human editorial approval",
-    ]
-    return result
-
-
-def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--pilot", choices=("lsg", "mhc"), required=True)
-    parser.add_argument("--sword-zip", type=Path, required=True)
-    parser.add_argument("--authored-zip", type=Path)
-    parser.add_argument("--config", type=Path, default=ROOT / "config/pilot-sources.json")
-    parser.add_argument("--report", type=Path, required=True)
-    args = parser.parse_args(argv)
-    try:
-        config = json.loads(args.config.read_text(encoding="utf-8"))
-        report = inspect_pilot(args.pilot, args.sword_zip, args.authored_zip, config=config)
-    except (OSError, ValueError, zipfile.BadZipFile, RuntimeError) as exc:
-        report = {"status": "blocked", "pilot": args.pilot, "error": str(exc),
-                  "approved_for_publication": False}
-        result_code = 1
-    else:
-        report["status"] = "inspected_not_approved"
-        result_code = 0
-    args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text(json.dumps(report, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
-                           encoding="utf-8")
-    print(f"Pilot {args.pilot}: {report['status']}; report: {args.report}")
-    if result_code:
-        print(report["error"], file=sys.stderr)
-    return result_code
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
