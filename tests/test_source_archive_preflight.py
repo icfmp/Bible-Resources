@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from pilot_preflight import PilotError, inspect_archive
 
 
-def create_sword(path, *, module="fraLSG1910eb", driver="zText",
+def create_sword(path, *, module="SyntheticBible", driver="zText",
                  conf_name=None, extra=None):
     conf_name = conf_name or f"mods.d/{module.lower()}.conf"
     with zipfile.ZipFile(path, "w") as z:
@@ -21,34 +21,34 @@ def create_sword(path, *, module="fraLSG1910eb", driver="zText",
             z.writestr(name, value)
 
 
-class PilotPreflightTests(unittest.TestCase):
+class SourceArchivePreflightTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
 
-    def test_lsg_without_text_mutation_and_with_metadata(self):
-        path = self.root / "lsg.zip"
+    def test_synthetic_bible_without_text_mutation_and_with_metadata(self):
+        path = self.root / "synthetic-bible.zip"
         create_sword(path)
         before = path.read_bytes()
         report = inspect_archive(path, source_kind="sword",
-                                 expected_module_id="fraLSG1910eb",
+                                 expected_module_id="SyntheticBible",
                                  expected_category="bible")
-        self.assertEqual(report["sword_conf"]["module_id"], "fraLSG1910eb")
+        self.assertEqual(report["sword_conf"]["module_id"], "SyntheticBible")
         self.assertEqual(report["sword_conf"]["category"], "bible")
         self.assertEqual(report["sword_conf"]["driver"], "zText")
         self.assertEqual(report["member_count"], 2)
         self.assertEqual(path.read_bytes(), before)
 
-    def test_zcom4_commentary_is_accepted_but_not_misidentified_as_mhcc(self):
+    def test_zcom4_commentary_is_accepted_but_not_misidentified_as_another_module(self):
         path = self.root / "commentary.zip"
-        create_sword(path, module="MHC", driver="zCom4")
+        create_sword(path, module="SyntheticCom", driver="zCom4")
         report = inspect_archive(
-            path, source_kind="sword", expected_module_id="MHC",
+            path, source_kind="sword", expected_module_id="SyntheticCom",
             expected_category="commentary")
         self.assertEqual(report["sword_conf"]["driver"], "zCom4")
         with self.assertRaisesRegex(PilotError, "module ID mismatch"):
-            inspect_archive(path, source_kind="sword", expected_module_id="MHCC",
+            inspect_archive(path, source_kind="sword", expected_module_id="OtherCom",
                             expected_category="commentary")
 
     def test_generic_authored_zip_inspection_does_not_assume_source_format(self):
@@ -64,9 +64,9 @@ class PilotPreflightTests(unittest.TestCase):
 
     def test_commentary_driver_is_rejected_for_wrong_module_category(self):
         path = self.root / "commentary.zip"
-        create_sword(path, module="MHC", driver="zText")
+        create_sword(path, module="SyntheticCom", driver="zText")
         with self.assertRaisesRegex(PilotError, "category or driver"):
-            inspect_archive(path, source_kind="sword", expected_module_id="MHC",
+            inspect_archive(path, source_kind="sword", expected_module_id="SyntheticCom",
                             expected_category="commentary")
 
     def test_rejects_traversal_absolute_and_windows_paths(self):
@@ -77,29 +77,29 @@ class PilotPreflightTests(unittest.TestCase):
                 create_sword(path, extra=[(unsafe, b"x")])
                 with self.assertRaisesRegex(PilotError, "unsafe ZIP"):
                     inspect_archive(path, source_kind="sword",
-                                    expected_module_id="fraLSG1910eb",
+                                    expected_module_id="SyntheticBible",
                                     expected_category="bible")
 
     def test_rejects_duplicate_casefolded_path(self):
         path = self.root / "duplicate.zip"
-        create_sword(path, extra=[("MODS.D/FRALSG1910EB.CONF", b"[Other]\n")])
+        create_sword(path, extra=[("MODS.D/SYNTHETICBIBLE.CONF", b"[Other]\n")])
         with self.assertRaisesRegex(PilotError, "duplicate ZIP"):
             inspect_archive(path, source_kind="sword",
-                            expected_module_id="fraLSG1910eb",
+                            expected_module_id="SyntheticBible",
                             expected_category="bible")
 
     def test_rejects_symlink_file(self):
         path = self.root / "link.zip"
         with zipfile.ZipFile(path, "w") as z:
-            conf = zipfile.ZipInfo("mods.d/fraLSG1910eb.conf")
-            z.writestr(conf, b"[fraLSG1910eb]\nModDrv=zText\n")
+            conf = zipfile.ZipInfo("mods.d/SyntheticBible.conf")
+            z.writestr(conf, b"[SyntheticBible]\nModDrv=zText\n")
             link = zipfile.ZipInfo("modules/malicious")
             link.create_system = 3
             link.external_attr = (0o120777 << 16)
             z.writestr(link, "../outside")
         with self.assertRaisesRegex(PilotError, "unsafe ZIP"):
             inspect_archive(path, source_kind="sword",
-                            expected_module_id="fraLSG1910eb",
+                            expected_module_id="SyntheticBible",
                             expected_category="bible")
 
     def test_rejects_broken_zip_and_missing_conf_or_payload(self):
@@ -107,13 +107,13 @@ class PilotPreflightTests(unittest.TestCase):
         broken.write_text("not a zip")
         with self.assertRaises(zipfile.BadZipFile):
             inspect_archive(broken, source_kind="sword",
-                            expected_module_id="fraLSG1910eb", expected_category="bible")
+                            expected_module_id="SyntheticBible", expected_category="bible")
         missing = self.root / "missing.zip"
         with zipfile.ZipFile(missing, "w") as z:
             z.writestr("notes.txt", b"hello")
         with self.assertRaisesRegex(PilotError, r"exactly one mods.d"):
             inspect_archive(missing, source_kind="sword",
-                            expected_module_id="fraLSG1910eb", expected_category="bible")
+                            expected_module_id="SyntheticBible", expected_category="bible")
 
 
 

@@ -26,11 +26,11 @@ class BoundedReaderTests(unittest.TestCase):
     def test_key_must_be_last_and_output_format_precedes_key(self):
         self.executable(
             "import json,sys\n"
-            "assert sys.argv[1:5] == ['-b','MHC','-f','internal']\n"
+            "assert sys.argv[1:5] == ['-b','SyntheticCom','-f','internal']\n"
             "assert sys.argv[5:] == ['-k','Gen 1:1']\n"
             "print('<p>Correct entry</p>')"
         )
-        code, body=query("MHC","Gen 1:1",fmt="internal",root=self.root,exe=str(self.fake))
+        code, body=query("SyntheticCom","Gen 1:1",fmt="internal",root=self.root,exe=str(self.fake))
         self.assertEqual(code,0)
         self.assertIn(b"Correct entry",body)
         self.assertTrue(present_key("Gen 1:1",body,code))
@@ -38,24 +38,24 @@ class BoundedReaderTests(unittest.TestCase):
     def test_explicit_note_and_xref_options_precede_terminal_key(self):
         self.executable(
             "import sys\n"
-            "assert sys.argv[1:7]==['-b','MHC','-f','internal','-o','sfnhl']\n"
+            "assert sys.argv[1:7]==['-b','SyntheticCom','-f','internal','-o','sfnhl']\n"
             "assert sys.argv[7:]==['-k','Gen 1:1']\n"
             "print('Synthetic note markup')"
         )
-        code,body=query("MHC","Gen 1:1",fmt="internal",root=self.root,
+        code,body=query("SyntheticCom","Gen 1:1",fmt="internal",root=self.root,
                         exe=str(self.fake),options="sfnhl")
         self.assertEqual(code,0)
         self.assertIn(b"Synthetic",body)
         for invalid in ("not-valid","sffff","s!!","*"):
             with self.subTest(options=invalid):
                 with self.assertRaisesRegex(PilotError,"Invalid explicit"):
-                    query("MHC","Gen 1:1",fmt="internal",root=self.root,
+                    query("SyntheticCom","Gen 1:1",fmt="internal",root=self.root,
                           exe=str(self.fake),options=invalid)
 
     def test_full_module_dump_is_blocked_at_small_cap(self):
         self.executable("import sys\nsys.stdout.write('X'*1000000)")
         with self.assertRaisesRegex(PilotError,"more than 4096 bytes"):
-            query("MHC","Gen 1",fmt="internal",root=self.root,
+            query("SyntheticCom","Gen 1",fmt="internal",root=self.root,
                   exe=str(self.fake),limit=4096)
         self.assertEqual(list(self.root.glob("*.xml")),[])
 
@@ -67,7 +67,7 @@ class BoundedReaderTests(unittest.TestCase):
 
     def test_invalid_query_format_blocks_before_execution(self):
         with self.assertRaisesRegex(PilotError,"Unreviewed"):
-            query("MHC","Gen 1",fmt="unsafe",root=self.root,exe=str(self.fake))
+            query("SyntheticCom","Gen 1",fmt="unsafe",root=self.root,exe=str(self.fake))
 
 
 if __name__=="__main__":
