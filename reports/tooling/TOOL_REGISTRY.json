@@ -1791,6 +1791,34 @@
       ]
     },
     {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "RawText",
+        "zText"
+      ],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/sword_native_raw_corpus.cpp",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Full native stock-SWORD raw-entry stream, PRIVATE framing only.",
+      "python_imports": [],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "6b6409aed7af865d1b4aece3d14a51c35db46bb1cb1e177a4a4b6b271f4bb0bf",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 4,
+      "static_references": [
+        ".github/workflows/approved-osis-native-audit.yml",
+        ".github/workflows/validate.yml",
+        "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
+        "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md"
+      ]
+    },
+    {
       "classification": "KEEP_GENERIC",
       "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
@@ -1829,34 +1857,6 @@
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
         "tests/test_commentary_native_raw_inventory.py",
         "tests/test_sword_native_raw_corpus_inventory.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "RawText",
-        "zText"
-      ],
-      "has_direct_tests_by_filename": false,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/sword_native_raw_corpus.cpp",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Full native stock-SWORD raw-entry stream, PRIVATE framing only.",
-      "python_imports": [],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "6b6409aed7af865d1b4aece3d14a51c35db46bb1cb1e177a4a4b6b271f4bb0bf",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 4,
-      "static_references": [
-        ".github/workflows/approved-osis-native-audit.yml",
-        ".github/workflows/validate.yml",
-        "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
-        "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md"
       ]
     },
     {
