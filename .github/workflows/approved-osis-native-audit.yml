@@ -1,0 +1,266 @@
+name: Audit approved cleaned OSIS against native SWORD (research only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: "Repository module ID with approved cleaned OSIS"
+        required: true
+        type: string
+        default: darby-jnd-2024
+      compiler:
+        description: "Compiler witness for private research, not publication"
+        required: true
+        type: choice
+        options:
+          - distro
+          - crosswire-r3918
+        default: distro
+  issue_comment:
+    types: [created]
+  pull_request:
+    paths:
+      - ".github/workflows/approved-osis-native-audit.yml"
+      - "scripts/approved_osis_sword_candidate.py"
+      - "scripts/research/bible/source_osis_verse_notes.py"
+      - "tests/test_source_osis_verse_notes.py"
+      - "scripts/research/bible/source_native_osis_target_addressability.py"
+      - "tests/test_source_native_osis_target_addressability.py"
+      - "scripts/research/bible/native_raw_main_text.py"
+      - "scripts/research/bible/source_native_osis_structure_screen.py"
+      - "scripts/research/bible/source_native_osis_boundary_positions.py"
+      - "tests/test_source_native_osis_boundary_positions.py"
+      - "tests/test_source_native_osis_structure_screen.py"
+      - "tests/test_approved_osis_sword_candidate.py"
+
+permissions:
+  contents: read
+
+jobs:
+  original-sword-probe:
+    if: >-
+      ${{ github.event_name != 'issue_comment' ||
+          (github.event.issue.pull_request == null &&
+           github.event.issue.number == 430 &&
+           github.event.comment.author_association == 'OWNER' &&
+           startsWith(github.event.comment.body, '/bible-osis-approved ')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    permissions:
+      contents: read
+      issues: write
+    env:
+      RESOURCE_ID: ${{ inputs.resource_id || 'darby-jnd-2024' }}
+      CANDIDATE_V11N: ""
+      CANDIDATE_COMPILER: ${{ inputs.compiler || 'distro' }}
+      REPORT: /tmp/bible-source-rebuild-probe/candidate-report.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install tested Python dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Offline private SWORD candidate regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_approved_osis_sword_candidate.py' -v
+          python -m unittest discover -s tests -p 'test_source_native_osis_structure_screen.py' -v
+          python -m unittest discover -s tests -p 'test_source_native_osis_boundary_positions.py' -v
+          python -m unittest discover -s tests -p 'test_source_native_osis_target_addressability.py' -v
+      - name: Parse authenticated owner request
+        if: github.event_name == 'issue_comment'
+        shell: bash
+        env:
+          COMMAND: ${{ github.event.comment.body }}
+        run: |
+          python - <<'PY'
+          import os, re
+          command = os.environ["COMMAND"]
+          approved = re.fullmatch(
+              r"/bible-osis-approved ([a-z0-9][a-z0-9-]{1,48})(?: (crosswire-r3918))?",
+              command)
+          if not approved:
+              raise SystemExit("Invalid approved source/native research command")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as out:
+              out.write("RESOURCE_ID="+approved.group(1)+"\n")
+              out.write("CANDIDATE_COMPILER="+("crosswire-r3918" if approved.group(2) else "distro")+"\n")
+          print("Authorized approved source/native audit:", approved.group(1))
+          PY
+      - name: Install standard SWORD compiler and independent native inspectors
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y libsword-dev libsword-utils diatheke
+          mkdir -p /tmp/native-probe-binaries
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o /tmp/native-probe-binaries/native-index -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o /tmp/native-probe-binaries/native-raw -lsword
+          command -v osis2mod
+      - name: Rebuild exact historical CrossWire r3918 osis2mod for reproducibility proof
+        if: github.event_name != 'pull_request' && env.CANDIDATE_COMPILER == 'crosswire-r3918'
+        shell: bash
+        timeout-minutes: 13
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y subversion cmake ninja-build \
+            zlib1g-dev libbz2-dev liblzma-dev libicu-dev libcurl4-openssl-dev
+          # The accepted Darby 0.1.1 research run used precisely SVN r3918.
+          # Never substitute HEAD / a revised CrossWire source silently.
+          svn export --non-interactive --quiet -r 3918 \
+            https://crosswire.org/svn/sword/trunk "$RUNNER_TEMP/sword-r3918"
+          cmake -S "$RUNNER_TEMP/sword-r3918" -B "$RUNNER_TEMP/sword-r3918-build" \
+            -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DSWORD_BUILD_UTILS=YES -DSWORD_BUILD_TESTS=NO -DSWORD_BUILD_EXAMPLES=NO
+          cmake --build "$RUNNER_TEMP/sword-r3918-build" --target osis2mod --parallel 4
+          compiler="$(find "$RUNNER_TEMP/sword-r3918-build" -type f -name osis2mod -perm /111 -print -quit)"
+          test -n "$compiler" && test -x "$compiler"
+          echo "PINNED_COMPILER_PATH=$compiler" >> "$GITHUB_ENV"
+          sha256sum "$RUNNER_TEMP/sword-r3918/utilities/osis2mod.cpp"
+      - name: Compile approved cleaned OSIS candidate and verify native entries
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/bible-source-rebuild-probe
+          case "${CANDIDATE_COMPILER:-distro}" in
+            distro) compiler="$(command -v osis2mod)" ;;
+            crosswire-r3918) compiler="${PINNED_COMPILER_PATH:?Pinned historical compiler missing}" ;;
+            *) echo "Unreviewed compiler mode" >&2; exit 1 ;;
+          esac
+          args=(--resource-id "$RESOURCE_ID"
+                --osis2mod "$compiler"
+                --native-index /tmp/native-probe-binaries/native-index
+                --native-raw /tmp/native-probe-binaries/native-raw
+                --report "$REPORT")
+          if [[ -n "${CANDIDATE_V11N:-}" ]]; then
+            args+=(--versification "$CANDIDATE_V11N")
+          fi
+          python scripts/approved_osis_sword_candidate.py "${args[@]}"
+      - name: Upload metadata-only evidence (never original OSIS or compiled SWORD)
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: publisher-sword-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/bible-source-rebuild-probe/candidate-report.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Record bounded approved-source/native findings on maintenance issue
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        env:
+          REPORT: ${{ env.REPORT }}
+          CANDIDATE_COMPILER: ${{ env.CANDIDATE_COMPILER }}
+        with:
+          script: |
+            const fs=require('fs');
+            const data=JSON.parse(fs.readFileSync(process.env.REPORT,'utf8'));
+            const lines=[
+              "### Approved cleaned OSIS → native SWORD research — NOT RELEASED",
+              "Compiler witness: " + (process.env.CANDIDATE_COMPILER || "distro"),
+              `Resource: \`${data.resource_id}\``,
+              `Research source SHA-256: \`${data.research_source_sha256}\``,
+              `Source kind: \`${data.research_source_kind}\``,
+              `Exact tool commit: \`${context.sha}\``,
+              `Action: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              "",
+            ];
+            for(const candidate of data.candidate_research_results){
+              lines.push(`#### ${candidate.candidate_versification}: ${candidate.candidate_status}`);
+              if(candidate.reason_category) lines.push(`Failure type: ${candidate.reason_category}`);
+              if(candidate.safe_failure_code) lines.push(`Safe failure code: ${candidate.safe_failure_code}`);
+              if(candidate.compiled_output_metadata) lines.push(
+                "Private compiler output metadata:", "\`\`\`json",
+                JSON.stringify(candidate.compiled_output_metadata,null,2), "\`\`\`");
+              if(candidate.standard_osis_compiler) lines.push(
+                "Compiler diagnostics (allowlisted counts only):", "\`\`\`json",
+                JSON.stringify(candidate.standard_osis_compiler,null,2), "\`\`\`");
+              if(candidate.compiled_native_milestone_closure_metadata_only){
+                const m=candidate.compiled_native_milestone_closure_metadata_only;
+                lines.push("Actual compiled structural milestone integrity (NOT source-layout parity):",
+                  "```json",JSON.stringify({
+                    status:m.status,
+                    paired_div_types_allowlisted:m.paired_div_types_allowlisted,
+                    native_milestone_tag_counts:m.native_milestone_tag_counts,
+                    native_milestone_pairing_findings:m.native_milestone_pairing_findings,
+                    remaining_unclosed_milestones_by_tag:m.remaining_unclosed_milestones_by_tag,
+                  },null,2),"```");
+              }
+              if(candidate.authorial_osis_structural_census) lines.push(
+                "Approved OSIS authored structural elements (census only):",
+                "```json",JSON.stringify(candidate.authorial_osis_structural_census,null,2),"```");
+              if(candidate.native_compiled_structure_screen) lines.push(
+                "Actual compiled native structural elements (census only):",
+                "```json",JSON.stringify(candidate.native_compiled_structure_screen,null,2),"```");
+              if(candidate.original_to_compiled_body_opening_order){
+                const o=candidate.original_to_compiled_body_opening_order;
+                lines.push("Original versus compiled paragraph/line opening order (NOT exact positioning):",
+                  "```json",JSON.stringify({
+                    same_order_and_kind_in_every_mapped_book:o.same_order_and_kind_in_every_mapped_book,
+                    source_native_body_opening_kind_counts:o.source_native_body_opening_kind_counts,
+                    first_mismatch_book_references_no_scripture:o.first_mismatch_book_references_no_scripture,
+                    source_native_exact_word_positions_or_boundary_spans_verified:
+                      o.source_native_exact_word_positions_or_boundary_spans_verified,
+                  },null,2),"```");
+              }
+              if(candidate.source_native_body_boundary_positions){
+                const p=candidate.source_native_body_boundary_positions;
+                lines.push("Full-book source/native non-whitespace structural open-close positions (NOT typography):",
+                  "```json",JSON.stringify({
+                    status:p.status,
+                    all_book_body_nonspace_and_boundary_events_equal:
+                      p.all_book_body_nonspace_and_boundary_events_equal,
+                    counts:p.counts,
+                    all_title_text_and_nonspace_placement_equal:p.all_title_text_and_nonspace_placement_equal,
+                    native_anonymous_top_nonspace_body_characters:
+                      p.native_anonymous_top_nonspace_body_characters,
+                    bounded_reference_only_findings:p.bounded_reference_only_findings,
+                    literal_whitespace_or_exact_typography_verified:
+                      p.literal_whitespace_or_exact_typography_verified,
+                  },null,2),"```");
+              }
+              if(candidate.explicit_note_target_index_addressability) {
+                const a=candidate.explicit_note_target_index_addressability;
+                lines.push("Stage-5 source OSIS note target native-index addressability (NOT clicked navigation):",
+                  "```json",JSON.stringify(a,null,2),"```");
+              }
+              if(candidate.source_to_compiled_counts){
+                lines.push("Checked counts (no Bible content):", "```json",
+                  JSON.stringify(candidate.source_to_compiled_counts,null,2), "```");
+              }
+              if(candidate.first_safe_reference_note_index_findings){
+                lines.push("Bounded review references:", "```json",
+                  JSON.stringify(candidate.first_safe_reference_note_index_findings.slice(0,20),null,2),
+                  "```");
+              }
+            }
+            lines.push("","**Temporary OSIS source copy, compiler logs and all ephemeral module binaries discarded.**",
+              "Not a rights/editorial sign-off, not complete structure/visual acceptance, not a release.");
+            await github.rest.issues.createComment({
+              ...context.repo, issue_number:context.issue.number,
+              body:lines.join("\n")
+            });
+      - name: Fail closed on unverified approved source/native parity
+        if: github.event_name != 'pull_request'
+        env:
+          RECEIPT: ${{ env.REPORT }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          data=json.loads(Path(os.environ["RECEIPT"]).read_text(encoding="utf-8"))
+          if data.get("research_source_kind") == "approved_cleaned_osis":
+              results=data.get("candidate_research_results", [])
+              if (len(results)!=1 or
+                  results[0].get("candidate_status") !=
+                      "full_numbered_text_and_note_preflight_equal_not_approved" or
+                  not results[0].get("source_native_body_boundary_positions",{}).get(
+                      "all_title_text_and_nonspace_placement_equal",False)):
+                  raise SystemExit("Approved OSIS native fidelity requires technical review; metadata report retained")
+          print("No unreviewed native source parity was silently promoted.")
+          PY
+
