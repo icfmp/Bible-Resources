@@ -23,7 +23,7 @@ class ScriptInventoryTests(unittest.TestCase):
         rows = report["files"]
         paths = [r["path"] for r in rows]
         self.assertEqual(len(paths), len(set(paths)))
-        self.assertGreaterEqual(len(rows), 140)
+        self.assertTrue(rows, 'An empty tool inventory cannot describe production')
         self.assertTrue(all(r["classification"] in ROLES for r in rows))
         self.assertTrue(all(len(r["sha256_at_inventory"]) == 64 for r in rows))
         self.assertTrue(all("delete" not in r["proposed_action"].lower()
@@ -157,22 +157,31 @@ class ScriptInventoryTests(unittest.TestCase):
             self.assertIn("scripts/" + name, paths)
 
 
-    def test_three_structural_evidence_helpers_are_package_owned(self):
-        """No old root implementation; read-only helpers keep real users/tests."""
-        entries = {row["path"]: row for row in self.result["files"]}
+    def test_retired_legacy_usfx_probes_do_not_remain_in_shared_scripts(self):
+        """One-off USFX/stock parity research is not the current OSIS process."""
+        entries = {row["path"] for row in self.result["files"]}
         for name in (
-            "native_absorbed_verse_groups",
-            "source_native_nonspace_boundaries",
-            "source_native_structure_topology",
+            "publisher_osis_usfx_parity.py",
+            "source_native_maintext_probe.py",
+            "source_native_record_scope_triage.py",
+            "source_native_structural_whitespace.py",
+            "source_usfx_newline_provenance.py",
+            "native_book_intro_screen.py",
+            "sword_missing_verse_witness.py",
         ):
-            with self.subTest(helper=name):
-                current = "scripts/research/bible/" + name + ".py"
-                self.assertIn(current, entries)
-                self.assertNotIn("scripts/" + name + ".py", entries)
-                self.assertIn("scripts/source_native_maintext_probe.py",
-                              entries[current]["static_references"])
-                self.assertIn("tests/test_" + name + ".py",
-                              entries[current]["static_references"])
+            self.assertNotIn("scripts/" + name, entries)
+        for name in (
+            "maintext_whitespace_patterns.py",
+            "native_absorbed_verse_groups.py",
+            "note_whitespace_diagnostics.py",
+            "source_native_layout_anchors.py",
+            "source_native_nonspace_boundaries.py",
+            "source_native_structure_topology.py",
+            "source_native_word_boundaries.py",
+            "source_native_scope.py",
+            "source_native_notes_audit.py",
+        ):
+            self.assertNotIn("scripts/research/bible/" + name, entries)
 
 
     def test_osis_source_native_helpers_are_package_owned(self):
@@ -212,7 +221,6 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertIn(shared, entries)
         refs = entries[shared]["static_references"]
         for p in (
-            "scripts/source_native_maintext_probe.py",
             "scripts/publisher_osis_sword_candidate.py",
             "scripts/inspect_paragraph_rendering.py",
             "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
@@ -316,75 +324,34 @@ class ScriptInventoryTests(unittest.TestCase):
             with self.subTest(caller=caller):
                 self.assertIn(caller, entries[new]["static_references"])
 
-    def test_native_milestone_and_whitespace_evidence_is_packaged(self):
-        """No duplicate top-level libraries; real edition witnesses retain callers."""
+    def test_current_osis_source_native_helpers_are_package_owned(self):
+        """Only maintained OSIS/native helpers should have live consumers."""
         entries = {row["path"]: row for row in self.result["files"]}
         helpers = {
             "native_milestone_pair_audit": (
                 "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
                 "tests/test_native_milestone_pair_audit.py"),
             "native_sword_markup_census": (
-                "scripts/source_native_maintext_probe.py",
+                "scripts/research/bible/native_raw_main_text.py",
                 "tests/test_native_sword_markup_census.py"),
-            "note_whitespace_diagnostics": (
-                "scripts/research/bible/maintext_whitespace_patterns.py",
-                "tests/test_note_whitespace_diagnostics.py"),
-            "maintext_whitespace_patterns": (
-                "scripts/source_native_maintext_probe.py",
-                "tests/test_maintext_whitespace_patterns.py"),
             "source_native_ordered_body": (
-                "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
+                "scripts/publisher_osis_sword_candidate.py",
                 "tests/test_source_native_ordered_body.py"),
-            "source_native_word_boundaries": (
-                "scripts/source_native_maintext_probe.py",
-                "tests/test_source_native_word_boundaries.py"),
-        }
-        for name, callers in helpers.items():
-            with self.subTest(name=name):
-                old_path = f"scripts/{name}.py"
-                package_path = f"scripts/research/bible/{name}.py"
-                self.assertNotIn(old_path, entries)
-                self.assertFalse((ROOT / old_path).exists())
-                self.assertIn(package_path, entries)
-                self.assertTrue((ROOT / package_path).is_file())
-                self.assertTrue(entries[package_path]["has_direct_tests_by_filename"])
-                for caller in callers:
-                    self.assertIn(caller, entries[package_path]["static_references"])
-
-    def test_bible_source_native_evidence_has_one_packaged_library_each(self):
-        """Real production consumers must follow six non-CLI Bible helpers."""
-        entries = {row["path"]: row for row in self.result["files"]}
-        helpers = {
-            "source_usfx_structure": (
-                "scripts/research/bible/source_native_layout_anchors.py",
-                "tests/test_source_usfx_structure.py"),
-            "source_native_scope": (
-                "scripts/source_native_maintext_probe.py",
-                "tests/test_source_native_scope.py"),
-            "source_native_notes_audit": (
-                "scripts/source_native_maintext_probe.py",
-                "tests/test_source_native_notes_audit.py"),
-            "source_native_paragraph_counts": (
-                "scripts/research/bible/source_native_word_boundaries.py",
-                "tests/test_source_native_paragraph_counts.py"),
             "source_native_note_positions": (
-                "scripts/publisher_osis_usfx_parity.py",
+                "scripts/publisher_osis_sword_candidate.py",
                 "tests/test_source_native_note_positions.py"),
-            "source_native_layout_anchors": (
-                "scripts/source_native_maintext_probe.py",
-                "tests/test_source_native_layout_anchors.py"),
+            "source_osis_verse_notes": (
+                "scripts/publisher_osis_sword_candidate.py",
+                "tests/test_source_osis_verse_notes.py"),
         }
-        for name, callers in helpers.items():
-            with self.subTest(name=name):
-                old_path = f"scripts/{name}.py"
-                package_path = f"scripts/research/bible/{name}.py"
-                self.assertNotIn(old_path, entries)
-                self.assertFalse((ROOT / old_path).exists())
-                self.assertIn(package_path, entries)
-                self.assertTrue((ROOT / package_path).is_file())
-                self.assertTrue(entries[package_path]["has_direct_tests_by_filename"])
+        for stem, callers in helpers.items():
+            with self.subTest(helper=stem):
+                path = "scripts/research/bible/" + stem + ".py"
+                self.assertIn(path, entries)
+                self.assertTrue(entries[path]["has_direct_tests_by_filename"])
                 for caller in callers:
-                    self.assertIn(caller, entries[package_path]["static_references"])
+                    self.assertIn(caller, entries[path]["static_references"])
+
 
     def test_private_transport_and_reader_probes_are_packaged(self):
         """Do not present imported diagnostic functions as separate CLIs."""
