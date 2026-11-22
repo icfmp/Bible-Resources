@@ -20,7 +20,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 - KEEP_GENERIC: 25
 - MERGE: 10
 - MODULE_LOCAL: 3
-- UNDECIDED: 120
+- UNDECIDED: 118
 
 ## All tracked tools
 
@@ -30,8 +30,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`modules/lsg-1910/tools/lsg_sword_compare.py`](../../modules/lsg-1910/tools/lsg_sword_compare.py) | MODULE_LOCAL | named test | 3 | source/native audit |
 | [`modules/lsg-1910/tools/probe_lsg_v11n.py`](../../modules/lsg-1910/tools/probe_lsg_v11n.py) | MODULE_LOCAL | not established | 3 | source/native audit |
 | [`scripts/audit_omitted_verse_notes.py`](../../scripts/audit_omitted_verse_notes.py) | UNDECIDED | named test | 3 | source/native audit |
-| [`scripts/audit_osis.py`](../../scripts/audit_osis.py) | UNDECIDED | not established | 7 | source/native audit |
-| [`scripts/audit_real_pilot.py`](../../scripts/audit_real_pilot.py) | UNDECIDED | not established | 3 | source/native audit |
+| [`scripts/audit_osis.py`](../../scripts/audit_osis.py) | UNDECIDED | not established | 6 | source/native audit |
 | [`scripts/bible_intake.py`](../../scripts/bible_intake.py) | KEEP_GENERIC | named test | 6 | intake |
 | [`scripts/build.py`](../../scripts/build.py) | KEEP_GENERIC | not established | 12 | publication/release |
 | [`scripts/catalogue_profiles.py`](../../scripts/catalogue_profiles.py) | UNDECIDED | named test | 4 | not determined |
@@ -69,12 +68,11 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/inspect_paragraph_rendering.py`](../../scripts/inspect_paragraph_rendering.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/lsg_source_compare.py`](../../scripts/lsg_source_compare.py) | HISTORICAL/ARCHIVE | named test | 7 | source/native audit |
 | [`scripts/native_book_intro_screen.py`](../../scripts/native_book_intro_screen.py) | UNDECIDED | named test | 2 | not determined |
-| [`scripts/normalize_osis.py`](../../scripts/normalize_osis.py) | KEEP_GENERIC | not established | 6 | not determined |
+| [`scripts/normalize_osis.py`](../../scripts/normalize_osis.py) | KEEP_GENERIC | not established | 5 | not determined |
 | [`scripts/osis_semantic_fidelity.py`](../../scripts/osis_semantic_fidelity.py) | UNDECIDED | named test | 3 | not determined |
-| [`scripts/pilot_fetch.py`](../../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 19 | not determined |
-| [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | named test | 79 | not determined |
-| [`scripts/pilot_runtime.py`](../../scripts/pilot_runtime.py) | UNDECIDED | named test | 2 | not determined |
-| [`scripts/pilot_subprocess.py`](../../scripts/pilot_subprocess.py) | UNDECIDED | named test | 13 | not determined |
+| [`scripts/pilot_fetch.py`](../../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 17 | not determined |
+| [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | named test | 76 | not determined |
+| [`scripts/pilot_subprocess.py`](../../scripts/pilot_subprocess.py) | UNDECIDED | named test | 11 | not determined |
 | [`scripts/private_sword_bundle.py`](../../scripts/private_sword_bundle.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/probe_andbible_android_emulator.py`](../../scripts/probe_andbible_android_emulator.py) | UNDECIDED | not established | 2 | source/native audit |
 | [`scripts/probe_andbible_android_private_import.py`](../../scripts/probe_andbible_android_private_import.py) | UNDECIDED | named test | 4 | source/native audit |
