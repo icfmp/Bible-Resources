@@ -27,7 +27,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | Script | Classification | Tests | Static callers | Stage hint |
 | --- | --- | --- | ---: | --- |
 | [`scripts/approved_osis_sword_candidate.py`](../../scripts/approved_osis_sword_candidate.py) | KEEP_GENERIC | named test | 6 | not determined |
-| [`scripts/audit_osis.py`](../../scripts/audit_osis.py) | KEEP_GENERIC | not established | 7 | source/native audit |
+| [`scripts/audit_osis.py`](../../scripts/audit_osis.py) | KEEP_GENERIC | not established | 6 | source/native audit |
 | [`scripts/bible_intake.py`](../../scripts/bible_intake.py) | KEEP_GENERIC | named test | 4 | intake |
 | [`scripts/build.py`](../../scripts/build.py) | KEEP_GENERIC | not established | 11 | publication/release |
 | [`scripts/catalogue_profiles.py`](../../scripts/catalogue_profiles.py) | KEEP_GENERIC | named test | 5 | not determined |
