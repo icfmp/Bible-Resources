@@ -13,7 +13,7 @@ from collections import defaultdict
 
 from lxml import etree
 
-from source_native_word_boundaries import (
+from research.bible.source_native_word_boundaries import (
     BoundaryAuditError, SOURCE_NOT_MAIN, _parsed_original,
 )
 from research.bible.source_native_paragraph_counts import classify_prefatory_p_sfm
