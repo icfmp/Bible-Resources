@@ -78,9 +78,9 @@
       "stage_hint": "intake",
       "static_reference_count": 4,
       "static_references": [
-        ".github/workflows/bible-observe-originals.yml",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/tool_registry.py",
+        ".github/workflows/bible-observe-originals.yml",
         "tests/test_bible_intake.py"
       ]
     },
@@ -116,14 +116,14 @@
       "stage_hint": "publication/release",
       "static_reference_count": 11,
       "static_references": [
+        "scripts/publish_reviewed_release.py",
+        "scripts/release_preflight.py",
+        "scripts/tool_registry.py",
         ".github/workflows/pages.yml",
         ".github/workflows/validate.yml",
         "docs/architecture/RESOURCE_PROFILES.md",
         "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
         "docs/workflows/PUBLISHING.md",
-        "scripts/publish_reviewed_release.py",
-        "scripts/release_preflight.py",
-        "scripts/tool_registry.py",
         "tests/test_catalogue_update_contract.py",
         "tests/test_repository.py",
         "tests/test_tool_registry.py"
@@ -155,9 +155,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
-        "docs/architecture/RESOURCE_PROFILES.md",
         "scripts/build.py",
         "scripts/validate.py",
+        "docs/architecture/RESOURCE_PROFILES.md",
         "tests/test_catalogue_profiles.py"
       ]
     },
@@ -187,12 +187,12 @@
       "stage_hint": "publication/release",
       "static_reference_count": 8,
       "static_references": [
-        ".github/workflows/pages.yml",
-        ".github/workflows/validate.yml",
-        "docs/workflows/PUBLISHING.md",
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
         "scripts/tool_registry.py",
+        ".github/workflows/pages.yml",
+        ".github/workflows/validate.yml",
+        "docs/workflows/PUBLISHING.md",
         "tests/test_catalogue_release_coverage.py",
         "tests/test_release_preflight.py"
       ]
@@ -269,11 +269,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 9,
       "static_references": [
-        ".github/workflows/upstream-check.yml",
-        "docs/technical/SOURCE_INVENTORY.md",
         "scripts/commentary_intake.py",
         "scripts/pilot_preflight.py",
         "scripts/select_sources.py",
+        ".github/workflows/upstream-check.yml",
+        "docs/technical/SOURCE_INVENTORY.md",
         "tests/test_catalogue_update_contract.py",
         "tests/test_provider_parity.py",
         "tests/test_source_selection.py",
@@ -323,10 +323,10 @@
       "stage_hint": "intake",
       "static_reference_count": 6,
       "static_references": [
-        ".github/workflows/commentary-intake.yml",
         "scripts/commentary_native_inventory.py",
         "scripts/commentary_native_raw_inventory.py",
         "scripts/tool_registry.py",
+        ".github/workflows/commentary-intake.yml",
         "tests/test_commentary_intake.py",
         "tests/test_tool_registry.py"
       ]
@@ -371,9 +371,9 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 4,
       "static_references": [
-        ".github/workflows/commentary-intake.yml",
         "scripts/commentary_native_raw_inventory.py",
         "scripts/tool_registry.py",
+        ".github/workflows/commentary-intake.yml",
         "tests/test_tool_registry.py"
       ]
     },
@@ -419,8 +419,8 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 3,
       "static_references": [
-        ".github/workflows/commentary-native-raw-corpus.yml",
         "scripts/tool_registry.py",
+        ".github/workflows/commentary-native-raw-corpus.yml",
         "tests/test_commentary_native_raw_inventory.py"
       ]
     },
@@ -526,11 +526,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
+        "scripts/normalize_osis.py",
+        "scripts/tool_registry.py",
         "docs/policies/COMMENTARY_POLICY.md",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
-        "scripts/normalize_osis.py",
-        "scripts/tool_registry.py",
         "tests/test_commentary_gate.py"
       ]
     },
@@ -568,15 +568,15 @@
       "stage_hint": "not determined",
       "static_reference_count": 13,
       "static_references": [
-        ".github/workflows/osis-schema-review.yml",
-        "docs/policies/NORMALIZATION_POLICY.md",
-        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
-        "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
         "scripts/audit_osis.py",
         "scripts/fetch_reviewed_schema.py",
         "scripts/guard_commentary.py",
         "scripts/normalize_osis.py",
         "scripts/tool_registry.py",
+        ".github/workflows/osis-schema-review.yml",
+        "docs/policies/NORMALIZATION_POLICY.md",
+        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
+        "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
         "tests/test_commentary_gate.py",
         "tests/test_editorial_pipeline.py",
         "tests/test_guard_osis.py",
@@ -618,10 +618,10 @@
       "stage_hint": "not determined",
       "static_reference_count": 5,
       "static_references": [
+        "scripts/tool_registry.py",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/policies/QUALITY_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
-        "scripts/tool_registry.py",
         "tests/test_editorial_pipeline.py"
       ]
     },
@@ -690,11 +690,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
-        ".github/workflows/commentary-intake.yml",
         "scripts/commentary_intake.py",
         "scripts/commentary_native_inventory.py",
         "scripts/commentary_native_raw_inventory.py",
         "scripts/tool_registry.py",
+        ".github/workflows/commentary-intake.yml",
         "tests/test_pilot_preparation.py"
       ]
     },
@@ -814,8 +814,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
-        ".github/workflows/private-sword-promotion-proof.yml",
         "scripts/tool_registry.py",
+        ".github/workflows/private-sword-promotion-proof.yml",
         "tests/test_promote_sword_preview.py",
         "tests/test_tool_registry.py"
       ]
@@ -852,12 +852,12 @@
       "stage_hint": "publication/release",
       "static_reference_count": 9,
       "static_references": [
+        "scripts/release_preflight.py",
+        "scripts/tool_registry.py",
         ".github/workflows/pages.yml",
         ".github/workflows/validate.yml",
         ".github/workflows/verify-previous-sword-release.yml",
         "docs/workflows/PUBLISHING.md",
-        "scripts/release_preflight.py",
-        "scripts/tool_registry.py",
         "tests/test_catalogue_release_coverage.py",
         "tests/test_release_preflight.py",
         "tests/test_tool_registry.py"
@@ -893,8 +893,8 @@
       "stage_hint": "publication/release",
       "static_reference_count": 3,
       "static_references": [
-        "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
         "scripts/validate.py",
+        "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
         "tests/test_published_reference_audit.py"
       ]
     },
@@ -930,8 +930,8 @@
       "stage_hint": "publication/release",
       "static_reference_count": 3,
       "static_references": [
-        ".github/workflows/publisher-osis-observation.yml",
         "scripts/publisher_osis_sword_candidate.py",
+        ".github/workflows/publisher-osis-observation.yml",
         "tests/test_publisher_osis_observation.py"
       ]
     },
@@ -1156,9 +1156,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
+        "scripts/publisher_osis_sword_candidate.py",
         ".github/workflows/publisher-osis-sword-candidate.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
-        "scripts/publisher_osis_sword_candidate.py",
         "tests/test_native_raw_main_text.py",
         "tests/test_native_sword_markup_census.py",
         "tests/test_tool_registry.py"
@@ -1223,8 +1223,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
-        "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
         "scripts/publisher_osis_sword_candidate.py",
+        "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
         "tests/test_source_native_note_positions.py"
       ]
     },
@@ -1288,8 +1288,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
-        ".github/workflows/publisher-osis-sword-candidate.yml",
         "scripts/publisher_osis_sword_candidate.py",
+        ".github/workflows/publisher-osis-sword-candidate.yml",
         "tests/test_source_native_osis_boundary_positions.py"
       ]
     },
@@ -1320,8 +1320,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
-        ".github/workflows/publisher-osis-sword-candidate.yml",
         "scripts/publisher_osis_sword_candidate.py",
+        ".github/workflows/publisher-osis-sword-candidate.yml",
         "tests/test_source_native_osis_structure_screen.py"
       ]
     },
@@ -1349,12 +1349,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
+        "scripts/publisher_osis_sword_candidate.py",
         ".github/workflows/publisher-osis-sword-candidate.yml",
         "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
-        "scripts/publisher_osis_sword_candidate.py",
-        "tests/test_source_native_osis_target_addressability.py"
+        "tests/test_source_native_osis_target_addressability.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -1385,10 +1386,10 @@
       "stage_hint": "not determined",
       "static_reference_count": 5,
       "static_references": [
+        "scripts/publisher_osis_sword_candidate.py",
         ".github/workflows/publisher-osis-sword-candidate.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
-        "scripts/publisher_osis_sword_candidate.py",
         "tests/test_source_osis_verse_notes.py"
       ]
     },
@@ -1420,10 +1421,10 @@
       "stage_hint": "publication/release",
       "static_reference_count": 7,
       "static_references": [
-        "docs/workflows/PUBLISHING.md",
         "scripts/promote_sword_preview.py",
         "scripts/tool_registry.py",
         "scripts/validate.py",
+        "docs/workflows/PUBLISHING.md",
         "tests/test_promote_sword_preview.py",
         "tests/test_reviewed_compiled_commentary_rebuild.py",
         "tests/test_tool_registry.py"
@@ -1594,13 +1595,13 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 9,
       "static_references": [
-        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
-        "docs/technical/SOURCE_OSIS_INVENTORY.md",
         "scripts/osis_semantic_fidelity.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
         "scripts/research/bible/source_native_osis_structure_screen.py",
         "scripts/research/bible/source_osis_verse_notes.py",
+        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
+        "docs/technical/SOURCE_OSIS_INVENTORY.md",
         "tests/test_osis_semantic_fidelity.py",
         "tests/test_source_osis_inventory.py"
       ]
@@ -1635,9 +1636,6 @@
       "stage_hint": "not determined",
       "static_reference_count": 18,
       "static_references": [
-        ".github/workflows/validate.yml",
-        "docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md",
-        "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
         "scripts/published_reference_audit.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
@@ -1650,6 +1648,9 @@
         "scripts/sword_native_inventory.py",
         "scripts/sword_native_raw_corpus_inventory.py",
         "scripts/validate.py",
+        ".github/workflows/validate.yml",
+        "docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md",
+        "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
         "tests/test_source_osis_inventory.py",
         "tests/test_stable_sword_refs.py",
         "tests/test_stable_sword_reviewed_merges.py"
@@ -1679,9 +1680,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
+        "scripts/tool_registry.py",
         ".github/workflows/commentary-intake.yml",
-        ".github/workflows/commentary-native-raw-corpus.yml",
-        "scripts/tool_registry.py"
+        ".github/workflows/commentary-native-raw-corpus.yml"
       ]
     },
     {
@@ -1708,8 +1709,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 2,
       "static_references": [
-        ".github/workflows/commentary-native-raw-corpus.yml",
-        "scripts/tool_registry.py"
+        "scripts/tool_registry.py",
+        ".github/workflows/commentary-native-raw-corpus.yml"
       ]
     },
     {
@@ -1735,14 +1736,14 @@
       "stage_hint": "not determined",
       "static_reference_count": 8,
       "static_references": [
+        "scripts/sword_native_inventory.py",
+        "scripts/tool_registry.py",
         ".github/workflows/publisher-osis-sword-candidate.yml",
         ".github/workflows/validate.yml",
         "docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md",
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
-        "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
-        "scripts/sword_native_inventory.py",
-        "scripts/tool_registry.py"
+        "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md"
       ]
     },
     {
@@ -1779,15 +1780,15 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 10,
       "static_references": [
-        ".github/workflows/validate.yml",
-        "docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md",
-        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
         "scripts/research/bible/native_sword_markup_census.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
         "scripts/sword_native_raw_corpus_inventory.py",
         "scripts/tool_registry.py",
+        ".github/workflows/validate.yml",
+        "docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md",
+        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "tests/test_sword_native_inventory.py"
       ]
     },
@@ -1852,10 +1853,10 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 6,
       "static_references": [
-        ".github/workflows/validate.yml",
-        "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
         "scripts/commentary_native_raw_inventory.py",
         "scripts/tool_registry.py",
+        ".github/workflows/validate.yml",
+        "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
         "tests/test_commentary_native_raw_inventory.py",
         "tests/test_sword_native_raw_corpus_inventory.py"
       ]
@@ -1977,15 +1978,15 @@
       "stage_hint": "not determined",
       "static_reference_count": 16,
       "static_references": [
+        "scripts/build.py",
+        "scripts/release_preflight.py",
+        "scripts/smoke.py",
+        "scripts/tool_registry.py",
         ".github/workflows/pages.yml",
         ".github/workflows/validate.yml",
         "docs/policies/COMMENTARY_POLICY.md",
         "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
         "docs/workflows/PUBLISHING.md",
-        "scripts/build.py",
-        "scripts/release_preflight.py",
-        "scripts/smoke.py",
-        "scripts/tool_registry.py",
         "tests/test_catalogue_update_contract.py",
         "tests/test_commentary_gate.py",
         "tests/test_pilot_preparation.py",
@@ -2023,9 +2024,9 @@
       "stage_hint": "not determined",
       "static_reference_count": 5,
       "static_references": [
+        "scripts/tool_registry.py",
         ".github/workflows/pages.yml",
         "docs/workflows/PUBLISHING.md",
-        "scripts/tool_registry.py",
         "tests/test_release_preflight.py",
         "tests/test_verify_public_catalogue.py"
       ]
