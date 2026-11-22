@@ -90,7 +90,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/publisher_osis_observation.py`](../../scripts/publisher_osis_observation.py) | UNDECIDED | named test | 11 | publication/release |
 | [`scripts/publisher_osis_preview_package.py`](../../scripts/publisher_osis_preview_package.py) | UNDECIDED | named test | 6 | publication/release |
 | [`scripts/publisher_osis_preview_readback.py`](../../scripts/publisher_osis_preview_readback.py) | UNDECIDED | not established | 2 | publication/release |
-| [`scripts/publisher_osis_sword_candidate.py`](../../scripts/publisher_osis_sword_candidate.py) | UNDECIDED | named test | 4 | publication/release |
+| [`scripts/publisher_osis_sword_candidate.py`](../../scripts/publisher_osis_sword_candidate.py) | UNDECIDED | named test | 5 | publication/release |
 | [`scripts/publisher_osis_usfx_parity.py`](../../scripts/publisher_osis_usfx_parity.py) | UNDECIDED | named test | 13 | publication/release |
 | [`scripts/reader_xiphos_headless_smoke.py`](../../scripts/reader_xiphos_headless_smoke.py) | UNDECIDED | named test | 7 | not determined |
 | [`scripts/rebuild_osis_commentary.py`](../../scripts/rebuild_osis_commentary.py) | UNDECIDED | named test | 2 | publication/release |
@@ -99,7 +99,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/repair_commentary_osis_milestones.py`](../../scripts/repair_commentary_osis_milestones.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/repair_osis_division_markers.py`](../../scripts/repair_osis_division_markers.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/repair_osis_inline_markup.py`](../../scripts/repair_osis_inline_markup.py) | UNDECIDED | named test | 5 | not determined |
-| [`scripts/repair_osis_note_links.py`](../../scripts/repair_osis_note_links.py) | UNDECIDED | named test | 11 | not determined |
+| [`scripts/repair_osis_note_links.py`](../../scripts/repair_osis_note_links.py) | UNDECIDED | named test | 12 | not determined |
 | [`scripts/repair_osis_paragraph_indentation.py`](../../scripts/repair_osis_paragraph_indentation.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/repair_osis_source_bytes.py`](../../scripts/repair_osis_source_bytes.py) | UNDECIDED | named test | 9 | not determined |
 | [`scripts/repair_osis_unlinked_reference_labels.py`](../../scripts/repair_osis_unlinked_reference_labels.py) | UNDECIDED | named test | 2 | not determined |
@@ -115,6 +115,8 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/bible/source_native_note_positions.py`](../../scripts/research/bible/source_native_note_positions.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/research/bible/source_native_notes_audit.py`](../../scripts/research/bible/source_native_notes_audit.py) | UNDECIDED | named test | 6 | source/native audit |
 | [`scripts/research/bible/source_native_ordered_body.py`](../../scripts/research/bible/source_native_ordered_body.py) | UNDECIDED | named test | 5 | not determined |
+| [`scripts/research/bible/source_native_osis_structure_screen.py`](../../scripts/research/bible/source_native_osis_structure_screen.py) | UNDECIDED | named test | 4 | not determined |
+| [`scripts/research/bible/source_native_osis_target_addressability.py`](../../scripts/research/bible/source_native_osis_target_addressability.py) | UNDECIDED | named test | 6 | not determined |
 | [`scripts/research/bible/source_native_paragraph_counts.py`](../../scripts/research/bible/source_native_paragraph_counts.py) | UNDECIDED | named test | 7 | not determined |
 | [`scripts/research/bible/source_native_scope.py`](../../scripts/research/bible/source_native_scope.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/research/bible/source_native_structure_topology.py`](../../scripts/research/bible/source_native_structure_topology.py) | UNDECIDED | named test | 3 | not determined |
@@ -166,8 +168,6 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/source_native_index_audit.py`](../../scripts/source_native_index_audit.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/source_native_maintext_probe.py`](../../scripts/source_native_maintext_probe.py) | UNDECIDED | named test | 16 | source/native audit |
 | [`scripts/source_native_osis_boundary_positions.py`](../../scripts/source_native_osis_boundary_positions.py) | UNDECIDED | named test | 4 | not determined |
-| [`scripts/source_native_osis_structure_screen.py`](../../scripts/source_native_osis_structure_screen.py) | UNDECIDED | named test | 4 | not determined |
-| [`scripts/source_native_osis_target_addressability.py`](../../scripts/source_native_osis_target_addressability.py) | UNDECIDED | named test | 6 | not determined |
 | [`scripts/source_native_record_scope_triage.py`](../../scripts/source_native_record_scope_triage.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/source_native_structural_whitespace.py`](../../scripts/source_native_structural_whitespace.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/source_osis_inventory.py`](../../scripts/source_osis_inventory.py) | UNDECIDED | named test | 28 | source/native audit |
