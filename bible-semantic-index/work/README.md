@@ -28,7 +28,7 @@ the allowed complete working inputs and a `manifest.json`. Separate
 checksums, source revisions, original producing Git commit, private
 editorial status and non-publication boundary.
 
-For every **successful protected-main push** to the corresponding BSI
+For every **successful protected-main push or main-branch manual dispatch** of the corresponding BSI
 workflow, if the private destination is configured, the workflow:
 
 1. Rebuilds and source-validates the unchanged canonical index.
@@ -65,15 +65,12 @@ The owner must provision a **dedicated private GitHub repository**, not
 no durable working-state snapshots.** No backup is claimed by merely
 committing this workflow or its documentation.
 
-Once configured, run each source-pinned BSI workflow via
-`workflow_dispatch` **or** make a reviewed BSI change on `main` to
-trigger a push. For the snapshot upload, the current workflow requires
-`push` to protected `main`; `workflow_dispatch` is a validation-only
-run. This avoids unexpected private uploads from manually dispatched
-feature branches. To take a new snapshot without changing code, add a
-reviewed, ordinary BSI documentation commit to `main`, which triggers
-the BSI general workflow; the Greek/Hebrew paths need their respective
-module changes or a separately designed protected-main scheduled run.
+Once configured, run each source-pinned BSI workflow via GitHub Actions
+**Run workflow**, selecting **main**. On a verified main-branch
+`workflow_dispatch`, the same privacy/reproducibility checks apply and
+an immutable private snapshot is saved. Never dispatch a branch-based
+source candidate and expect it to be archived. You can rebuild any one of
+the three streams without creating artificial Git history commits.
 
 ## Recover an exact historical working state
 
