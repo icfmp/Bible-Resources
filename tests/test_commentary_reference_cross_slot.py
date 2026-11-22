@@ -10,7 +10,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from commentary_reference_cross_slot import (
+from research.commentary.commentary_reference_cross_slot import (
     ReferenceCrossSlotTopology, actual_stock_osisref_targets,
     _private_target_counts, original_link_target_match_statuses,
 )
