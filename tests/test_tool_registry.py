@@ -285,6 +285,20 @@ class ScriptInventoryTests(unittest.TestCase):
                   / "PROVENANCE.json").read_text(encoding="utf-8")
         self.assertIn("config/publisher-osis/frajnd-2024.json", source)
 
+    def test_sword_upstream_priority_ranker_is_not_an_import_gate(self):
+        """OSIS source authority is edition based, never a SWORD provider rank."""
+        active = {row["path"] for row in self.result["files"]}
+        self.assertNotIn("scripts/select_sources.py", active)
+        self.assertFalse((ROOT / "config/source-priority.json").exists())
+        self.assertFalse((ROOT / "config/edition-identities.json").exists())
+        self.assertTrue((ROOT / "docs/policies/SOURCE_IDENTITY.md").is_file())
+        monitor = (ROOT / ".github/workflows/upstream-check.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("scripts/check_updates.py", monitor)
+        self.assertIn("scripts/check_provider_parity.py", monitor)
+        self.assertNotIn("source-selection.json", monitor)
+
     def test_completed_hmcc_modern_staging_is_not_an_active_publisher(self):
         """Version-pinned first-release bootstraps belong to Git history only."""
         entries = {row["path"] for row in self.result["files"]}
