@@ -35,6 +35,6 @@ A new-language or modernized edition is **a distinct editorial product**, not a 
 - Global process, schemas and validation rules: `docs/`.
 - Source-specific readings, correction decisions, ambiguous scopes and link decisions: `sources/cleaned/commentaries/<language>/<module-id>/editorial/`.
 - Versioned release receipts and source-bound audit reports: the same module's `editorial/releases/` and `editorial/evidence/`.
-- Dated, superseded research **not** defining current workflow: `history/`. The previous mixed commentary research/procedure is preserved in [historical records](https://github.com/icfmp/Bible-Resources/blob/2271b6c4473dda6dedf321463e4ffc6b250fd701/history/pipeline/COMMENTARY_PIPELINE_LEGACY_2026-11-20.md).
+- Dated, superseded research **not** defining current workflow is recoverable at its immutable Git revision. The previous mixed commentary research/procedure is preserved in [historical records](https://github.com/icfmp/Bible-Resources/blob/2271b6c4473dda6dedf321463e4ffc6b250fd701/history/pipeline/COMMENTARY_PIPELINE_LEGACY_2026-11-20.md).
 
 Do not introduce provider-specific or book-specific fixes into the generic toolchain to make a single module pass.

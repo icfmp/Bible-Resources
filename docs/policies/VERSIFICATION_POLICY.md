@@ -84,7 +84,7 @@ verified. Do not ship a misleading literal ellipsis as Scripture.
   commentary to the wrong verse.
 
 This is an editorial and QA policy. **No automatic blank-verse insertion,
-note creation or cross-versification mapping is implemented yet.** Historical pilot observations belong in `history/pilots/` and the corresponding resource records; they do not define new versification rules.
+note creation or cross-versification mapping is implemented yet.** Historical pilot observations remain recoverable from immutable Git history and any edition-specific evidence records; they do not define new versification rules.
 
 ## Enforced publication index evidence
 
