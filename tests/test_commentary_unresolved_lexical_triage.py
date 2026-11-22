@@ -9,7 +9,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
-from commentary_unresolved_lexical_triage import (
+from research.commentary.commentary_unresolved_lexical_triage import (
     source_stock_unresolved_words, stock_raw_element_counts,
     marked_word_token_indices, UnresolvedLexicalSelectionCensus,
 )
