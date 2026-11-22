@@ -64,6 +64,12 @@ class ActiveCommentaryCIContract(unittest.TestCase):
             encoding="utf-8")
         self.assertIn("Select exactly the modified commentary manifests", yaml)
         self.assertIn("fromJSON(needs.select-source.outputs.resources)", yaml)
+        self.assertIn("has_resources=", yaml)
+        self.assertIn(
+            "if: ${{ needs.select-source.outputs.has_resources == 'true' }}", yaml
+        )
+        self.assertNotIn('resources = ["mhcc-crosswire"]', yaml)
+        self.assertIn("Library-only changes must not select", yaml)
 
 
 if __name__ == "__main__":
