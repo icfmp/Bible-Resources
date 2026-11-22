@@ -6,7 +6,7 @@
 
 Start with the exact SHA-pinned original and reviewed cleaned OSIS master, its edition and rights evidence, and the independently built SWORD candidate. `scripts/research/bible/source_osis_verse_notes.py` reads literal numbered-verse source text, note bodies, original caller labels, source note positions and explicit OSIS destinations in memory. Do not publish its returned text.
 
-Compare these observations against actual native `RawText` or `zText` entries, not only HTML rendered by one reader. The strict native note-position helper `scripts/research/bible/source_native_note_positions.py` can measure note anchor offsets without creating or guessing missing notes. The OSIS source link triage tool `scripts/source_osis_note_link_triage.py` inventories explicit authorial references; source-native OSIS candidate validation remains separate.
+Compare these observations against actual native `RawText` or `zText` entries, not only HTML rendered by one reader. The strict native note-position helper `scripts/research/bible/source_native_note_positions.py` can measure note anchor offsets without creating or guessing missing notes. Explicit authorial reference destinations must be checked against the approved source index and the actual independently read native index; `scripts/research/bible/source_native_osis_target_addressability.py` supplies the maintained structural addressability checks. The former Darby-only upstream source-link triage is retained in Git history, not as a production gate.
 
 Keep these distinctions visible in review receipts:
 
