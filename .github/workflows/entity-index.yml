@@ -25,6 +25,7 @@ jobs:
       - name: Regression tests (offline, no data download)
         run: |
           python3 -I bible-semantic-index/tests/test_workspace_layout.py
+          python3 -I bible-semantic-index/tests/test_work_snapshot.py
           python3 -I bible-semantic-index/tests/test_distribution_profile.py
           python3 -I bible-semantic-index/tests/test_build.py
           python3 -I bible-semantic-index/tests/test_resolve.py
@@ -957,6 +958,34 @@ jobs:
             bible-semantic-index/dist/hebrew-missing-neighbor-review.json
           if-no-files-found: error
           retention-days: 14
+
+      - name: Verify complete entity snapshot against actual pinned-source output (runner-local only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="/tmp/bsi-work-entity-${GITHUB_SHA}.tar.gz"
+          python3 -I bible-semantic-index/scripts/work_snapshot.py pack \
+            --kind entity \
+            --source-commit "$GITHUB_SHA" \
+            --file complete-entity-index.json=bible-semantic-index/dist/index.json \
+            --file public-projection.json=bible-semantic-index/dist/bsi-v0.1-without-keyterms.json \
+            --file public-labels-en.json=bible-semantic-index/dist/bsi-v0.1-labels-en.json \
+            --output "$output"
+          python3 -I bible-semantic-index/scripts/work_snapshot.py verify --archive "$output"
+      - name: Archive complete entity working state in PRIVATE repository (main only)
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        env:
+          BSI_PRIVATE_SNAPSHOT_REPO: ${{ vars.BSI_PRIVATE_SNAPSHOT_REPO }}
+          GH_TOKEN: ${{ secrets.BSI_PRIVATE_SNAPSHOT_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$BSI_PRIVATE_SNAPSHOT_REPO" || -z "$GH_TOKEN" ]]; then
+            echo "::warning::PRIVATE BSI entity working snapshot NOT saved durably: configure BSI_PRIVATE_SNAPSHOT_REPO and BSI_PRIVATE_SNAPSHOT_TOKEN. Existing 14-day CI artifact is NOT a substitute."
+            exit 0
+          fi
+          output="/tmp/bsi-work-entity-${GITHUB_SHA}.tar.gz"
+          bash bible-semantic-index/scripts/publish_private_work_snapshot.sh "$output" "$GITHUB_SHA"
 
   publish-bsi:
     name: Publish verified BSI v0.1.0
