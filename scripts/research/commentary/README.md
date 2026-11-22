@@ -15,6 +15,12 @@ This package contains **read-only, non-CLI** evidence-gathering functions. They 
 | [`commentary_osis_rebuild_preflight.py`](commentary_osis_rebuild_preflight.py) | Whether original native frames can be wrapped as *test-only* OSIS without changing inner XML |
 | [`commentary_lexical_overlap.py`](commentary_lexical_overlap.py) | Bounded source-versus-stock lexical overlap without exporting text |
 | [`commentary_nonlink_analysis.py`](commentary_nonlink_analysis.py) | Bounded plain-word accounting and separate Unicode word alignment, both unchanged |
+| [`commentary_layout_census.py`](commentary_layout_census.py) | Bounded read-only SWORD layout and heading inventories |
+| [`commentary_original_div1_book_consistency.py`](commentary_original_div1_book_consistency.py) | Original source div1 section/book-code contradictions for independent review |
+| [`commentary_stock_prefix_topology.py`](commentary_stock_prefix_topology.py) | Native XML prefix topology compared with authenticated authored word sequences |
+| [`commentary_shared_raw_source_units.py`](commentary_shared_raw_source_units.py) | Source-unit membership of shared native raw commentary runs |
+| [`commentary_source_native_boundaries.py`](commentary_source_native_boundaries.py) | Original ThML/stock SWORD source-marker boundary evidence |
+| [`commentary_navigation_link_plan.py`](commentary_navigation_link_plan.py) | Candidate source-scoped, versification-checked link plans, never automatic edits |
 | [`commentary_unresolved_lexical_triage.py`](commentary_unresolved_lexical_triage.py) | Bounded word-level mismatches and source-joined mark positions, without text export |
 | [`commentary_near_prose_unicode_review.py`](commentary_near_prose_unicode_review.py) | Separate original/stock Unicode normalization witnesses, never a rewrite |
 | [`commentary_source_identity_lexical_gate.py`](commentary_source_identity_lexical_gate.py) | Quarantine contradictory original title/book-code joins before lexical comparisons |
