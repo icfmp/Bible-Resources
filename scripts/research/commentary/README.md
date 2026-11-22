@@ -42,6 +42,8 @@ Original native-link identity checks remain private observations: an authenticat
 
 The unified nonlink library deliberately keeps different bounds for each calculation: large-input accounting must never be mistaken for bounded longest-common-subsequence alignment. Existing tests continue to verify these differences.
 
+**Canonical-title witness:** `commentary_source_english_osis_alias.py` reads the checked-in 66-book OSIS/USFM crosswalk from the repository root, not from this research package. The module-relative root lookup was updated on relocation, and its existing direct tests still load and verify the complete real 66-book registry. Neither a matching English title nor a normalized word is authorization to change an original `scripCom` marker, reference or exposition.
+
 ## Verify the package without exposing source content
 
 From the repository root, run the direct synthetic regressions and then the
