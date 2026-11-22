@@ -41,7 +41,6 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/check_updates.py`](../../scripts/check_updates.py) | UNDECIDED | not established | 11 | not determined |
 | [`scripts/clean_source_osis.py`](../../scripts/clean_source_osis.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_anchor_parity.py`](../../scripts/commentary_anchor_parity.py) | UNDECIDED | named test | 5 | not determined |
-| [`scripts/commentary_bookcode_repair_receipt_guard.py`](../../scripts/commentary_bookcode_repair_receipt_guard.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_intake.py`](../../scripts/commentary_intake.py) | KEEP_GENERIC | named test | 13 | intake |
 | [`scripts/commentary_modern_draft_guard.py`](../../scripts/commentary_modern_draft_guard.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_modern_draft_osis_preview.py`](../../scripts/commentary_modern_draft_osis_preview.py) | UNDECIDED | named test | 8 | not determined |
@@ -53,20 +52,15 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_modern_source_receipt.py`](../../scripts/commentary_modern_source_receipt.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_native_inventory.py`](../../scripts/commentary_native_inventory.py) | KEEP_GENERIC | not established | 9 | source/native audit |
 | [`scripts/commentary_native_raw_inventory.py`](../../scripts/commentary_native_raw_inventory.py) | KEEP_GENERIC | named test | 9 | source/native audit |
-| [`scripts/commentary_osis_intro_transport_probe.py`](../../scripts/commentary_osis_intro_transport_probe.py) | UNDECIDED | named test | 2 | source/native audit |
-| [`scripts/commentary_osis_mixed_transport_probe.py`](../../scripts/commentary_osis_mixed_transport_probe.py) | UNDECIDED | named test | 6 | source/native audit |
-| [`scripts/commentary_osis_paragraph_presence.py`](../../scripts/commentary_osis_paragraph_presence.py) | UNDECIDED | named test | 2 | not determined |
-| [`scripts/commentary_osis_transport_probe.py`](../../scripts/commentary_osis_transport_probe.py) | UNDECIDED | named test | 5 | source/native audit |
+| [`scripts/commentary_osis_mixed_transport_probe.py`](../../scripts/commentary_osis_mixed_transport_probe.py) | UNDECIDED | named test | 7 | source/native audit |
 | [`scripts/commentary_private_text_compare.py`](../../scripts/commentary_private_text_compare.py) | UNDECIDED | named test | 22 | source/native audit |
 | [`scripts/commentary_section_scope_audit.py`](../../scripts/commentary_section_scope_audit.py) | UNDECIDED | named test | 3 | source/native audit |
-| [`scripts/commentary_source_erratum_compiled_probe.py`](../../scripts/commentary_source_erratum_compiled_probe.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/commentary_stock_candidate.py`](../../scripts/commentary_stock_candidate.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/commentary_sword_identity_migration.py`](../../scripts/commentary_sword_identity_migration.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_text_delta.py`](../../scripts/commentary_text_delta.py) | KEEP_GENERIC | named test | 12 | not determined |
 | [`scripts/commentary_usfm_title_witness.py`](../../scripts/commentary_usfm_title_witness.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/commentary_witness.py`](../../scripts/commentary_witness.py) | UNDECIDED | not established | 2 | source/native audit |
 | [`scripts/commentary_xiphos_dual_reader.py`](../../scripts/commentary_xiphos_dual_reader.py) | GENERALIZE | named test | 9 | not determined |
-| [`scripts/commentary_xiphos_heading_probe.py`](../../scripts/commentary_xiphos_heading_probe.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/commentary_xml_witness.py`](../../scripts/commentary_xml_witness.py) | UNDECIDED | named test | 12 | source/native audit |
 | [`scripts/compiled_stock_commentary_proof.py`](../../scripts/compiled_stock_commentary_proof.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/diff_sword_snapshots.py`](../../scripts/diff_sword_snapshots.py) | UNDECIDED | named test | 4 | not determined |
@@ -115,6 +109,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/repair_osis_paragraph_indentation.py`](../../scripts/repair_osis_paragraph_indentation.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/repair_osis_source_bytes.py`](../../scripts/repair_osis_source_bytes.py) | UNDECIDED | named test | 9 | not determined |
 | [`scripts/repair_osis_unlinked_reference_labels.py`](../../scripts/repair_osis_unlinked_reference_labels.py) | UNDECIDED | named test | 2 | not determined |
+| [`scripts/research/commentary/commentary_bookcode_repair_receipt_guard.py`](../../scripts/research/commentary/commentary_bookcode_repair_receipt_guard.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/research/commentary/commentary_chapter_body_evidence.py`](../../scripts/research/commentary/commentary_chapter_body_evidence.py) | MERGE | not established | 3 | not determined |
 | [`scripts/research/commentary/commentary_chapter_cross_slot.py`](../../scripts/research/commentary/commentary_chapter_cross_slot.py) | MERGE | named test | 2 | not determined |
 | [`scripts/research/commentary/commentary_chapter_neighbors.py`](../../scripts/research/commentary/commentary_chapter_neighbors.py) | MERGE | named test | 6 | not determined |
@@ -133,7 +128,10 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/commentary/commentary_original_bookcode_repair.py`](../../scripts/research/commentary/commentary_original_bookcode_repair.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/research/commentary/commentary_original_div1_book_consistency.py`](../../scripts/research/commentary/commentary_original_div1_book_consistency.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/research/commentary/commentary_original_link_identity.py`](../../scripts/research/commentary/commentary_original_link_identity.py) | UNDECIDED | not established | 5 | not determined |
+| [`scripts/research/commentary/commentary_osis_intro_transport_probe.py`](../../scripts/research/commentary/commentary_osis_intro_transport_probe.py) | UNDECIDED | named test | 2 | source/native audit |
+| [`scripts/research/commentary/commentary_osis_paragraph_presence.py`](../../scripts/research/commentary/commentary_osis_paragraph_presence.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/research/commentary/commentary_osis_rebuild_preflight.py`](../../scripts/research/commentary/commentary_osis_rebuild_preflight.py) | UNDECIDED | named test | 2 | publication/release |
+| [`scripts/research/commentary/commentary_osis_transport_probe.py`](../../scripts/research/commentary/commentary_osis_transport_probe.py) | UNDECIDED | named test | 5 | source/native audit |
 | [`scripts/research/commentary/commentary_paragraph_witness_probe.py`](../../scripts/research/commentary/commentary_paragraph_witness_probe.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/research/commentary/commentary_prose_cross_slot.py`](../../scripts/research/commentary/commentary_prose_cross_slot.py) | MERGE | named test | 5 | not determined |
 | [`scripts/research/commentary/commentary_public_metadata_preflight.py`](../../scripts/research/commentary/commentary_public_metadata_preflight.py) | UNDECIDED | named test | 2 | not determined |
@@ -142,10 +140,12 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/commentary/commentary_reference_registry_triage.py`](../../scripts/research/commentary/commentary_reference_registry_triage.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/research/commentary/commentary_shared_raw_source_units.py`](../../scripts/research/commentary/commentary_shared_raw_source_units.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/research/commentary/commentary_source_english_osis_alias.py`](../../scripts/research/commentary/commentary_source_english_osis_alias.py) | UNDECIDED | named test | 6 | not determined |
+| [`scripts/research/commentary/commentary_source_erratum_compiled_probe.py`](../../scripts/research/commentary/commentary_source_erratum_compiled_probe.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/research/commentary/commentary_source_identity_lexical_gate.py`](../../scripts/research/commentary/commentary_source_identity_lexical_gate.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/research/commentary/commentary_source_native_boundaries.py`](../../scripts/research/commentary/commentary_source_native_boundaries.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/research/commentary/commentary_stock_prefix_topology.py`](../../scripts/research/commentary/commentary_stock_prefix_topology.py) | UNDECIDED | named test | 7 | not determined |
 | [`scripts/research/commentary/commentary_unresolved_lexical_triage.py`](../../scripts/research/commentary/commentary_unresolved_lexical_triage.py) | MERGE | named test | 11 | not determined |
+| [`scripts/research/commentary/commentary_xiphos_heading_probe.py`](../../scripts/research/commentary/commentary_xiphos_heading_probe.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 11 | publication/release |
 | [`scripts/reviewed_modern_commentary_rebuild.py`](../../scripts/reviewed_modern_commentary_rebuild.py) | UNDECIDED | named test | 2 | publication/release |
 | [`scripts/reviewed_osis_commentary_rebuild.py`](../../scripts/reviewed_osis_commentary_rebuild.py) | UNDECIDED | not established | 1 | publication/release |
