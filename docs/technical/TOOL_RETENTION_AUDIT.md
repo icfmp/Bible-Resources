@@ -73,7 +73,11 @@ The approved compiled and modernized commentary release validators now share
 the **same** deterministic native zCom member layout definition, including
 BOOK, CHAPTER and VERSE compression granularities, safe SWORD identifiers
 and the seven expected payload paths. Both gates also share fail-closed inventory
-checks for missing, extra and symlinked payload members. The modern release still authenticates
+checks for missing, extra and symlinked payload members.
+The historical authorial-OSIS MHC release gate now shares those same
+strict checks for both supported SWORD drivers (`zCom` and `zCom4`) and
+all three compression block modes. Edition-specific source attestations,
+owner authorization and final payload hashes remain separate and unchanged. The modern release still authenticates
 the actual bytes against its independently approved artifact hashes.
 
 This is *technical code consolidation*, not a rewrite of the modern-English

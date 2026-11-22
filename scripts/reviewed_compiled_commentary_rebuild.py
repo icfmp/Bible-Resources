@@ -26,32 +26,33 @@ def zcom_member_suffixes(block_type: str) -> tuple[str, ...]:
         for suffix in ("s", "v", "z")
     )
 
-def zcom_payload_paths(sword_id: str, block_type: str) -> frozenset[str]:
-    """Exact relative seven-member payload of a native zCom commentary.
-
-    Validate identifiers before constructing paths; never use an arbitrary
-    source-supplied filename in an approved release integrity check.
-    """
-    if not isinstance(sword_id, str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9]{0,31}", sword_id):
+def commentary_payload_paths(sword_id: str, block_type: str,
+                             driver: str = "zCom") -> frozenset[str]:
+    """Exact seven-member SWORD commentary payload for zCom or zCom4."""
+    if (not isinstance(sword_id, str)
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9]{0,31}", sword_id)):
         raise ValueError("Unsafe SWORD module identifier for native payload")
+    if driver not in ("zCom", "zCom4"):
+        raise ValueError("Unsupported native SWORD commentary driver")
     folder = sword_id.lower()
     return frozenset({"mods.d/" + folder + ".conf"} | {
-        "modules/comments/zcom/" + folder + "/" + member
+        "modules/comments/" + driver.lower() + "/" + folder + "/" + member
         for member in zcom_member_suffixes(block_type)
     })
 
 
-def checked_zcom_payload_files(payload: Path, sword_id: str,
-                               block_type: str) -> dict[str, Path]:
-    """Enumerate precisely the approved zCom payload, never following symlinks.
+def zcom_payload_paths(sword_id: str, block_type: str) -> frozenset[str]:
+    """Backwards-compatible exact zCom-only layout used by other release gates."""
+    return commentary_payload_paths(sword_id, block_type, "zCom")
 
-    This is an inventory gate, not a source/text fidelity or publication
-    approval. The caller still authenticates every returned file's SHA-256
-    against independently approved release evidence.
-    """
-    expected = zcom_payload_paths(sword_id, block_type)
+
+def checked_commentary_payload_files(payload: Path, sword_id: str,
+                                     block_type: str,
+                                     driver: str = "zCom") -> dict[str, Path]:
+    """Read-only exact inventory gate; no source/owner approval is inferred."""
+    expected = commentary_payload_paths(sword_id, block_type, driver)
     if payload.is_symlink() or not payload.is_dir():
-        raise ValueError("Missing or unsafe native zCom payload directory")
+        raise ValueError("Missing or unsafe native commentary payload directory")
     found: dict[str, Path] = {}
     for item in payload.rglob("*"):
         if item.is_symlink():
@@ -59,8 +60,14 @@ def checked_zcom_payload_files(payload: Path, sword_id: str,
         if item.is_file():
             found[item.relative_to(payload).as_posix()] = item
     if set(found) != expected:
-        raise ValueError("Added or omitted native zCom payload inventory files")
+        raise ValueError("Added or omitted native commentary payload inventory files")
     return found
+
+
+def checked_zcom_payload_files(payload: Path, sword_id: str,
+                               block_type: str) -> dict[str, Path]:
+    """Backwards-compatible fail-closed zCom inventory gate."""
+    return checked_commentary_payload_files(payload, sword_id, block_type, "zCom")
 
 
 SHA = re.compile(r"[0-9a-f]{64}\Z")
