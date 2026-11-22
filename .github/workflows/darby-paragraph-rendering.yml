@@ -5,6 +5,8 @@ on:
     paths:
       - ".github/workflows/darby-paragraph-rendering.yml"
       - "scripts/inspect_paragraph_rendering.py"
+      - "scripts/research/bible/source_osis_verse_notes.py"
+      - "tests/test_source_osis_verse_notes.py"
       - "tests/test_inspect_paragraph_rendering.py"
       - "scripts/repair_osis_division_markers.py"
       - "tests/test_repair_osis_division_markers.py"
