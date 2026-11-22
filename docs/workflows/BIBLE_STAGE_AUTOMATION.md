@@ -2,7 +2,7 @@
 
 **Current operator quick guide.** The full [source-first production contract](../PRODUCTION_PIPELINE.md) governs original OSIS/USFM preservation, cleanup, full validation, SWORD compilation and publication. Use the [Bible seven-stage workflow](BIBLE_7_STAGE_WORKFLOW.md) for the required checkpoints. This automation **collects read-only evidence**; it does not clean, approve, compile or publish an edition.
 
-The original detailed WEBP research and stage-4/5 diagnostic investigations have been preserved, without deleting their evidence, in the [historical technical research appendix](../../history/pipeline/BIBLE_STAGE_AUTOMATION_RESEARCH.md). That appendix documents experiments and limitations, not additional mandatory procedures.
+Previous single-edition research and stage-4/5 diagnostic investigations remain preserved in the [historical technical research appendix](../../history/pipeline/BIBLE_STAGE_AUTOMATION_RESEARCH.md). They document past experiments and limitations, not current mandatory procedures, active intake candidates, or evidence for a newly reviewed OSIS master.
 
 ## Prepare the reviewed intake manifest
 

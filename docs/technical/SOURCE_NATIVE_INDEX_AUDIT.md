@@ -54,10 +54,11 @@ silently ignore the source-only references to make this command pass.
   reader behavior remain **unverified**.
 - Complete editorial review, publication approval and the release receipt
   are separate requirements. All such booleans remain false by design.
-- The synthetic tests mock the stock reader producer; existing *separate*
-  GitHub CI workflows exercise actual published LSG RawText and original WEBP
-  zText native inventories. This command alone is **not yet end-to-end
-  exercised on two independently converted same-edition Bibles**.
+- Synthetic unit tests mock the stock reader producer. Successful
+  source-to-native proof for a particular edition requires the **actual**
+  independently collected native SWORD index and source-pinned evidence.
+  Do not present this tool's synthetic tests or a separate historical
+  research pilot as a second live edition or as full end-to-end proof.
 
 No published module, public catalogue, Scripture, annotation, source archive
 or edition identity is changed by this addition.
