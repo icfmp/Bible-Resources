@@ -5,7 +5,7 @@ from lxml import etree
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_reference_registry_triage import (
+from research.commentary.commentary_reference_registry_triage import (
     OriginalCommentaryReferenceRegistryTriage,
     classify_original_reference_target,
 )
