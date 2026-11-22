@@ -4,7 +4,7 @@ from pathlib import Path
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_navigation_link_plan import (
+from research.commentary.commentary_navigation_link_plan import (
     propose_commentary_links, UnsafeCommentaryLinkPlan,
     parse_native_commentary_verse_registry, triage_missing_native_section_links,
     triage_single_key_chapter_navigation,
