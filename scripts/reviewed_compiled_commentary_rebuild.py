@@ -41,6 +41,28 @@ def zcom_payload_paths(sword_id: str, block_type: str) -> frozenset[str]:
     })
 
 
+def checked_zcom_payload_files(payload: Path, sword_id: str,
+                               block_type: str) -> dict[str, Path]:
+    """Enumerate precisely the approved zCom payload, never following symlinks.
+
+    This is an inventory gate, not a source/text fidelity or publication
+    approval. The caller still authenticates every returned file's SHA-256
+    against independently approved release evidence.
+    """
+    expected = zcom_payload_paths(sword_id, block_type)
+    if payload.is_symlink() or not payload.is_dir():
+        raise ValueError("Missing or unsafe native zCom payload directory")
+    found: dict[str, Path] = {}
+    for item in payload.rglob("*"):
+        if item.is_symlink():
+            raise ValueError("Symlink in reviewed SWORD payload")
+        if item.is_file():
+            found[item.relative_to(payload).as_posix()] = item
+    if set(found) != expected:
+        raise ValueError("Added or omitted native zCom payload inventory files")
+    return found
+
+
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 ORIGINAL = re.compile(r"config/commentary-intake/[a-z0-9-]+\.json\Z")
 REVIEW = re.compile(r"config/commentary-rebuilds/[a-z0-9-]+\.json\Z")
@@ -249,28 +271,14 @@ def reviewed_rebuilt_commentary_errors(
                 or conf.get("BlockType") not in {"BOOK", "CHAPTER", "VERSE"}
                 or conf.get("BlockType") != review.get("block_type")):
             raise ValueError("Compiled zCom format or metadata does not match review")
-        folder = metadata["sword_id"].lower()
-        paths = {
-            "mods.d/" + folder + ".conf",
-            *("modules/comments/zcom/" + folder + "/" + name
-              for name in zcom_member_suffixes(conf.get("BlockType"))),
-        }
+        paths = zcom_payload_paths(metadata["sword_id"], conf["BlockType"])
         expected_files = review.get("payload_sha256")
         if (not isinstance(expected_files, dict)
                 or set(expected_files) != paths
                 or not all(_digest(value) for value in expected_files.values())):
             raise ValueError("Incomplete exact compiled payload file inventory")
-        payload = module_dir / "payload"
-        if payload.is_symlink() or not payload.is_dir():
-            raise ValueError("Missing original-safe payload directory")
-        actual = {}
-        for path in payload.rglob("*"):
-            if path.is_symlink():
-                raise ValueError("Symlink in rebuilt SWORD payload")
-            if path.is_file():
-                actual[path.relative_to(payload).as_posix()] = path
-        if set(actual) != paths:
-            raise ValueError("Added or omitted compiled commentary files")
+        actual = checked_zcom_payload_files(
+            module_dir / "payload", metadata["sword_id"], conf["BlockType"])
         for relative in sorted(paths):
             if sha256(actual[relative].read_bytes()).hexdigest() != expected_files[relative]:
                 raise ValueError("Compiled commentary payload checksum mismatch: " + relative)
