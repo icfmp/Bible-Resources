@@ -21,6 +21,12 @@ This package contains **read-only, non-CLI** evidence-gathering functions. They 
 | [`commentary_shared_raw_source_units.py`](commentary_shared_raw_source_units.py) | Source-unit membership of shared native raw commentary runs |
 | [`commentary_source_native_boundaries.py`](commentary_source_native_boundaries.py) | Original ThML/stock SWORD source-marker boundary evidence |
 | [`commentary_navigation_link_plan.py`](commentary_navigation_link_plan.py) | Candidate source-scoped, versification-checked link plans, never automatic edits |
+| [`commentary_reference_registry_triage.py`](commentary_reference_registry_triage.py) | Unambiguous original OSIS reference targets checked against authentic native verse registry |
+| [`commentary_literal_erratum_preflight.py`](commentary_literal_erratum_preflight.py) | Byte-bound, review-only erratum candidate safety; no source mutation |
+| [`commentary_public_metadata_preflight.py`](commentary_public_metadata_preflight.py) | In-memory versioned SWORD commentary metadata candidate, never approval |
+| [`commentary_rebuild_attestation_draft.py`](commentary_rebuild_attestation_draft.py) | Original-to-private-rebuild evidence with explicit never-approved status |
+| [`commentary_original_bookcode_repair.py`](commentary_original_bookcode_repair.py) | Reversible proposal for authorial book-code mismatches, never automatic edits |
+| [`commentary_source_english_osis_alias.py`](commentary_source_english_osis_alias.py) | Pinned original div1 titles against canonical alias witnesses without inferring authorial scope |
 | [`commentary_unresolved_lexical_triage.py`](commentary_unresolved_lexical_triage.py) | Bounded word-level mismatches and source-joined mark positions, without text export |
 | [`commentary_near_prose_unicode_review.py`](commentary_near_prose_unicode_review.py) | Separate original/stock Unicode normalization witnesses, never a rewrite |
 | [`commentary_source_identity_lexical_gate.py`](commentary_source_identity_lexical_gate.py) | Quarantine contradictory original title/book-code joins before lexical comparisons |
