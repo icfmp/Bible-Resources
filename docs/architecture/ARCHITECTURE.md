@@ -13,7 +13,7 @@ Bible Resources is a **source-first editorial and SWORD distribution repository*
 | `catalog/v1/` and `sword/` | Distribute approved, versioned module artifacts | Publish draft/research outputs |
 | `docs/` | Explain lasting, edition-independent architecture, policies, procedures and verification | Store individual-module histories or transient audit results |
 | `history/` | Retain historical cross-resource research when preservation has real value | Serve as current operating instructions |
-| `bible-semantic-index/` | Separate Bible Semantic Index project | Be altered by resource housekeeping |
+| [Bible Semantic Index](https://github.com/icfmp/Bible-Resources-Semantic-Index) (separate repository) | Maintain entity and lexical index sources, reviews and builds | Be duplicated or built as part of Bible-Resources |
 
 Directory conventions and exact storage responsibilities are in [workspace layout](WORKSPACE_LAYOUT.md). A resource's **current** editorial state is determined from its own manifest, issue, reviewed PR and release receipt, never inferred from documentation prose.
 
