@@ -1,0 +1,32 @@
+name: One-shot private commentary transport registry refresh
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/maintenance-commentary-transport-registry.yml'
+permissions:
+  contents: write
+jobs:
+  refresh:
+    if: github.repository == 'icfmp/Bible-Resources'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: maintenance/commentary-private-transport-libraries-20261122
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Remove temporary workflow then regenerate exact metadata inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/maintenance-commentary-transport-registry.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git add -f reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore: sync metadata registry after moving six private research helpers'
+          git push origin HEAD:maintenance/commentary-private-transport-libraries-20261122
