@@ -72,7 +72,8 @@ its invocation contract.
 The approved compiled and modernized commentary release validators now share
 the **same** deterministic native zCom member layout definition, including
 BOOK, CHAPTER and VERSE compression granularities, safe SWORD identifiers
-and the seven expected payload paths. The modern release still authenticates
+and the seven expected payload paths. Both gates also share fail-closed inventory
+checks for missing, extra and symlinked payload members. The modern release still authenticates
 the actual bytes against its independently approved artifact hashes.
 
 This is *technical code consolidation*, not a rewrite of the modern-English
