@@ -1821,9 +1821,8 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 11,
+      "static_reference_count": 10,
       "static_references": [
-        "scripts/publisher_osis_preview_readback.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
         "scripts/research/bible/native_sword_markup_census.py",
