@@ -82,6 +82,15 @@ or publish a release.
 Related: [UPDATES.md](../workflows/UPDATES.md) and [Bible's affiliated-source audit](https://github.com/icfmp/Bible/blob/main/docs/SOURCES_AFFILIEES_11.md).
 
 
-## Edition-level duplicate selection
+## Edition identity and duplicate review
 
-For Bibles and commentaries available through several SWORD providers, check [source priority](../policies/SOURCE_PRIORITY.md). The read-only `scripts/select_sources.py` command reports one preferred candidate per *verified identical edition*, lower-priority copies to skip, and unresolved same-ID/title collisions that need review. Priority is a separate policy from the live declaration parity check; a provider can remain registered for Bible even if its copies lose selection to a higher-priority upstream. The source audit uploads a distinct `source-selection.json` report and never imports or deletes content.
+Provider catalogues are discovery and update-monitoring metadata, **not** an
+automatic choice of a preferred SWORD importer. Different upstream module IDs
+or matching descriptions do not establish identical editions. Before approval,
+review the authoritative source, revision, language, completeness,
+versification, rights, and the resource's `canonical_edition_id` against
+existing approved editions.
+
+See [source identity](../policies/SOURCE_IDENTITY.md) for the duplicate-edition
+gate. The daily upstream monitor reports catalogue changes and Bible provider
+declarations only; it does not import, skip or publish any source.
