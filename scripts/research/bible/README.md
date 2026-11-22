@@ -21,6 +21,7 @@ remain in `scripts/` and use these exact checked helpers.
 | [`source_native_note_positions.py`](source_native_note_positions.py) | Exact authored note-caller positions vs raw native SWORD structures |
 | [`source_native_layout_anchors.py`](source_native_layout_anchors.py) | Source/native paragraph, poetry and heading anchor comparisons |
 | [`native_milestone_pair_audit.py`](native_milestone_pair_audit.py) | Strict compiled SWORD verse milestone sID/eID pairing without inserting a verse |
+| [`native_raw_main_text.py`](native_raw_main_text.py) | Source-format-independent strict native SWORD main-text parsing, excluding note/title bodies and rejecting invalid XML |
 | [`native_sword_markup_census.py`](native_sword_markup_census.py) | Metadata-only original native XML markup census |
 | [`note_whitespace_diagnostics.py`](note_whitespace_diagnostics.py) | Read-only note whitespace difference categories, preserving literal source |
 | [`maintext_whitespace_patterns.py`](maintext_whitespace_patterns.py) | Source/native main-text whitespace topology, not editorial normalization |

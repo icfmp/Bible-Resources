@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from research.bible.source_native_layout_anchors import (
     SourceLayoutError, source_usfx_layout_start_anchors, compare_start_anchors)
 from research.bible.native_sword_markup_census import NativeMarkupCensus
-from source_native_maintext_probe import native_raw_main_text
+from research.bible.native_raw_main_text import native_raw_main_text
 
 MAPPING=[("GEN", "Gen")]
 AUTHORIAL=(b'<usfx><book id="GEN"><c id="1"/>'

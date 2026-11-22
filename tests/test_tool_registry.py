@@ -205,6 +205,23 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertIn("tests/test_" + stem + ".py",
                       entries[expected]["static_references"])
 
+    def test_native_raw_reader_is_shared_not_hidden_in_usfx_cli(self):
+        """OSIS code must not import original-USFX-only command for native text."""
+        entries = {row["path"]: row for row in self.result["files"]}
+        shared = "scripts/research/bible/native_raw_main_text.py"
+        self.assertIn(shared, entries)
+        refs = entries[shared]["static_references"]
+        for p in (
+            "scripts/source_native_maintext_probe.py",
+            "scripts/publisher_osis_sword_candidate.py",
+            "scripts/inspect_paragraph_rendering.py",
+            "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
+            "tests/test_native_raw_main_text.py",
+        ):
+            with self.subTest(caller=p):
+                self.assertIn(p, refs)
+
+
     def test_nested_package_imports_count_as_real_static_callers(self):
         entries = {item["path"]: item for item in self.result["files"]}
         module = ("scripts/research/commentary/"

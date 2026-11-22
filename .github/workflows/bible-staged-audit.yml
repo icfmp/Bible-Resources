@@ -38,6 +38,7 @@ on:
       - "tests/test_stock_reuse_preflight.py"
       - "scripts/maintext_fidelity_classification.py"
       - "scripts/research/bible/maintext_whitespace_patterns.py"
+      - "scripts/research/bible/native_raw_main_text.py"
       - "scripts/research/bible/native_sword_markup_census.py"
       - "scripts/research/bible/native_milestone_pair_audit.py"
       - "scripts/research/bible/source_native_paragraph_counts.py"

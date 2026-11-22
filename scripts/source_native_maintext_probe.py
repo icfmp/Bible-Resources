@@ -28,6 +28,7 @@ from research.bible.source_native_note_positions import (
 from research.bible.source_native_scope import read_crosswalk
 from research.bible.maintext_whitespace_patterns import MainTextWhitespacePatterns
 from research.bible.native_sword_markup_census import NativeMarkupCensus
+from research.bible.native_raw_main_text import (MAX_VERSE, MainTextParityError, native_raw_main_text)
 from research.bible.native_milestone_pair_audit import NativeMilestonePairAudit
 from research.bible.source_native_paragraph_counts import compare_authored_native_paragraphs, audit_usfx_book_prefaces
 from native_book_intro_screen import private_original_preface_text, NativeBookIntroScreen
@@ -58,7 +59,6 @@ from sword_native_raw_corpus_inventory import (
 )
 
 MAX_XML = 128 * 1024 * 1024
-MAX_VERSE = 2 * 1024 * 1024
 MAX_MISMATCHES = 25
 # USFX p[@sfm="sp"] is a *speaker identification* (not a
 # Scripture verse); see eBible's USFX schema and USFM/USX paragraph styles.
@@ -71,13 +71,8 @@ USFX_HEAD = {"s", "s1", "s2", "s3", "s4", "ms", "ms1", "ms2",
 # Generated verse/chapter labels and alternatives are not authored
 # Scripture prose. A <ve> milestone also explicitly ends the verse.
 USFX_LABELS = {"vp", "va", "cp", "ca"}
-NATIVE_SKIP = {"note", "title"}
 WORD = re.compile(r"[^\W_]+(?:['\u2019][^\W_]+)*", re.UNICODE)
 USFM_ID = re.compile(r"^[1-4]?[A-Z][A-Z0-9]{1,4}$")
-
-
-class MainTextParityError(ValueError):
-    """Authored or native text could not be independently audited."""
 
 
 def _tree(data: bytes, root_name: str):
@@ -202,50 +197,6 @@ def authored_usfx_main_text(xml: bytes, mapping: list[tuple[str, str]]):
         "excluded_source_heading_or_note_element_counts": dict(sorted(skipped.items())),
         "source_explicit_usfm_to_native_book_crosswalk_only": True,
     }
-
-
-def native_raw_main_text(raw: bytes, *, markup_census: NativeMarkupCensus | None = None,
-                         reference: str | None = None) -> tuple[str, dict]:
-    """Strictly parse a complete raw XML fragment; never 'repair' bad tags.
-
-    Note text and headings are not Scripture. XML entity decoding is done
-    by a strict parser; exact emitted bytes are tracked separately by the
-    independent native raw corpus hash.
-    """
-    if len(raw) > MAX_VERSE:
-        raise MainTextParityError("Oversized raw native verse")
-    if b"<!DOCTYPE" in raw.upper() or b"<?xml" in raw.lower():
-        raise MainTextParityError("Unexpected declarations inside native XML fragment")
-    parser = etree.XMLParser(resolve_entities=False, load_dtd=False,
-                             no_network=True, recover=False, huge_tree=False)
-    try:
-        root = etree.fromstring(b"<private_root>" + raw + b"</private_root>", parser)
-    except etree.XMLSyntaxError as exc:
-        raise MainTextParityError("Stock SWORD raw entry is not a self-contained XML fragment") from exc
-    if any(isinstance(x, etree._Entity) for x in root.iter()):
-        raise MainTextParityError("Unresolved native XML entity")
-    if markup_census is not None:
-        if reference is None:
-            raise MainTextParityError("Native markup census needs an actual reader reference")
-        markup_census.observe(reference, root)
-    chars = []
-    excluded = Counter()
-
-    def walk(node):
-        if isinstance(node.tag, str):
-            kind = etree.QName(node).localname
-            if kind in NATIVE_SKIP:
-                excluded[kind] += 1
-                return
-            if node.text:
-                chars.append(node.text)
-            for child in node:
-                walk(child)
-                if child.tail:
-                    chars.append(child.tail)
-
-    walk(root)
-    return "".join(chars), dict(excluded)
 
 
 def _tolerant_fragment_lexical_diagnostic(raw: bytes, authored: str) -> dict:

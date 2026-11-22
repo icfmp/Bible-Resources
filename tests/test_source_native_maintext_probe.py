@@ -1,7 +1,7 @@
 """Main-text source USFX vs true stock-SWORD raw: synthetic-only regressions.
 
 No published Bible language is reproduced in test fixtures or CI reports.
-Full native libraries are exercised in the separate pinned real-WEBP workflow.
+Full native libraries are exercised independently in the applicable source-pinned reader workflows.
 """
 import io
 import json
@@ -12,8 +12,9 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from source_native_maintext_probe import (
     _classify, _tolerant_fragment_lexical_diagnostic, authored_usfx_main_text,
-    compare_private_main_text, native_raw_main_text, MainTextParityError,
+    compare_private_main_text,
 )
+from research.bible.native_raw_main_text import native_raw_main_text, MainTextParityError
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus
 
 PAIR = [("AAA", "Alpha"), ("BBB", "Beta")]

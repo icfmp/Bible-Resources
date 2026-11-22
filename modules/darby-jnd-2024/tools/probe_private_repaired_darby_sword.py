@@ -262,7 +262,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         division_reader_shapes = None
         if division_overlay:
             from inspect_paragraph_rendering import diff, native_xml_prefix_shape
-            from source_native_maintext_probe import native_raw_main_text
+            from research.bible.native_raw_main_text import native_raw_main_text
             if set(render_raw) != render_refs:
                 raise PrivateRepairedProbeError("Private SWORD lacks verified original paragraph samples")
             division_reader_shapes = {}
