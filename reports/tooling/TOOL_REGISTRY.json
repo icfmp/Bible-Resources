@@ -75,14 +75,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/tool_registry.py",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/policies/QUALITY_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
-        "tests/test_editorial_pipeline.py",
-        "tests/test_tool_registry.py"
+        "tests/test_editorial_pipeline.py"
       ]
     },
     {
@@ -270,14 +269,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/upstream-check.yml",
         "docs/policies/SOURCE_IDENTITY.md",
         "docs/technical/SOURCE_INVENTORY.md",
-        "tests/test_provider_parity.py",
-        "tests/test_tool_registry.py"
+        "tests/test_provider_parity.py"
       ]
     },
     {
@@ -315,7 +313,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 10,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/commentary_intake.py",
         "scripts/pilot_preflight.py",
@@ -325,7 +323,6 @@
         "docs/technical/SOURCE_INVENTORY.md",
         "tests/test_catalogue_update_contract.py",
         "tests/test_provider_parity.py",
-        "tests/test_tool_registry.py",
         "tests/test_updates.py"
       ]
     },
@@ -1237,14 +1234,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/approved_osis_sword_candidate.py",
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
         "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
-        "tests/test_source_native_osis_target_addressability.py",
-        "tests/test_tool_registry.py"
+        "tests/test_source_native_osis_target_addressability.py"
       ]
     },
     {
@@ -1348,12 +1344,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/tool_registry.py",
         "scripts/validate.py",
-        "tests/test_reviewed_modern_commentary_rebuild.py",
-        "tests/test_tool_registry.py"
+        "tests/test_reviewed_modern_commentary_rebuild.py"
       ]
     },
     {
