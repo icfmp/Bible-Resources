@@ -26,11 +26,11 @@ from publisher_osis_usfx_parity import (
 )
 from source_native_maintext_probe import native_raw_main_text
 from research.bible.source_native_note_positions import native_note_anchor_positions
-from source_native_osis_structure_screen import (
+from research.bible.source_native_osis_structure_screen import (
     authorial_structures, NativeStructuralCensus, authorial_body_opening_sequences,
 )
 from research.bible.source_native_ordered_body import compare_ordered_body_openings
-from source_native_osis_target_addressability import audit_explicit_targets
+from research.bible.source_native_osis_target_addressability import audit_explicit_targets
 from source_native_osis_boundary_positions import (
     authorial_book_streams,authorial_outside_book_titles,
     NativeBookStreams,compare_book_boundary_positions,

@@ -31,7 +31,7 @@ from publisher_osis_sword_candidate import (
 )
 from publisher_osis_usfx_parity import original_osis_verses_and_notes
 from source_osis_inventory import source_inventory
-from source_native_osis_structure_screen import (
+from research.bible.source_native_osis_structure_screen import (
     authorial_structures, authorial_body_opening_sequences,
 )
 from source_native_osis_boundary_positions import (
