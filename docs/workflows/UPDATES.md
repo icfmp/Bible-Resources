@@ -20,4 +20,4 @@ An updated public module requires explicit approval, exact new package hashes, u
 
 Bible Resources owns source selection, provenance, curation, builds and the published catalogue. The [Bible application](https://github.com/icfmp/Bible) owns its own client caching, update prompts, download transactions and display behavior. Report client defects in that repository instead of editing authoritative source text to accommodate a reader.
 
-See [source priority](../policies/SOURCE_PRIORITY.md), [catalogue integration](CATALOGUE_INTEGRATION.md) and [upstream contributions](UPSTREAM.md).
+See [source identity](../policies/SOURCE_IDENTITY.md), [catalogue integration](CATALOGUE_INTEGRATION.md) and [upstream contributions](UPSTREAM.md).
