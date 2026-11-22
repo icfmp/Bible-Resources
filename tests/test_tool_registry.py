@@ -271,6 +271,20 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertNotIn("read_pinned_publisher_osis", source)
         self.assertNotIn("config_for(resource_id)", source)
 
+    def test_retired_darby_publisher_observer_keeps_original_source_identity(self):
+        """No network duplicate of a safely retained original OSIS identity."""
+        current = {row["path"] for row in self.result["files"]}
+        self.assertNotIn("scripts/publisher_osis_observation.py", current)
+        self.assertFalse(
+            (ROOT / ".github/workflows/publisher-osis-observation.yml").exists()
+        )
+        self.assertTrue(
+            (ROOT / "config/publisher-osis/frajnd-2024.json").is_file()
+        )
+        source = (ROOT / "sources/original/bibles/fr/darby-jnd-2024"
+                  / "PROVENANCE.json").read_text(encoding="utf-8")
+        self.assertIn("config/publisher-osis/frajnd-2024.json", source)
+
     def test_completed_hmcc_modern_staging_is_not_an_active_publisher(self):
         """Version-pinned first-release bootstraps belong to Git history only."""
         entries = {row["path"] for row in self.result["files"]}
