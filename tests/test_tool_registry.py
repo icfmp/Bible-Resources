@@ -180,12 +180,15 @@ class ScriptInventoryTests(unittest.TestCase):
         import re
 
         active = {row["path"] for row in self.result["files"]}
-        pattern = re.compile(r"(?<![A-Za-z0-9_/])scripts/[A-Za-z0-9_./-]+\\.(?:py|sh)\\b")
+        pattern = re.compile(r"(?<![A-Za-z0-9_/])scripts/[A-Za-z0-9_./-]+\.(?:py|sh)\b")
+        checked = 0
         for workflow in (ROOT / ".github/workflows").glob("*.yml"):
             content = workflow.read_text(encoding="utf-8")
             for script in pattern.findall(content):
+                checked += 1
                 with self.subTest(workflow=workflow.name, script=script):
                     self.assertIn(script, active)
+        self.assertGreater(checked, 0, "Workflow references were not inspected")
 
     def test_registry_has_no_promoted_editorial_or_publication_claims(self):
         for entry in self.result["files"]:
