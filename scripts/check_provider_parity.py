@@ -60,25 +60,56 @@ def named_assignments(source: str) -> dict[str, ast.expr]:
 
 
 def declared_providers(source: str) -> list[dict]:
+    """Resolve a bounded, literal-only provider declaration without executing code.
+
+    Supports the application's named provider constants, static tuple aliases
+    and starred tuple expansion; rejects calls, comprehensions, unknown names
+    and circular expansions outside the Provider(...) declarations themselves.
+    """
     nodes = named_assignments(source)
     active = nodes.get("PROVIDERS")
     if not isinstance(active, (ast.Tuple, ast.List)):
         raise ValueError("Bible PROVIDERS declaration cannot be inspected safely")
-    providers = []
-    for element in active.elts:
-        if not isinstance(element, ast.Name):
+
+    def references(expr: ast.expr, visited: frozenset[str] = frozenset()):
+        if isinstance(expr, ast.Starred):
+            return references(expr.value, visited)
+        if isinstance(expr, (ast.Tuple, ast.List)):
+            result = []
+            for item in expr.elts:
+                result.extend(references(item, visited))
+                if len(result) > 100:
+                    raise ValueError("Excessive declared providers")
+            return result
+        if not isinstance(expr, ast.Name) or expr.id in visited:
             raise ValueError("Unexpected provider expression")
-        call = nodes.get(element.id)
-        if not isinstance(call, ast.Call) or not isinstance(call.func, ast.Name) or call.func.id != "Provider":
-            raise ValueError("Unexpected provider definition: " + element.id)
+        value = nodes.get(expr.id)
+        if isinstance(value, (ast.Tuple, ast.List)):
+            return references(value, visited | {expr.id})
+        if not isinstance(value, ast.Call):
+            raise ValueError("Unexpected provider expression")
+        return [expr.id]
+
+    providers = []
+    for name in references(active):
+        call = nodes[name]
+        if (not isinstance(call, ast.Call) or
+                not isinstance(call.func, ast.Name) or
+                call.func.id != "Provider"):
+            raise ValueError("Unexpected provider definition: " + name)
         if len(call.args) != 5 or call.keywords:
             raise ValueError("Unexpected Provider signature")
-        values = [ast.literal_eval(argument) for argument in call.args]
+        try:
+            values = [ast.literal_eval(argument) for argument in call.args]
+        except (ValueError, TypeError, MemoryError) as exc:
+            raise ValueError("Nonliteral provider field") from exc
         if not all(isinstance(value, str) for value in values):
             raise ValueError("Nonliteral provider field")
-        identifier, name, source_url, catalogue_url, packages_url = values
-        providers.append(dict(id=identifier, name=name, source_url=source_url,
+        identifier, display_name, source_url, catalogue_url, packages_url = values
+        providers.append(dict(id=identifier, name=display_name, source_url=source_url,
                               catalogue_url=catalogue_url, packages_url=packages_url))
+    if len({provider["id"] for provider in providers}) != len(providers):
+        raise ValueError("Duplicate declared Bible provider")
     return providers
 
 
@@ -156,6 +187,11 @@ def compare(config: dict, sources: dict[str, str]) -> dict:
             elif identifier == "youversion":
                 checks = {"kind": "api", "source_url": original["source_url"],
                           "catalogue_url": original["catalogue_url"]}
+            elif original.get("catalogue_url") and original.get("packages_url"):
+                checks = {"kind": "curated_catalogue",
+                          "source_url": original["source_url"],
+                          "catalogue_url": original["catalogue_url"],
+                          "packages_url": original["packages_url"]}
             else:
                 checks = {"kind": "dataset", "source_url": original["source_url"],
                           "download_url": original["download_url"]}
