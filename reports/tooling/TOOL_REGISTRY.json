@@ -126,13 +126,14 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/policies/QUALITY_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
         "tests/test_commentary_shared_key_retrieval.py",
-        "tests/test_editorial_pipeline.py"
+        "tests/test_editorial_pipeline.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -1029,12 +1030,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-andbible-android-private.yml",
-        "tests/test_probe_andbible_android_private_import.py",
-        "tests/test_tool_registry.py"
+        "tests/test_probe_andbible_android_private_import.py"
       ]
     },
     {
@@ -1067,11 +1067,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
-        ".github/workflows/darby-andbible-jsword.yml",
-        "tests/test_tool_registry.py"
+        ".github/workflows/darby-andbible-jsword.yml"
       ]
     },
     {
@@ -1430,14 +1429,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-private-repaired-sword.yml",
         ".github/workflows/xiphos-preview-smoke.yml",
         "tests/test_reader_xiphos_headless_smoke.py",
-        "tests/test_reader_xiphos_reference_navigation.py",
-        "tests/test_tool_registry.py"
+        "tests/test_reader_xiphos_reference_navigation.py"
       ]
     },
     {
@@ -2124,10 +2122,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 2,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/validate.py",
-        "tests/test_reviewed_modern_commentary_rebuild.py"
+        "tests/test_reviewed_modern_commentary_rebuild.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
