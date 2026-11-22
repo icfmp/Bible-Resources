@@ -20,7 +20,7 @@ import unicodedata
 from lxml import etree
 
 from lsg_source_compare import read_source_xml, scan_usfx
-from real_second_bible_probe import _safe_single_module
+from research.bible.private_sword_install import _safe_single_module
 from native_absorbed_verse_groups import inspect_absorbed_source_verse_groups
 from research.bible.source_native_notes_audit import collect_usfx_numbered_notes, NoteAudit
 from research.bible.source_native_note_positions import (

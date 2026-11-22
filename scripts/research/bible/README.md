@@ -8,6 +8,7 @@ remain in `scripts/` and use these exact checked helpers.
 | Helper | Verified responsibility |
 | --- | --- |
 | [`source_usfx_structure.py`](source_usfx_structure.py) | Preserve and classify the authored USFX book/chapter/verse and layout inventory |
+| [`private_sword_install.py`](private_sword_install.py) | Safety-check and isolate one original stock SWORD Bible ZIP for generic read-only QA |
 | [`source_native_scope.py`](source_native_scope.py) | Compare independently attested verse-key scope with the native SWORD keys |
 | [`source_native_notes_audit.py`](source_native_notes_audit.py) | Source/native numbered and non-numbered note identity and completeness evidence |
 | [`source_native_paragraph_counts.py`](source_native_paragraph_counts.py) | Source paragraph and poetry structure vs installed native entry signatures |
@@ -34,6 +35,7 @@ The following direct regressions exercise the helpers without publishing
 source words:
 
 ```sh
+python -m unittest discover -s tests -p 'test_private_sword_install.py' -v
 python -m unittest discover -s tests -p 'test_source_usfx_structure.py' -v
 python -m unittest discover -s tests -p 'test_source_native_notes_audit.py' -v
 python scripts/tool_registry.py --check

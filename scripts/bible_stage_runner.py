@@ -318,7 +318,7 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
                             work / "source-original.osis.xml")
     from guard_osis import inspect as inspect_osis
     inspect_osis(original,schema)
-    from real_second_bible_probe import _safe_single_module
+    from research.bible.private_sword_install import _safe_single_module
     from source_native_index_audit import audit_source_native_index
     module = work / "isolated-original-sword"
     conf = _safe_single_module(archives["sword"],module)

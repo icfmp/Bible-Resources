@@ -11,7 +11,7 @@
 
 ## Read-only integration
 
-The private, optional [second real Bible workflow](../../.github/workflows/second-bible-proof.yml) already downloads publisher original WEBP USFX and actual original SWORD `zText` ZIPs, pinned by previously recorded independent exact SHA-256 values, into temporary Actions storage. It now adds `explicit_standard_book_scope_reference_audit` to the **metadata-only** receipt, plus `standard_66_book_crosswalk_sha256`. The actual original USFX and SWORD assets remain ephemeral and are never added to this repository or uploaded as CI artifacts.
+The private, optional [second real Bible workflow](https://github.com/icfmp/Bible-Resources/blob/b25e3bf27213/.github/workflows/second-bible-proof.yml) already downloads publisher original WEBP USFX and actual original SWORD `zText` ZIPs, pinned by previously recorded independent exact SHA-256 values, into temporary Actions storage. It now adds `explicit_standard_book_scope_reference_audit` to the **metadata-only** receipt, plus `standard_66_book_crosswalk_sha256`. The actual original USFX and SWORD assets remain ephemeral and are never added to this repository or uploaded as CI artifacts.
 
 An explicit scoped canonical **verse-key match**, should it occur, is only an index check. It still does **not** establish a matching publisher revision, complete SWORD source-text, lexical markup, note body/anchors, explicit references, intro/poetry/paragraph positions, licensing/redistribution or editorial publication approval. The existing whole-source versus compiled-source **canon discrepancy remains blocked** until its exact provenance and full content are reviewed; no extra USFX books may be silently discarded or represented as missing verses.
 
