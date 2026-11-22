@@ -1,15 +1,17 @@
 """Offline source downloader and XSD provenance tests."""
 from pathlib import Path
 import hashlib
+import json
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import urllib.error
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from pilot_fetch import PilotError, SafeRedirect, fetch, validate_url
-from probe_official_osis import inspect_bytes
+from fetch_reviewed_schema import inspect_bytes, main as schema_main, OFFICIAL_MAIN, OFFICIAL_DEP
 from validate import DRIVERS, ALLOWED
 
 
@@ -93,6 +95,46 @@ class PreparationTests(unittest.TestCase):
         found = inspect_bytes(with_deps)
         self.assertFalse(found["ready_to_pin"])
         self.assertEqual(found["schema_dependencies"][0]["kind"], "import")
+
+    def test_consolidated_schema_provenance_report_is_read_only(self):
+        xsd = (b'<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" '
+               b'targetNamespace="urn:test"><xs:element name="r" '
+               b'type="xs:string"/></xs:schema>')
+        dependency = (b'<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" '
+                      b'targetNamespace="http://www.w3.org/XML/1998/namespace"/>')
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "config").mkdir()
+            policy = {
+                "schema_status": "reviewed",
+                "schema_sha256": hashlib.sha256(xsd).hexdigest(),
+                "schema_dependencies": [{
+                    "download_url": OFFICIAL_DEP,
+                    "local_filename": "xml.xsd",
+                    "sha256": hashlib.sha256(dependency).hexdigest(),
+                }],
+            }
+            (root / "config/osis-policy.json").write_text(json.dumps(policy))
+            report = root / "reports/provenance.json"
+
+            def offline_fetch(url, expected_sha, target):
+                data = {OFFICIAL_MAIN: xsd, OFFICIAL_DEP: dependency}[url]
+                self.assertEqual(hashlib.sha256(data).hexdigest(), expected_sha)
+                target.write_bytes(data)
+
+            with patch("fetch_reviewed_schema.ROOT", root), \
+                 patch("fetch_reviewed_schema.pinned_fetch", side_effect=offline_fetch), \
+                 patch("fetch_reviewed_schema._schema", return_value=(None, "")):
+                self.assertEqual(schema_main([
+                    "--directory", str(root / "cache"), "--report", str(report)
+                ]), 0)
+            value = json.loads(report.read_text(encoding="utf-8"))
+            self.assertEqual(value["status"], "reviewed_XSD_and_dependency_verified")
+            self.assertEqual(value["sha256"], policy["schema_sha256"])
+            self.assertEqual(value["official_xml_dependency"]["sha256"],
+                             policy["schema_dependencies"][0]["sha256"])
+            self.assertTrue(value["guard_schema_compiled_offline"])
+            self.assertTrue(value["no_bible_text_validated"])
 
     def test_mhc_zcom4_supported_by_repository_publisher(self):
         self.assertIn("zCom4", DRIVERS)

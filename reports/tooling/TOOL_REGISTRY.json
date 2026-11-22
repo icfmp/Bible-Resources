@@ -461,7 +461,9 @@
       "classification": "UNDECIDED",
       "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [],
+      "format_signals_not_certified_support": [
+        "OSIS"
+      ],
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/fetch_reviewed_schema.py",
@@ -473,6 +475,7 @@
         "guard_osis",
         "hashlib",
         "json",
+        "lxml",
         "os",
         "pathlib",
         "tempfile",
@@ -480,15 +483,16 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "ca3044acfd754efe049cad70c680e479620db4b0a606fd33175f88fc76ee91c2",
+      "sha256_at_inventory": "af36511e35687caa3a8227e1ac21f568b30fecab8bdafc75621be148c4efb5bf",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         ".github/workflows/osis-schema-review.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
-        "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md"
+        "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
+        "tests/test_pilot_preparation.py"
       ]
     },
     {
@@ -562,13 +566,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 14,
+      "static_reference_count": 13,
       "static_references": [
         "scripts/audit_osis.py",
         "scripts/fetch_reviewed_schema.py",
         "scripts/guard_commentary.py",
         "scripts/normalize_osis.py",
-        "scripts/probe_official_osis.py",
         "scripts/tool_registry.py",
         ".github/workflows/osis-schema-review.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
@@ -776,41 +779,6 @@
       "static_references": [
         "scripts/commentary_intake.py",
         "tests/test_pilot_subprocess.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": false,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/probe_official_osis.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Inspect CrossWire's official OSIS XSD without trusting a live schema for import.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "guard_osis",
-        "hashlib",
-        "json",
-        "lxml",
-        "pathlib",
-        "sys",
-        "urllib"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "d1ca61f7b5849e61f832f18b48e94c919abf6ee58f2c67f5167899871422ffa7",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/osis-schema-review.yml",
-        "tests/test_pilot_preparation.py"
       ]
     },
     {
