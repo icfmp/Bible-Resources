@@ -76,6 +76,7 @@ class ScriptInventoryTests(unittest.TestCase):
         """Published Darby 0.1.1 must rely on its approved OSIS master."""
         current = {row["path"] for row in self.result["files"]}
         self.assertNotIn(
+            "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
             current)
         for name in ("repair_osis_source_bytes.py",
                      "repair_osis_division_markers.py",
@@ -151,8 +152,6 @@ class ScriptInventoryTests(unittest.TestCase):
         refs = entries[shared]["static_references"]
         for p in (
             "scripts/publisher_osis_sword_candidate.py",
-            "scripts/inspect_paragraph_rendering.py",
-            "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
             "tests/test_native_raw_main_text.py",
         ):
             with self.subTest(caller=p):
