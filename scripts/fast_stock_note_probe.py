@@ -16,10 +16,10 @@ import unicodedata
 
 from lsg_source_compare import read_source_xml
 from real_second_bible_probe import _safe_single_module
-from source_native_notes_audit import (
+from research.bible.source_native_notes_audit import (
     collect_usfx_numbered_notes, parse_native_numbered_notes, NoteEvidenceError,
 )
-from source_native_scope import read_crosswalk
+from research.bible.source_native_scope import read_crosswalk
 from stable_sword_refs import KEY
 
 MAX_SAMPLES = 12
