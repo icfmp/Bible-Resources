@@ -1,6 +1,7 @@
 """Fail-closed regression tests for the distinct modern commentary source gate."""
 from pathlib import Path
 import json
+import hashlib
 import shutil
 import sys
 import tempfile
@@ -19,6 +20,23 @@ class ModernCommentaryReleaseContract(unittest.TestCase):
         self.metadata = json.loads((self.module / "metadata.json").read_text())
         self.conf = parse_conf(
             self.module / "payload/mods.d/hmccmodern.conf")[1]
+
+    def test_existing_editorial_witnesses_have_byte_exact_pins(self):
+        """Explicitly detect any byte difference in the two owner-reviewed files."""
+        from reviewed_modern_commentary_rebuild import REVIEWED_MODERN_WITNESSES
+        pin = REVIEWED_MODERN_WITNESSES["hmcc-modern"]
+        actual = {
+            "plan_sha256": hashlib.sha256(
+                (ROOT / "config/commentary-rebuilds/hmcc-modern.json").read_bytes()
+            ).hexdigest(),
+            "decisions_sha256": hashlib.sha256(
+                (ROOT / pin["decisions_path"]).read_bytes()
+            ).hexdigest(),
+        }
+        self.assertEqual(
+            (pin["plan_sha256"], pin["decisions_sha256"]),
+            (actual["plan_sha256"], actual["decisions_sha256"]),
+        )
 
     def test_real_authenticated_binary_and_provenance_pass(self):
         self.assertEqual(
