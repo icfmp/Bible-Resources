@@ -101,8 +101,23 @@ def inspect_archive(path: Path, *, source_kind: str, expected_module_id: str | N
                 raise PilotError(f"sword: module ID mismatch: {parsed['module_id']!r}, expected {expected_module_id!r}")
             if parsed["category"] != expected_category or parsed["driver"] not in APPROVED_DRIVERS.get(expected_category, set()):
                 raise PilotError(f"sword: unexpected category or driver: {parsed['category']}/{parsed['driver']}")
-            if not any(PurePosixPath(name).parts[0] == "modules" for name in (m["name"] for m in report["members"])):
-                raise PilotError("sword: no modules/ payload in archive")
+            # A safe ZIP with a correct .conf is not necessarily a usable
+            # SWORD archive. Require at least one real file in the native
+            # payload subtree for the declared module category. This is
+            # structural intake only, not a binary/content parity claim.
+            expected_subtree = {
+                "bible": ("modules", "texts"),
+                "commentary": ("modules", "comments"),
+            }[expected_category]
+            if not any(
+                PurePosixPath(member["name"]).parts[:2] == expected_subtree
+                and len(PurePosixPath(member["name"]).parts) > 2
+                for member in report["members"]
+            ):
+                raise PilotError(
+                    f"sword: no {expected_subtree[0]}/{expected_subtree[1]}/ "
+                    "payload files for declared driver/category"
+                )
             report["sword_conf"] = {
                 **parsed, "entry": conf.filename, "encoding_checked": "metadata_only"
             }
