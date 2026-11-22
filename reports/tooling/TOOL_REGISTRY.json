@@ -786,10 +786,10 @@
         "scripts/pilot_fetch.py",
         "scripts/pilot_subprocess.py",
         "scripts/tool_registry.py",
+        "tests/test_bounded_sword_reader.py",
         "tests/test_commentary_intake.py",
         "tests/test_commentary_native_raw_inventory.py",
-        "tests/test_source_archive_preflight.py",
-        "tests/test_bounded_sword_reader.py"
+        "tests/test_source_archive_preflight.py"
       ]
     },
     {
@@ -1854,9 +1854,9 @@
         "docs/workflows/PUBLISHING.md",
         "tests/test_catalogue_update_contract.py",
         "tests/test_commentary_gate.py",
-        "tests/test_source_acquisition_and_schema.py",
         "tests/test_repository.py",
         "tests/test_reviewed_modern_commentary_rebuild.py",
+        "tests/test_source_acquisition_and_schema.py",
         "tests/test_source_gate.py",
         "tests/test_tool_registry.py"
       ]
