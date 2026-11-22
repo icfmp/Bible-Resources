@@ -21,7 +21,6 @@ scripts/                                            # reusable production and au
 catalog/v1/                                         # client-facing catalogue
 sword/                                              # distributed module packages
 docs/                                               # durable, generic documentation
-history/                                            # old cross-resource research
 reports/tooling/                                    # generated script inventory
 ```
 
@@ -35,7 +34,7 @@ Create independent candidates outside the original tree. **A source-derived cura
 
 Existing historical `work/` layouts may differ. Keep existing paths required to reproduce or resume work until their references have been audited; they are not templates for new resources.
 
-Shared read-only Bible/OSIS evidence with no independent CLI belongs under [`scripts/research/bible/`](../../scripts/research/bible/README.md). Historical commentary stock research is available through Git history, not maintained as an alternate production path. These tools never substitute for editorial or publication approval. Keep the actual stable producer/validator commands in `scripts/` and edition-owned scripts under `modules/<resource-id>/tools/`, after verifying real workflow and test consumers.
+Shared read-only Bible/OSIS evidence with no independent CLI belongs under [`scripts/research/bible/`](../../scripts/research/bible/README.md). Historical cross-resource research is available through immutable Git revisions, not maintained as an alternate production path. The [document relocation provenance ledger](../technical/DOCUMENT_RELOCATIONS.json) preserves original file identities. These tools never substitute for editorial or publication approval. Keep the actual stable producer/validator commands in `scripts/` and edition-owned scripts under `modules/<resource-id>/tools/`, after verifying real workflow and test consumers.
 
 ## Compiled and published output
 

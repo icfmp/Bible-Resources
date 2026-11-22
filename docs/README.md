@@ -22,7 +22,7 @@
 | How to execute a production or release step | [workflows](workflows/README.md) |
 | How to inspect OSIS, SWORD, notes, references or rendering | [technical methods](technical/README.md) |
 | Current priorities, blockers and actual progress | GitHub issues, PRs, Actions and approved edition manifests |
-| Older cross-cutting experiments retained for provenance | `history/` — never treat these as instructions |
+| Historical cross-cutting experiments | [Immutable Git history](https://github.com/icfmp/Bible-Resources/tree/2271b6c4473dda6dedf321463e4ffc6b250fd701/history) — not current instructions |
 | Compiled modules and distribution outputs | `modules/`, `sword/`, `catalog/v1/` |
 
 ## A concrete way to contribute
@@ -33,6 +33,6 @@ Do not confuse **source defect**, **editorial convention**, **compiler/index beh
 
 ## Documentation maintenance rule
 
-Keep `docs/` short and durable. Document a reusable rule **once**, at its most natural home, with links from entry points. Remove superseded explanations rather than accumulating variants. Place dated tests and module-specific history with the module; preserve cross-project research in `history/` only when its evidence is useful. Do not add execution logs or lists of temporary PR results to general guides.
+Keep `docs/` short and durable. Document a reusable rule **once**, at its most natural home, with links from entry points. Remove superseded explanations rather than accumulating variants. Place dated tests and module-specific history with the module; preserve source-bound evidence with the appropriate edition, and use immutable Git revisions for superseded cross-project research. Do not add execution logs or lists of temporary PR results to general guides.
 
 The [Bible Semantic Index](https://github.com/icfmp/Bible-Resources-Semantic-Index) is maintained in a separate repository; its source data and builds are not part of this resource documentation.

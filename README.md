@@ -61,7 +61,7 @@ Do not interpret a local build as rights clearance, complete source fidelity or 
 - `catalog/v1/`, `sword/`: versioned public interfaces and compiled package distribution.
 - `scripts/`, `tests/`: reusable verification and production tooling.
 - `docs/`: lasting architecture, policies, procedures and technical methods.
-- `history/`: historical cross-resource research retained for provenance.
+- Historical cross-resource research is recoverable from Git history; the [document relocation ledger](docs/technical/DOCUMENT_RELOCATIONS.json) preserves the earlier file identities.
 - [Bible Semantic Index](https://github.com/icfmp/Bible-Resources-Semantic-Index): separate authoritative repository for entity and lexical index development; this repository retains its historical releases.
 
 The retired place-context dataset is not a source of truth; future Wikipedia-related enrichment is a separate [Bible-Resources-Wikipedia](https://github.com/icfmp/Bible-Resources-Wikipedia) concern dependent on validated entity identities.
