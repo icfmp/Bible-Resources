@@ -14,7 +14,8 @@ import json
 from pathlib import Path
 import re
 
-from reviewed_compiled_commentary_rebuild import zcom_payload_paths
+from reviewed_compiled_commentary_rebuild import (zcom_payload_paths,
+                                                checked_zcom_payload_files)
 
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 
@@ -126,14 +127,8 @@ def reviewed_modern_commentary_errors(directory: Path, root: Path,
         members = zcom_payload_paths(metadata["sword_id"], conf["BlockType"])
         if not isinstance(expected_members, dict) or set(expected_members) != members:
             raise ValueError("Expected seven native zCom payload members missing")
-        actual: dict[str, Path] = {}
-        for path in (directory / "payload").rglob("*"):
-            if path.is_symlink():
-                raise ValueError("Payload symlink forbidden")
-            if path.is_file():
-                actual[path.relative_to(directory / "payload").as_posix()] = path
-        if set(actual) != members:
-            raise ValueError("Published payload inventory is not the exact reviewed zCom")
+        actual = checked_zcom_payload_files(
+            directory / "payload", metadata["sword_id"], conf["BlockType"])
         for name in sorted(members):
             digest = expected_members[name]
             if not sha(digest) or hashlib.sha256(actual[name].read_bytes()).hexdigest() != digest:
