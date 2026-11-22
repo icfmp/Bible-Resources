@@ -22,9 +22,9 @@ from bible_intake import ROOT, acquire, load_manifest
 from lsg_source_compare import read_source_xml
 from publisher_osis_observation import read_pinned_publisher_osis
 from source_native_maintext_probe import authored_usfx_main_text
-from source_native_notes_audit import collect_usfx_numbered_notes
-from source_native_note_positions import original_usfx_note_anchors
-from source_native_scope import read_crosswalk
+from research.bible.source_native_notes_audit import collect_usfx_numbered_notes
+from research.bible.source_native_note_positions import original_usfx_note_anchors
+from research.bible.source_native_scope import read_crosswalk
 from source_osis_inventory import source_inventory, _source_tree, OSIS
 from stable_sword_refs import KEY
 
