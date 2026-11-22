@@ -1,14 +1,14 @@
 # Script tooling
 
-The `scripts/` directory contains **production commands**, reusable libraries, independent research probes and historical reproduction tools. Their status is determined by tested callers and source evidence, not by filename or location.
+The `scripts/` directory is for **maintained, reusable production and verification tools**. The active authoring path uses a reviewed OSIS master and independent SWORD/reader checks. Historical one-off probes belong in Git history, not in the current working process.
 
 ## Find the right tool
 
 | Location | Role |
 | --- | --- |
-| `scripts/*.py`, `scripts/*.cpp`, `scripts/*.sh` | Existing production entrypoints, shared validators, native inspectors and research commands whose callers have not yet been migrated |
+| `scripts/*.py`, `scripts/*.cpp`, `scripts/*.sh` | Maintained OSIS-first commands, generic validators and independently checked native SWORD tools |
 | [`research/commentary/`](research/commentary/README.md) | Non-CLI, read-only commentary chapter, section, introduction, paragraph and native-scope diagnostics; **not** publication or editorial approval |
-| [`research/bible/`](research/bible/README.md) | Shared read-only USFX, authored note, source/native scope and structural anchor libraries; no CLI, source edits, or editorial approval |
+| [`research/bible/`](research/bible/README.md) | Shared strict source-OSIS readers, SWORD markup/verse inspectors and source/native structural evidence; no CLI, source edits or editorial approval |
 | `modules/<resource-id>/tools/` | Maintained edition-only diagnostics/replay, never a second publisher; see [LSG 1910](../modules/lsg-1910/tools/README.md) and [Darby](../modules/darby-jnd-2024/tools/README.md) |
 | [Generated tool inventory](../reports/tooling/TOOL_REGISTRY.md) | Every tracked tool's classification, source hash, imports and static callers; review evidence, **not** proof that a script is unused |
 
