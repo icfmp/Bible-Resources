@@ -11,8 +11,9 @@ No original commentary text is printed, written to reports, or uploaded.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import shutil
 import sys
@@ -20,14 +21,81 @@ import tempfile
 from urllib.parse import urlsplit
 import zipfile
 
-from audit_real_pilot import scan_sword_entries
 from check_updates import ID_PATTERN
 from pilot_fetch import fetch, validate_url
 from pilot_preflight import ROOT, PilotError, inspect_archive
+from pilot_subprocess import query, present_key
 
 ID = re.compile(r"^[a-z][a-z0-9-]{1,63}$")
 SHA = re.compile(r"^[a-f0-9]{64}$")
 COMMENTARY_DRIVERS = {"RawCom", "RawCom4", "zCom", "zCom4"}
+
+DISPLAY_MARKERS = {
+    "paragraph": re.compile(r"<p(?:\s|>)|<div[^>]*type=['\"]x-p", re.IGNORECASE),
+    "poetry_line": re.compile(r"<l(?:\s|>)|type=['\"]x-line", re.IGNORECASE),
+    "note": re.compile(r"<note(?:\s|>)", re.IGNORECASE),
+    "reference": re.compile(r"<reference(?:\s|>)", re.IGNORECASE),
+    "emphasis": re.compile(r"<hi(?:\s|>)", re.IGNORECASE),
+    "original_word": re.compile(r"<w(?:\s|>)", re.IGNORECASE),
+}
+
+def _scan_sword_entries(archive_path: Path, *, module_id: str,
+                        reference_keys: list[str], diatheke=None) -> dict:
+    """Read actual isolated commentary keys without exposing source prose."""
+    conf = {"module_id": module_id, "category": "commentary",
+            "sample_references": reference_keys}
+    archive_info = inspect_archive(
+        archive_path, source_kind="sword",
+        expected_module_id=conf["module_id"],
+        expected_category=conf["category"],
+    )
+    exe = diatheke or shutil.which("diatheke")
+    if not exe:
+        raise PilotError("diatheke is required for a real SWORD entry scan")
+    samples = []
+    with tempfile.TemporaryDirectory(prefix="bible-resources-source-audit-") as temp:
+        root = Path(temp)
+        with zipfile.ZipFile(archive_path) as archive:
+            for item in archive_info["members"]:
+                name = item["name"]
+                destination = root / PurePosixPath(name)
+                if not destination.resolve().is_relative_to(root.resolve()):
+                    raise PilotError("Unsafe source entry in ZIP")
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                with archive.open(name) as input_file, destination.open("xb") as output_file:
+                    shutil.copyfileobj(input_file, output_file, length=262144)
+        for key in conf["sample_references"]:
+            return_code, data = query(
+                conf["module_id"], key, fmt="internal", root=root, exe=exe
+            )
+            # Do NOT emit raw text or stderr. A single key must not trigger
+            # an unbounded full-module dump; query() enforces the limit.
+            decoded = data.decode("utf-8", errors="replace")
+            samples.append({
+                "reference": key,
+                "successful": present_key(key, data, return_code),
+                "return_code": return_code,
+                "bytes": len(data),
+                "sha256": hashlib.sha256(data).hexdigest(),
+                "render_markup_signal_counts": {
+                    name: len(marker.findall(decoded))
+                    for name, marker in DISPLAY_MARKERS.items()
+                },
+                "not_original_xml_source": True,
+            })
+    return {
+        "archive_sha256": archive_info["archive_sha256"],
+        "module_id": conf["module_id"],
+        "category": archive_info["sword_conf"]["category"],
+        "language": archive_info["sword_conf"]["language"],
+        "versification": archive_info["sword_conf"]["versification"],
+        "source_type_declared": archive_info["sword_conf"]["source_type"],
+        "driver": archive_info["sword_conf"]["driver"],
+        "version": archive_info["sword_conf"]["version"],
+        "samples": samples,
+        "has_all_sample_keys": all(x["successful"] for x in samples),
+        "content_not_normalized": True,
+    }
 
 
 def load_manifest(resource_id: str, directory: Path | None = None) -> dict:
@@ -135,16 +203,12 @@ def inspect_resource(resource_id: str, stage: str, *, directory: Path | None = N
         # A licensor's declaration is metadata evidence, NOT a legal determination.
         if "public domain" not in (conf["distribution_license"] or "").lower():
             raise PilotError("Actual .conf lacks the declared Public Domain license claim")
-        scanner_config = {"pilots": {resource_id: {
-            "module_id": manifest["module_id"],
-            "category": "commentary",
-            "sample_references": manifest["sample_references"],
-        }}}
         reader_exe = reader or shutil.which("diatheke")
         if not reader_exe:
             raise PilotError("Actual diatheke reader required for commentary observation")
-        sample = scan_sword_entries(resource_id, archive, config=scanner_config,
-                                    diatheke=reader_exe)
+        sample = _scan_sword_entries(
+            archive, module_id=manifest["module_id"],
+            reference_keys=manifest["sample_references"], diatheke=reader_exe)
         # A 19-byte `John 3:16` response can be just a reference echo.
         # This is an advisory signal, not proof the author omitted material:
         # the commentary may be indexed by an enclosing passage range.
