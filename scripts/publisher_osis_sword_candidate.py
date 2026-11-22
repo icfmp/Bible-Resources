@@ -29,14 +29,14 @@ from research.bible.source_native_note_positions import native_note_anchor_posit
 from source_native_osis_structure_screen import (
     authorial_structures, NativeStructuralCensus, authorial_body_opening_sequences,
 )
-from source_native_ordered_body import compare_ordered_body_openings
+from research.bible.source_native_ordered_body import compare_ordered_body_openings
 from source_native_osis_target_addressability import audit_explicit_targets
 from source_native_osis_boundary_positions import (
     authorial_book_streams,authorial_outside_book_titles,
     NativeBookStreams,compare_book_boundary_positions,
 )
 from source_osis_inventory import source_inventory
-from native_milestone_pair_audit import NativeMilestonePairAudit
+from research.bible.native_milestone_pair_audit import NativeMilestonePairAudit
 from sword_native_inventory import collect_native_inventory
 from publisher_osis_preview_package import package_preview
 from stable_sword_refs import KEY
