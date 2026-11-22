@@ -6,7 +6,7 @@ from lxml import etree
 from io import BytesIO
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus, RawCorpusError
-from commentary_osis_intro_transport_probe import make_unmodified_intro_osis
+from research.commentary.commentary_osis_intro_transport_probe import make_unmodified_intro_osis
 
 
 class IntroTransportTests(unittest.TestCase):

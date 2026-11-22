@@ -24,7 +24,7 @@ import zipfile
 from lxml import etree
 from pilot_preflight import PilotError
 
-from commentary_osis_transport_probe import (
+from research.commentary.commentary_osis_transport_probe import (
     KEY, WORK, OSIS_NS, _strict_parser, _source_visible_text,
     classify_native_osis_roundtrip_delta
 )

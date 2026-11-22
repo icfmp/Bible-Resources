@@ -17,7 +17,7 @@ import subprocess
 
 from lxml import etree
 
-from commentary_osis_transport_probe import (
+from research.commentary.commentary_osis_transport_probe import (
     _strict_parser, _source_visible_text, classify_native_osis_roundtrip_delta,
     WORK, OSIS_NS
 )

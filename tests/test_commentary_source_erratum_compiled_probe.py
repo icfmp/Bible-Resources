@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from commentary_source_erratum_compiled_probe import (
+from research.commentary.commentary_source_erratum_compiled_probe import (
     _original_citation_endpoints,
     _apply_private_reviewed_prose_changes,
 )

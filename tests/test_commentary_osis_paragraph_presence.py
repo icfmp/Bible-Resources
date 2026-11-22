@@ -8,7 +8,7 @@ import sys
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from commentary_osis_paragraph_presence import (
+from research.commentary.commentary_osis_paragraph_presence import (
     original_ccel_paragraph_words,
     exact_original_paragraph_runs_in_osis,
     original_authoring_chapter_scope_metadata,
@@ -644,7 +644,7 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
 
     def test_full_corpus_source_native_chapter_marker_index_is_fail_closed(self):
         from lxml import etree
-        from commentary_osis_paragraph_presence import (
+        from research.commentary.commentary_osis_paragraph_presence import (
             original_authoring_native_chapter_index_receipt)
         # 66 genuine-style book divisions; first book owns two chapters,
         # all later synthetic books own one. No prose/verse addresses leak.
@@ -859,7 +859,7 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
 
 
     def test_full_original_native_raw_KI_search_recovers_entire_source_gap(self):
-        from commentary_osis_paragraph_presence import (
+        from research.commentary.commentary_osis_paragraph_presence import (
             PrivateOriginalNativeWholeCorpusGapSearch)
         intro=[f"intro{i:02d}" for i in range(8)]
         first=[f"before{i:02d}" for i in range(8)]
@@ -947,7 +947,7 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
 
 
     def test_original_osis_prose_against_sha_pinned_independent_ccel_digital_volume(self):
-        from commentary_osis_paragraph_presence import (
+        from research.commentary.commentary_osis_paragraph_presence import (
             private_original_osis_gap_against_pinned_ccel_volume)
         original=[f"originalword{i:03d}" for i in range(30)]
         other=[f"differentword{i:03d}" for i in range(38)]
@@ -989,7 +989,7 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
 
 
     def test_private_ccel_collation_quantifies_one_word_substitution_or_insert(self):
-        from commentary_osis_paragraph_presence import (
+        from research.commentary.commentary_osis_paragraph_presence import (
             private_original_osis_gap_against_pinned_ccel_volume)
         original=[f"wordtoken{i:03d}" for i in range(60)]
         case=[("Ps.95",1747,original)]

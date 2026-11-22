@@ -39,7 +39,7 @@ from research.commentary.commentary_reference_registry_triage import (
 from commentary_osis_mixed_transport_probe import (
     probe_complete_original_transport, privately_stage_versioned_zcom_zip,
 )
-from commentary_osis_transport_probe import classify_native_osis_roundtrip_delta
+from research.commentary.commentary_osis_transport_probe import classify_native_osis_roundtrip_delta
 from commentary_xiphos_dual_reader import (
     BIBLE_MODULE, _run_real_gui, verify_and_install_reviewed_bible,
 )
@@ -446,7 +446,7 @@ def probe_private_compiled_source_erratum(
     if (original_source_manifest is None or original_native_corpus_sha256 is None):
         raise ValueError("Private source attestation needs the independently pinned original")
     attestation = private_rebuild_attestation_draft(
-        repo_root=Path(__file__).resolve().parents[1],
+        repo_root=Path(__file__).resolve().parents[3],
         original_manifest=original_source_manifest,
         module_id=curated_module_id, version=curated_proposed_version,
         versification=_exact_conf_value(installed_conf.decode("utf-8"), "Versification"),

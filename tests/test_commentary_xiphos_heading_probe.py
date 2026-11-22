@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_xiphos_heading_probe import (
+from research.commentary.commentary_xiphos_heading_probe import (
     _I_BOOK, _I_CHAPTER, _intro_in_gui_clipboard,
     _normal_chapter_intro_in_real_gui,
     probe_real_xiphos_commentary_heading_menu,
@@ -73,8 +73,8 @@ class SourceNativeIntroContextMenuTests(unittest.TestCase):
                 {"DISPLAY": ":0", "GDK_BACKEND": "x11"}, {}, ordinary_first_verse=b"")
 
     def test_real_source_intro_not_available_is_not_missing_text(self):
-        with patch("commentary_xiphos_heading_probe._main_xiphos_window",return_value="101"),\
-             patch("commentary_xiphos_heading_probe._commentary_pane_focus_points",return_value=((1000,390),)):
+        with patch("research.commentary.commentary_xiphos_heading_probe._main_xiphos_window",return_value="101"),\
+             patch("research.commentary.commentary_xiphos_heading_probe._commentary_pane_focus_points",return_value=((1000,390),)):
             r=probe_real_xiphos_commentary_heading_menu(
                 {"DISPLAY":":91","GDK_BACKEND":"x11"}, {}, ordinary_first_verse=b"commentary")
         self.assertFalse(r["heading_GUI_presentation_verified"])
@@ -83,7 +83,7 @@ class SourceNativeIntroContextMenuTests(unittest.TestCase):
         self.assertEqual(set(r["book_and_chapter_menu_observations"]),{"book","chapter"})
 
     def test_no_real_window_is_not_a_heading_pass(self):
-        with patch("commentary_xiphos_heading_probe._main_xiphos_window",return_value=None):
+        with patch("research.commentary.commentary_xiphos_heading_probe._main_xiphos_window",return_value=None):
             r=probe_real_xiphos_commentary_heading_menu(
                 {"DISPLAY":":91","GDK_BACKEND":"x11"}, {"book":b"original"},
                 ordinary_first_verse=b"commentary")
@@ -91,9 +91,9 @@ class SourceNativeIntroContextMenuTests(unittest.TestCase):
         self.assertFalse(r["heading_GUI_presentation_verified"])
         self.assertFalse(r["original_intro_in_normal_chapter_GUI_verified"])
 
-    @patch("commentary_xiphos_heading_probe.time.sleep")
-    @patch("commentary_xiphos_heading_probe._seed_x11_clipboard")
-    @patch("commentary_xiphos_heading_probe._x11")
+    @patch("research.commentary.commentary_xiphos_heading_probe.time.sleep")
+    @patch("research.commentary.commentary_xiphos_heading_probe._seed_x11_clipboard")
+    @patch("research.commentary.commentary_xiphos_heading_probe._x11")
     def test_normal_chapter_display_checks_second_real_pane_point(
         self, x11, _seed, _sleep,
     ):
@@ -114,9 +114,9 @@ class SourceNativeIntroContextMenuTests(unittest.TestCase):
             for call in x11.call_args_list
         ), 2)
 
-    @patch("commentary_xiphos_heading_probe.time.sleep")
-    @patch("commentary_xiphos_heading_probe._seed_x11_clipboard")
-    @patch("commentary_xiphos_heading_probe._x11")
+    @patch("research.commentary.commentary_xiphos_heading_probe.time.sleep")
+    @patch("research.commentary.commentary_xiphos_heading_probe._seed_x11_clipboard")
+    @patch("research.commentary.commentary_xiphos_heading_probe._x11")
     def test_normal_chapter_cannot_pass_with_unmodified_verse(
         self, x11, _seed, _sleep,
     ):
@@ -131,12 +131,12 @@ class SourceNativeIntroContextMenuTests(unittest.TestCase):
             {"DISPLAY": ":91"}, ((900, 310),), intro, verse,
         ))
 
-    @patch("commentary_xiphos_heading_probe._intro_in_gui_clipboard",return_value=True)
-    @patch("commentary_xiphos_heading_probe.time.sleep")
-    @patch("commentary_xiphos_heading_probe._seed_x11_clipboard")
-    @patch("commentary_xiphos_heading_probe._x11",return_value=b"unique original introduction")
-    @patch("commentary_xiphos_heading_probe._commentary_pane_focus_points",return_value=((1000,390),))
-    @patch("commentary_xiphos_heading_probe._main_xiphos_window",return_value="101")
+    @patch("research.commentary.commentary_xiphos_heading_probe._intro_in_gui_clipboard",return_value=True)
+    @patch("research.commentary.commentary_xiphos_heading_probe.time.sleep")
+    @patch("research.commentary.commentary_xiphos_heading_probe._seed_x11_clipboard")
+    @patch("research.commentary.commentary_xiphos_heading_probe._x11",return_value=b"unique original introduction")
+    @patch("research.commentary.commentary_xiphos_heading_probe._commentary_pane_focus_points",return_value=((1000,390),))
+    @patch("research.commentary.commentary_xiphos_heading_probe._main_xiphos_window",return_value="101")
     def test_both_real_menu_actions_are_required_before_positive_GUI_evidence(
         self,*_mocks
     ):
