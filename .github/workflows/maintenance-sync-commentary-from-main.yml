@@ -1,0 +1,30 @@
+name: One-shot sync commentary refactor with latest protected main
+on:
+  pull_request:
+    paths:
+      - .github/workflows/maintenance-sync-commentary-from-main.yml
+permissions:
+  contents: write
+jobs:
+  sync:
+    if: github.repository == 'icfmp/Bible-Resources'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: maintenance/commentary-evidence-libraries-20261122
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Merge newest unrelated main changes and remove this maintenance job
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main
+          git merge --no-edit --no-ff origin/main
+          git rm .github/workflows/maintenance-sync-commentary-from-main.yml
+          git commit -m 'chore: remove temporary protected-main sync job'
+          python scripts/tool_registry.py --check
+          git push origin HEAD:maintenance/commentary-evidence-libraries-20261122
