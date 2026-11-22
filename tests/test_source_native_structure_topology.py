@@ -7,7 +7,7 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from source_native_structure_topology import (
+from research.bible.source_native_structure_topology import (
     compare_structural_event_topology,StructureTopologyError
 )
 

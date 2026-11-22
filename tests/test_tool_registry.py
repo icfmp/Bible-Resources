@@ -156,6 +156,24 @@ class ScriptInventoryTests(unittest.TestCase):
                      "reader_xiphos_headless_smoke.py"):
             self.assertIn("scripts/" + name, paths)
 
+
+    def test_three_structural_evidence_helpers_are_package_owned(self):
+        """No old root implementation; read-only helpers keep real users/tests."""
+        entries = {row["path"]: row for row in self.result["files"]}
+        for name in (
+            "native_absorbed_verse_groups",
+            "source_native_nonspace_boundaries",
+            "source_native_structure_topology",
+        ):
+            with self.subTest(helper=name):
+                current = "scripts/research/bible/" + name + ".py"
+                self.assertIn(current, entries)
+                self.assertNotIn("scripts/" + name + ".py", entries)
+                self.assertIn("scripts/source_native_maintext_probe.py",
+                              entries[current]["static_references"])
+                self.assertIn("tests/test_" + name + ".py",
+                              entries[current]["static_references"])
+
     def test_nested_package_imports_count_as_real_static_callers(self):
         entries = {item["path"]: item for item in self.result["files"]}
         module = ("scripts/research/commentary/"

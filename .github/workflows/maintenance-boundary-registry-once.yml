@@ -1,0 +1,27 @@
+name: One-shot Bible boundary helper registry refresh
+on:
+  push:
+    branches:
+      - maintenance/group-bible-boundary-evidence-20261122
+permissions:
+  contents: write
+jobs:
+  registry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh only generated registry and remove updater
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/maintenance-boundary-registry-once.yml
+          python scripts/tool_registry.py --write
+          git add -f reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          python scripts/tool_registry.py --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: update boundary helper registry and remove temporary workflow"
+          git push

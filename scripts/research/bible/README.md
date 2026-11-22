@@ -9,6 +9,9 @@ remain in `scripts/` and use these exact checked helpers.
 | --- | --- |
 | [`source_usfx_structure.py`](source_usfx_structure.py) | Preserve and classify the authored USFX book/chapter/verse and layout inventory |
 | [`private_sword_install.py`](private_sword_install.py) | Safety-check and isolate one original stock SWORD Bible ZIP for generic read-only QA |
+| [`native_absorbed_verse_groups.py`](native_absorbed_verse_groups.py) | Check if source-only verse words survive in a neighboring native slot, without approving a merge |
+| [`source_native_nonspace_boundaries.py`](source_native_nonspace_boundaries.py) | Compare source/native punctuation-relative paragraph and poetry boundaries without rewriting words |
+| [`source_native_structure_topology.py`](source_native_structure_topology.py) | Compare structural open/close anchors while preserving authored scope and order |
 | [`source_native_scope.py`](source_native_scope.py) | Compare independently attested verse-key scope with the native SWORD keys |
 | [`source_native_notes_audit.py`](source_native_notes_audit.py) | Source/native numbered and non-numbered note identity and completeness evidence |
 | [`source_native_paragraph_counts.py`](source_native_paragraph_counts.py) | Source paragraph and poetry structure vs installed native entry signatures |
