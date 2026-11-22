@@ -5,7 +5,7 @@ import unittest
 from lxml import etree
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_osis_transport_probe import (
+from research.commentary.commentary_osis_transport_probe import (
     build_numbered_transport_sample, classify_native_osis_roundtrip_delta
 )
 
