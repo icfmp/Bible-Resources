@@ -949,42 +949,6 @@
       "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/publisher_osis_observation.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Observe an explicitly reviewed publisher's unpinned official OSIS XML.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "collections",
-        "hashlib",
-        "json",
-        "lxml",
-        "pathlib",
-        "re",
-        "ssl",
-        "urllib"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "45f72f27b7428cd7f40596758b2f315a206a8af3732575129da1255f981cfbbf",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "publication/release",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/publisher-osis-observation.yml",
-        "tests/test_publisher_osis_observation.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
         "RawText",
         "zText",
         "OSIS"
