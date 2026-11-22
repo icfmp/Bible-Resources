@@ -14,6 +14,8 @@ import json
 from pathlib import Path
 import re
 
+from reviewed_compiled_commentary_rebuild import zcom_payload_paths
+
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 
 
@@ -121,10 +123,7 @@ def reviewed_modern_commentary_errors(directory: Path, root: Path,
             raise ValueError("Exact approved QA artifact not bound to final binary")
         expected_members = artifact.get("payload_sha256")
         folder = metadata["sword_id"].lower()
-        members = {"mods.d/" + folder + ".conf"} | {
-            "modules/comments/zcom/" + folder + "/" + part + ".cz" + suffix
-            for part in ("nt", "ot") for suffix in ("s", "v", "z")
-        }
+        members = zcom_payload_paths(metadata["sword_id"], conf["BlockType"])
         if not isinstance(expected_members, dict) or set(expected_members) != members:
             raise ValueError("Expected seven native zCom payload members missing")
         actual: dict[str, Path] = {}
