@@ -20,4 +20,4 @@ Matching keys does **not** prove that wording, punctuation, notes, cross-referen
 
 The read-only standard identity mapping is in `config/standard_usfm_osis_66.json` where appropriate; a translation may have an entirely different verified canon/versification. Never fabricate omitted verses simply because a stock SWORD versification contains an index slot.
 
-**Previous edition experiment:** preserved verbatim in [historical source/native book-scope research](../../history/pilots/WEBP_SOURCE_NATIVE_BOOK_SCOPE_2026-11-20.md), separate from this general method.
+**Previous edition experiment:** preserved verbatim in [historical source/native book-scope research](https://github.com/icfmp/Bible-Resources/blob/2271b6c4473dda6dedf321463e4ffc6b250fd701/history/pilots/WEBP_SOURCE_NATIVE_BOOK_SCOPE_2026-11-20.md), separate from this general method.
