@@ -8,7 +8,6 @@ on:
       - "scripts/research/bible/source_osis_verse_notes.py"
       - "tests/test_source_osis_verse_notes.py"
       - "tests/test_source_osis_note_link_triage.py"
-      - "scripts/publisher_osis_usfx_parity.py"
       - "scripts/publisher_osis_observation.py"
       - "scripts/research/bible/source_native_osis_target_addressability.py"
       - "config/publisher-osis/**"
@@ -48,7 +47,7 @@ jobs:
           set -euo pipefail
           python -m unittest discover -s tests -p 'test_source_osis_note_link_triage.py' -v
           python -m unittest discover -s tests -p 'test_source_native_osis_target_addressability.py' -v
-          python -m unittest discover -s tests -p 'test_publisher_osis_usfx_parity.py' -v
+          python -m unittest discover -s tests -p 'test_source_osis_verse_notes.py' -v
       - name: Parse exact authorized import-issue request
         if: github.event_name == 'issue_comment'
         shell: bash
