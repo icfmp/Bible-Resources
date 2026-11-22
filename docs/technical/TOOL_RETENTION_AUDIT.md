@@ -81,6 +81,22 @@ editorial proof. All edition-specific link corrections, restorations,
 authorizations and SHA-256 evidence remain frozen and are **not** inferred
 from a generic validator or revised on the basis of the format helper.
 
+## Immutable owner evidence for HMCC Modern
+
+The HMCC Modern gate now checks independently pinned SHA-256 fingerprints
+of the exact historical owner-decision JSON and release review manifest,
+before using either one to determine the approved editorial correction counts.
+The measured case, destination and restoration totals are then compared
+against the source-validation receipt. This protects against changes to a
+destination that keep the same counts, or coordinated edits to the two mutable
+JSON files.
+
+These code-held pins are not a digital signature or a substitute for human
+approval: changing either original evidence file requires an explicit
+reviewed code change, preservation of the prior evidence, and new owner
+authorization. The original decision record's own publication and merger
+status flags are preserved verbatim; this audit does not reinterpret them.
+
 ## Next maintenance boundary
 
 Further reduction now requires a **proved functional consolidation**:
