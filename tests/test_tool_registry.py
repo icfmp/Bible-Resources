@@ -44,13 +44,18 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertTrue(any("workflow" in ref
                             for ref in entries["validate.py"]["static_references"]))
 
-    def test_proven_generic_tools_keep_shared_contracts(self):
-        entries = {v["path"].rsplit("/", 1)[-1]: v
-                   for v in self.result["files"]}
-        for name in ("promote_sword_preview.py",):
-            with self.subTest(shared=name):
-                self.assertEqual(entries[name]["classification"], "KEEP_GENERIC")
-                self.assertTrue(entries[name]["has_direct_tests_by_filename"])
+    def test_expired_darby_preview_flows_are_not_active(self):
+        """No mutable CI path may rely on old unapproved TEST-ONLY archives."""
+        scripts = {item["path"] for item in self.result["files"]}
+        for name in ("promote_sword_preview.py",
+                     "reader_xiphos_headless_smoke.py"):
+            self.assertNotIn("scripts/" + name, scripts)
+            self.assertNotIn(name, CORE)
+        for name in ("private-sword-promotion-proof.yml",
+                     "xiphos-preview-smoke.yml"):
+            self.assertFalse((ROOT / ".github/workflows" / name).exists())
+        self.assertIn("scripts/approved_osis_sword_candidate.py", scripts)
+        self.assertIn("scripts/reviewed_compiled_commentary_rebuild.py", scripts)
 
     def test_obsolete_first_release_pilots_are_not_active(self):
         """Original USFX/stock pilots must not survive in the OSIS workflow."""

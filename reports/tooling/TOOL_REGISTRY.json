@@ -833,45 +833,6 @@
       "classification": "KEEP_GENERIC",
       "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "RawText",
-        "zText",
-        "zCom",
-        "zCom4"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/promote_sword_preview.py",
-      "proposed_action": "Retain stable verified interface; extend test fixtures.",
-      "purpose_first_line": "Promote a fully verified private SWORD trial ZIP without changing its data.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "hashlib",
-        "json",
-        "pathlib",
-        "re",
-        "reviewed_compiled_commentary_rebuild",
-        "zipfile"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "5bcf3af2bb307e0ddd428690e518411798876eb6f36677eb96995c9ddb8402a3",
-      "side_effects": "consult the documented core tool contract",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 4,
-      "static_references": [
-        "scripts/tool_registry.py",
-        ".github/workflows/private-sword-promotion-proof.yml",
-        "tests/test_promote_sword_preview.py",
-        "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "KEEP_GENERIC",
-      "confidence": "high",
-      "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [],
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
@@ -944,50 +905,6 @@
         "scripts/validate.py",
         "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
         "tests/test_published_reference_audit.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "RawText",
-        "zText",
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/reader_xiphos_headless_smoke.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Test-only Xiphos GTK startup with a SHA-pinned isolated SWORD module.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "hashlib",
-        "json",
-        "os",
-        "pathlib",
-        "re",
-        "shutil",
-        "signal",
-        "subprocess",
-        "tempfile",
-        "time",
-        "zipfile"
-      ],
-      "reader_tool_signals": [
-        "xiphos"
-      ],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "bda2cd7462d2b42e686627176b39df1423c42fc2882ef6de7afc7dfaa849b0eb",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 3,
-      "static_references": [
-        ".github/workflows/xiphos-preview-smoke.yml",
-        "tests/test_reader_xiphos_headless_smoke.py",
-        "tests/test_reader_xiphos_reference_navigation.py"
       ]
     },
     {
@@ -1383,13 +1300,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 7,
+      "static_reference_count": 5,
       "static_references": [
-        "scripts/promote_sword_preview.py",
         "scripts/tool_registry.py",
         "scripts/validate.py",
         "docs/workflows/PUBLISHING.md",
-        "tests/test_promote_sword_preview.py",
         "tests/test_reviewed_compiled_commentary_rebuild.py",
         "tests/test_tool_registry.py"
       ]
@@ -1856,7 +1771,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "463d55895a755f67a19120fd1c6d0175a0d3519cf64cba88ccb32dedaa92c778",
+      "sha256_at_inventory": "92b76348ae7e235ab800b5e704873bd09feb54bf838a317b00524bfb910ff9f9",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
