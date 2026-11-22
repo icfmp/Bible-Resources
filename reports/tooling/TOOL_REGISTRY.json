@@ -773,7 +773,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "1689630715f76e1163de7e1da688d4b3468029e5051dd3421c943a966fd59421",
+      "sha256_at_inventory": "1ce0ac549fcd37a514daca03eb0882e311aaaae3342fc93bfb2c80035fd3fd9a",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
