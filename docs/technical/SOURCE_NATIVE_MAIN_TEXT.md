@@ -1,43 +1,22 @@
-# Source-to-native main text comparison
+# OSIS-to-native Scripture text verification
 
-Use `scripts/source_native_maintext_probe.py` to compare publisher **USFX numbered-verse text** with actual compiled stock-SWORD text. This is a **read-only diagnostic**, not a general OSIS conversion validator or a release approval.
+**Active source path:** exact immutable original -> reviewed cleaned **OSIS** master -> SWORD compilation -> independent native readback. This procedure covers source/native text evidence, not permission, editorial sign-off or release approval. See the [production contract](../PRODUCTION_PIPELINE.md).
 
-**Current OSIS-first workflow:** when the reviewed edition has an OSIS authoring master, audit that exact OSIS directly using `scripts/source_osis_inventory.py`, `scripts/osis_semantic_fidelity.py` and the OSIS-to-native candidate and boundary checks. Do **not** convert an approved OSIS master to USFX merely to run the USFX-only probe. Keep this older USFX probe only to verify a genuinely USFX-authored original or independently pinned historical source witness. The source bytes and edition provenance remain authoritative, regardless of the working format.
+## Required evidence
 
-## Inputs and execution
+1. Pin original and approved cleaned OSIS bytes, SHA-256, edition, rights, canon and versification. Preserve authorial omitted verses as omissions; do not create missing text from available native index slots.
+2. Validate the reviewed OSIS source with the official schema and [source inventory](SOURCE_OSIS_INVENTORY.md). Inspect all authored verse keys, introductions and source-only sections without assuming the native versification matches.
+3. For a native candidate, use the current `scripts/publisher_osis_sword_candidate.py` source-to-SWORD research checks, together with `scripts/sword_native_index.cpp`, `scripts/sword_native_raw_corpus.cpp`, `scripts/sword_native_raw_entry.cpp`, and the strict `scripts/research/bible/native_raw_main_text.py` parser as needed. The private source parser `scripts/research/bible/source_osis_verse_notes.py` preserves original verse text and note bodies in memory; **never log or publish those values**.
+4. Compare **all** source-addressable numbered verse text against actual compiled entries, not a few reader-visible samples. Record exact character equality, Unicode normalization-only changes, whitespace-only changes, punctuation/case differences, changed prose, duplicate/missing native keys, and compiler-created unaddressable keys as separate classes.
+5. Independently verify notes, callers, explicit cross-references, headings, poetry, paragraphs, book introductions, and layout anchors. The source/native structural and note checks must agree with the main-text results. Run actual SWORD and independent reader checks before any publication decision.
 
-Pin independently acquired USFX and native SWORD ZIP archives, exact edition identities, their hashes, the reviewed USFM-to-OSIS book crosswalk and the native inspectors. Install the SWORD development library for the C++ inspectors.
+## Interpreting the result
 
-```sh
-g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp \
-  -o /private/sword-native-index -lsword
-g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp \
-  -o /private/sword-native-raw-corpus -lsword
-g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_entry.cpp \
-  -o /private/sword-native-raw-entry -lsword
+- A successful OSIS XSD check or native index-key match does **not** prove source-to-native text, annotation or structural fidelity.
+- A whitespace-equivalent word stream does **not** prove faithful poetry, punctuation, paragraph breaks or typography.
+- A stock upstream binary is not an approved replacement for a reviewed source-derived OSIS master merely because it renders a few verses.
+- A source-authored omission cannot be repaired by inserting an unrelated verse or note.
 
-python scripts/source_native_maintext_probe.py \
-  --source-usfx-zip /private/original-usfx.zip \
-  --original-sword-zip /private/original-sword.zip \
-  --crosswalk config/standard_usfm_osis_66.json \
-  --native-index-inspector /private/sword-native-index \
-  --native-raw-inspector /private/sword-native-raw-corpus \
-  --native-entry-inspector /private/sword-native-raw-entry \
-  --report /private/maintext-report.json
-```
+Keep textual source material private. Publish only bounded reference IDs, status categories, counts, source fingerprints and review receipts. Any non-equivalent source/native behavior requires a documented editorial disposition under `sources/cleaned/**/editorial/`. Unresolved evidence blocks acceptance.
 
-**Privacy:** capture native raw-entry streams only through the tool's private pipe. Never print or upload copyrighted source/native text to Actions logs. The report should contain bounded reference IDs, classifications, counts, sizes and hashes rather than source passages.
-
-## Understand the classifications
-
-The comparison distinguishes exact characters, NFC-only variation, whitespace-only differences, changed punctuation/case, changed word order, unparseable native markup, missing source references and unexpected indexed references. Do not collapse these classes into a single pass/fail string.
-
-USFX source labels and styles are not always authored verse prose: `c`/`v` can represent chapter/verse identifiers, `ve` closes a verse, and `sp` denotes a speaker. Count excluded editorial material separately, including headings, notes and verse-zero data. Unsupported mixed-content structures must be flagged for review, not silently stripped.
-
-An individual native fragment may not be self-contained XML. Report it as unparseable; a tolerant token comparison can assist diagnosis but cannot certify proper native OSIS structure. A second independent exact-key native inspector protects against cursor-position errors that can otherwise repeat one verse's content under different keys.
-
-## Limits
-
-Matching main-text characters does **not** certify note bodies/anchors, Strong and morphology positions, link targets, paragraphs, poetry, quotations, introductions, rights, authorial source edition identity or behavior in Xiphos/another client. Every corresponding [production gate](../PRODUCTION_PIPELINE.md) remains mandatory.
-
-Do not put particular edition's observed counts or one-off study results here; retain them beside its source under `sources/cleaned/**/editorial/evidence/`. For related checks see [native index](SOURCE_NATIVE_INDEX_AUDIT.md), [notes](SOURCE_NATIVE_NOTES_AUDIT.md) and [whole-corpus verification](NATIVE_SWORD_WHOLE_CORPUS.md).
+Related procedures: [notes](SOURCE_NATIVE_NOTES_AUDIT.md), [native index](SOURCE_NATIVE_INDEX_AUDIT.md), [whole-corpus verification](NATIVE_SWORD_WHOLE_CORPUS.md), and [release gates](../PRODUCTION_PIPELINE.md).
