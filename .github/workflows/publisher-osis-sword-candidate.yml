@@ -121,8 +121,8 @@ jobs:
           svn export --non-interactive --quiet -r 3918 \
             https://crosswire.org/svn/sword/trunk "$RUNNER_TEMP/sword-r3918"
           cmake -S "$RUNNER_TEMP/sword-r3918" -B "$RUNNER_TEMP/sword-r3918-build" \
-            -G Ninja -DCMAKE_BUILD_TYPE=Release -DSWORD_BUILD_UTILS=YES \
-            -DSWORD_BUILD_TESTS=NO -DSWORD_BUILD_EXAMPLES=NO
+            -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DSWORD_BUILD_UTILS=YES -DSWORD_BUILD_TESTS=NO -DSWORD_BUILD_EXAMPLES=NO
           cmake --build "$RUNNER_TEMP/sword-r3918-build" --target osis2mod --parallel 4
           compiler="$(find "$RUNNER_TEMP/sword-r3918-build" -type f -name osis2mod -perm /111 -print -quit)"
           test -n "$compiler" && test -x "$compiler"
