@@ -250,6 +250,41 @@ class ScriptInventoryTests(unittest.TestCase):
             with self.subTest(caller=caller):
                 self.assertIn(caller, entries[new]["static_references"])
 
+    def test_source_authenticity_and_editorial_preflights_are_libraries(self):
+        """Six conservative original/source checks are import-only and tested."""
+        entries = {row["path"]: row for row in self.result["files"]}
+        helpers = {
+            "commentary_literal_erratum_preflight": (
+                "scripts/commentary_section_scope_audit.py",
+                "tests/test_commentary_literal_erratum_preflight.py"),
+            "commentary_reference_registry_triage": (
+                "scripts/commentary_anchor_parity.py",
+                "tests/test_commentary_reference_registry_triage.py"),
+            "commentary_public_metadata_preflight": (
+                "scripts/commentary_source_erratum_compiled_probe.py",
+                "tests/test_commentary_public_metadata_preflight.py"),
+            "commentary_rebuild_attestation_draft": (
+                "scripts/commentary_section_scope_audit.py",
+                "tests/test_commentary_rebuild_attestation_draft.py"),
+            "commentary_original_bookcode_repair": (
+                "scripts/commentary_private_text_compare.py",
+                "tests/test_commentary_original_bookcode_repair.py"),
+            "commentary_source_english_osis_alias": (
+                "scripts/research/commentary/commentary_source_identity_lexical_gate.py",
+                "tests/test_commentary_source_english_osis_alias.py"),
+        }
+        for name, callers in helpers.items():
+            with self.subTest(name=name):
+                old = f"scripts/{name}.py"
+                packaged = f"scripts/research/commentary/{name}.py"
+                self.assertNotIn(old, entries)
+                self.assertFalse((ROOT / old).exists())
+                self.assertIn(packaged, entries)
+                self.assertTrue((ROOT / packaged).is_file())
+                self.assertTrue(entries[packaged]["has_direct_tests_by_filename"])
+                for caller in callers:
+                    self.assertIn(caller, entries[packaged]["static_references"])
+
     def test_commentary_census_and_topology_helpers_are_packaged(self):
         """Six independently useful non-CLI helpers retain real consumers."""
         entries = {row["path"]: row for row in self.result["files"]}
