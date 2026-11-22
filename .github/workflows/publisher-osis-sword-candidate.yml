@@ -200,7 +200,7 @@ jobs:
               }
               if(candidate.explicit_note_target_index_addressability) {
                 const a=candidate.explicit_note_target_index_addressability;
-                lines.push("Stage-5 original OSIS note target native-index addressability (NOT clicked navigation):",
+                lines.push("Stage-5 source OSIS note target native-index addressability (NOT clicked navigation):",
                   "```json",JSON.stringify(a,null,2),"```");
               }
               if(candidate.source_to_compiled_counts){
@@ -213,7 +213,7 @@ jobs:
                   "```");
               }
             }
-            lines.push("","**Original OSIS source, compiler logs and all ephemeral module binaries discarded.**",
+            lines.push("","**Temporary OSIS source copy, compiler logs and all ephemeral module binaries discarded.**",
               "Not a rights/editorial sign-off, not complete structure/visual acceptance, not a release.");
             await github.rest.issues.createComment({
               ...context.repo, issue_number:context.issue.number,
