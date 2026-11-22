@@ -122,8 +122,8 @@ class PreparationTests(unittest.TestCase):
                 self.assertEqual(hashlib.sha256(data).hexdigest(), expected_sha)
                 target.write_bytes(data)
 
-            with patch("fetch_reviewed_schema.ROOT", root), \\
-                 patch("fetch_reviewed_schema.pinned_fetch", side_effect=offline_fetch), \\
+            with patch("fetch_reviewed_schema.ROOT", root), \
+                 patch("fetch_reviewed_schema.pinned_fetch", side_effect=offline_fetch), \
                  patch("fetch_reviewed_schema._schema", return_value=(None, "")):
                 self.assertEqual(schema_main([
                     "--directory", str(root / "cache"), "--report", str(report)
