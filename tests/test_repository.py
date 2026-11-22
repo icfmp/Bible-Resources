@@ -16,7 +16,37 @@ class Tests(unittest.TestCase):
         (self.root/"config").mkdir()
         shutil.copyfile(ROOT/"schemas/module.schema.json",self.root/"schemas/module.schema.json")
         shutil.copyfile(ROOT/"config/osis-policy.json",self.root/"config/osis-policy.json")
-        self.m=json.loads((ROOT/"examples/metadata.template.json").read_text())
+        # Synthetic, unpublished fixture local to these validation/build tests.
+        # This is not an example source or an approved publication manifest.
+        self.m = {
+            "schema_version": 1,
+            "id": "example-commentary",
+            "sword_id": "ExampleCom",
+            "title": {"en": "Example commentary"},
+            "category": "commentary",
+            "language": "en",
+            "version": "0.1.0",
+            "versification": "KJV",
+            "origin": {
+                "publisher": "Original publisher",
+                "url": "https://example.org/source",
+                "source_revision": "unknown",
+            },
+            "rights": {
+                "license": "Pending verification",
+                "evidence_url": "https://example.org/rights",
+                "redistribution_allowed": False,
+                "derivatives_allowed": False,
+                "reviewed_by": "PENDING",
+            },
+            "quality": {
+                "status": "draft",
+                "edition": "faithful",
+                "reviewed_by": "PENDING",
+                "smoke_key": "Gen 1:1",
+            },
+            "canonical_edition_id": "example-commentary-edition-verified",
+        }
     def create(self):
         d=self.root/"modules"/self.m["id"];d.mkdir()
         (d/"metadata.json").write_text(json.dumps(self.m),encoding="utf-8")
