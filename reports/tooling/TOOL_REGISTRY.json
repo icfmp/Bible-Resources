@@ -304,12 +304,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "intake",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/publisher_osis_usfx_parity.py",
         "scripts/tool_registry.py",
-        "scripts/usfx_schema_gate.py",
         ".github/workflows/bible-observe-originals.yml",
         "tests/test_bible_intake.py"
       ]
@@ -416,7 +415,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 9,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
@@ -425,7 +424,6 @@
         ".github/workflows/validate.yml",
         "docs/workflows/PUBLISHING.md",
         "tests/test_catalogue_release_coverage.py",
-        "tests/test_commentary_sword_identity_migration.py",
         "tests/test_release_preflight.py"
       ]
     },
@@ -1297,35 +1295,6 @@
         ".github/workflows/commentary-zcom-private-candidate.yml",
         "tests/test_commentary_stock_candidate.py",
         "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_sword_identity_migration.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Preflight an intentionally renamed SWORD commentary without changing releases.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "json",
-        "pathlib",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "8ac0df1b1ed7122ab097329d79494bcb46fe2ef91fc90cf54b75de1d4eb4b804",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        "scripts/tool_registry.py",
-        "tests/test_commentary_sword_identity_migration.py"
       ]
     },
     {
@@ -3448,10 +3417,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 2,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/source_native_maintext_probe.py",
-        "tests/test_source_native_layout_anchors.py"
+        "tests/test_source_native_layout_anchors.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -3863,14 +3833,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/research/bible/source_native_layout_anchors.py",
         "scripts/research/bible/source_native_ordered_body.py",
         "scripts/research/bible/source_native_paragraph_counts.py",
         "scripts/research/bible/source_native_word_boundaries.py",
-        "scripts/usfx_schema_gate.py",
-        "docs/technical/SOURCE_USFX_STRUCTURE.md",
         "tests/test_source_usfx_structure.py"
       ]
     },
@@ -6190,43 +6158,6 @@
         ".github/workflows/commentary-modern-source-receipt.yml",
         ".github/workflows/tool-registry-maintenance.yml",
         "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "USFX"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/usfx_schema_gate.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Observe and optionally verify the original eBible USFX XSD, without rewriting.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "bible_intake",
-        "contextlib",
-        "hashlib",
-        "json",
-        "lxml",
-        "pathlib",
-        "re",
-        "research",
-        "urllib"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "b3879cc51b60f4bcc2ce4d3590f76c1cc04433f4574c960383152f16880594c5",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        "tests/test_tool_registry.py",
-        "tests/test_usfx_schema_gate.py"
       ]
     },
     {
