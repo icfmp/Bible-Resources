@@ -250,6 +250,19 @@ class ScriptInventoryTests(unittest.TestCase):
             with self.subTest(caller=caller):
                 self.assertIn(caller, entries[new]["static_references"])
 
+    def test_completed_hmcc_modern_staging_is_not_an_active_publisher(self):
+        """Version-pinned first-release bootstraps belong to Git history only."""
+        entries = {row["path"] for row in self.result["files"]}
+        self.assertNotIn("scripts/stage_hmcc_modern_release.py", entries)
+        self.assertFalse(
+            (ROOT / ".github/workflows/stage-hmcc-modern-release.yml").exists()
+        )
+        # Retiring the pre-release job must not remove approved release inputs.
+        self.assertTrue((ROOT / "modules/hmcc-modern/metadata.json").is_file())
+        self.assertTrue(
+            (ROOT / "config/release-plans/hmcc-modern-0.1.0.json").is_file()
+        )
+
     def test_registry_has_no_promoted_editorial_or_publication_claims(self):
         for entry in self.result["files"]:
             self.assertEqual(entry["release_approval"],
