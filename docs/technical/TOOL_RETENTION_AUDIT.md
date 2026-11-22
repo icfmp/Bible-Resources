@@ -67,6 +67,19 @@ its invocation contract.
 - Do **not** classify a parser, test fixture or SWORD reader merely by its
   filename; verify its exact contract and run all relevant real-source tests.
 
+## First safe shared binary format extraction
+
+The approved compiled and modernized commentary release validators now share
+the **same** deterministic native zCom member layout definition, including
+BOOK, CHAPTER and VERSE compression granularities, safe SWORD identifiers
+and the seven expected payload paths. The modern release still authenticates
+the actual bytes against its independently approved artifact hashes.
+
+This is *technical code consolidation*, not a rewrite of the modern-English
+editorial proof. All edition-specific link corrections, restorations,
+authorizations and SHA-256 evidence remain frozen and are **not** inferred
+from a generic validator or revised on the basis of the format helper.
+
 ## Next maintenance boundary
 
 Further reduction now requires a **proved functional consolidation**:
