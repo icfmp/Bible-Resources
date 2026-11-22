@@ -10,7 +10,7 @@ import urllib.error
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from pilot_fetch import PilotError, SafeRedirect, fetch, validate_url
+from pilot_fetch import ALLOWED_HOSTS, PilotError, SafeRedirect, fetch, validate_url
 from fetch_reviewed_schema import inspect_bytes, main as schema_main, OFFICIAL_MAIN, OFFICIAL_DEP
 from validate import DRIVERS, ALLOWED
 
@@ -59,6 +59,12 @@ class PreparationTests(unittest.TestCase):
             SafeRedirect("ebible").redirect_request(
                 None, None, 302, "moved", {}, "http://ebible.org/sword/zip/test.zip"
             )
+
+    def test_legacy_edition_pilots_cannot_be_used_as_download_providers(self):
+        self.assertEqual(set(ALLOWED_HOSTS), {"ebible", "crosswire", "ccel"})
+        for legacy in ("lsg", "mhc", "not-reviewed"):
+            with self.subTest(provider=legacy), self.assertRaises(PilotError):
+                validate_url("https://ebible.org/example.zip", legacy)
 
     def test_fetch_does_not_overwrite_or_leave_temp_artifacts(self):
         with tempfile.TemporaryDirectory() as root:
