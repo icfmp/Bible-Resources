@@ -24,16 +24,16 @@ import subprocess
 
 from lxml import etree
 
-from commentary_literal_erratum_preflight import (
+from research.commentary.commentary_literal_erratum_preflight import (
     preview_exact_reversible_commentary_reference_erratum,
     preview_exact_reversible_commentary_prose_erratum,
 )
-from commentary_public_metadata_preflight import (
+from research.commentary.commentary_public_metadata_preflight import (
     prepare_provisional_public_commentary_conf, _exact_conf_value,
     rehearse_private_versioned_commentary_package,
     reconcile_private_rebuild_package_evidence,
 )
-from commentary_reference_registry_triage import (
+from research.commentary.commentary_reference_registry_triage import (
     SINGLE_VERSE, _unambiguous_verse_range_endpoints,
 )
 from commentary_osis_mixed_transport_probe import (
@@ -45,7 +45,7 @@ from commentary_xiphos_dual_reader import (
 )
 from pilot_subprocess import present_key, query
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus
-from commentary_rebuild_attestation_draft import private_rebuild_attestation_draft, _native_map_digest
+from research.commentary.commentary_rebuild_attestation_draft import private_rebuild_attestation_draft, _native_map_digest
 
 MAX_SCAN = 512 * 1024 * 1024
 MAX_ADJACENT = 12 * 1024 * 1024
