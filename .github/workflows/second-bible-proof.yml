@@ -4,7 +4,7 @@ on:
     paths:
       - .github/workflows/second-bible-proof.yml
       - scripts/real_second_bible_probe.py
-      - scripts/source_native_scope.py
+      - scripts/research/bible/source_native_scope.py
       - config/standard_usfm_osis_66.json
       - tests/test_source_native_scope.py
       - scripts/sword_native_raw_entry.cpp
@@ -15,7 +15,7 @@ on:
       - tests/test_sword_native_raw_corpus_inventory.py
       - scripts/source_native_maintext_probe.py
       - tests/test_source_native_maintext_probe.py
-      - scripts/source_native_notes_audit.py
+      - scripts/research/bible/source_native_notes_audit.py
       - tests/test_source_native_notes_audit.py
       - docs/SOURCE_NATIVE_NOTES_AUDIT.md
       - scripts/native_absorbed_verse_groups.py
