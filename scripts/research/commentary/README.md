@@ -27,6 +27,12 @@ This package contains **read-only, non-CLI** evidence-gathering functions. They 
 | [`commentary_rebuild_attestation_draft.py`](commentary_rebuild_attestation_draft.py) | Original-to-private-rebuild evidence with explicit never-approved status |
 | [`commentary_original_bookcode_repair.py`](commentary_original_bookcode_repair.py) | Reversible proposal for authorial book-code mismatches, never automatic edits |
 | [`commentary_source_english_osis_alias.py`](commentary_source_english_osis_alias.py) | Pinned original div1 titles against canonical alias witnesses without inferring authorial scope |
+| [`commentary_bookcode_repair_receipt_guard.py`](commentary_bookcode_repair_receipt_guard.py) | Fail-closed private authorial book-code repair receipt verification |
+| [`commentary_osis_intro_transport_probe.py`](commentary_osis_intro_transport_probe.py) | Exact original introduction OSIS transport in disposable reader candidates |
+| [`commentary_osis_paragraph_presence.py`](commentary_osis_paragraph_presence.py) | Original CCEL/OSIS paragraph location comparison, not authorial parity |
+| [`commentary_osis_transport_probe.py`](commentary_osis_transport_probe.py) | Private original numbered SWORD XML into OSIS transport and readback |
+| [`commentary_xiphos_heading_probe.py`](commentary_xiphos_heading_probe.py) | Actual isolated Xiphos chapter-introduction and menu behavior evidence |
+| [`commentary_source_erratum_compiled_probe.py`](commentary_source_erratum_compiled_probe.py) | Private SWORD compilation of separately authorized-to-test source errata, never release |
 | [`commentary_unresolved_lexical_triage.py`](commentary_unresolved_lexical_triage.py) | Bounded word-level mismatches and source-joined mark positions, without text export |
 | [`commentary_near_prose_unicode_review.py`](commentary_near_prose_unicode_review.py) | Separate original/stock Unicode normalization witnesses, never a rewrite |
 | [`commentary_source_identity_lexical_gate.py`](commentary_source_identity_lexical_gate.py) | Quarantine contradictory original title/book-code joins before lexical comparisons |
