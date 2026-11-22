@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from maintext_whitespace_patterns import MainTextWhitespacePatterns
+from research.bible.maintext_whitespace_patterns import MainTextWhitespacePatterns
 
 
 class MainTextWhitespacePatternsTests(unittest.TestCase):
