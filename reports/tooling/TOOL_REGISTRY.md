@@ -105,7 +105,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/bible/native_sword_markup_census.py`](../../scripts/research/bible/native_sword_markup_census.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/research/bible/note_whitespace_diagnostics.py`](../../scripts/research/bible/note_whitespace_diagnostics.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/research/bible/private_sword_install.py`](../../scripts/research/bible/private_sword_install.py) | UNDECIDED | named test | 3 | not determined |
-| [`scripts/research/bible/source_native_layout_anchors.py`](../../scripts/research/bible/source_native_layout_anchors.py) | UNDECIDED | named test | 2 | not determined |
+| [`scripts/research/bible/source_native_layout_anchors.py`](../../scripts/research/bible/source_native_layout_anchors.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/research/bible/source_native_nonspace_boundaries.py`](../../scripts/research/bible/source_native_nonspace_boundaries.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/research/bible/source_native_note_positions.py`](../../scripts/research/bible/source_native_note_positions.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_notes_audit.py`](../../scripts/research/bible/source_native_notes_audit.py) | UNDECIDED | named test | 4 | source/native audit |
