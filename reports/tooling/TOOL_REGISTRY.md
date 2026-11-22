@@ -20,7 +20,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 - KEEP_GENERIC: 24
 - MERGE: 0
 - MODULE_LOCAL: 0
-- UNDECIDED: 29
+- UNDECIDED: 28
 
 ## All tracked tools
 
@@ -49,7 +49,6 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/promote_sword_preview.py`](../../scripts/promote_sword_preview.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/publish_reviewed_release.py`](../../scripts/publish_reviewed_release.py) | KEEP_GENERIC | not established | 9 | publication/release |
 | [`scripts/published_reference_audit.py`](../../scripts/published_reference_audit.py) | UNDECIDED | named test | 3 | publication/release |
-| [`scripts/publisher_osis_observation.py`](../../scripts/publisher_osis_observation.py) | UNDECIDED | named test | 2 | publication/release |
 | [`scripts/reader_xiphos_headless_smoke.py`](../../scripts/reader_xiphos_headless_smoke.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/release_preflight.py`](../../scripts/release_preflight.py) | KEEP_GENERIC | named test | 3 | publication/release |
 | [`scripts/research/bible/__init__.py`](../../scripts/research/bible/__init__.py) | UNDECIDED | not established | 0 | not determined |
