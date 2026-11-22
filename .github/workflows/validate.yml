@@ -19,6 +19,37 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Diagnose historical owner decision witness checkout (metadata only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          witness="work/hmcc-modern/production/OWNER_EDITORIAL_DECISIONS_2026-11-19.json"
+          echo "HEAD: $(git rev-parse HEAD)"
+          echo "HEAD tree: $(git rev-parse HEAD^{tree})"
+          echo "Root work tree entry:"
+          git ls-tree HEAD -- work || :
+          echo "Nested work entries:"
+          git ls-tree HEAD:work -- hmcc-modern || :
+          echo "Exact full tree witness entry:"
+          git ls-tree -r HEAD -- "$witness" || :
+          echo "Tracked witness:"
+          git ls-files --stage -- "$witness" || :
+          echo "Checkout witness presence:"
+          if [[ -f "$witness" ]]; then
+            python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          p=Path("work/hmcc-modern/production/OWNER_EDITORIAL_DECISIONS_2026-11-19.json")
+          print("Witness bytes",p.stat().st_size)
+          print("Witness SHA256",hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+          else
+            echo "WITNESS_NOT_PRESENT"
+          fi
+          echo "Sparse state:"
+          git sparse-checkout list || :
+          echo "Work metadata:"
+          ls -ld work work/hmcc-modern work/hmcc-modern/production 2>&1 || :
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
