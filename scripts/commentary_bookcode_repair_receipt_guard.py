@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 
-from commentary_original_bookcode_repair import MAX_REPAIRS
+from research.commentary.commentary_original_bookcode_repair import MAX_REPAIRS
 from pilot_preflight import PilotError
 
 SHA = re.compile(r"[a-f0-9]{64}\Z")

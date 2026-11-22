@@ -15,7 +15,7 @@ from xml.parsers import expat
 
 from lxml import etree
 
-from commentary_reference_registry_triage import (
+from research.commentary.commentary_reference_registry_triage import (
     SINGLE_VERSE, _unambiguous_verse_range_endpoints
 )
 

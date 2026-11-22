@@ -19,7 +19,7 @@ import re
 
 from lxml import etree
 
-from commentary_source_english_osis_alias import (
+from research.commentary.commentary_source_english_osis_alias import (
     _classify, read_existing_66_book_english_aliases,
 )
 from pilot_preflight import PilotError

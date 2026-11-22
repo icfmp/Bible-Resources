@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_original_bookcode_repair import (
+from research.commentary.commentary_original_bookcode_repair import (
     propose_private_source_bookcode_repair,
 )
 from pilot_preflight import PilotError
@@ -23,7 +23,7 @@ def review(raw: bytes):
 class SourceDiv1BookMarkerRepairTests(unittest.TestCase):
     def setUp(self):
         self.patcher = patch(
-            "commentary_original_bookcode_repair.read_existing_66_book_english_aliases",
+            "research.commentary.commentary_original_bookcode_repair.read_existing_66_book_english_aliases",
             return_value=(
                 {"Jude": "Jude", "Judg": "Judges", "Gen": "Genesis"},
                 {"reviewed_test_registry": True},

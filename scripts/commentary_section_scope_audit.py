@@ -49,7 +49,7 @@ from research.commentary.commentary_navigation_link_plan import (
     verify_original_native_adjacent_section_boundaries,
     corroborate_reviewed_commentary_link_plan,
 )
-from commentary_source_english_osis_alias import (
+from research.commentary.commentary_source_english_osis_alias import (
     read_existing_66_book_english_aliases, _canon_name
 )
 from research.commentary.commentary_nonlink_analysis import plain_word_alignment
@@ -64,13 +64,13 @@ from research.commentary.commentary_chapter_ref_labels import link_label_locatio
 from research.commentary.commentary_editorial_topology import NativeCommentaryEditorialTopology
 from research.commentary.commentary_layout_census import NativeCommentaryLayoutCensus
 from research.commentary.commentary_paragraph_witness_probe import compare_paragraph_witness
-from commentary_reference_registry_triage import OriginalCommentaryReferenceRegistryTriage
-from commentary_literal_erratum_preflight import (
+from research.commentary.commentary_reference_registry_triage import OriginalCommentaryReferenceRegistryTriage
+from research.commentary.commentary_literal_erratum_preflight import (
     preview_exact_reversible_commentary_reference_erratum,
     preview_exact_reversible_commentary_prose_erratum,
 )
 from commentary_source_erratum_compiled_probe import probe_private_compiled_source_erratum
-from commentary_rebuild_attestation_draft import PUBLIC_REBUILD_ATTESTATION_ERROR_CODES
+from research.commentary.commentary_rebuild_attestation_draft import PUBLIC_REBUILD_ATTESTATION_ERROR_CODES
 from research.commentary.commentary_unresolved_lexical_triage import marked_word_token_indices
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck

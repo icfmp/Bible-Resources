@@ -42,7 +42,7 @@ def _canon_name(title:str)->str:
 
 
 def read_existing_66_book_english_aliases() -> tuple[dict[str,str],dict]:
-    root=Path(__file__).resolve().parents[1]
+    root=Path(__file__).resolve().parents[3]
     crosswalk=root/"config/standard_usfm_osis_66.json"
     aliases=root/"config/diatheke-usfm-book-aliases.json"
     if any(p.is_symlink() or not p.is_file() or p.stat().st_size>100_000 for p in (
