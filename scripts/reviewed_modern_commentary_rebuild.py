@@ -19,6 +19,38 @@ from reviewed_compiled_commentary_rebuild import (zcom_payload_paths,
 
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 
+# Historical owner-reviewed evidence is independently pinned here. Editing
+# two mutable JSON manifests together must NOT silently authorize a new set of
+# manuscript corrections or a different release plan. A new edition requires
+# separate editorial approval and an explicit reviewed pin change.
+REVIEWED_MODERN_WITNESSES = {
+    "hmcc-modern": {
+        "plan_sha256": "1fed89b3916d32d1e726346889247acc7f75b04af5b4377f00c48a64123f476a",
+        "decisions_path": (
+            "work/hmcc-modern/production/"
+            "OWNER_EDITORIAL_DECISIONS_2026-11-19.json"
+        ),
+        "decisions_sha256": "cdb206a1d3760ee7f7a096ffd596069e1589df4c0820c033747521b07f1eeee4",
+    },
+}
+
+
+def _checked_json(path: Path, expected_sha256: str) -> dict:
+    """Verify exact bytes before consuming owner-reviewed editorial evidence."""
+    if (path.is_symlink() or not path.is_file()
+            or path.stat().st_size > 1_000_000):
+        raise ValueError("Missing or unsafe pinned evidence JSON")
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != expected_sha256:
+        raise ValueError("Pinned editorial evidence SHA256 differs")
+    value = json.loads(raw)
+    if not isinstance(value, dict):
+        raise ValueError("Pinned editorial evidence is not an object")
+    return value
+
+
+
+
 
 def reviewed_modern_commentary_errors(directory: Path, root: Path,
                                      metadata: dict, conf: dict) -> list[str]:
@@ -42,11 +74,26 @@ def reviewed_modern_commentary_errors(directory: Path, root: Path,
             "manifest": f"config/commentary-rebuilds/{ident}.json",
         }:
             raise ValueError("Missing source-bound modern commentary review route")
-        plan = load(root / "config/commentary-rebuilds" / (ident + ".json"))
+        witness = REVIEWED_MODERN_WITNESSES.get(ident)
+        if witness is None:
+            raise ValueError("Unreviewed modern commentary edition")
+        plan = _checked_json(root / "config/commentary-rebuilds" /
+                             (ident + ".json"), witness["plan_sha256"])
         proof = load(directory / "SOURCE_VALIDATION.json")
         artifact = load(directory / "RELEASE_ARTIFACT_PROOF.json")
-        decisions = load(root / "work/mhcc-modern/production/"
-                         "OWNER_EDITORIAL_DECISIONS_2026-11-19.json")
+        decisions = _checked_json(root / witness["decisions_path"],
+                                  witness["decisions_sha256"])
+        links = decisions.get("link_cases")
+        sections = decisions.get("ccel_only_sections")
+        if (not isinstance(links, list) or not isinstance(sections, list)
+                or any(not isinstance(case, dict)
+                       or not isinstance(case.get("approved_derived_destinations"), list)
+                       for case in links)):
+            raise ValueError("Malformed pinned source editorial decision counts")
+        link_cases = len(links)
+        link_destinations = sum(len(case["approved_derived_destinations"])
+                                for case in links)
+        historical_restorations = len(sections)
         if (plan.get("schema_version") != 1
                 or plan.get("status") != "owner_authorized_for_release"
                 or plan.get("module_id") != ident
@@ -56,19 +103,13 @@ def reviewed_modern_commentary_errors(directory: Path, root: Path,
                 or plan.get("original_native_sha256") !=
                     decisions.get("source_native_corpus_sha256")
                 or not sha(plan.get("source_approved_osis_sha256"))
-                or plan.get("source_decisions") !=
-                    "work/mhcc-modern/production/OWNER_EDITORIAL_DECISIONS_2026-11-19.json"
-                or plan.get("approved_link_cases") != 15
-                or plan.get("approved_link_destinations") != 28
-                or plan.get("historical_authorial_restorations") != 2
+                or plan.get("source_decisions") != witness["decisions_path"]
+                or plan.get("approved_link_cases") != link_cases
+                or plan.get("approved_link_destinations") != link_destinations
+                or plan.get("historical_authorial_restorations") != historical_restorations
                 or plan.get("release_id") != "HMCCModern"
                 or metadata["quality"]["edition"] != "reader_optimized"):
             raise ValueError("Source/edition, counted corrections or release identity changed")
-        links = decisions.get("link_cases")
-        if (not isinstance(links, list) or len(links) != 15
-                or sum(len(v["approved_derived_destinations"]) for v in links) != 28
-                or len(decisions.get("ccel_only_sections", [])) != 2):
-            raise ValueError("Owner-reviewed source decisions no longer match")
         auth = plan.get("authorization", {})
         if (auth.get("approved_by") != "Bible Resources project owner"
                 or auth.get("approval_url") !=
@@ -99,9 +140,9 @@ def reviewed_modern_commentary_errors(directory: Path, root: Path,
             "original_native_sha256": plan["original_native_sha256"],
             "source_approved_osis_sha256": plan["source_approved_osis_sha256"],
             "source_reader_run_url": plan["source_reader_run_url"],
-            "approved_link_cases": 15,
-            "approved_link_destinations": 28,
-            "historical_authorial_restorations": 2,
+            "approved_link_cases": link_cases,
+            "approved_link_destinations": link_destinations,
+            "historical_authorial_restorations": historical_restorations,
             "compiled_zcom_members_identical_to_accepted_QA": True,
             "original_source_unchanged": True,
             "modern_manuscripts_unchanged": True,
