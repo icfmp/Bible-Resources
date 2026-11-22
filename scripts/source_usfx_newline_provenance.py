@@ -16,7 +16,7 @@ from lxml import etree
 from source_native_word_boundaries import (
     BoundaryAuditError, SOURCE_NOT_MAIN, _parsed_original,
 )
-from source_native_paragraph_counts import classify_prefatory_p_sfm
+from research.bible.source_native_paragraph_counts import classify_prefatory_p_sfm
 from stable_sword_refs import KEY
 
 MAX_SOURCE_VERSE = 2 * 1024 * 1024
