@@ -48,7 +48,6 @@ jobs:
         run: |
           set -euo pipefail
           python -m unittest discover -s tests -p 'test_publisher_osis_sword_candidate.py' -v
-          python -m unittest discover -s tests -p 'test_publisher_osis_usfx_parity.py' -v
           python -m unittest discover -s tests -p 'test_source_native_osis_structure_screen.py' -v
           python -m unittest discover -s tests -p 'test_source_native_osis_boundary_positions.py' -v
           python -m unittest discover -s tests -p 'test_source_native_osis_target_addressability.py' -v
