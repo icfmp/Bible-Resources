@@ -5,7 +5,7 @@ on:
       - '.github/workflows/commentary-mhc-source-text.yml'
       - 'scripts/commentary_private_text_compare.py'
       - 'tests/test_commentary_private_text_compare.py'
-      - 'scripts/commentary_source_native_boundaries.py'
+      - 'scripts/research/commentary/commentary_source_native_boundaries.py'
       - 'tests/test_commentary_source_native_boundaries.py'
       - 'scripts/research/commentary/commentary_nonlink_analysis.py'
       - 'tests/test_commentary_nonlink_word_alignment.py'

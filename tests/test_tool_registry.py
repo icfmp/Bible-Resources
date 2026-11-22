@@ -250,6 +250,42 @@ class ScriptInventoryTests(unittest.TestCase):
             with self.subTest(caller=caller):
                 self.assertIn(caller, entries[new]["static_references"])
 
+    def test_commentary_census_and_topology_helpers_are_packaged(self):
+        """Six independently useful non-CLI helpers retain real consumers."""
+        entries = {row["path"]: row for row in self.result["files"]}
+        helpers = {
+            "commentary_layout_census": (
+                "scripts/commentary_section_scope_audit.py",
+                "tests/test_commentary_layout_census.py"),
+            "commentary_original_div1_book_consistency": (
+                "scripts/commentary_private_text_compare.py",
+                "tests/test_commentary_original_div1_book_consistency.py"),
+            "commentary_stock_prefix_topology": (
+                "scripts/commentary_private_text_compare.py",
+                "tests/test_commentary_stock_prefix_topology.py"),
+            "commentary_shared_raw_source_units": (
+                "scripts/commentary_private_text_compare.py",
+                "tests/test_commentary_shared_raw_source_units.py"),
+            "commentary_source_native_boundaries": (
+                "scripts/commentary_private_text_compare.py",
+                ".github/workflows/commentary-mhc-source-text.yml",
+                "tests/test_commentary_source_native_boundaries.py"),
+            "commentary_navigation_link_plan": (
+                "scripts/commentary_anchor_parity.py",
+                "tests/test_commentary_navigation_link_plan.py"),
+        }
+        for name, callers in helpers.items():
+            with self.subTest(name=name):
+                root_path = f"scripts/{name}.py"
+                packaged_path = f"scripts/research/commentary/{name}.py"
+                self.assertNotIn(root_path, entries)
+                self.assertFalse((ROOT / root_path).exists())
+                self.assertIn(packaged_path, entries)
+                self.assertTrue((ROOT / packaged_path).is_file())
+                self.assertTrue(entries[packaged_path]["has_direct_tests_by_filename"])
+                for caller in callers:
+                    self.assertIn(caller, entries[packaged_path]["static_references"])
+
     def test_source_neutral_lexical_and_cross_slot_helpers_are_packaged(self):
         """Non-CLI evidence algorithms must remain imported from one package."""
         entries = {row["path"]: row for row in self.result["files"]}
@@ -266,7 +302,7 @@ class ScriptInventoryTests(unittest.TestCase):
                  "tests/test_commentary_source_identity_lexical_gate.py"),
             "commentary_prose_cross_slot":
                 ("scripts/commentary_anchor_parity.py",
-                 "scripts/commentary_shared_raw_source_units.py",
+                 "scripts/research/commentary/commentary_shared_raw_source_units.py",
                  "tests/test_commentary_prose_cross_slot.py"),
             "commentary_unresolved_lexical_triage":
                 ("scripts/commentary_section_scope_audit.py",

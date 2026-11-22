@@ -42,7 +42,7 @@ from research.commentary.commentary_intro_chapter_text_review import (
     review_original_intro_against_numbered_chapter,
     independent_thml_chapter_intro_witness,
 )
-from commentary_navigation_link_plan import (
+from research.commentary.commentary_navigation_link_plan import (
     parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan,
     triage_missing_native_section_links,
     triage_single_key_chapter_navigation,
@@ -53,7 +53,7 @@ from commentary_source_english_osis_alias import (
     read_existing_66_book_english_aliases, _canon_name
 )
 from research.commentary.commentary_nonlink_analysis import plain_word_alignment
-from commentary_stock_prefix_topology import (
+from research.commentary.commentary_stock_prefix_topology import (
     source_word_prefix_topology, stock_prefixed_source_body_concordance,
     single_word_stock_markup_diagnostic, stock_prefix_context_correspondence,
 )
@@ -62,7 +62,7 @@ from research.commentary.commentary_chapter_body_evidence import (
 )
 from research.commentary.commentary_chapter_ref_labels import link_label_location
 from research.commentary.commentary_editorial_topology import NativeCommentaryEditorialTopology
-from commentary_layout_census import NativeCommentaryLayoutCensus
+from research.commentary.commentary_layout_census import NativeCommentaryLayoutCensus
 from research.commentary.commentary_paragraph_witness_probe import compare_paragraph_witness
 from commentary_reference_registry_triage import OriginalCommentaryReferenceRegistryTriage
 from commentary_literal_erratum_preflight import (

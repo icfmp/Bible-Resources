@@ -11,7 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
 from commentary_private_text_compare import _original_source_markers
-from commentary_original_div1_book_consistency import private_original_div1_book_code_consistency
+from research.commentary.commentary_original_div1_book_consistency import private_original_div1_book_code_consistency
 from pilot_preflight import PilotError
 
 

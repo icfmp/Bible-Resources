@@ -9,7 +9,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
-from commentary_stock_prefix_topology import (
+from research.commentary.commentary_stock_prefix_topology import (
     stock_prefixed_source_body_concordance, unexplained_word_boundary_census,
 )
 from commentary_private_text_compare import (

@@ -11,7 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
 from commentary_private_text_compare import _original_source_markers
-from commentary_source_native_boundaries import (
+from research.commentary.commentary_source_native_boundaries import (
     NativeRawRunBoundaryInventory, original_marker_boundary,
 )
 from pilot_preflight import PilotError
@@ -45,7 +45,7 @@ def review_case(source,key="Gen.1.1",raw=b"<div>Raw shared</div>"):
 class SourceVersusNativeRunBoundaryTests(unittest.TestCase):
 
     def test_source_longer_scope_reuses_original_native_boundary_proof(self):
-        from commentary_source_native_boundaries import (
+        from research.commentary.commentary_source_native_boundaries import (
             compare_longer_original_source_to_occupied_native_runs)
         source=original_fixture()
         original=source["Gen.1.1"][0]
@@ -73,7 +73,7 @@ class SourceVersusNativeRunBoundaryTests(unittest.TestCase):
         self.assertFalse(out["original_edition_or_section_layout_parity_proven"])
 
     def test_source_longer_scope_fails_closed_on_original_or_native_mutation(self):
-        from commentary_source_native_boundaries import (
+        from research.commentary.commentary_source_native_boundaries import (
             compare_longer_original_source_to_occupied_native_runs)
         source=original_fixture()
         unit=source["Gen.1.1"][0]

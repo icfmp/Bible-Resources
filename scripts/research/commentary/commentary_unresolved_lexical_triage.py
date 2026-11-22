@@ -15,7 +15,7 @@ import unicodedata
 
 from lxml import etree
 
-from commentary_stock_prefix_topology import unexplained_word_boundary_census
+from research.commentary.commentary_stock_prefix_topology import unexplained_word_boundary_census
 from research.commentary.commentary_chapter_ref_labels import link_label_location
 from research.commentary.commentary_nonlink_analysis import compare_words_outside_links
 from research.commentary.commentary_nonlink_analysis import plain_word_alignment

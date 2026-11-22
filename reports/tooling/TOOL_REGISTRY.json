@@ -638,7 +638,6 @@
         "commentary_intake",
         "commentary_native_inventory",
         "commentary_native_raw_inventory",
-        "commentary_navigation_link_plan",
         "commentary_osis_mixed_transport_probe",
         "commentary_reference_registry_triage",
         "commentary_text_delta",
@@ -663,7 +662,7 @@
         "jsword"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "63983523638b7a2d7b469438893af6c7eb28dd4525d9d7df41cea15210713712",
+      "sha256_at_inventory": "5af2879be1004cc11820b799252afc7853927ecd4c86c4d6c9c8de0f55bcb018",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -761,36 +760,6 @@
         ".github/workflows/commentary-intake.yml",
         "tests/test_commentary_intake.py",
         "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_layout_census.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Source-neutral, read-only commentary layout census.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "hashlib",
-        "lxml",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "2490dcafd48ef9d3834cbb070125bb2778c3a8427975ffd2d778faced6f1e3ee",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 3,
-      "static_references": [
-        "scripts/commentary_section_scope_audit.py",
-        "scripts/research/commentary/commentary_paragraph_witness_probe.py",
-        "tests/test_commentary_layout_census.py"
       ]
     },
     {
@@ -1233,41 +1202,6 @@
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
-        "RawCom",
-        "RawCom4",
-        "zCom",
-        "zCom4",
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_navigation_link_plan.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Propose safe, source-preserving commentary links; never mutate any module.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "aec11b91aff323784bbac42e6fd90502041b71d6efde71d503d83b44fb983e97",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 4,
-      "static_references": [
-        "scripts/commentary_anchor_parity.py",
-        "scripts/commentary_section_scope_audit.py",
-        "docs/policies/COMMENTARY_POLICY.md",
-        "tests/test_commentary_navigation_link_plan.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
         "zCom",
         "OSIS",
         "ThML"
@@ -1297,37 +1231,6 @@
         "scripts/commentary_bookcode_repair_receipt_guard.py",
         "scripts/commentary_private_text_compare.py",
         "tests/test_commentary_original_bookcode_repair.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "ThML"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_original_div1_book_consistency.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Private original ThML book-code vs physical div1 document ancestry census.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "hashlib",
-        "pilot_preflight",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "b59e46885691acd3e79dd28a949faa9d0384a9076202c63acf28296b9317e14b",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        "scripts/commentary_private_text_compare.py",
-        "tests/test_commentary_original_div1_book_consistency.py"
       ]
     },
     {
@@ -1516,11 +1419,7 @@
         "commentary_intake",
         "commentary_native_raw_inventory",
         "commentary_original_bookcode_repair",
-        "commentary_original_div1_book_consistency",
-        "commentary_shared_raw_source_units",
         "commentary_source_english_osis_alias",
-        "commentary_source_native_boundaries",
-        "commentary_stock_prefix_topology",
         "commentary_text_delta",
         "commentary_xml_witness",
         "hashlib",
@@ -1540,7 +1439,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "2c0b723f7954e1be127f429a4e993e5d2a4805e71bd940d51123a10e3ec7496b",
+      "sha256_at_inventory": "e50619386ef6a639a566d796f3fd39e8407ffb9de2dbe0773177f0d94b1d06af",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -1693,10 +1592,8 @@
         "argparse",
         "collections",
         "commentary_intake",
-        "commentary_layout_census",
         "commentary_literal_erratum_preflight",
         "commentary_native_raw_inventory",
-        "commentary_navigation_link_plan",
         "commentary_osis_intro_transport_probe",
         "commentary_osis_mixed_transport_probe",
         "commentary_osis_transport_probe",
@@ -1704,7 +1601,6 @@
         "commentary_reference_registry_triage",
         "commentary_source_english_osis_alias",
         "commentary_source_erratum_compiled_probe",
-        "commentary_stock_prefix_topology",
         "commentary_xml_witness",
         "hashlib",
         "json",
@@ -1727,7 +1623,7 @@
         "xiphos"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "f70419ca26793e4574c1f4275b41e266fa3541eead14d9e9d54b1f105b2d25ca",
+      "sha256_at_inventory": "574956b775ad0f364ba0331875670839d8a124f77f55135f5660783606fc8b73",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -1735,40 +1631,6 @@
       "static_references": [
         ".github/workflows/commentary-editorial-section-scope.yml",
         "tests/test_commentary_section_scope_audit.py",
-        "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "ThML"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_shared_raw_source_units.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Private source-authoritative inventory of ALL ThML units sharing a native raw run.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "commentary_xml_witness",
-        "hashlib",
-        "pilot_preflight",
-        "re",
-        "research"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "37e7ede822244fa6f58f2478843c19f7c8f80faebacfdae0f74502c286b6ec58",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 3,
-      "static_references": [
-        "scripts/commentary_private_text_compare.py",
-        "tests/test_commentary_shared_raw_source_units.py",
         "tests/test_tool_registry.py"
       ]
     },
@@ -1861,41 +1723,6 @@
     {
       "classification": "UNDECIDED",
       "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "OSIS",
-        "ThML"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_source_native_boundaries.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Original ThML marker boundaries versus *occupied* native SWORD K-key runs.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "commentary_xml_witness",
-        "hashlib",
-        "pilot_preflight",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "3fd573837e12cabda6dd3a8fe905cd82ef6a19a06329e0161fcd6100931380aa",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 4,
-      "static_references": [
-        "scripts/commentary_private_text_compare.py",
-        ".github/workflows/commentary-mhc-source-text.yml",
-        "tests/test_commentary_shared_raw_source_units.py",
-        "tests/test_commentary_source_native_boundaries.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "zCom"
@@ -1941,43 +1768,6 @@
         ".github/workflows/commentary-zcom-private-candidate.yml",
         "tests/test_commentary_stock_candidate.py",
         "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/commentary_stock_prefix_topology.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Read-only, PRIVATE diagnostics of commentary stock XML prefix topology.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "commentary_text_delta",
-        "commentary_xml_witness",
-        "difflib",
-        "lxml",
-        "re",
-        "unicodedata"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "c80bc4823cacce3cef3b5371b393b111191e1c047f62b4b8b41cbe0d7de6e681",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 7,
-      "static_references": [
-        "scripts/commentary_private_text_compare.py",
-        "scripts/commentary_section_scope_audit.py",
-        "scripts/research/commentary/commentary_lexical_overlap.py",
-        "scripts/research/commentary/commentary_unresolved_lexical_triage.py",
-        "tests/test_commentary_prefixed_suffix.py",
-        "tests/test_commentary_stock_prefix_topology.py",
-        "tests/test_commentary_stock_source_context.py"
       ]
     },
     {
@@ -2035,12 +1825,12 @@
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_private_text_compare.py",
-        "scripts/commentary_stock_prefix_topology.py",
         "scripts/research/commentary/commentary_chapter_cross_slot.py",
         "scripts/research/commentary/commentary_chapter_neighbors.py",
         "scripts/research/commentary/commentary_chapter_paragraph_overlap.py",
         "scripts/research/commentary/commentary_chapter_ref_labels.py",
         "scripts/research/commentary/commentary_nonlink_analysis.py",
+        "scripts/research/commentary/commentary_stock_prefix_topology.py",
         "scripts/tool_registry.py",
         "tests/test_commentary_nonlink_word_alignment.py",
         "tests/test_commentary_text_delta.py",
@@ -2253,12 +2043,12 @@
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
-        "scripts/commentary_shared_raw_source_units.py",
-        "scripts/commentary_source_native_boundaries.py",
-        "scripts/commentary_stock_prefix_topology.py",
         "scripts/research/commentary/commentary_chapter_body_evidence.py",
         "scripts/research/commentary/commentary_chapter_neighbors.py",
         "scripts/research/commentary/commentary_paragraph_witness_probe.py",
+        "scripts/research/commentary/commentary_shared_raw_source_units.py",
+        "scripts/research/commentary/commentary_source_native_boundaries.py",
+        "scripts/research/commentary/commentary_stock_prefix_topology.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-xml-witness.yml",
         "tests/test_commentary_xml_witness.py"
@@ -3000,13 +2790,10 @@
         "scripts/commentary_native_inventory.py",
         "scripts/commentary_native_raw_inventory.py",
         "scripts/commentary_original_bookcode_repair.py",
-        "scripts/commentary_original_div1_book_consistency.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
-        "scripts/commentary_shared_raw_source_units.py",
         "scripts/commentary_source_english_osis_alias.py",
-        "scripts/commentary_source_native_boundaries.py",
         "scripts/commentary_stock_candidate.py",
         "scripts/commentary_witness.py",
         "scripts/commentary_xiphos_dual_reader.py",
@@ -3026,9 +2813,12 @@
         "scripts/research/commentary/commentary_lexical_overlap.py",
         "scripts/research/commentary/commentary_near_prose_unicode_review.py",
         "scripts/research/commentary/commentary_nonlink_analysis.py",
+        "scripts/research/commentary/commentary_original_div1_book_consistency.py",
         "scripts/research/commentary/commentary_prose_cross_slot.py",
         "scripts/research/commentary/commentary_reference_cross_slot.py",
+        "scripts/research/commentary/commentary_shared_raw_source_units.py",
         "scripts/research/commentary/commentary_source_identity_lexical_gate.py",
+        "scripts/research/commentary/commentary_source_native_boundaries.py",
         "scripts/research/commentary/commentary_unresolved_lexical_triage.py",
         "scripts/stage_verified_stock_commentary.py",
         "scripts/tool_registry.py",
@@ -4484,6 +4274,36 @@
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_layout_census.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Source-neutral, read-only commentary layout census.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "hashlib",
+        "lxml",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "2490dcafd48ef9d3834cbb070125bb2778c3a8427975ffd2d778faced6f1e3ee",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/commentary_section_scope_audit.py",
+        "scripts/research/commentary/commentary_paragraph_witness_probe.py",
+        "tests/test_commentary_layout_census.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [],
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/research/commentary/commentary_lexical_overlap.py",
@@ -4492,7 +4312,6 @@
       "python_imports": [
         "__future__",
         "collections",
-        "commentary_stock_prefix_topology",
         "lxml",
         "pilot_preflight",
         "re",
@@ -4500,7 +4319,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "9992ab475d4f75eba50427c415af874c4e05b5e9663ba05c67f1834ba0cdaf15",
+      "sha256_at_inventory": "382bfbc0cd2cc63390bc048b9ede9232470f0872d9fa10032ebe639502fde9ad",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -4540,6 +4359,41 @@
         "scripts/commentary_modern_reference_gate.py",
         "tests/test_commentary_modern_reference_gate.py",
         "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "RawCom",
+        "RawCom4",
+        "zCom",
+        "zCom4",
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_navigation_link_plan.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Propose safe, source-preserving commentary links; never mutate any module.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "aec11b91aff323784bbac42e6fd90502041b71d6efde71d503d83b44fb983e97",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 4,
+      "static_references": [
+        "scripts/commentary_anchor_parity.py",
+        "scripts/commentary_section_scope_audit.py",
+        "docs/policies/COMMENTARY_POLICY.md",
+        "tests/test_commentary_navigation_link_plan.py"
       ]
     },
     {
@@ -4603,11 +4457,11 @@
         "scripts/commentary_osis_transport_probe.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
-        "scripts/commentary_shared_raw_source_units.py",
         "scripts/research/commentary/commentary_intro_chapter_text_review.py",
         "scripts/research/commentary/commentary_lexical_overlap.py",
         "scripts/research/commentary/commentary_near_prose_unicode_review.py",
         "scripts/research/commentary/commentary_prose_cross_slot.py",
+        "scripts/research/commentary/commentary_shared_raw_source_units.py",
         "scripts/research/commentary/commentary_unresolved_lexical_triage.py",
         ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-modern-source-receipt.yml",
@@ -4616,6 +4470,37 @@
         "tests/test_commentary_private_text_compare.py",
         "tests/test_commentary_prose_cross_slot.py",
         "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "ThML"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_original_div1_book_consistency.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Private original ThML book-code vs physical div1 document ancestry census.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "hashlib",
+        "pilot_preflight",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "b59e46885691acd3e79dd28a949faa9d0384a9076202c63acf28296b9317e14b",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 2,
+      "static_references": [
+        "scripts/commentary_private_text_compare.py",
+        "tests/test_commentary_original_div1_book_consistency.py"
       ]
     },
     {
@@ -4695,14 +4580,14 @@
       "python_imports": [
         "__future__",
         "collections",
-        "commentary_layout_census",
         "commentary_xml_witness",
         "lxml",
-        "re"
+        "re",
+        "research"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "e65ea68a88c1aa037f50ff913440606b152fe7345b9ebe34d2d956249cab3f43",
+      "sha256_at_inventory": "2b64df465efdeb1d931a8b00e077f6c7a6b9a7163af21c1e4b838e5759fdb9a1",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -4743,7 +4628,7 @@
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_private_text_compare.py",
-        "scripts/commentary_shared_raw_source_units.py",
+        "scripts/research/commentary/commentary_shared_raw_source_units.py",
         "tests/test_commentary_prose_cross_slot.py",
         "tests/test_tool_registry.py"
       ]
@@ -4785,6 +4670,40 @@
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
+        "ThML"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_shared_raw_source_units.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Private source-authoritative inventory of ALL ThML units sharing a native raw run.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "commentary_xml_witness",
+        "hashlib",
+        "pilot_preflight",
+        "re",
+        "research"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "37e7ede822244fa6f58f2478843c19f7c8f80faebacfdae0f74502c286b6ec58",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/commentary_private_text_compare.py",
+        "tests/test_commentary_shared_raw_source_units.py",
+        "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
         "OSIS",
         "ThML"
       ],
@@ -4814,6 +4733,78 @@
       ]
     },
     {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "OSIS",
+        "ThML"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_source_native_boundaries.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Original ThML marker boundaries versus *occupied* native SWORD K-key runs.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "commentary_xml_witness",
+        "hashlib",
+        "pilot_preflight",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "3fd573837e12cabda6dd3a8fe905cd82ef6a19a06329e0161fcd6100931380aa",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 4,
+      "static_references": [
+        "scripts/commentary_private_text_compare.py",
+        ".github/workflows/commentary-mhc-source-text.yml",
+        "tests/test_commentary_shared_raw_source_units.py",
+        "tests/test_commentary_source_native_boundaries.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/commentary/commentary_stock_prefix_topology.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Read-only, PRIVATE diagnostics of commentary stock XML prefix topology.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "commentary_text_delta",
+        "commentary_xml_witness",
+        "difflib",
+        "lxml",
+        "re",
+        "unicodedata"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "c80bc4823cacce3cef3b5371b393b111191e1c047f62b4b8b41cbe0d7de6e681",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 7,
+      "static_references": [
+        "scripts/commentary_private_text_compare.py",
+        "scripts/commentary_section_scope_audit.py",
+        "scripts/research/commentary/commentary_lexical_overlap.py",
+        "scripts/research/commentary/commentary_unresolved_lexical_triage.py",
+        "tests/test_commentary_prefixed_suffix.py",
+        "tests/test_commentary_stock_prefix_topology.py",
+        "tests/test_commentary_stock_source_context.py"
+      ]
+    },
+    {
       "classification": "MERGE",
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
@@ -4826,7 +4817,6 @@
       "python_imports": [
         "__future__",
         "collections",
-        "commentary_stock_prefix_topology",
         "difflib",
         "hashlib",
         "lxml",
@@ -4837,7 +4827,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "2d2543abee5ed3dca797b5107ce18d4093d69e93648a152a49e5ef31f38bef62",
+      "sha256_at_inventory": "0d9cc31db3d0277afc2d3bb692a3a87776716ec05b29728b51302c60dd9c3bdf",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -4847,10 +4837,10 @@
         "scripts/commentary_osis_paragraph_presence.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
-        "scripts/commentary_shared_raw_source_units.py",
         "scripts/research/commentary/commentary_chapter_body_evidence.py",
         "scripts/research/commentary/commentary_near_prose_unicode_review.py",
         "scripts/research/commentary/commentary_prose_cross_slot.py",
+        "scripts/research/commentary/commentary_shared_raw_source_units.py",
         "tests/test_commentary_osis_paragraph_presence.py",
         "tests/test_commentary_unresolved_lexical_triage.py",
         "tests/test_tool_registry.py"

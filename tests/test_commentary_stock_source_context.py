@@ -10,7 +10,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
 from commentary_private_text_compare import _original_source_markers, compare_private_texts
-from commentary_stock_prefix_topology import stock_prefix_context_correspondence
+from research.commentary.commentary_stock_prefix_topology import stock_prefix_context_correspondence
 
 
 class CommentaryStockSourceContextTests(unittest.TestCase):

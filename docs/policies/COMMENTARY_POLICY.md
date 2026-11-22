@@ -25,7 +25,7 @@ The authorial prose, theological argument, Scripture quotations and original sec
 
 Where independent evidence proves an entry covers a full chapter or passage but native SWORD indexes only its first key, a **separate explicitly reviewed corrected edition** may add navigational aliases so users can discover that single authorial entry at its actual covered verses. Do **not** copy the prose into independently authored per-verse entries, assume scope from a first-key shortcut, or overwrite distinct occupied keys.
 
-Each alias must be derived from verified source scope and actual source/reader versification, with original and candidate byte hashes, complete link/topology comparison, deduplicated reader behavior and a reversible change receipt. The generic read-only proposal tool is `scripts/commentary_navigation_link_plan.py`. Any individual edition's decisions live in its `sources/cleaned/**/editorial/` folder.
+Each alias must be derived from verified source scope and actual source/reader versification, with original and candidate byte hashes, complete link/topology comparison, deduplicated reader behavior and a reversible change receipt. The generic read-only proposal tool is `scripts/research/commentary/commentary_navigation_link_plan.py`. Any individual edition's decisions live in its `sources/cleaned/**/editorial/` folder.
 
 ## Validation and limits
 

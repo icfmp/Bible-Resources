@@ -11,10 +11,10 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
 from commentary_private_text_compare import _original_source_markers
-from commentary_shared_raw_source_units import (
+from research.commentary.commentary_shared_raw_source_units import (
     inspect_shared_original_units_in_native_runs
 )
-from commentary_source_native_boundaries import NativeRawRunBoundaryInventory
+from research.commentary.commentary_source_native_boundaries import NativeRawRunBoundaryInventory
 from pilot_preflight import PilotError
 
 

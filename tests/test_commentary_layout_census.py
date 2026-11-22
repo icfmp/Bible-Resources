@@ -6,7 +6,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_layout_census import NativeCommentaryLayoutCensus, layout_profile, layout_flags
+from research.commentary.commentary_layout_census import NativeCommentaryLayoutCensus, layout_profile, layout_flags
 
 
 class CommentaryLayoutCensusTests(unittest.TestCase):
