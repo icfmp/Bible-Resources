@@ -121,7 +121,7 @@ class ScriptInventoryTests(unittest.TestCase):
         entries = {row["path"]: row for row in self.result["files"]}
         for stem, caller in (
             ("source_native_osis_target_addressability",
-             "scripts/source_osis_note_link_triage.py"),
+             "scripts/publisher_osis_sword_candidate.py"),
             ("source_native_osis_structure_screen",
              "scripts/publisher_osis_sword_candidate.py"),
         ):
@@ -237,6 +237,18 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertIn("scripts/audit_osis.py", current)
         self.assertIn("scripts/reviewed_modern_commentary_rebuild.py", current)
 
+
+    def test_historical_darby_source_link_triage_is_not_active(self):
+        """Source/native target evidence replaces original-only import research."""
+        current = {row["path"] for row in self.result["files"]}
+        self.assertNotIn("scripts/source_osis_note_link_triage.py", current)
+        self.assertFalse(
+            (ROOT / ".github/workflows/source-osis-note-links.yml").exists()
+        )
+        self.assertIn(
+            "scripts/research/bible/source_native_osis_target_addressability.py",
+            current,
+        )
 
     def test_completed_hmcc_modern_staging_is_not_an_active_publisher(self):
         """Version-pinned first-release bootstraps belong to Git history only."""

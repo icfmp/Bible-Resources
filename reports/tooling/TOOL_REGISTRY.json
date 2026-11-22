@@ -928,12 +928,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 5,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/publisher_osis_sword_candidate.py",
-        "scripts/source_osis_note_link_triage.py",
         ".github/workflows/publisher-osis-observation.yml",
-        ".github/workflows/source-osis-note-links.yml",
         "tests/test_publisher_osis_observation.py"
       ]
     },
@@ -1354,10 +1352,10 @@
       "static_reference_count": 5,
       "static_references": [
         "scripts/publisher_osis_sword_candidate.py",
-        "scripts/source_osis_note_link_triage.py",
         ".github/workflows/publisher-osis-sword-candidate.yml",
-        ".github/workflows/source-osis-note-links.yml",
-        "tests/test_source_native_osis_target_addressability.py"
+        "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
+        "tests/test_source_native_osis_target_addressability.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -1386,12 +1384,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/publisher_osis_sword_candidate.py",
-        "scripts/source_osis_note_link_triage.py",
         ".github/workflows/publisher-osis-sword-candidate.yml",
-        ".github/workflows/source-osis-note-links.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
         "tests/test_source_osis_verse_notes.py"
@@ -1615,44 +1611,6 @@
       "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/source_osis_note_link_triage.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Source-only triage of original OSIS note-link navigation limitations.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "collections",
-        "hashlib",
-        "json",
-        "pathlib",
-        "publisher_osis_observation",
-        "re",
-        "research",
-        "stable_sword_refs"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "d2ba385fa056a20038e2133259dac64d7903eadd34305e308047cfae8751f796",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 4,
-      "static_references": [
-        ".github/workflows/source-osis-note-links.yml",
-        "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
-        "tests/test_source_osis_note_link_triage.py",
-        "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
         "OSIS",
         "USFX"
       ],
@@ -1676,7 +1634,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 19,
+      "static_reference_count": 18,
       "static_references": [
         "scripts/published_reference_audit.py",
         "scripts/publisher_osis_sword_candidate.py",
@@ -1687,7 +1645,6 @@
         "scripts/research/bible/source_native_osis_target_addressability.py",
         "scripts/research/bible/source_osis_verse_notes.py",
         "scripts/source_osis_inventory.py",
-        "scripts/source_osis_note_link_triage.py",
         "scripts/sword_native_inventory.py",
         "scripts/sword_native_raw_corpus_inventory.py",
         "scripts/validate.py",
