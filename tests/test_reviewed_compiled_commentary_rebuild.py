@@ -15,7 +15,10 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from reviewed_compiled_commentary_rebuild import reviewed_rebuilt_commentary_errors
-from reviewed_compiled_commentary_rebuild import zcom_member_suffixes, zcom_payload_paths, checked_zcom_payload_files
+from reviewed_compiled_commentary_rebuild import (
+    zcom_member_suffixes, zcom_payload_paths, checked_zcom_payload_files,
+    commentary_payload_paths, checked_commentary_payload_files,
+)
 from jsonschema import Draft202012Validator
 
 
@@ -65,6 +68,40 @@ class NativeZcomPayloadPathTests(unittest.TestCase):
             other.symlink_to(payload, target_is_directory=True)
             with self.assertRaisesRegex(ValueError, "unsafe"):
                 checked_zcom_payload_files(other, "Fixture", "CHAPTER")
+
+    def test_native_zcom4_layout_and_exact_inventory_are_fail_closed(self):
+        for mode, ext in (("BOOK", "bz"), ("CHAPTER", "cz"), ("VERSE", "vz")):
+            with self.subTest(mode=mode), TemporaryDirectory() as tmp:
+                payload = Path(tmp) / "payload"
+                names = commentary_payload_paths("Attested", mode, "zCom4")
+                self.assertEqual(len(names), 7)
+                self.assertIn("mods.d/attested.conf", names)
+                self.assertEqual(
+                    names - {"mods.d/attested.conf"},
+                    {"modules/comments/zcom4/attested/" + part + "." + ext + suffix
+                     for part in ("nt", "ot") for suffix in ("s", "v", "z")},
+                )
+                for name in names:
+                    file = payload / name
+                    file.parent.mkdir(parents=True, exist_ok=True)
+                    file.write_bytes(b"synthetic native member")
+                self.assertEqual(
+                    set(checked_commentary_payload_files(
+                        payload, "Attested", mode, "zCom4")), names)
+                unexpected = payload / "extra.bin"
+                unexpected.write_bytes(b"unapproved")
+                with self.assertRaisesRegex(ValueError, "inventory"):
+                    checked_commentary_payload_files(payload, "Attested", mode, "zCom4")
+                unexpected.unlink()
+                alias = payload / "unexpected-symlink"
+                alias.symlink_to(payload / "mods.d/attested.conf")
+                with self.assertRaisesRegex(ValueError, "Symlink"):
+                    checked_commentary_payload_files(payload, "Attested", mode, "zCom4")
+
+    def test_unsafe_native_driver_is_not_inferred_from_an_unknown_name(self):
+        for driver in ("", "zcom", "zCom5", "../zCom", None):
+            with self.subTest(driver=driver), self.assertRaises(ValueError):
+                commentary_payload_paths("Attested", "CHAPTER", driver)
 
     def test_module_path_or_unknown_block_mode_is_rejected(self):
         for bad in ("../outside", "/absolute", "", "with-hyphen", "ab/../../x"):
