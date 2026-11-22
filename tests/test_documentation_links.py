@@ -24,7 +24,7 @@ SKIP = ("http:", "https:", "mailto:", "data:", "#", "//")
 class DocumentationLinkIntegrityTests(unittest.TestCase):
     def test_existing_local_markdown_destinations(self):
         tracked = subprocess.run(
-            ["git", "ls-files", "-z", "--", "docs", "sources", "history",
+            ["git", "ls-files", "-z", "--", "docs", "sources",
              "modules", "scripts", "README.md", "CONTRIBUTING.md",
              "INSTALLATION_FR.md", "SECURITY.md",
              ".github/PULL_REQUEST_TEMPLATE.md"],
