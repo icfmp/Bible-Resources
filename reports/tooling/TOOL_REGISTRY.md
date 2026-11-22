@@ -60,7 +60,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/bible/source_native_ordered_body.py`](../../scripts/research/bible/source_native_ordered_body.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/research/bible/source_native_osis_boundary_positions.py`](../../scripts/research/bible/source_native_osis_boundary_positions.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/research/bible/source_native_osis_structure_screen.py`](../../scripts/research/bible/source_native_osis_structure_screen.py) | UNDECIDED | named test | 3 | not determined |
-| [`scripts/research/bible/source_native_osis_target_addressability.py`](../../scripts/research/bible/source_native_osis_target_addressability.py) | UNDECIDED | named test | 4 | not determined |
+| [`scripts/research/bible/source_native_osis_target_addressability.py`](../../scripts/research/bible/source_native_osis_target_addressability.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/research/bible/source_osis_verse_notes.py`](../../scripts/research/bible/source_osis_verse_notes.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 7 | publication/release |
 | [`scripts/reviewed_modern_commentary_rebuild.py`](../../scripts/reviewed_modern_commentary_rebuild.py) | UNDECIDED | named test | 3 | publication/release |
