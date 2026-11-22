@@ -11,6 +11,8 @@ The `scripts/` directory is for **maintained, reusable production and verificati
 | `modules/<resource-id>/tools/` | Only proven, still-needed edition-specific maintenance tools, never a second publisher |
 | [Generated tool inventory](../reports/tooling/TOOL_REGISTRY.md) | Every tracked tool's classification, source hash, imports and static callers; review evidence, **not** proof that a script is unused |
 
+The official OSIS schema review now uses the single pinned `fetch_reviewed_schema.py` command for both offline schema compilation and optional provenance metadata (`--report`). This is a technical XSD check, not an editorial approval or a license decision.
+
 For a new resource, begin with the [canonical production pipeline](../docs/PRODUCTION_PIPELINE.md). Do not improvise a second importer or add a script for each individual verse or edition correction.
 
 The former MHC and MHCC Modern stock-source reconstruction helpers were retired after their approved OSIS masters were archived under `sources/cleaned/`. The maintained tools validate those masters and their SWORD results; Git history retains the old exploratory code.
