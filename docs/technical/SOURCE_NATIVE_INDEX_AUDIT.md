@@ -17,7 +17,7 @@ as evidence. See the [production pipeline](../PRODUCTION_PIPELINE.md).
    `scripts/sword_native_index.cpp` and
    `scripts/sword_native_inventory.py`, ensuring correct SWORD module,
    versification, intros, empty native slots and occupied entries.
-4. Use `scripts/publisher_osis_sword_candidate.py --approved --resource-id <approved-module-id>` for the maintained private source-to-compiled candidate checks. The `--approved` mode reads the canonical cleaned OSIS master in `sources/cleaned/`, verifies the source validation and cleanup-manifest SHA-256 against the actual bytes, and uses the module's recorded versification. The original-publisher research mode is historical and is not a production compiler. Compare every authored address to its
+4. Use `scripts/approved_osis_sword_candidate.py --resource-id <approved-module-id>` for the maintained private source-to-compiled candidate checks. The `--approved` mode reads the canonical cleaned OSIS master in `sources/cleaned/`, verifies the source validation and cleanup-manifest SHA-256 against the actual bytes, and uses the module's recorded versification. The original-publisher research mode has been retired; approved cleaned OSIS is the only audit input. Compare every authored address to its
    independently read native address. Do not infer text from an addressable
    but empty SWORD slot; never reconstruct a missing source verse.
 5. Record exact key equality and each reviewed conversion/reindex exception

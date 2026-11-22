@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Build isolated SWORD research candidates from pinned official or approved OSIS.
+"""Build isolated SWORD research candidates from approved cleaned OSIS masters.
 
-Research-only: compile original bytes via standard osis2mod, inspect with the
+Research-only: compile approved, hash-pinned bytes via osis2mod, inspect with the
 *actual* native libSWORD and discard every temporary module. Emit bounded
 source-vs-reader evidence, not Bible text, note bodies or a release package.
 """
@@ -20,7 +20,6 @@ import tempfile
 from lxml import etree
 
 from bible_intake import ROOT
-from publisher_osis_observation import read_pinned_publisher_osis
 from research.bible.source_osis_verse_notes import (
     original_osis_verses_and_notes, _nonspace, _fold,
 )
@@ -49,45 +48,19 @@ MAX_LOG = 32 * 1024 * 1024
 MAX_FRAMES = 350_000
 
 
-class PublisherSWORDResearchError(ValueError):
+class ApprovedOSISNativeError(ValueError):
     """SWORD research candidate is incomplete, contradictory, or unsafe."""
-
-
-def config_for(resource_id):
-    if not RESOURCE.fullmatch(resource_id):
-        raise PublisherSWORDResearchError("Invalid source research ID")
-    path=ROOT/"config/publisher-sword-research"/f"{resource_id}.json"
-    if not path.is_file() or path.is_symlink():
-        raise PublisherSWORDResearchError("No reviewed compilation candidate config")
-    cfg=json.loads(path.read_text(encoding="utf-8"))
-    if (not isinstance(cfg,dict) or set(cfg)!={
-            "schema_version","resource_id","purpose","publisher_source_manifest",
-            "candidate_module_id","candidate_versifications","compression","note"}
-            or cfg["schema_version"]!=1 or cfg["resource_id"]!=resource_id
-            or cfg["purpose"]!="research_only"
-            or cfg["publisher_source_manifest"]!=
-                f"config/publisher-osis/{resource_id}.json"
-            or cfg["compression"]!="zip"
-            or not MODULE.fullmatch(cfg["candidate_module_id"])
-            or not isinstance(cfg["candidate_versifications"],list)
-            or not 1<=len(cfg["candidate_versifications"])<=4
-            or any(not isinstance(v,str) or not SYSTEM.fullmatch(v)
-                   for v in cfg["candidate_versifications"])
-            or len(set(cfg["candidate_versifications"]))!=len(cfg["candidate_versifications"])
-            or not isinstance(cfg["note"],str) or len(cfg["note"])>250):
-        raise PublisherSWORDResearchError("Unreviewed compilation candidate settings")
-    return cfg
 
 
 def approved_source_for(resource_id: str, *, root: Path = ROOT):
     """Load the exact approved cleaned OSIS, checking the validated source pins."""
     if not isinstance(resource_id, str) or not RESOURCE.fullmatch(resource_id):
-        raise PublisherSWORDResearchError("Invalid approved resource ID")
+        raise ApprovedOSISNativeError("Invalid approved resource ID")
     module = root / "modules" / resource_id
     metadata_path = module / "metadata.json"
     receipt_path = module / "SOURCE_VALIDATION.json"
     if any(p.is_symlink() or not p.is_file() for p in (metadata_path, receipt_path)):
-        raise PublisherSWORDResearchError("Missing approved metadata or source receipt")
+        raise ApprovedOSISNativeError("Missing approved metadata or source receipt")
     meta = json.loads(metadata_path.read_text(encoding="utf-8"))
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     lang, system, sword_id = (meta.get("language"), meta.get("versification"),
@@ -100,11 +73,11 @@ def approved_source_for(resource_id: str, *, root: Path = ROOT):
             or not isinstance(sword_id, str) or MODULE.fullmatch(sword_id) is None
             or receipt.get("status") != "validated"
             or receipt.get("source_kind") != "bible"):
-        raise PublisherSWORDResearchError("Unapproved Bible metadata or source")
+        raise ApprovedOSISNativeError("Unapproved Bible metadata or source")
     folder = root / "sources" / "cleaned" / "bibles" / lang / resource_id
     manifest_path = folder / "CLEANUP_MANIFEST.json"
     if manifest_path.is_symlink() or not manifest_path.is_file():
-        raise PublisherSWORDResearchError("Missing approved cleaned OSIS manifest")
+        raise ApprovedOSISNativeError("Missing approved cleaned OSIS manifest")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     candidates = list(folder.glob("*.osis.xml"))
     if (len(candidates) != 1 or candidates[0].is_symlink()
@@ -113,19 +86,19 @@ def approved_source_for(resource_id: str, *, root: Path = ROOT):
             or manifest.get("language") != lang
             or manifest.get("type") != "bible"
             or manifest.get("source_format") not in (None, "OSIS")):
-        raise PublisherSWORDResearchError("Ambiguous approved cleaned source")
+        raise ApprovedOSISNativeError("Ambiguous approved cleaned source")
     digest = receipt.get("source_sha256")
     pins = [manifest[k] for k in ("cleaned_source_sha256", "cleaned_osis_sha256",
                                   "final_candidate_osis_sha256") if k in manifest]
     if (not isinstance(digest, str) or re.fullmatch(r"[a-f0-9]{64}", digest) is None
             or not pins or any(pin != digest for pin in pins)):
-        raise PublisherSWORDResearchError("Approved OSIS source pins disagree")
+        raise ApprovedOSISNativeError("Approved OSIS source pins disagree")
     data = candidates[0].read_bytes()
     if sha256(data).hexdigest() != digest:
-        raise PublisherSWORDResearchError("Cleaned OSIS bytes differ from approved pin")
+        raise ApprovedOSISNativeError("Cleaned OSIS bytes differ from approved pin")
     research_id = sword_id + "Research"
     if MODULE.fullmatch(research_id) is None:
-        raise PublisherSWORDResearchError("Invalid isolated candidate module ID")
+        raise ApprovedOSISNativeError("Invalid isolated candidate module ID")
     return {"candidate_module_id": research_id,
             "candidate_versifications": [system], "language": lang}, data
 
@@ -135,7 +108,7 @@ def _create_candidate_layout(folder: Path, module_id: str, system: str, language
     if (not MODULE.fullmatch(module_id) or not SYSTEM.fullmatch(system)
             or not isinstance(language, str)
             or re.fullmatch(r'[a-z]{2,3}', language) is None):
-        raise PublisherSWORDResearchError("Unsafe original source candidate module identity")
+        raise ApprovedOSISNativeError("Unsafe original source candidate module identity")
     name=module_id.lower()
     payload=folder/"payload"
     conf=payload/"mods.d"/f"{name}.conf"
@@ -152,7 +125,7 @@ def _create_candidate_layout(folder: Path, module_id: str, system: str, language
         f"Lang={language}\n"
         "SourceType=OSIS\n"
         f"Versification={system}\n"
-        "Description=Publisher original OSIS research-only unapproved module\n"
+        "Description=Approved cleaned OSIS audit candidate (not a publication)\n"
         "Version=0.0.0-research\n"
         "GlobalOptionFilter=OSISFootnotes\n"
         "GlobalOptionFilter=OSISXRefs\n",
@@ -163,18 +136,18 @@ def _create_candidate_layout(folder: Path, module_id: str, system: str, language
 def _compile_osis(tool: Path, outfile: Path, module_path: Path, system: str,
                   log_path: Path):
     if not tool.is_file() or tool.is_symlink() or not outfile.is_file():
-        raise PublisherSWORDResearchError("Missing trusted compiler or original pinned OSIS")
+        raise ApprovedOSISNativeError("Missing trusted compiler or original pinned OSIS")
     with log_path.open("xb") as log:
         try:
             cmd=[str(tool.resolve(strict=True)),str(module_path),
                  str(outfile),"-z","z","-b","4","-v",system]
             process=subprocess.run(cmd,stdout=log,stderr=log,check=False,timeout=420)
         except subprocess.TimeoutExpired as exc:
-            raise PublisherSWORDResearchError("Official OSIS compiler exceeded bounded timeout") from exc
+            raise ApprovedOSISNativeError("Official OSIS compiler exceeded bounded timeout") from exc
         except OSError as exc:
-            raise PublisherSWORDResearchError("Official OSIS compiler failed to launch") from exc
+            raise ApprovedOSISNativeError("Official OSIS compiler failed to launch") from exc
     if log_path.stat().st_size>MAX_LOG:
-        raise PublisherSWORDResearchError("OSIS tool emitted excessive diagnostics")
+        raise ApprovedOSISNativeError("OSIS tool emitted excessive diagnostics")
     # Never print raw compiler stdout/stderr: even diagnostic messages can
     # include quoted Scripture/notes. Keep only bounded category counts.
     lines=log_path.read_text(encoding="utf-8",errors="replace").splitlines()
@@ -192,7 +165,7 @@ def _compile_osis(tool: Path, outfile: Path, module_path: Path, system: str,
                                "source_line":int(match.group(1)),
                                "source_column":int(match.group(2))})
     if process.returncode!=0:
-        raise PublisherSWORDResearchError(
+        raise ApprovedOSISNativeError(
             f"OSIS tool returned nonzero exit status {process.returncode}")
     return {"compiler_tool":"osis2mod","tool_sha256":sha256(tool.read_bytes()).hexdigest(),
             "returncode":process.returncode,
@@ -208,46 +181,46 @@ def _read_native_frames(reader: Path, module_id: str, payload: Path):
     try:
         p=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
     except OSError as exc:
-        raise PublisherSWORDResearchError("Trusted native reader cannot execute") from exc
+        raise ApprovedOSISNativeError("Trusted native reader cannot execute") from exc
     count=Counter()
     try:
         while True:
             header=p.stdout.readline(192)
             if not header:
-                raise PublisherSWORDResearchError("Native raw reader ended without checksum trailer")
+                raise ApprovedOSISNativeError("Native raw reader ended without checksum trailer")
             if len(header)>=192 or not header.endswith(b"\n"):
-                raise PublisherSWORDResearchError("Unsafe raw native entry frame header")
+                raise ApprovedOSISNativeError("Unsafe raw native entry frame header")
             line=header.decode("ascii",errors="strict").rstrip("\n")
             cells=line.split("\t")
             if cells[0]=="S":
                 if len(cells)!=5:
-                    raise PublisherSWORDResearchError("Malformed native frame trailer")
+                    raise ApprovedOSISNativeError("Malformed native frame trailer")
                 expected=tuple(map(int,cells[1:]))
                 if expected!=(sum(count.values()),count["K"],count["I"],count["U"]):
-                    raise PublisherSWORDResearchError("Native frame count mismatch")
+                    raise ApprovedOSISNativeError("Native frame count mismatch")
                 if p.stdout.read(1):
-                    raise PublisherSWORDResearchError("Unexpected trailing native raw bytes")
+                    raise ApprovedOSISNativeError("Unexpected trailing native raw bytes")
                 try:
                     if p.wait(timeout=15)!=0:
-                        raise PublisherSWORDResearchError(
+                        raise ApprovedOSISNativeError(
                             "Native raw reader returned nonzero after final frame")
                 except subprocess.TimeoutExpired as exc:
-                    raise PublisherSWORDResearchError(
+                    raise ApprovedOSISNativeError(
                         "Native raw reader failed to terminate") from exc
                 break
             if len(cells)!=3 or cells[0] not in {"K","I","U"}:
-                raise PublisherSWORDResearchError("Invalid native entry frame type")
+                raise ApprovedOSISNativeError("Invalid native entry frame type")
             kind,ref,number=cells
             if kind=="K" and KEY.fullmatch(ref) is None:
-                raise PublisherSWORDResearchError("Unsafe populated native verse reference")
+                raise ApprovedOSISNativeError("Unsafe populated native verse reference")
             if not number.isdecimal() or int(number)>MAX_ENTRY:
-                raise PublisherSWORDResearchError("Invalid native raw XML fragment size")
+                raise ApprovedOSISNativeError("Invalid native raw XML fragment size")
             raw=p.stdout.read(int(number))
             if len(raw)!=int(number):
-                raise PublisherSWORDResearchError("Truncated native raw XML frame")
+                raise ApprovedOSISNativeError("Truncated native raw XML frame")
             count[kind]+=1
             if sum(count.values())>MAX_FRAMES:
-                raise PublisherSWORDResearchError("Native corpus exceeded safe size")
+                raise ApprovedOSISNativeError("Native corpus exceeded safe size")
             yield kind,ref,raw
     finally:
         p.stdout.close()
@@ -263,9 +236,9 @@ def _native_notes(raw: bytes):
             etree.XMLParser(resolve_entities=False,load_dtd=False,
                             no_network=True,recover=False,huge_tree=False))
     except etree.XMLSyntaxError as exc:
-        raise PublisherSWORDResearchError("Invalid native raw XML note structure") from exc
+        raise ApprovedOSISNativeError("Invalid native raw XML note structure") from exc
     if any(isinstance(x,etree._Entity) for x in root.iter()):
-        raise PublisherSWORDResearchError("Native source contains unresolved entity")
+        raise ApprovedOSISNativeError("Native source contains unresolved entity")
     return [
         {"caller":n.get("n"),"type":n.get("type"),
          "body":"".join(n.itertext()),
@@ -375,7 +348,7 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
                 counts["note_explicit_target_sequence_different"]+=1
                 sample("note_explicit_target_sequence_different",ref,one_based_note=idx)
     if indexed_seen!=native_set:
-        raise PublisherSWORDResearchError("Native index and raw corpus enumerations disagree")
+        raise ApprovedOSISNativeError("Native index and raw corpus enumerations disagree")
     native_structure=milestones.finish()
     target_addressability=audit_explicit_targets(notes,source_set,native_set)
     ordered_body=compare_ordered_body_openings(
@@ -432,10 +405,10 @@ def compiler_output_metrics(output_dir: Path) -> dict:
     This is diagnostics, not proof that the index is readable.
     """
     if output_dir.is_symlink() or not output_dir.is_dir():
-        raise PublisherSWORDResearchError("Missing private compiler output directory")
+        raise ApprovedOSISNativeError("Missing private compiler output directory")
     entries = list(output_dir.rglob("*"))
     if len(entries) > 1000 or any(item.is_symlink() for item in entries):
-        raise PublisherSWORDResearchError("Unsafe private compiler output tree")
+        raise ApprovedOSISNativeError("Unsafe private compiler output tree")
     files = [item for item in entries if item.is_file()]
     sizes = [item.stat().st_size for item in files]
     return {
@@ -483,23 +456,10 @@ def safe_failure_code(exc: Exception) -> str:
     return "unclassified_private_failure"
 
 
-def select_candidate_versifications(cfg: dict, requested: str | None):
-    """Never invent or silently switch an unreviewed original source v11n."""
-    allowed=cfg["candidate_versifications"]
-    if requested is not None and requested not in allowed:
-        raise PublisherSWORDResearchError("Unreviewed requested candidate versification")
-    return list(allowed) if requested is None else [requested]
-
-
 def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
-          raw_binary:Path, versification: str | None = None,
-          approved: bool = False):
-    if approved:
-        cfg, original = approved_source_for(resource_id)
-    else:
-        cfg = config_for(resource_id)
-        original = read_pinned_publisher_osis(resource_id)
-    selected=select_candidate_versifications(cfg,versification)
+          raw_binary:Path):
+    cfg, original = approved_source_for(resource_id)
+    selected=cfg["candidate_versifications"]
     source_keys,source_meta=source_inventory(original)
     verses,notes,source_check=original_osis_verses_and_notes(original)
     original_structures=authorial_structures(original)
@@ -509,9 +469,9 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
     if (set(verses)!=set(source_keys.splitlines())
             or source_check["publisher_numbered_verse_count"]!=
                source_meta["source_verse_count"]):
-        raise PublisherSWORDResearchError("Independent publisher source inventories differ")
+        raise ApprovedOSISNativeError("Independent publisher source inventories differ")
     results=[]
-    with tempfile.TemporaryDirectory(prefix="bible-official-osis-compile-research-") as root:
+    with tempfile.TemporaryDirectory(prefix="bible-approved-osis-compile-audit-") as root:
         tmp=Path(root)
         sourcefile=tmp/"source-authored-pinned.osis.xml"
         sourcefile.write_bytes(original)
@@ -530,7 +490,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                     original_structures,authored_body,authored_body_counts,
                     authored_boundaries,authored_outside_titles)
                 compared["standard_osis_compiler"]=compilation
-            except (PublisherSWORDResearchError,ValueError,OSError,
+            except (ApprovedOSISNativeError,ValueError,OSError,
                     subprocess.TimeoutExpired) as exc:
                 compared={
                     "candidate_status":"blocked_compilation_or_source_native_evidence",
@@ -544,15 +504,14 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                 compared["compiled_output_metadata"] = compiler_output_metrics(out)
             results.append(compared)
         if sha256(sourcefile.read_bytes()).hexdigest()!=sha256(original).hexdigest():
-            raise PublisherSWORDResearchError("Original publisher XML mutated during compilation")
+            raise ApprovedOSISNativeError("Approved cleaned OSIS mutated during compilation")
     return {
         "schema_version":1,
-        "status":"reviewed_original_standards_sword_compilation_research_only",
+        "status":"approved_cleaned_osis_native_sword_research_only",
         "resource_id":resource_id,
-        "research_source_kind":"approved_cleaned_osis" if approved else "pinned_publisher_original",
+        "research_source_kind":"approved_cleaned_osis",
         "research_source_sha256":sha256(original).hexdigest(),
-        "original_publisher_osis_sha256":sha256(original).hexdigest() if not approved else None,
-        "approved_cleaned_osis_sha256":sha256(original).hexdigest() if approved else None,
+        "approved_cleaned_osis_sha256":sha256(original).hexdigest(),
         "official_source_verse_count":len(verses),
         "official_source_note_count":sum(map(len,notes.values())),
         "candidate_research_results":results,
@@ -570,21 +529,17 @@ def main():
     p.add_argument("--osis2mod",type=Path,required=True)
     p.add_argument("--native-index",type=Path,required=True)
     p.add_argument("--native-raw",type=Path,required=True)
-    p.add_argument("--versification",default=None)
-    p.add_argument("--approved",action="store_true",
-                   help="Use hash-verified approved cleaned OSIS from repository")
     p.add_argument("--report",type=Path,required=True)
     a=p.parse_args()
     if a.report.exists() or a.report.is_symlink() or not a.report.parent.is_dir():
         p.error("Use new metadata report in an existing directory")
     result=probe(a.resource_id,osis2mod=a.osis2mod,index_binary=a.native_index,
-                 raw_binary=a.native_raw,versification=a.versification,
-                 approved=a.approved)
+                 raw_binary=a.native_raw)
     a.report.write_text(json.dumps(result,indent=2,sort_keys=True)+"\n",encoding="utf-8")
-    print("Pinned OSIS to SWORD research executed for",a.resource_id)
+    print("Approved cleaned OSIS to native SWORD audit executed for",a.resource_id)
     for row in result["candidate_research_results"]:
         print(row["candidate_versification"],row["candidate_status"])
-    print("No original OSIS, compiler logs, or unapproved sources persisted")
+    print("No cleaned OSIS copy, compiler logs, or candidate module persisted")
     print("All research module binaries discarded")
     return 0
 

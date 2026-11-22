@@ -5,6 +5,52 @@
       "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
+        "zText",
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/approved_osis_sword_candidate.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Build isolated SWORD research candidates from approved cleaned OSIS masters.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "bible_intake",
+        "collections",
+        "hashlib",
+        "json",
+        "lxml",
+        "os",
+        "pathlib",
+        "re",
+        "research",
+        "source_osis_inventory",
+        "stable_sword_refs",
+        "subprocess",
+        "sword_native_inventory",
+        "tempfile"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "fc86c453f7efcfaab1adc6957777fb0037b1ff78e031e9094ed71a46ed49331e",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 5,
+      "static_references": [
+        ".github/workflows/approved-osis-native-audit.yml",
+        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
+        "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
+        "tests/test_approved_osis_sword_candidate.py",
+        "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
         "OSIS"
       ],
       "has_direct_tests_by_filename": false,
@@ -78,7 +124,7 @@
       "stage_hint": "intake",
       "static_reference_count": 4,
       "static_references": [
-        "scripts/publisher_osis_sword_candidate.py",
+        "scripts/approved_osis_sword_candidate.py",
         "scripts/tool_registry.py",
         ".github/workflows/bible-observe-originals.yml",
         "tests/test_bible_intake.py"
@@ -928,58 +974,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
-        "scripts/publisher_osis_sword_candidate.py",
         ".github/workflows/publisher-osis-observation.yml",
         "tests/test_publisher_osis_observation.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
-        "zText",
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/publisher_osis_sword_candidate.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Build isolated SWORD research candidates from pinned official or approved OSIS.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "bible_intake",
-        "collections",
-        "hashlib",
-        "json",
-        "lxml",
-        "os",
-        "pathlib",
-        "publisher_osis_observation",
-        "re",
-        "research",
-        "source_osis_inventory",
-        "stable_sword_refs",
-        "subprocess",
-        "sword_native_inventory",
-        "tempfile"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "a5c0a3db0a834aaaa2628f11cd2cb6a1c679f0829685e5360817f979ad1f1443",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "publication/release",
-      "static_reference_count": 5,
-      "static_references": [
-        ".github/workflows/publisher-osis-sword-candidate.yml",
-        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
-        "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
-        "tests/test_publisher_osis_sword_candidate.py",
-        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -1122,10 +1120,10 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 5,
       "static_references": [
-        "scripts/publisher_osis_sword_candidate.py",
+        "scripts/approved_osis_sword_candidate.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
+        "tests/test_approved_osis_sword_candidate.py",
         "tests/test_native_milestone_pair_audit.py",
-        "tests/test_publisher_osis_sword_candidate.py",
         "tests/test_source_native_ordered_body.py"
       ]
     },
@@ -1156,8 +1154,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
-        "scripts/publisher_osis_sword_candidate.py",
-        ".github/workflows/publisher-osis-sword-candidate.yml",
+        "scripts/approved_osis_sword_candidate.py",
+        ".github/workflows/approved-osis-native-audit.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "tests/test_native_raw_main_text.py",
         "tests/test_native_sword_markup_census.py",
@@ -1223,7 +1221,7 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/publisher_osis_sword_candidate.py",
+        "scripts/approved_osis_sword_candidate.py",
         "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
         "tests/test_source_native_note_positions.py"
       ]
@@ -1253,7 +1251,7 @@
       "stage_hint": "not determined",
       "static_reference_count": 2,
       "static_references": [
-        "scripts/publisher_osis_sword_candidate.py",
+        "scripts/approved_osis_sword_candidate.py",
         "tests/test_source_native_ordered_body.py"
       ]
     },
@@ -1288,8 +1286,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/publisher_osis_sword_candidate.py",
-        ".github/workflows/publisher-osis-sword-candidate.yml",
+        "scripts/approved_osis_sword_candidate.py",
+        ".github/workflows/approved-osis-native-audit.yml",
         "tests/test_source_native_osis_boundary_positions.py"
       ]
     },
@@ -1320,8 +1318,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
-        "scripts/publisher_osis_sword_candidate.py",
-        ".github/workflows/publisher-osis-sword-candidate.yml",
+        "scripts/approved_osis_sword_candidate.py",
+        ".github/workflows/approved-osis-native-audit.yml",
         "tests/test_source_native_osis_structure_screen.py"
       ]
     },
@@ -1351,8 +1349,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 5,
       "static_references": [
-        "scripts/publisher_osis_sword_candidate.py",
-        ".github/workflows/publisher-osis-sword-candidate.yml",
+        "scripts/approved_osis_sword_candidate.py",
+        ".github/workflows/approved-osis-native-audit.yml",
         "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
         "tests/test_source_native_osis_target_addressability.py",
         "tests/test_tool_registry.py"
@@ -1386,8 +1384,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 5,
       "static_references": [
-        "scripts/publisher_osis_sword_candidate.py",
-        ".github/workflows/publisher-osis-sword-candidate.yml",
+        "scripts/approved_osis_sword_candidate.py",
+        ".github/workflows/approved-osis-native-audit.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
         "tests/test_source_osis_verse_notes.py"
@@ -1595,8 +1593,8 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 9,
       "static_references": [
+        "scripts/approved_osis_sword_candidate.py",
         "scripts/osis_semantic_fidelity.py",
-        "scripts/publisher_osis_sword_candidate.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
         "scripts/research/bible/source_native_osis_structure_screen.py",
         "scripts/research/bible/source_osis_verse_notes.py",
@@ -1636,8 +1634,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 18,
       "static_references": [
+        "scripts/approved_osis_sword_candidate.py",
         "scripts/published_reference_audit.py",
-        "scripts/publisher_osis_sword_candidate.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
         "scripts/research/bible/source_native_note_positions.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
@@ -1738,7 +1736,7 @@
       "static_references": [
         "scripts/sword_native_inventory.py",
         "scripts/tool_registry.py",
-        ".github/workflows/publisher-osis-sword-candidate.yml",
+        ".github/workflows/approved-osis-native-audit.yml",
         ".github/workflows/validate.yml",
         "docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md",
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
@@ -1780,7 +1778,7 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 10,
       "static_references": [
-        "scripts/publisher_osis_sword_candidate.py",
+        "scripts/approved_osis_sword_candidate.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
         "scripts/research/bible/native_sword_markup_census.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
@@ -1814,7 +1812,7 @@
       "stage_hint": "not determined",
       "static_reference_count": 4,
       "static_references": [
-        ".github/workflows/publisher-osis-sword-candidate.yml",
+        ".github/workflows/approved-osis-native-audit.yml",
         ".github/workflows/validate.yml",
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md"

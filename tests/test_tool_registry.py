@@ -121,9 +121,9 @@ class ScriptInventoryTests(unittest.TestCase):
         entries = {row["path"]: row for row in self.result["files"]}
         for stem, caller in (
             ("source_native_osis_target_addressability",
-             "scripts/publisher_osis_sword_candidate.py"),
+             "scripts/approved_osis_sword_candidate.py"),
             ("source_native_osis_structure_screen",
-             "scripts/publisher_osis_sword_candidate.py"),
+             "scripts/approved_osis_sword_candidate.py"),
         ):
             with self.subTest(helper=stem):
                 relocated = "scripts/research/bible/" + stem + ".py"
@@ -139,7 +139,7 @@ class ScriptInventoryTests(unittest.TestCase):
         expected = "scripts/research/bible/" + stem + ".py"
         self.assertIn(expected, entries)
         self.assertNotIn("scripts/" + stem + ".py", entries)
-        self.assertIn("scripts/publisher_osis_sword_candidate.py",
+        self.assertIn("scripts/approved_osis_sword_candidate.py",
                       entries[expected]["static_references"])
         self.assertIn("tests/test_" + stem + ".py",
                       entries[expected]["static_references"])
@@ -151,7 +151,7 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertIn(shared, entries)
         refs = entries[shared]["static_references"]
         for p in (
-            "scripts/publisher_osis_sword_candidate.py",
+            "scripts/approved_osis_sword_candidate.py",
             "tests/test_native_raw_main_text.py",
         ):
             with self.subTest(caller=p):
@@ -187,19 +187,19 @@ class ScriptInventoryTests(unittest.TestCase):
         entries = {row["path"]: row for row in self.result["files"]}
         helpers = {
             "native_milestone_pair_audit": (
-                "scripts/publisher_osis_sword_candidate.py",
+                "scripts/approved_osis_sword_candidate.py",
                 "tests/test_native_milestone_pair_audit.py"),
             "native_sword_markup_census": (
                 "scripts/research/bible/native_raw_main_text.py",
                 "tests/test_native_sword_markup_census.py"),
             "source_native_ordered_body": (
-                "scripts/publisher_osis_sword_candidate.py",
+                "scripts/approved_osis_sword_candidate.py",
                 "tests/test_source_native_ordered_body.py"),
             "source_native_note_positions": (
-                "scripts/publisher_osis_sword_candidate.py",
+                "scripts/approved_osis_sword_candidate.py",
                 "tests/test_source_native_note_positions.py"),
             "source_osis_verse_notes": (
-                "scripts/publisher_osis_sword_candidate.py",
+                "scripts/approved_osis_sword_candidate.py",
                 "tests/test_source_osis_verse_notes.py"),
         }
         for stem, callers in helpers.items():
@@ -249,6 +249,27 @@ class ScriptInventoryTests(unittest.TestCase):
             "scripts/research/bible/source_native_osis_target_addressability.py",
             current,
         )
+
+    def test_approved_osis_native_audit_has_no_publisher_original_rebuild_path(self):
+        """Preserve native corpus checks without a second source/import pipeline."""
+        current = {row["path"] for row in self.result["files"]}
+        self.assertIn("scripts/approved_osis_sword_candidate.py", current)
+        self.assertNotIn("scripts/publisher_osis_sword_candidate.py", current)
+        self.assertTrue(
+            (ROOT / ".github/workflows/approved-osis-native-audit.yml").is_file()
+        )
+        self.assertFalse(
+            (ROOT / ".github/workflows/publisher-osis-sword-candidate.yml").exists()
+        )
+        self.assertFalse(
+            (ROOT / "config/publisher-sword-research/frajnd-2024.json").exists()
+        )
+        source = (ROOT / "scripts/approved_osis_sword_candidate.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("approved_source_for(resource_id)", source)
+        self.assertNotIn("read_pinned_publisher_osis", source)
+        self.assertNotIn("config_for(resource_id)", source)
 
     def test_completed_hmcc_modern_staging_is_not_an_active_publisher(self):
         """Version-pinned first-release bootstraps belong to Git history only."""

@@ -1,4 +1,4 @@
-"""Synthetic safety tests for disposable official OSIS SWORD research builds."""
+"""Synthetic safety tests for native SWORD audits from approved cleaned OSIS."""
 import os
 from pathlib import Path
 import json
@@ -9,32 +9,19 @@ import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from research.bible.native_milestone_pair_audit import NativeMilestonePairAudit
-from publisher_osis_sword_candidate import (
-    PublisherSWORDResearchError, _create_candidate_layout, _native_notes,
-    _read_native_frames, _compile_osis, config_for, safe_failure_code,
+from approved_osis_sword_candidate import (
+    ApprovedOSISNativeError, _create_candidate_layout, _native_notes,
+    _read_native_frames, _compile_osis, safe_failure_code,
     compiler_output_metrics,
-    select_candidate_versifications, approved_source_for,
+    approved_source_for,
 )
 
 
-class PublisherSwordProbeTests(unittest.TestCase):
-    def test_reviewed_candidate_does_not_assume_one_versification(self):
-        cfg=config_for("frajnd-2024")
-        self.assertEqual(cfg["purpose"],"research_only")
-        self.assertEqual(cfg["candidate_module_id"],"JND2024Research")
-        self.assertEqual(cfg["candidate_versifications"],["DarbyFr","Luther"])
-        for value in ("../evil","", "SECRET/private"):
-            with self.assertRaises(PublisherSWORDResearchError):
-                config_for(value)
-
-    def test_explicit_one_scheme_limits_work_without_source_download(self):
-        cfg=config_for("frajnd-2024")
-        self.assertEqual(select_candidate_versifications(cfg,"Luther"),["Luther"])
-        self.assertEqual(select_candidate_versifications(cfg,"DarbyFr"),["DarbyFr"])
-        self.assertEqual(select_candidate_versifications(cfg,None),["DarbyFr","Luther"])
-        for invalid in ("KJV","../evil","","DarbyFr/evil"):
-            with self.assertRaises(PublisherSWORDResearchError):
-                select_candidate_versifications(cfg,invalid)
+class ApprovedSourceNativeAuditTests(unittest.TestCase):
+    def test_unreviewed_or_missing_approved_modules_are_rejected(self):
+        for value in ("../evil", "", "frajnd-2024", "SECRET/private"):
+            with self.assertRaises(ApprovedOSISNativeError):
+                approved_source_for(value)
 
     def test_approved_cleaned_osis_uses_exact_published_source_pins(self):
         for name, scheme in (("darby-jnd-2024", "Luther"),
@@ -75,33 +62,33 @@ class PublisherSwordProbeTests(unittest.TestCase):
             self.assertEqual(cfg["language"], "en")
             self.assertEqual(cfg["candidate_versifications"], ["KJV"])
             xml.write_bytes(raw + b"changed")
-            with self.assertRaises(PublisherSWORDResearchError):
+            with self.assertRaises(ApprovedOSISNativeError):
                 approved_source_for("fixture", root=root)
             xml.write_bytes(raw)
             manifest["cleaned_source_sha256"] = "0" * 64
             (cleaned / "CLEANUP_MANIFEST.json").write_text(json.dumps(manifest))
-            with self.assertRaises(PublisherSWORDResearchError):
+            with self.assertRaises(ApprovedOSISNativeError):
                 approved_source_for("fixture", root=root)
             manifest["cleaned_source_sha256"] = digest
             (cleaned / "CLEANUP_MANIFEST.json").write_text(json.dumps(manifest))
             meta["quality"]["status"] = "pending"
             (module / "metadata.json").write_text(json.dumps(meta))
-            with self.assertRaises(PublisherSWORDResearchError):
+            with self.assertRaises(ApprovedOSISNativeError):
                 approved_source_for("fixture", root=root)
 
     def test_layout_is_separate_nonpublishing_standard_sword(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder)
             payload,out=_create_candidate_layout(
-                root/"build","JND2024Research","Luther")
-            conf=(payload/"mods.d/jnd2024research.conf").read_text()
+                root/"build","TestAuditResearch","Luther")
+            conf=(payload/"mods.d/testauditresearch.conf").read_text()
             self.assertIn("ModDrv=zText",conf)
             self.assertIn("BlockType=BOOK",conf)
             self.assertIn("CompressType=ZIP",conf)
             self.assertIn("Versification=Luther",conf)
             self.assertIn("SourceType=OSIS",conf)
             self.assertTrue(out.is_dir())
-            with self.assertRaises(PublisherSWORDResearchError):
+            with self.assertRaises(ApprovedOSISNativeError):
                 _create_candidate_layout(root/"bad","../Private","Luther")
 
     def test_raw_footnote_n_preserved_as_source_value_in_private_memory(self):
@@ -140,16 +127,16 @@ class PublisherSwordProbeTests(unittest.TestCase):
                 'import sys\n'
                 'sys.stdout.buffer.write(b"K\\tGen.1.1\\t8\\nshort")\n')
             stub.chmod(0o755)
-            with self.assertRaises(PublisherSWORDResearchError):
+            with self.assertRaises(ApprovedOSISNativeError):
                 list(_read_native_frames(stub,"Fake",root))
 
     def test_safe_failure_codes_do_not_expose_private_exception_content(self):
-        self.assertEqual(safe_failure_code(PublisherSWORDResearchError(
+        self.assertEqual(safe_failure_code(ApprovedOSISNativeError(
             "OSIS tool returned nonzero exit status 1")), "compiler_nonzero_exit")
-        self.assertEqual(safe_failure_code(PublisherSWORDResearchError(
+        self.assertEqual(safe_failure_code(ApprovedOSISNativeError(
             "Stock SWORD module contains no populated Bible verses")),
             "native_zero_populated_verses")
-        self.assertEqual(safe_failure_code(PublisherSWORDResearchError(
+        self.assertEqual(safe_failure_code(ApprovedOSISNativeError(
             "Official OSIS compiler exceeded bounded timeout")),
             "compiler_bounded_timeout")
         self.assertEqual(safe_failure_code(ValueError(
