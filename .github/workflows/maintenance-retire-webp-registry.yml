@@ -1,0 +1,29 @@
+name: One-shot refresh tooling registry after removing WEBP-only probe
+on:
+  push:
+    branches:
+      - maintenance/retire-webp-private-probe-20261122
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Regenerate metadata-only registry and remove this one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/tool_registry.py --write
+          git rm .github/workflows/maintenance-retire-webp-registry.yml
+          git add reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          python scripts/tool_registry.py --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: refresh registry after retiring WEBP-only proof"
+          git push
