@@ -1,104 +1,20 @@
-#!/usr/bin/env python3
-"""Verify the ordered *kind* of authored USFX vs native SWORD body openings.
+"""Compare already inventoried OSIS/native paragraph and poetry opening events.
 
-This is deliberately narrower than source↔compiled exact layout equivalence:
-a matching p/q order and count does NOT prove matching word positions,
-start/end spans, source styles, poetry line breaks, or typography.
-No Scripture/title/note content or raw native XML is returned.
+The originating OSIS structural census and independent native markup
+readback are performed by their own strict readers. This helper compares
+only event *kinds and order*, never infers missing source boundaries,
+authors' typography, or publication approval.
 """
 from __future__ import annotations
 
 from collections import Counter
 from hashlib import sha256
-from lxml import etree
-
-from research.bible.source_usfx_structure import audit_source_usfx
-from research.bible.source_native_paragraph_counts import (
-    IGNORE_CONTAINER, classify_prefatory_p_sfm,
-)
 
 MAX_SAMPLES = 24
 
 
 class OrderedStructureError(ValueError):
-    """Ambiguous source, mapping or compiled event scope cannot be accepted."""
-
-
-def _within_annotation(node, book):
-    parent = node.getparent()
-    while parent is not None and parent is not book:
-        if isinstance(parent.tag, str) and etree.QName(parent).localname in IGNORE_CONTAINER:
-            return True
-        parent = parent.getparent()
-    return False
-
-
-def original_body_opening_sequences(xml: bytes, mapping: list[tuple[str, str]]):
-    """Private per-book (p/q, source-prior-ref) events, source metadata only."""
-    proof = audit_source_usfx(xml)
-    if proof["source_structural_issues"]:
-        raise OrderedStructureError("Unresolved original source structural anomalies")
-    pairs = dict(mapping)
-    if (not mapping or len(pairs) != len(mapping)
-            or len(set(pairs.values())) != len(mapping)):
-        raise OrderedStructureError("Ambiguous original/native book crosswalk")
-    parser = etree.XMLParser(resolve_entities=False, load_dtd=False,
-                             no_network=True, recover=False, huge_tree=False)
-    try:
-        root = etree.fromstring(xml, parser)
-    except (etree.XMLSyntaxError, ValueError) as exc:
-        raise OrderedStructureError("Original source cannot be parsed for order") from exc
-
-    private = {}
-    counts = Counter()
-    seen = set()
-    for book in root.iter("book"):
-        authorial = book.get("id")
-        if not authorial or authorial in seen:
-            raise OrderedStructureError("Ambiguous original book identity")
-        seen.add(authorial)
-        if authorial not in pairs:
-            raise OrderedStructureError("Unmapped original authorial book")
-        native = pairs[authorial]
-        events = []
-        chapter = None
-        last_verse = None
-        for node in book.iter():
-            if not isinstance(node.tag, str):
-                continue
-            tag = etree.QName(node).localname
-            if tag == "c":
-                chapter = node.get("id")
-                last_verse = None
-                continue
-            if tag == "v":
-                last_verse = node.get("id")
-                continue
-            if tag not in {"p", "q"}:
-                continue
-            if _within_annotation(node, book):
-                counts["source_p_or_q_nested_in_notes_excluded"] += 1
-                continue
-            if tag == "p" and chapter is None:
-                family, _code = classify_prefatory_p_sfm(node.get("sfm"))
-                if family == "book_title_style":
-                    # Independently accounted for by the authorial prefatory
-                    # SFM/title+native book title audit, not discarded.
-                    counts["authored_pre_chapter_book_titles_separately_verified"] += 1
-                    continue
-                counts["non_title_p_before_first_chapter_requires_review"] += 1
-            if tag == "q" and chapter is None:
-                counts["source_poetry_before_first_chapter_requires_review"] += 1
-            ref = (f"{native}.{chapter}.{last_verse}"
-                   if chapter is not None and last_verse is not None
-                   else f"{native}.{chapter or 0}.0")
-            events.append((tag, ref))
-            counts[f"source_body_{tag}_openings"] += 1
-        private[native] = events
-
-    if seen != set(pairs) or len(seen) != proof["source_book_count"]:
-        raise OrderedStructureError("Book inventory differs from the original source")
-    return private, dict(sorted(counts.items()))
+    """Ambiguous source/native event scope must not be accepted."""
 
 
 def compare_ordered_body_openings(source_by_book, native_by_book, source_counts):
@@ -168,7 +84,7 @@ def compare_ordered_body_openings(source_by_book, native_by_book, source_counts)
             and counts["books_with_body_opening_kind_difference"] == 0
         ),
         "first_mismatch_book_references_no_scripture":examples,
-        "explicit_prechapter_book_title_styles_separately_accounted_for":True,
+        "explicit_prechapter_book_title_styles_separately_accounted_for":False,
         "original_to_native_book_title_match_not_verified_by_this_screen":True,
         "source_native_exact_word_positions_or_boundary_spans_verified":False,
         "source_native_whitespace_or_full_editorial_layout_verified":False,

@@ -363,12 +363,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 11,
+      "static_reference_count": 10,
       "static_references": [
         "scripts/commentary_intake.py",
         "scripts/diff_sword_snapshots.py",
         "scripts/pilot_preflight.py",
-        "scripts/research/bible/private_sword_install.py",
         "scripts/select_sources.py",
         ".github/workflows/upstream-check.yml",
         "docs/technical/SOURCE_INVENTORY.md",
@@ -1332,12 +1331,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 2,
       "static_references": [
-        "scripts/research/bible/private_sword_install.py",
         ".github/workflows/validate.yml",
-        "tests/test_diff_sword_snapshots.py",
-        "tests/test_private_sword_install.py"
+        "tests/test_diff_sword_snapshots.py"
       ]
     },
     {
@@ -1449,7 +1446,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 15,
+      "static_reference_count": 16,
       "static_references": [
         "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
         "scripts/audit_osis.py",
@@ -1461,6 +1458,7 @@
         ".github/workflows/darby-link-repair-research.yml",
         ".github/workflows/osis-schema-review.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
+        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
         "tests/test_commentary_gate.py",
         "tests/test_editorial_pipeline.py",
@@ -2238,11 +2236,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
         "scripts/audit_omitted_verse_notes.py",
         ".github/workflows/publisher-osis-sword-candidate.yml",
+        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "tests/test_publisher_osis_sword_candidate.py",
         "tests/test_tool_registry.py"
@@ -2816,39 +2815,6 @@
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
-        "RawText",
-        "zText"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/research/bible/private_sword_install.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Safely install one vetted stock SWORD Bible ZIP into an isolated research root.",
-      "python_imports": [
-        "__future__",
-        "check_updates",
-        "diff_sword_snapshots",
-        "hashlib",
-        "pathlib",
-        "stable_sword_refs",
-        "zipfile"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "9b7c654a93e842bf82ba71a036145de2956e4fc50c76b7a918f209ab1ab486d3",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 1,
-      "static_references": [
-        "tests/test_private_sword_install.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
         "USFX"
       ],
       "has_direct_tests_by_filename": true,
@@ -2882,23 +2848,21 @@
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
-        "USFX"
+        "OSIS"
       ],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/research/bible/source_native_ordered_body.py",
       "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Verify the ordered *kind* of authored USFX vs native SWORD body openings.",
+      "purpose_first_line": "Compare already inventoried OSIS/native paragraph and poetry opening events.",
       "python_imports": [
         "__future__",
         "collections",
-        "hashlib",
-        "lxml",
-        "research"
+        "hashlib"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "c6c8ef81066f026089bc87e9c990097f1bc6dc0abca2975aaacf685b0c5b12bf",
+      "sha256_at_inventory": "3876ed63ea35263bd97bfa9128fc9c7e278d34372d8aedac8f2d1830cb559f40",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -3018,40 +2982,6 @@
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
-        "USFM",
-        "USFX"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/research/bible/source_native_paragraph_counts.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Compare original USFX <p> inventory with *typed* native SWORD x-p pairs.",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "hashlib",
-        "json",
-        "lxml",
-        "re",
-        "research"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "9b715413c02c446500ff76c635f921cdbe5b478ea9dec5e0e6028f451d4c6b80",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        "scripts/research/bible/source_native_ordered_body.py",
-        "tests/test_source_native_paragraph_counts.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
         "OSIS"
       ],
       "has_direct_tests_by_filename": true,
@@ -3093,39 +3023,6 @@
         "tests/test_repair_osis_division_markers.py",
         "tests/test_repair_osis_paragraph_indentation.py",
         "tests/test_source_osis_verse_notes.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "USFX"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/research/bible/source_usfx_structure.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Strict, read-only inventory of original USFX structural events (no Scripture).",
-      "python_imports": [
-        "__future__",
-        "collections",
-        "hashlib",
-        "json",
-        "lxml",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "2850753dd3132bdff67cdd4857b94347e950e822ddf76c64d38627179dfacf4a",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 3,
-      "static_references": [
-        "scripts/research/bible/source_native_ordered_body.py",
-        "scripts/research/bible/source_native_paragraph_counts.py",
-        "tests/test_source_usfx_structure.py"
       ]
     },
     {
@@ -4161,44 +4058,6 @@
       "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
-        "RawText",
-        "zText",
-        "OSIS",
-        "USFM",
-        "USFX"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/source_native_index_audit.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Read-only, edition-neutral source OSIS -> actual stock SWORD index audit.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "hashlib",
-        "json",
-        "pathlib",
-        "source_osis_inventory",
-        "stable_sword_refs",
-        "sword_native_inventory"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "7cab09cb3cde96919849e4f54f7bf040569a4d7dfb4cdcfb2210136c3208b560",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 2,
-      "static_references": [
-        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
-        "tests/test_source_native_index_audit.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [
         "OSIS",
         "USFM",
         "USFX"
@@ -4226,7 +4085,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 27,
+      "static_reference_count": 26,
       "static_references": [
         "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py",
         "scripts/audit_omitted_verse_notes.py",
@@ -4243,7 +4102,6 @@
         "scripts/research/bible/source_native_osis_structure_screen.py",
         "scripts/research/bible/source_osis_verse_notes.py",
         "scripts/source_native_division_markers.py",
-        "scripts/source_native_index_audit.py",
         "scripts/source_osis_note_markup_shape.py",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "docs/technical/SOURCE_OSIS_INVENTORY.md",
@@ -4357,20 +4215,18 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 25,
+      "static_reference_count": 21,
       "static_references": [
         "scripts/inspect_paragraph_rendering.py",
         "scripts/published_reference_audit.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
-        "scripts/research/bible/private_sword_install.py",
         "scripts/research/bible/source_native_note_positions.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
         "scripts/research/bible/source_native_osis_structure_screen.py",
         "scripts/research/bible/source_native_osis_target_addressability.py",
         "scripts/research/bible/source_osis_verse_notes.py",
         "scripts/source_native_division_markers.py",
-        "scripts/source_native_index_audit.py",
         "scripts/source_osis_inventory.py",
         "scripts/source_osis_note_link_triage.py",
         "scripts/sword_native_inventory.py",
@@ -4378,9 +4234,7 @@
         "scripts/validate.py",
         ".github/workflows/validate.yml",
         "docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md",
-        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
-        "tests/test_source_native_index_audit.py",
         "tests/test_source_osis_inventory.py",
         "tests/test_stable_sword_refs.py",
         "tests/test_stable_sword_reviewed_merges.py"
@@ -4520,14 +4374,13 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 12,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/publisher_osis_preview_readback.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
         "scripts/research/bible/native_sword_markup_census.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
-        "scripts/source_native_index_audit.py",
         "scripts/sword_native_raw_corpus_inventory.py",
         "scripts/tool_registry.py",
         ".github/workflows/validate.yml",
