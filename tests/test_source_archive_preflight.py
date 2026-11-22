@@ -59,7 +59,7 @@ class SourceArchivePreflightTests(unittest.TestCase):
         # A ZIP with a valid commentary .conf but no commentary content.
         with zipfile.ZipFile(path, "w") as archive:
             archive.writestr("mods.d/syntheticcom.conf",
-                             "[SyntheticCom]\\nModDrv=zCom4\\nLang=en\\n")
+                             "[SyntheticCom]\nModDrv=zCom4\nLang=en\n")
             archive.writestr("modules/texts/ztext/synthetic/ot.bdt", b"not commentary")
         with self.assertRaisesRegex(PilotError, "no modules/comments/"):
             inspect_archive(path, source_kind="sword",
@@ -70,7 +70,7 @@ class SourceArchivePreflightTests(unittest.TestCase):
         path = self.root / "placeholder.zip"
         with zipfile.ZipFile(path, "w") as archive:
             archive.writestr("mods.d/syntheticbible.conf",
-                             "[SyntheticBible]\\nModDrv=zText\\nLang=en\\n")
+                             "[SyntheticBible]\nModDrv=zText\nLang=en\n")
             archive.writestr("modules/README.txt", "not an indexed SWORD payload")
         with self.assertRaisesRegex(PilotError, "no modules/texts/"):
             inspect_archive(path, source_kind="sword",
