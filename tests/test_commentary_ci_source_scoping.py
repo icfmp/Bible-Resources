@@ -1,4 +1,4 @@
-"""Assert that active intake workflows are source-scoped after stock research retirement."""
+"""Guard source-scoped commentary intake and native audit workflows."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,23 +6,6 @@ import re
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-
-RETIRED_STOCK_WORKFLOWS = (
-    "commentary-zcom-private-candidate.yml",
-    "commentary-evidence.yml",
-    "commentary-xml-witness.yml",
-    "commentary-anchor-parity.yml",
-    "commentary-private-text-compare.yml",
-    "commentary-xiphos-dual-reader.yml",
-    "stage-stock-commentary.yml",
-    "commentary-mhc-ccel-private-rebuild.yml",
-    "commentary-mhc-private-jsword.yml",
-    "commentary-mhc-private-xiphos.yml",
-    "commentary-mhc-source-text.yml",
-    "commentary-mhc-technical-rebuild.yml",
-    "commentary-modern-source-receipt.yml",
-)
-
 
 def _pr_paths(workflow: str) -> tuple[str, ...]:
     path = ROOT / ".github" / "workflows" / workflow
@@ -48,28 +31,34 @@ def _pr_paths(workflow: str) -> tuple[str, ...]:
 
 
 class ActiveCommentaryCIContract(unittest.TestCase):
-    def test_superseded_original_mhcc_stock_workflows_stay_retired(self):
-        for workflow in RETIRED_STOCK_WORKFLOWS:
+    def test_active_intake_and_raw_workflows_only_select_changed_registered_sources(self):
+        """PRs unrelated to reviewed source manifests must not probe stock ZIPs."""
+        for workflow, job in (
+            ("commentary-intake.yml", "intake"),
+            ("commentary-native-raw-corpus.yml", "full_stock_commentary_raw"),
+        ):
             with self.subTest(workflow=workflow):
-                self.assertFalse(
-                    (ROOT / ".github/workflows" / workflow).exists(),
-                    "The OSIS-first process must not silently revive stock-only research",
+                paths = _pr_paths(workflow)
+                self.assertIn("config/commentary-intake/**", paths)
+                yaml = (ROOT / ".github/workflows" / workflow).read_text(
+                    encoding="utf-8")
+                self.assertIn("Select exactly the modified commentary manifests", yaml)
+                self.assertIn(
+                    "resources = sorted(set(registered[path] for path in changed if path in registered))",
+                    yaml,
                 )
+                self.assertIn("if path in registered", yaml)
+                self.assertIn('if data.get("category") == "commentary"', yaml)
+                self.assertIn("has_resources=", yaml)
+                self.assertIn("fromJSON(needs.select-source.outputs.resources)", yaml)
+                self.assertIn(
+                    f"{job}:\\n    needs: select-source\\n"
+                    "    if: ${{ needs.select-source.outputs.has_resources == 'true' }}".replace(
+                        "\\${", "${"),
+                    yaml,
+                )
+                self.assertNotIn('resources = ["mhcc-crosswire"]', yaml)
 
-    def test_current_source_neutral_intake_selects_modified_manifest(self):
-        workflow = "commentary-intake.yml"
-        paths = _pr_paths(workflow)
-        self.assertIn("config/commentary-intake/**", paths)
-        yaml = (ROOT / ".github/workflows" / workflow).read_text(
-            encoding="utf-8")
-        self.assertIn("Select exactly the modified commentary manifests", yaml)
-        self.assertIn("fromJSON(needs.select-source.outputs.resources)", yaml)
-        self.assertIn("has_resources=", yaml)
-        self.assertIn(
-            "if: ${{ needs.select-source.outputs.has_resources == 'true' }}", yaml
-        )
-        self.assertNotIn('resources = ["mhcc-crosswire"]', yaml)
-        self.assertIn("Library-only changes must not select", yaml)
 
 
 if __name__ == "__main__":
