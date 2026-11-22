@@ -15,7 +15,7 @@ import re
 
 from lxml import etree
 
-from publisher_osis_usfx_parity import original_osis_verses_and_notes
+from research.bible.source_osis_verse_notes import original_osis_verses_and_notes
 from source_osis_inventory import OSIS, _source_tree, source_inventory
 from research.bible.source_native_osis_target_addressability import _classify_one
 
