@@ -31,7 +31,14 @@ permissions:
 
 jobs:
   original-sword-probe:
-    if: ${{ github.event_name != 'issue_comment' || (github.event.issue.pull_request == null && github.event.comment.author_association == 'OWNER' && startsWith(github.event.issue.title, '[Import]') && startsWith(github.event.comment.body, '/bible-osis-candidate ')) }}
+    if: >-
+      ${{ github.event_name != 'issue_comment' ||
+          (github.event.issue.pull_request == null &&
+           github.event.comment.author_association == 'OWNER' &&
+           ((startsWith(github.event.issue.title, '[Import]') &&
+             startsWith(github.event.comment.body, '/bible-osis-candidate ')) ||
+            (github.event.issue.number == 430 &&
+             startsWith(github.event.comment.body, '/bible-osis-approved ')))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 32
     permissions:
@@ -40,6 +47,7 @@ jobs:
     env:
       RESOURCE_ID: ${{ inputs.resource_id || 'frajnd-2024' }}
       CANDIDATE_V11N: ""
+      CANDIDATE_APPROVED: "false"
       REPORT: /tmp/bible-source-rebuild-probe/candidate-report.json
     steps:
       - uses: actions/checkout@v4
@@ -65,15 +73,19 @@ jobs:
         run: |
           python - <<'PY'
           import os, re
-          match = re.fullmatch(
+          command = os.environ["COMMAND"]
+          approved = re.fullmatch(
+              r"/bible-osis-approved ([a-z0-9][a-z0-9-]{1,48})", command)
+          legacy = re.fullmatch(
               r"/bible-osis-candidate ([a-z0-9][a-z0-9-]{1,48})(?: ([A-Za-z][A-Za-z0-9]{1,31}))?",
-              os.environ["COMMAND"])
-          if not match:
-              raise SystemExit("Invalid research command")
+              command)
+          if not approved and not legacy:
+              raise SystemExit("Invalid source/native research command")
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as out:
-              out.write("RESOURCE_ID="+match.group(1)+"\n")
-              out.write("CANDIDATE_V11N="+(match.group(2) or "")+"\n")
-          print("Authorized private compiler research:", match.group(1))
+              out.write("RESOURCE_ID="+(approved or legacy).group(1)+"\\n")
+              out.write("CANDIDATE_V11N="+((legacy.group(2) or "") if legacy else "")+"\\n")
+              out.write("CANDIDATE_APPROVED="+("true" if approved else "false")+"\\n")
+          print("Authorized private source/native research:", (approved or legacy).group(1))
           PY
       - name: Install standard SWORD compiler and independent native inspectors
         if: github.event_name != 'pull_request'
@@ -101,7 +113,7 @@ jobs:
           if [[ -n "${CANDIDATE_V11N:-}" ]]; then
             args+=(--versification "$CANDIDATE_V11N")
           fi
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${CANDIDATE_APPROVED:-false}" == "true" ]]; then
             args+=(--approved)
           fi
           python scripts/publisher_osis_sword_candidate.py "${args[@]}"
@@ -123,7 +135,7 @@ jobs:
             const fs=require('fs');
             const data=JSON.parse(fs.readFileSync(process.env.REPORT,'utf8'));
             const lines=[
-              "### Official publisher OSIS → standard native SWORD research — NOT RELEASED",
+              "### Pinned OSIS → standard native SWORD research — NOT RELEASED",
               `Compiler: standard installed osis2mod`,
               `Resource: \`${data.resource_id}\``,
               `Original SHA-256: \`${data.original_publisher_osis_sha256}\``,
