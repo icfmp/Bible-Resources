@@ -15,12 +15,34 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from reviewed_compiled_commentary_rebuild import reviewed_rebuilt_commentary_errors
-from reviewed_compiled_commentary_rebuild import zcom_member_suffixes
+from reviewed_compiled_commentary_rebuild import zcom_member_suffixes, zcom_payload_paths
 from jsonschema import Draft202012Validator
 
 
 def digest(data: bytes) -> str:
     return sha256(data).hexdigest()
+
+
+class NativeZcomPayloadPathTests(unittest.TestCase):
+    def test_native_compression_modes_use_exact_seven_safe_paths(self):
+        for mode, infix in (("BOOK", "bz"), ("CHAPTER", "cz"), ("VERSE", "vz")):
+            with self.subTest(mode=mode):
+                paths = zcom_payload_paths("Review2026", mode)
+                self.assertEqual(len(paths), 7)
+                self.assertIn("mods.d/review2026.conf", paths)
+                self.assertEqual(
+                    paths - {"mods.d/review2026.conf"},
+                    {"modules/comments/zcom/review2026/" + part + "." + infix + suffix
+                     for part in ("nt", "ot") for suffix in ("s", "v", "z")},
+                )
+
+    def test_module_path_or_unknown_block_mode_is_rejected(self):
+        for bad in ("../outside", "/absolute", "", "with-hyphen", "ab/../../x"):
+            with self.subTest(module=bad), self.assertRaises(ValueError):
+                zcom_payload_paths(bad, "CHAPTER")
+        for bad in ("", "chapter", "OTHER", None):
+            with self.subTest(mode=bad), self.assertRaises(ValueError):
+                zcom_payload_paths("Review2026", bad)
 
 
 class RebuiltCommentaryContractTests(unittest.TestCase):

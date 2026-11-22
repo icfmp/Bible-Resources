@@ -36,6 +36,29 @@ class ModernCommentaryReleaseContract(unittest.TestCase):
             self.assertTrue(failures)
             self.assertIn("SHA256 differs", failures[0])
 
+    def test_extra_payload_member_fails_even_when_hashes_match(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "hmcc-modern"
+            shutil.copytree(self.module, target)
+            extra = target / "payload/modules/comments/zcom/hmccmodern/nt.unknown"
+            extra.write_bytes(b"unreviewed bytes")
+            failures = reviewed_modern_commentary_errors(
+                target, ROOT, self.metadata, self.conf)
+            self.assertTrue(failures)
+            self.assertIn("inventory", failures[0].lower())
+
+    def test_unapproved_module_path_and_driver_cannot_pass(self):
+        revised = json.loads(json.dumps(self.metadata))
+        revised["sword_id"] = "../escape"
+        failures = reviewed_modern_commentary_errors(
+            self.module, ROOT, revised, self.conf)
+        self.assertTrue(failures)
+        modified = dict(self.conf, BlockType="BOOK")
+        failures = reviewed_modern_commentary_errors(
+            self.module, ROOT, self.metadata, modified)
+        self.assertTrue(failures)
+        self.assertIn("metadata", failures[0].lower())
+
     def test_false_owner_authorization_fails(self):
         revised = json.loads(json.dumps(self.metadata))
         revised["rights"]["redistribution_allowed"] = False
