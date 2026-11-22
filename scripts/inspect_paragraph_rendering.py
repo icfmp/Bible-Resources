@@ -18,7 +18,7 @@ import subprocess
 from lxml import etree
 from publisher_osis_observation import read_pinned_publisher_osis
 from publisher_osis_usfx_parity import original_osis_verses_and_notes, _nonspace
-from source_native_maintext_probe import native_raw_main_text
+from research.bible.native_raw_main_text import native_raw_main_text
 from source_osis_inventory import _source_tree, OSIS
 from stable_sword_refs import KEY
 

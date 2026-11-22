@@ -1,0 +1,27 @@
+name: One-shot native main text reader registry refresh
+on:
+  push:
+    branches:
+      - maintenance/extract-native-sword-maintext-reader-20261122
+permissions:
+  contents: write
+jobs:
+  registry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh metadata-only inventory and remove one-shot job
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/maintenance-native-maintext-registry-once.yml
+          python scripts/tool_registry.py --write
+          git add -f reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          python scripts/tool_registry.py --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: refresh native main text reader inventory"
+          git push
