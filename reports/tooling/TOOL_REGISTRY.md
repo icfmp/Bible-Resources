@@ -32,7 +32,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/catalogue_profiles.py`](../../scripts/catalogue_profiles.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/catalogue_release_coverage.py`](../../scripts/catalogue_release_coverage.py) | KEEP_GENERIC | named test | 8 | publication/release |
 | [`scripts/check_provider_parity.py`](../../scripts/check_provider_parity.py) | UNDECIDED | not established | 3 | not determined |
-| [`scripts/check_updates.py`](../../scripts/check_updates.py) | UNDECIDED | not established | 10 | not determined |
+| [`scripts/check_updates.py`](../../scripts/check_updates.py) | UNDECIDED | not established | 9 | not determined |
 | [`scripts/commentary_intake.py`](../../scripts/commentary_intake.py) | KEEP_GENERIC | named test | 6 | intake |
 | [`scripts/commentary_native_inventory.py`](../../scripts/commentary_native_inventory.py) | KEEP_GENERIC | not established | 4 | source/native audit |
 | [`scripts/commentary_native_raw_inventory.py`](../../scripts/commentary_native_raw_inventory.py) | KEEP_GENERIC | named test | 3 | source/native audit |
