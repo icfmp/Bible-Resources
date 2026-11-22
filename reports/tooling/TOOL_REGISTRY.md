@@ -26,6 +26,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 
 | Script | Classification | Tests | Static callers | Stage hint |
 | --- | --- | --- | ---: | --- |
+| [`scripts/approved_osis_sword_candidate.py`](../../scripts/approved_osis_sword_candidate.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/audit_osis.py`](../../scripts/audit_osis.py) | UNDECIDED | not established | 6 | source/native audit |
 | [`scripts/bible_intake.py`](../../scripts/bible_intake.py) | KEEP_GENERIC | named test | 4 | intake |
 | [`scripts/build.py`](../../scripts/build.py) | KEEP_GENERIC | not established | 11 | publication/release |
@@ -48,8 +49,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/promote_sword_preview.py`](../../scripts/promote_sword_preview.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/publish_reviewed_release.py`](../../scripts/publish_reviewed_release.py) | KEEP_GENERIC | not established | 9 | publication/release |
 | [`scripts/published_reference_audit.py`](../../scripts/published_reference_audit.py) | UNDECIDED | named test | 3 | publication/release |
-| [`scripts/publisher_osis_observation.py`](../../scripts/publisher_osis_observation.py) | UNDECIDED | named test | 3 | publication/release |
-| [`scripts/publisher_osis_sword_candidate.py`](../../scripts/publisher_osis_sword_candidate.py) | UNDECIDED | named test | 5 | publication/release |
+| [`scripts/publisher_osis_observation.py`](../../scripts/publisher_osis_observation.py) | UNDECIDED | named test | 2 | publication/release |
 | [`scripts/reader_xiphos_headless_smoke.py`](../../scripts/reader_xiphos_headless_smoke.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/release_preflight.py`](../../scripts/release_preflight.py) | KEEP_GENERIC | named test | 3 | publication/release |
 | [`scripts/research/bible/__init__.py`](../../scripts/research/bible/__init__.py) | UNDECIDED | not established | 0 | not determined |
