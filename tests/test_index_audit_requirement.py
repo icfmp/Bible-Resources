@@ -18,8 +18,19 @@ class IndexAuditRequirementTests(unittest.TestCase):
     def errors(self, metadata):
         return list(self.validator.iter_errors(metadata))
 
-    def test_current_published_bible_has_valid_index_proof_declaration(self):
-        self.assertEqual(self.errors(self.metadata), [])
+    def test_every_approved_bible_has_valid_index_proof_declaration(self):
+        """New releases cannot escape index validation by not being LSG."""
+        approved = []
+        for path in sorted((ROOT / "modules").glob("*/metadata.json")):
+            metadata = json.loads(path.read_text(encoding="utf-8"))
+            if (metadata.get("category") == "bible" and
+                    metadata.get("quality", {}).get("status") == "approved"):
+                approved.append(path)
+                with self.subTest(module=path.parent.name):
+                    self.assertEqual(self.errors(metadata), [])
+                    self.assertIn("index_audit", metadata)
+                    self.assertIn("mode", metadata["index_audit"])
+        self.assertGreater(len(approved), 0)
 
     def test_approved_bible_without_index_proof_rejected(self):
         metadata = dict(self.metadata)
