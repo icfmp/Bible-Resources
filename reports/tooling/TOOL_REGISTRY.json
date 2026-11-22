@@ -1619,41 +1619,6 @@
     {
       "classification": "UNDECIDED",
       "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/fast_stock_note_probe.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Bounded, source-first note preflight before expensive SWORD layout audits.",
-      "python_imports": [
-        "__future__",
-        "lsg_source_compare",
-        "os",
-        "pathlib",
-        "research",
-        "stable_sword_refs",
-        "subprocess",
-        "tempfile",
-        "unicodedata"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "01fb78b9bb4d2c96632cbd0ca706975cda45feafe25ef3a695a29f6ad43891ff",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 2,
-      "static_references": [
-        "tests/test_fast_stock_note_probe.py",
-        "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [],
       "has_direct_tests_by_filename": false,
@@ -1861,40 +1826,15 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 8,
+      "static_reference_count": 7,
       "static_references": [
         "modules/lsg-1910/tools/lsg_sword_compare.py",
         "modules/lsg-1910/tools/probe_lsg_v11n.py",
-        "scripts/fast_stock_note_probe.py",
         "scripts/publisher_osis_usfx_parity.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/sword_missing_verse_witness.py",
         ".github/workflows/lsg-fidelity.yml",
         "tests/test_lsg_source_compare.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/maintext_fidelity_classification.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Classify full-corpus original→native text evidence without waiving layout.",
-      "python_imports": [
-        "__future__"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "df54b097cd916a50dd79159ce6399add2b92120bdccb3159f9aa10fe9bdd8838",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 1,
-      "static_references": [
-        "tests/test_maintext_fidelity_classification.py"
       ]
     },
     {
@@ -3475,9 +3415,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
-        "scripts/fast_stock_note_probe.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/sword_missing_verse_witness.py",
         "tests/test_private_sword_install.py"
@@ -3605,9 +3544,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
-        "scripts/fast_stock_note_probe.py",
         "scripts/publisher_osis_usfx_parity.py",
         "scripts/source_native_maintext_probe.py",
         "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
@@ -3817,9 +3755,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
-        "scripts/fast_stock_note_probe.py",
         "scripts/publisher_osis_usfx_parity.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/sword_missing_verse_witness.py",
@@ -5772,9 +5709,8 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 34,
+      "static_reference_count": 33,
       "static_references": [
-        "scripts/fast_stock_note_probe.py",
         "scripts/inspect_paragraph_rendering.py",
         "scripts/published_reference_audit.py",
         "scripts/publisher_osis_sword_candidate.py",
@@ -5846,30 +5782,6 @@
       "static_references": [
         ".github/workflows/stage-stock-commentary.yml",
         "tests/test_compiled_stock_commentary_proof.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/stock_reuse_preflight.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Source-safe, edition-neutral stock-SWORD material loss preflight.",
-      "python_imports": [
-        "__future__"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "3771a353ab1eef2a775e9b4025f13f298288642e81df7a04ed40800592654a0e",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 1,
-      "static_references": [
-        "tests/test_stock_reuse_preflight.py"
       ]
     },
     {

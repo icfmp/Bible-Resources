@@ -359,7 +359,7 @@ class ScriptInventoryTests(unittest.TestCase):
                 "scripts/usfx_schema_gate.py",
                 "tests/test_source_usfx_structure.py"),
             "source_native_scope": (
-                "scripts/fast_stock_note_probe.py",
+                "scripts/source_native_maintext_probe.py",
                 "tests/test_source_native_scope.py"),
             "source_native_notes_audit": (
                 "scripts/source_native_maintext_probe.py",
