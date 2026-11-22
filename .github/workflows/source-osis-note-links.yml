@@ -5,6 +5,8 @@ on:
     paths:
       - ".github/workflows/source-osis-note-links.yml"
       - "scripts/source_osis_note_link_triage.py"
+      - "scripts/research/bible/source_osis_verse_notes.py"
+      - "tests/test_source_osis_verse_notes.py"
       - "tests/test_source_osis_note_link_triage.py"
       - "scripts/publisher_osis_usfx_parity.py"
       - "scripts/publisher_osis_observation.py"

@@ -7,6 +7,8 @@ on:
       - "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py"
       - "scripts/reader_xiphos_headless_smoke.py"
       - "scripts/repair_osis_note_links.py"
+      - "scripts/research/bible/source_osis_verse_notes.py"
+      - "tests/test_source_osis_verse_notes.py"
       - "scripts/repair_osis_inline_markup.py"
       - "scripts/repair_osis_source_bytes.py"
       - "tests/test_repair_osis_source_bytes.py"

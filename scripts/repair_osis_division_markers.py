@@ -15,7 +15,7 @@ from xml.parsers import expat
 
 from lxml import etree
 
-from publisher_osis_usfx_parity import original_osis_verses_and_notes, _nonspace
+from research.bible.source_osis_verse_notes import original_osis_verses_and_notes, _nonspace
 from repair_osis_source_bytes import _end_of_tag
 from source_osis_inventory import _source_tree, OSIS, source_inventory
 

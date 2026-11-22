@@ -29,7 +29,7 @@ from probe_andbible_android_private_import import attempt_private_android_import
 from publisher_osis_sword_candidate import (
     _candidate_result, _compile_osis, _create_candidate_layout, _read_native_frames,
 )
-from publisher_osis_usfx_parity import original_osis_verses_and_notes
+from research.bible.source_osis_verse_notes import original_osis_verses_and_notes
 from source_osis_inventory import source_inventory
 from research.bible.source_native_osis_structure_screen import (
     authorial_structures, authorial_body_opening_sequences,

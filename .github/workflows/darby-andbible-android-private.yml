@@ -7,6 +7,8 @@ on:
       - "scripts/probe_andbible_android_private_import.py"
       - "tests/test_probe_andbible_android_private_import.py"
       - "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py"
+      - "scripts/research/bible/source_osis_verse_notes.py"
+      - "tests/test_source_osis_verse_notes.py"
   workflow_dispatch:
 
 permissions:

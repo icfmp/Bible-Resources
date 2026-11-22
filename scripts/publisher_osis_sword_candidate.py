@@ -21,7 +21,7 @@ from lxml import etree
 
 from bible_intake import ROOT
 from publisher_osis_observation import read_pinned_publisher_osis
-from publisher_osis_usfx_parity import (
+from research.bible.source_osis_verse_notes import (
     original_osis_verses_and_notes, _nonspace, _fold,
 )
 from research.bible.native_raw_main_text import native_raw_main_text
