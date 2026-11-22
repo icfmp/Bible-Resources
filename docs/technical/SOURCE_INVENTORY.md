@@ -22,9 +22,12 @@ or changes Bible's code.
 | AndBible | SWORD catalogue | Active for catalogue metadata |
 | STEP Bible | SWORD catalogue | Active for catalogue metadata |
 | eBible | SWORD catalogue | Active for catalogue metadata |
+| Bible Resources | Our curated JSON catalogue | Application declaration parity only; not an upstream importer |
 | YouVersion / Bible.com | API / edition metadata | Inventory only; API permissions differ by edition |
 | OpenBible cross-references | ZIP dataset | Inventory only; Bible publishes pinned snapshot revisions separately |
 | OpenBible topic scores | ZIP dataset | Inventory only; Bible publishes pinned snapshot revisions separately |
+
+The application's own Bible Resources catalogue uses its published JSON index rather than a SWORD `mods.d.tar.gz`; it is inventoried but **not** considered a separate upstream source for import or editorial approval.
 
 The Xiphos legacy HTTP/FTP source is documented but is not an active direct
 Bible provider: AndBible Extra is an incomplete HTTPS mirror, not a claim that
