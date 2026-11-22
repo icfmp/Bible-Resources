@@ -43,7 +43,7 @@ class FakeOpener:
         return FakeResponse(self.url, self.payload)
 
 
-class PreparationTests(unittest.TestCase):
+class SourceAcquisitionAndSchemaTests(unittest.TestCase):
     def test_https_allowlist_blocks_arbitrary_mirrors_and_redirects(self):
         for url in ("http://ebible.org/sword/zip/test.zip",
                     "https://evil.example.net/Scriptures/x.zip",
@@ -53,23 +53,23 @@ class PreparationTests(unittest.TestCase):
             with self.subTest(url=url):
                 with self.assertRaises(PilotError):
                     validate_url(url, "ebible")
-        validate_url("https://ebible.org/Scriptures/fraLSG_usfm.zip", "ebible")
-        validate_url("https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHC.zip", "crosswire")
+        validate_url("https://ebible.org/Scriptures/synthetic-usfm.zip", "ebible")
+        validate_url("https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/synthetic-commentary.zip", "crosswire")
         with self.assertRaises(PilotError):
             SafeRedirect("ebible").redirect_request(
                 None, None, 302, "moved", {}, "http://ebible.org/sword/zip/test.zip"
             )
 
-    def test_legacy_edition_pilots_cannot_be_used_as_download_providers(self):
+    def test_module_names_cannot_be_used_as_download_providers(self):
         self.assertEqual(set(ALLOWED_HOSTS), {"ebible", "crosswire", "ccel"})
-        for legacy in ("lsg", "mhc", "not-reviewed"):
+        for legacy in ("edition-one", "edition-two", "not-reviewed"):
             with self.subTest(provider=legacy), self.assertRaises(PilotError):
                 validate_url("https://ebible.org/example.zip", legacy)
 
     def test_fetch_does_not_overwrite_or_leave_temp_artifacts(self):
         with tempfile.TemporaryDirectory() as root:
             path = Path(root) / "sword.zip"
-            url = "https://ebible.org/sword/zip/fraLSG1910eb.zip"
+            url = "https://ebible.org/sword/zip/synthetic-bible.zip"
             payload = b"demo zip bytes"
             result = fetch(url, path, "ebible", opener=FakeOpener(url, payload))
             self.assertEqual(result["sha256"], hashlib.sha256(payload).hexdigest())
@@ -142,7 +142,7 @@ class PreparationTests(unittest.TestCase):
             self.assertTrue(value["guard_schema_compiled_offline"])
             self.assertTrue(value["no_bible_text_validated"])
 
-    def test_mhc_zcom4_supported_by_repository_publisher(self):
+    def test_zcom4_supported_only_for_commentary(self):
         self.assertIn("zCom4", DRIVERS)
         self.assertIn("zCom4", ALLOWED["commentary"])
         self.assertNotIn("zCom4", ALLOWED["bible"])
