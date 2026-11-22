@@ -239,8 +239,8 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertNotIn("scripts/commentary_nonlink_word_alignment.py", entries)
         for caller in (
             "scripts/commentary_private_text_compare.py",
-            "scripts/commentary_prose_cross_slot.py",
-            "scripts/commentary_unresolved_lexical_triage.py",
+            "scripts/research/commentary/commentary_prose_cross_slot.py",
+            "scripts/research/commentary/commentary_unresolved_lexical_triage.py",
             "scripts/commentary_section_scope_audit.py",
             "scripts/research/commentary/commentary_lexical_overlap.py",
             "tests/test_commentary_nonlink_words.py",
@@ -249,6 +249,43 @@ class ScriptInventoryTests(unittest.TestCase):
         ):
             with self.subTest(caller=caller):
                 self.assertIn(caller, entries[new]["static_references"])
+
+    def test_source_neutral_lexical_and_cross_slot_helpers_are_packaged(self):
+        """Non-CLI evidence algorithms must remain imported from one package."""
+        entries = {row["path"]: row for row in self.result["files"]}
+        helpers = {
+            "commentary_near_prose_unicode_review":
+                ("scripts/commentary_private_text_compare.py",
+                 "tests/test_commentary_near_prose_unicode_review.py"),
+            "commentary_reference_cross_slot":
+                ("scripts/commentary_private_text_compare.py",
+                 "scripts/commentary_xiphos_dual_reader.py",
+                 "tests/test_commentary_reference_cross_slot.py"),
+            "commentary_source_identity_lexical_gate":
+                ("scripts/commentary_private_text_compare.py",
+                 "tests/test_commentary_source_identity_lexical_gate.py"),
+            "commentary_prose_cross_slot":
+                ("scripts/commentary_anchor_parity.py",
+                 "scripts/commentary_shared_raw_source_units.py",
+                 "tests/test_commentary_prose_cross_slot.py"),
+            "commentary_unresolved_lexical_triage":
+                ("scripts/commentary_section_scope_audit.py",
+                 "scripts/research/commentary/commentary_chapter_body_evidence.py",
+                 "tests/test_commentary_unresolved_lexical_triage.py"),
+        }
+        for name, consumers in helpers.items():
+            with self.subTest(helper=name):
+                old_path = "scripts/" + name + ".py"
+                new_path = "scripts/research/commentary/" + name + ".py"
+                self.assertNotIn(old_path, entries)
+                self.assertFalse((ROOT / old_path).exists())
+                self.assertIn(new_path, entries)
+                self.assertTrue((ROOT / new_path).is_file())
+                self.assertTrue(entries[new_path]["has_direct_tests_by_filename"])
+                self.assertEqual(entries[new_path]["entrypoint_hint"],
+                                 "library, native helper or workflow-invoked")
+                for caller in consumers:
+                    self.assertIn(caller, entries[new_path]["static_references"])
 
     def test_completed_hmcc_modern_staging_is_not_an_active_publisher(self):
         """Version-pinned first-release bootstraps belong to Git history only."""

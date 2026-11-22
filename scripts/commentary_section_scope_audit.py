@@ -71,7 +71,7 @@ from commentary_literal_erratum_preflight import (
 )
 from commentary_source_erratum_compiled_probe import probe_private_compiled_source_erratum
 from commentary_rebuild_attestation_draft import PUBLIC_REBUILD_ATTESTATION_ERROR_CODES
-from commentary_unresolved_lexical_triage import marked_word_token_indices
+from research.commentary.commentary_unresolved_lexical_triage import marked_word_token_indices
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import ALLOWED_HOSTS, fetch

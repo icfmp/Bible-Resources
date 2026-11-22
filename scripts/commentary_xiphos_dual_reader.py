@@ -30,7 +30,7 @@ from zipfile import ZipFile
 
 from commentary_intake import load_manifest
 from commentary_stock_candidate import _reader_identity_only_equivalence
-from commentary_reference_cross_slot import actual_stock_osisref_targets
+from research.commentary.commentary_reference_cross_slot import actual_stock_osisref_targets
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus, RawCorpusError
 from commentary_native_raw_inventory import _safe_stock_install
 from pilot_fetch import fetch

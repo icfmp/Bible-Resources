@@ -15,14 +15,35 @@ This package contains **read-only, non-CLI** evidence-gathering functions. They 
 | [`commentary_osis_rebuild_preflight.py`](commentary_osis_rebuild_preflight.py) | Whether original native frames can be wrapped as *test-only* OSIS without changing inner XML |
 | [`commentary_lexical_overlap.py`](commentary_lexical_overlap.py) | Bounded source-versus-stock lexical overlap without exporting text |
 | [`commentary_nonlink_analysis.py`](commentary_nonlink_analysis.py) | Bounded plain-word accounting and separate Unicode word alignment, both unchanged |
+| [`commentary_unresolved_lexical_triage.py`](commentary_unresolved_lexical_triage.py) | Bounded word-level mismatches and source-joined mark positions, without text export |
+| [`commentary_near_prose_unicode_review.py`](commentary_near_prose_unicode_review.py) | Separate original/stock Unicode normalization witnesses, never a rewrite |
+| [`commentary_source_identity_lexical_gate.py`](commentary_source_identity_lexical_gate.py) | Quarantine contradictory original title/book-code joins before lexical comparisons |
+| [`commentary_prose_cross_slot.py`](commentary_prose_cross_slot.py) | Alternative native slot evidence for original commentary prose without inferred placement |
+| [`commentary_reference_cross_slot.py`](commentary_reference_cross_slot.py) | Original/native Scripture target and XML link topology across slots |
 | [`commentary_chapter_body_evidence.py`](commentary_chapter_body_evidence.py) | Chapter-unit boundaries, book identity and native coverage evidence |
 | [`commentary_link_disposition_review.py`](commentary_link_disposition_review.py) | Source-pinned MHCC Modern link-correction proposal checks against original link hashes; no edits or release approval |
 | [`commentary_original_link_identity.py`](commentary_original_link_identity.py) | Byte-pinned native original link identities, targets and link-label hashes; no text export or publication |
 
-Each helper has its own documented script and test consumers; not every helper is imported by the section-scope audit. The lexical/chapter-body diagnostics, original link identities and modern proposal-review gate were extracted without changing their algorithms. The latter remains tied to the attested MHCC Modern manuscript and source edition; it is not a generic editorial rule. The former two unlinked-word root helpers are now grouped into one import-only research module; all eight original functions remain distinct and verbatim. Import via `research.commentary.<module>` with `scripts/` on `PYTHONPATH`. No root-level import shims, duplicate modules or executables are provided.
+Each helper has its own documented script and test consumers; not every helper is imported by the section-scope audit. The lexical/chapter-body diagnostics, original link identities and modern proposal-review gate were extracted without changing their algorithms. The latter remains tied to the attested MHCC Modern manuscript and source edition; it is not a generic editorial rule. The former two unlinked-word root helpers are now grouped into one import-only research module; all eight original functions remain distinct and verbatim. Import via `research.commentary.<module>` with `scripts/` on `PYTHONPATH`. No root-level import shims, duplicate modules or executables are provided. Five further non-CLI lexical, source-identity and cross-slot observers now live in this same package; their function bodies and input/output contracts were not changed, and real importer/test paths were updated.
 
 Original native-link identity checks remain private observations: an authenticated destination or label digest is not evidence that a translated manuscript preserves the reference. The parent runner remains responsible for source-pinned native streaming and editorial/release gatekeeping.
 
 The unified nonlink library deliberately keeps different bounds for each calculation: large-input accounting must never be mistaken for bounded longest-common-subsequence alignment. Existing tests continue to verify these differences.
+
+## Verify the package without exposing source content
+
+From the repository root, run the direct synthetic regressions and then the
+full production validation; the library files themselves have no CLI:
+
+```sh
+python -m unittest discover -s tests -p 'test_commentary_reference_cross_slot.py' -v
+python -m unittest discover -s tests -p 'test_commentary_source_identity_lexical_gate.py' -v
+python -m unittest discover -s tests -p 'test_commentary_unresolved_lexical_triage.py' -v
+python scripts/tool_registry.py --check
+```
+
+A passing lexical or native-slot helper test does not independently attest an
+external author's changed source archive. Preserve source SHA pins and run the
+separate source/native reader acceptance gate before any editorial decision.
 
 **Separate observations from decisions.** Similar-sounding helpers have different inputs, outputs and evidence limits. None is removable or interchangeable without a source-bound equivalence review. [Script maintenance #430](https://github.com/icfmp/Bible-Resources/issues/430) tracks this work; the [production contract](../../../docs/PRODUCTION_PIPELINE.md) remains authoritative.

@@ -18,7 +18,7 @@ import re
 
 from lxml import etree
 
-from commentary_unresolved_lexical_triage import WORD
+from research.commentary.commentary_unresolved_lexical_triage import WORD
 
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 MAX_SOURCE_BYTES = 90 * 1024 * 1024

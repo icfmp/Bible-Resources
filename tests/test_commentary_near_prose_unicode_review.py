@@ -8,7 +8,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_near_prose_unicode_review import classify_same_book_unicode_variants
+from research.commentary.commentary_near_prose_unicode_review import classify_same_book_unicode_variants
 from pilot_preflight import PilotError
 from commentary_private_text_compare import raw_as_strict_xml_text
 

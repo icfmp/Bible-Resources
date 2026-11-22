@@ -13,6 +13,8 @@ The `scripts/` directory contains **production commands**, reusable libraries, i
 
 For a new resource, begin with the [canonical production pipeline](../docs/PRODUCTION_PIPELINE.md). Do not improvise a second importer or add a script for each individual verse or edition correction.
 
+The commentary lexical, original-source book identity, Unicode and cross-slot witnesses are **import-only** helpers under [`research/commentary/`](research/commentary/README.md). Run their established audit CLIs and tests instead of invoking an internal helper as an independent publication or source-correction command.
+
 ## Changing a script
 
 1. **Identify its contract.** Is it an invoked CLI, an imported helper, a read-only probe or immutable historical reproduction? Record exact inputs, outputs, failure behavior and relevant rights/source constraints.
