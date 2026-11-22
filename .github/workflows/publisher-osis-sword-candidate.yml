@@ -138,7 +138,8 @@ jobs:
               "### Pinned OSIS → standard native SWORD research — NOT RELEASED",
               `Compiler: standard installed osis2mod`,
               `Resource: \`${data.resource_id}\``,
-              `Original SHA-256: \`${data.original_publisher_osis_sha256}\``,
+              `Research source SHA-256: \`${data.research_source_sha256}\``,
+              `Source kind: \`${data.research_source_kind}\``,
               `Exact tool commit: \`${context.sha}\``,
               `Action: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               "",
@@ -218,3 +219,24 @@ jobs:
               ...context.repo, issue_number:context.issue.number,
               body:lines.join("\n")
             });
+      - name: Fail closed on unverified approved source/native parity
+        if: github.event_name != 'pull_request'
+        env:
+          RECEIPT: ${{ env.REPORT }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          data=json.loads(Path(os.environ["RECEIPT"]).read_text(encoding="utf-8"))
+          if data.get("research_source_kind") == "approved_cleaned_osis":
+              results=data.get("candidate_research_results", [])
+              if (len(results)!=1 or
+                  results[0].get("candidate_status") !=
+                      "full_numbered_text_and_note_preflight_equal_not_approved" or
+                  not results[0].get("source_native_body_boundary_positions",{}).get(
+                      "all_title_text_and_nonspace_placement_equal",False)):
+                  raise SystemExit("Approved OSIS native fidelity requires technical review; metadata report retained")
+          print("No unreviewed native source parity was silently promoted.")
+          PY
+
