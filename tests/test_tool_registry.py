@@ -121,7 +121,7 @@ class ScriptInventoryTests(unittest.TestCase):
         entries = {row["path"]: row for row in self.result["files"]}
         for stem, caller in (
             ("source_native_osis_target_addressability",
-             "scripts/repair_osis_note_links.py"),
+             "scripts/source_osis_note_link_triage.py"),
             ("source_native_osis_structure_screen",
              "scripts/publisher_osis_sword_candidate.py"),
         ):
