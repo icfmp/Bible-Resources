@@ -22,6 +22,14 @@ exact distributed schema and version. A GitHub Actions artifact under
 `/tmp/` or `dist/` is **temporary build output**, not the permanent index.
 Nothing is automatically exported to the Bible application.
 
+**Working-state preservation:** source-verified complete internal states are
+different from the published and source-baseline indexes. The new
+[private working-state archive procedure](work/README.md) covers the entity,
+Greek and Hebrew streams, with commit-locked manifests, SHA-256 checks and
+private-only immutable GitHub Release storage. **The archiving destination
+must first be configured; no durable private backup is claimed before the
+private repository exists and an actual archive is uploaded/read back.**
+
 ## Directory map
 
 ```text
@@ -32,7 +40,7 @@ bible-semantic-index/
 ├── tests/               Regression tests for shared BSI tooling
 ├── data/                Source locks, reviewed editorial decisions and evidence
 ├── sources/             Pinned ACAI checkout procedure; downloaded originals ignored
-├── work/                Editorial workspace (not a published data store)
+├── work/                Private working-state archive policy and recovery instructions
 └── links/
     ├── schema.v1.json   Reviewed link schema
     ├── dictionaries/
