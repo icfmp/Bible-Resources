@@ -1313,7 +1313,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "f3c862777bf327eb4de6ceafb771c707f34446749203c94ab49ac8002b49f794",
+      "sha256_at_inventory": "55ef3759c2b4edcdb1e45cdf003999634fb07a1d0b462209a0028d0078986c0e",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
@@ -1344,11 +1344,12 @@
         "hashlib",
         "json",
         "pathlib",
-        "re"
+        "re",
+        "reviewed_compiled_commentary_rebuild"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "4f99a3600512d98861aa683fbcc358919af3635e34e2c6640a19c711178dabf0",
+      "sha256_at_inventory": "d9cb8701e727080775ac1e9a185734cd3536c9bca4d819845f63c4f5730d5484",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
