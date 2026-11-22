@@ -72,7 +72,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/lsg_source_compare.py`](../../scripts/lsg_source_compare.py) | HISTORICAL/ARCHIVE | named test | 9 | source/native audit |
 | [`scripts/maintext_fidelity_classification.py`](../../scripts/maintext_fidelity_classification.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/native_book_intro_screen.py`](../../scripts/native_book_intro_screen.py) | UNDECIDED | named test | 3 | not determined |
-| [`scripts/normalize_osis.py`](../../scripts/normalize_osis.py) | KEEP_GENERIC | not established | 7 | not determined |
+| [`scripts/normalize_osis.py`](../../scripts/normalize_osis.py) | KEEP_GENERIC | not established | 6 | not determined |
 | [`scripts/osis_semantic_fidelity.py`](../../scripts/osis_semantic_fidelity.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/pilot_fetch.py`](../../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 19 | not determined |
 | [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | named test | 80 | not determined |
