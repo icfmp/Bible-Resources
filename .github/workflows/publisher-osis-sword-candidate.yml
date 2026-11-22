@@ -7,6 +7,8 @@ on:
     paths:
       - ".github/workflows/publisher-osis-sword-candidate.yml"
       - "scripts/publisher_osis_sword_candidate.py"
+      - "scripts/research/bible/source_osis_verse_notes.py"
+      - "tests/test_source_osis_verse_notes.py"
       - "scripts/research/bible/source_native_osis_target_addressability.py"
       - "tests/test_source_native_osis_target_addressability.py"
       - "scripts/publisher_osis_preview_package.py"
