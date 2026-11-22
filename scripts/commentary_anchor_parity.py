@@ -29,7 +29,7 @@ from commentary_xml_witness import (
 )
 from commentary_native_inventory import MAX_OUTPUT, parse_index
 from research.commentary.commentary_navigation_link_plan import parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan
-from commentary_reference_registry_triage import classify_original_reference_target
+from research.commentary.commentary_reference_registry_triage import classify_original_reference_target
 from commentary_osis_mixed_transport_probe import (probe_original_mixed_transport,
     probe_complete_original_transport)
 from research.commentary.commentary_prose_cross_slot import strict_native_stock_plain_words
