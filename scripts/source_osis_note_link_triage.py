@@ -16,7 +16,7 @@ from pathlib import Path
 import re
 
 from publisher_osis_observation import read_pinned_publisher_osis
-from publisher_osis_usfx_parity import original_osis_verses_and_notes
+from research.bible.source_osis_verse_notes import original_osis_verses_and_notes
 from research.bible.source_native_osis_target_addressability import (
     _classify_one, ENDPOINT, MAX_LINKS,
 )
