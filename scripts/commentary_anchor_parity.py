@@ -28,7 +28,7 @@ from commentary_xml_witness import (
     xml_structure,
 )
 from commentary_native_inventory import MAX_OUTPUT, parse_index
-from commentary_navigation_link_plan import parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan
+from research.commentary.commentary_navigation_link_plan import parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan
 from commentary_reference_registry_triage import classify_original_reference_target
 from commentary_osis_mixed_transport_probe import (probe_original_mixed_transport,
     probe_complete_original_transport)
