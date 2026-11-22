@@ -37,6 +37,29 @@ CORE = {
     "sword_native_commentary_index.cpp",
     "sword_native_commentary_raw_corpus.cpp",
 }
+# Reviewed real consumers that are not automatically high-confidence CORE
+# contracts: native auditors, imported helpers and manual OSIS diagnostics.
+# Retention is not editorial approval and does not prohibit later refactoring.
+REVIEWED_ACTIVE = frozenset({
+    "approved_osis_sword_candidate.py", "audit_osis.py",
+    "catalogue_profiles.py", "check_provider_parity.py", "check_updates.py",
+    "fetch_reviewed_schema.py", "osis_semantic_fidelity.py",
+    "pilot_subprocess.py", "published_reference_audit.py",
+    "__init__.py",  # research/bible package marker
+    "native_milestone_pair_audit.py", "native_raw_main_text.py",
+    "native_sword_markup_census.py", "source_native_note_positions.py",
+    "source_native_ordered_body.py", "source_native_osis_boundary_positions.py",
+    "source_native_osis_structure_screen.py",
+    "source_native_osis_target_addressability.py",
+    "source_osis_verse_notes.py", "reviewed_osis_commentary_rebuild.py",
+    "smoke.py", "source_osis_inventory.py", "stable_sword_refs.py",
+    "sword_native_raw_corpus.cpp", "sword_native_raw_entry.cpp",
+})
+# The HMCC Modern release gate is currently required but embeds
+# one-edition editorial decisions; it must not be represented as generic.
+REVIEWED_EDITION_COUPLED = frozenset({
+    "reviewed_modern_commentary_rebuild.py",
+})
 EXPERIMENTS = (
     "commentary_chapter_", "commentary_nonlink_",
     "commentary_prose_cross_slot", "commentary_reference_cross_slot",
@@ -80,6 +103,10 @@ def _code(source: str) -> tuple[str, bool, tuple[str, ...]]:
 def classify(name: str, source: str, *, core=CORE) -> tuple[str, str]:
     if name in core:
         return "KEEP_GENERIC", "high"
+    if name in REVIEWED_ACTIVE:
+        return "KEEP_GENERIC", "medium"
+    if name in REVIEWED_EDITION_COUPLED:
+        return "GENERALIZE", "medium"
     if name.startswith(EDITION_PREFIXES) or (
             any(token in name.lower() for token in ("darby", "mhcc", "lsg"))
             and name != "commentary_sword_identity_migration.py"):
@@ -159,6 +186,9 @@ def generate(root: Path = ROOT) -> dict:
                          "maintenance/replay workflow and regression checks remain necessary.")
         elif path.name in CORE:
             next_step = "Retain stable verified interface; extend test fixtures."
+        elif path.name in REVIEWED_ACTIVE:
+            next_step = ("Retain observed consumer; preserve independent source/native "
+                         "checks; review scope when changing the caller.")
         elif role == "HISTORICAL/ARCHIVE":
             next_step = ("Retain runnable historical evidence; extract shared "
                          "algorithms only after byte-equivalence tests.")

@@ -7,7 +7,8 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from tool_registry import CORE, ROLES, generate, markdown
+from tool_registry import (CORE, ROLES, REVIEWED_ACTIVE, REVIEWED_EDITION_COUPLED,
+                           generate, markdown)
 
 
 class ScriptInventoryTests(unittest.TestCase):
@@ -56,6 +57,46 @@ class ScriptInventoryTests(unittest.TestCase):
             self.assertFalse((ROOT / ".github/workflows" / name).exists())
         self.assertIn("scripts/approved_osis_sword_candidate.py", scripts)
         self.assertIn("scripts/reviewed_compiled_commentary_rebuild.py", scripts)
+
+    def test_remaining_scripts_have_explicit_reviewed_lifecycle(self):
+        """All currently retained tools need an actual reviewer decision."""
+        rows = self.result["files"]
+        names = {r["path"].rsplit("/", 1)[-1] for r in rows}
+        self.assertEqual(
+            names,
+            (CORE | REVIEWED_ACTIVE | REVIEWED_EDITION_COUPLED) & names,
+        )
+        self.assertEqual(
+            len([r for r in rows if r["classification"] == "UNDECIDED"]), 0
+        )
+        reviewed = {r["path"].rsplit("/", 1)[-1]: r for r in rows
+                    if r["path"].rsplit("/", 1)[-1] in REVIEWED_ACTIVE}
+        self.assertEqual(set(reviewed), REVIEWED_ACTIVE)
+        for name, row in reviewed.items():
+            self.assertEqual(row["classification"], "KEEP_GENERIC")
+            self.assertEqual(row["confidence"], "medium")
+            if name != "__init__.py":
+                self.assertTrue(row["static_references"], name)
+        coupled = {r["path"].rsplit("/", 1)[-1]: r for r in rows
+                   if r["path"].rsplit("/", 1)[-1] in REVIEWED_EDITION_COUPLED}
+        self.assertEqual(set(coupled), REVIEWED_EDITION_COUPLED)
+        self.assertTrue(all(r["classification"] == "GENERALIZE"
+                            for r in coupled.values()))
+        # These gates currently secure different *approved* publications.
+        for module_id, expected_mode in (
+            ("mhc-crosswire", "reviewed_osis_commentary_rebuild"),
+            ("hmcc-modern", "reviewed_modern_commentary_rebuild"),
+            ("mhcc-crosswire", "reviewed_compiled_commentary_rebuild"),
+        ):
+            import json
+            metadata = json.loads(
+                (ROOT / "modules" / module_id / "metadata.json")
+                .read_text(encoding="utf-8")
+            )
+            self.assertEqual(metadata["quality"]["status"], "approved")
+            self.assertEqual(metadata["index_audit"]["mode"], expected_mode)
+            self.assertIn("scripts/" + expected_mode + ".py",
+                          {r["path"] for r in rows})
 
     def test_obsolete_first_release_pilots_are_not_active(self):
         """Original USFX/stock pilots must not survive in the OSIS workflow."""

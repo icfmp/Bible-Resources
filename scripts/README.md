@@ -11,6 +11,8 @@ The `scripts/` directory is for **maintained, reusable production and verificati
 | `modules/<resource-id>/tools/` | Only proven, still-needed edition-specific maintenance tools, never a second publisher |
 | [Generated tool inventory](../reports/tooling/TOOL_REGISTRY.md) | Every tracked tool's classification, source hash, imports and static callers; review evidence, **not** proof that a script is unused |
 
+The [reviewed tool retention audit](../docs/technical/TOOL_RETENTION_AUDIT.md) explains why the remaining tools are still needed and identifies the modern-commentary release proof as edition-coupled. Classification is a maintenance decision, not editorial sign-off.
+
 The official OSIS schema review now uses the single pinned `fetch_reviewed_schema.py` command for both offline schema compilation and optional provenance metadata (`--report`). This is a technical XSD check, not an editorial approval or a license decision.
 
 For a new resource, begin with the [canonical production pipeline](../docs/PRODUCTION_PIPELINE.md). Do not improvise a second importer or add a script for each individual verse or edition correction.
