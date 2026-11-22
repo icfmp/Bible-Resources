@@ -25,6 +25,7 @@ jobs:
       - name: Regression tests (offline, no data download)
         run: |
           python3 -I bible-semantic-index/tests/test_workspace_layout.py
+          python3 -I bible-semantic-index/tests/test_work_snapshot.py
           python3 -I bible-semantic-index/tests/test_distribution_profile.py
           python3 -I bible-semantic-index/tests/test_build.py
           python3 -I bible-semantic-index/tests/test_resolve.py
@@ -931,7 +932,7 @@ jobs:
           PY
 
       - name: Archive complete entity working state in PRIVATE repository (main only)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           BSI_PRIVATE_SNAPSHOT_REPO: ${{ vars.BSI_PRIVATE_SNAPSHOT_REPO }}
           GH_TOKEN: ${{ secrets.BSI_PRIVATE_SNAPSHOT_TOKEN }}
