@@ -161,34 +161,6 @@ def acquire(manifest: dict, root: Path, *, source: bool, sword: bool, opener=Non
     return receipts, archives
 
 
-def parse_audit_command(body: str) -> tuple[str, int | str, int | None]:
-    """Strict owner-only research command: no text, shell or unbounded run id.
-
-    4a–4d replay strictly requires an existing GitHub Actions run ID; normal
-    stages never silently accept one. GitHub artifact provenance and SHA/commit
-    parity are verified independently after trusted download.
-    """
-    if not isinstance(body, str) or len(body) > 150 or "\n" in body or "\r" in body:
-        raise IntakeError("Expected one bounded /bible-audit command")
-    match = re.fullmatch(
-        r"/bible-audit ([a-z][a-z0-9-]{1,63}) ([1-7]|4-5|4[a-d])(?: ([1-9][0-9]{0,15}))?",
-        body.strip())
-    if not match:
-        raise IntakeError("Invalid audited stage, resource ID or prior GitHub run ID")
-    rid, stage, run_id = match.groups()
-    replay = stage in ("4a", "4b", "4c", "4d")
-    if replay != (run_id is not None):
-        raise IntakeError("4a-4d require prior run ID; ordinary stages forbid it")
-    return rid, (int(stage) if stage in "1234567" and len(stage) == 1
-                 else stage), int(run_id) if replay else None
-
-
-def parse_audit_comment(body: str) -> tuple[str, int | str]:
-    """Backward-compatible strict command parser for issue-comment Actions."""
-    rid, stage, _run_id = parse_audit_command(body)
-    return rid, stage
-
-
 def parse_observe_comment(body: str) -> str:
     """Read-only owner-command grammar, with no shell interpolation."""
     if not isinstance(body, str) or len(body) > 150 or "\\n" in body or "\\r" in body:

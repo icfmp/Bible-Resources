@@ -8,7 +8,6 @@
 | --- | --- | --- |
 | Import a Bible | [Bible checkpoints](BIBLE_7_STAGE_WORKFLOW.md) | One import issue, pinned source, seven evidenced stages |
 | Import a commentary | [Commentary pipeline](COMMENTARY_PIPELINE.md) | One import issue and edition-local editorial record |
-| Collect read-only Bible stage evidence | [Bible stage automation](BIBLE_STAGE_AUTOMATION.md) | Machine observation, **not** editorial approval |
 | Review structural corrections | [Editorial audit](EDITORIAL_AUDIT_WORKFLOW.md) | Reversible decision ledger and source/cleaned comparison |
 | Translate or modernize a commentary | [Translation procedure](COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md) | Separate derivative edition, explicit source/rights evidence |
 | Publish an approved version | [Publishing](PUBLISHING.md) | Signed decision, exact module hashes and catalogue checks |

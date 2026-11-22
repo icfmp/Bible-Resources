@@ -16,7 +16,7 @@ This is the **progress checklist**, not an alternative production policy. The [p
 
 ## Running and resuming checks
 
-The [Bible stage audit workflow](BIBLE_STAGE_AUTOMATION.md) describes supported read-only commands and Actions. It collects evidence, **not** editorial approval. Optional combined `4-5` execution may share source acquisition and scanning but must record separate stage receipts.
+The OSIS-first [production pipeline](../PRODUCTION_PIPELINE.md) specifies the active source validation, cleaned-source fidelity, independent SWORD readback and reader checks. Keep evidence for each checkpoint in the edition's editorial records; no legacy stage-audit runner substitutes for those checks.
 
 Maintain **one** issue per resource with its current status (`IN_PROGRESS`, `BLOCKED`, `READY_FOR_OWNER`, `COMPLETE`), the completed count out of seven, exact original hash, evidence links, latest passing tests, unresolved decisions and next action. The issue and approved manifests, not chat history, are authoritative. When interrupted, resume the first unverified stage after checking the real GitHub state.
 

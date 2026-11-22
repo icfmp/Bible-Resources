@@ -36,4 +36,4 @@ The emitted receipt must contain metadata, structural digests and bounded refere
 - When redistributing an approved stock module without converting source USFX, record **conversion not performed**; do not invent an OSIS master or claim source/native equivalence without independent proof.
 - A rebuilt edition requires its own full original-to-cleaned and cleaned-to-native comparison, with source-attested decisions for every difference.
 
-For executable staging use [Bible onboarding](../workflows/BIBLE_7_STAGE_WORKFLOW.md), [stage automation](../workflows/BIBLE_STAGE_AUTOMATION.md), [OSIS source inventory](SOURCE_OSIS_INVENTORY.md) and the [production contract](../PRODUCTION_PIPELINE.md). Keep real-edition run IDs, anomalies and editorial decisions beside the edition in `sources/cleaned/**/editorial/evidence/`.
+For executable staging use [Bible onboarding](../workflows/BIBLE_7_STAGE_WORKFLOW.md), [OSIS source inventory](SOURCE_OSIS_INVENTORY.md) and the [production contract](../PRODUCTION_PIPELINE.md). Keep real-edition run IDs, anomalies and editorial decisions beside the edition in `sources/cleaned/**/editorial/evidence/`.
