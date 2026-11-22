@@ -7,7 +7,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_bookcode_repair_receipt_guard import validate_private_bookcode_repair_receipt
+from research.commentary.commentary_bookcode_repair_receipt_guard import validate_private_bookcode_repair_receipt
 from pilot_preflight import PilotError
 
 
