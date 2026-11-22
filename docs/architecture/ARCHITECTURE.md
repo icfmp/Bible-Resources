@@ -21,7 +21,7 @@ Directory conventions and exact storage responsibilities are in [workspace layou
 
 The published catalogue is `catalog/v1/catalog.json`. SWORD distribution includes module configuration/archive and packages under `sword/`. Consumers, including the [Bible application](https://github.com/icfmp/Bible), should treat that interface as versioned; any future change needs an explicit migration plan.
 
-Multiple upstream repositories are **discovery sources**, not automatic import queues. Candidate editions must be identified by exact source and rights; only verified-equivalent editions can be deduplicated. See [source priority](../policies/SOURCE_PRIORITY.md) and [rights](../policies/RIGHTS.md).
+Multiple upstream repositories are **discovery sources**, not automatic import queues. Candidate editions must be identified by exact source and rights; only verified-equivalent editions can be deduplicated. See [source identity](../policies/SOURCE_IDENTITY.md) and [rights](../policies/RIGHTS.md).
 
 ## Two distinct proof routes for compiled commentaries
 

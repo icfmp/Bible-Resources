@@ -36,7 +36,12 @@ EBIBLE = Provider('ebible','eBible','https://ebible.org/sword/',
   'https://ebible.org/sword/mods.d.tar.gz','https://ebible.org/sword/zip/')
 YOUVERSION = Provider('youversion','YouVersion / Bible.com','https://www.bible.com/',
   'https://bible.youversionapi.com/3.1/configuration.json','')
-PROVIDERS = (CROSSWIRE, EXTRA, ANDBIBLE, STEP, EBIBLE, YOUVERSION)
+BIBLE_RESOURCES = Provider('bible-resources','Bible Resources',
+  'https://icfmp.github.io/Bible-Resources/',
+  'https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json',
+  'https://icfmp.github.io/Bible-Resources/sword/packages/')
+DEFAULT_PROVIDERS = (CROSSWIRE, EXTRA, ANDBIBLE, STEP, EBIBLE, YOUVERSION)
+PROVIDERS = (*DEFAULT_PROVIDERS, BIBLE_RESOURCES)
 """
 REFERENCE = """
 SOURCE_URL = 'https://www.openbible.info/labs/cross-references/'
@@ -60,7 +65,7 @@ class ProviderParityTests(unittest.TestCase):
         report = compare(self.config, self.sources)
         self.assertEqual(report["status"], "in_sync", report["errors"])
         self.assertEqual(len(report["bible_sword_providers"]), 5)
-        self.assertEqual(len(report["bible_external_sources"]), 3)
+        self.assertEqual(len(report["bible_external_sources"]), 4)
 
     def test_missing_sword_provider_is_detected(self):
         config = deepcopy(self.config)
@@ -71,7 +76,7 @@ class ProviderParityTests(unittest.TestCase):
     def test_new_bible_provider_is_detected(self):
         sources = dict(self.sources)
         sources["bible/providers.py"] = sources["bible/providers.py"].replace(
-            "PROVIDERS = (CROSSWIRE, EXTRA", "NEW = Provider('new','New','https://new.test/', 'https://new.test/mods.d.tar.gz','https://new.test/zip/')\nPROVIDERS = (NEW, CROSSWIRE, EXTRA"
+            "PROVIDERS = (*DEFAULT_PROVIDERS, BIBLE_RESOURCES)", "NEW = Provider('new','New','https://new.test/', 'https://new.test/mods.d.tar.gz','https://new.test/zip/')\nPROVIDERS = (*DEFAULT_PROVIDERS, BIBLE_RESOURCES, NEW)"
         )
         report = compare(self.config, sources)
         self.assertIn("SWORD: Bible declares missing source new", report["errors"])
@@ -98,7 +103,38 @@ class ProviderParityTests(unittest.TestCase):
 
     def test_provider_source_is_inspected_not_executed(self):
         source = BIBLE_PROVIDERS + "\nraise Exception('Should never run')\n"
-        self.assertEqual(len(declared_providers(source)), 6)
+        self.assertEqual(len(declared_providers(source)), 7)
+
+    def test_literal_starred_provider_aliases_and_safe_rejection(self):
+        declared = declared_providers(BIBLE_PROVIDERS)
+        self.assertEqual(len(declared), 7)
+        self.assertEqual(declared[-1]["id"], "bible-resources")
+        self.assertEqual(
+            declared[-1]["catalogue_url"],
+            "https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json"
+        )
+        for replacement in (
+            "(*DEFAULT_PROVIDERS, dynamic_provider())",
+            "(*DEFAULT_PROVIDERS, BIBLE_RESOURCES, BIBLE_RESOURCES)",
+            "(*INVALID_PROVIDER_LIST, BIBLE_RESOURCES)",
+        ):
+            source = BIBLE_PROVIDERS.replace(
+                "(*DEFAULT_PROVIDERS, BIBLE_RESOURCES)", replacement
+            )
+            with self.subTest(expression=replacement), self.assertRaises(ValueError):
+                declared_providers(source)
+
+    def test_own_curated_catalogue_is_not_a_stock_sword_upstream(self):
+        config = deepcopy(self.config)
+        own = next(p for p in config["external_sources"]
+                   if p["id"] == "bible-resources")
+        self.assertEqual(own["kind"], "curated_catalogue")
+        report = compare(config, self.sources)
+        self.assertEqual(report["status"], "in_sync", report["errors"])
+        own["catalogue_url"] = "https://example.invalid/catalog.json"
+        report = compare(config, self.sources)
+        self.assertIn("external: bible-resources.catalogue_url differs from Bible",
+                      report["errors"])
 
     def test_literal_dataset_urls(self):
         self.assertEqual(literal_constant(REFERENCE, "DOWNLOAD_URL"),
@@ -115,7 +151,7 @@ class ProviderParityTests(unittest.TestCase):
     def test_provider_registry_classification(self):
         sword, external = expected_inventory(self.sources)
         self.assertEqual(set(sword), {"crosswire", "andbible-extra", "andbible", "step", "ebible"})
-        self.assertEqual(set(external), {"youversion", "openbible-cross-references", "openbible-topics"})
+        self.assertEqual(set(external), {"youversion", "openbible-cross-references", "openbible-topics", "bible-resources"})
 
 
 if __name__ == "__main__":

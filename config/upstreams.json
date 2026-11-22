@@ -85,6 +85,16 @@
       "download_url": "https://a.openbible.info/data/topic-scores.zip",
       "monitoring": "inventory_only",
       "notes": "Bible currently uses an independently versioned, SHA-256-pinned snapshot. This is not a SWORD module."
+    },
+    {
+      "id": "bible-resources",
+      "name": "Bible Resources",
+      "kind": "curated_catalogue",
+      "source_url": "https://icfmp.github.io/Bible-Resources/",
+      "catalogue_url": "https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json",
+      "packages_url": "https://icfmp.github.io/Bible-Resources/sword/packages/",
+      "monitoring": "inventory_only",
+      "notes": "Own reviewed release catalogue declared in Bible; not an upstream SWORD import candidate or an external copyright witness."
     }
   ],
   "excluded_upstreams": [
