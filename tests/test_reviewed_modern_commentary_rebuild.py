@@ -59,6 +59,48 @@ class ModernCommentaryReleaseContract(unittest.TestCase):
         self.assertTrue(failures)
         self.assertIn("metadata", failures[0].lower())
 
+    def test_revised_owner_decisions_fail_even_when_counts_stay_unchanged(self):
+        """Changed destinations cannot be approved by editing a JSON value."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            original_plan = ROOT / "config/commentary-rebuilds/hmcc-modern.json"
+            plan = root / "config/commentary-rebuilds/hmcc-modern.json"
+            plan.parent.mkdir(parents=True)
+            shutil.copy2(original_plan, plan)
+            original = (ROOT / "work/hmcc-modern/production/"
+                        "OWNER_EDITORIAL_DECISIONS_2026-11-19.json")
+            decisions = (root / "work/hmcc-modern/production/"
+                         "OWNER_EDITORIAL_DECISIONS_2026-11-19.json")
+            decisions.parent.mkdir(parents=True)
+            shutil.copy2(original, decisions)
+            self.assertEqual(
+                reviewed_modern_commentary_errors(
+                    self.module, root, self.metadata, self.conf), []
+            )
+            altered = json.loads(decisions.read_text(encoding="utf-8"))
+            self.assertTrue(altered["link_cases"])
+            altered["link_cases"][0]["approved_derived_destinations"][0] = "Gen.1.1"
+            decisions.write_text(json.dumps(altered), encoding="utf-8")
+            result = reviewed_modern_commentary_errors(
+                self.module, root, self.metadata, self.conf)
+            self.assertTrue(result)
+            self.assertIn("Pinned editorial evidence SHA256 differs", result[0])
+
+    def test_review_plan_is_independently_pinned(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            plan = root / "config/commentary-rebuilds/hmcc-modern.json"
+            plan.parent.mkdir(parents=True)
+            original = ROOT / "config/commentary-rebuilds/hmcc-modern.json"
+            shutil.copy2(original, plan)
+            altered = json.loads(plan.read_text(encoding="utf-8"))
+            altered["authorization"]["decision"] += " Unreviewed new approval."
+            plan.write_text(json.dumps(altered), encoding="utf-8")
+            result = reviewed_modern_commentary_errors(
+                self.module, root, self.metadata, self.conf)
+            self.assertTrue(result)
+            self.assertIn("Pinned editorial evidence SHA256 differs", result[0])
+
     def test_false_owner_authorization_fails(self):
         revised = json.loads(json.dumps(self.metadata))
         revised["rights"]["redistribution_allowed"] = False
