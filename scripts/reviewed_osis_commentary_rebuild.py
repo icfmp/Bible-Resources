@@ -10,6 +10,9 @@ from hashlib import sha256
 import json
 import re
 
+from reviewed_compiled_commentary_rebuild import (
+    commentary_payload_paths, checked_commentary_payload_files)
+
 def reviewed_osis_commentary_errors(module_dir, root, metadata, conf):
     pfx = f"{module_dir.name}: [OSIS_REBUILD_PROOF_INVALID] "
     try:
@@ -95,25 +98,14 @@ def reviewed_osis_commentary_errors(module_dir, root, metadata, conf):
         if (conf.get("ModDrv") not in ("zCom","zCom4")
                 or conf.get("BlockType") not in ("BOOK","CHAPTER","VERSE")):
             raise ValueError("Unsupported commentary driver or compression layout")
-        block={"BOOK":"b","CHAPTER":"c","VERSE":"v"}[conf["BlockType"]]
-        extension = block+"z"
-        directory = "zcom" if conf["ModDrv"]=="zCom" else "zcom4"
-        folder=metadata["sword_id"].lower()
-        members={"mods.d/"+folder+".conf"}
-        members.update("modules/comments/"+directory+"/"+folder+"/"+part+"."+extension+suffix
-                       for part in ("nt","ot") for suffix in ("s","v","z"))
-        expected_hashes=artifact.get("member_sha256")
-        if not isinstance(expected_hashes,dict) or set(expected_hashes)!=members:
+        members = commentary_payload_paths(
+            metadata["sword_id"], conf["BlockType"], conf["ModDrv"])
+        expected_hashes = artifact.get("member_sha256")
+        if not isinstance(expected_hashes, dict) or set(expected_hashes) != members:
             raise ValueError("Incomplete SWORD member inventory")
-        payload=module_dir/"payload"
-        files={}
-        for file in payload.rglob("*"):
-            if file.is_symlink():
-                raise ValueError("Symlink in published native package")
-            if file.is_file():
-                files[file.relative_to(payload).as_posix()]=file
-        if set(files)!=members:
-            raise ValueError("Package membership differs from audited source")
+        files = checked_commentary_payload_files(
+            module_dir / "payload", metadata["sword_id"],
+            conf["BlockType"], conf["ModDrv"])
         for relative,file in files.items():
             digest=expected_hashes[relative]
             if not isinstance(digest,str) or len(digest)!=64 or sha256(file.read_bytes()).hexdigest()!=digest:
