@@ -2,7 +2,7 @@
 
 This module returns private in-memory text to its checked callers; never export
 these text and note bodies in public metadata receipts. This is a source
-inspector, not a source correction, USFX conversion or release approval.
+inspector, not a source correction, format conversion or release approval.
 """
 from __future__ import annotations
 
