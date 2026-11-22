@@ -6,6 +6,8 @@ on:
       - ".github/workflows/darby-andbible-jsword.yml"
       - "scripts/probe_andbible_jsword.py"
       - "modules/darby-jnd-2024/tools/probe_private_repaired_darby_sword.py"
+      - "scripts/research/bible/source_osis_verse_notes.py"
+      - "tests/test_source_osis_verse_notes.py"
       - "tests/java/org/icfmp/research/DarbyAndBibleJSwordProbeTest.java"
       - "scripts/repair_osis_source_bytes.py"
       - "config/publisher-osis/frajnd-2024-note-link-research.json"
