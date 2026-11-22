@@ -9,7 +9,7 @@ import urllib.error
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from pilot_fetch import PilotError, SafeRedirect, fetch, validate_url
-from probe_official_osis import inspect_bytes
+from fetch_reviewed_schema import inspect_bytes
 from validate import DRIVERS, ALLOWED
 
 
