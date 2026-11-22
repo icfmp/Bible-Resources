@@ -109,7 +109,7 @@ jobs:
                 json.dumps(counts, sort_keys=True))
           import sys
           sys.path.insert(0, str(Path("scripts").resolve()))
-          from commentary_bookcode_repair_receipt_guard import validate_private_bookcode_repair_receipt
+          from research.commentary.commentary_bookcode_repair_receipt_guard import validate_private_bookcode_repair_receipt
           guarded_repairs = validate_private_bookcode_repair_receipt(report)
           print("Private source-bound book-marker proposal (not an approved edit): " +
                 json.dumps(guarded_repairs, sort_keys=True))
