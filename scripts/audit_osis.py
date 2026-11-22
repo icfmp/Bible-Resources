@@ -580,6 +580,21 @@ def source_commentary_reviewed_shared_key_plan(
     }
 
 
+def exact_unicode_source_ordered_subsequence(source: list[str], compiled: list[str]) -> bool | None:
+    """Bounded exact Unicode word-order check; not editorial text equivalence.
+
+    False may mean changed order rather than omitted source prose. None means
+    the input exceeds the independently bounded linear analysis.
+    """
+    if max(len(source), len(compiled)) > 100_000:
+        return None
+    matched = 0
+    for token in compiled:
+        if matched < len(source) and token == source[matched]:
+            matched += 1
+    return matched == len(source)
+
+
 def compare_source_overlap_native_bodies(
         overlapping: dict, native_raw: dict[str, bytes],
         *, max_cases: int = 35) -> dict:
@@ -590,7 +605,6 @@ def compare_source_overlap_native_bodies(
     alone cannot prove full notes/markup fidelity or printed edition identity.
     """
     from lxml import etree
-    from research.commentary.commentary_nonlink_analysis import exact_unicode_source_ordered_subsequence
     if (not isinstance(overlapping,dict) or not overlapping
             or not isinstance(native_raw,dict) or not native_raw):
         raise ValueError("No source/native overlap evidence")

@@ -47,7 +47,7 @@ class ScriptInventoryTests(unittest.TestCase):
     def test_proven_generic_tools_keep_shared_contracts(self):
         entries = {v["path"].rsplit("/", 1)[-1]: v
                    for v in self.result["files"]}
-        for name in ("promote_sword_preview.py", "commentary_text_delta.py"):
+        for name in ("promote_sword_preview.py",):
             with self.subTest(shared=name):
                 self.assertEqual(entries[name]["classification"], "KEEP_GENERIC")
                 self.assertTrue(entries[name]["has_direct_tests_by_filename"])
@@ -98,41 +98,6 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("usage:", result.stdout)
         self.assertIn("--division-overlay", result.stdout)
-
-    def test_completed_original_mhcc_stock_reader_harnesses_are_retired(self):
-        """Keep source identity and generic readers, not old one-off GUI adapters."""
-        paths = {row["path"] for row in self.result["files"]}
-        for name in (
-            "commentary_private_candidate_xiphos_gui.py",
-            "commentary_stock_andbible_android.py",
-            "commentary_android_text_witness.py",
-            "commentary_android_webview_debug.py",
-            "commentary_stock_xiphos_smoke.py",
-            "commentary_andbible_jsword.py",
-        ):
-            with self.subTest(name=name):
-                self.assertNotIn("scripts/" + name, paths)
-                self.assertNotIn("modules/mhcc-crosswire/tools/" + name, paths)
-        for workflow in (
-            "commentary-private-candidate-xiphos-gui.yml",
-            "commentary-zcom-andbible-android.yml",
-            "commentary-zcom-xiphos-private-smoke.yml",
-            "commentary-zcom-andbible-jsword.yml",
-        ):
-            with self.subTest(workflow=workflow):
-                self.assertFalse((ROOT / ".github/workflows" / workflow).exists())
-        self.assertFalse(
-            (ROOT / "tests/java/org/icfmp/research/"
-             "CommentaryAndBibleJSwordProbeTest.java").exists()
-        )
-        # Source identity and true shared readers remain active and tested.
-        for name in ("commentary_xiphos_dual_reader.py",
-                     "commentary_stock_candidate.py",
-                     "probe_andbible_android_private_import.py",
-                     "probe_andbible_jsword.py",
-                     "reader_xiphos_headless_smoke.py"):
-            self.assertIn("scripts/" + name, paths)
-
 
     def test_retired_legacy_usfx_probes_do_not_remain_in_shared_scripts(self):
         """One-off USFX/stock parity research is not the current OSIS process."""
@@ -207,23 +172,6 @@ class ScriptInventoryTests(unittest.TestCase):
                 self.assertIn(p, refs)
 
 
-    def test_nested_package_imports_count_as_real_static_callers(self):
-        entries = {item["path"]: item for item in self.result["files"]}
-        module = ("scripts/research/commentary/"
-                  "commentary_chapter_neighbors.py")
-        self.assertIn(module, entries)
-        self.assertIn("scripts/commentary_private_text_compare.py",
-                      entries[module]["static_references"])
-        self.assertIn("tests/test_commentary_chapter_neighbors.py",
-                      entries[module]["static_references"])
-        self.assertIn("scripts/research/commentary/"
-                      "commentary_chapter_p_boundaries.py", entries)
-        self.assertIn(
-            "scripts/research/commentary/commentary_chapter_p_boundaries.py",
-            entries["scripts/research/commentary/"
-                    "commentary_chapter_paragraph_overlap.py"]["static_references"],
-        )
-
     def test_old_section_scope_experiment_is_not_retained(self):
         """Completed stock commentary section research stays in Git history."""
         active = {row["path"] for row in self.result["files"]}
@@ -247,49 +195,6 @@ class ScriptInventoryTests(unittest.TestCase):
             self.assertNotIn("scripts/research/commentary/" + stem + ".py",
                              active)
 
-
-    def test_original_link_identity_gate_is_a_scoped_import_only_helper(self):
-        """Check all real module and regression-test consumers after extraction."""
-        entries = {entry["path"]: entry for entry in self.result["files"]}
-        name = "scripts/research/commentary/commentary_original_link_identity.py"
-        self.assertIn(name, entries)
-        for caller in (
-            "scripts/commentary_modern_reference_gate.py",
-            "scripts/commentary_modern_linked_candidate_preview.py",
-            "tests/test_commentary_modern_reference_gate.py",
-        ):
-            with self.subTest(caller=caller):
-                self.assertIn(caller, entries[name]["static_references"])
-        self.assertNotIn("scripts/commentary_original_link_identity.py", entries)
-
-    def test_link_disposition_review_keeps_real_cli_and_test_imports(self):
-        """Original link proposal checking remains pinned and read-only."""
-        entries = {entry["path"]: entry for entry in self.result["files"]}
-        helper = ("scripts/research/commentary/"
-                  "commentary_link_disposition_review.py")
-        self.assertIn(helper, entries)
-        for caller in ("scripts/commentary_modern_reference_gate.py",
-                       "tests/test_commentary_modern_reference_gate.py"):
-            self.assertIn(caller, entries[helper]["static_references"])
-        self.assertNotIn("scripts/commentary_link_disposition_review.py", entries)
-
-    def test_nonlink_analyses_share_one_reviewed_research_module(self):
-        """Check all substantive imports after retiring two root module paths."""
-        entries = {row["path"]: row for row in self.result["files"]}
-        new = "scripts/research/commentary/commentary_nonlink_analysis.py"
-        self.assertIn(new, entries)
-        self.assertNotIn("scripts/commentary_nonlink_words.py", entries)
-        self.assertNotIn("scripts/commentary_nonlink_word_alignment.py", entries)
-        for caller in (
-            "scripts/commentary_private_text_compare.py",
-            "scripts/research/commentary/commentary_prose_cross_slot.py",
-            "scripts/research/commentary/commentary_unresolved_lexical_triage.py",
-            "tests/test_commentary_nonlink_words.py",
-            "tests/test_commentary_nonlink_word_alignment.py",
-            ".github/workflows/commentary-modern-source-receipt.yml",
-        ):
-            with self.subTest(caller=caller):
-                self.assertIn(caller, entries[new]["static_references"])
 
     def test_current_osis_source_native_helpers_are_package_owned(self):
         """Only maintained OSIS/native helpers should have live consumers."""
@@ -320,127 +225,32 @@ class ScriptInventoryTests(unittest.TestCase):
                     self.assertIn(caller, entries[path]["static_references"])
 
 
-    def test_private_transport_and_reader_probes_are_packaged(self):
-        """Do not present imported diagnostic functions as separate CLIs."""
-        entries = {row["path"]: row for row in self.result["files"]}
-        helpers = {
-            "commentary_osis_paragraph_presence": (
-                ".github/workflows/commentary-mhc-source-text.yml",
-                "tests/test_commentary_osis_paragraph_presence.py"),
-            "commentary_osis_transport_probe": (
-                "scripts/commentary_osis_mixed_transport_probe.py",
-                "tests/test_commentary_osis_transport_probe.py"),
-            "commentary_xiphos_heading_probe": (
-                ".github/workflows/commentary-mhc-technical-rebuild.yml",
-                ".github/workflows/commentary-modern-source-receipt.yml",
-                "tests/test_commentary_xiphos_heading_probe.py"),
-        }
-        for name, callers in helpers.items():
-            with self.subTest(name=name):
-                root_file = f"scripts/{name}.py"
-                packaged = f"scripts/research/commentary/{name}.py"
-                self.assertNotIn(root_file, entries)
-                self.assertFalse((ROOT / root_file).exists())
-                self.assertIn(packaged, entries)
-                self.assertTrue((ROOT / packaged).is_file())
-                self.assertTrue(entries[packaged]["has_direct_tests_by_filename"])
-                for caller in callers:
-                    self.assertIn(caller, entries[packaged]["static_references"])
+    def test_historical_mhc_mhcc_stock_research_is_not_active(self):
+        """Use approved OSIS masters, not original stock reconstruction jobs."""
+        current = {row["path"] for row in self.result["files"]}
+        for name in ("commentary_modern_draft_osis_preview.py",
+                     "commentary_private_text_compare.py",
+                     "commentary_xiphos_dual_reader.py",
+                     "commentary_modern_reference_gate.py",
+                     "commentary_text_delta.py"):
+            self.assertNotIn("scripts/" + name, current)
+        self.assertFalse((ROOT / "scripts/research/commentary").exists())
+        for name in ("commentary-modern-source-receipt.yml",
+                     "commentary-mhc-source-text.yml",
+                     "commentary-mhc-technical-rebuild.yml",
+                     "commentary-mhc-private-jsword.yml",
+                     "commentary-mhc-private-xiphos.yml",
+                     "commentary-mhc-ccel-private-rebuild.yml"):
+            self.assertFalse((ROOT / ".github/workflows" / name).exists())
+        for resource in ("mhcc-crosswire", "mhc-crosswire", "hmcc-modern"):
+            self.assertTrue(
+                (ROOT / "sources/cleaned/commentaries/en" /
+                 resource / (resource if resource != "mhc-crosswire" else "mhc")).exists()
+                or (ROOT / "sources/cleaned/commentaries/en" / resource).is_dir()
+            )
+        self.assertIn("scripts/audit_osis.py", current)
+        self.assertIn("scripts/reviewed_modern_commentary_rebuild.py", current)
 
-    def test_source_authenticity_and_editorial_preflights_are_libraries(self):
-        """Six conservative original/source checks are import-only and tested."""
-        entries = {row["path"]: row for row in self.result["files"]}
-        helpers = {
-            "commentary_reference_registry_triage": (
-                "scripts/commentary_anchor_parity.py",
-                "tests/test_commentary_reference_registry_triage.py"),
-            "commentary_original_bookcode_repair": (
-                "scripts/commentary_private_text_compare.py",
-                "tests/test_commentary_original_bookcode_repair.py"),
-            "commentary_source_english_osis_alias": (
-                "scripts/research/commentary/commentary_source_identity_lexical_gate.py",
-                "tests/test_commentary_source_english_osis_alias.py"),
-        }
-        for name, callers in helpers.items():
-            with self.subTest(name=name):
-                old = f"scripts/{name}.py"
-                packaged = f"scripts/research/commentary/{name}.py"
-                self.assertNotIn(old, entries)
-                self.assertFalse((ROOT / old).exists())
-                self.assertIn(packaged, entries)
-                self.assertTrue((ROOT / packaged).is_file())
-                self.assertTrue(entries[packaged]["has_direct_tests_by_filename"])
-                for caller in callers:
-                    self.assertIn(caller, entries[packaged]["static_references"])
-
-    def test_commentary_census_and_topology_helpers_are_packaged(self):
-        """Six independently useful non-CLI helpers retain real consumers."""
-        entries = {row["path"]: row for row in self.result["files"]}
-        helpers = {
-            "commentary_original_div1_book_consistency": (
-                "scripts/commentary_private_text_compare.py",
-                "tests/test_commentary_original_div1_book_consistency.py"),
-            "commentary_stock_prefix_topology": (
-                "scripts/commentary_private_text_compare.py",
-                "tests/test_commentary_stock_prefix_topology.py"),
-            "commentary_shared_raw_source_units": (
-                "scripts/commentary_private_text_compare.py",
-                "tests/test_commentary_shared_raw_source_units.py"),
-            "commentary_source_native_boundaries": (
-                "scripts/commentary_private_text_compare.py",
-                ".github/workflows/commentary-mhc-source-text.yml",
-                "tests/test_commentary_source_native_boundaries.py"),
-            "commentary_navigation_link_plan": (
-                "scripts/commentary_anchor_parity.py",
-                "tests/test_commentary_navigation_link_plan.py"),
-        }
-        for name, callers in helpers.items():
-            with self.subTest(name=name):
-                root_path = f"scripts/{name}.py"
-                packaged_path = f"scripts/research/commentary/{name}.py"
-                self.assertNotIn(root_path, entries)
-                self.assertFalse((ROOT / root_path).exists())
-                self.assertIn(packaged_path, entries)
-                self.assertTrue((ROOT / packaged_path).is_file())
-                self.assertTrue(entries[packaged_path]["has_direct_tests_by_filename"])
-                for caller in callers:
-                    self.assertIn(caller, entries[packaged_path]["static_references"])
-
-    def test_source_neutral_lexical_and_cross_slot_helpers_are_packaged(self):
-        """Non-CLI evidence algorithms must remain imported from one package."""
-        entries = {row["path"]: row for row in self.result["files"]}
-        helpers = {
-            "commentary_near_prose_unicode_review":
-                ("scripts/commentary_private_text_compare.py",
-                 "tests/test_commentary_near_prose_unicode_review.py"),
-            "commentary_reference_cross_slot":
-                ("scripts/commentary_private_text_compare.py",
-                 "scripts/commentary_xiphos_dual_reader.py",
-                 "tests/test_commentary_reference_cross_slot.py"),
-            "commentary_source_identity_lexical_gate":
-                ("scripts/commentary_private_text_compare.py",
-                 "tests/test_commentary_source_identity_lexical_gate.py"),
-            "commentary_prose_cross_slot":
-                ("scripts/commentary_anchor_parity.py",
-                 "scripts/research/commentary/commentary_shared_raw_source_units.py",
-                 "tests/test_commentary_prose_cross_slot.py"),
-            "commentary_unresolved_lexical_triage":
-                ("scripts/commentary_private_text_compare.py",
-                 "tests/test_commentary_unresolved_lexical_triage.py"),
-        }
-        for name, consumers in helpers.items():
-            with self.subTest(helper=name):
-                old_path = "scripts/" + name + ".py"
-                new_path = "scripts/research/commentary/" + name + ".py"
-                self.assertNotIn(old_path, entries)
-                self.assertFalse((ROOT / old_path).exists())
-                self.assertIn(new_path, entries)
-                self.assertTrue((ROOT / new_path).is_file())
-                self.assertTrue(entries[new_path]["has_direct_tests_by_filename"])
-                self.assertEqual(entries[new_path]["entrypoint_hint"],
-                                 "library, native helper or workflow-invoked")
-                for caller in consumers:
-                    self.assertIn(caller, entries[new_path]["static_references"])
 
     def test_completed_hmcc_modern_staging_is_not_an_active_publisher(self):
         """Version-pinned first-release bootstraps belong to Git history only."""

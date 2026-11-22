@@ -7,14 +7,13 @@ The `scripts/` directory is for **maintained, reusable production and verificati
 | Location | Role |
 | --- | --- |
 | `scripts/*.py`, `scripts/*.cpp`, `scripts/*.sh` | Maintained OSIS-first commands, generic validators and independently checked native SWORD tools |
-| [`research/commentary/`](research/commentary/README.md) | Non-CLI, read-only commentary chapter, section, introduction, paragraph and native-scope diagnostics; **not** publication or editorial approval |
 | [`research/bible/`](research/bible/README.md) | Shared strict source-OSIS readers, SWORD markup/verse inspectors and source/native structural evidence; no CLI, source edits or editorial approval |
 | `modules/<resource-id>/tools/` | Maintained edition-only diagnostics/replay, never a second publisher; see [Darby](../modules/darby-jnd-2024/tools/README.md) |
 | [Generated tool inventory](../reports/tooling/TOOL_REGISTRY.md) | Every tracked tool's classification, source hash, imports and static callers; review evidence, **not** proof that a script is unused |
 
 For a new resource, begin with the [canonical production pipeline](../docs/PRODUCTION_PIPELINE.md). Do not improvise a second importer or add a script for each individual verse or edition correction.
 
-The commentary lexical, original-source book identity, Unicode, cross-slot, layout-census, source/native boundary and reference-registry witnesses — together with bounded erratum, metadata and rebuild-attestation **proposals** — are **import-only** helpers under [`research/commentary/`](research/commentary/README.md). Their diagnostic results never authorize commentary movement, Scripture reference rewriting, or publication. The original OSIS transport, paragraph-presence, approved-to-test erratum and Xiphos heading probes in the same package remain **private research helpers**, called only by source-pinned audit/workflow entrypoints; a successful in-memory transport or GUI probe is not a published commentary certification. Run the existing audited entrypoints and tests rather than treating an internal research function as an independent source-correction command.
+The former MHC and MHCC Modern stock-source reconstruction helpers were retired after their approved OSIS masters were archived under `sources/cleaned/`. The maintained tools validate those masters and their SWORD results; Git history retains the old exploratory code.
 
 ## Changing a script
 

@@ -15,6 +15,12 @@ RETIRED_STOCK_WORKFLOWS = (
     "commentary-private-text-compare.yml",
     "commentary-xiphos-dual-reader.yml",
     "stage-stock-commentary.yml",
+    "commentary-mhc-ccel-private-rebuild.yml",
+    "commentary-mhc-private-jsword.yml",
+    "commentary-mhc-private-xiphos.yml",
+    "commentary-mhc-source-text.yml",
+    "commentary-mhc-technical-rebuild.yml",
+    "commentary-modern-source-receipt.yml",
 )
 
 

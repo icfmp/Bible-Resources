@@ -17,8 +17,7 @@ work/<type>/<language>/<resource-id>/                # new drafts and local inve
 modules/<resource-id>/                              # native SWORD and approved metadata
   tools/                                             # only still-needed edition-specific QA/replay scripts
 scripts/                                            # reusable production and audit commands
-  research/bible/                                    # non-CLI USFX/source/native evidence libraries
-  research/commentary/                               # non-CLI commentary evidence libraries
+  research/bible/                                    # reusable OSIS/native evidence libraries
 catalog/v1/                                         # client-facing catalogue
 sword/                                              # distributed module packages
 docs/                                               # durable, generic documentation
@@ -36,7 +35,7 @@ Create independent candidates outside the original tree. **A source-derived cura
 
 Existing historical `work/` layouts may differ. Keep existing paths required to reproduce or resume work until their references have been audited; they are not templates for new resources.
 
-Shared read-only evidence code that has **no independent CLI** belongs in the relevant `scripts/research/` package; source/native USFX and note witnesses are under [`scripts/research/bible/`](../../scripts/research/bible/README.md), and commentary evidence under [`scripts/research/commentary/`](../../scripts/research/commentary/README.md). These are not alternate source formats or approval authorities. Keep the actual stable producer/validator commands in `scripts/` and edition-owned scripts under `modules/<resource-id>/tools/`, after verifying real workflow and test consumers.
+Shared read-only Bible/OSIS evidence with no independent CLI belongs under [`scripts/research/bible/`](../../scripts/research/bible/README.md). Historical commentary stock research is available through Git history, not maintained as an alternate production path. These tools never substitute for editorial or publication approval. Keep the actual stable producer/validator commands in `scripts/` and edition-owned scripts under `modules/<resource-id>/tools/`, after verifying real workflow and test consumers.
 
 ## Compiled and published output
 
