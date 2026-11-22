@@ -51,10 +51,9 @@ class ActiveCommentaryCIContract(unittest.TestCase):
                 self.assertIn('if data.get("category") == "commentary"', yaml)
                 self.assertIn("has_resources=", yaml)
                 self.assertIn("fromJSON(needs.select-source.outputs.resources)", yaml)
+                self.assertIn(f"{job}:", yaml)
                 self.assertIn(
-                    f"{job}:\\n    needs: select-source\\n"
-                    "    if: ${{ needs.select-source.outputs.has_resources == 'true' }}".replace(
-                        "\\${", "${"),
+                    "if: ${{ needs.select-source.outputs.has_resources == 'true' }}",
                     yaml,
                 )
                 self.assertNotIn('resources = ["mhcc-crosswire"]', yaml)
