@@ -59,7 +59,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/bible/source_native_osis_structure_screen.py`](../../scripts/research/bible/source_native_osis_structure_screen.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_osis_target_addressability.py`](../../scripts/research/bible/source_native_osis_target_addressability.py) | KEEP_GENERIC | named test | 6 | not determined |
 | [`scripts/research/bible/source_osis_verse_notes.py`](../../scripts/research/bible/source_osis_verse_notes.py) | KEEP_GENERIC | named test | 6 | not determined |
-| [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 6 | publication/release |
+| [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 7 | publication/release |
 | [`scripts/reviewed_modern_commentary_rebuild.py`](../../scripts/reviewed_modern_commentary_rebuild.py) | GENERALIZE | named test | 4 | publication/release |
 | [`scripts/reviewed_osis_commentary_rebuild.py`](../../scripts/reviewed_osis_commentary_rebuild.py) | KEEP_GENERIC | not established | 2 | publication/release |
 | [`scripts/smoke.py`](../../scripts/smoke.py) | KEEP_GENERIC | named test | 5 | not determined |
