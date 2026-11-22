@@ -16,7 +16,7 @@ import re
 
 from lxml import etree
 
-from commentary_layout_census import layout_profile, _strict_fragment
+from research.commentary.commentary_layout_census import layout_profile, _strict_fragment
 from commentary_xml_witness import WORK_REF, _parse_reference
 
 WORD = re.compile(r"\w+", re.UNICODE)
