@@ -30,4 +30,20 @@ Original native-link identity checks remain private observations: an authenticat
 
 The unified nonlink library deliberately keeps different bounds for each calculation: large-input accounting must never be mistaken for bounded longest-common-subsequence alignment. Existing tests continue to verify these differences.
 
+## Verify the package without exposing source content
+
+From the repository root, run the direct synthetic regressions and then the
+full production validation; the library files themselves have no CLI:
+
+```sh
+python -m unittest discover -s tests -p 'test_commentary_reference_cross_slot.py' -v
+python -m unittest discover -s tests -p 'test_commentary_source_identity_lexical_gate.py' -v
+python -m unittest discover -s tests -p 'test_commentary_unresolved_lexical_triage.py' -v
+python scripts/tool_registry.py --check
+```
+
+A passing lexical or native-slot helper test does not independently attest an
+external author's changed source archive. Preserve source SHA pins and run the
+separate source/native reader acceptance gate before any editorial decision.
+
 **Separate observations from decisions.** Similar-sounding helpers have different inputs, outputs and evidence limits. None is removable or interchangeable without a source-bound equivalence review. [Script maintenance #430](https://github.com/icfmp/Bible-Resources/issues/430) tracks this work; the [production contract](../../../docs/PRODUCTION_PIPELINE.md) remains authoritative.
