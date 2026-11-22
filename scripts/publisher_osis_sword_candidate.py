@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build two isolated SWORD research candidates from exact official OSIS.
+"""Build isolated SWORD research candidates from pinned official or approved OSIS.
 
 Research-only: compile original bytes via standard osis2mod, inspect with the
 *actual* native libSWORD and discard every temporary module. Emit bounded
@@ -79,9 +79,62 @@ def config_for(resource_id):
     return cfg
 
 
-def _create_candidate_layout(folder: Path, module_id: str, system: str):
+def approved_source_for(resource_id: str, *, root: Path = ROOT):
+    """Load the exact approved cleaned OSIS, checking the validated source pins."""
+    if not isinstance(resource_id, str) or not RESOURCE.fullmatch(resource_id):
+        raise PublisherSWORDResearchError("Invalid approved resource ID")
+    module = root / "modules" / resource_id
+    metadata_path = module / "metadata.json"
+    receipt_path = module / "SOURCE_VALIDATION.json"
+    if any(p.is_symlink() or not p.is_file() for p in (metadata_path, receipt_path)):
+        raise PublisherSWORDResearchError("Missing approved metadata or source receipt")
+    meta = json.loads(metadata_path.read_text(encoding="utf-8"))
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    lang, system, sword_id = (meta.get("language"), meta.get("versification"),
+                              meta.get("sword_id"))
+    if (meta.get("id") != resource_id or meta.get("category") != "bible"
+            or not isinstance(meta.get("quality"), dict)
+            or meta["quality"].get("status") != "approved"
+            or not isinstance(lang, str) or re.fullmatch(r"[a-z]{2,3}", lang) is None
+            or not isinstance(system, str) or SYSTEM.fullmatch(system) is None
+            or not isinstance(sword_id, str) or MODULE.fullmatch(sword_id) is None
+            or receipt.get("status") != "validated"
+            or receipt.get("source_kind") != "bible"):
+        raise PublisherSWORDResearchError("Unapproved Bible metadata or source")
+    folder = root / "sources" / "cleaned" / "bibles" / lang / resource_id
+    manifest_path = folder / "CLEANUP_MANIFEST.json"
+    if manifest_path.is_symlink() or not manifest_path.is_file():
+        raise PublisherSWORDResearchError("Missing approved cleaned OSIS manifest")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    candidates = list(folder.glob("*.osis.xml"))
+    if (len(candidates) != 1 or candidates[0].is_symlink()
+            or not candidates[0].is_file()
+            or manifest.get("resource_id") != resource_id
+            or manifest.get("language") != lang
+            or manifest.get("type") != "bible"
+            or manifest.get("source_format") not in (None, "OSIS")):
+        raise PublisherSWORDResearchError("Ambiguous approved cleaned source")
+    digest = receipt.get("source_sha256")
+    pins = [manifest[k] for k in ("cleaned_source_sha256", "cleaned_osis_sha256",
+                                  "final_candidate_osis_sha256") if k in manifest]
+    if (not isinstance(digest, str) or re.fullmatch(r"[a-f0-9]{64}", digest) is None
+            or not pins or any(pin != digest for pin in pins)):
+        raise PublisherSWORDResearchError("Approved OSIS source pins disagree")
+    data = candidates[0].read_bytes()
+    if sha256(data).hexdigest() != digest:
+        raise PublisherSWORDResearchError("Cleaned OSIS bytes differ from approved pin")
+    research_id = sword_id + "Research"
+    if MODULE.fullmatch(research_id) is None:
+        raise PublisherSWORDResearchError("Invalid isolated candidate module ID")
+    return {"candidate_module_id": research_id,
+            "candidate_versifications": [system], "language": lang}, data
+
+
+def _create_candidate_layout(folder: Path, module_id: str, system: str, language: str = 'fr'):
     """Create separate normal SWORD root and one strict research-only .conf."""
-    if not MODULE.fullmatch(module_id) or not SYSTEM.fullmatch(system):
+    if (not MODULE.fullmatch(module_id) or not SYSTEM.fullmatch(system)
+            or not isinstance(language, str)
+            or re.fullmatch(r'[a-z]{2,3}', language) is None):
         raise PublisherSWORDResearchError("Unsafe original source candidate module identity")
     name=module_id.lower()
     payload=folder/"payload"
@@ -96,7 +149,7 @@ def _create_candidate_layout(folder: Path, module_id: str, system: str):
         "BlockType=BOOK\n"
         "CompressType=ZIP\n"
         "Encoding=UTF-8\n"
-        "Lang=fr\n"
+        f"Lang={language}\n"
         "SourceType=OSIS\n"
         f"Versification={system}\n"
         "Description=Publisher original OSIS research-only unapproved module\n"
@@ -439,10 +492,14 @@ def select_candidate_versifications(cfg: dict, requested: str | None):
 
 
 def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
-          raw_binary:Path, versification: str | None = None):
-    cfg=config_for(resource_id)
+          raw_binary:Path, versification: str | None = None,
+          approved: bool = False):
+    if approved:
+        cfg, original = approved_source_for(resource_id)
+    else:
+        cfg = config_for(resource_id)
+        original = read_pinned_publisher_osis(resource_id)
     selected=select_candidate_versifications(cfg,versification)
-    original=read_pinned_publisher_osis(resource_id)
     source_keys,source_meta=source_inventory(original)
     verses,notes,source_check=original_osis_verses_and_notes(original)
     original_structures=authorial_structures(original)
@@ -462,7 +519,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
             work=tmp/("research-"+system)
             work.mkdir()
             payload,out=_create_candidate_layout(
-                work,cfg["candidate_module_id"],system)
+                work,cfg["candidate_module_id"],system,cfg.get("language", "fr"))
             compilation=None
             try:
                 compilation=_compile_osis(
@@ -492,6 +549,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
         "schema_version":1,
         "status":"reviewed_original_standards_sword_compilation_research_only",
         "resource_id":resource_id,
+        "research_source_kind":"approved_cleaned_osis" if approved else "pinned_publisher_original",
         "original_publisher_osis_sha256":sha256(original).hexdigest(),
         "official_source_verse_count":len(verses),
         "official_source_note_count":sum(map(len,notes.values())),
@@ -511,14 +569,17 @@ def main():
     p.add_argument("--native-index",type=Path,required=True)
     p.add_argument("--native-raw",type=Path,required=True)
     p.add_argument("--versification",default=None)
+    p.add_argument("--approved",action="store_true",
+                   help="Use hash-verified approved cleaned OSIS from repository")
     p.add_argument("--report",type=Path,required=True)
     a=p.parse_args()
     if a.report.exists() or a.report.is_symlink() or not a.report.parent.is_dir():
         p.error("Use new metadata report in an existing directory")
     result=probe(a.resource_id,osis2mod=a.osis2mod,index_binary=a.native_index,
-                 raw_binary=a.native_raw,versification=a.versification)
+                 raw_binary=a.native_raw,versification=a.versification,
+                 approved=a.approved)
     a.report.write_text(json.dumps(result,indent=2,sort_keys=True)+"\n",encoding="utf-8")
-    print("Official OSIS to SWORD research executed for",a.resource_id)
+    print("Pinned OSIS to SWORD research executed for",a.resource_id)
     for row in result["candidate_research_results"]:
         print(row["candidate_versification"],row["candidate_status"])
     print("No original OSIS, compiler logs, or unapproved sources persisted")
