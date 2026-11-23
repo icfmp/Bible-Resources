@@ -43,11 +43,11 @@
         "page_reference_full_note_certified": false
       },
       "original_print_case_review": {
-        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "case_examination_status": "partial_marginal_reference_token_read_only",
         "inspected_exact_print_verse_on_page": 13,
-        "printed_token": null,
-        "printed_token_target_hint": null,
-        "print_proof_source": null,
+        "printed_token": "Lé. 7. 26.",
+        "printed_token_target_hint": "Lev.7.26",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
         "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
         "source_note_edited": false,
         "machine_link_authorized": false,
@@ -119,11 +119,11 @@
         "page_reference_full_note_certified": false
       },
       "original_print_case_review": {
-        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "case_examination_status": "partial_marginal_reference_token_read_only",
         "inspected_exact_print_verse_on_page": 36,
-        "printed_token": null,
-        "printed_token_target_hint": null,
-        "print_proof_source": null,
+        "printed_token": "voy. 32. 28.",
+        "printed_token_target_hint": "Gen.32.28",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
         "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
         "source_note_edited": false,
         "machine_link_authorized": false,
@@ -233,11 +233,11 @@
         "page_reference_full_note_certified": false
       },
       "original_print_case_review": {
-        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "case_examination_status": "partial_marginal_reference_token_read_only",
         "inspected_exact_print_verse_on_page": 103,
-        "printed_token": null,
-        "printed_token_target_hint": null,
-        "print_proof_source": null,
+        "printed_token": "Hé. 13. 11.",
+        "printed_token_target_hint": "Heb.13.11",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
         "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
         "source_note_edited": false,
         "machine_link_authorized": false,
@@ -2067,8 +2067,8 @@
     "status": "first_pass_full_1910_original_image_screening_completed_not_full_editorial_certification",
     "totals": {
       "full_print_citation_verified": 1,
-      "partial_marginal_reference_token_read_only": 23,
-      "original_page_and_verse_examined_but_printed_citation_not_certified": 30
+      "partial_marginal_reference_token_read_only": 26,
+      "original_page_and_verse_examined_but_printed_citation_not_certified": 27
     },
     "reviewed_source_note_origins": 54,
     "source_label_edits_authorized": 0,
