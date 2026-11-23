@@ -211,7 +211,7 @@ class HistoricalIndexProofTests(unittest.TestCase):
                 metadata, source["source_sha256"]), [])
             return
         self.assertEqual(mode, "stock_reader_keys")
-        self.assertEqual(metadata["version"], "1.0.0")
+        self.assertEqual(metadata["version"], "1.0.1")
         self.assertEqual(source["source_sha256"],
                          "1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d")
         current = json.loads((module / "SWORD_COMPATIBILITY.json").read_text())
@@ -224,6 +224,23 @@ class HistoricalIndexProofTests(unittest.TestCase):
         }])
         self.assertEqual(current["source_to_native_full_body_mismatch_count"], 0)
         self.assertEqual(current["source_to_native_note_mismatch_count"], 0)
+        # A configuration-only hotfix may not alter historical original content.
+        historic_plan = json.loads((ROOT /
+            "sources/cleaned/bibles/fr/lsg-1910/editorial/releases/"
+            "LSG-1.0.0-RELEASE-PLAN.json").read_text())
+        self.assertEqual(historic_plan["tag"], "lsg-1.0.0")
+        self.assertEqual(historic_plan["package_sha256"],
+            "cc3b57ab0b61476a77b42fa19004956085d7608a974724c770cc2211adc67499")
+        historic_import = json.loads((ROOT /
+            "config/catalogue-import-lsg-1.0.0.json").read_text())
+        current_import = json.loads((ROOT /
+            "config/catalogue-import-lsg-1.0.1.json").read_text())
+        for member, hash_value in historic_import["files"].items():
+            if member.startswith("modules/texts/"):
+                self.assertEqual(current_import["files"][member], hash_value)
+        self.assertNotEqual(current_import["files"]["mods.d/brlsg1910.conf"],
+                            historic_import["files"]["mods.d/brlsg1910.conf"])
+
 
         legacy = json.loads((ROOT /
             "sources/cleaned/bibles/fr/lsg-1910/editorial/releases/"

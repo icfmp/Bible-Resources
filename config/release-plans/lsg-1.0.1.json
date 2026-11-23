@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "Owner-requested 1.0.1 config-only OSISScripref filter correction, source/native bytes unchanged, default-off stripText verified, explicit-on limitation disclosed.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/pull/548",
+    "reviewed_by": "Bible Resources project owner — configuration-only LSG 1.0.1 rendering correction requested 2026-11-23",
+    "source_rights": "eBible fraLSG public-domain source; independently reviewed original electronic reference citations and historical printed evidence"
+  },
+  "editorial_path": "modules/lsg-1910/EDITORIAL.md",
+  "evidence_path": "modules/lsg-1910/SOURCE_VALIDATION.json",
+  "module_id": "lsg-1910",
+  "notes_path": "sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-1.0.1.md",
+  "package_sha256": "c7b7471cba433abf99c84c1a6968a7a07a1d1cb5d021ca3bf6fdb86f6f6adf63",
+  "package_size_bytes": 4267046,
+  "schema_version": 1,
+  "sword_id": "BRLSG1910",
+  "tag": "lsg-1.0.1",
+  "title": "Louis Segond 1910 — 1.0.1",
+  "version": "1.0.1",
+  "zip_name": "BRLSG1910-1.0.1.zip"
+}

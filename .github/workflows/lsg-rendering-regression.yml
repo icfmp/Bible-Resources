@@ -1,0 +1,147 @@
+name: LSG native rendered-note regression (no publish)
+on:
+  push:
+    branches: ['fix/lsg-1.0.1-note-rendering']
+    paths:
+      - '.github/workflows/lsg-rendering-regression.yml'
+      - 'modules/lsg-1910/tools/stage_filter_hotfix.py'
+  pull_request:
+    paths:
+      - '.github/workflows/lsg-rendering-regression.yml'
+      - 'modules/lsg-1910/**'
+      - 'tests/test_catalogue_profiles.py'
+      - 'tests/test_release_preflight.py'
+      - 'tests/test_published_reference_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  render-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent stable SWORD compiler and renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libsword-dev libsword-utils diatheke
+      - name: Retrieve and attest the immutable preceding LSG 0.1.0 release
+        run: |
+          set -euo pipefail
+          curl -fLsS --retry 2 \
+            https://github.com/icfmp/Bible-Resources/releases/download/lsg-0.1.0/BRLSG1910-0.1.0.zip \
+            -o /tmp/lsg-0.1.0.zip
+          echo 'af2f80ea84f40a6bf62993c9e65c2e2061e1ec20b34b0772a4eb775dd47723c1  /tmp/lsg-0.1.0.zip' | sha256sum --check
+          mkdir -p /tmp/lsg-0.1.0
+          unzip -q /tmp/lsg-0.1.0.zip -d /tmp/lsg-0.1.0
+      - name: Probe real installed SWORD modules and the exact failing verses
+        run: |
+          cat > /tmp/lsg_render_probe.cpp <<'CPP'
+          #include <sword/swmgr.h>
+          #include <sword/swmodule.h>
+          #include <sword/versekey.h>
+          #include <iostream>
+          #include <string>
+          #include <vector>
+          #include <stdexcept>
+          static bool literal(const std::string &s) {
+            return s.find("<reference")!=std::string::npos ||
+                s.find("</reference")!=std::string::npos ||
+                s.find("osisRef=")!=std::string::npos ||
+                s.find("&lt;reference")!=std::string::npos;
+          }
+          static void describe(const char* kind,const std::string& ref,
+                               const char* opts,const std::string &s) {
+            bool leak=literal(s);
+            std::cout<<kind<<" "<<ref<<" "<<opts<<" chars="<<s.size()
+                     <<" literal_ref_leak="<<(leak?"YES":"NO")
+                     <<" link_tag="<<(s.find("<a ")!=std::string::npos?"YES":"NO")
+                     <<" first_note="<<(s.find("<note")!=std::string::npos?"YES":"NO")
+                     <<'\n';
+            if (leak && std::string(kind)!="RAW") {
+              auto index=s.find("<reference");
+              if(index==std::string::npos)index=s.find("osisRef=");
+              if(index==std::string::npos)index=s.find("&lt;reference");
+              if(index!=std::string::npos)
+                std::cout<<"LITERAL_SAMPLE "<<ref<<" "<<kind<<" "
+                         <<s.substr(index,180)<<'\n';
+            }
+          }
+          int main(int argc,char **argv) {
+            if(argc!=2) return 2;
+            sword::SWMgr mgr;
+            sword::SWModule* module=mgr.getModule(argv[1]);
+            if(!module) { std::cerr<<"missing-module\n"; return 3;}
+            for(const char* mode:{"Off","On"}) {
+              mgr.setGlobalOption("Cross-references",mode);
+              mgr.setGlobalOption("Footnotes",mode);
+              for(const std::string ref: {"Rom.1.7","Rom.1.9","John.1.1","Gen.1.1"}) {
+                sword::VerseKey key;
+                key.setVersificationSystem("Segond");
+                key.setAutoNormalize(false);
+                key.setText(ref.c_str());
+                if(key.popError())return 4;
+                if(module->setKey(key))return 5;
+                std::string raw=module->getRawEntry();
+                std::string plain=module->stripText();
+                sword::SWBuf html=module->renderText();
+                describe("RAW",ref,mode,raw);
+                describe("PLAIN",ref,mode,plain);
+                describe("HTML",ref,mode,html.c_str());
+              }
+            }
+            return 0;
+          }
+          CPP
+          g++ -std=c++17 -O2 -I/usr/include/sword /tmp/lsg_render_probe.cpp -o /tmp/lsg_render_probe -lsword
+          echo '===== LSG 0.1.0 previous immutable RawText =====' | tee /tmp/lsg-rendering-probe.log
+          SWORD_PATH=/tmp/lsg-0.1.0 /tmp/lsg_render_probe BRLSG1910 | tee -a /tmp/lsg-rendering-probe.log
+          echo '===== Current LSG zText with checked-in filter =====' | tee -a /tmp/lsg-rendering-probe.log
+          SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg_render_probe BRLSG1910 | tee -a /tmp/lsg-rendering-probe.log
+          echo '===== LSG 1.0.0 exact binary with historical valid OSISScripref filter =====' | tee -a /tmp/lsg-rendering-probe.log
+          cp -a "$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg-valid-filter
+          python - <<'PY'
+          from pathlib import Path
+          conf=Path('/tmp/lsg-valid-filter/mods.d/brlsg1910.conf')
+          original=conf.read_text()
+          assert original.count('GlobalOptionFilter=OSISXRefs') + original.count('GlobalOptionFilter=OSISScripref') == 1
+          conf.write_text(original.replace('GlobalOptionFilter=OSISXRefs',
+                                           'GlobalOptionFilter=OSISScripref'))
+          PY
+          SWORD_PATH=/tmp/lsg-valid-filter /tmp/lsg_render_probe BRLSG1910 | tee -a /tmp/lsg-rendering-probe.log
+      - name: Prepare a new reviewed 1.0.1 release on the dedicated branch only
+        if: github.event_name == 'push' && github.ref == 'refs/heads/fix/lsg-1.0.1-note-rendering'
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          python modules/lsg-1910/tools/stage_filter_hotfix.py
+          g++ -std=c++17 -O2 -I/usr/include/sword modules/lsg-1910/tools/check_native_render.cpp -o /tmp/lsg-native-render-check -lsword
+          SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg-native-render-check BRLSG1910
+          python scripts/tool_registry.py --write
+          # Track the superseding plan and the deleted prior active plan
+          # BEFORE topology tests inspect git ls-files; do not relax checks.
+          git add -A modules/lsg-1910 sources/cleaned/bibles/fr/lsg-1910 \
+            config/catalogue-import-lsg-1.0.1.json \
+            config/release-plans/lsg-1.0.0.json config/release-plans/lsg-1.0.1.json \
+            catalog/v1/catalog.json
+          git add -u -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          python -m unittest discover -s tests -q
+          python scripts/validate.py
+          python scripts/release_preflight.py --module-id lsg-1910 --report /tmp/lsg-1.0.1-preflight.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git diff --cached --check
+          git commit -m "release(lsg): stage verified configuration-only SWORD 1.0.1 package"
+          git push origin HEAD:refs/heads/fix/lsg-1.0.1-note-rendering
+      - name: Fail-closed complete SWORD plain display check for all 31,169 native verses
+        if: github.event_name != 'push'
+        run: |
+          g++ -std=c++17 -O2 -I/usr/include/sword modules/lsg-1910/tools/check_native_render.cpp -o /tmp/lsg-native-render-check -lsword
+          SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg-native-render-check BRLSG1910
+      - name: Store diagnostic report without publication
+        uses: actions/upload-artifact@v4
+        with:
+          name: lsg-1.0.0-native-render-diagnostic
+          path: /tmp/lsg-rendering-probe.log
+          retention-days: 7
+          if-no-files-found: error

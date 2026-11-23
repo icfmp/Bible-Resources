@@ -13,11 +13,11 @@
   "original_usfx_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
   "previous_approved_cleaned_osis_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
   "prior_generated_osis_sha256": "1752ea16f7c8b5ddbca3570b53110086243e0bb40a517af17ee11cce78cd2830",
-  "published_release_provenance": "config/catalogue-import-lsg-1.0.0.json",
+  "published_release_provenance": "config/catalogue-import-lsg-1.0.1.json",
   "recovery_replayed_existing_source_transforms": true,
   "resource_id": "lsg-1910",
   "retyped_parallel_heading_osis_sha256": "1a248d27291f6f041a4642e6f97831d4951584cf76331d8b069a7a91179fc233",
   "schema_version": 1,
-  "status": "reviewed_lsg_1_0_0_candidate_pending_publication",
+  "status": "reviewed_lsg_1_0_1_configuration_only_hotfix",
   "type": "bible"
 }

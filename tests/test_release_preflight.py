@@ -26,8 +26,8 @@ class CrossEditionReleasePreflightTests(unittest.TestCase):
         by_id = {r["resource_id"]: r for r in report["modules"]}
         self.assertEqual(set(by_id), set(self.ids))
         self.assertEqual(by_id["lsg-1910"]["driver"], "zText")
-        self.assertEqual(by_id["lsg-1910"]["version"], "1.0.0")
-        self.assertEqual(by_id["lsg-1910"]["release_tag"], "lsg-1.0.0")
+        self.assertEqual(by_id["lsg-1910"]["version"], "1.0.1")
+        self.assertEqual(by_id["lsg-1910"]["release_tag"], "lsg-1.0.1")
         self.assertEqual(by_id["darby-jnd-2024"]["driver"], "zText")
         self.assertEqual(by_id["mhcc-crosswire"]["driver"], "zCom")
         for record in by_id.values():
