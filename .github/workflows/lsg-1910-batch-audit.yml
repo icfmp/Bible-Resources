@@ -11,36 +11,95 @@ jobs:
     timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
-      - name: Install DjVu tooling
+      - name: Install DjVu and source inspection dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq -y djvulibre-bin
           python -m pip install -q lxml rapidfuzz Pillow
-      - name: Download and check immutable original 1910 printed edition
+      - uses: actions/cache@v4
+        with:
+          path: /tmp/lsg-print-1910.djvu
+          key: original-facsimile-1910-sha256-67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b
+      - name: Download and check exact original 1910 printed edition
         run: |
-          curl --retry 3 -fsSL 'https://upload.wikimedia.org/wikipedia/commons/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu' -o /tmp/lsg-print-1910.djvu
+          if [ ! -f /tmp/lsg-print-1910.djvu ]; then
+            curl --retry 3 -fsSL 'https://upload.wikimedia.org/wikipedia/commons/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu' -o /tmp/lsg-print-1910.djvu
+          fi
           echo '67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b  /tmp/lsg-print-1910.djvu' | sha256sum --check
-      - name: Analyze original DjVu text layer for source verse locating
+      - name: Reconstruct source verse snippets and locate all 54 cases in the 1061-page embedded transcription
         run: |
+          mkdir -p /tmp/lsg1910batch
           python - <<'PY'
-          from zipfile import ZipFile
-          from lxml import etree
+          import re, json, unicodedata, subprocess, hashlib
           from pathlib import Path
-          import subprocess,re,unicodedata,json
-          p='/tmp/lsg-print-1910.djvu'
-          raw=subprocess.run(['djvutxt',p],capture_output=True,check=True).stdout.decode('utf-8','replace')
+          from zipfile import ZipFile
+          from rapidfuzz import fuzz
+          from lxml import etree
+          from collections import defaultdict
+          records=json.loads(Path('sources/cleaned/bibles/fr/lsg-1910/editorial/SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json').read_text())['records']
+          original=Path('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip')
+          with ZipFile(original) as z: doc=etree.fromstring(z.read('fraLSG_usfx.xml'))
+          raw=subprocess.run(['djvutxt','/tmp/lsg-print-1910.djvu'],check=True,capture_output=True).stdout.decode('utf-8','replace')
           pages=raw.split('\f')
-          print('TOTAL_PAGES',len(pages),'TOTAL_CHARS',len(raw))
-          for n in [13,29,36,96,103,300,500,900]:
-              t=pages[n-1]
-              print('PRINTED_PAGE',n,'LENGTH',len(t),'FIRST',repr(t[:450]),'LAST',repr(t[-250:]))
-          with ZipFile('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip') as z:
-              root=etree.fromstring(z.read('fraLSG_usfx.xml'))
-          for bid,chapter,verse in [('GEN',9,4),('GEN',28,12),('GEN',35,10),('LEV',10,18),('REV',20,12)]:
-              book=next(b for b in root.iter('book') if b.get('id')==bid)
-              ch=next(c for c in book.iter('c') if c.get('id')==str(chapter))
-              v=next((x for x in ch.iter('v') if x.get('id')==str(verse)),None)
-              print('USFX',bid,chapter,verse,'FOUND',v is not None,'VERSE',repr(''.join(v.itertext())[:350]) if v is not None else '')
-              print('CHAPTER_CONTENT',bid,etree.tostring(ch,encoding='unicode')[:650])
-              print('FIRST_VERSE_ELEMENTS',bid,[(x.tag,x.attrib,repr(x.text or '')[:40],repr(x.tail or '')[:80]) for x in list(ch.iter()) if x.tag in ('v','verse')][:5])
+          if len(pages)!=1061: raise SystemExit('Unexpected printed page inventory')
+          def norm(s):
+              s=unicodedata.normalize('NFKD',s.casefold())
+              s=''.join(c for c in s if not unicodedata.combining(c))
+              return ' '.join(re.findall('[a-z0-9]+',s))
+          normalized=[norm(p) for p in pages]
+          expected={(r['original_usfm_book'],r['source_note_origin']) for r in records}
+          samples={}
+          for book in doc.iter('book'):
+              bid=book.get('id')
+              ch=None
+              for node in book.iter():
+                  if node.tag=='c':
+                      ch=node.get('id')
+                  elif node.tag=='v' and ch:
+                      ref=(bid,ch+'.'+str(node.get('id')))
+                      if ref not in expected: continue
+                      # The USFX uses empty verse-number elements, with authorial text after each milestone.
+                      text=(node.tail or '')
+                      sibling=node.getnext()
+                      while sibling is not None and sibling.tag not in ('c','v'):
+                          if sibling.tag not in ('x','f'):
+                              text+=' '+''.join(sibling.itertext())
+                          text+=' '+(sibling.tail or '')
+                          sibling=sibling.getnext()
+                      samples[ref]=norm(text)[:220]
+          print('EXTRACTED_VERSE_SNIPPETS',len(samples),'of',len(expected))
+          for sample in [('GEN','9.4'),('GEN','28.12'),('LEV','10.18'),('REV','20.12')]:
+              print('SAMPLE_VERSE',sample,repr(samples.get(sample,''))[:240])
+          results=[]
+          for r in records:
+              key=(r['original_usfm_book'],r['source_note_origin'])
+              snippet=samples.get(key,'')
+              if len(snippet)<30: 
+                  print('SOURCE_VERSE_TOO_SHORT',r['record_id'],repr(snippet))
+                  results.append({'record_id':r['record_id'],'source_usfm_book':key[0],'source_note_origin':key[1],'source_excerpt':snippet,'match_status':'insufficient_original_verse_snippet','candidate_pages':[]})
+                  continue
+              # Matching only identifies a candidate page. OCR is inherently noisy: a high
+              # similarity here is NOT historical proof of the literal printed marginal notes.
+              query=snippet[:130]
+              scores=sorted(((round(fuzz.partial_ratio(query,p),2),i+1) for i,p in enumerate(normalized)),reverse=True)[:5]
+              best_score,best_page=scores[0]
+              row={'record_id':r['record_id'],'source_usfm_book':key[0],'source_note_origin':key[1],
+                   'source_excerpt':snippet[:160],
+                   'match_status':'candidate_not_manually_verified',
+                   'candidate_pages':[{'page':page,'score':score,'header':pages[page-1].splitlines()[0][:100]} for score,page in scores]}
+              results.append(row)
+              print('BATCH_VERSE_PAGE_CANDIDATE='+json.dumps(row,ensure_ascii=False,separators=(',',':')))
+          assert len(results)==54 and len({r['record_id'] for r in results})==54
+          Path('/tmp/lsg1910batch/all-candidate-page-locators.json').write_text(json.dumps({
+            'source':'original_1910_print_existing_ocr_layer_only_not_print_reference_certification',
+            'scan_sha256':'67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b',
+            'original_usfx_sha256':hashlib.sha256(original.read_bytes()).hexdigest(),
+            'records':results
+          },indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print('PAGE_LOCATOR_COMPLETE',len(results),'unique_pages',len(set(r['candidate_pages'][0]['page'] for r in results if r['candidate_pages'])))
           PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lsg-1910-source-verse-to-original-print-OCR-page-candidates-unapproved
+          path: /tmp/lsg1910batch/all-candidate-page-locators.json
+          retention-days: 7
