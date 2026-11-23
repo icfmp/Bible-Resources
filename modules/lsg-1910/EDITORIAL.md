@@ -1,3 +1,15 @@
+# Louis Segond 1910 — Bible Resources 1.0.0 (release review)
+
+**Not yet published.** New edition based on the complete source-verified candidate SHA-256 1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d. Actual SWORD is a new zText payload.
+
+- 12 reviewed source-specific electronic reference-fragment repairs and 3 introduction decisions, fully source-proven and reversible.
+- 31,169/31,169 native verse bodies preserve the original Scripture text; 9,751/9,751 native note caller/type/bodies match the revised source.
+- Original 31,170 verse keys preserved. Stock Segond lacks Mark.10.53 as a separately addressable verse; its text is included under Mark.10.52, with a separately owner-reviewed reversible compatibility policy.
+- The source contains no Job.34.37. No source-absent verse is added.
+- Historical release 0.1.0 remains immutable and distinctly documented below.
+
+## Historical 0.1.0 editorial record
+
 # Louis Segond 1910 — Bible Resources 0.1.0
 
 **Status:** source and compiled SWORD payload accepted for the **first, explicitly provisional** edition on 2026-11-09 by the project owner. This editorial approval permits initial publication; it does not claim exhaustive typographical comparison against a printed edition.

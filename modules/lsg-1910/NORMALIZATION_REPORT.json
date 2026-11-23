@@ -1,30 +1,33 @@
 {
-  "diff_format": "text-free structural change manifest, not a text-bearing patch",
-  "diff_sha256": "a2d4e96395615079146c8a01172d41337dd8ec8b1616b0630326ebb7b5228696",
+  "diff_sha256": "1f75143a8340723c87a34eaba467b642ab3eb594f549d6ff0355ba96d83a0078",
   "edition": "reader_optimized",
   "full_text_exactly_preserved": true,
   "inline_semantic_tags_preserved": true,
   "kind": "bible",
   "operations": [
     {
-      "count": 2786,
-      "kind": "retype_verified_targetless_parallel_heading"
+      "operation": "source_attested_navigation_links",
+      "result": "1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d",
+      "source": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0"
     },
     {
-      "count": 25,
-      "kind": "retype_verified_targetless_scope_heading"
+      "count": 12,
+      "operation": "reviewed_exact_electronic_reference_fragments"
     },
     {
-      "count": 1,
-      "kind": "add_reviewed_mark_10_52_53_reader_index_label"
+      "count": 3,
+      "operation": "source_introduction_typo_and_link_splits"
+    },
+    {
+      "operation": "individually_addressed_citation_segmentation",
+      "source_groups": 4909
     }
   ],
   "original_source_unchanged": true,
-  "output_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
-  "plan_sha256": "71df871646f7e80fd40e1dd59da4ca3b4923194ebceee71f518a7223810d2d03",
-  "provenance_audit_sha256": "f602d9305ee3a7dd008cd127ae7e66f16e9fb9ba39b51b7c7ddb879866cddcca",
-  "review_asserted_by_plan": "Bible Resources project owner on 2026-11-09",
+  "output_sha256": "1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d",
+  "plan_sha256": "3e29ce023671fcc8ab4b85c1a639f7f52b8d89d4024d27cea6d3335e74787aa4",
+  "review_asserted_by_plan": "Owner-reviewed separate LSG 1.0.0 derivative approved 2026-11-23; Scripture/notes native verified",
   "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
-  "source_sha256": "1752ea16f7c8b5ddbca3570b53110086243e0bb40a517af17ee11cce78cd2830",
+  "source_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
   "status": "structural_edit_verified_not_published"
 }

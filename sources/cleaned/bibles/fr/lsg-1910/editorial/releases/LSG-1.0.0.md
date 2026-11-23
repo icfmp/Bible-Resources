@@ -1,4 +1,4 @@
-# Louis Segond 1910 — 1.0.0 build candidate (NOT PUBLISHED)
+# Louis Segond 1910 — 1.0.0 reviewed release staging (NOT YET PUBLISHED)
 
 **Owner direction, 23 November 2026:** prepare **1.0.0**, not 0.1.1. This document records an isolated, reproducible candidate build; it is **not** an approved publication plan, a release tag, or a new cleaned-master approval.
 
@@ -31,3 +31,9 @@ The dedicated [GitHub Actions preview workflow](../../../../../../../.github/wor
 Before creating a real release plan under `config/release-plans/lsg-1.0.0.json`, replacing the approved cleaned master or changing the catalogue: retain the exact generated module source and native compile receipts, independently verify all notes and verse text in the compiled package, reconcile the stock-SWORD versification exception, prepare the new source validation/manifests and published reader profile, obtain owner review and run the complete production publication gates. No package checksum or source validation is to be invented from intent.
 
 **Release status: NOT YET AUTHORIZED; NO RELEASE TAG, NO PUBLIC MODULE OR CATALOGUE MODIFICATION.**
+
+## Full reviewed native evidence
+
+- Scripture body parity: 31,169/31,169 native entries match the source, including the source-authored Mark.10.53 text in the available Mark.10.52 slot; 9,751/9,751 note contents and callers match.
+- Source SHA-256: 1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d. Released stable SWORD 1.9.0.
+- Publication remains gated on the exact final package, catalogue, and public approval. Source-original USFX is immutable.

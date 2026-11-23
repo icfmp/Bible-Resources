@@ -1,0 +1,30 @@
+{
+  "editorial_approval": {
+    "approved_by": "Bible Resources project owner",
+    "date": "2026-11-23",
+    "scope": "Owner-requested reviewed LSG 1.0.0 with 12 electronic reference repairs, 3 introductions and previously approved Mark 10:53 provisional stock mapping"
+  },
+  "files": {
+    "mods.d/brlsg1910.conf": "377d95ece763b8f53c1199e9d13970210a394acc898a96f307d066cd56266965",
+    "modules/texts/ztext/brlsg1910/nt.bzs": "f8b0e066053b4d0db4801b277e85c95eaf6194c803b96c5ec99b70303ecb24d5",
+    "modules/texts/ztext/brlsg1910/nt.bzv": "cc294f9783c990ba8146f40e765c3fb0037225c764a5916f480d815f6400432e",
+    "modules/texts/ztext/brlsg1910/nt.bzz": "789294816116600ff54ac85a76e30ad284b16bae9304cf9af93cdefdf246776f",
+    "modules/texts/ztext/brlsg1910/ot.bzs": "6e1e5103b986ad064f001789f906b0edb945c39df66debabde231ea7269164ba",
+    "modules/texts/ztext/brlsg1910/ot.bzv": "d18ae11430d2cf2c0cbd462b151fba419554a7864d0e334df20c2578af360f46",
+    "modules/texts/ztext/brlsg1910/ot.bzz": "926736e7a2a9e95e0218b37b9bac935193d93ea9221549930d16040f792491a7"
+  },
+  "metadata_path": "modules/lsg-1910/metadata.json",
+  "module_id": "BRLSG1910",
+  "provenance": {
+    "new_full_native_readback_sha256": "9c8a797b946fcbc3ba10915879c6698509211906010ceb4c2a12284a88b2483a",
+    "original_usfx_zip_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+    "previous_approved_osis_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
+    "reviewed_candidate_osis_sha256": "1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d"
+  },
+  "release_audit_sha256": "9c8a797b946fcbc3ba10915879c6698509211906010ceb4c2a12284a88b2483a",
+  "release_tag": "lsg-1.0.0",
+  "release_zip_sha256": "cc3b57ab0b61476a77b42fa19004956085d7608a974724c770cc2211adc67499",
+  "schema_version": 1,
+  "source_usfm_zip_sha256": "64c4fe2a84d92f958deb0d1add4247d126a21c8a51e5b3058338f661a42d4900",
+  "source_usfx_zip_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e"
+}
