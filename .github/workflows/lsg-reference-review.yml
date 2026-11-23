@@ -14,6 +14,9 @@ on:
       - 'config/lsg-1910-printed-book-aliases.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_PAGE_LOCATORS_2026-11-23.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_PAGE_LOCATORS_2026-11-23.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json'
@@ -355,6 +358,89 @@ jobs:
               or compared_counts['text_identical_in_separately_hosted_digital_witness']!=22):
               raise SystemExit('Secondary witness evidence coverage or comparison classification drifted')
           print('Secondary digital apparatus comparison (NOT 1910 print certification):',dict(compared_counts))
+          page_data=json.loads(Path(
+              'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_PAGE_LOCATORS_2026-11-23.json'
+          ).read_text(encoding='utf-8'))
+          printed_tokens=json.loads(Path(
+              'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json'
+          ).read_text(encoding='utf-8'))
+          if (page_data['schema_version']!=1
+              or page_data['source_usfx_sha256']!=sha256(orig.read_bytes()).hexdigest()
+              or page_data['original_printed_djvu_sha256']!=source_scan['retrieved_djvu_sha256']
+              or page_data['exact_djvu_page_count']!=1061
+              or page_data['historical_printed_reference_note_readings_confirmed']!=len(proven)
+              or page_data['historical_printed_reference_note_readings_pending']!=len(expected)-len(proven)
+              or page_data['original_citation_changes_authorized']!=0
+              or len(page_data['records'])!=len(expected)):
+              raise SystemExit('Original-1910 print page/source ledger drift or unapproved correction')
+          page_map={r['record_id']:r for r in page_data['records']}
+          if set(page_map)!={r['record_id'] for r in expected}:
+              raise SystemExit('Original printed page inventory must cover exactly all 54 source notes')
+          location_checks=page_data['batch_printed_page_and_source_verse_alignment']
+          status_counts=Counter(r['printed_source_verse_alignment']['source_verse_match_status']
+                                for r in page_data['records'])
+          if (location_checks['scan_sha256']!=source_scan['retrieved_djvu_sha256']
+              or location_checks['historical_marginal_full_note_approved_for_change']!=0
+              or (location_checks['source_verse_text_locator_high_confidence']+
+                  location_checks['source_verse_text_locator_needing_special_caution']!=len(expected))
+              or location_checks['source_verse_text_locator_high_confidence']!=
+                 status_counts['high_confidence_verse_text_locator_not_reference_certification']
+              or len(status_counts)!=3):
+              raise SystemExit('Printed verse page alignment classifications are not source/evidence consistent')
+          comparison_map={r['record_id']:r for r in compared}
+          for r in page_data['records']:
+              source=original_by_id[r['record_id']]
+              other=comparison_map[r['record_id']]
+              loc=r['printed_source_verse_alignment']
+              full_print_certified=r['record_id'] in proof_map
+              if ((r['original_usfm_book'],r['source_note_origin'],r['original_citation_label'])!=
+                  (source['original_usfm_book'],source['source_note_origin'],source['original_citation_label'])
+                  or r['secondary_citation_label']!=other['secondary_citation_label']
+                  or r['source_citation_modified']
+                  or r['authorised_correction'] is not None
+                  or r['original_1910_djvu_page']<1
+                  or r['original_1910_djvu_page']>1061
+                  or not r['printed_page_url'].endswith('/'+str(r['original_1910_djvu_page']))
+                  or loc['native_printed_page']!=r['original_1910_djvu_page']
+                  or loc['page_reference_full_note_certified'] is not full_print_certified
+                  or loc['original_djvu_image_rendered_and_preserved'] is not True
+                  or r['printed_reference_status']!=
+                     ('historical_marginal_label_visually_verified_in_separate_citation_record'
+                      if full_print_certified else 'page_identified_marginal_label_not_certified')):
+                  raise SystemExit('Original printed page/verse alignment not traceable to exact source record: '+r['record_id'])
+          tokens=printed_tokens['records']
+          if (printed_tokens['schema_version']!=1
+              or printed_tokens['original_printed_scan_sha256']!=source_scan['retrieved_djvu_sha256']
+              or printed_tokens['original_usfx_zip_sha256']!=sha256(orig.read_bytes()).hexdigest()
+              or printed_tokens['original_scan_publication_year']!=1910
+              or printed_tokens['confirmed_individual_printed_reference_token_sightings']!=len(tokens)
+              or printed_tokens['original_or_cleaned_text_changes_approved']!=0
+              or len(tokens)!=len({r['record_id'] for r in tokens})
+              or len(tokens)>len(expected)):
+              raise SystemExit('Verified individual printed marginal tokens ledger inconsistent with original print')
+          for r in tokens:
+              original=original_by_id.get(r['record_id'])
+              page=page_map.get(r['record_id'])
+              other=comparison_map.get(r['record_id'])
+              if (original is None or page is None or other is None
+                  or r['original_usfm_book']!=original['original_usfm_book']
+                  or r['source_note_origin']!=original['source_note_origin']
+                  or r['original_usfx_label']!=original['original_citation_label']
+                  or r['secondary_digital_label']!=other['secondary_citation_label']
+                  or r['original_1910_print_page']!=page['original_1910_djvu_page']
+                  or r['facsimile_page_url']!=page['printed_page_url']
+                  or not r['printed_reference_token_or_local_group']
+                  or not r['interpreted_print_target_token']
+                  or r['scope']!='identified_printed_margin_reference_token_not_full_digital_xt_collation'
+                  or r['printed_reference_token_visually_read'] is not True
+                  or r['printed_full_cross_reference_label_matches_eBible'] is not None
+                  or r['editorial_change_authorized'] is not None):
+                  raise SystemExit('An individual printed citation token is missing evidence or implies full-note certification')
+          print('Physical 1910 print page coverage and authorial source-verse alignment: ',
+                len(page_data['records']),'of',len(expected),
+                'individual printed reference token findings:',len(tokens),
+                'complete printed-note citations:',len(proven),
+                'original source labels changed: 0')
           print('Persistent original-source unaddressable citation ledger verified:',len(current))
           print('Unlinked 1910 source-citation classes:',dict(classes))
           print('Review-only category examples:',examples)
