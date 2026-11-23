@@ -59,22 +59,33 @@ def main():
     norm=load(module/"NORMALIZATION_REPORT.json")
     report=load(receipt)
     native=load(native_report)
-    if not (sha(master)==OLD and sha(candidate)==NEW and
-      sha(ROOT/"sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip")==USFX and
-      cleanup["cleaned_osis_sha256"]==OLD and metadata["version"]=="1.0.1" and
-      compat["source_osis_sha256"]==OLD and
-      compat["module_payload_sha256"]==module_payload_digest(module) and
-      source_proof["source_sha256"]==OLD and norm["output_sha256"]==OLD and
-      plan["tag"]=="lsg-1.0.1" and plan["package_sha256"]==OLD_ZIP and
-      imp["release_zip_sha256"]==OLD_ZIP and
-      report["original_sha256"]==OLD and report["candidate_sha256"]==NEW and
-      report["typed_chapter_first_titles"]==803 and
-      report["source_bytes_restorable"] is True and
-      native["candidate_sha256"]==NEW and native["source_keys"]==31170 and
-      native["native_keys"]==31169 and
-      native["chapter_first_headings_now_in_first_verse"]==803 and
-      native["scripture_text_mismatches"]==0 and native["note_mismatches"]==0):
-        raise SystemExit("Unverified source, old module, or native verse/heading evidence")
+    gates = {
+      "old_approved_master_sha256": sha(master)==OLD,
+      "new_candidate_sha256": sha(candidate)==NEW,
+      "publisher_USFX_sha256": sha(ROOT/"sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip")==USFX,
+      "old_cleanup_source_sha256": cleanup["cleaned_osis_sha256"]==OLD,
+      "old_metadata_version": metadata["version"]=="1.0.1",
+      "old_SWORD_proof_source_sha256": compat["source_osis_sha256"]==OLD,
+      "old_SWORD_payload_sha256": compat["module_payload_sha256"]==module_payload_digest(module),
+      "old_validation_source_sha256": source_proof["source_sha256"]==OLD,
+      "old_normalization_output_sha256": norm["output_sha256"]==OLD,
+      "old_release_tag": plan["tag"]=="lsg-1.0.1",
+      "old_release_plan_zip_sha256": plan["package_sha256"]==OLD_ZIP,
+      "old_catalogue_import_zip_sha256": imp["release_zip_sha256"]==OLD_ZIP,
+      "overlay_source_sha256": report["original_sha256"]==OLD,
+      "overlay_candidate_sha256": report["candidate_sha256"]==NEW,
+      "overlay_heading_count": report["typed_chapter_first_titles"]==803,
+      "overlay_reversible": report["source_bytes_restorable"] is True,
+      "native_receipt_candidate_sha256": native["candidate_sha256"]==NEW,
+      "native_receipt_source_count": native["source_keys"]==31170,
+      "native_receipt_populated_count": native["native_keys"]==31169,
+      "native_receipt_heading_count": native["chapter_first_headings_now_in_first_verse"]==803,
+      "native_receipt_verse_parity": native["scripture_text_mismatches"]==0,
+      "native_receipt_note_parity": native["note_mismatches"]==0,
+    }
+    failures = [name for name, ok in gates.items() if not ok]
+    if failures:
+        raise SystemExit("Pinned LSG staging acceptance gates failed: "+", ".join(failures))
 
     old_data={name:val for name,val in imp["files"].items()
               if name.startswith(NATIVE+"/")}
