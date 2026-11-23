@@ -1,5 +1,5 @@
 {
-  "diff_sha256": "1f75143a8340723c87a34eaba467b642ab3eb594f549d6ff0355ba96d83a0078",
+  "diff_sha256": "2551fbfae3a3479125f8aa986562b3d4f2290082a0656a7bd3c8562ae7b43cb5",
   "edition": "reader_optimized",
   "full_text_exactly_preserved": true,
   "inline_semantic_tags_preserved": true,
@@ -21,12 +21,19 @@
     {
       "operation": "individually_addressed_citation_segmentation",
       "source_groups": 4909
+    },
+    {
+      "count": 803,
+      "new_sha256": "2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd",
+      "old_sha256": "1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d",
+      "only_title_type_attributes_added": true,
+      "operation": "annotate_untyped_first_section_headings"
     }
   ],
   "original_source_unchanged": true,
-  "output_sha256": "1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d",
-  "plan_sha256": "3e29ce023671fcc8ab4b85c1a639f7f52b8d89d4024d27cea6d3335e74787aa4",
-  "review_asserted_by_plan": "Owner-reviewed separate LSG 1.0.0 derivative approved 2026-11-23; Scripture/notes native verified",
+  "output_sha256": "2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd",
+  "plan_sha256": "c3b9a2a9dc215f07ce1d0eefbdbf3e238d3b57c6e1af41780a9b292187a5e607",
+  "review_asserted_by_plan": "Owner-reported missing chapter-first headings; independently validated source/native candidate PR #551",
   "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
   "source_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
   "status": "structural_edit_verified_not_published"

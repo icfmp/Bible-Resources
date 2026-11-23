@@ -1,3 +1,9 @@
+# Louis Segond 1910 — Bible Resources 1.0.2 (unpublished candidate)
+
+Existing original section headings now carry the OSIS-valid x-section type where they immediately follow a chapter opening. Exactly 803 unchanged titles are now part of native verse 1 entries. All original Scripture, publisher notes and citations are identical. The known Segond index exception for Mark 10:53 is retained.
+
+## Earlier approved 1.0.1 editorial record
+
 # Louis Segond 1910 — Bible Resources 1.0.1
 
 Module configuration-only hotfix: replace OSISXRefs with the registered OSISScripref filter. Native binary data and reviewed Bible source are byte-identical to v1.0.0. Plain-text cross-reference On rendering remains a known upstream limitation. Old tagged releases are not rewritten.

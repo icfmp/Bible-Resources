@@ -13,7 +13,7 @@
   },
   "quality": {
     "edition": "reader_optimized",
-    "reviewed_by": "Bible Resources project owner — SWORD config-only 1.0.1 fix requested 2026-11-23",
+    "reviewed_by": "Bible Resources owner — missing chapter-start headings reported; source/native candidate verified PR #551",
     "smoke_key": "John 3:16",
     "status": "approved"
   },
@@ -38,5 +38,5 @@
     }
   ],
   "versification": "Segond",
-  "version": "1.0.1"
+  "version": "1.0.2"
 }

@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "Source-attested OSIS section-heading markup repair, 803 unchanged titles re-associated to verse one; all Scripture and notes preserved in independent native SWORD testing",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/pull/551",
+    "reviewed_by": "Bible Resources owner — missing chapter-first headings issue #550; publication approval still distinct",
+    "source_rights": "eBible fraLSG public-domain source; independently reviewed original electronic reference citations and historical printed evidence"
+  },
+  "editorial_path": "modules/lsg-1910/EDITORIAL.md",
+  "evidence_path": "modules/lsg-1910/SOURCE_VALIDATION.json",
+  "module_id": "lsg-1910",
+  "notes_path": "sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-1.0.2.md",
+  "package_sha256": "547d5b953c3a3720bf21bed0e48d515e1d9c581dc419bd4b0af5593286180f01",
+  "package_size_bytes": 4268030,
+  "schema_version": 1,
+  "sword_id": "BRLSG1910",
+  "tag": "lsg-1.0.2",
+  "title": "Louis Segond 1910 — 1.0.2",
+  "version": "1.0.2",
+  "zip_name": "BRLSG1910-1.0.2.zip"
+}
