@@ -324,6 +324,20 @@ class NormalizationTests(unittest.TestCase):
         with self.assertRaisesRegex(ReviewError, "pinned original evidence"):
             self.apply(aliases=path, complete_lists=True)
 
+    def test_provider_alias_must_actually_appear_in_original_citations(self):
+        self.fixture(clean_dest="Ge 1:2.", original_dest="Ge 1:2.")
+        path = self.aliases()
+        doc = json.loads(path.read_text())
+        doc["source_attested_digital_variants"] = {
+            "status": "source_provider_spelling_not_printed_edition_abbreviation",
+            "witness_usfx_zip_sha256": sha256(self.original.read_bytes()).hexdigest(),
+            "evidence": "The correct pinned original must contain the supposed abbreviation in a real citation.",
+            "aliases": {"Gen": "Gen"},
+        }
+        path.write_text(json.dumps(doc))
+        with self.assertRaisesRegex(ReviewError, "not present in original citation"):
+            self.apply(aliases=path, complete_lists=True)
+
     def test_provider_variant_cannot_override_printed_alias(self):
         self.fixture()
         path = self.aliases()
