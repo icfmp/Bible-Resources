@@ -115,7 +115,7 @@ class SplitSourceReferencesTest(unittest.TestCase):
         candidate,_=self.build(label)
         split,receipt=segment_candidate(candidate,self.aliases)
         self.assertEqual(receipt["segmented_destination_labels"],1)
-        self.assertIn(b'> Ge 1:1</reference>; <reference osisRef="Gen.2.1">2:1</reference>. ',
+        self.assertIn(b'> <reference osisRef="Gen.1.1">Ge 1:1</reference>; <reference osisRef="Gen.2.1">2:1</reference>. ',
                       split)
         self.assertEqual("".join(etree.fromstring(candidate).itertext()),
                          "".join(etree.fromstring(split).itertext()))
