@@ -53,6 +53,67 @@ jobs:
               print(base64.b64encode(payload).decode('ascii'))
               print(f'LSG_SCAN_CROP_{page}_BASE64_END')
           PY
+      - name: Locate reference-bearing pages in independent 1911 printed scan
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq djvulibre-bin
+          python - <<'PY'
+          from urllib.request import Request, urlopen
+          from pathlib import Path
+          from io import BytesIO
+          import hashlib, subprocess, re, base64
+          from PIL import Image, ImageOps, ImageEnhance
+          uri='https://upload.wikimedia.org/wikipedia/commons/c/c5/La_Sainte_Bible%2C_1911.djvu'
+          req=Request(uri,headers={'User-Agent':'Bible-Resources-evidence/1.0 (https://github.com/icfmp/Bible-Resources)'})
+          scan=Path('/tmp/lsg-margins/segond-revision-1910-printed-1911.djvu')
+          try:
+              with urlopen(req,timeout=90) as r,scan.open('wb') as f:
+                  while True:
+                      b=r.read(1024*1024)
+                      if not b:break
+                      f.write(b)
+          except Exception as exc:
+              print('1911_PRINT_SOURCE_UNAVAILABLE',type(exc).__name__,str(exc)[:300])
+              raise SystemExit(1)
+          print('1911_SCAN_URI',uri,'size',scan.stat().st_size,'sha256',hashlib.sha256(scan.read_bytes()).hexdigest())
+          proc=subprocess.run(['djvutxt',str(scan)],capture_output=True,check=True)
+          raw=proc.stdout.decode('utf-8','replace')
+          pages=raw.split('\\f')
+          print('1911 OCR-layer pages',len(pages),'overall chars',len(raw))
+          found={}
+          for i,page in enumerate(pages,1):
+              normalized=re.sub(r'\\s+',' ',page.casefold())
+              if 'mangerez' in normalized and ('sang' in normalized or 'chair' in normalized):
+                  found.setdefault('Gen9.4',[]).append(i)
+              if 'songe' in normalized and ('échelle' in normalized or 'echelle' in normalized or 'ange' in normalized):
+                  found.setdefault('Gen28.12',[]).append(i)
+          print('1911 source-verse page hints from *existing* scan OCR layer (NOT accepted reference readings):',found)
+          chosen=[]
+          for case in ['Gen9.4','Gen28.12']:
+              nums=found.get(case,[])
+              if nums:
+                  chosen.append((case,nums[0]))
+          if len(chosen)<2:
+              print('Insufficient scan OCR to locate both historical source verses without guessed page numbers')
+              raise SystemExit(1)
+          for case,pageno in chosen:
+              dest=f'/tmp/lsg-margins/1911-{case}-p{pageno}.tif'
+              subprocess.run(['ddjvu','-page='+str(pageno),'-format=tiff',str(scan),dest],check=True)
+              image=Image.open(dest).convert('RGB')
+              print('1911_SOURCE_IMAGE',case,'page',pageno,'size',image.size)
+              image.save(f'/tmp/lsg-margins/1911-{case}-p{pageno}-full.png')
+              w,h=image.size
+              excerpt=image.crop((int(w*.35),int(h*.08),int(w*.65),int(h*.92)))
+              excerpt=ImageOps.grayscale(excerpt)
+              excerpt=ImageEnhance.Contrast(excerpt).enhance(1.65)
+              excerpt.thumbnail((600,1600),Image.Resampling.LANCZOS)
+              out=BytesIO()
+              excerpt.save(out,format='PNG',optimize=True)
+              data=out.getvalue()
+              print('LSG_1911_'+case+'_P'+str(pageno)+'_BASE64_BEGIN')
+              print(base64.b64encode(data).decode('ascii'))
+              print('LSG_1911_'+case+'_P'+str(pageno)+'_BASE64_END')
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
