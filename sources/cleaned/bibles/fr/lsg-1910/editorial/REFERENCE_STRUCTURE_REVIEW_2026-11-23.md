@@ -242,6 +242,22 @@ Reproducibility and limits: the `additional_public_usfm_witness` record in `SECO
 
 **Editorial consequence:** an inherited UBS/DBL-family digital annotation layer is a stronger working hypothesis than a unique eBible transcription error. However, neither the public witness nor the 2024 testimony proves which specific DBL export was eBible's direct parent, nor authenticates the *full printed 1910 margin* for the 53 pending equivalences. All original authorial labels and all 54 unlinked destinations stay unchanged; no new edition/release approval or redistribution-rights determination follows from this comparison.
 
+## Final case-by-case printed-target triage (2026-11-23)
+
+All **54** original eBible `xo/xt` cases have individual, immutable-source-pinned source-page dispositions in `PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json` (`full_54_case_target_corroboration`), with the original 1910 printed page and printed margin callout/token where legibly corroborated. Source/cleaned text and all 54 unresolved destination labels remain unchanged.
+
+| Exact scope of print evidence | Cases |
+| --- | ---: |
+| Full printed 1910 note matches whole digital label | **1** |
+| **Printed target token contradicts a specific digital citation fragment**, with verified callout | **19** |
+| Printed citation token legible and potentially compatible; whole digital note not certified | **5** |
+| Printed verse inspected without a certified corresponding marginal token and callout | **29** |
+| **Total physically screened and individually adjudicated** | **54** |
+
+The 19 contrasts span source-specific wrong book, chapter or verse identifiers, plus historical numbering differences and separate editorial-apparatus scopes. Examples are original Joshua 5:13 `És 23:23` versus printed `Ex. 23. 23.`, Jeremiah 32:29 `Jé 21:20` versus printed `21. 10.`, 1 John 3:1 `1 Jn 1:12` versus printed `Jn. 1. 12.`, and 1 Peter 2:10 `Os 1:10; 2:22` versus printed `Os. 2. 1, 25.`. The last example involves historically different numbering, not necessarily a digitization typo. These are certified **specific printed-token observations** and discrepancies, not license to replace *whole* digital `xt` groups with fragments of a different printed note system.
+
+**Meaning of completion:** All 54 cases are examined and assigned a falsifiable evidence disposition, 19 target-level contrasts and 1 complete printed note are positively supported. **It is false to describe the other 53 entire digital notes as faithfully reproduced from the 1910 printed marginal apparatus.** The 29 insufficient print readings remain explicitly unproven rather than marked correct. Any future published annotation correction, change in target mapping or master-file replacement requires separate editorial approval and full source/native/reader tests.
+
 ## Remaining release/merge gates
 
 1. **Individual hyperlink usability:** compare representative one-target, multi-target, ranges, chapters and implicit-context references in real Xiphos and AndBible (and if applicable Bible); preserve exactly the printed punctuation. The stock libSWORD HTML renderer already confirms two independent anchors for two separated source citations; this is still not proof of each graphical reader's click/navigation behavior. Do not relax BRNP to suppress reader defects.

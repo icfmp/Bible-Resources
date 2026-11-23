@@ -522,6 +522,64 @@ jobs:
                 'individual printed reference token findings:',len(tokens),
                 'complete printed-note citations:',len(proven),
                 'original source labels changed: 0')
+          final=printed_tokens.get('full_54_case_target_corroboration')
+          if (not isinstance(final,dict)
+              or final.get('status')!='54_complete_case_dispositions_not_54_identical_1910_annotations'
+              or final.get('original_usfx_sha256')!=sha256(orig.read_bytes()).hexdigest()
+              or final.get('scan_sha256')!=source_scan['retrieved_djvu_sha256']
+              or final.get('original_source_labels_rewritten')!=0
+              or final.get('editorial_changes_authorized')!=0
+              or final.get('automatic_links_authorized')!=0
+              or final.get('all_source_note_origins_screened')!=len(expected)):
+              raise SystemExit('Print-target adjudication provenance/approval boundary changed')
+          final_classes=Counter()
+          tok_by_id={r['record_id']:r for r in tokens}
+          page_by_id={r['record_id']:r for r in page_data['records']}
+          proven_ids={r['record_id'] for r in proven}
+          if len(final.get('records',[]))!=len(expected):
+              raise SystemExit('54-case adjudication does not cover all original digital labels')
+          for case,source in zip(final['records'],expected):
+              ident=source['record_id'];page=page_by_id[ident]
+              if (case['record_id']!=ident
+                  or case['original_usfm_book']!=source['original_usfm_book']
+                  or case['source_note_origin']!=source['source_note_origin']
+                  or case['original_source_label']!=source['original_citation_label']
+                  or case['scan_page']!=page['original_1910_djvu_page']
+                  or case['scan_page_url']!=page['printed_page_url']
+                  or case['source_original_label_edited'] is not False
+                  or case['editorial_correction_approved'] is not None
+                  or case['automatic_machine_link_approved'] is not None):
+                  raise SystemExit('Whole-corpus print-citation case identity/approval drift')
+              tok=tok_by_id.get(ident)
+              cls=case['disposition']
+              if ident in proven_ids:
+                  if cls!='complete_printed_note_verbatim_match' or case['complete_print_equivalence_certified'] is not True:
+                      raise SystemExit('Exact printed full-note evidence lost')
+              else:
+                  if case['complete_print_equivalence_certified'] is not None:
+                      raise SystemExit('Unverified printed full-note equivalence silently promoted')
+              if tok:
+                  if (cls not in ('verified_printed_token_only','confirmed_printed_target_contrast')
+                      or case['verified_printed_callout']!=tok['printed_note_callout']
+                      or case['verified_printed_fragment']!=tok['printed_reference_token_or_local_group']):
+                      raise SystemExit('Printed callout/token must match signed original scan finding')
+              elif ident not in proven_ids and (cls!='print_page_screened_note_not_certified' or case['verified_printed_callout'] is not None):
+                  raise SystemExit('Missing printed callout falsely certified')
+              if cls=='confirmed_printed_target_contrast':
+                  if (not tok or not case['target_discrepancy_class']
+                      or not case['contrasted_original_digital_excerpt']
+                      or case['contrasted_original_digital_excerpt'] not in source['original_citation_label']):
+                      raise SystemExit('Printed target mismatch lacks source-bound exact token')
+              elif case['target_discrepancy_class'] is not None or case['contrasted_original_digital_excerpt'] is not None:
+                  raise SystemExit('Unproved printed mismatch added')
+              final_classes[cls]+=1
+          if (dict(final_classes)!=final['distribution']
+              or final_classes['complete_printed_note_verbatim_match']!=len(proven)
+              or final_classes['confirmed_printed_target_contrast']!=19
+              or final_classes['verified_printed_token_only']!=len(tokens)-19
+              or final_classes['print_page_screened_note_not_certified']!=len(expected)-len(tokens)-len(proven)):
+              raise SystemExit('Printed target adjudication category counts invalid')
+          print('All 54 original printed-page citation dispositions verified:',dict(final_classes))
           print('Persistent original-source unaddressable citation ledger verified:',len(current))
           print('Unlinked 1910 source-citation classes:',dict(classes))
           print('Review-only category examples:',examples)
