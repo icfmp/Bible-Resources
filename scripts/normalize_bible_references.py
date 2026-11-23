@@ -292,6 +292,56 @@ def _complete_printed_destinations(label: str, aliases: dict | None,
     return None, "compound_or_implicit_reference", 0
 
 
+def _explicit_source_local_reference(label: str, aliases: dict | None,
+                                     origin: str, source_book: str,
+                                     verse_ids: set[str]) -> tuple[str | None, str]:
+    """Only complete, explicit source-local citation shorthand forms.
+
+    'v. 15.' is relative to the note's *attested* source chapter.
+    'Jud v. 14.' is unambiguous only if the edition has exactly one
+    attested chapter for Jude. 'Lé 11.' explicitly addresses chapter 11.
+    No context is taken from surrounding notes, previous references or
+    unverified reader defaults. Missing source keys remain unlinked.
+    """
+    if aliases is None:
+        return None, "edition_alias_table_not_requested"
+    origin_ref = _origin_target(origin, source_book, verse_ids)
+    _book, source_chapter, _verse = origin_ref.rsplit(".", 2)
+    own = re.fullmatch(r"v\.\s*([1-9][0-9]{0,3})\.", label)
+    if own:
+        target = f"{source_book}.{source_chapter}.{int(own[1])}"
+        return ((target, "source_relative_same_chapter_verse")
+                if target in verse_ids else
+                (None, "unattested_source_relative_verse"))
+    named = re.fullmatch(
+        r"((?:[1-3]\s+)?[A-Za-zÀ-ÿ]{1,12})\s+v\.\s*([1-9][0-9]{0,3})\.",
+        label)
+    if named:
+        cited_book = aliases.get(" ".join(named[1].split()))
+        if not cited_book:
+            return None, "unverified_printed_book_alias"
+        chapters = {key.split(".")[1] for key in verse_ids
+                    if key.startswith(cited_book + ".")}
+        if chapters != {"1"}:
+            return None, "named_relative_requires_one_chapter_book"
+        target = f"{cited_book}.1.{int(named[2])}"
+        return ((target, "explicit_one_chapter_book_verse")
+                if target in verse_ids else
+                (None, "unattested_named_relative_verse"))
+    chapter = re.fullmatch(
+        r"((?:[1-3]\s+)?[A-Za-zÀ-ÿ]{1,12})\s+([1-9][0-9]{0,3})\.",
+        label)
+    if chapter:
+        cited_book = aliases.get(" ".join(chapter[1].split()))
+        if not cited_book:
+            return None, "unverified_printed_book_alias"
+        prefix = f"{cited_book}.{int(chapter[2])}"
+        if any(key.startswith(prefix + ".") for key in verse_ids):
+            return prefix, "explicit_source_chapter"
+        return None, "unattested_source_chapter"
+    return None, "compound_or_implicit_reference"
+
+
 def _usfx_bytes(archive: Path) -> bytes:
     with ZipFile(archive) as zipped:
         candidates = [item for item in zipped.infolist()
@@ -363,7 +413,8 @@ def _intro_target(label: str, book: str, verse_ids: set[str]) -> str | None:
 
 def _source_bindings(cleaned, original, crosswalk: dict,
                      destination_aliases: dict | None = None,
-                     complete_lists: bool = False) -> tuple[dict, dict, list, list]:
+                     complete_lists: bool = False,
+                     source_local_short_forms: bool = False) -> tuple[dict, dict, list, list]:
     """Bind each exact cleaned reference to source-attested USFX semantics.
 
     Book identity is verified using the independent reviewed USFM->OSIS map.
@@ -413,6 +464,12 @@ def _source_bindings(cleaned, original, crosswalk: dict,
             else:
                 destination_target, status = _single_explicit_destination(
                     _label(xt), destination_aliases, verse_ids)
+            if (destination_target is None and source_local_short_forms and
+                    status == "compound_or_implicit_reference"):
+                destination_target, status = _explicit_source_local_reference(
+                    _label(xt), destination_aliases, _label(xo), book, verse_ids)
+                if destination_target is not None:
+                    counts["source_local_short_forms_resolved"] += 1
             if destination_target is None:
                 if destination_refs[0].get("osisRef"):
                     raise ReviewError("Unreviewed printed destination already linked")
@@ -518,9 +575,12 @@ def _patch_exact_start_tags(source: bytes, root, changes: dict) -> tuple[bytes, 
 def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         crosswalk_path: Path, output_path: Path | None = None,
         destination_aliases_path: Path | None = None,
-        complete_citation_lists: bool = False) -> tuple[bytes, dict]:
+        complete_citation_lists: bool = False,
+        source_local_short_forms: bool = False) -> tuple[bytes, dict]:
     if complete_citation_lists and destination_aliases_path is None:
         raise ReviewError("Complete reference lists require a pinned original-edition abbreviation witness")
+    if source_local_short_forms and not complete_citation_lists:
+        raise ReviewError("Local shorthand requires full source-citation review mode")
     manifest = json.loads(_bytes(manifest_path, 256 * 1024).decode("utf-8"))
     current = _bytes(cleaned_path, MAX_SOURCE)
     zipped = _bytes(usfx_zip, MAX_SOURCE)
@@ -539,7 +599,8 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
     )
     changes, counts, unresolved, destination_findings = _source_bindings(
         source, original, crosswalk, aliases,
-        complete_lists=complete_citation_lists)
+        complete_lists=complete_citation_lists,
+        source_local_short_forms=source_local_short_forms)
     candidate, edits = _patch_exact_start_tags(current, source, changes)
     # Validate actual candidate XML, every edited target, and the unchanged
     # ordered contents of every text/tail/element. No lossy reserialization.
@@ -576,6 +637,7 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         "existing_attributes_rewritten": 0,
         "unverified_authorial_destinations_guessed": 0,
         "complete_citation_lists_enabled": complete_citation_lists,
+        "source_local_short_forms_enabled": source_local_short_forms,
         "printed_abbreviation_map_sha256": alias_digest,
         "machine_destinations_interpreted_from_complete_explicit_labels":
             counts["resolved_original_destination_labels"],
@@ -611,6 +673,8 @@ def main() -> int:
                         help="Exact edition-printed abbreviation witness, optional")
     parser.add_argument("--complete-citation-lists", action="store_true",
                         help="Parse only fully consumed source-attested citation grammar")
+    parser.add_argument("--source-local-short-forms", action="store_true",
+                        help="Review only explicit v./one-chapter/chapter-only citations with original anchors")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
@@ -626,6 +690,7 @@ def main() -> int:
             manifest_path=args.manifest, crosswalk_path=args.crosswalk,
             destination_aliases_path=args.destination_aliases,
             complete_citation_lists=args.complete_citation_lists,
+            source_local_short_forms=args.source_local_short_forms,
             output_path=args.output,
         )
     except (ReviewError, OSError, ValueError, etree.XMLSyntaxError) as exc:
