@@ -1,20 +1,33 @@
 name: LSG source-pinned chapter-opening section heading and SWORD audit
 on:
+  push:
+    branches: ['fix/lsg-chapter-opening-headings']
+    paths:
+      - '.github/workflows/lsg-chapter-heading-review.yml'
+      - 'modules/lsg-1910/tools/stage_chapter_heading_hotfix.py'
   pull_request:
     paths:
       - '.github/workflows/lsg-chapter-heading-review.yml'
       - 'scripts/mark_osis_preverse_section_titles.py'
       - 'tests/test_mark_osis_preverse_section_titles.py'
       - 'sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml'
+      - 'modules/lsg-1910/**'
+      - 'tests/**'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   headings:
     runs-on: ubuntu-latest
     timeout-minutes: 22
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore immutable approved 1.0.1 source before deriving the new heading edition
+        run: |
+          git show 33690e60647a9fd389cd347b8f44140770796bc0:sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml > /tmp/lsg-1.0.1-original.osis.xml
+          echo '1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d  /tmp/lsg-1.0.1-original.osis.xml' | sha256sum -c -
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -27,7 +40,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p test_mark_osis_preverse_section_titles.py -v
           python scripts/mark_osis_preverse_section_titles.py \
-            --input sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml \
+            --input /tmp/lsg-1.0.1-original.osis.xml \
             --expected-input-sha256 1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d \
             --expected-count 803 \
             --output /tmp/lsg-preverse-section-candidate.osis.xml \
@@ -48,8 +61,17 @@ jobs:
           from lxml import etree
           from collections import Counter
           import json,sys
-          original=Path('sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml')
+          original=Path('/tmp/lsg-1.0.1-original.osis.xml')
           candidate=Path('/tmp/lsg-preverse-section-candidate.osis.xml')
+          current=Path('sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml')
+          current_sha=sha256(current.read_bytes()).hexdigest()
+          if current_sha not in (
+              '1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d',
+              'c95c02c40de173b3ccdb396e62e917b96f90b12c8aebc82e1f3c7264c4f26c24'):
+              raise SystemExit('Unexpected current master source during staging or after merge')
+          if current_sha == 'c95c02c40de173b3ccdb396e62e917b96f90b12c8aebc82e1f3c7264c4f26c24':
+              if current.read_bytes() != candidate.read_bytes():
+                  raise SystemExit('Staged master differs from exact independently regenerated output')
           parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
                                  no_network=True,recover=False,huge_tree=False)
           before=etree.parse(str(original),parser=parser)
@@ -191,6 +213,24 @@ jobs:
           PY
           SWORD_PATH=/tmp/lsg-chapter-heading-sword/payload \
             /tmp/lsg-heading-native-display BRLSG1910
+      - name: Stage new source and full native module in the review branch only
+        if: github.event_name == 'push' && github.ref == 'refs/heads/fix/lsg-chapter-opening-headings'
+        run: |
+          set -euo pipefail
+          python modules/lsg-1910/tools/stage_chapter_heading_hotfix.py
+          python scripts/tool_registry.py --write
+          python scripts/validate.py
+          python scripts/release_preflight.py --module-id lsg-1910 --report /tmp/lsg-1.0.2-preflight.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A modules/lsg-1910 sources/cleaned/bibles/fr/lsg-1910 \
+            config/catalogue-import-lsg-1.0.2.json \
+            config/release-plans/lsg-1.0.1.json config/release-plans/lsg-1.0.2.json \
+            catalog/v1/catalog.json
+          git add -u -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git diff --cached --check
+          git commit -m "release(lsg): stage reviewed 1.0.2 source and new heading-correct SWORD module for approval"
+          git push origin HEAD:refs/heads/fix/lsg-chapter-opening-headings
       - name: Upload temporary source and native validation receipts only
         uses: actions/upload-artifact@v4
         with:
