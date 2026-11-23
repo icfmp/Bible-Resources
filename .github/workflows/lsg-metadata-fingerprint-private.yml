@@ -1,0 +1,39 @@
+name: Temporary private Segond metadata fingerprint
+on:
+  pull_request:
+    paths:
+      - 'modules/lsg-1910/**'
+      - '.github/workflows/lsg-metadata-fingerprint-private.yml'
+permissions:
+  contents: read
+jobs:
+  fingerprint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read-only deterministic ZIP fingerprint (no publication)
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import zipfile
+          import json
+          root = Path("modules/lsg-1910/payload")
+          members = sorted(p for p in root.rglob("*") if p.is_file())
+          import tempfile
+          with tempfile.TemporaryDirectory() as tmp:
+              archive = Path(tmp) / "BRLSG1910.zip"
+              with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as out:
+                  for path in sorted(members, key=lambda p: p.relative_to(root).as_posix()):
+                      rel = path.relative_to(root).as_posix()
+                      info = zipfile.ZipInfo(rel, (1980,1,1,0,0,0))
+                      info.compress_type = zipfile.ZIP_DEFLATED
+                      info.external_attr = 0o100644 << 16
+                      out.writestr(info, path.read_bytes())
+              c = root/"mods.d/brlsg1910.conf"
+              print("LSG_DISPLAY_CONF_SHA256=" + hashlib.sha256(c.read_bytes()).hexdigest())
+              print("LSG_NEW_PACKAGE_SHA256=" + hashlib.sha256(archive.read_bytes()).hexdigest())
+              print("LSG_NEW_PACKAGE_BYTES=" + str(archive.stat().st_size))
+              print("LSG_NATIVE_MEMBER_COUNT=" + str(len(members)))
+              print("LSG_METADATA_VERSION=" + json.loads(Path("modules/lsg-1910/metadata.json").read_text())["version"])
+          PY

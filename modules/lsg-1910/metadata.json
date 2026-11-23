@@ -10,7 +10,7 @@
   },
   "quality": {
     "edition": "reader_optimized",
-    "reviewed_by": "Bible Resources project owner, release approval 2026-11-09",
+    "reviewed_by": "Bible Resources project owner, original edition approval 2026-11-09; display-only metadata update requested 2026-11-23",
     "smoke_key": "John 3:16",
     "status": "approved"
   },
@@ -35,7 +35,7 @@
     }
   ],
   "versification": "Segond",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "index_audit": {
     "mode": "published_source_audit",
     "manifest": "config/catalogue-import-lsg-0.1.0.json"
