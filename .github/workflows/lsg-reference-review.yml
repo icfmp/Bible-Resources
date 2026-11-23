@@ -25,6 +25,15 @@ jobs:
     timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reuse source-hash-verified historical 0.1.0 OSIS for deterministic review
+        run: |
+          mkdir -p /tmp/lsg-history
+          git show 06621666cc0d5a5daec18e4923abde6cc523f041:sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml > /tmp/lsg-history/lsg-0.1.0.osis.xml
+          git show 06621666cc0d5a5daec18e4923abde6cc523f041:sources/cleaned/bibles/fr/lsg-1910/CLEANUP_MANIFEST.json > /tmp/lsg-history/CLEANUP_MANIFEST-0.1.0.json
+          echo 'd6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0  /tmp/lsg-history/lsg-0.1.0.osis.xml' | sha256sum -c -
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -100,9 +109,9 @@ jobs:
       - name: Build separate complete cleaned-source candidate and preservation ledger
         run: |
           python scripts/normalize_bible_references.py \
-            --cleaned sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml \
+            --cleaned /tmp/lsg-history/lsg-0.1.0.osis.xml \
             --original-usfx sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip \
-            --manifest sources/cleaned/bibles/fr/lsg-1910/CLEANUP_MANIFEST.json \
+            --manifest /tmp/lsg-history/CLEANUP_MANIFEST-0.1.0.json \
             --crosswalk config/standard_usfm_osis_66.json \
             --destination-aliases config/lsg-1910-printed-book-aliases.json \
             --complete-citation-lists \
@@ -115,7 +124,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import json, os, subprocess, sys
-          original='sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml'
+          original='/tmp/lsg-history/lsg-0.1.0.osis.xml'
           folder=Path('/tmp')
           candidate=folder/'lsg-structural-candidate.osis.xml'
           schema=folder/'lsg-reviewed-osis/osisCore.2.1.1-cw-latest.xsd'
@@ -1046,7 +1055,7 @@ jobs:
           sys.path.insert(0,'scripts')
           from approved_osis_sword_candidate import (
               _create_candidate_layout, _compile_osis, _read_native_frames)
-          original=Path('sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml')
+          original=Path('/tmp/lsg-history/lsg-0.1.0.osis.xml')
           candidate=Path('/tmp/lsg-structural-candidate.osis.xml')
           individual=Path('/tmp/lsg-individual-reference-candidate.osis.xml')
           compiler=Path(shutil.which('osis2mod'))

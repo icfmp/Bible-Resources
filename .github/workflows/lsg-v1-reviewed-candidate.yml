@@ -1,21 +1,38 @@
 name: LSG 1.0.0 reproducible unpublished native build
 on:
+  push:
+    branches: ['release/lsg-1.0.0-reviewed']
+    paths:
+      - '.github/workflows/lsg-v1-reviewed-candidate.yml'
+      - 'modules/lsg-1910/tools/stage_reviewed_release.py'
   pull_request:
     paths:
       - '.github/workflows/lsg-v1-reviewed-candidate.yml'
+      - 'modules/lsg-1910/tools/stage_reviewed_release.py'
+      - 'sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml'
+      - 'modules/lsg-1910/metadata.json'
       - 'scripts/normalize_bible_references.py'
       - 'scripts/apply_reviewed_osis_editorial_corrections.py'
       - 'scripts/segment_osis_reference_destinations.py'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/REVIEWED_REFERENCE_AND_INTRO_OVERLAY_2026-11-23.json'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   candidate:
     runs-on: ubuntu-latest
     timeout-minutes: 22
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reuse source-hash-verified historical 0.1.0 OSIS for deterministic review
+        run: |
+          mkdir -p /tmp/lsg-history
+          git show 06621666cc0d5a5daec18e4923abde6cc523f041:sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml > /tmp/lsg-history/lsg-0.1.0.osis.xml
+          git show 06621666cc0d5a5daec18e4923abde6cc523f041:sources/cleaned/bibles/fr/lsg-1910/CLEANUP_MANIFEST.json > /tmp/lsg-history/CLEANUP_MANIFEST-0.1.0.json
+          echo 'd6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0  /tmp/lsg-history/lsg-0.1.0.osis.xml' | sha256sum -c -
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -30,9 +47,9 @@ jobs:
           set -euo pipefail
           mkdir -p /tmp/lsg-v1
           python scripts/normalize_bible_references.py \
-            --cleaned sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml \
+            --cleaned /tmp/lsg-history/lsg-0.1.0.osis.xml \
             --original-usfx sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip \
-            --manifest sources/cleaned/bibles/fr/lsg-1910/CLEANUP_MANIFEST.json \
+            --manifest /tmp/lsg-history/CLEANUP_MANIFEST-0.1.0.json \
             --crosswalk config/standard_usfm_osis_66.json \
             --destination-aliases config/lsg-1910-printed-book-aliases.json \
             --complete-citation-lists --source-local-short-forms \
@@ -115,7 +132,7 @@ jobs:
           [BRLSG1910]
           Description=Louis Segond 1910
           Abbreviation=LSG1910
-          About=Louis Segond 1910 (eBible fraLSG, Public Domain), reviewed Bible Resources 1.0.0 candidate. Source-authored Mark 10:53 has no separate address in stock SWORD Segond; content is included under Mark 10:52. No source-absent Job 34:37 was added. Original annotations and notes were maintained except twelve independently documented electronic reference-fragment corrections and one Titus introduction heading error; ambiguous references remain visible without false links. This is a non-published research build.
+          About=Louis Segond 1910 (eBible fraLSG, Public Domain), reviewed Bible Resources 1.0.0 candidate. Source-authored Mark 10:53 has no separate address in stock SWORD Segond; content is included under Mark 10:52. No source-absent Job 34:37 was added. Original annotations and notes were maintained except twelve independently documented electronic reference-fragment corrections and one Titus introduction heading error; ambiguous references remain visible without false links. The exact source/reader evidence, Public Domain source and temporary Mark 10:53 stock Segond limitation are documented in the release notes.
           Version=1.0.0
           DataPath=./modules/texts/ztext/brlsg1910/
           ModDrv=zText
@@ -297,6 +314,24 @@ jobs:
             manifest,ensure_ascii=False,sort_keys=True,indent=2)+'\n')
           print('Review-only 1.0.0 candidate package hash:',manifest['preview_zip_sha256'])
           PY
+      - name: Stage complete reviewed 1.0.0 on branch without publishing
+        if: github.event_name == 'push' && github.ref == 'refs/heads/release/lsg-1.0.0-reviewed'
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o /tmp/lsg-v1-native-index -lsword
+          python modules/lsg-1910/tools/stage_reviewed_release.py --work /tmp/lsg-v1 --native-index /tmp/lsg-v1-native-index
+          python scripts/tool_registry.py --write
+          python scripts/validate.py
+          python scripts/release_preflight.py --module-id lsg-1910 --report /tmp/lsg-v1/preflight-repeat.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A modules/lsg-1910 sources/cleaned/bibles/fr/lsg-1910 \
+            config/catalogue-import-lsg-1.0.0.json config/release-plans/lsg-1.0.0.json \
+            catalog/v1/catalog.json reports/tooling/TOOL_REGISTRY.json \
+            reports/tooling/TOOL_REGISTRY.md
+          git diff --cached --check
+          git commit -m "release(lsg): stage verified v1.0.0 source and rebuilt SWORD package for review"
+          git push origin HEAD:refs/heads/release/lsg-1.0.0-reviewed
       - name: Upload reviewed OSIS, new SWORD 1.0.0 preview and validation receipts
         uses: actions/upload-artifact@v4
         with:
