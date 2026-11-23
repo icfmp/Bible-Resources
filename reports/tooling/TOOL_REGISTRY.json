@@ -20,8 +20,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 1,
+      "static_reference_count": 2,
       "static_references": [
+        ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-rendering-regression.yml"
       ]
     },
@@ -183,10 +184,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
+        ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-reference-review.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
@@ -423,11 +425,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/normalize_osis.py",
         "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
+        ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-reference-review.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "docs/PRODUCTION_PIPELINE.md",
@@ -726,10 +729,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
+        ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-reference-review.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         ".github/workflows/osis-schema-review.yml",
@@ -827,6 +831,42 @@
         "tests/test_guard_osis.py",
         "tests/test_schema_dependencies.py"
       ]
+    },
+    {
+      "path": "scripts/mark_osis_preverse_section_titles.py",
+      "purpose_first_line": "Mark source-attested chapter-opening section titles for SWORD pre-verse import.",
+      "sha256_at_inventory": "b21adf31be58f505b3d4efbe85b0b4010de952807e591e828aeb4bc7315ae62b",
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "OSIS"
+      ],
+      "reader_tool_signals": [],
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "hashlib",
+        "json",
+        "os",
+        "pathlib",
+        "re",
+        "tempfile",
+        "xml"
+      ],
+      "static_references": [
+        "scripts/tool_registry.py",
+        ".github/workflows/lsg-chapter-heading-review.yml",
+        "tests/test_mark_osis_preverse_section_titles.py"
+      ],
+      "static_reference_count": 3,
+      "has_direct_tests_by_filename": true,
+      "stage_hint": "not determined",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "release_approval": "never inferred from inventory",
+      "owner": "Bible Resources maintainers"
     },
     {
       "classification": "KEEP_GENERIC",
@@ -1284,11 +1324,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/approved_osis_sword_candidate.py",
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
+        ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "tests/test_native_raw_main_text.py",
@@ -1521,11 +1562,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/approved_osis_sword_candidate.py",
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
+        ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
@@ -1966,10 +2008,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
+        ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-reference-review.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         ".github/workflows/validate.yml",
@@ -2085,7 +2128,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "77e06694d645e325238236e763bcadca0e49bc011b09ea07e357fa576c2d2397",
+      "sha256_at_inventory": "e9e6aeb9d305942fb96120a4a060374a776290f7e66af07cb4b39973bf790f1a",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
