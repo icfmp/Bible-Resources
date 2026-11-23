@@ -131,6 +131,39 @@ jobs:
           outfile.write_text(json.dumps({'schema_version':1,'status':'source_verse_and_margin_geometry_candidates_only',
               'original_print_djvu_sha256':expected_sha,'no_original_reference_labels_changed':True,
               'no_editorial_approval_given':True,'records':results},ensure_ascii=False,indent=2)+'\n')
+          # Record entire central reference context near each identified source verse.
+          # Image manipulation is for human reading only; exact original DjVu is immutable.
+          from PIL import Image,ImageOps,ImageEnhance
+          from io import BytesIO
+          import base64
+          root_out=Path('/tmp/lsg-geometry')
+          for result in results:
+              docpage=result['best_ocr_verse_page']
+              filename=root_out/f"{result['record_id']}-print-page{docpage}.tif"
+              subprocess.run(['ddjvu','-page='+str(docpage),'-format=tiff',
+                              '/tmp/lsg-print-1910.djvu',str(filename)],check=True)
+              scan=Image.open(filename).convert('RGB')
+              width,height=scan.size
+              if (result['geometry']['score']>=77
+                   and result['geometry']['top'] is not None
+                   and result['geometry']['column'] is not None):
+                  top=max(0,int(result['geometry']['top'])-115)
+                  bottom=min(height,int(result['geometry']['bottom'])+185)
+                  if result['geometry']['column']=='left':x0,x1=50,535
+                  else:x0,x1=300,785
+              else:top,bottom,x0,x1=0,height,50,785
+              crop=scan.crop((x0,top,x1,bottom))
+              crop=ImageEnhance.Contrast(ImageOps.grayscale(crop)).enhance(1.45)
+              crop=crop.resize((crop.width*2,crop.height*2),Image.Resampling.NEAREST)
+              buf=BytesIO()
+              crop.save(buf,format='PNG',optimize=True)
+              data=buf.getvalue()
+              out=root_out/f"{result['record_id']}-margin-verse-context.png"
+              out.write_bytes(data)
+              print('LSG_1910_ALIGNED_MARGIN_IMAGE_'+result['record_id']+'_BEGIN')
+              print(base64.b64encode(data).decode('ascii'))
+              print('LSG_1910_ALIGNED_MARGIN_IMAGE_'+result['record_id']+'_END')
+              filename.unlink(missing_ok=True)
           print('BULK_1910_PRINT_PAGE_AUDIT',len(results),'corrected_page_estimates',
              [(r['record_id'],r['original_printed_page_locator'],r['best_ocr_verse_page'])
                  for r in results if r['best_ocr_verse_page']!=r['original_printed_page_locator']])
@@ -138,5 +171,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: lsg-1910-54-verse-and-marginal-geometry-preliminary
-          path: /tmp/lsg-geometry/print-geometry-all54.json
+          path: |
+            /tmp/lsg-geometry/print-geometry-all54.json
+            /tmp/lsg-geometry/*-margin-verse-context.png
           retention-days: 7
