@@ -10,6 +10,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from check_brnp import check  # noqa: E402
+from normalize_osis import brnp_regressions  # noqa: E402
 
 NS = 'http://www.bibletechnologies.net/2003/OSIS/namespace'
 
@@ -249,6 +250,16 @@ class BRNPStructuralPilotTests(unittest.TestCase):
             '<verse osisID="Gen.2.1">Second</verse><chapter eID="chapter-a"/>'
         ))
         self.assertIn("CHAPTER_START_ID", report["finding_codes"])
+
+    def test_normalizer_detects_new_finding_class_even_if_total_decreases(self):
+        before = {"finding_codes": {"INVALID_STRUCTURAL_PARENT": 3}}
+        after = {"finding_codes": {"BOOK_SCOPE": 1}}
+        self.assertEqual(brnp_regressions(before, after), {"BOOK_SCOPE": 1})
+
+    def test_normalizer_accepts_only_nonincreasing_finding_counts(self):
+        before = {"finding_codes": {"BOOK_SCOPE": 2, "VERSE_END_PAIR": 1}}
+        after = {"finding_codes": {"BOOK_SCOPE": 1}}
+        self.assertEqual(brnp_regressions(before, after), {})
 
     def test_source_unchanged(self):
         content = document('<verse osisID="Gen.1.1">Test</verse>')
