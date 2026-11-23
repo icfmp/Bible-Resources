@@ -1,0 +1,57 @@
+name: BRNP read-only conformance pilot
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/check_brnp.py'
+      - 'tests/test_brnp.py'
+      - 'docs/architecture/BRNP.md'
+      - '.github/workflows/brnp-review.yml'
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install reviewed validation dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run positive and negative synthetic fixtures
+        run: python -m unittest discover -s tests -p test_brnp.py -v
+      - name: Read-only real-edition inventory (diagnostic, not release approval)
+        shell: bash
+        run: |
+          mkdir -p "${RUNNER_TEMP}/brnp-reports"
+          paths=(
+            "bible|sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml|lsg"
+            "bible|sources/cleaned/bibles/fr/darby-jnd-2024/bible_jnd_2_0.osis.xml|darby"
+            "commentary|sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml|mhcc"
+            "commentary|sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml|mhc"
+          )
+          echo '## BRNP v0.1 inventory (non-normative)' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Edition | Diagnostic exit |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| --- | --- |' >> "$GITHUB_STEP_SUMMARY"
+          for entry in "${paths[@]}"; do
+            IFS='|' read -r kind input label <<< "$entry"
+            set +e
+            python scripts/check_brnp.py "$input" --kind "$kind" --report "${RUNNER_TEMP}/brnp-reports/$label.json"
+            status=$?
+            set -e
+            echo "| $label | $status |" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$status" -ge 2 ]; then
+              echo "::warning::BRNP pilot could not inspect $label (exit $status)"
+            fi
+          done
+          echo 'Exit 1 means pilot findings, not failed official OSIS validity. These results are non-blocking until BRNP is independently reviewed and approved.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload diagnostics only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brnp-readonly-structural-inventory
+          path: ${{ runner.temp }}/brnp-reports/*.json
+          if-no-files-found: warn
+          retention-days: 30
