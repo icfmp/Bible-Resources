@@ -1,0 +1,194 @@
+name: LSG source-pinned chapter-opening section heading and SWORD audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/lsg-chapter-heading-review.yml'
+      - 'scripts/mark_osis_preverse_section_titles.py'
+      - 'tests/test_mark_osis_preverse_section_titles.py'
+      - 'sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  headings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install strict OSIS validator and stock native SWORD
+        run: |
+          python -m pip install -r requirements.txt
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libsword-dev libsword-utils
+      - name: Test reversible generic source title overlay
+        run: |
+          python -m unittest discover -s tests -p test_mark_osis_preverse_section_titles.py -v
+          python scripts/mark_osis_preverse_section_titles.py \
+            --input sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml \
+            --expected-input-sha256 1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d \
+            --expected-count 855 \
+            --output /tmp/lsg-preverse-section-candidate.osis.xml \
+            --report /tmp/lsg-preverse-section-receipt.json
+      - name: Validate official OSIS schema unchanged Bible verse identities and full headings
+        run: |
+          python scripts/fetch_reviewed_schema.py --directory /tmp/lsg-heading-schema
+          python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          from lxml import etree
+          from collections import Counter
+          import json,sys
+          original=Path('sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml')
+          candidate=Path('/tmp/lsg-preverse-section-candidate.osis.xml')
+          parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                                 no_network=True,recover=False,huge_tree=False)
+          before=etree.parse(str(original),parser=parser)
+          after=etree.parse(str(candidate),parser=parser)
+          schema=etree.XMLSchema(etree.parse('/tmp/lsg-heading-schema/osisCore.2.1.1-cw-latest.xsd'))
+          schema.assertValid(after)
+          ns='{http://www.bibletechnologies.net/2003/OSIS/namespace}'
+          old_tags=list(before.iter())
+          new_tags=list(after.iter())
+          if len(old_tags)!=len(new_tags):
+              raise SystemExit('OSIS element count changed')
+          changed=Counter()
+          for x,y in zip(old_tags,new_tags):
+              if x.tag!=y.tag or x.text!=y.text or x.tail!=y.tail:
+                  raise SystemExit('OSIS content/punctuation/structure altered beyond the first title type')
+              if x.attrib!=y.attrib:
+                  if (x.tag!=ns+'title' or 'type' in x.attrib or
+                      dict(y.attrib)!={**dict(x.attrib),'type':'section'}):
+                      raise SystemExit('Unapproved OSIS attribute alteration')
+                  changed['heading_types_added']+=1
+          old_verse_keys={v.get('osisID') for v in before.iter(ns+'verse') if v.get('sID')}
+          new_verse_keys={v.get('osisID') for v in after.iter(ns+'verse') if v.get('sID')}
+          receipt=json.load(open('/tmp/lsg-preverse-section-receipt.json'))
+          if (len(old_verse_keys)!=31170 or old_verse_keys!=new_verse_keys or
+              changed['heading_types_added']!=855 or
+              receipt['typed_chapter_first_titles']!=855):
+              raise SystemExit('Inconsistent full source heading or Scripture key counts')
+          print('Official OSIS schema valid, 855 pre-existing title types defined, original verse IDs/content/notes and other markup unchanged')
+          PY
+      - name: Compile exact source-faithful candidate through stable osis2mod
+        run: |
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp \
+            -o /tmp/lsg-heading-native-raw -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword modules/lsg-1910/tools/check_native_render.cpp \
+            -o /tmp/lsg-heading-native-display -lsword
+          python - <<'PY'
+          from pathlib import Path
+          import shutil,sys
+          sys.path.insert(0,'scripts')
+          from approved_osis_sword_candidate import _create_candidate_layout,_compile_osis
+          working=Path('/tmp/lsg-chapter-heading-sword')
+          working.mkdir()
+          payload,out=_create_candidate_layout(working,'BRLSG1910','Segond','fr')
+          conf=payload/'mods.d/brlsg1910.conf'
+          conf.write_text(conf.read_text().replace(
+            'GlobalOptionFilter=OSISXRefs',
+            'GlobalOptionFilter=OSISScripref\nGlobalOptionFilter=OSISHeadings'))
+          _compile_osis(Path(shutil.which('osis2mod')),
+              Path('/tmp/lsg-preverse-section-candidate.osis.xml'),
+              out,'Segond',Path('/tmp/lsg-headings-osis2mod.log'))
+          print('SWORD candidate compiled: new zText independent of the approved published module')
+          PY
+      - name: Independently verify all numbered Scripture prose notes and chapter-initial titles
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from hashlib import sha256
+          from html import unescape
+          from pathlib import Path
+          from lxml import etree
+          import json,re,sys
+          sys.path.insert(0,'scripts')
+          from mark_osis_preverse_section_titles import DIRECT_UNTYPED,CHAPTER_ID,TITLE_CLOSE
+          from approved_osis_sword_candidate import _read_native_frames,_native_notes
+          from research.bible.native_raw_main_text import native_raw_main_text
+          from research.bible.source_osis_verse_notes import original_osis_verses_and_notes,_nonspace
+          original=Path('sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml').read_bytes()
+          candidate=Path('/tmp/lsg-preverse-section-candidate.osis.xml').read_bytes()
+          expected={}
+          for match in DIRECT_UNTYPED.finditer(original):
+              chapter=CHAPTER_ID.search(match.group('prefix')).group(1).decode('ascii')
+              end=original.index(TITLE_CLOSE,match.end('opening'))
+              expected[chapter+'.1']=original[match.end('opening'):end].decode('utf-8')
+          if len(expected)!=855:
+              raise SystemExit('Unexpected edition heading source count')
+          authored,notes,source_receipt=original_osis_verses_and_notes(candidate)
+          if len(authored)!=31170 or source_receipt['publisher_numbered_note_count']!=9751:
+              raise SystemExit('Actual authorial Scripture/note inventory changed')
+          osis_ns='{http://www.bibletechnologies.net/2003/OSIS/namespace}'
+          named=Counter()
+          native=set()
+          missing=[]
+          verses_wrong=[]
+          notes_wrong=[]
+          binary=Path('/tmp/lsg-heading-native-raw')
+          payload=Path('/tmp/lsg-chapter-heading-sword/payload')
+          for kind,key,raw in _read_native_frames(binary,'BRLSG1910',payload):
+              if kind!='K':
+                  continue
+              native.add(key)
+              named['verses_checked']+=1
+              text,_=native_raw_main_text(raw)
+              expected_text=authored[key]
+              expected_notes=list(notes[key])
+              if key=='Mark.10.52':
+                  expected_text+=authored['Mark.10.53']
+                  expected_notes+=list(notes['Mark.10.53'])
+              if _nonspace(text)!=_nonspace(expected_text):
+                  verses_wrong.append(key)
+              ns=_native_notes(raw)
+              if len(ns)!=len(expected_notes) or any(
+                  x['caller']!=y['caller'] or x['type']!=y['type'] or
+                  _nonspace(x['body'])!=_nonspace(y['body'])
+                  for x,y in zip(ns,expected_notes)):
+                  notes_wrong.append(key)
+              named['notes_checked']+=len(ns)
+              if key in expected:
+                  root=etree.fromstring(b'<root>'+raw+b'</root>')
+                  titles=[''.join(elem.itertext()) for elem in root.iter()
+                          if isinstance(elem.tag,str) and
+                          etree.QName(elem).localname=='title']
+                  if expected[key] not in titles:
+                      missing.append(key)
+                  else:
+                      named['chapter_first_titles_in_numbered_verse']+=1
+          if (native!=set(authored)-{'Mark.10.53'} or
+              named['verses_checked']!=31169 or
+              named['notes_checked']!=9751 or
+              named['chapter_first_titles_in_numbered_verse']!=855 or
+              verses_wrong or notes_wrong or missing):
+              raise SystemExit('SWORD source/main-note-heading parity failure: '+
+                repr({'verses':verses_wrong[:10],'notes':notes_wrong[:10],
+                      'missing_headings':missing[:15],'counts':dict(named)}))
+          receipt={
+              'status':'full_source_native_chapter_heading_candidate_verified',
+              'source_sha256':sha256(original).hexdigest(),
+              'candidate_sha256':sha256(candidate).hexdigest(),
+              'source_keys':31170,'native_keys':31169,
+              'stock_segon_single_exception':'Mark.10.53',
+              'chapter_first_headings_now_in_first_verse':855,
+              'scripture_text_mismatches':0,'note_mismatches':0,
+              'source_original_verse_ids_and_text_unchanged':True,
+              'public_release_created':False,
+          }
+          Path('/tmp/lsg-heading-native-receipt.json').write_text(
+              json.dumps(receipt,indent=2,sort_keys=True)+'\n')
+          print('All 855 original chapter-opening headings present in native first verse, all 31,169 Scripture verse bodies and 9,751 notes preserved')
+          PY
+          SWORD_PATH=/tmp/lsg-chapter-heading-sword/payload \
+            /tmp/lsg-heading-native-display BRLSG1910
+      - name: Upload temporary source and native validation receipts only
+        uses: actions/upload-artifact@v4
+        with:
+          name: lsg-chapter-opening-heading-preverse-research-only
+          path: |
+            /tmp/lsg-preverse-section-receipt.json
+            /tmp/lsg-heading-native-receipt.json
+          retention-days: 14
+          if-no-files-found: error
