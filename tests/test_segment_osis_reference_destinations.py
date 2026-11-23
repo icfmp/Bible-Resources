@@ -104,6 +104,26 @@ class SplitSourceReferencesTest(unittest.TestCase):
                       b'<reference osisRef="Gen.2.1">Ge 2:1</reference>.',split)
         self.assertEqual(report["individual_reference_elements_created"],2)
 
+    def test_disambiguated_chapter_verse_is_one_explicit_source_slice(self):
+        verses={"Exod.20.11","Exod.31.17"}
+        spans=_exact_reference_spans(
+            "Ex 20:11, 31, 17.",{"Ex":"Exod"},verses,
+            disambiguated_chapter_commas=True)
+        self.assertEqual([key for _a,_b,key in spans],
+                         ["Exod.20.11","Exod.31.17"])
+        self.assertEqual(["Ex 20:11, 31, 17."[a:b] for a,b,_ in spans],
+                         ["Ex 20:11","31, 17"])
+        with self.assertRaisesRegex(ReviewError,"Cannot split"):
+            _exact_reference_spans("Ex 20:11, 31, 17.",
+                                   {"Ex":"Exod"},verses)
+
+    def test_disambiguated_chapter_missing_target_is_not_partially_linked(self):
+        verses={"Exod.20.11"}
+        with self.assertRaisesRegex(ReviewError,"Cannot split"):
+            _exact_reference_spans(
+                "Ex 20:11, 31, 17.",{"Ex":"Exod"},verses,
+                disambiguated_chapter_commas=True)
+
     def test_single_reference_never_retyped(self):
         candidate,_=self.build("Ge 1:1.")
         split,report=segment_candidate(candidate,self.aliases)
