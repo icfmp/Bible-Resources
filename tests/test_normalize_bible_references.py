@@ -395,6 +395,45 @@ class NormalizationTests(unittest.TestCase):
         with self.assertRaisesRegex(ReviewError,"requires full source-citation"):
             self.apply(aliases=self.aliases(),short_forms=True)
 
+    def test_chapter_comma_verse_after_missing_current_chapter_verse(self):
+        # Witness label Ex 20:11, 31, 17. occurs in original USFX;
+        # Exod.20.31 is nonexistent but Exod.31.17 exists.
+        verses = {"Exod.20.11", "Exod.31.17"}
+        parsed,reason,contexts=_complete_printed_destinations(
+            "Ex 20:11, 31, 17.",{"Ex":"Exod"},verses,
+            disambiguated_chapter_commas=True)
+        self.assertEqual(parsed,"Exod.20.11 Exod.31.17")
+        self.assertEqual(reason,"complete_printed_list")
+        self.assertEqual(contexts,1)
+        old,_,_=_complete_printed_destinations(
+            "Ex 20:11, 31, 17.",{"Ex":"Exod"},verses)
+        self.assertIsNone(old)
+
+    def test_chapter_comma_cannot_override_attested_current_chapter_verse(self):
+        verses = {"Gen.1.1","Gen.1.2","Gen.1.3","Gen.2.1"}
+        parsed,reason,_=_complete_printed_destinations(
+            "Ge 1:1, 2, 3.",{"Ge":"Gen"},verses,
+            disambiguated_chapter_commas=True)
+        self.assertEqual(parsed,"Gen.1.1 Gen.1.2 Gen.1.3")
+
+    def test_chapter_comma_no_target_or_partial_target_is_rejected(self):
+        verses = {"Exod.20.11"}
+        for citation in ("Ex 20:11, 31, 17.",
+                         "Ex 20:11, 31, 99.",
+                         "Ex 20:11, 99, 17."):
+            with self.subTest(citation=citation):
+                resolved,_,_=_complete_printed_destinations(
+                    citation,{"Ex":"Exod"},verses,
+                    disambiguated_chapter_commas=True)
+                self.assertIsNone(resolved)
+
+    def test_disambiguated_chapter_commas_require_complete_source_mode(self):
+        self.fixture()
+        with self.assertRaisesRegex(ReviewError,"requires full source-citation"):
+            run(cleaned_path=self.cleaned,usfx_zip=self.original,
+                manifest_path=self.manifest,crosswalk_path=self.crosswalk,
+                disambiguated_chapter_commas=True)
+
     def test_wrong_source_sha_blocks(self):
         self.fixture()
         self.manifest.write_text('{"cleaned_osis_sha256": "wrong"}')
