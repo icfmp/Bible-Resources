@@ -302,6 +302,42 @@ class NormalizationTests(unittest.TestCase):
         self.assertEqual(mapping["2 Co"], "2Cor")
         self.assertNotIn("Mal", mapping)  # not the printed 1910 abbreviation
 
+    def test_provider_variant_is_distinct_from_printed_alias_and_pinned(self):
+        self.fixture(clean_dest="Gen 1:2.", original_dest="Gen 1:2.")
+        path = self.aliases()
+        doc = json.loads(path.read_text())
+        doc["source_attested_digital_variants"] = {
+            "status": "source_provider_spelling_not_printed_edition_abbreviation",
+            "witness_usfx_zip_sha256": sha256(self.original.read_bytes()).hexdigest(),
+            "evidence": "Source-original contains this unambiguous alternate spelling.",
+            "aliases": {"Gen": "Gen"},
+        }
+        self.assertNotIn("Gen", doc["aliases"])
+        path.write_text(json.dumps(doc))
+        candidate, report = self.apply(aliases=path, complete_lists=True)
+        self.assertIn(b'osisRef="Gen.1.2">Gen 1:2.</reference>', candidate)
+        self.assertEqual(report["resolved_original_destination_labels"], 1)
+        self.assertEqual(report["unlinked_original_destination_labels_preserved"], 0)
+
+        doc["source_attested_digital_variants"]["witness_usfx_zip_sha256"] = "0" * 64
+        path.write_text(json.dumps(doc))
+        with self.assertRaisesRegex(ReviewError, "pinned original evidence"):
+            self.apply(aliases=path, complete_lists=True)
+
+    def test_provider_variant_cannot_override_printed_alias(self):
+        self.fixture()
+        path = self.aliases()
+        doc = json.loads(path.read_text())
+        doc["source_attested_digital_variants"] = {
+            "status": "source_provider_spelling_not_printed_edition_abbreviation",
+            "witness_usfx_zip_sha256": sha256(self.original.read_bytes()).hexdigest(),
+            "evidence": "An alternate spelling has independently checked source evidence.",
+            "aliases": {"Ge": "Gen"},
+        }
+        path.write_text(json.dumps(doc))
+        with self.assertRaisesRegex(ReviewError, "ambiguous provider-specific"):
+            self.apply(aliases=path, complete_lists=True)
+
     def test_wrong_source_sha_blocks(self):
         self.fixture()
         self.manifest.write_text('{"cleaned_osis_sha256": "wrong"}')
