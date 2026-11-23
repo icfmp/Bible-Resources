@@ -255,6 +255,15 @@ jobs:
                      x['decision']!='preserve_source_label_unlinked'
                      for x in expected)):
               raise SystemExit('Historical source-citation review ledger has drifted or silently approved corrections')
+          parallel=[entry for entry in expected if
+                    'parallel_versification_review' in entry]
+          if (len(parallel)!=ledger['independent_parallel_versification_candidates']
+              or ledger['independent_printed_note_corrections_certified']!=0
+              or any(entry['parallel_versification_review']['status'] !=
+                     'candidate_only_requires_actual_printed_note_collation'
+                     for entry in parallel)):
+              raise SystemExit('Parallel versification evidence must remain non-authoritative until actual print-note collation')
+          print('Source text and nine historical numbering candidates kept independent:',len(parallel))
           print('Persistent original-source unaddressable citation ledger verified:',len(current))
           print('Unlinked 1910 source-citation classes:',dict(classes))
           print('Review-only category examples:',examples)
