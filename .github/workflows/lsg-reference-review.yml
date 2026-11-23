@@ -24,6 +24,54 @@ jobs:
         run: python -m pip install -r requirements.txt
       - name: Run source-attested normalizer negative and idempotence tests
         run: python -m unittest discover -s tests -p test_normalize_bible_references.py -v
+      - name: Inventory original citation-label grammar without creating links
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from zipfile import ZipFile
+          from lxml import etree
+          import json, re
+          original='sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip'
+          with ZipFile(original) as z:
+              root=etree.fromstring(z.read('fraLSG_usfx.xml'),
+                  etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True))
+          labels=[' '.join(''.join(n.itertext()).split())
+                  for n in root.iter('xt')]
+          label_re=re.compile(r'(?<!\w)([1-3]?\s*[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ.]{0,12})\s+([1-9]\d{0,2}):([1-9]\d{0,2})')
+          aliases=Counter()
+          counts=Counter()
+          samples={}
+          for label in labels:
+              matches=list(label_re.finditer(label))
+              for m in matches:aliases[m.group(1).strip()]+=1
+              counts['notes_total']+=1
+              if not matches:
+                  counts['no_explicit_book_chapter_verse']+=1
+                  if len(samples.get('no_explicit_book_chapter_verse',[]))<20:
+                      samples.setdefault('no_explicit_book_chapter_verse',[]).append(label[:170])
+              counts['explicit_book_chapter_verse_tokens']+=len(matches)
+              if len(matches)>1:counts['multiple_explicit_book_tokens']+=1
+              if ';' in label:counts['contains_semicolon']+=1
+              if '–' in label or '—' in label or '-' in label:counts['contains_range_dash']+=1
+              if '(' in label or ')' in label:counts['contains_parenthesis']+=1
+              if re.search(r'\b(?:voir|cf|comp|et|ou)\b',label,re.I):
+                  counts['contains_prose_connector']+=1
+              if label.endswith('.'):counts['ends_with_period']+=1
+          report={
+              'status':'inventory_only_no_targets_inferred',
+              'counts':dict(counts),
+              'distinct_candidate_book_aliases':len(aliases),
+              'top_candidate_aliases':aliases.most_common(100),
+              'bounded_unmatched_examples':samples.get('no_explicit_book_chapter_verse',[]),
+              'source_citation_labels_rewritten':0,
+          }
+          from pathlib import Path
+          Path('/tmp/lsg-citation-grammar-inventory.json').write_text(
+              json.dumps(report,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print('LSG printed-citation syntax inventory:',dict(counts))
+          print('Candidate alias tokens (not approved):',aliases.most_common(100))
+          print('Unmatched examples (never linked):',samples.get('no_explicit_book_chapter_verse',[]))
+          PY
       - name: Fetch independently pinned official OSIS schema
         run: python scripts/fetch_reviewed_schema.py --directory /tmp/lsg-reviewed-osis
       - name: Build separate complete cleaned-source candidate and preservation ledger
@@ -202,5 +250,6 @@ jobs:
             /tmp/lsg-brnp-before.json
             /tmp/lsg-brnp-candidate.json
             /tmp/lsg-native-reference-parity.json
+            /tmp/lsg-citation-grammar-inventory.json
           if-no-files-found: warn
           retention-days: 14
