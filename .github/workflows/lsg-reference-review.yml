@@ -99,6 +99,7 @@ jobs:
             --crosswalk config/standard_usfm_osis_66.json \
             --destination-aliases config/lsg-1910-printed-book-aliases.json \
             --complete-citation-lists \
+            --source-local-short-forms \
             --output /tmp/lsg-structural-candidate.osis.xml \
             --report /tmp/lsg-structural-report.json
       - name: Validate official schema plus BRNP diagnostic before/after
