@@ -555,7 +555,7 @@ jobs:
               or tokens['original_scan_publication_year']!=1910
               or tokens['status']!='original_printed_1910_individual_reference_tokens_verified_from_native_page_images_not_full_note_transcriptions'
               or tokens['original_or_cleaned_text_changes_approved']!=0
-              or tokens['corrections_proposed_not_approved']!=len(tokens['records'])
+              or tokens['printed_token_observations_without_authorized_corrections']!=len(tokens['records'])
               or tokens['confirmed_individual_printed_reference_token_sightings']!=len(tokens['records'])
               or len(tokens['records'])>len(locators['records'])):
               raise SystemExit('Physical print token evidence must remain exact-original and non-approved')
