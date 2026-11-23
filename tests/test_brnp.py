@@ -139,7 +139,7 @@ class BRNPStructuralPilotTests(unittest.TestCase):
             'annotateType="commentary" annotateRef="Gen.1.2">'
             '<p>Second</p></div></div>'
         ), kind="commentary")
-        self.assertNotIn("BOOK_ID", report["finding_codes"])
+        self.assertIn("COMMENTARY_REPEATED_BOOK_DIVISION", report["finding_codes"])
         self.assertEqual(report["commentary_entry_count"], 2)
 
 
@@ -150,6 +150,35 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         ))
         self.assertEqual(report["finding_count"], 0)
         self.assertEqual(report["verse_identifier_count"], 1)
+
+
+    def test_canonical_and_pairing_ids_are_independently_unique(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1">'
+            '<verse osisID="Gen.1.1" sID="v-001"/>One<verse eID="v-001"/>'
+            '<verse osisID="Gen.1.1" sID="v-002"/>Two<verse eID="v-002"/>'
+            '</chapter>'
+        ))
+        self.assertIn("VERSE_START_ID", report["finding_codes"])
+        self.assertEqual(report["verse_start_reasons"]["duplicate_osisID"], 1)
+
+    def test_repeated_pairing_key_is_blocked_even_for_different_verses(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1">'
+            '<verse osisID="Gen.1.1" sID="v-001"/>One<verse eID="v-001"/>'
+            '<verse osisID="Gen.1.2" sID="v-001"/>Two<verse eID="v-001"/>'
+            '</chapter>'
+        ))
+        self.assertEqual(report["verse_start_reasons"]["duplicate_sID"], 1)
+
+    def test_wrong_table_cell_or_list_item_parent_is_blocked(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><verse osisID="Gen.1.1">One</verse>'
+            '<cell>Wrongly detached cell</cell>'
+            '<list><row><item>Wrongly detached item</item></row></list>'
+            '</chapter>'
+        ))
+        self.assertGreaterEqual(report["finding_codes"]["INVALID_STRUCTURAL_PARENT"], 3)
 
     def test_source_unchanged(self):
         content = document('<verse osisID="Gen.1.1">Test</verse>')
