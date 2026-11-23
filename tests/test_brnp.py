@@ -120,6 +120,28 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         ))
         self.assertIn("CHAPTER_CONTAINER_ID", [f["code"] for f in report["findings"]])
 
+
+    def test_official_osis_table_and_list_are_not_flattened(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><verse osisID="Gen.1.1">One</verse>'
+            '<table><row><cell>Cell</cell></row></table>'
+            '<list><item>Item</item></list></chapter>'
+        ))
+        self.assertEqual(report["finding_count"], 0)
+        self.assertEqual(report["element_counts"]["cell"], 1)
+
+    def test_commentary_repeated_book_divisions_not_rejected_as_bible_duplicates(self):
+        report = self.inspect(document(
+            '<div type="book" osisID="Gen"><div type="section" '
+            'annotateType="commentary" annotateRef="Gen.1.1">'
+            '<p>First</p></div></div>'
+            '<div type="book" osisID="Gen"><div type="section" '
+            'annotateType="commentary" annotateRef="Gen.1.2">'
+            '<p>Second</p></div></div>'
+        ), kind="commentary")
+        self.assertNotIn("BOOK_ID", report["finding_codes"])
+        self.assertEqual(report["commentary_entry_count"], 2)
+
     def test_source_unchanged(self):
         content = document('<verse osisID="Gen.1.1">Test</verse>')
         self.path.write_text(content, encoding="utf-8")
