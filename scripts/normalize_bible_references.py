@@ -82,7 +82,7 @@ def _usfx_bytes(archive: Path) -> bytes:
 def _origin_target(origin: str, book: str, verse_ids: set[str]) -> str:
     match = ORIGIN.fullmatch(origin)
     if not match:
-        raise ReviewError("Unrecognized source annotation-origin grammar")
+        raise ReviewError(f"Unrecognized source annotation-origin grammar: {book}, {origin!r}")
     chapter, verse = (int(value) for value in match.groups())
     if chapter < 1 or verse < 1:
         raise ReviewError("Invalid annotation-origin verse")
@@ -95,7 +95,7 @@ def _origin_target(origin: str, book: str, verse_ids: set[str]) -> str:
 def _intro_target(label: str, book: str, verse_ids: set[str]) -> str:
     match = INTRO.fullmatch(label)
     if not match:
-        raise ReviewError("Unrecognized source introduction-span grammar")
+        raise ReviewError(f"Unrecognized source introduction-span grammar: {book}, {label!r}")
     chapter, verse = int(match[1]), int(match[2])
     if chapter < 1 or verse < 1:
         raise ReviewError("Invalid introduction start")
