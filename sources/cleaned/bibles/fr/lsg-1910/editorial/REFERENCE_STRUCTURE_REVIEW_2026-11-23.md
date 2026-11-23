@@ -102,6 +102,17 @@ Evidence: [1910 printed-derived Jonah text](https://fr.wikisource.org/wiki/Bible
 
 The distinction matters: **an unaddressable citation is not automatically an authorial transcription error**. Any cross-versification mapping must use source-specific versification tables and an independently checked correspondence of the actual verses, not a hardcoded exception based on the target label.
 
+## Complete 54-note cross-host digital apparatus comparison — review, not print certification
+
+All **54** remaining source-unaddressable USFX `x/xt` citation labels have now been checked against the *separately hosted digital* `La Bible Louis Segond 1910` reference apparatus on [Biblia.com](https://biblia.com/bible/lsg/genesis/28/12). The evidence is preserved, source-note by source-note, in `SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json` alongside the original 54-case ledger.
+
+- **22/54 original `xt` labels have identical reference text** on the second digital host. This establishes corroborated *digital circulation* of these particular labels (including several non-addressable labels), **not** agreement with a physical printed 1910 reference note.
+- **32/54 `xt` labels differ** from the second digital witness. Examples of exact compared source citation tokens: `Gen 9.4`: eBible `Lé 3:27` versus Biblia `Lé 3:17`; `Gen 28.12`: `Jn 1:52` versus `Jn 1:51`; `2 Chr 35.7`: `2 R 30:24` versus `2 Ch 30:24`; `1 Jean 3.1`: `1 Jn 1:12` versus `Jn 1:12`. The comparisons are factual observations of separately hosted text, **not authorization to change any reference**.
+- The secondary host's digital editing/transcription provenance is **not established as independent of the eBible family**. “Different host” is not “verified historical witness.” The underlying digital Bibles may share editorial ancestry.
+- Original print scans with a *visible marginal-reference column* have been located in the 1,061-page [1910 Wikisource facsimile](https://fr.wikisource.org/wiki/Livre:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu); e.g. [facsimile page 29, Genesis 28](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/29). The scans, not the digital comparison above, are the next authoritative source for determining the printed marginal notes. The book transcription (OCR/Match & Split, acknowledged unfinished by Wikisource) is **not** itself a substitute for visual printed-note collation.
+
+**Publication protection:** all 54 literal original USFX labels remain untouched; all 54 remain unlinked until separately approved. The comparison file marks `historical_print_status: not_collated_from_printed_1910_reference_note` and `authorized_change: null` for each record. The GitHub CI verifies the exact original archive identity, labels, secondary comparison classification and continued absence of editorial approval. This is a complete **digital-to-digital audit**, not completion of the required **digital-to-1910-print collation**.
+
 ## Remaining release/merge gates
 
 1. **Individual hyperlink usability:** compare representative one-target, multi-target, ranges, chapters and implicit-context references in real Xiphos and AndBible (and if applicable Bible); preserve exactly the printed punctuation. The stock libSWORD HTML renderer already confirms two independent anchors for two separated source citations; this is still not proof of each graphical reader's click/navigation behavior. Do not relax BRNP to suppress reader defects.
