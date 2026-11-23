@@ -152,6 +152,10 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         "commentary_entry_count": annotations, "verse_identifier_count": len(verse_ids),
         "book_identifier_count": len(books_seen), "chapter_identifier_count": len(chapters_seen),
         "findings": errors[:100], "finding_count": len(errors),
+        "finding_codes": dict(sorted(Counter(e["code"] for e in errors).items())),
+        "unreviewed_elements": dict(sorted(Counter(
+            e["element"] for e in errors if e["code"] == "UNREVIEWED_ELEMENT"
+        ).items())),
         "limitations": [
             "Official OSIS XSD is checked only when --schema is supplied; neither route proves historical/authorial fidelity",
             "NOT a complete verse hierarchy, reference target, annotation or reader validation",
