@@ -16,6 +16,7 @@ import sys
 from lxml import etree
 
 from guard_osis import StructureFailure, _schema, parse_xml, require_regular_file, MAX_SOURCE_BYTES, POLICY_PATH
+from guard_commentary import _check_reference as check_commentary_reference
 
 ROOT = Path(__file__).resolve().parents[1]
 POLICY = ROOT / "config" / "osis-policy.json"
@@ -203,8 +204,17 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
             annotations += 1
             if kind != "commentary":
                 errors.append({"code": "ANNOTATION_KIND", "line": line})
-            if not element.get("annotateRef") or not element.get("annotateRef").strip():
+            reference = element.get("annotateRef")
+            if not reference or not reference.strip():
                 errors.append({"code": "ANNOTATE_REF", "line": line})
+            else:
+                try:
+                    # Reuse the already-reviewed commentary grammar; do not
+                    # invent a second looser parser for the same references.
+                    check_commentary_reference(path, element, reference)
+                except StructureFailure as exc:
+                    errors.append({"code": "COMMENTARY_REFERENCE_INVALID",
+                                   "line": line, "guard_code": exc.code})
         if tag == "div" and element.get("annotateRef") and element.get("annotateType") != "commentary":
             errors.append({"code": "ANNOTATION_TYPE", "line": line})
         if tag == "reference" and element.get("osisRef") == "":
