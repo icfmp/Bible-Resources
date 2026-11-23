@@ -46,7 +46,8 @@ class BRNPStructuralPilotTests(unittest.TestCase):
             '</p></chapter>'
         )
         report = self.inspect(xml)
-        self.assertEqual(report["status"], "pilot_structural_checks_passed")
+        self.assertEqual(report["status"], "diagnostic_only_schema_not_checked")
+        self.assertFalse(report["brnp_conformance_certified"])
         self.assertEqual(report["verse_identifier_count"], 2)
 
     def test_commentary_entry_with_range(self):
