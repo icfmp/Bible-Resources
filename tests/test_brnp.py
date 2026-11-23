@@ -142,6 +142,15 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         self.assertNotIn("BOOK_ID", report["finding_codes"])
         self.assertEqual(report["commentary_entry_count"], 2)
 
+
+    def test_osis_milestone_pairing_id_may_differ_from_canonical_osis_id(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><verse osisID="Gen.1.1" sID="v-001"/>'
+            'Text<verse eID="v-001"/></chapter>'
+        ))
+        self.assertEqual(report["finding_count"], 0)
+        self.assertEqual(report["verse_identifier_count"], 1)
+
     def test_source_unchanged(self):
         content = document('<verse osisID="Gen.1.1">Test</verse>')
         self.path.write_text(content, encoding="utf-8")
