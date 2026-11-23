@@ -185,6 +185,84 @@ jobs:
             json.dumps(evidence,sort_keys=True,indent=2)+'\n')
           print('Source 31170; native 31169; exactly Mark.10.53 lacks an independent stock Segond address')
           PY
+      - name: Independently compare all authorial main verse text and note anchors to the new native SWORD payload
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from pathlib import Path
+          from hashlib import sha256
+          import json,sys
+          sys.path.insert(0,'scripts')
+          from approved_osis_sword_candidate import _read_native_frames,_native_notes
+          from research.bible.source_osis_verse_notes import (
+              original_osis_verses_and_notes,_nonspace)
+          from research.bible.native_raw_main_text import native_raw_main_text
+          source=Path('/tmp/lsg-v1/LSG1910-1.0.0.osis.xml')
+          authored,notes,info=original_osis_verses_and_notes(source.read_bytes())
+          assert len(authored)==31170 and info['publisher_numbered_note_count']==9751
+          body_failures=[]
+          note_failures=[]
+          counters=Counter()
+          keys=set()
+          for kind,key,raw in _read_native_frames(
+              Path('/tmp/lsg-v1-native-read'),'BRLSG1910',Path('/tmp/lsg-v1/sword')):
+              counters['native_frames']+=1
+              if kind!='K':
+                  continue
+              if key in keys or key not in authored:
+                  raise SystemExit('Unrecognized or duplicate compiled source verse key')
+              keys.add(key)
+              expected=authored[key]
+              exp_notes=list(notes[key])
+              if key=='Mark.10.52':
+                  expected+=authored['Mark.10.53']
+                  exp_notes.extend(notes['Mark.10.53'])
+              actual,_=native_raw_main_text(raw)
+              counters['native_verse_text_checked']+=1
+              if _nonspace(actual)!=_nonspace(expected):
+                  body_failures.append(key)
+              else:
+                  counters['native_verse_nonspace_text_equal']+=1
+              actual_notes=_native_notes(raw)
+              counters['notes_from_compiled_verses']+=len(actual_notes)
+              counters['notes_from_matched_authored_verses']+=len(exp_notes)
+              if len(exp_notes)!=len(actual_notes):
+                  note_failures.append({'verse':key,'reason':'count'})
+                  continue
+              for index,(left,right) in enumerate(zip(exp_notes,actual_notes)):
+                  if (left['caller']!=right['caller'] or
+                      left['type']!=right['type'] or
+                      _nonspace(left['body'])!=_nonspace(right['body'])):
+                      note_failures.append({'verse':key,'reason':'caller_type_or_nonspace_body'})
+                  else:
+                      counters['native_note_caller_type_nonspace_body_equal']+=1
+          source_only=sorted(set(authored)-keys)
+          if (source_only!=['Mark.10.53'] or len(keys)!=31169):
+              raise SystemExit('Native source verse index differs beyond reviewed Mark 10 exception')
+          report={
+              'status':'independent_full_source_verse_and_note_readback',
+              'source_sha256':sha256(source.read_bytes()).hexdigest(),
+              'source_verse_count':len(authored),
+              'native_verse_count':len(keys),
+              'source_only_verses':source_only,
+              'full_body_mismatch_count':len(body_failures),
+              'full_body_mismatch_first_keys':body_failures[:20],
+              'note_caller_type_or_body_mismatch_count':len(note_failures),
+              'note_mismatch_first_keys':note_failures[:20],
+              'native_compiler_version_source':'libsword-utils_from_stock_ubuntu_runner',
+              'counts':dict(counters),
+              'original_scripture_verse_identities_preserved':True,
+              'this_is_not_graphical_xiphos_acceptance':True,
+              'stock_segon_v11n_key_parity':False,
+              'publication_approved':False
+          }
+          Path('/tmp/lsg-v1/full-source-native-readback.json').write_text(
+              json.dumps(report,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          print('31,169 independently read native verses vs 31,170 original source IDs; source/native readback:',dict(counters),
+                'body mismatch count',len(body_failures),'note mismatch count',len(note_failures))
+          if body_failures or note_failures:
+              raise SystemExit('Real source-to-native content changes detected (no verification bypass)')
+          PY
       - name: Freeze exact deterministic preview ZIP and member fingerprints
         run: |
           python - <<'PY'
@@ -229,6 +307,7 @@ jobs:
             /tmp/lsg-v1/preview-manifest.json
             /tmp/lsg-v1/validation.json
             /tmp/lsg-v1/native-readback.json
+            /tmp/lsg-v1/full-source-native-readback.json
             /tmp/lsg-v1/editorial.receipt.json
             /tmp/lsg-v1/individual.receipt.json
           if-no-files-found: error

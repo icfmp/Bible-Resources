@@ -54,14 +54,14 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/release_preflight.py`](../../scripts/release_preflight.py) | KEEP_GENERIC | named test | 3 | publication/release |
 | [`scripts/research/bible/__init__.py`](../../scripts/research/bible/__init__.py) | KEEP_GENERIC | not established | 2 | not determined |
 | [`scripts/research/bible/native_milestone_pair_audit.py`](../../scripts/research/bible/native_milestone_pair_audit.py) | KEEP_GENERIC | named test | 6 | source/native audit |
-| [`scripts/research/bible/native_raw_main_text.py`](../../scripts/research/bible/native_raw_main_text.py) | KEEP_GENERIC | named test | 7 | not determined |
+| [`scripts/research/bible/native_raw_main_text.py`](../../scripts/research/bible/native_raw_main_text.py) | KEEP_GENERIC | named test | 8 | not determined |
 | [`scripts/research/bible/native_sword_markup_census.py`](../../scripts/research/bible/native_sword_markup_census.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/research/bible/source_native_note_positions.py`](../../scripts/research/bible/source_native_note_positions.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_ordered_body.py`](../../scripts/research/bible/source_native_ordered_body.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/research/bible/source_native_osis_boundary_positions.py`](../../scripts/research/bible/source_native_osis_boundary_positions.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_osis_structure_screen.py`](../../scripts/research/bible/source_native_osis_structure_screen.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_osis_target_addressability.py`](../../scripts/research/bible/source_native_osis_target_addressability.py) | KEEP_GENERIC | named test | 5 | not determined |
-| [`scripts/research/bible/source_osis_verse_notes.py`](../../scripts/research/bible/source_osis_verse_notes.py) | KEEP_GENERIC | named test | 6 | not determined |
+| [`scripts/research/bible/source_osis_verse_notes.py`](../../scripts/research/bible/source_osis_verse_notes.py) | KEEP_GENERIC | named test | 7 | not determined |
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 7 | publication/release |
 | [`scripts/reviewed_modern_commentary_rebuild.py`](../../scripts/reviewed_modern_commentary_rebuild.py) | GENERALIZE | named test | 3 | publication/release |
 | [`scripts/reviewed_osis_commentary_rebuild.py`](../../scripts/reviewed_osis_commentary_rebuild.py) | KEEP_GENERIC | not established | 2 | publication/release |

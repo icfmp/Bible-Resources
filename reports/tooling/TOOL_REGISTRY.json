@@ -1167,11 +1167,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/approved_osis_sword_candidate.py",
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "tests/test_native_raw_main_text.py",
         "tests/test_native_sword_markup_census.py",
@@ -1403,11 +1404,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/approved_osis_sword_candidate.py",
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
         "tests/test_source_osis_verse_notes.py"
