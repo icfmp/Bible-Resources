@@ -211,9 +211,18 @@ class HistoricalIndexProofTests(unittest.TestCase):
                 metadata, source["source_sha256"]), [])
             return
         self.assertEqual(mode, "stock_reader_keys")
-        self.assertEqual(metadata["version"], "1.0.1")
-        self.assertEqual(source["source_sha256"],
-                         "1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d")
+        # The live module may be a staged, not-yet-published edition.
+        # Bind its identity to the active plan and actual cleaned source;
+        # reserve fixed checksums for immutable historical releases below.
+        active_version = metadata["version"]
+        active_plan = json.loads((ROOT / f"config/release-plans/lsg-{active_version}.json").read_text())
+        active_import = json.loads((ROOT / f"config/catalogue-import-lsg-{active_version}.json").read_text())
+        self.assertEqual(active_plan["version"], active_version)
+        self.assertEqual(active_plan["tag"], f"lsg-{active_version}")
+        self.assertEqual(active_plan["package_sha256"], active_import["release_zip_sha256"])
+        self.assertEqual(source["source_sha256"], sha((
+            ROOT / "sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml"
+        ).read_bytes()))
         current = json.loads((module / "SWORD_COMPATIBILITY.json").read_text())
         self.assertEqual(current["source_osis_sha256"], source["source_sha256"])
         self.assertEqual(current["status"],
@@ -224,7 +233,8 @@ class HistoricalIndexProofTests(unittest.TestCase):
         }])
         self.assertEqual(current["source_to_native_full_body_mismatch_count"], 0)
         self.assertEqual(current["source_to_native_note_mismatch_count"], 0)
-        # A configuration-only hotfix may not alter historical original content.
+        # Historical releases remain immutable even when the current
+        # native zText payload is intentionally rebuilt for a newer edition.
         historic_plan = json.loads((ROOT /
             "sources/cleaned/bibles/fr/lsg-1910/editorial/releases/"
             "LSG-1.0.0-RELEASE-PLAN.json").read_text())
@@ -233,12 +243,22 @@ class HistoricalIndexProofTests(unittest.TestCase):
             "cc3b57ab0b61476a77b42fa19004956085d7608a974724c770cc2211adc67499")
         historic_import = json.loads((ROOT /
             "config/catalogue-import-lsg-1.0.0.json").read_text())
-        current_import = json.loads((ROOT /
+        prior_import = json.loads((ROOT /
             "config/catalogue-import-lsg-1.0.1.json").read_text())
+        prior_plan_path = ROOT / "config/release-plans/lsg-1.0.1.json"
+        if not prior_plan_path.exists():
+            prior_plan_path = (ROOT /
+                "sources/cleaned/bibles/fr/lsg-1910/editorial/releases/"
+                "LSG-1.0.1-RELEASE-PLAN.json")
+        prior_plan = json.loads(prior_plan_path.read_text())
+        self.assertEqual(prior_plan["tag"], "lsg-1.0.1")
+        self.assertEqual(prior_plan["package_sha256"],
+                         "c7b7471cba433abf99c84c1a6968a7a07a1d1cb5d021ca3bf6fdb86f6f6adf63")
+        self.assertEqual(prior_import["release_zip_sha256"], prior_plan["package_sha256"])
         for member, hash_value in historic_import["files"].items():
             if member.startswith("modules/texts/"):
-                self.assertEqual(current_import["files"][member], hash_value)
-        self.assertNotEqual(current_import["files"]["mods.d/brlsg1910.conf"],
+                self.assertEqual(prior_import["files"][member], hash_value)
+        self.assertNotEqual(prior_import["files"]["mods.d/brlsg1910.conf"],
                             historic_import["files"]["mods.d/brlsg1910.conf"])
 
 
