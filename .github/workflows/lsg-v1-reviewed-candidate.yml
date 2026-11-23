@@ -327,8 +327,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A modules/lsg-1910 sources/cleaned/bibles/fr/lsg-1910 \
             config/catalogue-import-lsg-1.0.0.json config/release-plans/lsg-1.0.0.json \
-            catalog/v1/catalog.json reports/tooling/TOOL_REGISTRY.json \
-            reports/tooling/TOOL_REGISTRY.md
+            config/release-legacy-bindings.json catalog/v1/catalog.json
+          # The reports folder is ignored for new arbitrary files, but these
+          # two source-bound inventory reports are already tracked.
+          git add -u -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
           git diff --cached --check
           git commit -m "release(lsg): stage verified v1.0.0 source and rebuilt SWORD package for review"
           git push origin HEAD:refs/heads/release/lsg-1.0.0-reviewed
