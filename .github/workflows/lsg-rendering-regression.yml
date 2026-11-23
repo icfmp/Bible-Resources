@@ -1,0 +1,88 @@
+name: LSG native rendered-note regression (no publish)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/lsg-rendering-regression.yml'
+      - 'modules/lsg-1910/**'
+      - 'scripts/lsg_rendered_note_gate.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent stable SWORD compiler and renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libsword-dev libsword-utils diatheke
+      - name: Probe real installed SWORD modules and the exact failing verses
+        run: |
+          cat > /tmp/lsg_render_probe.cpp <<'CPP'
+          #include <sword/swmgr.h>
+          #include <sword/swmodule.h>
+          #include <sword/versekey.h>
+          #include <iostream>
+          #include <string>
+          #include <vector>
+          #include <stdexcept>
+          static bool literal(const std::string &s) {
+            return s.find("<reference")!=std::string::npos ||
+                s.find("</reference")!=std::string::npos ||
+                s.find("osisRef=")!=std::string::npos ||
+                s.find("&lt;reference")!=std::string::npos;
+          }
+          static void describe(const char* kind,const std::string& ref,
+                               const char* opts,const std::string &s) {
+            bool leak=literal(s);
+            std::cout<<kind<<" "<<ref<<" "<<opts<<" chars="<<s.size()
+                     <<" literal_ref_leak="<<(leak?"YES":"NO")
+                     <<" link_tag="<<(s.find("<a ")!=std::string::npos?"YES":"NO")
+                     <<" first_note="<<(s.find("<note")!=std::string::npos?"YES":"NO")
+                     <<'\n';
+            if (leak && std::string(kind)!="RAW") {
+              auto index=s.find("<reference");
+              if(index==std::string::npos)index=s.find("osisRef=");
+              if(index==std::string::npos)index=s.find("&lt;reference");
+              if(index!=std::string::npos)
+                std::cout<<"LITERAL_SAMPLE "<<ref<<" "<<kind<<" "
+                         <<s.substr(index,180)<<'\n';
+            }
+          }
+          int main(int argc,char **argv) {
+            if(argc!=2) return 2;
+            sword::SWMgr mgr;
+            sword::SWModule* module=mgr.getModule(argv[1]);
+            if(!module) { std::cerr<<"missing-module\n"; return 3;}
+            for(const char* mode:{"Off","On"}) {
+              mgr.setGlobalOption("Cross-references",mode);
+              mgr.setGlobalOption("Footnotes",mode);
+              for(const std::string ref: {"Rom.1.7","Rom.1.9","John.1.1","Gen.1.1"}) {
+                sword::VerseKey key;
+                key.setVersificationSystem("Segond");
+                key.setAutoNormalize(false);
+                key.setText(ref.c_str());
+                if(key.popError())return 4;
+                if(module->setKey(key))return 5;
+                std::string raw=module->getRawEntry();
+                std::string plain=module->stripText();
+                sword::SWBuf html=module->renderText();
+                describe("RAW",ref,mode,raw);
+                describe("PLAIN",ref,mode,plain);
+                describe("HTML",ref,mode,html.c_str());
+              }
+            }
+            return 0;
+          }
+          CPP
+          g++ -std=c++17 -O2 /tmp/lsg_render_probe.cpp -o /tmp/lsg_render_probe -lsword
+          SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg_render_probe BRLSG1910 | tee /tmp/lsg-rendering-probe.log
+      - name: Store diagnostic report without publication
+        uses: actions/upload-artifact@v4
+        with:
+          name: lsg-1.0.0-native-render-diagnostic
+          path: /tmp/lsg-rendering-probe.log
+          retention-days: 7
+          if-no-files-found: error
