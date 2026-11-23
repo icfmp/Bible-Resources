@@ -25,7 +25,8 @@ MAX_SOURCE = 128 * 1024 * 1024
 MAX_USFX = 64 * 1024 * 1024
 OPEN_REFERENCE = re.compile(rb"<reference(?=[\s/>])[^<>]*>")
 ORIGIN = re.compile(r"(\d+)\.(\d+)")
-INTRO = re.compile(r"(\d+):(\d+)(?:\s*[-–]\s*(?:(\d+):)?(\d+))?")
+INTRO = re.compile(r"(\d+)[:.](\d+)(?:\s*[-–—]\s*(?:(\d+)[:.])?(\d+))?")
+VERSE_ONLY_RANGE = re.compile(r"(\d+)\s*[-–—]\s*(\d+)")
 DIGEST = re.compile(r"[a-f0-9]{64}")
 
 
@@ -92,7 +93,31 @@ def _origin_target(origin: str, book: str, verse_ids: set[str]) -> str:
     return target
 
 
-def _intro_target(label: str, book: str, verse_ids: set[str]) -> str:
+def _intro_target(label: str, book: str, verse_ids: set[str]) -> str | None:
+    """Resolve only an entire attested label, never a partial prose fragment.
+
+    USFX introduction pointers can be chapter ranges, single-chapter-book
+    verse spans, and occasionally mixed narrative notes. Mixed prose is
+    deliberately kept as an unlinked original section label.
+    """
+    if any(character.isalpha() or character in "()，," for character in label):
+        return None
+    chapters = {int(part.split(".")[1]) for part in verse_ids
+                if part.startswith(book + ".") and len(part.split(".")) == 3}
+    if label.isdigit():
+        chapter = int(label)
+        if chapter < 1 or chapter not in chapters:
+            raise ReviewError("Unattested introduction chapter")
+        return f"{book}.{chapter}"
+    verse_only = VERSE_ONLY_RANGE.fullmatch(label)
+    if verse_only and chapters == {1}:
+        first_v, last_v = (int(x) for x in verse_only.groups())
+        if first_v < 1 or first_v > last_v:
+            raise ReviewError("Reversed or invalid single-chapter introduction range")
+        first, last = f"{book}.1.{first_v}", f"{book}.1.{last_v}"
+        if first not in verse_ids or last not in verse_ids:
+            raise ReviewError("Unattested single-chapter introduction endpoints")
+        return first + "-" + last
     match = INTRO.fullmatch(label)
     if not match:
         raise ReviewError(f"Unrecognized source introduction-span grammar: {book}, {label!r}")
@@ -112,7 +137,6 @@ def _intro_target(label: str, book: str, verse_ids: set[str]) -> str:
     if last not in verse_ids:
         raise ReviewError("Unattested introduction end")
     return first + "-" + last
-
 
 def _source_bindings(cleaned, original, crosswalk: dict) -> tuple[dict, dict]:
     """Bind each exact cleaned reference to source-attested USFX semantics.
@@ -173,13 +197,19 @@ def _source_bindings(cleaned, original, crosswalk: dict) -> tuple[dict, dict]:
             if _label(src) != _label(ref):
                 raise ReviewError("Source/cleaned introduction span label differs")
             target = _intro_target(_label(src), book, verse_ids)
+            counts["original_introduction_spans"] += 1
+            if target is None:
+                if ref.get("osisRef"):
+                    raise ReviewError("Unresolved prose span already has an unsafe target")
+                counts["unlinked_introduction_spans_preserved"] += 1
+                continue
             if ref.get("osisRef") not in (None, target):
                 raise ReviewError("Introduction span conflicts with existing target")
             changes[ref] = target
-            counts["original_introduction_spans"] += 1
+            counts["resolved_introduction_spans"] += 1
 
     if len(changes) != (counts["original_cross_reference_notes"] +
-                         counts["original_introduction_spans"]):
+                         counts["resolved_introduction_spans"]):
         raise ReviewError("Duplicate source witness binding")
     return changes, dict(counts)
 
