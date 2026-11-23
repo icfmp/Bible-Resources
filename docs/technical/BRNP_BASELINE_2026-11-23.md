@@ -52,3 +52,40 @@ The 529 MHCC findings do **not** mean 529 independent editorial errors. The exac
 **Controls added after the initial pilot:** duplicate canonical verse identifiers (including members of compound IDs); distinct milestone-key uniqueness for chapters and verses; correct Bible book and chapter ownership, including active chapter milestones; no nested books in the canonical representation; explicit detection of repeated commentary book divisions; standard table/list containment; grouping of poetry lines; unresolved cross-reference targets; and the existing reviewed commentary reference grammar, rather than a permissive second parser. The normalizer's optional BRNP diagnostic detects newly introduced finding classes/counts and blocks its *local candidate* when enabled. None of these checks silently rewrites a released resource.
 
 **Acceptance boundaries:** A zero under these checks means *no findings in the implemented draft subset*, not independently verified printed-edition fidelity, reference target resolution, native SWORD parity, or reader acceptance. Do not suppress any findings to make this table green; create source-hash-bound transformation plans with full before/after equivalence evidence. No editorial/publishing sign-off is implied.
+
+
+## Confirmed structural triage, not just warning counts
+
+**Evidence:** readonly GitHub Actions [first full structural inspection #45124107419](https://github.com/icfmp/Bible-Resources/actions/runs/45124107419), [role-aware checker #45124439876](https://github.com/icfmp/Bible-Resources/actions/runs/45124439876), and [original-to-cleaned MHC comparison #45124609712](https://github.com/icfmp/Bible-Resources/actions/runs/45124609712). Each run inspected actual Git-committed source XML and printed structural metadata only. The original and cleaned files were not edited.
+
+### LSG — 19,679 different kinds of reference markup, not 19,679 broken hyperlinks
+
+The 19,679 source `reference` elements have **no** `osisRef`. They resolve into three *roles* that the previous pilot conflated:
+
+- **9,751** `reference type="annotateRef" subType="x-origin"` within cross-reference notes identify the note's **origin location**; they are **not missing destination links**. This is provider-specific presentation/association markup requiring deliberate mapping to the canonical note anchor, without losing the printed cue.
+- **9,751** plain `reference` elements in those same `note type="crossReference"` elements hold the human-readable **destination labels**, sometimes containing multiple biblical citations. Their literal labels are intact; navigable `osisRef` destinations are **not encoded**. This is a genuine absence of machine navigation, *not proof of a missing author's reference or of textual corruption*. Restoring destinations requires independent verification of individual printed labels and reference parsing, not a guessed rule.
+- **177** `reference subType="x-introduction"` elements in list items contain chapter/passage spans used by book introductions. Their semantics as editorial section spans must be preserved; classify them separately rather than treating each as a broken cross-reference note.
+
+The corrected pilot therefore reports three distinct categories and retains all 19,679 diagnostic occurrences instead of hiding evidence. An authorially faithful, noninteractive printed cross-reference is preferable to an invented live link.
+
+### MHC — 10 whitespace-only technical irregularities; representation mismatch is not a missing commentary
+
+The **10** leading/trailing whitespace cases in `osisRef` are **identical in the immutable original XML and the cleaned XML**. They are inherited digital-source technical imperfections, not regressions introduced by the repository's previous cleanup. A reviewed, source-pinned `.strip()` mapping is plausible only after checking tokenized reference equality and SWORD behavior; no authored words need changing.
+
+The source contains **66** actual book containers and **4,255** keyed `verse` starts; verse pairing and compound canonical IDs express commentary passage scopes. It has no `div annotateType="commentary"`. The single `NO_COMMENTARY_ENTRIES` warning therefore means **BRNP canonical representation differs from the source**, not that MHC lacks commentary, lacks passage coverage, or is malformed OSIS. Migration into canonical annotated divisions would require whole-corpus authored-section equivalence, not an opportunistic markup rewrite.
+
+### MHCC — book milestones were mistaken for 264 extra book containers
+
+The source has **66** actual book containers. The previously reported **264** nested/repeated `div type="book"` occurrences are empty **milestone elements**, exactly **132** `sID` starts and **132** `eID` ends. Their four appearances per book are not 264 additional content-bearing books. The pilot now distinguishes containers from milestones.
+
+Within the existing book containers, there are **132** extra book-milestone starts inconsistent with the intended *single logical book container* BRNP target, and **one** reused book `sID` pairing key (a pairing ambiguity; the distinct `canonical` flag does not itself establish a unique key). These are genuine normalized-structure concerns, but removal or remapping must first prove that all legacy roles and reader behavior survive.
+
+The **two** chapter starts `1Sam.25` and `Ps.95` lack their matching `eID` endings: **confirmed unpaired chapter milestones**. They are substantive structural defects in the cleaned OSIS representation, not absent Bible verses. Any correction must be source-hash-bound, reversible and independently checked against unchanged chapter-level sections, notes, text and native SWORD entries.
+
+After role-based classification, the latest pilot has **134 MHCC diagnostic occurrences**: 132 book milestones inside containers, one duplicate pairing key and one aggregate unclosed-chapter warning covering two distinct chapter starts. The lower count is **a correction of the checker’s element-kind classification**, not relaxation of BRNP or proof that 395 source anomalies were repaired.
+
+### What is independently established and what is not
+
+**Established from XML structure:** the specific origin/destination roles and unlinked human-readable cross-reference labels in LSG; inherited whitespace in MHC; authored-scope milestone model in MHC; the 66 MHCC real book containers, their 264 book milestones, one duplicate pairing key and two unclosed chapter starts.
+
+**Still requiring separate investigation before a fix:** historical authority and rights for LSG cross-reference apparatus; real passage-target mapping; whether the MHC canonical conversion is safe or necessary; native/compiler/reader behavior of MHCC book milestones; exact approved, reversible insertion/normalization for each MHCC chapter end. The checker reports *draft normalization discrepancies*, not historical-text errors or publication approval.
