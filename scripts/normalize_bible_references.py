@@ -33,6 +33,15 @@ DIRECT_DESTINATION = re.compile(
     r"(?:\s*[-–]\s*(?P<last>[1-9]\d{0,3}))?\."
 )
 DIGEST = re.compile(r"[a-f0-9]{64}")
+BOOK_CITATION = re.compile(
+    r"(?P<alias>(?:[1-3]\s+)?[A-Za-zÀ-ÿ]{1,12})\s+"
+    r"(?P<chapter>[1-9]\d{0,3}):\s*(?P<verse>[1-9]\d{0,3})"
+)
+SAME_BOOK_CITATION = re.compile(
+    r"(?P<chapter>[1-9]\d{0,3}):\s*(?P<verse>[1-9]\d{0,3})"
+)
+VERSES_ONLY = re.compile(r"[1-9]\d{0,3}")
+
 
 
 class ReviewError(ValueError):
@@ -130,6 +139,121 @@ def _single_explicit_destination(label: str, aliases: dict | None,
     return first + "-" + last, "full_explicit_printed_range"
 
 
+def _complete_printed_destinations(label: str, aliases: dict | None,
+                                   verse_ids: set[str]) -> tuple[str | None, str, int]:
+    """Consume a complete printed reference list or refuse the whole label.
+
+    Every book alias comes from the independently attested edition table;
+    commas carry the explicitly preceding chapter, and semicolons carry the
+    book when the following component is a chapter:verse. Full stops require
+    a fresh *explicit* book alias. 'etc.', 'v.', nonnumeric terms, unknown books,
+    source-absent keys, reversed ranges and any leftover punctuation block.
+    Preserve source order, including repetitions, without editing printed text.
+    """
+    if aliases is None:
+        return None, "edition_alias_table_not_requested", 0
+    if not label or len(label) > 2048:
+        return None, "compound_or_implicit_reference", 0
+    pos = 0
+    book = None
+    chapter = None
+    targets = []
+    contextual = 0
+    can_repeat_book = False
+    while pos < len(label):
+        direct = BOOK_CITATION.match(label, pos)
+        if direct:
+            book = aliases.get(" ".join(direct["alias"].split()))
+            if not book:
+                return None, "unverified_printed_book_alias", 0
+            chapter, verse = int(direct["chapter"]), int(direct["verse"])
+            pos = direct.end()
+        elif can_repeat_book and book:
+            carried = SAME_BOOK_CITATION.match(label, pos)
+            if not carried:
+                return None, "compound_or_implicit_reference", 0
+            chapter, verse = int(carried["chapter"]), int(carried["verse"])
+            contextual += 1
+            pos = carried.end()
+        else:
+            return None, "compound_or_implicit_reference", 0
+        can_repeat_book = False
+        first = f"{book}.{chapter}.{verse}"
+        if first not in verse_ids:
+            return None, "unattested_reference_start", 0
+
+        pos_after_number = pos
+        while pos < len(label) and label[pos].isspace():
+            pos += 1
+        if pos < len(label) and label[pos] in "-–":
+            pos += 1
+            while pos < len(label) and label[pos].isspace():
+                pos += 1
+            m = VERSES_ONLY.match(label, pos)
+            if m is None:
+                return None, "compound_or_implicit_reference", 0
+            last_verse = int(m.group())
+            last = f"{book}.{chapter}.{last_verse}"
+            if last_verse < verse or last not in verse_ids:
+                return None, "unattested_or_reversed_reference_end", 0
+            targets.append(first + "-" + last)
+            pos = m.end()
+        else:
+            targets.append(first)
+            pos = pos_after_number
+
+        # A comma enumerates more verses of the same explicitly established
+        # book and chapter. Any unattested verse invalidates the entire list.
+        while True:
+            j = pos
+            while j < len(label) and label[j].isspace():
+                j += 1
+            if j >= len(label) or label[j] != ",":
+                break
+            j += 1
+            while j < len(label) and label[j].isspace():
+                j += 1
+            extra = VERSES_ONLY.match(label, j)
+            if extra is None:
+                return None, "compound_or_implicit_reference", 0
+            key = f"{book}.{chapter}.{int(extra.group())}"
+            if key not in verse_ids:
+                return None, "unattested_reference_start", 0
+            targets.append(key)
+            pos = extra.end()
+
+        while pos < len(label) and label[pos].isspace():
+            pos += 1
+        if pos == len(label):
+            # The printed reference labels have a terminal full stop; do not
+            # silently treat an unfinished fragment as a fully read source.
+            return None, "compound_or_implicit_reference", 0
+        sep = label[pos]
+        pos += 1
+        if sep == ".":
+            if pos == len(label):
+                return " ".join(targets), "complete_printed_list", contextual
+            if not label[pos].isspace():
+                return None, "compound_or_implicit_reference", 0
+            while pos < len(label) and label[pos].isspace():
+                pos += 1
+            if pos == len(label):
+                return None, "compound_or_implicit_reference", 0
+            book = None
+            can_repeat_book = False
+        elif sep == ";":
+            while pos < len(label) and label[pos].isspace():
+                pos += 1
+            if pos == len(label):
+                return None, "compound_or_implicit_reference", 0
+            can_repeat_book = True
+        else:
+            return None, "compound_or_implicit_reference", 0
+        if len(targets) > 128:
+            return None, "overlong_printed_reference_sequence", 0
+    return None, "compound_or_implicit_reference", 0
+
+
 def _usfx_bytes(archive: Path) -> bytes:
     with ZipFile(archive) as zipped:
         candidates = [item for item in zipped.infolist()
@@ -200,7 +324,8 @@ def _intro_target(label: str, book: str, verse_ids: set[str]) -> str | None:
     return first + "-" + last
 
 def _source_bindings(cleaned, original, crosswalk: dict,
-                     destination_aliases: dict | None = None) -> tuple[dict, dict, list, list]:
+                     destination_aliases: dict | None = None,
+                     complete_lists: bool = False) -> tuple[dict, dict, list, list]:
     """Bind each exact cleaned reference to source-attested USFX semantics.
 
     Book identity is verified using the independent reviewed USFM->OSIS map.
@@ -243,8 +368,13 @@ def _source_bindings(cleaned, original, crosswalk: dict,
                     _label(origin_refs[0]) != _label(xo) or
                     _label(destination_refs[0]) != _label(xt)):
                 raise ReviewError("Mismatch in callout, note origin or printed destination")
-            destination_target, status = _single_explicit_destination(
-                _label(xt), destination_aliases, verse_ids)
+            if complete_lists:
+                destination_target, status, carried = _complete_printed_destinations(
+                    _label(xt), destination_aliases, verse_ids)
+                counts["explicit_semicolon_contexts_used"] += carried
+            else:
+                destination_target, status = _single_explicit_destination(
+                    _label(xt), destination_aliases, verse_ids)
             if destination_target is None:
                 if destination_refs[0].get("osisRef"):
                     raise ReviewError("Unreviewed printed destination already linked")
@@ -343,7 +473,8 @@ def _patch_exact_start_tags(source: bytes, root, changes: dict) -> tuple[bytes, 
 
 def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         crosswalk_path: Path, output_path: Path | None = None,
-        destination_aliases_path: Path | None = None) -> tuple[bytes, dict]:
+        destination_aliases_path: Path | None = None,
+        complete_citation_lists: bool = False) -> tuple[bytes, dict]:
     manifest = json.loads(_bytes(manifest_path, 256 * 1024).decode("utf-8"))
     current = _bytes(cleaned_path, MAX_SOURCE)
     zipped = _bytes(usfx_zip, MAX_SOURCE)
@@ -360,7 +491,8 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         if destination_aliases_path is not None else (None, None)
     )
     changes, counts, unresolved, destination_findings = _source_bindings(
-        source, original, crosswalk, aliases)
+        source, original, crosswalk, aliases,
+        complete_lists=complete_citation_lists)
     candidate, edits = _patch_exact_start_tags(current, source, changes)
     # Validate actual candidate XML, every edited target, and the unchanged
     # ordered contents of every text/tail/element. No lossy reserialization.
@@ -395,7 +527,8 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         "unresolved_source_introduction_spans": unresolved,
         "unresolved_explicit_source_destination_findings": destination_findings,
         "existing_attributes_rewritten": 0,
-        "authorial_destinations_inferred": 0,
+        "unverified_authorial_destinations_guessed": 0,
+        "complete_citation_lists_enabled": complete_citation_lists,
         "printed_abbreviation_map_sha256": alias_digest,
         "machine_destinations_interpreted_from_complete_explicit_labels":
             counts["resolved_original_destination_labels"],
@@ -429,6 +562,8 @@ def main() -> int:
     parser.add_argument("--crosswalk", type=Path, required=True)
     parser.add_argument("--destination-aliases", type=Path,
                         help="Exact edition-printed abbreviation witness, optional")
+    parser.add_argument("--complete-citation-lists", action="store_true",
+                        help="Parse only fully consumed source-attested citation grammar")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
@@ -443,6 +578,7 @@ def main() -> int:
             cleaned_path=args.cleaned, usfx_zip=args.original_usfx,
             manifest_path=args.manifest, crosswalk_path=args.crosswalk,
             destination_aliases_path=args.destination_aliases,
+            complete_citation_lists=args.complete_citation_lists,
             output_path=args.output,
         )
     except (ReviewError, OSError, ValueError, etree.XMLSyntaxError) as exc:
