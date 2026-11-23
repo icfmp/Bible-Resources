@@ -468,6 +468,17 @@ jobs:
               or disposition_count['partial_marginal_reference_token_read_only']!=len(tokens)
               or disposition_count['original_page_and_verse_examined_but_printed_citation_not_certified']!=len(expected)-len(proven)-len(tokens)):
               raise SystemExit('Batch review disposition is not complete or is wrongly certified')
+          screening=ledger.get('first_pass_actual_1910_source_verse_screening',{})
+          if (ledger.get('printed_page_evidence_not_yet_recorded') is not False
+              or screening.get('source_record_count')!=len(expected)
+              or screening.get('historical_scan_sha256')!=source_scan['retrieved_djvu_sha256']
+              or screening.get('original_printed_full_note_certified_count')!=len(proven)
+              or screening.get('original_printed_marginal_token_with_callout_only_count')!=len(tokens)
+              or screening.get('original_printed_page_reviewed_no_verified_note_token_count')!=disposition_count['original_page_and_verse_examined_but_printed_citation_not_certified']
+              or screening.get('pending_full_printed_note_equivalence_count')!=len(expected)-len(proven)
+              or screening.get('authored_reference_changes_approved')!=0
+              or screening.get('machine_links_added_to_unresolved_original_notes')!=0):
+              raise SystemExit('First-pass printed-page audit metadata inconsistent with case-by-case evidence')
           print('All 54 cases assigned evidence-scoped print screening disposition:',dict(disposition_count))
           print('Physical 1910 print page coverage and authorial source-verse alignment: ',
                 len(page_data['records']),'of',len(expected),
