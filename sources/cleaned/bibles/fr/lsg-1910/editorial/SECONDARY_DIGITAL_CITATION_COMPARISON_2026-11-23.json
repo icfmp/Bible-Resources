@@ -95,7 +95,7 @@
       "secondary_uri": "https://biblia.com/bible/lsg/joshua/5/13",
       "secondary_citation_label": "És 23:23.",
       "comparison": "text_identical_in_separately_hosted_digital_witness",
-      "historical_print_status": "printed_reference_token_verified_full_note_pending",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
       "authorized_change": null
     },
     {
@@ -106,7 +106,7 @@
       "secondary_uri": "https://biblia.com/bible/lsg/joshua/14/6",
       "secondary_citation_label": "No 12:16. De 1:36.",
       "comparison": "digital_witness_disagrees_with_original_usfx",
-      "historical_print_status": "printed_reference_token_verified_full_note_pending",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
       "authorized_change": null
     },
     {
@@ -128,7 +128,7 @@
       "secondary_uri": "https://biblia.com/bible/lsg/2-chronicles/35/7",
       "secondary_citation_label": "2 Ch 30:24.",
       "comparison": "digital_witness_disagrees_with_original_usfx",
-      "historical_print_status": "printed_reference_token_verified_full_note_pending",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
       "authorized_change": null
     },
     {
@@ -326,7 +326,7 @@
       "secondary_uri": "https://biblia.com/bible/lsg/matthew/19/14",
       "secondary_citation_label": "Mc 18:3. 1 Co 14:20. 1 Pi 2:2.",
       "comparison": "text_identical_in_separately_hosted_digital_witness",
-      "historical_print_status": "printed_reference_token_verified_full_note_pending",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
       "authorized_change": null
     },
     {
@@ -557,7 +557,7 @@
       "secondary_uri": "https://biblia.com/bible/lsg/1-john/3/1",
       "secondary_citation_label": "Jn 1:12.",
       "comparison": "digital_witness_disagrees_with_original_usfx",
-      "historical_print_status": "printed_reference_token_verified_full_note_pending",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
       "authorized_change": null
     },
     {
@@ -579,7 +579,7 @@
       "secondary_uri": "https://biblia.com/bible/lsg/revelation/7/3",
       "secondary_citation_label": "Ép 6:4.",
       "comparison": "digital_witness_disagrees_with_original_usfx",
-      "historical_print_status": "printed_reference_token_verified_full_note_pending",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
       "authorized_change": null
     },
     {
