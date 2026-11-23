@@ -95,14 +95,18 @@ jobs:
               run(["xdotool","key","--clearmodifiers","ctrl+c"],env)
               time.sleep(0.8)
               return run(["xclip","-selection","clipboard","-o"],env)
-          def prose_match(copied,native):
-              # Require a ten-word consecutive witness, not a window title or just a heading.
+          def longest_native_prose_run(copied,native):
+              # Diagnostic; acceptance still needs an uninterrupted ten-word body witness.
               copied_words=tokenize(copied)
               native_words=tokenize(native)
-              if len(copied_words)<30 or len(native_words)<15:return False
-              copied_set={tuple(copied_words[j:j+10]) for j in range(len(copied_words)-9)}
-              return any(tuple(native_words[i:i+10]) in copied_set
-                         for i in range(4,len(native_words)-9))
+              if len(copied_words)<30 or len(native_words)<15:return 0
+              for span in (16,14,12,10,8,6):
+                  copied_set={tuple(copied_words[j:j+span])
+                              for j in range(len(copied_words)-span+1)}
+                  if any(tuple(native_words[i:i+span]) in copied_set
+                         for i in range(4,len(native_words)-span+1)):
+                      return span
+              return 0
           disp=app=None
           with tempfile.TemporaryDirectory(prefix="isolated-lsg-xiphos-") as home:
               home=Path(home)
@@ -136,29 +140,41 @@ jobs:
                   run(["xdotool","windowmove",window,"16","16"],env)
                   time.sleep(1.2)
                   for key,reference,title in samples:
-                      run(["xdotool","windowfocus","--sync",window],env)
-                      run(["xdotool","key","--clearmodifiers","ctrl+l"],env)
-                      run(["xdotool","type","--clearmodifiers","--delay","25",reference],env)
-                      run(["xdotool","key","Return"],env)
-                      time.sleep(2.5)
-                      record={"navigation_accepted":True,"heading_once":False,
+                      record={"navigation_accepted":False,"heading_once":False,
                               "native_verse_prose_match":False,"clipboard_bytes":0,
-                              "actual_copy_attempts":0}
-                      for x,y in ((535,290),(680,460),(390,550)):
-                          text=copy_reader(env,window,x,y)
-                          text_words=tokenize(text.decode("utf-8","replace"))
-                          title_words=tokenize(title)
-                          count=sum(text_words[i:i+len(title_words)]==title_words
-                                    for i in range(len(text_words)-len(title_words)+1))
-                          record["actual_copy_attempts"]+=1
-                          record["clipboard_bytes"]=len(text)
-                          record["heading_once"]=(count==1)
-                          record["native_verse_prose_match"]=prose_match(
-                              text.decode("utf-8","replace"),native[key])
-                          if record["heading_once"] and record["native_verse_prose_match"]:
+                              "actual_copy_attempts":0,"heading_occurrences":0,
+                              "longest_contiguous_native_word_run":0,
+                              "successful_navigation_form":None,
+                              "attempted_navigation_forms":[]}
+                      for navigate in (reference,reference.split(":")[0]):
+                          record["attempted_navigation_forms"].append(navigate)
+                          run(["xdotool","windowfocus","--sync",window],env)
+                          run(["xdotool","key","--clearmodifiers","ctrl+l"],env)
+                          run(["xdotool","type","--clearmodifiers","--delay","25",navigate],env)
+                          run(["xdotool","key","Return"],env)
+                          record["navigation_accepted"]=True
+                          time.sleep(2.5)
+                          for x,y in ((535,290),(680,460),(390,550)):
+                              selected=copy_reader(env,window,x,y)
+                              selected_text=selected.decode("utf-8","replace")
+                              text_words=tokenize(selected_text)
+                              title_words=tokenize(title)
+                              count=sum(text_words[i:i+len(title_words)]==title_words
+                                        for i in range(len(text_words)-len(title_words)+1))
+                              overlap=longest_native_prose_run(selected_text,native[key])
+                              record["actual_copy_attempts"]+=1
+                              record["clipboard_bytes"]=len(selected)
+                              record["heading_occurrences"]=count
+                              record["longest_contiguous_native_word_run"]=overlap
+                              record["heading_once"]=(count==1)
+                              record["native_verse_prose_match"]=(overlap>=10)
+                              if record["heading_once"] and record["native_verse_prose_match"]:
+                                  record["successful_navigation_form"]=navigate
+                                  break
+                          if record["successful_navigation_form"] is not None:
                               break
                       report["observations"][key]=record
-                      print("Actual GUI title/prose confirmation:",key,json.dumps(record,sort_keys=True))
+                      print("Actual GUI title/prose diagnostic:",key,json.dumps(record,sort_keys=True))
                   if not all(v["heading_once"] and v["native_verse_prose_match"]
                              for v in report["observations"].values()):
                       raise RuntimeError("GUI clipboard did not confirm both source titles and verse prose")
