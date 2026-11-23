@@ -178,6 +178,27 @@ Full read-only batch [run #45156275006](https://github.com/icfmp/Bible-Resources
 
 The source-pinned CI now verifies all **54** case identities, historical page range and links, immutable source/scan digests, and the strict distinction between a merely located page and a separately verified marginal citation; no hidden approvals are accepted. The 53 remaining historical citations are not falsely certified or treated as edited.
 
+## Batch print-to-source discrepancy findings — six physically attested individual reference tokens
+
+After locating and visually screening the **54** original 1910 page contexts in one batch, a second read-only extraction enlarged the actual central reference columns for 13 priority case contexts. The original [focused printed-image run #45158131029](https://github.com/icfmp/Bible-Resources/actions/runs/45158131029) ([image artifact #14809073411](https://github.com/icfmp/Bible-Resources/actions/runs/45158131029/artifacts/14809073411)) used the immutable 1910 DjVu SHA-256 already pinned above. The previous full-page source scan/verses were also independently compared to each excerpt.
+
+**Six additional case-specific printed reference tokens** are now readable and separately recorded in `PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json`. The printed note groups can be longer than the digital `xt` notes; **these are token-level historical testimonies, not certification that the entire digital note label matches the printed apparatus**:
+
+| Case and verse | 1910 printed reference token | Original eBible digital token | Secondary digital token | Evidence |
+| --- | --- | --- | --- | --- |
+| `LSG-CR-008` Jos 5:13 | `Ex. 23. 23.` | `És 23:23` | `És 23:23` | [Printed p. 190](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/190) |
+| `LSG-CR-009` Jos 14:6 | `No. 14. 24. De. 1. 36.` | `No 12:24. De 1:36` | `No 12:16. De 1:36` | [Printed p. 198](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/198) |
+| `LSG-CR-011` 2 Chr 35:7 | `30. 24.` (*same book: 2 Chronicles*) | `2 R 30:24` | `2 Ch 30:24` | [Printed p. 394](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/394) |
+| `LSG-CR-029` Mt 19:14 | `18. 3.` (*same book: Matthew*) | `Mc 18:3` | `Mc 18:3` | [Printed p. 814](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/814) |
+| `LSG-CR-050` 1 Jn 3:1 | `Jn. 1. 12.` | `1 Jn 1:12` | `Jn 1:12` | [Printed p. 1022](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/1022) |
+| `LSG-CR-052` Ap 7:3 | `Éz. 9. 4-6.` | `Ép 9:4` | `Ép 6:4` | [Printed p. 1031](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/1031) |
+
+These corroborate **concrete digital-only reference token errors or changed digital reference identities** in a subset; the first original-print-certified `LSG-CR-002` at Genesis 28:12 conversely establishes that the wrong `Jn 1:52` **was already in the printed edition**. Thus neither blanket correction from Biblia, nor blanket trust in eBible, is editorially defensible.
+
+The other **47** of the 54 cases do not yet have a print token independently certified and cross-walked to their exact source `xt` at this checkpoint; they remain individually located in `PRINTED_1910_PAGE_LOCATORS_2026-11-23.json` and untouched. The source and print ledgers deliberately count **1 full printed-note reading**, **6 additional individually attested printed *tokens***, and **53 full-note cases still unapproved**. The categories are **not additive as 54 fully certified notes**. All six corrections are *evidence-based proposals* for a future separately approved edited version, not silently applied changes to the original text, existing cleaned master, candidate OSIS or released binary.
+
+The temporary scan-download and image/OCR forensics workflows were deleted after their evidence runs to avoid accidentally introducing large downloads into the regular production pipeline. The permanent image source URL, SHA-256, page positions and individual reference observations are in the editorial registry and can be reproduced using the documented native `ddjvu` command.
+
 ## Remaining release/merge gates
 
 1. **Individual hyperlink usability:** compare representative one-target, multi-target, ranges, chapters and implicit-context references in real Xiphos and AndBible (and if applicable Bible); preserve exactly the printed punctuation. The stock libSWORD HTML renderer already confirms two independent anchors for two separated source citations; this is still not proof of each graphical reader's click/navigation behavior. Do not relax BRNP to suppress reader defects.
