@@ -1,4 +1,4 @@
-name: BRNP read-only conformance pilot
+name: BRNP advisory diagnostics (not publication conformance)
 on:
   workflow_dispatch:
   pull_request:
@@ -34,7 +34,7 @@ jobs:
             "commentary|sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml|mhcc"
             "commentary|sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml|mhc"
           )
-          echo '## BRNP v0.1 inventory (non-normative)' >> "$GITHUB_STEP_SUMMARY"
+          echo '## BRNP v0.2-draft inventory (not a certification)' >> "$GITHUB_STEP_SUMMARY"
           echo '| Edition | Diagnostic exit |' >> "$GITHUB_STEP_SUMMARY"
           echo '| --- | --- |' >> "$GITHUB_STEP_SUMMARY"
           for entry in "${paths[@]}"; do
@@ -53,14 +53,14 @@ jobs:
           from pathlib import Path
           folder = Path(os.environ["RUNNER_TEMP"]) / "brnp-reports"
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
-              summary.write("\\n### Full diagnostic category counts\\n")
+              print("### Full diagnostic category counts", file=summary)
               for path in sorted(folder.glob("*.json")):
                   report = json.loads(path.read_text(encoding="utf-8"))
                   counts = report.get("finding_codes", {})
-                  print(path.stem, report.get("finding_count"), dict(counts), "tags:", report.get("unreviewed_elements", {}), "verse reasons:", report.get("verse_start_reasons", {}), "first findings:", report.get("findings", [])[:5])
-                  summary.write(f"- {path.stem}: total {report.get('finding_count', 0)}; first-100 distribution {dict(counts)}; element tags {report.get('unreviewed_elements', {})}\\n")
+                  print(path.stem, report.get("finding_count"), dict(counts), "tags:", report.get("unreviewed_elements", {}), "verse reasons:", report.get("verse_start_reasons", {}), "representative findings:", report.get("finding_examples_by_code", {}))
+                  print(f"- {path.stem}: total {report.get('finding_count', 0)}; categories {dict(counts)}; element tags {report.get('unreviewed_elements', {})}", file=summary)
           PY
-          echo 'Exit 1 means pilot findings, not failed official OSIS validity. These results are non-blocking until BRNP is independently reviewed and approved.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Nonzero finding counts indicate unresolved BRNP draft non-conformance; a green workflow means diagnostics executed, NOT resources passed. The official OSIS schema result is separate. These findings are non-gating until owner approval.' >> "$GITHUB_STEP_SUMMARY"
       - name: Upload diagnostics only
         if: always()
         uses: actions/upload-artifact@v4
