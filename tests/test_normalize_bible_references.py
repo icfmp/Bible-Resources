@@ -257,7 +257,7 @@ class NormalizationTests(unittest.TestCase):
         self.assertEqual(report["resolved_original_destination_labels"], 1)
         self.assertEqual(report["resolved_destination_target_tokens"], 3)
         self.assertEqual(report["multi_target_reference_labels"], 1)
-        self.assertEqual(report["explicit_semicolon_contexts_used"], 1)
+        self.assertEqual(report["source_contextual_followups_used"], 1)
         self.assertEqual(report["candidate_additions"], 3)
         self.assertIn(
             b'osisRef="Gen.1.1 Gen.1.2 Gen.2.1">Ge 1:1, 2; 2:1.',
