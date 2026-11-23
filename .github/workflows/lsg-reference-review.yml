@@ -12,6 +12,7 @@ on:
       - 'sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip'
       - 'config/standard_usfm_osis_66.json'
       - 'config/lsg-1910-printed-book-aliases.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json'
 permissions:
   contents: read
 jobs:
@@ -237,6 +238,24 @@ jobs:
                   'proposed_corrections_or_links':0}
           Path('/tmp/lsg-source-citation-triage.json').write_text(
               json.dumps(report,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          ledger=json.loads(Path(
+              'sources/cleaned/bibles/fr/lsg-1910/editorial/UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json'
+          ).read_text(encoding='utf-8'))
+          current=[e for e in records
+                   if e['parser_reason']=='unattested_reference_start']
+          expected=ledger['records']
+          if (ledger['source_original_usfx_zip_sha256']!=sha256(orig.read_bytes()).hexdigest()
+              or len(current)!=ledger['references_original_count']
+              or len(expected)!=len(current)
+              or [(x['original_usfm_book'],x['source_note_origin'],
+                   x['original_citation_label']) for x in current]!=
+                 [(x['original_usfm_book'],x['source_note_origin'],
+                   x['original_citation_label']) for x in expected]
+              or any(x['editorial_change'] is not None or
+                     x['decision']!='preserve_source_label_unlinked'
+                     for x in expected)):
+              raise SystemExit('Historical source-citation review ledger has drifted or silently approved corrections')
+          print('Persistent original-source unaddressable citation ledger verified:',len(current))
           print('Unlinked 1910 source-citation classes:',dict(classes))
           print('Review-only category examples:',examples)
           print('Unattested-reference original note evidence (no editorial corrections):')
