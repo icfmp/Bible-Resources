@@ -27,6 +27,11 @@ OPEN_REFERENCE = re.compile(rb"<reference(?=[\s/>])[^<>]*>")
 ORIGIN = re.compile(r"(\d+)\.(\d+)")
 INTRO = re.compile(r"(\d+)[:.](\d+)(?:\s*[-–—]\s*(?:(\d+)[:.])?(\d+))?")
 VERSE_ONLY_RANGE = re.compile(r"(\d+)\s*[-–—]\s*(\d+)")
+DIRECT_DESTINATION = re.compile(
+    r"(?P<alias>(?:[1-3]\s+)?[A-Za-zÀ-ÿ]{1,12})\s+"
+    r"(?P<chapter>[1-9]\d{0,3}):\s*(?P<verse>[1-9]\d{0,3})"
+    r"(?:\s*[-–]\s*(?P<last>[1-9]\d{0,3}))?\."
+)
 DIGEST = re.compile(r"[a-f0-9]{64}")
 
 
@@ -71,6 +76,58 @@ def _crosswalk(path: Path) -> dict:
     if not entries or len(mapping) != len(entries) or len(set(mapping.values())) != len(entries):
         raise ReviewError("Missing or ambiguous reviewed USFM/OSIS book crosswalk")
     return mapping
+
+
+def _printed_book_aliases(path: Path, crosswalk: dict) -> tuple[dict, str]:
+    """Interpret exact source-edition printed abbreviations only, never fuzzy ones."""
+    raw = _bytes(path, 256 * 1024)
+    doc = json.loads(raw.decode("utf-8"))
+    mapping = doc.get("aliases")
+    if (doc.get("schema_version") != 1 or
+            doc.get("crosswalk") != "config/standard_usfm_osis_66.json" or
+            not isinstance(mapping, dict) or
+            len(mapping) != len(crosswalk) or
+            set(mapping.values()) != set(crosswalk.values()) or
+            not isinstance(doc.get("printed_sources"), list) or
+            not doc["printed_sources"] or
+            not all(isinstance(url, str) and url.startswith("https://")
+                    for url in doc["printed_sources"])):
+        raise ReviewError("Missing independently sourced one-to-one printed book aliases")
+    for alias, book in mapping.items():
+        if (not isinstance(alias, str) or
+                re.fullmatch(r"(?:[1-3] )?[A-Za-zÀ-ÿ]{1,12}", alias) is None or
+                not isinstance(book, str)):
+            raise ReviewError("Invalid printed edition abbreviation")
+    return mapping, sha256(raw).hexdigest()
+
+
+def _single_explicit_destination(label: str, aliases: dict | None,
+                                 verse_ids: set[str]) -> tuple[str | None, str]:
+    """Only complete literal one-passage printed labels are machine-linked.
+
+    Multiple books, semicolons, carry-forward chapter references, v. references,
+    parenthetical notes and unrecognized aliases are intentionally unlinked.
+    A full source reference with no actual source verse is also left unlinked.
+    """
+    if aliases is None:
+        return None, "edition_alias_table_not_requested"
+    match = DIRECT_DESTINATION.fullmatch(label)
+    if match is None:
+        return None, "compound_or_implicit_reference"
+    book = aliases.get(" ".join(match["alias"].split()))
+    if not book:
+        return None, "unverified_printed_book_alias"
+    chapter, verse = int(match["chapter"]), int(match["verse"])
+    first = f"{book}.{chapter}.{verse}"
+    if first not in verse_ids:
+        return None, "unattested_reference_start"
+    if match["last"] is None:
+        return first, "full_explicit_printed_reference"
+    last_verse = int(match["last"])
+    last = f"{book}.{chapter}.{last_verse}"
+    if last_verse < verse or last not in verse_ids:
+        return None, "unattested_or_reversed_reference_end"
+    return first + "-" + last, "full_explicit_printed_range"
 
 
 def _usfx_bytes(archive: Path) -> bytes:
@@ -142,7 +199,8 @@ def _intro_target(label: str, book: str, verse_ids: set[str]) -> str | None:
         raise UnresolvedSourceTarget("unattested_end")
     return first + "-" + last
 
-def _source_bindings(cleaned, original, crosswalk: dict) -> tuple[dict, dict, list]:
+def _source_bindings(cleaned, original, crosswalk: dict,
+                     destination_aliases: dict | None = None) -> tuple[dict, dict, list]:
     """Bind each exact cleaned reference to source-attested USFX semantics.
 
     Book identity is verified using the independent reviewed USFM->OSIS map.
@@ -184,14 +242,23 @@ def _source_bindings(cleaned, original, crosswalk: dict) -> tuple[dict, dict, li
                     _label(origin_refs[0]) != _label(xo) or
                     _label(destination_refs[0]) != _label(xt)):
                 raise ReviewError("Mismatch in callout, note origin or printed destination")
-            if destination_refs[0].get("osisRef"):
-                raise ReviewError("Printed destination unexpectedly already linked")
+            destination_target, status = _single_explicit_destination(
+                _label(xt), destination_aliases, verse_ids)
+            if destination_target is None:
+                if destination_refs[0].get("osisRef"):
+                    raise ReviewError("Unreviewed printed destination already linked")
+                counts["unlinked_original_destination_labels_preserved"] += 1
+                counts["unlinked_destination_reason_" + status] += 1
+            else:
+                if destination_refs[0].get("osisRef") not in (None, destination_target):
+                    raise ReviewError("Printed destination conflicts with source-verified address")
+                changes[destination_refs[0]] = destination_target
+                counts["resolved_original_destination_labels"] += 1
             target = _origin_target(_label(xo), book, verse_ids)
             if origin_refs[0].get("osisRef") not in (None, target):
                 raise ReviewError("Origin conflicts with an existing OSIS destination")
             changes[origin_refs[0]] = target
             counts["original_cross_reference_notes"] += 1
-            counts["unlinked_original_destination_labels_preserved"] += 1
 
         original_spans = [x for x in obook.iter("ior")]
         clean_spans = [x for x in cbook.iter(OSIS + "reference")
@@ -223,10 +290,12 @@ def _source_bindings(cleaned, original, crosswalk: dict) -> tuple[dict, dict, li
 
     for key in ("original_cross_reference_notes",
                 "unlinked_original_destination_labels_preserved",
+                "resolved_original_destination_labels",
                 "original_introduction_spans", "resolved_introduction_spans",
                 "unlinked_introduction_spans_preserved"):
         counts.setdefault(key, 0)
     if len(changes) != (counts["original_cross_reference_notes"] +
+                         counts["resolved_original_destination_labels"] +
                          counts["resolved_introduction_spans"]):
         raise ReviewError("Duplicate source witness binding")
     return changes, dict(counts), unresolved
@@ -263,7 +332,8 @@ def _patch_exact_start_tags(source: bytes, root, changes: dict) -> tuple[bytes, 
 
 
 def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
-        crosswalk_path: Path, output_path: Path | None = None) -> tuple[bytes, dict]:
+        crosswalk_path: Path, output_path: Path | None = None,
+        destination_aliases_path: Path | None = None) -> tuple[bytes, dict]:
     manifest = json.loads(_bytes(manifest_path, 256 * 1024).decode("utf-8"))
     current = _bytes(cleaned_path, MAX_SOURCE)
     zipped = _bytes(usfx_zip, MAX_SOURCE)
@@ -274,7 +344,13 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
     original = _parse(_usfx_bytes(usfx_zip))
     if source.tag != OSIS + "osis" or original.tag != "usfx":
         raise ReviewError("Expected canonical OSIS and original USFX document")
-    changes, counts, unresolved = _source_bindings(source, original, _crosswalk(crosswalk_path))
+    crosswalk = _crosswalk(crosswalk_path)
+    aliases, alias_digest = (
+        _printed_book_aliases(destination_aliases_path, crosswalk)
+        if destination_aliases_path is not None else (None, None)
+    )
+    changes, counts, unresolved = _source_bindings(
+        source, original, crosswalk, aliases)
     candidate, edits = _patch_exact_start_tags(current, source, changes)
     # Validate actual candidate XML, every edited target, and the unchanged
     # ordered contents of every text/tail/element. No lossy reserialization.
@@ -309,6 +385,9 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         "unresolved_source_introduction_spans": unresolved,
         "existing_attributes_rewritten": 0,
         "authorial_destinations_inferred": 0,
+        "printed_abbreviation_map_sha256": alias_digest,
+        "machine_destinations_interpreted_from_complete_explicit_labels":
+            counts["resolved_original_destination_labels"],
         "original_note_text_deleted": 0,
         "original_section_labels_deleted": 0,
         "published_release_approved": False,
@@ -316,7 +395,8 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
     }
     if output_path is not None:
         if output_path.resolve() in {p.resolve() for p in (
-                cleaned_path, usfx_zip, manifest_path, crosswalk_path)}:
+                cleaned_path, usfx_zip, manifest_path, crosswalk_path,
+                *([destination_aliases_path] if destination_aliases_path else []))}:
             raise ReviewError("Refusing to overwrite cleaned or original source")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         fd, temp = tempfile.mkstemp(prefix=".candidate-", dir=output_path.parent)
@@ -336,16 +416,22 @@ def main() -> int:
     parser.add_argument("--original-usfx", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--crosswalk", type=Path, required=True)
+    parser.add_argument("--destination-aliases", type=Path,
+                        help="Exact edition-printed abbreviation witness, optional")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
     if args.output.resolve() in {args.cleaned.resolve(), args.original_usfx.resolve(),
-                                 args.manifest.resolve(), args.crosswalk.resolve(), args.report.resolve()}:
+                                 args.manifest.resolve(), args.crosswalk.resolve(),
+                                 args.report.resolve(),
+                                 *([args.destination_aliases.resolve()]
+                                   if args.destination_aliases else [])}:
         parser.error("All sources, candidate and report must be separate paths")
     try:
         _, report = run(
             cleaned_path=args.cleaned, usfx_zip=args.original_usfx,
             manifest_path=args.manifest, crosswalk_path=args.crosswalk,
+            destination_aliases_path=args.destination_aliases,
             output_path=args.output,
         )
     except (ReviewError, OSError, ValueError, etree.XMLSyntaxError) as exc:
