@@ -15,7 +15,7 @@ import sys
 
 from lxml import etree
 
-from guard_osis import StructureFailure, inspect as inspect_official_osis
+from guard_osis import StructureFailure, _schema, parse_xml, require_regular_file, MAX_SOURCE_BYTES, POLICY_PATH
 
 ROOT = Path(__file__).resolve().parents[1]
 POLICY = ROOT / "config" / "osis-policy.json"
@@ -29,7 +29,20 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         raise ValueError("input must be a regular XML file at most 128 MiB")
     # The optional official-XSD check is independent of BRNP's narrower
     # project profile. A BRNP-only result is never a publication certificate.
-    official = inspect_official_osis(path.absolute(), schema_path.absolute()) if schema_path else None
+    official = None
+    if schema_path is not None:
+        # The pinned XSD and the stricter existing project allowlist are
+        # separate checks. Do not mistake unsupported metadata (e.g.
+        # revisionDesc) for an XML schema failure.
+        policy = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
+        schema, pinned_hash = _schema(policy, schema_path.absolute())
+        raw = require_regular_file(path.absolute(), MAX_SOURCE_BYTES, "SOURCE_UNAVAILABLE")
+        doc = parse_xml(path.absolute(), raw, "MALFORMED_XML")
+        if not schema.validate(doc):
+            issue = schema.error_log[0]
+            raise StructureFailure(path, issue.line or 1, "OSIS_SCHEMA_INVALID",
+                                   issue.message, issue.column or None)
+        official = {"schema_sha256": pinned_hash, "source_sha256": sha256(raw).hexdigest()}
     content = path.read_bytes()
     policy = json.loads(POLICY.read_text(encoding="utf-8"))
     allowed = set(policy["supported_elements"])
