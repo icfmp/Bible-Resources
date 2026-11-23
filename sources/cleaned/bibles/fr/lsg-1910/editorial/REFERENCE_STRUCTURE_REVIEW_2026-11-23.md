@@ -34,7 +34,7 @@ The [full source-citation and one-reference-per-passage trial #45136656184](http
 
 - Candidate: 30,170,765 bytes, SHA-256 `e68f81b8298bcf364221af7f178e4f8e556a6b9452f9fd8780784cc76fbf2ac4`. Exactly 9,751 + 9,392 + 174 = 19,317 added attributes, **zero existing attributes rewritten**.
 - The parser follows source-defined shorthand in 2,539 verified contextual followups (including one disambiguated chapter-comma-verse group), each on a fully verified, fully consumed note. No unsupported label or unattested verse is assigned a guessed target.
-- Both source and candidate passed the independently pinned official OSIS schema check. BRNP now reports **360 unresolved destination labels and 3 unresolved introduction labels**, compared with 9,751/177 before; no new finding category was introduced.
+- Both source and candidate passed the independently pinned official OSIS schema check. BRNP now reports **359 unresolved destination labels and 3 unresolved introduction labels**, compared with 9,751/177 before; no new finding category was introduced.
 - The [native SWORD cross-compiler comparison in the same run](https://github.com/icfmp/Bible-Resources/actions/runs/45136656184) compiled the released cleaned master and both candidate files into **three isolated temporary SWORD modules** and compared **32,426** ordered raw frames, including **31,169** populated native verse entries. The source's 31,170 authored verses and the existing Segond SWORD Mark 10:52–53 indexing compromise must not be conflated.
 - All native differences were limited to the 9,751 expected origin `osisRef` attributes, 9,392 expected printed-destination `osisRef` attributes and 174 expected introduction `osisRef` attributes. **Zero unrelated raw native changes.** This proves engine preservation and scope of the changes, **not** actual clickable rendering in Xiphos, AndBible or Bible.
 - All authorial words, note captions, original destination labels, identifiers, poetry, text order and punctuation are preserved. No published module has been altered.
@@ -62,7 +62,7 @@ These three texts were inherited from the original USFX, not introduced by sourc
 
 ## Earlier provider-variant-only checkpoint (superseded by full source-local pass)
 
-The earlier [#45132279039](https://github.com/icfmp/Bible-Resources/actions/runs/45132279039) confirmed that the eBible-original `Mal` spelling could be recognized against the exact original USFX hash without changing the printed `Ma` abbreviation. At that intermediate stage, **9,345** destination labels were linked, **406** remained unlinked and no other native content changed. That is a historical intermediate result; the authoritative **9,391 linked / 360 unlinked** full-corpus result is recorded above.
+The earlier [#45132279039](https://github.com/icfmp/Bible-Resources/actions/runs/45132279039) confirmed that the eBible-original `Mal` spelling could be recognized against the exact original USFX hash without changing the printed `Ma` abbreviation. At that intermediate stage, **9,345** destination labels were linked, **406** remained unlinked and no other native content changed. That is a historical intermediate result; the authoritative **9,392 linked / 359 unlinked** full-corpus result is recorded above.
 
 ## Independently verified per-passage presentation and source-local forms
 
@@ -87,6 +87,20 @@ The [full source-native run #45144018694](https://github.com/icfmp/Bible-Resourc
 The **54 remaining source-addressability cases** (not 54 confirmed printed errors) have been preserved in the separate versioned and source-hash-pinned `UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json`: each record carries the source USFM book, note verse, literal citation, source and original file hashes, and a pending historical-print review status; none has an approved correction. The LSG CI now checks all 54 records against the exact original archive and fails on any silent change or accidental editorial approval.
 
 Several records may reflect genuine typographical mistakes **or historical versification differences**, not simply invalid text. In particular, source-unaddressable `Jon 1:17`, `Os 1:10` and `Na 1:15` appear with variant chapter/verse numbering in other published Segond representations. These are *candidates for printed-edition collation*, **not** authority to remap Scripture verses or invent references.
+
+## Nine source-unaddressable labels with documented versification alternatives
+
+Within the **54** source-digitization labels whose destination is still unaddressable in this cleaned source, **nine notes** contain one of three citation identities demonstrably numbered differently in another edition or representation:
+
+| Digital citation token in preserved eBible note | 1910 facsimile-derived printed chapter-text numbering | Source-note occurrences | Evidence status |
+| --- | --- | ---: | --- |
+| `Jon 1:17` | `Jonas 2:1` (great-fish narrative) | 4 | Chapter-text comparison; printed **note** not collated |
+| `Os 1:10` | `Osée 2:1` (children of Israel promise) | 3 | Chapter-text comparison; printed **note** not collated |
+| `Na 1:15` | `Nahum 2:1` (messenger of peace) | 2 | Chapter-text comparison; printed **note** not collated |
+
+Evidence: [1910 printed-derived Jonah text](https://fr.wikisource.org/wiki/Bible_Segond_1910/Jonas), [1910 Hosea text](https://fr.wikisource.org/wiki/Bible_Segond_1910/Os%C3%A9e), and [1910 Nahum text](https://fr.wikisource.org/wiki/Bible_Segond_1910/Nahum). The transcription directly associates the cited words with different verse identifiers; separate digital Segond texts support the alternate numbering. This **does not demonstrate how the reference appears in its original 1910 printed margin**, nor does it authorize automatic source-versification changes, citation rewrite, or target remapping. The nine exact source-origin entries are flagged, without editorial approval, in `UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json`.
+
+The distinction matters: **an unaddressable citation is not automatically an authorial transcription error**. Any cross-versification mapping must use source-specific versification tables and an independently checked correspondence of the actual verses, not a hardcoded exception based on the target label.
 
 ## Remaining release/merge gates
 
