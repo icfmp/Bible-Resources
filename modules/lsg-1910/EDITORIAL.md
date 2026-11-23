@@ -2,6 +2,10 @@
 
 Existing original section headings now carry the OSIS-valid x-section type where they immediately follow a chapter opening. Exactly 803 unchanged titles are now part of native verse 1 entries. All original Scripture, publisher notes and citations are identical. The known Segond index exception for Mark 10:53 is retained.
 
+## Reader QA and publication gate
+
+The native SWORD readback verifies all 803 original section headings are inside the appropriate first numbered verse. This is not a substitute for an independent graphical check in Xiphos or BibleTime. That GUI check and a separate, explicit public-release decision remain outstanding; no public 1.0.2 release is claimed by this candidate.
+
 ## Earlier approved 1.0.1 editorial record
 
 # Louis Segond 1910 — Bible Resources 1.0.1
