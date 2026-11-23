@@ -498,6 +498,12 @@ def _source_bindings(cleaned, original, crosswalk: dict,
                     _label(xt), destination_aliases, _label(xo), book, verse_ids)
                 if destination_target is not None:
                     counts["source_local_short_forms_resolved"] += 1
+            if (destination_target is not None and
+                    disambiguated_chapter_commas and complete_lists):
+                old_target, _old_reason, _old_context = _complete_printed_destinations(
+                    _label(xt), destination_aliases, verse_ids)
+                if old_target is None:
+                    counts["source_disambiguated_chapter_comma_labels_resolved"] += 1
             if destination_target is None:
                 if destination_refs[0].get("osisRef"):
                     raise ReviewError("Unreviewed printed destination already linked")
