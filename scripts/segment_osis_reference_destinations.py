@@ -37,6 +37,8 @@ def _exact_reference_spans(label: str, aliases: dict,
     The existing, separately tested canonical full-label parser is an
     independent oracle: the ordered targets MUST agree exactly.
     """
+    start_padding = len(label) - len(label.lstrip())
+    label = label.strip()
     expected, reason, _ = _complete_printed_destinations(label, aliases, verse_ids)
     if expected is None:
         raise ReviewError(f"Cannot split incompletely parsed original label: {label[:120]!r}, reason={reason}")
@@ -128,7 +130,8 @@ def _exact_reference_spans(label: str, aliases: dict,
                      all(x in verse_ids for x in target.split("-")))
                 for _a, _b, target in spans)):
         raise ReviewError("Independent canonical-target or offset validation failed")
-    return spans
+    return [(a + start_padding, b + start_padding, target)
+            for a, b, target in spans]
 
 
 def _patched_reference(label: str, spans: list[tuple[int, int, str]]) -> bytes:
