@@ -27,7 +27,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 13,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 98.53,
+        "verse_position_ocr_similarity_percent": 97.06,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          458,
+          538
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-002",
@@ -40,7 +54,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "historical_marginal_label_visually_verified_in_separate_citation_record",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 29,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 98,
+        "verse_position_ocr_similarity_percent": 98.18,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          571,
+          651
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": true
+      }
     },
     {
       "record_id": "LSG-CR-003",
@@ -53,7 +81,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 36,
+        "source_verse_match_status": "printed_page_requires_manual_verse_confirmation",
+        "verse_text_ocr_similarity_percent": 81.69,
+        "verse_position_ocr_similarity_percent": 82.72,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          75,
+          185
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-004",
@@ -66,7 +108,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 96,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 98,
+        "verse_position_ocr_similarity_percent": 98.62,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          498,
+          604
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-005",
@@ -79,7 +135,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 101,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 96.84,
+        "verse_position_ocr_similarity_percent": 96.84,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          434,
+          510
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-006",
@@ -92,7 +162,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 103,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 100,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          543,
+          635
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-007",
@@ -105,7 +189,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 171,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 97.27,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          161,
+          241
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-008",
@@ -118,7 +216,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 190,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 98.67,
+        "verse_position_ocr_similarity_percent": 97.27,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          114,
+          224
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-009",
@@ -131,7 +243,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 198,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 96.67,
+        "verse_position_ocr_similarity_percent": 97.27,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          319,
+          446
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-010",
@@ -144,7 +270,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 326,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 97.6,
+        "verse_position_ocr_similarity_percent": 98.62,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          710,
+          789
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-011",
@@ -157,7 +297,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 394,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 99.08,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          261,
+          341
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-012",
@@ -170,7 +324,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 412,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 98,
+        "verse_position_ocr_similarity_percent": 98.18,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          332,
+          427
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-013",
@@ -183,7 +351,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 525,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 100,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          897,
+          945
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-014",
@@ -196,7 +378,18 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 533,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 90.24,
+        "verse_position_ocr_similarity_percent": 0,
+        "estimated_source_column": null,
+        "estimated_top_bottom_pixels": null,
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-015",
@@ -209,7 +402,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 554,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 99.33,
+        "verse_position_ocr_similarity_percent": 99.09,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          665,
+          760
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-016",
@@ -222,7 +429,18 @@
       "page_locator_method": "printed_chapter_header_cross_checked_with_source_context",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 559,
+        "source_verse_match_status": "short_verse_requires_manual_page_confirmation",
+        "verse_text_ocr_similarity_percent": 0,
+        "verse_position_ocr_similarity_percent": 0,
+        "estimated_source_column": null,
+        "estimated_top_bottom_pixels": null,
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-017",
@@ -235,7 +453,18 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 572,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 0,
+        "estimated_source_column": null,
+        "estimated_top_bottom_pixels": null,
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-018",
@@ -248,7 +477,18 @@
       "page_locator_method": "printed_chapter_header_cross_checked_with_source_context",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 580,
+        "source_verse_match_status": "short_verse_requires_manual_page_confirmation",
+        "verse_text_ocr_similarity_percent": 0,
+        "verse_position_ocr_similarity_percent": 0,
+        "estimated_source_column": null,
+        "estimated_top_bottom_pixels": null,
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-019",
@@ -261,7 +501,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 607,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 100,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          418,
+          449
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-020",
@@ -274,7 +528,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 619,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 98.67,
+        "verse_position_ocr_similarity_percent": 98.18,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          266,
+          345
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-021",
@@ -287,7 +555,21 @@
       "page_locator_method": "printed_chapter_header_cross_checked_with_source_context",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 627,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 100,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          695,
+          775
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-022",
@@ -300,7 +582,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 655,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 100,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          195,
+          272
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-023",
@@ -313,7 +609,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 663,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 98.67,
+        "verse_position_ocr_similarity_percent": 99.09,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          570,
+          680
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-024",
@@ -326,7 +636,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 747,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 94.74,
+        "verse_position_ocr_similarity_percent": 93.64,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          824,
+          917
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-025",
@@ -339,7 +663,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 791,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 100,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          617,
+          678
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-026",
@@ -352,7 +690,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 799,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 97.03,
+        "verse_position_ocr_similarity_percent": 97.51,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          849,
+          913
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-027",
@@ -365,7 +717,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 807,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 99.33,
+        "verse_position_ocr_similarity_percent": 98.17,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          382,
+          459
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-028",
@@ -378,7 +744,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 811,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 99.3,
+        "verse_position_ocr_similarity_percent": 99.09,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          694,
+          790
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-029",
@@ -391,7 +771,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 814,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 97.08,
+        "verse_position_ocr_similarity_percent": 96.36,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          71,
+          180
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-030",
@@ -404,7 +798,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 815,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 95.65,
+        "verse_position_ocr_similarity_percent": 95.65,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          397,
+          461
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-031",
@@ -417,7 +825,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 819,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 96.43,
+        "verse_position_ocr_similarity_percent": 96.43,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          335,
+          399
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-032",
@@ -430,7 +852,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 827,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 93.33,
+        "verse_position_ocr_similarity_percent": 93.33,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          309,
+          373
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-033",
@@ -443,7 +879,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 846,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 96.55,
+        "verse_position_ocr_similarity_percent": 95.45,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          618,
+          712
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-034",
@@ -456,7 +906,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 862,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 98.67,
+        "verse_position_ocr_similarity_percent": 95.45,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          911,
+          1019
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-035",
@@ -469,7 +933,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 863,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 96.75,
+        "verse_position_ocr_similarity_percent": 98.18,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          724,
+          819
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-036",
@@ -482,7 +960,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 876,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 100,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          968,
+          1028
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-037",
@@ -495,7 +987,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 878,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 96.46,
+        "verse_position_ocr_similarity_percent": 96.36,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          571,
+          651
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-038",
@@ -508,7 +1014,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 884,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 99.33,
+        "verse_position_ocr_similarity_percent": 97.7,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          676,
+          755
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-039",
@@ -521,7 +1041,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 899,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 97.33,
+        "verse_position_ocr_similarity_percent": 96.36,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          329,
+          427
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-040",
@@ -534,7 +1068,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 943,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 98.88,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          694,
+          758
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-041",
@@ -547,7 +1095,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 944,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 93.1,
+        "verse_position_ocr_similarity_percent": 93.1,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          99,
+          179
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-042",
@@ -560,7 +1122,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 960,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 96.34,
+        "verse_position_ocr_similarity_percent": 96.34,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          618,
+          679
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-043",
@@ -573,7 +1149,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 972,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 95,
+        "verse_position_ocr_similarity_percent": 95,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          69,
+          162
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-044",
@@ -586,7 +1176,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 988,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 97.27,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          801,
+          881
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-045",
@@ -599,7 +1203,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 989,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 99.33,
+        "verse_position_ocr_similarity_percent": 100,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          520,
+          630
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-046",
@@ -612,7 +1230,18 @@
       "page_locator_method": "printed_chapter_header_cross_checked_with_source_context",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 1001,
+        "source_verse_match_status": "short_verse_requires_manual_page_confirmation",
+        "verse_text_ocr_similarity_percent": 0,
+        "verse_position_ocr_similarity_percent": 0,
+        "estimated_source_column": null,
+        "estimated_top_bottom_pixels": null,
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-047",
@@ -625,7 +1254,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 1010,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 97.74,
+        "verse_position_ocr_similarity_percent": 97.27,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          644,
+          740
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-048",
@@ -638,7 +1281,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 1016,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 98,
+        "verse_position_ocr_similarity_percent": 97.27,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          176,
+          271
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-049",
@@ -651,7 +1308,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 1017,
+        "source_verse_match_status": "printed_page_requires_manual_verse_confirmation",
+        "verse_text_ocr_similarity_percent": 73.2,
+        "verse_position_ocr_similarity_percent": 100,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          1024,
+          1057
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-050",
@@ -664,7 +1335,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 1022,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 96.67,
+        "verse_position_ocr_similarity_percent": 95.45,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          899,
+          1010
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-051",
@@ -677,7 +1362,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 1022,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 96.3,
+        "verse_position_ocr_similarity_percent": 96.3,
+        "estimated_source_column": "right",
+        "estimated_top_bottom_pixels": [
+          273,
+          353
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-052",
@@ -690,7 +1389,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 1031,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 97.12,
+        "verse_position_ocr_similarity_percent": 98.18,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          425,
+          506
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-053",
@@ -703,7 +1416,21 @@
       "page_locator_method": "native_djvu_page_source_verse_text_fuzzy_locator",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 1039,
+        "source_verse_match_status": "high_confidence_verse_text_locator_not_reference_certification",
+        "verse_text_ocr_similarity_percent": 100,
+        "verse_position_ocr_similarity_percent": 100,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          599,
+          664
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     },
     {
       "record_id": "LSG-CR-054",
@@ -716,7 +1443,30 @@
       "page_locator_method": "printed_chapter_header_cross_checked_with_source_context",
       "printed_reference_status": "page_identified_marginal_label_not_certified",
       "source_citation_modified": false,
-      "authorised_correction": null
+      "authorised_correction": null,
+      "printed_source_verse_alignment": {
+        "scope": "source_verse_page_and_region_only_not_printed_cross_reference_note",
+        "native_printed_page": 1040,
+        "source_verse_match_status": "printed_page_requires_manual_verse_confirmation",
+        "verse_text_ocr_similarity_percent": 64.67,
+        "verse_position_ocr_similarity_percent": 75.53,
+        "estimated_source_column": "left",
+        "estimated_top_bottom_pixels": [
+          76,
+          187
+        ],
+        "original_djvu_image_rendered_and_preserved": true,
+        "page_reference_full_note_certified": false
+      }
     }
-  ]
+  ],
+  "batch_printed_page_and_source_verse_alignment": {
+    "run": "https://github.com/icfmp/Bible-Resources/actions/runs/45166535509",
+    "artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/45166535509/artifacts/14814633213",
+    "scan_sha256": "67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b",
+    "status": "all_54_original_pages_and_verse_contexts_checked_ocr_is_not_reference_citation_certification",
+    "source_verse_text_locator_high_confidence": 48,
+    "source_verse_text_locator_needing_special_caution": 6,
+    "historical_marginal_full_note_approved_for_change": 0
+  }
 }
