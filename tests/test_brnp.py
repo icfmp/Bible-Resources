@@ -84,6 +84,38 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         ))
         self.assertNotIn("Private sentinel phrase", json.dumps(report))
 
+
+    def test_duplicate_book_is_blocked(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><verse osisID="Gen.1.1">One</verse></chapter>'
+            '<div type="book" osisID="Gen"><chapter osisID="Gen.2">'
+            '<verse osisID="Gen.2.1">Two</verse></chapter></div>'
+        ))
+        self.assertIn("BOOK_ID", [f["code"] for f in report["findings"]])
+
+    def test_unclosed_chapter_milestone_is_blocked(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1" sID="Gen.1"/>'
+            '<verse osisID="Gen.1.1">One</verse>'
+        ))
+        self.assertIn("UNCLOSED_CHAPTER_MILESTONE", [f["code"] for f in report["findings"]])
+
+    def test_chapter_pair_is_accepted(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1" sID="Gen.1"/>'
+            '<verse osisID="Gen.1.1">One</verse>'
+            '<chapter eID="Gen.1"/>'
+        ))
+        self.assertEqual(report["finding_count"], 0)
+        self.assertEqual(report["chapter_identifier_count"], 1)
+
+    def test_duplicate_chapter_is_blocked(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><verse osisID="Gen.1.1">One</verse></chapter>'
+            '<chapter osisID="Gen.1"><verse osisID="Gen.1.2">Two</verse></chapter>'
+        ))
+        self.assertIn("CHAPTER_CONTAINER_ID", [f["code"] for f in report["findings"]])
+
     def test_source_unchanged(self):
         content = document('<verse osisID="Gen.1.1">Test</verse>')
         self.path.write_text(content, encoding="utf-8")
