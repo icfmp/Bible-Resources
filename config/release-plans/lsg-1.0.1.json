@@ -2,7 +2,7 @@
   "authorization": {
     "decision": "Owner-requested 1.0.1 config-only OSISScripref filter correction, source/native bytes unchanged, default-off stripText verified, explicit-on limitation disclosed.",
     "evidence_url": "https://github.com/icfmp/Bible-Resources/pull/548",
-    "reviewed_by": "Bible Resources project owner — continuation to v1.0.0 requested on 2026-11-23",
+    "reviewed_by": "Bible Resources project owner — configuration-only LSG 1.0.1 rendering correction requested 2026-11-23",
     "source_rights": "eBible fraLSG public-domain source; independently reviewed original electronic reference citations and historical printed evidence"
   },
   "editorial_path": "modules/lsg-1910/EDITORIAL.md",
