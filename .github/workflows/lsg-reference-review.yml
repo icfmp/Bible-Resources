@@ -380,7 +380,7 @@ jobs:
               book=item['usfm_book']
               if (book in seen_books
                   or not re.fullmatch(r'[0-9a-f]{40}',item.get('git_blob_sha',''))
-                  or not re.fullmatch(r'p[.]sfm/FRA\\[B\\]LSG1910\\[PD\\]UBS-[0-9]{2}-[A-Z0-9]{3}[.]p[.]sfm',item.get('path',''))
+                  or not re.fullmatch(r'p[.]sfm/FRA\[B\]LSG1910\[PD\]UBS-[0-9]{2}-[A-Z0-9]{3}[.]p[.]sfm',item.get('path',''))
                   or not item['path'].endswith('-'+book+'.p.sfm')):
                   raise SystemExit('Public-USFM witness unpinned, duplicate or malformed book')
               seen_books.add(book)
