@@ -1,0 +1,643 @@
+{
+  "schema_version": 1,
+  "status": "54_unaddressable_source_labels_original_1910_verse_pages_screened_53_full_print_note_equivalences_uncertified",
+  "source_original_usfx_zip_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+  "source_cleaned_osis_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
+  "normalization_scope": "Only original eBible x/xt note labels whose candidate target references remain unaddressable under the reviewed complete citation and source-disambiguated chapter-comma grammar.",
+  "authoritative_print_editions_collated": 0,
+  "printed_page_evidence_not_yet_recorded": false,
+  "corrections_approved": 0,
+  "published_osis_modified": false,
+  "references_original_count": 54,
+  "exclusions": "Original 360 unresolved labels include 242 etc., 54 embedded v., 9 other forms and these 54 target-addressability cases; 1 historical comma chapter,verse was independently recoverable as Ex 20:11 and Ex 31:17.",
+  "verification_run": "https://github.com/icfmp/Bible-Resources/actions/runs/45144018694",
+  "records": [
+    {
+      "record_id": "LSG-CR-001",
+      "original_usfm_book": "GEN",
+      "source_note_origin": "9.4",
+      "original_citation_label": "Lé 3:27; 7:26; 17:14; 19:26. De 12:23.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-002",
+      "original_usfm_book": "GEN",
+      "source_note_origin": "28.12",
+      "original_citation_label": "Jn 1:52.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "visually_verified_from_actual_original_1910_page",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-003",
+      "original_usfm_book": "GEN",
+      "source_note_origin": "35.10",
+      "original_citation_label": "Ge 32:28. 2 Ch 17:34.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-004",
+      "original_usfm_book": "LEV",
+      "source_note_origin": "10.18",
+      "original_citation_label": "Lé 4:5; 6:26; 16:27.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-005",
+      "original_usfm_book": "LEV",
+      "source_note_origin": "15.12",
+      "original_citation_label": "Lé 6:28; 11:33.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-006",
+      "original_usfm_book": "LEV",
+      "source_note_origin": "16.27",
+      "original_citation_label": "Lé 6:30. Hé 13:11.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-007",
+      "original_usfm_book": "DEU",
+      "source_note_origin": "19.15",
+      "original_citation_label": "No 35:50. De 17:6. Mt 18:16.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-008",
+      "original_usfm_book": "JOS",
+      "source_note_origin": "5.13",
+      "original_citation_label": "És 23:23.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-009",
+      "original_usfm_book": "JOS",
+      "source_note_origin": "14.6",
+      "original_citation_label": "No 12:24. De 1:36.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-010",
+      "original_usfm_book": "2KI",
+      "source_note_origin": "12.17",
+      "original_citation_label": "2 R 8:12. 2 R 24:23.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-011",
+      "original_usfm_book": "2CH",
+      "source_note_origin": "35.7",
+      "original_citation_label": "2 R 30:24.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-012",
+      "original_usfm_book": "NEH",
+      "source_note_origin": "9.26",
+      "original_citation_label": "1 R 18:4; 19:10. 2 Ch 24:30.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-013",
+      "original_usfm_book": "PRO",
+      "source_note_origin": "3.31",
+      "original_citation_label": "Pr 37:1; 73:3. Pr 23:17.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-014",
+      "original_usfm_book": "PRO",
+      "source_note_origin": "13.16",
+      "original_citation_label": "Pr 12:33; 15:2.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-015",
+      "original_usfm_book": "ECC",
+      "source_note_origin": "5.17",
+      "original_citation_label": "Ec 2:24; 3:12, 22; 9:7; 11:9.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-016",
+      "original_usfm_book": "SNG",
+      "source_note_origin": "2.15",
+      "original_citation_label": "Éz 13:4. Lu 13:52.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-017",
+      "original_usfm_book": "ISA",
+      "source_note_origin": "11.6",
+      "original_citation_label": "És 65:26. Os 2:17.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-018",
+      "original_usfm_book": "ISA",
+      "source_note_origin": "23.1",
+      "original_citation_label": "Jé 47:4. Éz 26:27, 28. Za 9:3, 4.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-019",
+      "original_usfm_book": "ISA",
+      "source_note_origin": "52.7",
+      "original_citation_label": "Na 1:15. Ro 10:15.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Na 1:15",
+        "possible_1910_print_body_key": "Nah.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Nahum",
+        "reason": "The 1910 print-derived chapter text places the messenger-on-mountains line at Nahum 2:1; alternative digital numbering has Nahum 1:15.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
+    },
+    {
+      "record_id": "LSG-CR-020",
+      "original_usfm_book": "JER",
+      "source_note_origin": "1.3",
+      "original_citation_label": "2 R 5:23, 34. 2 Ch 36:4.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-021",
+      "original_usfm_book": "JER",
+      "source_note_origin": "7.16",
+      "original_citation_label": "Ex 32:10. Jé 11:34; 14:11.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-022",
+      "original_usfm_book": "JER",
+      "source_note_origin": "32.29",
+      "original_citation_label": "Jé 21:20.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-023",
+      "original_usfm_book": "JER",
+      "source_note_origin": "41.1",
+      "original_citation_label": "2 R 25:35.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-024",
+      "original_usfm_book": "HOS",
+      "source_note_origin": "2.25",
+      "original_citation_label": "Os 1:10. Ro 9:26. 1 Pi 2:10.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Os 1:10",
+        "possible_1910_print_body_key": "Hos.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Os%C3%A9e",
+        "reason": "The 1910 print-derived chapter text starts the descendants-as-sand promise at Osée 2:1; another digital edition labels this verse Osée 1:10.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
+    },
+    {
+      "record_id": "LSG-CR-025",
+      "original_usfm_book": "MAL",
+      "source_note_origin": "3.6",
+      "original_citation_label": "Ps 33:11. Pr 19:21. És 15:26, 27; 25:9; 46:10.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-026",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "5.35",
+      "original_citation_label": "Jé 66:1.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-027",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "12.40",
+      "original_citation_label": "Jon 1:17; 2:10.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Jon 1:17",
+        "possible_1910_print_body_key": "Jonah.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Jonas",
+        "reason": "The 1910 print-derived chapter text starts the great-fish passage at Jonas 2:1 whereas other digital editions label the identical passage 1:17; any other note reference, including Jon 2:10, needs its own complete review.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
+    },
+    {
+      "record_id": "LSG-CR-028",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "16.4",
+      "original_citation_label": "Jon 1:17.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Jon 1:17",
+        "possible_1910_print_body_key": "Jonah.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Jonas",
+        "reason": "The 1910 print-derived chapter text starts the great-fish passage at Jonas 2:1 whereas other digital editions label the identical passage 1:17; any other note reference, including Jon 2:10, needs its own complete review.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
+    },
+    {
+      "record_id": "LSG-CR-029",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "19.14",
+      "original_citation_label": "Mc 18:3. 1 Co 14:20. 1 Pi 2:2.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-030",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "20.27",
+      "original_citation_label": "Mc 23:11. Mc 9:35; 10:43.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-031",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "23.22",
+      "original_citation_label": "2 Ch 8:33. És 66:1. Mt 5:34. Ac 7:49.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-032",
+      "original_usfm_book": "MRK",
+      "source_note_origin": "1.17",
+      "original_citation_label": "És 16:16. Éz 47:10.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-033",
+      "original_usfm_book": "LUK",
+      "source_note_origin": "1.13",
+      "original_citation_label": "Lu 11:60.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-034",
+      "original_usfm_book": "LUK",
+      "source_note_origin": "11.29",
+      "original_citation_label": "Jon 1:17; 2:10.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Jon 1:17",
+        "possible_1910_print_body_key": "Jonah.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Jonas",
+        "reason": "The 1910 print-derived chapter text starts the great-fish passage at Jonas 2:1 whereas other digital editions label the identical passage 1:17; any other note reference, including Jon 2:10, needs its own complete review.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
+    },
+    {
+      "record_id": "LSG-CR-035",
+      "original_usfm_book": "LUK",
+      "source_note_origin": "12.19",
+      "original_citation_label": "Ec 11:9. 1 Co 15:32. Ja 5:5.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-036",
+      "original_usfm_book": "LUK",
+      "source_note_origin": "22.69",
+      "original_citation_label": "Da 7:9. Mt 16:27; 24:30; 25:31; 26:64. Mc 15:62. Ac 1:11. 1 Th 1:10. Ap 1:7.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-037",
+      "original_usfm_book": "LUK",
+      "source_note_origin": "24.27",
+      "original_citation_label": "Ps 132:11. És 7:14; 9:5; 40:10. Jé 23:5; 33:14. Éz 34:33; 37:25. Da 9:24. Mi 7:20.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-038",
+      "original_usfm_book": "JHN",
+      "source_note_origin": "5.20",
+      "original_citation_label": "Jn 1:2; 2:35; 7:16; 8:28; 14:24.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-039",
+      "original_usfm_book": "JHN",
+      "source_note_origin": "18.15",
+      "original_citation_label": "Mt 25:58. Mc 14:54. Lu 22:45.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-040",
+      "original_usfm_book": "ROM",
+      "source_note_origin": "9.26",
+      "original_citation_label": "Os 1:10. 1 Pi 2:10.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Os 1:10",
+        "possible_1910_print_body_key": "Hos.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Os%C3%A9e",
+        "reason": "The 1910 print-derived chapter text starts the descendants-as-sand promise at Osée 2:1; another digital edition labels this verse Osée 1:10.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
+    },
+    {
+      "record_id": "LSG-CR-041",
+      "original_usfm_book": "ROM",
+      "source_note_origin": "10.15",
+      "original_citation_label": "És 52:7. Na 1:15.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Na 1:15",
+        "possible_1910_print_body_key": "Nah.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Nahum",
+        "reason": "The 1910 print-derived chapter text places the messenger-on-mountains line at Nahum 2:1; alternative digital numbering has Nahum 1:15.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
+    },
+    {
+      "record_id": "LSG-CR-042",
+      "original_usfm_book": "1CO",
+      "source_note_origin": "15.4",
+      "original_citation_label": "Ps 16:10. És 53:9. Jon 1:17. Mt 12:40.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Jon 1:17",
+        "possible_1910_print_body_key": "Jonah.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Jonas",
+        "reason": "The 1910 print-derived chapter text starts the great-fish passage at Jonas 2:1 whereas other digital editions label the identical passage 1:17; any other note reference, including Jon 2:10, needs its own complete review.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
+    },
+    {
+      "record_id": "LSG-CR-043",
+      "original_usfm_book": "GAL",
+      "source_note_origin": "1.20",
+      "original_citation_label": "Ro 1:9; 9:1. 2 Co 1:23; 11:41. 1 Th 2:5. 1 Ti 5:21. 2 Ti 4:1.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-044",
+      "original_usfm_book": "1TH",
+      "source_note_origin": "3.10",
+      "original_citation_label": "Ro 1:10, 11; 5:23. 2 Ti 1:4.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-045",
+      "original_usfm_book": "1TH",
+      "source_note_origin": "4.9",
+      "original_citation_label": "Lé 19:18. Mt 22:39. Jn 13:34; 15:12. Ép 5:2. 2 Pi 4:8. 1 Jn 3:23; 4:21.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-046",
+      "original_usfm_book": "HEB",
+      "source_note_origin": "2.13",
+      "original_citation_label": "Ps 8:13.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-047",
+      "original_usfm_book": "HEB",
+      "source_note_origin": "13.11",
+      "original_citation_label": "Ex 29:14. Lé 4:21; 6:30; 16:27. No 19:3.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-048",
+      "original_usfm_book": "1PE",
+      "source_note_origin": "2.10",
+      "original_citation_label": "Os 1:10; 2:22. Ro 9:26.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Os 1:10",
+        "possible_1910_print_body_key": "Hos.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Os%C3%A9e",
+        "reason": "The 1910 print-derived chapter text starts the descendants-as-sand promise at Osée 2:1; another digital edition labels this verse Osée 1:10.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
+    },
+    {
+      "record_id": "LSG-CR-049",
+      "original_usfm_book": "1PE",
+      "source_note_origin": "4.14",
+      "original_citation_label": "Mt 5:10. 1 Pi 2:30; 3:14.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-050",
+      "original_usfm_book": "1JN",
+      "source_note_origin": "3.1",
+      "original_citation_label": "1 Jn 1:12.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-051",
+      "original_usfm_book": "1JN",
+      "source_note_origin": "3.7",
+      "original_citation_label": "Jn 2:29.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-052",
+      "original_usfm_book": "REV",
+      "source_note_origin": "7.3",
+      "original_citation_label": "Ép 9:4.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-053",
+      "original_usfm_book": "REV",
+      "source_note_origin": "19.16",
+      "original_citation_label": "1 Th 6:15. Ap 17:14.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    },
+    {
+      "record_id": "LSG-CR-054",
+      "original_usfm_book": "REV",
+      "source_note_origin": "20.12",
+      "original_citation_label": "Ex 33:32. Ps 69:29. Ph 4:3. Ap 3:5; 21:27.",
+      "source_resolution": "unattested_reference_start",
+      "decision": "preserve_source_label_unlinked",
+      "printed_witness_status": "pending_manual_facsimile_collation",
+      "editorial_change": null
+    }
+  ],
+  "independent_parallel_versification_candidates": 9,
+  "independent_printed_note_corrections_certified": 0,
+  "first_pass_actual_1910_source_verse_screening": {
+    "status": "all_54_source_verses_screened_not_all_54_full_marginal_citations_certified",
+    "historical_scan_sha256": "67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b",
+    "source_record_count": 54,
+    "original_printed_full_note_certified_count": 1,
+    "original_printed_marginal_token_with_callout_only_count": 24,
+    "original_printed_page_reviewed_no_verified_note_token_count": 29,
+    "pending_full_printed_note_equivalence_count": 53,
+    "evidence_registry": "PRINTED_1910_PAGE_LOCATORS_2026-11-23.json",
+    "authored_reference_changes_approved": 0,
+    "machine_links_added_to_unresolved_original_notes": 0,
+    "conclusion": "Source eBible digital x/xt groups and the 1910 printed marginal apparatus differ in grouping and selection. The first-pass printed-page audit is complete; unverified whole-note identities are retained without speculative targets."
+  }
+}

@@ -1,0 +1,876 @@
+{
+  "schema_version": 1,
+  "status": "source_specific_cross_host_digital_citation_comparison_not_print_certification",
+  "original_usfx_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+  "original_cleaned_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
+  "secondary_resource": "Biblia.com / La Bible Louis Segond 1910 (a separately hosted digital reference apparatus; edition/provenance independence from eBible unverified)",
+  "secondary_resource_copyright_note": "Store only short bibliographic reference tokens and URLs, not verse text, rendered page contents, site HTML, or proprietary annotations.",
+  "comparison_performed_date": "2026-11-23",
+  "printed_1910_facsimile_reference_collation_complete": false,
+  "authorial_corrections_approved": 0,
+  "auto_link_enrichment_authorized": false,
+  "records": [
+    {
+      "record_id": "LSG-CR-001",
+      "original_usfm_book": "GEN",
+      "source_note_origin": "9.4",
+      "original_citation_label": "Lé 3:27; 7:26; 17:14; 19:26. De 12:23.",
+      "secondary_uri": "https://biblia.com/bible/lsg/genesis/9/4",
+      "secondary_citation_label": "Lé 3:17; 7:26; 17:14; 19:26. De 12:23.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-002",
+      "original_usfm_book": "GEN",
+      "source_note_origin": "28.12",
+      "original_citation_label": "Jn 1:52.",
+      "secondary_uri": "https://biblia.com/bible/lsg/genesis/28/12",
+      "secondary_citation_label": "Jn 1:51.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "visually_verified_from_actual_original_1910_page",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-003",
+      "original_usfm_book": "GEN",
+      "source_note_origin": "35.10",
+      "original_citation_label": "Ge 32:28. 2 Ch 17:34.",
+      "secondary_uri": "https://biblia.com/bible/lsg/genesis/35/10",
+      "secondary_citation_label": "Ge 32:28. 2 Ch 17:19.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-004",
+      "original_usfm_book": "LEV",
+      "source_note_origin": "10.18",
+      "original_citation_label": "Lé 4:5; 6:26; 16:27.",
+      "secondary_uri": "https://biblia.com/bible/lsg/leviticus/10/18",
+      "secondary_citation_label": "Lé 4:5; 6:26; 16:27.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-005",
+      "original_usfm_book": "LEV",
+      "source_note_origin": "15.12",
+      "original_citation_label": "Lé 6:28; 11:33.",
+      "secondary_uri": "https://biblia.com/bible/lsg/leviticus/15/12",
+      "secondary_citation_label": "Lé 6:28; 11:33.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-006",
+      "original_usfm_book": "LEV",
+      "source_note_origin": "16.27",
+      "original_citation_label": "Lé 6:30. Hé 13:11.",
+      "secondary_uri": "https://biblia.com/bible/lsg/leviticus/16/27",
+      "secondary_citation_label": "Lé 6:30. Hé 13:11.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-007",
+      "original_usfm_book": "DEU",
+      "source_note_origin": "19.15",
+      "original_citation_label": "No 35:50. De 17:6. Mt 18:16.",
+      "secondary_uri": "https://biblia.com/bible/lsg/deuteronomy/19/15",
+      "secondary_citation_label": "No 35:30. De 17:6. Mt 18:16.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-008",
+      "original_usfm_book": "JOS",
+      "source_note_origin": "5.13",
+      "original_citation_label": "És 23:23.",
+      "secondary_uri": "https://biblia.com/bible/lsg/joshua/5/13",
+      "secondary_citation_label": "És 23:23.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-009",
+      "original_usfm_book": "JOS",
+      "source_note_origin": "14.6",
+      "original_citation_label": "No 12:24. De 1:36.",
+      "secondary_uri": "https://biblia.com/bible/lsg/joshua/14/6",
+      "secondary_citation_label": "No 12:16. De 1:36.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-010",
+      "original_usfm_book": "2KI",
+      "source_note_origin": "12.17",
+      "original_citation_label": "2 R 8:12. 2 R 24:23.",
+      "secondary_uri": "https://biblia.com/bible/lsg/2-kings/12/17",
+      "secondary_citation_label": "2 R 8:12. 2 R 24:23.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-011",
+      "original_usfm_book": "2CH",
+      "source_note_origin": "35.7",
+      "original_citation_label": "2 R 30:24.",
+      "secondary_uri": "https://biblia.com/bible/lsg/2-chronicles/35/7",
+      "secondary_citation_label": "2 Ch 30:24.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-012",
+      "original_usfm_book": "NEH",
+      "source_note_origin": "9.26",
+      "original_citation_label": "1 R 18:4; 19:10. 2 Ch 24:30.",
+      "secondary_uri": "https://biblia.com/bible/lsg/nehemiah/9/26",
+      "secondary_citation_label": "1 R 18:4; 19:10. 2 Ch 24:27.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-013",
+      "original_usfm_book": "PRO",
+      "source_note_origin": "3.31",
+      "original_citation_label": "Pr 37:1; 73:3. Pr 23:17.",
+      "secondary_uri": "https://biblia.com/bible/lsg/proverbs/3/31",
+      "secondary_citation_label": "Pr 37:1; 73:3. Pr 23:17.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-014",
+      "original_usfm_book": "PRO",
+      "source_note_origin": "13.16",
+      "original_citation_label": "Pr 12:33; 15:2.",
+      "secondary_uri": "https://biblia.com/bible/lsg/proverbs/13/16",
+      "secondary_citation_label": "Pr 12:28; 15:2.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-015",
+      "original_usfm_book": "ECC",
+      "source_note_origin": "5.17",
+      "original_citation_label": "Ec 2:24; 3:12, 22; 9:7; 11:9.",
+      "secondary_uri": "https://biblia.com/bible/lsg/ecclesiastes/5/17",
+      "secondary_citation_label": "Ec 2:24; 3:12, 22; 9:7; 11:9.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-016",
+      "original_usfm_book": "SNG",
+      "source_note_origin": "2.15",
+      "original_citation_label": "Éz 13:4. Lu 13:52.",
+      "secondary_uri": "https://biblia.com/bible/lsg/song-of-solomon/2/15",
+      "secondary_citation_label": "Éz 13:4. Lu 13:35.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-017",
+      "original_usfm_book": "ISA",
+      "source_note_origin": "11.6",
+      "original_citation_label": "És 65:26. Os 2:17.",
+      "secondary_uri": "https://biblia.com/bible/lsg/isaiah/11/6",
+      "secondary_citation_label": "És 65:25. Os 2:17.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-018",
+      "original_usfm_book": "ISA",
+      "source_note_origin": "23.1",
+      "original_citation_label": "Jé 47:4. Éz 26:27, 28. Za 9:3, 4.",
+      "secondary_uri": "https://biblia.com/bible/lsg/isaiah/23/1",
+      "secondary_citation_label": "Jé 47:4. Éz 26; 27; 28. Za 9:3, 4.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-019",
+      "original_usfm_book": "ISA",
+      "source_note_origin": "52.7",
+      "original_citation_label": "Na 1:15. Ro 10:15.",
+      "secondary_uri": "https://biblia.com/bible/lsg/isaiah/52/7",
+      "secondary_citation_label": "Na 1:15. Ro 10:15.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-020",
+      "original_usfm_book": "JER",
+      "source_note_origin": "1.3",
+      "original_citation_label": "2 R 5:23, 34. 2 Ch 36:4.",
+      "secondary_uri": "https://biblia.com/bible/lsg/jeremiah/1/3",
+      "secondary_citation_label": "2 R 5:23, 27. 2 Ch 36:4.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-021",
+      "original_usfm_book": "JER",
+      "source_note_origin": "7.16",
+      "original_citation_label": "Ex 32:10. Jé 11:34; 14:11.",
+      "secondary_uri": "https://biblia.com/bible/lsg/jeremiah/7/16",
+      "secondary_citation_label": "Ex 32:10. Jé 11:23; 14:11.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-022",
+      "original_usfm_book": "JER",
+      "source_note_origin": "32.29",
+      "original_citation_label": "Jé 21:20.",
+      "secondary_uri": "https://biblia.com/bible/lsg/jeremiah/32/29",
+      "secondary_citation_label": "Jé 21:10.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-023",
+      "original_usfm_book": "JER",
+      "source_note_origin": "41.1",
+      "original_citation_label": "2 R 25:35.",
+      "secondary_uri": "https://biblia.com/bible/lsg/jeremiah/41/1",
+      "secondary_citation_label": "2 R 25:25.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-024",
+      "original_usfm_book": "HOS",
+      "source_note_origin": "2.25",
+      "original_citation_label": "Os 1:10. Ro 9:26. 1 Pi 2:10.",
+      "secondary_uri": "https://biblia.com/bible/lsg/hosea/2/25",
+      "secondary_citation_label": "Os 1:10. Ro 9:26. 1 Pi 2:10.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-025",
+      "original_usfm_book": "MAL",
+      "source_note_origin": "3.6",
+      "original_citation_label": "Ps 33:11. Pr 19:21. És 15:26, 27; 25:9; 46:10.",
+      "secondary_uri": "https://biblia.com/bible/lsg/malachi/3/6",
+      "secondary_citation_label": "Ps 33:11. Pr 19:21. És 14:26, 27; 25:9; 46:10.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-026",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "5.35",
+      "original_citation_label": "Jé 66:1.",
+      "secondary_uri": "https://biblia.com/bible/lsg/matthew/5/35",
+      "secondary_citation_label": "Jé 66:1.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-027",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "12.40",
+      "original_citation_label": "Jon 1:17; 2:10.",
+      "secondary_uri": "https://biblia.com/bible/lsg/matthew/12/40",
+      "secondary_citation_label": "Jon 1:17; 2:10.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-028",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "16.4",
+      "original_citation_label": "Jon 1:17.",
+      "secondary_uri": "https://biblia.com/bible/lsg/matthew/16/4",
+      "secondary_citation_label": "Jon 1:17.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-029",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "19.14",
+      "original_citation_label": "Mc 18:3. 1 Co 14:20. 1 Pi 2:2.",
+      "secondary_uri": "https://biblia.com/bible/lsg/matthew/19/14",
+      "secondary_citation_label": "Mc 18:3. 1 Co 14:20. 1 Pi 2:2.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-030",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "20.27",
+      "original_citation_label": "Mc 23:11. Mc 9:35; 10:43.",
+      "secondary_uri": "https://biblia.com/bible/lsg/matthew/20/27",
+      "secondary_citation_label": "Mc 23:11. Mc 9:35; 10:43.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-031",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "23.22",
+      "original_citation_label": "2 Ch 8:33. És 66:1. Mt 5:34. Ac 7:49.",
+      "secondary_uri": "https://biblia.com/bible/lsg/matthew/23/22",
+      "secondary_citation_label": "És 66:1. Mt 5:34. Ac 7:49.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-032",
+      "original_usfm_book": "MRK",
+      "source_note_origin": "1.17",
+      "original_citation_label": "És 16:16. Éz 47:10.",
+      "secondary_uri": "https://biblia.com/bible/lsg/mark/1/17?culture=en",
+      "secondary_citation_label": "És 16:16. Éz 47:10.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-033",
+      "original_usfm_book": "LUK",
+      "source_note_origin": "1.13",
+      "original_citation_label": "Lu 11:60.",
+      "secondary_uri": "https://biblia.com/bible/lsg/luke/1/13",
+      "secondary_citation_label": "Lu 11:54.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-034",
+      "original_usfm_book": "LUK",
+      "source_note_origin": "11.29",
+      "original_citation_label": "Jon 1:17; 2:10.",
+      "secondary_uri": "https://biblia.com/bible/lsg/luke/11/29",
+      "secondary_citation_label": "Jon 1:17; 2:10.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-035",
+      "original_usfm_book": "LUK",
+      "source_note_origin": "12.19",
+      "original_citation_label": "Ec 11:9. 1 Co 15:32. Ja 5:5.",
+      "secondary_uri": "https://biblia.com/bible/lsg/luke/12/19",
+      "secondary_citation_label": "Ec 11:9. 1 Co 15:32. Ja 5:5.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-036",
+      "original_usfm_book": "LUK",
+      "source_note_origin": "22.69",
+      "original_citation_label": "Da 7:9. Mt 16:27; 24:30; 25:31; 26:64. Mc 15:62. Ac 1:11. 1 Th 1:10. Ap 1:7.",
+      "secondary_uri": "https://biblia.com/bible/lsg/luke/22/69",
+      "secondary_citation_label": "Da 7:9. Mt 16:27; 24:30; 25:31; 26:64. Mc 15:47. Ac 1:11. 1 Th 1:10. Ap 1:7.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-037",
+      "original_usfm_book": "LUK",
+      "source_note_origin": "24.27",
+      "original_citation_label": "Ps 132:11. És 7:14; 9:5; 40:10. Jé 23:5; 33:14. Éz 34:33; 37:25. Da 9:24. Mi 7:20.",
+      "secondary_uri": "https://biblia.com/bible/lsg/luke/24/27?culture=fr",
+      "secondary_citation_label": "Ps 132:11. És 7:14; 9:5; 40:10. Jé 23:5; 33:14. Éz 34:31; 37:25. Da 9:24. Mi 7:20.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-038",
+      "original_usfm_book": "JHN",
+      "source_note_origin": "5.20",
+      "original_citation_label": "Jn 1:2; 2:35; 7:16; 8:28; 14:24.",
+      "secondary_uri": "https://biblia.com/bible/lsg/john/5/20",
+      "secondary_citation_label": "Jn 1:2; 2:25; 7:16; 8:28; 14:24.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-039",
+      "original_usfm_book": "JHN",
+      "source_note_origin": "18.15",
+      "original_citation_label": "Mt 25:58. Mc 14:54. Lu 22:45.",
+      "secondary_uri": "https://biblia.com/bible/lsg/john/18/15",
+      "secondary_citation_label": "Mt 25:46. Mc 14:54. Lu 22:45.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-040",
+      "original_usfm_book": "ROM",
+      "source_note_origin": "9.26",
+      "original_citation_label": "Os 1:10. 1 Pi 2:10.",
+      "secondary_uri": "https://biblia.com/bible/lsg/romans/9/26",
+      "secondary_citation_label": "Os 1:10. 1 Pi 2:10.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-041",
+      "original_usfm_book": "ROM",
+      "source_note_origin": "10.15",
+      "original_citation_label": "És 52:7. Na 1:15.",
+      "secondary_uri": "https://biblia.com/bible/lsg/romans/10/15",
+      "secondary_citation_label": "És 52:7. Na 1:15.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-042",
+      "original_usfm_book": "1CO",
+      "source_note_origin": "15.4",
+      "original_citation_label": "Ps 16:10. És 53:9. Jon 1:17. Mt 12:40.",
+      "secondary_uri": "https://biblia.com/bible/lsg/1-corinthians/15/4",
+      "secondary_citation_label": "Ps 16:10. És 53:9. Jon 1:17. Mt 12:40.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-043",
+      "original_usfm_book": "GAL",
+      "source_note_origin": "1.20",
+      "original_citation_label": "Ro 1:9; 9:1. 2 Co 1:23; 11:41. 1 Th 2:5. 1 Ti 5:21. 2 Ti 4:1.",
+      "secondary_uri": "https://biblia.com/bible/lsg/galatians/1/20",
+      "secondary_citation_label": "Ro 1:9; 9:1. 2 Co 1:23; 11:33. 1 Th 2:5. 1 Ti 5:21. 2 Ti 4:1.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-044",
+      "original_usfm_book": "1TH",
+      "source_note_origin": "3.10",
+      "original_citation_label": "Ro 1:10, 11; 5:23. 2 Ti 1:4.",
+      "secondary_uri": "https://biblia.com/bible/lsg/1-thessalonians/3/10",
+      "secondary_citation_label": "Ro 1:10, 11; 5:21. 2 Ti 1:4.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-045",
+      "original_usfm_book": "1TH",
+      "source_note_origin": "4.9",
+      "original_citation_label": "Lé 19:18. Mt 22:39. Jn 13:34; 15:12. Ép 5:2. 2 Pi 4:8. 1 Jn 3:23; 4:21.",
+      "secondary_uri": "https://biblia.com/bible/lsg/1-thessalonians/4/9",
+      "secondary_citation_label": "Lé 19:18. Mt 22:39. Jn 13:34; 15:12. Ép 5:2. 2 Pi 3:8. 1 Jn 3:23; 4:21.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-046",
+      "original_usfm_book": "HEB",
+      "source_note_origin": "2.13",
+      "original_citation_label": "Ps 8:13.",
+      "secondary_uri": "https://biblia.com/bible/lsg/hebrews/2/13",
+      "secondary_citation_label": "Ps 8:10.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-047",
+      "original_usfm_book": "HEB",
+      "source_note_origin": "13.11",
+      "original_citation_label": "Ex 29:14. Lé 4:21; 6:30; 16:27. No 19:3.",
+      "secondary_uri": "https://biblia.com/bible/lsg/hebrews/13/11",
+      "secondary_citation_label": "Ex 29:14. Lé 4:21; 6:30; 16:27. No 19:3.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-048",
+      "original_usfm_book": "1PE",
+      "source_note_origin": "2.10",
+      "original_citation_label": "Os 1:10; 2:22. Ro 9:26.",
+      "secondary_uri": "https://biblia.com/bible/lsg/1-peter/2/10",
+      "secondary_citation_label": "Os 1:10; 2:22. Ro 9:26.",
+      "comparison": "text_identical_in_separately_hosted_digital_witness",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-049",
+      "original_usfm_book": "1PE",
+      "source_note_origin": "4.14",
+      "original_citation_label": "Mt 5:10. 1 Pi 2:30; 3:14.",
+      "secondary_uri": "https://biblia.com/bible/lsg/1-peter/4/14",
+      "secondary_citation_label": "Mt 5:10. 1 Pi 2:20; 3:14.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-050",
+      "original_usfm_book": "1JN",
+      "source_note_origin": "3.1",
+      "original_citation_label": "1 Jn 1:12.",
+      "secondary_uri": "https://biblia.com/bible/lsg/1-john/3/1",
+      "secondary_citation_label": "Jn 1:12.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-051",
+      "original_usfm_book": "1JN",
+      "source_note_origin": "3.7",
+      "original_citation_label": "Jn 2:29.",
+      "secondary_uri": "https://biblia.com/bible/lsg/1-john/3/7",
+      "secondary_citation_label": "Jn 2:25.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-052",
+      "original_usfm_book": "REV",
+      "source_note_origin": "7.3",
+      "original_citation_label": "Ép 9:4.",
+      "secondary_uri": "https://biblia.com/bible/lsg/revelation/7/3",
+      "secondary_citation_label": "Ép 6:4.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-053",
+      "original_usfm_book": "REV",
+      "source_note_origin": "19.16",
+      "original_citation_label": "1 Th 6:15. Ap 17:14.",
+      "secondary_uri": "https://biblia.com/bible/lsg/revelation/19/16",
+      "secondary_citation_label": "1 Th 5:15. Ap 17:14.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    },
+    {
+      "record_id": "LSG-CR-054",
+      "original_usfm_book": "REV",
+      "source_note_origin": "20.12",
+      "original_citation_label": "Ex 33:32. Ps 69:29. Ph 4:3. Ap 3:5; 21:27.",
+      "secondary_uri": "https://biblia.com/bible/lsg/revelation/20/12",
+      "secondary_citation_label": "Ex 33:23. Ps 69:29. Ph 4:3. Ap 3:5; 21:27.",
+      "comparison": "digital_witness_disagrees_with_original_usfx",
+      "historical_print_status": "not_collated_from_printed_1910_reference_note",
+      "authorized_change": null
+    }
+  ],
+  "additional_public_usfm_witness": {
+    "status": "direct_public_usfm_xo_xt_comparison_exact_for_all_54_cases_not_1910_print_certification",
+    "observed_date": "2026-11-23",
+    "repository": "BibleCorps/FRA-B-LSG1910-PD-UBS",
+    "repository_url": "https://github.com/BibleCorps/FRA-B-LSG1910-PD-UBS",
+    "ref_observed": "main",
+    "metadata_path": "p.sfm/metadata.xml",
+    "metadata_git_blob_sha": "fdbb00cc3fcdac65d187ed42c08f7366dcf19326",
+    "metadata_identity": {
+      "paratext_name": "FLS10",
+      "paratext_full_name": "Français Louis Segond 1910",
+      "archived_at": "2012-09-27T19:17:07.5577248+00:00",
+      "last_updated_at": "2013-05-08T21:09:16.646618",
+      "archive_comment": "Updated version abbreviation. Added toc1 and toc2. (Updated to DBL 4.0)"
+    },
+    "testimony_urls": [
+      "https://crosswire.org/pipermail/sword-devel/2024-November/050249.html",
+      "https://crosswire.org/pipermail/sword-devel/2024-November/050251.html"
+    ],
+    "method": "For each source ledger record, locate an exact USFM cross-reference \\x ... \\xo chapter:verse \\xt full literal label \\x* in the pinned public book blob; compare both chapter:verse and complete label verbatim. Multiple cross-references at the same origin remain distinct.",
+    "book_files": [
+      {
+        "usfm_book": "GEN",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-01-GEN.p.sfm",
+        "git_blob_sha": "229138d912d25d3c57704ad040bad45f9d9c5e74",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-001",
+          "LSG-CR-002",
+          "LSG-CR-003"
+        ]
+      },
+      {
+        "usfm_book": "LEV",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-03-LEV.p.sfm",
+        "git_blob_sha": "89c38ba3c2ed45dbab17933c387b77af89967543",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-004",
+          "LSG-CR-005",
+          "LSG-CR-006"
+        ]
+      },
+      {
+        "usfm_book": "DEU",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-05-DEU.p.sfm",
+        "git_blob_sha": "86a249c091bfdbaba35a2b4244b83254bff7d076",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-007"
+        ]
+      },
+      {
+        "usfm_book": "JOS",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-06-JOS.p.sfm",
+        "git_blob_sha": "4b5092b1c279f4781f04918a1b4d146aedaf1e93",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-008",
+          "LSG-CR-009"
+        ]
+      },
+      {
+        "usfm_book": "2KI",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-12-2KI.p.sfm",
+        "git_blob_sha": "d7903b53ab3417f1511c66ee24b77ab638f0a79a",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-010"
+        ]
+      },
+      {
+        "usfm_book": "2CH",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-14-2CH.p.sfm",
+        "git_blob_sha": "0c51c57323c3af49eccb37890311eaed05b4e6b5",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-011"
+        ]
+      },
+      {
+        "usfm_book": "NEH",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-16-NEH.p.sfm",
+        "git_blob_sha": "8f11bf4d80cdaab4afc0178ad994df4df40f3ea9",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-012"
+        ]
+      },
+      {
+        "usfm_book": "PRO",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-20-PRO.p.sfm",
+        "git_blob_sha": "50ab9bd267ae08500ab2e6f30a781eaa4aa65332",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-013",
+          "LSG-CR-014"
+        ]
+      },
+      {
+        "usfm_book": "ECC",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-21-ECC.p.sfm",
+        "git_blob_sha": "f6b56f1e5d6ce689265070dda76431c7116f2bab",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-015"
+        ]
+      },
+      {
+        "usfm_book": "SNG",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-22-SNG.p.sfm",
+        "git_blob_sha": "cf785a76a06d3d0fa673936a3cb7cd145cdf1cdc",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-016"
+        ]
+      },
+      {
+        "usfm_book": "ISA",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-23-ISA.p.sfm",
+        "git_blob_sha": "953c6e6fad0b801a93712df3fc5b9446dd5c97f4",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-017",
+          "LSG-CR-018",
+          "LSG-CR-019"
+        ]
+      },
+      {
+        "usfm_book": "JER",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-24-JER.p.sfm",
+        "git_blob_sha": "d9676e9294bdd27c6cdff1432744956eac35d63e",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-020",
+          "LSG-CR-021",
+          "LSG-CR-022",
+          "LSG-CR-023"
+        ]
+      },
+      {
+        "usfm_book": "HOS",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-28-HOS.p.sfm",
+        "git_blob_sha": "11667757e6859b8883c42b9777712987d8702fa2",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-024"
+        ]
+      },
+      {
+        "usfm_book": "MAL",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-39-MAL.p.sfm",
+        "git_blob_sha": "877caf9d1581b04967018536c02e7aec3f09ba9e",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-025"
+        ]
+      },
+      {
+        "usfm_book": "MAT",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-41-MAT.p.sfm",
+        "git_blob_sha": "0297a127764817a50ec754a710c6d49adb1b99a8",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-026",
+          "LSG-CR-027",
+          "LSG-CR-028",
+          "LSG-CR-029",
+          "LSG-CR-030",
+          "LSG-CR-031"
+        ]
+      },
+      {
+        "usfm_book": "MRK",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-42-MRK.p.sfm",
+        "git_blob_sha": "48f5926849ceaf3a10810130c13fc4583c7e26c3",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-032"
+        ]
+      },
+      {
+        "usfm_book": "LUK",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-43-LUK.p.sfm",
+        "git_blob_sha": "79ca1da14568a23eee84ecc74172002d501360e3",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-033",
+          "LSG-CR-034",
+          "LSG-CR-035",
+          "LSG-CR-036",
+          "LSG-CR-037"
+        ]
+      },
+      {
+        "usfm_book": "JHN",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-44-JHN.p.sfm",
+        "git_blob_sha": "eca3d16f34c74a23acbcdf8486c46b951b6d9616",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-038",
+          "LSG-CR-039"
+        ]
+      },
+      {
+        "usfm_book": "ROM",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-46-ROM.p.sfm",
+        "git_blob_sha": "b4bfada4b21248ea6dabca8417d0c9fe0111c152",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-040",
+          "LSG-CR-041"
+        ]
+      },
+      {
+        "usfm_book": "1CO",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-47-1CO.p.sfm",
+        "git_blob_sha": "5fb0c1c9a68401b5c7b4170a8606d00d0a1d7328",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-042"
+        ]
+      },
+      {
+        "usfm_book": "GAL",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-49-GAL.p.sfm",
+        "git_blob_sha": "c0256371b28eaea8e223c1844f83075ea943b138",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-043"
+        ]
+      },
+      {
+        "usfm_book": "1TH",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-53-1TH.p.sfm",
+        "git_blob_sha": "63bfa19327aa7781950231a625d4c0b8f32201cd",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-044",
+          "LSG-CR-045"
+        ]
+      },
+      {
+        "usfm_book": "HEB",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-59-HEB.p.sfm",
+        "git_blob_sha": "ed20014725aee0857ad32e1deb0d5b82499fd662",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-046",
+          "LSG-CR-047"
+        ]
+      },
+      {
+        "usfm_book": "1PE",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-61-1PE.p.sfm",
+        "git_blob_sha": "720039e34bee3f591d315b781518e3d8085a3943",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-048",
+          "LSG-CR-049"
+        ]
+      },
+      {
+        "usfm_book": "1JN",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-63-1JN.p.sfm",
+        "git_blob_sha": "7a904ac3b5c79a6aa688dff81a4a5f394d96d011",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-050",
+          "LSG-CR-051"
+        ]
+      },
+      {
+        "usfm_book": "REV",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-67-REV.p.sfm",
+        "git_blob_sha": "38e734422d11ed0f4cbf0b7ba6931c98280dda1a",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-052",
+          "LSG-CR-053",
+          "LSG-CR-054"
+        ]
+      }
+    ],
+    "exact_complete_digital_labels_matched": 54,
+    "compared_original_source_labels": 54,
+    "metadata_years_do_not_date_each_reference": true,
+    "independent_transcription_from_1910_print_proven": false,
+    "exact_UBS_DBL_archive_identity_proven": false,
+    "eBible_direct_parent_archive_proven": false,
+    "upstream_label_edit_approved": 0,
+    "machine_link_edits_approved": 0,
+    "interpretation": "Strong common digital ancestry evidence; not proof of the exact editorial ancestor, the original 1910 margin, authenticity of each cross-reference, or rights to republish a later annotated edition."
+  }
+}

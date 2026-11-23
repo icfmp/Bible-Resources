@@ -1,0 +1,1400 @@
+name: LSG source-pinned structural reference candidate
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/lsg-reference-review.yml'
+      - 'scripts/normalize_bible_references.py'
+      - 'tests/test_normalize_bible_references.py'
+      - 'scripts/segment_osis_reference_destinations.py'
+      - 'tests/test_segment_osis_reference_destinations.py'
+      - 'sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml'
+      - 'sources/cleaned/bibles/fr/lsg-1910/CLEANUP_MANIFEST.json'
+      - 'sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip'
+      - 'config/standard_usfm_osis_66.json'
+      - 'config/lsg-1910-printed-book-aliases.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_PAGE_LOCATORS_2026-11-23.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json'
+permissions:
+  contents: read
+jobs:
+  forensic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install reviewed dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run source-attested normalizer negative and idempotence tests
+        run: python -m unittest discover -s tests -p test_normalize_bible_references.py -v
+      - name: Test individually linked OSIS segmentation and source preservation
+        run: python -m unittest discover -s tests -p test_segment_osis_reference_destinations.py -v
+      - name: Fail-closed tests for reversible editorial overlay and introduction edits
+        run: python -m unittest discover -s tests -p test_apply_reviewed_osis_editorial_corrections.py -v
+      - name: Inventory original citation-label grammar without creating links
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from zipfile import ZipFile
+          from lxml import etree
+          import json, re
+          original='sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip'
+          with ZipFile(original) as z:
+              root=etree.fromstring(z.read('fraLSG_usfx.xml'),
+                  etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True))
+          labels=[' '.join(''.join(n.itertext()).split())
+                  for n in root.iter('xt')]
+          label_re=re.compile(r'(?<!\w)([1-3]?\s*[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ.]{0,12})\s+([1-9]\d{0,2}):([1-9]\d{0,2})')
+          from scripts.normalize_bible_references import DIRECT_DESTINATION
+          aliases=Counter()
+          counts=Counter()
+          samples={}
+          compound_samples={}
+          for label in labels:
+              matches=list(label_re.finditer(label))
+              for m in matches:aliases[m.group(1).strip()]+=1
+              counts['notes_total']+=1
+              if not matches:
+                  counts['no_explicit_book_chapter_verse']+=1
+                  if len(samples.get('no_explicit_book_chapter_verse',[]))<20:
+                      samples.setdefault('no_explicit_book_chapter_verse',[]).append(label[:170])
+              counts['explicit_book_chapter_verse_tokens']+=len(matches)
+              if len(matches)>1:counts['multiple_explicit_book_tokens']+=1
+              if ';' in label:counts['contains_semicolon']+=1
+              if '–' in label or '—' in label or '-' in label:counts['contains_range_dash']+=1
+              if '(' in label or ')' in label:counts['contains_parenthesis']+=1
+              if re.search(r'\b(?:voir|cf|comp|et|ou)\b',label,re.I):
+                  counts['contains_prose_connector']+=1
+              if label.endswith('.'):counts['ends_with_period']+=1
+              if not DIRECT_DESTINATION.fullmatch(label):
+                  group=('multi_explicit_books' if len(matches)>1
+                         else 'implicit_or_semicolon' if ';' in label
+                         else 'other_compound')
+                  counts['compound_'+group]+=1
+                  if len(compound_samples.get(group, []))<24:
+                      compound_samples.setdefault(group, []).append(label[:240])
+          report={
+              'status':'inventory_only_no_targets_inferred',
+              'counts':dict(counts),
+              'distinct_candidate_book_aliases':len(aliases),
+              'top_candidate_aliases':aliases.most_common(100),
+              'bounded_unmatched_examples':samples.get('no_explicit_book_chapter_verse',[]),
+              'compound_examples_by_grammar_class':compound_samples,
+              'source_citation_labels_rewritten':0,
+          }
+          from pathlib import Path
+          Path('/tmp/lsg-citation-grammar-inventory.json').write_text(
+              json.dumps(report,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print('LSG printed-citation syntax inventory:',dict(counts))
+          print('Candidate alias tokens (not approved):',aliases.most_common(100))
+          print('Unmatched examples (never linked):',samples.get('no_explicit_book_chapter_verse',[]))
+          print('Compound examples by grammar class:',compound_samples)
+          PY
+      - name: Fetch independently pinned official OSIS schema
+        run: python scripts/fetch_reviewed_schema.py --directory /tmp/lsg-reviewed-osis
+      - name: Build separate complete cleaned-source candidate and preservation ledger
+        run: |
+          python scripts/normalize_bible_references.py \
+            --cleaned sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml \
+            --original-usfx sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip \
+            --manifest sources/cleaned/bibles/fr/lsg-1910/CLEANUP_MANIFEST.json \
+            --crosswalk config/standard_usfm_osis_66.json \
+            --destination-aliases config/lsg-1910-printed-book-aliases.json \
+            --complete-citation-lists \
+            --source-local-short-forms \
+            --disambiguated-chapter-commas \
+            --output /tmp/lsg-structural-candidate.osis.xml \
+            --report /tmp/lsg-structural-report.json
+      - name: Validate official schema plus BRNP diagnostic before/after
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json, os, subprocess, sys
+          original='sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml'
+          folder=Path('/tmp')
+          candidate=folder/'lsg-structural-candidate.osis.xml'
+          schema=folder/'lsg-reviewed-osis/osisCore.2.1.1-cw-latest.xsd'
+          reports=[]
+          for label, file in [('before',original),('candidate',str(candidate))]:
+              report=folder/f'lsg-brnp-{label}.json'
+              result=subprocess.run([sys.executable,'scripts/check_brnp.py',file,
+                  '--kind','bible','--schema',str(schema),'--report',str(report)],
+                  capture_output=True,text=True)
+              if result.returncode not in (0,1):
+                  raise SystemExit(f'BRNP failed for {label}: {result.stderr}')
+              reports.append(json.loads(report.read_text(encoding='utf-8')))
+          before, after=reports
+          receipt=json.loads((folder/'lsg-structural-report.json').read_text())
+          old=before['finding_codes'];new=after['finding_codes']
+          print('Before categories',old)
+          print('After categories',new)
+          print('Normalization candidate proof',receipt)
+          assert receipt['exact_original_xml_text_and_element_order_preserved']
+          assert receipt['only_source_attested_reference_osisRef_attributes_added']
+          assert receipt['candidate_additions'] == (
+              old.get('NONCANONICAL_REFERENCE_ORIGIN',0)+
+              old.get('UNRESOLVED_INTRODUCTION_SPAN',0)-
+              receipt['unlinked_introduction_spans_preserved']+
+              receipt['resolved_original_destination_labels'])
+          assert (receipt['original_cross_reference_notes'] ==
+                  receipt['resolved_original_destination_labels']+
+                  receipt['unlinked_original_destination_labels_preserved'])
+          assert receipt['printed_abbreviation_map_sha256']
+          assert (receipt['original_introduction_spans'] ==
+                  receipt['resolved_introduction_spans']+
+                  receipt['unlinked_introduction_spans_preserved'])
+          assert not new.get('NONCANONICAL_REFERENCE_ORIGIN',0)
+          assert (new.get('UNRESOLVED_INTRODUCTION_SPAN',0) ==
+                  receipt['unlinked_introduction_spans_preserved'])
+          assert new.get('UNRESOLVED_REFERENCE_TARGET',0)==(
+              old.get('UNRESOLVED_REFERENCE_TARGET',0)-
+              receipt['resolved_original_destination_labels'])
+          for code,number in new.items():
+              assert number <= old.get(code,0),f'New or increased BRNP diagnostic: {code}'
+          assert after['official_osis']['status']=='validated'
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8') as f:
+              f.write('## LSG source-attested reference candidate (unpublished)\n\n')
+              f.write(f"Exact added osisRef targets: {receipt['candidate_additions']}\n\n")
+              f.write(f"Unlinked authored destination labels retained: {receipt['unlinked_original_destination_labels_preserved']}\n\n")
+              f.write(f"Before: {old}\n\nAfter: {new}\n\n")
+              f.write('Original source, translation text, note callouts, existing markup, authorial reference labels and compiled releases are unchanged.\n')
+          PY
+      - name: Classify each still-unresolved original citation label without creating links
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from pathlib import Path
+          from zipfile import ZipFile
+          from lxml import etree
+          import json,re,sys
+          sys.path.insert(0,'scripts')
+          from normalize_bible_references import (
+              _complete_printed_destinations,_explicit_source_local_reference,
+              _printed_book_aliases,_crosswalk,_parse,_usfx_bytes,_label,OSIS)
+          orig=Path('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip')
+          with ZipFile(orig) as z:
+              doc=_parse(z.read('fraLSG_usfx.xml'))
+          source=_parse(Path('/tmp/lsg-structural-candidate.osis.xml').read_bytes())
+          verse_ids={x for verse in source.iter(OSIS+'verse')
+                     for x in (verse.get('osisID') or '').split()}
+          from hashlib import sha256
+          aliases,_digest=_printed_book_aliases(
+              Path('config/lsg-1910-printed-book-aliases.json'),
+              _crosswalk(Path('config/standard_usfm_osis_66.json')),
+              sha256(orig.read_bytes()).hexdigest(),doc)
+          records=[]
+          causes=Counter()
+          classes=Counter()
+          examples={}
+          def group(label,reason):
+              if reason!='compound_or_implicit_reference':
+                  return reason
+              if re.search(r'\betc\.?',label,re.I):
+                  return 'open_ended_etc'
+              if re.fullmatch(r'v\.\s*[0-9]+\.?',label):
+                  return 'same_chapter_relative_verse'
+              if re.fullmatch(r'(?:[1-3]\s+)?[A-Za-zÀ-ÿ]+\s+v\.\s*[0-9]+\.?',label):
+                  return 'named_book_relative_verse'
+              if re.fullmatch(r'(?:[1-3]\s+)?[A-Za-zÀ-ÿ]+\s+[0-9]+\.?',label):
+                  return 'chapter_only_reference'
+              if re.search(r'\bv\.',label,re.I):
+                  return 'embedded_relative_verse'
+              return 'other_unresolved_syntax'
+          for book in doc.iter('book'):
+              for note in book.iter('x'):
+                  xt=next((e for e in note if e.tag=='xt'),None)
+                  xo=next((e for e in note if e.tag=='xo'),None)
+                  if xt is None or xo is None:
+                      raise SystemExit('Unexpected source USFX note shape')
+                  label=_label(xt)
+                  value,reason,_=_complete_printed_destinations(
+                      label,aliases,verse_ids,disambiguated_chapter_commas=True,
+                      named_single_chapter_refs=True)
+                  if value is None and reason=='compound_or_implicit_reference':
+                      value,reason=_explicit_source_local_reference(
+                          label,aliases,_label(xo),
+                          _crosswalk(Path('config/standard_usfm_osis_66.json'))[book.get('id')],
+                          verse_ids)
+                  if value is not None:continue
+                  category=group(label,reason)
+                  causes[reason]+=1
+                  classes[category]+=1
+                  entry={'original_usfm_book':book.get('id'),
+                         'source_note_origin':_label(xo),
+                         'original_citation_label':label,
+                         'parser_reason':reason,
+                         'editorial_review_class':category,
+                         'action':'preserve_unlinked_until_independent_evidence'}
+                  records.append(entry)
+                  if len(examples.get(category,[]))<4:
+                      examples.setdefault(category,[]).append(label[:100])
+          receipt=json.loads(Path('/tmp/lsg-structural-report.json').read_text())
+          if (receipt.get('source_named_one_chapter_compound_notes_resolved')!=36
+              or receipt['unlinked_original_destination_labels_preserved']!=323):
+              raise SystemExit('Expected exactly 36 fully source-attested named single-chapter compound links; ambiguous 323 remain untouched')
+          if len(records)!=receipt['unlinked_original_destination_labels_preserved']:
+              raise SystemExit('Original citation triage and normalized report diverge')
+          report={'original_zip_sha256':sha256(orig.read_bytes()).hexdigest(),
+                  'status':'read_only_full_source_witness_triage',
+                  'unlinked_original_notes':len(records),
+                  'cause_counts':dict(causes),
+                  'review_categories':dict(classes),
+                  'entries':records,
+                  'proposed_corrections_or_links':0}
+          Path('/tmp/lsg-source-citation-triage.json').write_text(
+              json.dumps(report,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          ledger=json.loads(Path(
+              'sources/cleaned/bibles/fr/lsg-1910/editorial/UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json'
+          ).read_text(encoding='utf-8'))
+          current=[e for e in records
+                   if e['parser_reason']=='unattested_reference_start']
+          expected=ledger['records']
+          if (ledger['source_original_usfx_zip_sha256']!=sha256(orig.read_bytes()).hexdigest()
+              or len(current)!=ledger['references_original_count']
+              or len(expected)!=len(current)
+              or [(x['original_usfm_book'],x['source_note_origin'],
+                   x['original_citation_label']) for x in current]!=
+                 [(x['original_usfm_book'],x['source_note_origin'],
+                   x['original_citation_label']) for x in expected]
+              or any(x['editorial_change'] is not None or
+                     x['decision']!='preserve_source_label_unlinked'
+                     for x in expected)):
+              raise SystemExit('Historical source-citation review ledger has drifted or silently approved corrections')
+          parallel=[entry for entry in expected if
+                    'parallel_versification_review' in entry]
+          if (len(parallel)!=ledger['independent_parallel_versification_candidates']
+              or ledger['independent_printed_note_corrections_certified']!=0
+              or any(entry['parallel_versification_review']['status'] !=
+                     'candidate_only_requires_actual_printed_note_collation'
+                     for entry in parallel)):
+              raise SystemExit('Parallel versification evidence must remain non-authoritative until actual print-note collation')
+          print('Source text and nine historical numbering candidates kept independent:',len(parallel))
+          print_witness=json.loads(Path(
+              'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json'
+          ).read_text(encoding='utf-8'))
+          proven=print_witness['records']
+          proof_map={r['record_id']:r for r in proven}
+          original_by_id={r['record_id']:r for r in expected}
+          source_scan=print_witness['facsimile']
+          if (print_witness['schema_version']!=1
+              or print_witness['source_original_usfx_zip_sha256']!=sha256(orig.read_bytes()).hexdigest()
+              or print_witness['authored_reference_label_edits_approved']!=0
+              or print_witness['automatic_target_link_edits_approved']!=0
+              or print_witness['print_readings_requiring_no_change']+print_witness['print_readings_with_original_usfx_discrepancy']!=len(proven)
+              or print_witness['print_readings_requiring_no_change']!=sum(1 for row in proven if row['printed_marginal_note_matches_original_usfx'])
+              or print_witness['print_readings_with_original_usfx_discrepancy']!=sum(1 for row in proven if not row['printed_marginal_note_matches_original_usfx'])
+              or len(proof_map)!=len(proven)
+              or len(proven)>len(expected)
+              or source_scan['edition'].find('1910')<0
+              or source_scan['retrieved_djvu_bytes']<200000000
+              or len(source_scan['retrieved_djvu_sha256'])!=64
+              or not source_scan['source_file_url'].startswith('https://commons.wikimedia.org/wiki/')
+              or not source_scan['extraction_run'].startswith('https://github.com/icfmp/Bible-Resources/actions/runs/')):
+              raise SystemExit('Original 1910 printed-witness evidence has changed identity or implied unapproved edits')
+          for record_id, witness in proof_map.items():
+              source_record=original_by_id.get(record_id)
+              if (source_record is None
+                  or witness['original_usfm_book']!=source_record['original_usfm_book']
+                  or witness['source_note_origin']!=source_record['source_note_origin']
+                  or witness['original_usfx_reference_label']!=source_record['original_citation_label']
+                  or not witness['normalized_marginal_citation']
+                  or witness['printed_marginal_note_matches_original_usfx'] is not
+                     (witness['normalized_marginal_citation']==witness['original_usfx_reference_label'])
+                  or witness['print_reading_status']!='visually_verified_from_actual_original_1910_page'
+                  or witness['original_1910_djvu_page']<1
+                  or not witness['page_url'].endswith('/'+str(witness['original_1910_djvu_page']))
+                  or not witness['visually_read_marginal_citation']
+                  or witness['authorized_change'] is not None):
+                  raise SystemExit('Printed 1910 witness must be attested per original note with an unchanged citation')
+          for row in expected:
+              historical=('visually_verified_from_actual_original_1910_page'
+                          if row['record_id'] in proof_map
+                          else 'pending_manual_facsimile_collation')
+              if row['printed_witness_status']!=historical:
+                  raise SystemExit('Unresolved source note print status changed without an exact visual evidence record')
+          print('Independent actual 1910 printed-note page readings:',len(proven),
+                'pending:',len(expected)-len(proven))
+          comparison=json.loads(Path(
+              'sources/cleaned/bibles/fr/lsg-1910/editorial/SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json'
+          ).read_text(encoding='utf-8'))
+          compared=comparison['records']
+          checks=[(row['record_id'],row['original_usfm_book'],
+                   row['source_note_origin'],row['original_citation_label'])
+                  for row in compared]
+          stable=[(row['record_id'],row['original_usfm_book'],
+                   row['source_note_origin'],row['original_citation_label'])
+                  for row in expected]
+          if (comparison['schema_version']!=1 or
+              comparison['original_usfx_sha256']!=sha256(orig.read_bytes()).hexdigest()
+              or comparison['original_cleaned_sha256']!=receipt['source_sha256']
+              or not comparison['status'].endswith('not_print_certification')
+              or comparison['printed_1910_facsimile_reference_collation_complete']
+              or comparison['authorial_corrections_approved']!=0
+              or comparison['auto_link_enrichment_authorized']
+              or checks!=stable or len(checks)!=54):
+              raise SystemExit('Digital witness comparison must remain exact-original, distinct from print certification and without silent edits')
+          compared_counts=Counter()
+          for row in compared:
+              if row['record_id'] in proof_map:
+                  witness=proof_map[row['record_id']]
+                  if (witness['secondary_digital_reference_label']!=row['secondary_citation_label']
+                      or witness['printed_marginal_note_matches_secondary_digital'] is not
+                          (witness['normalized_marginal_citation']==row['secondary_citation_label'])):
+                      raise SystemExit('Printed citation disagrees with the secondary comparison record')
+              source_label=row['original_citation_label']
+              other=row['secondary_citation_label']
+              computed=('text_identical_in_separately_hosted_digital_witness'
+                        if source_label==other else
+                        'digital_witness_disagrees_with_original_usfx')
+              if (row['comparison']!=computed or
+                  row['historical_print_status']!=('visually_verified_from_actual_original_1910_page' if row['record_id'] in proof_map else 'not_collated_from_printed_1910_reference_note')
+                  or row['authorized_change'] is not None or not other
+                  or not row['secondary_uri'].startswith('https://biblia.com/bible/lsg/')):
+                  raise SystemExit('Secondary digital witness status/content invalid or wrongly editorially approved')
+              compared_counts[computed]+=1
+          if (compared_counts['digital_witness_disagrees_with_original_usfx']!=32
+              or compared_counts['text_identical_in_separately_hosted_digital_witness']!=22):
+              raise SystemExit('Secondary witness evidence coverage or comparison classification drifted')
+          print('Secondary digital apparatus comparison (NOT 1910 print certification):',dict(compared_counts))
+          # A pinned external witness corroborates digital ancestry, not the 1910 print.
+          ext=comparison.get('additional_public_usfm_witness')
+          if (not isinstance(ext,dict)
+              or ext.get('status')!='direct_public_usfm_xo_xt_comparison_exact_for_all_54_cases_not_1910_print_certification'
+              or ext.get('repository')!='BibleCorps/FRA-B-LSG1910-PD-UBS'
+              or ext.get('ref_observed')!='main'
+              or ext.get('exact_complete_digital_labels_matched')!=54
+              or ext.get('compared_original_source_labels')!=54
+              or ext.get('upstream_label_edit_approved')!=0
+              or ext.get('machine_link_edits_approved')!=0
+              or ext.get('independent_transcription_from_1910_print_proven') is not False
+              or ext.get('exact_UBS_DBL_archive_identity_proven') is not False
+              or ext.get('eBible_direct_parent_archive_proven') is not False
+              or not re.fullmatch(r'[0-9a-f]{40}',ext.get('metadata_git_blob_sha',''))):
+              raise SystemExit('Public-USFM witness identity or certification boundary changed')
+          files=ext.get('book_files',[])
+          seen_cases=set()
+          seen_books=set()
+          original_cases={r['record_id']:r for r in expected}
+          if not isinstance(files,list) or len(files)!=26:
+              raise SystemExit('Public-USFM witness must pin 26 source book blobs')
+          for item in files:
+              book=item['usfm_book']
+              if (book in seen_books
+                  or not re.fullmatch(r'[0-9a-f]{40}',item.get('git_blob_sha',''))
+                  or not re.fullmatch(r'p[.]sfm/FRA\[B\]LSG1910\[PD\]UBS-[0-9]{2}-[A-Z0-9]{3}[.]p[.]sfm',item.get('path',''))
+                  or not item['path'].endswith('-'+book+'.p.sfm')):
+                  raise SystemExit('Public-USFM witness unpinned, duplicate or malformed book')
+              seen_books.add(book)
+              for case_id in item['exact_xo_xt_case_ids']:
+                  if (case_id in seen_cases or case_id not in original_cases
+                      or original_cases[case_id]['original_usfm_book']!=book):
+                      raise SystemExit('Public-USFM cross-reference case duplicated or wrong book')
+                  seen_cases.add(case_id)
+          if seen_cases!=set(original_cases):
+              raise SystemExit('Public-USFM witness does not cover the same 54 original citations')
+          print('Pinned independent public USFM witness: 54 exact digital label observations across 26 immutable Git blobs; no historical-print certification')
+          page_data=json.loads(Path(
+              'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_PAGE_LOCATORS_2026-11-23.json'
+          ).read_text(encoding='utf-8'))
+          printed_tokens=json.loads(Path(
+              'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json'
+          ).read_text(encoding='utf-8'))
+          if (page_data['schema_version']!=1
+              or page_data['source_usfx_sha256']!=sha256(orig.read_bytes()).hexdigest()
+              or page_data['original_printed_djvu_sha256']!=source_scan['retrieved_djvu_sha256']
+              or page_data['exact_djvu_page_count']!=1061
+              or page_data['historical_printed_reference_note_readings_confirmed']!=len(proven)
+              or page_data['historical_printed_reference_note_readings_pending']!=len(expected)-len(proven)
+              or page_data['original_citation_changes_authorized']!=0
+              or len(page_data['records'])!=len(expected)):
+              raise SystemExit('Original-1910 print page/source ledger drift or unapproved correction')
+          page_map={r['record_id']:r for r in page_data['records']}
+          if set(page_map)!={r['record_id'] for r in expected}:
+              raise SystemExit('Original printed page inventory must cover exactly all 54 source notes')
+          location_checks=page_data['batch_printed_page_and_source_verse_alignment']
+          status_counts=Counter(r['printed_source_verse_alignment']['source_verse_match_status']
+                                for r in page_data['records'])
+          if (location_checks['scan_sha256']!=source_scan['retrieved_djvu_sha256']
+              or location_checks['historical_marginal_full_note_approved_for_change']!=0
+              or (location_checks['source_verse_text_locator_high_confidence']+
+                  location_checks['source_verse_text_locator_needing_special_caution']!=len(expected))
+              or location_checks['source_verse_text_locator_high_confidence']!=
+                 status_counts['high_confidence_verse_text_locator_not_reference_certification']
+              or len(status_counts)!=3):
+              raise SystemExit('Printed verse page alignment classifications are not source/evidence consistent')
+          comparison_map={r['record_id']:r for r in compared}
+          for r in page_data['records']:
+              source=original_by_id[r['record_id']]
+              other=comparison_map[r['record_id']]
+              loc=r['printed_source_verse_alignment']
+              full_print_certified=r['record_id'] in proof_map
+              if ((r['original_usfm_book'],r['source_note_origin'],r['original_citation_label'])!=
+                  (source['original_usfm_book'],source['source_note_origin'],source['original_citation_label'])
+                  or r['secondary_citation_label']!=other['secondary_citation_label']
+                  or r['source_citation_modified']
+                  or r['authorised_correction'] is not None
+                  or r['original_1910_djvu_page']<1
+                  or r['original_1910_djvu_page']>1061
+                  or not r['printed_page_url'].endswith('/'+str(r['original_1910_djvu_page']))
+                  or loc['native_printed_page']!=r['original_1910_djvu_page']
+                  or loc['page_reference_full_note_certified'] is not full_print_certified
+                  or loc['original_djvu_image_rendered_and_preserved'] is not True
+                  or r['printed_reference_status']!=
+                     ('historical_marginal_label_visually_verified_in_separate_citation_record'
+                      if full_print_certified else 'page_identified_marginal_label_not_certified')):
+                  raise SystemExit('Original printed page/verse alignment not traceable to exact source record: '+r['record_id'])
+          tokens=printed_tokens['records']
+          if (printed_tokens['schema_version']!=1
+              or printed_tokens['original_printed_scan_sha256']!=source_scan['retrieved_djvu_sha256']
+              or printed_tokens['original_usfx_zip_sha256']!=sha256(orig.read_bytes()).hexdigest()
+              or printed_tokens['original_scan_publication_year']!=1910
+              or printed_tokens['confirmed_individual_printed_reference_token_sightings']!=len(tokens)
+              or printed_tokens['original_or_cleaned_text_changes_approved']!=0
+              or len(tokens)!=len({r['record_id'] for r in tokens})
+              or len(tokens)>len(expected)):
+              raise SystemExit('Verified individual printed marginal tokens ledger inconsistent with original print')
+          for r in tokens:
+              original=original_by_id.get(r['record_id'])
+              page=page_map.get(r['record_id'])
+              other=comparison_map.get(r['record_id'])
+              if (original is None or page is None or other is None
+                  or r['original_usfm_book']!=original['original_usfm_book']
+                  or r['source_note_origin']!=original['source_note_origin']
+                  or r['original_usfx_label']!=original['original_citation_label']
+                  or r['secondary_digital_label']!=other['secondary_citation_label']
+                  or r['original_1910_print_page']!=page['original_1910_djvu_page']
+                  or r['facsimile_page_url']!=page['printed_page_url']
+                  or not r['printed_reference_token_or_local_group']
+                  or not r['interpreted_print_target_token']
+                  or r['scope']!='identified_printed_margin_reference_token_not_full_digital_xt_collation'
+                  or r['printed_reference_token_visually_read'] is not True
+                  or r['printed_full_cross_reference_label_matches_eBible'] is not None
+                  or r['editorial_change_authorized'] is not None):
+                  raise SystemExit('An individual printed citation token is missing evidence or implies full-note certification')
+          disposition=page_data['batch_review_disposition']
+          verified_total=0
+          partial_total=0
+          screen_only_total=0
+          token_ids={r['record_id'] for r in tokens}
+          full_ids=set(proof_map)
+          if (disposition['original_scan_provenance_sha256']!=source_scan['retrieved_djvu_sha256']
+              or disposition['reviewed_source_note_origins']!=len(expected)
+              or disposition['source_label_edits_authorized']!=0
+              or disposition['source_reference_links_authorized']!=0):
+              raise SystemExit('Full-batch printed page screening disposition not evidence bound')
+          for r in page_data['records']:
+              record=r['original_print_case_review']
+              caseid=r['record_id']
+              expected_scope=('full_print_citation_verified' if caseid in full_ids else
+                              'partial_marginal_reference_token_read_only' if caseid in token_ids else
+                              'original_page_and_verse_examined_but_printed_citation_not_certified')
+              if (record['case_examination_status']!=expected_scope
+                  or record['inspected_exact_print_verse_on_page']!=r['original_1910_djvu_page']
+                  or record['source_note_edited'] is not False
+                  or record['machine_link_authorized'] is not False
+                  or record['authorial_print_notation_interpretation_approved'] is not False
+                  or record['editorial_disposition']!='preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review'
+                  or record['printed_token']!=(next((p['printed_reference_token_or_local_group']
+                                                     for p in tokens if p['record_id']==caseid),None))
+                  or record['printed_token_target_hint']!=(next((p['interpreted_print_target_token']
+                                                                 for p in tokens if p['record_id']==caseid),None))):
+                  raise SystemExit('Full-batch disposition must preserve unapproved source note and recorded printed evidence')
+          disposition_count=Counter(r['original_print_case_review']['case_examination_status'] for r in page_data['records'])
+          if (disposition['totals']!=dict(disposition_count)
+              or sum(disposition_count.values())!=len(expected)
+              or disposition_count['full_print_citation_verified']!=len(proven)
+              or disposition_count['partial_marginal_reference_token_read_only']!=len(tokens)
+              or disposition_count['original_page_and_verse_examined_but_printed_citation_not_certified']!=len(expected)-len(proven)-len(tokens)):
+              raise SystemExit('Batch review disposition is not complete or is wrongly certified')
+          screening=ledger.get('first_pass_actual_1910_source_verse_screening',{})
+          if (ledger.get('printed_page_evidence_not_yet_recorded') is not False
+              or screening.get('source_record_count')!=len(expected)
+              or screening.get('historical_scan_sha256')!=source_scan['retrieved_djvu_sha256']
+              or screening.get('original_printed_full_note_certified_count')!=len(proven)
+              or screening.get('original_printed_marginal_token_with_callout_only_count')!=len(tokens)
+              or screening.get('original_printed_page_reviewed_no_verified_note_token_count')!=disposition_count['original_page_and_verse_examined_but_printed_citation_not_certified']
+              or screening.get('pending_full_printed_note_equivalence_count')!=len(expected)-len(proven)
+              or screening.get('authored_reference_changes_approved')!=0
+              or screening.get('machine_links_added_to_unresolved_original_notes')!=0):
+              raise SystemExit('First-pass printed-page audit metadata inconsistent with case-by-case evidence')
+          print('All 54 cases assigned evidence-scoped print screening disposition:',dict(disposition_count))
+          print('Physical 1910 print page coverage and authorial source-verse alignment: ',
+                len(page_data['records']),'of',len(expected),
+                'individual printed reference token findings:',len(tokens),
+                'complete printed-note citations:',len(proven),
+                'original source labels changed: 0')
+          final=printed_tokens.get('full_54_case_target_corroboration')
+          if (not isinstance(final,dict)
+              or final.get('status')!='54_complete_case_dispositions_not_54_identical_1910_annotations'
+              or final.get('original_usfx_sha256')!=sha256(orig.read_bytes()).hexdigest()
+              or final.get('scan_sha256')!=source_scan['retrieved_djvu_sha256']
+              or final.get('original_source_labels_rewritten')!=0
+              or final.get('editorial_changes_authorized')!=0
+              or final.get('automatic_links_authorized')!=0
+              or final.get('all_source_note_origins_screened')!=len(expected)):
+              raise SystemExit('Print-target adjudication provenance/approval boundary changed')
+          final_classes=Counter()
+          tok_by_id={r['record_id']:r for r in tokens}
+          page_by_id={r['record_id']:r for r in page_data['records']}
+          proven_ids={r['record_id'] for r in proven}
+          if len(final.get('records',[]))!=len(expected):
+              raise SystemExit('54-case adjudication does not cover all original digital labels')
+          for case,source in zip(final['records'],expected):
+              ident=source['record_id'];page=page_by_id[ident]
+              if (case['record_id']!=ident
+                  or case['original_usfm_book']!=source['original_usfm_book']
+                  or case['source_note_origin']!=source['source_note_origin']
+                  or case['original_source_label']!=source['original_citation_label']
+                  or case['scan_page']!=page['original_1910_djvu_page']
+                  or case['scan_page_url']!=page['printed_page_url']
+                  or case['source_original_label_edited'] is not False
+                  or case['editorial_correction_approved'] is not None
+                  or case['automatic_machine_link_approved'] is not None):
+                  raise SystemExit('Whole-corpus print-citation case identity/approval drift')
+              tok=tok_by_id.get(ident)
+              cls=case['disposition']
+              if ident in proven_ids:
+                  if cls!='complete_printed_note_verbatim_match' or case['complete_print_equivalence_certified'] is not True:
+                      raise SystemExit('Exact printed full-note evidence lost')
+              else:
+                  if case['complete_print_equivalence_certified'] is not None:
+                      raise SystemExit('Unverified printed full-note equivalence silently promoted')
+              if tok:
+                  if (cls not in ('verified_printed_token_only','confirmed_printed_target_contrast')
+                      or case['verified_printed_callout']!=tok['printed_note_callout']
+                      or case['verified_printed_fragment']!=tok['printed_reference_token_or_local_group']):
+                      raise SystemExit('Printed callout/token must match signed original scan finding')
+              elif ident not in proven_ids and (cls!='print_page_screened_note_not_certified' or case['verified_printed_callout'] is not None):
+                  raise SystemExit('Missing printed callout falsely certified')
+              if cls=='confirmed_printed_target_contrast':
+                  if (not tok or not case['target_discrepancy_class']
+                      or not case['contrasted_original_digital_excerpt']
+                      or case['contrasted_original_digital_excerpt'] not in source['original_citation_label']):
+                      raise SystemExit('Printed target mismatch lacks source-bound exact token')
+              elif case['target_discrepancy_class'] is not None or case['contrasted_original_digital_excerpt'] is not None:
+                  raise SystemExit('Unproved printed mismatch added')
+              final_classes[cls]+=1
+          if (dict(final_classes)!=final['distribution']
+              or final_classes['complete_printed_note_verbatim_match']!=len(proven)
+              or final_classes['confirmed_printed_target_contrast']!=19
+              or final_classes['verified_printed_token_only']!=len(tokens)-19
+              or final_classes['print_page_screened_note_not_certified']!=len(expected)-len(tokens)-len(proven)):
+              raise SystemExit('Printed target adjudication category counts invalid')
+          fallback=final.get('provider_fallback_decision')
+          if (not isinstance(fallback,dict)
+              or fallback.get('status')!='owner_accepts_unverified_1910_print_notes_as_original_digital_provider_evidence_without_further_facsimile_search'
+              or fallback.get('source_preserved')!='original_eBible_USFX_xt_labels'
+              or fallback.get('crosswire_reference_module')!='FreSegond1910'
+              or fallback.get('crosswire_reference_notes_available') is not False
+              or fallback.get('printed_1910_equivalence_asserted') is not False
+              or fallback.get('original_digital_labels_edit_authorized') is not False
+              or fallback.get('machine_link_augmentation_authorized') is not False
+              or fallback.get('reader_release_approval') is not False):
+              raise SystemExit('Unverified printed-note owner fallback cannot become authorial print certification or a release approval')
+          pending_cases=[r['record_id'] for r in final['records']
+                         if r['disposition']=='print_page_screened_note_not_certified']
+          if (len(pending_cases)!=29
+              or pending_cases!=fallback.get('affected_case_ids')):
+              raise SystemExit('Provider fallback scope must remain the exact 29 uncertified printed-note cases')
+          for r in final['records']:
+              expected_follow_up=('closed_as_uncertified_print_source_retained_digital_witness'
+                  if r['record_id'] in pending_cases else 'not_in_29_case_fallback_scope')
+              if r.get('follow_up_status')!=expected_follow_up:
+                  raise SystemExit('Uncertified printed-note fallback status drift')
+          print('Owner decision: 29 uncertified printed notes retained as original digital source, no invented 1910 proof or CrossWire note endorsement')
+          print('All 54 original printed-page citation dispositions verified:',dict(final_classes))
+          # Source-attested preview only; never edits a source label or OSIS.
+          repairs=printed_tokens.get('target_repair_preview')
+          if (not isinstance(repairs,dict)
+              or repairs.get('schema_version')!=1
+              or repairs.get('status')!='individually_reviewable_unapproved_target_repair_proposals_not_applied'
+              or repairs.get('source_usfx_sha256')!=sha256(orig.read_bytes()).hexdigest()
+              or repairs.get('scan_sha256')!=source_scan['retrieved_djvu_sha256']
+              or repairs.get('original_source_labels_modified')!=0
+              or repairs.get('cleaned_master_modified') is not False
+              or repairs.get('compiled_release_modified') is not False
+              or repairs.get('editorial_replacement_authorized') is not False
+              or repairs.get('machine_link_generation_authorized') is not False
+              or repairs.get('approval_required_for_any_actual_label_change') is not True):
+              raise SystemExit('Editorial correction preview must remain source-pinned and unapproved')
+          candidate_list=repairs.get('individually_proposed_replacements',[])
+          blocked_list=repairs.get('deliberately_unmodified_cases',[])
+          printed_contrasts={r['record_id']:r for r in final['records']
+              if r['disposition']=='confirmed_printed_target_contrast'}
+          if len(candidate_list)!=12 or len(blocked_list)!=7 or len(printed_contrasts)!=19:
+              raise SystemExit('19 printed contrasts must have exactly 12 review candidates and 7 holds')
+          ids_seen=set()
+          by_secondary={r['record_id']:r for r in compared}
+          for edit in candidate_list:
+              caseid=edit['record_id']
+              if caseid in ids_seen or caseid not in printed_contrasts:
+                  raise SystemExit('Duplicate/unproven suggested printed correction')
+              ids_seen.add(caseid)
+              old=printed_contrasts[caseid]
+              prior=edit['original_literal_label']
+              before=edit['original_fragment']
+              after=edit['candidate_fragment']
+              if (edit['original_usfm_book']!=old['original_usfm_book']
+                  or edit['source_note_origin']!=old['source_note_origin']
+                  or prior!=old['original_source_label']
+                  or before!=old['contrasted_original_digital_excerpt']
+                  or prior.count(before)!=1
+                  or not after or after==before
+                  or edit['entire_candidate_label']!=prior.replace(before,after,1)
+                  or edit['printed_note_callout']!=old['verified_printed_callout']
+                  or edit['printed_target_observation']!=old['verified_printed_fragment']
+                  or edit['review_status']!='unapproved_isolated_candidate_never_original_source'
+                  or edit['original_label_changed'] is not False
+                  or edit['editorial_approval'] is not None
+                  or edit['release_approval'] is not False):
+                  raise SystemExit('Proposed target edit is not an exact reversible source-bound change')
+              resolved,reason,n_targets=_complete_printed_destinations(
+                  edit['entire_candidate_label'],aliases,verse_ids,
+                  disambiguated_chapter_commas=True)
+              if not resolved or edit['exact_printed_target_osis'] not in resolved.split():
+                  raise SystemExit('Proposed target does not resolve as a whole under original source versification: '+caseid+' ('+reason+')')
+              sec=by_secondary[caseid]['secondary_citation_label']
+              basis=edit['evidence_basis']
+              if basis=='printed_and_secondary_digital':
+                  if after not in sec:
+                      raise SystemExit('Claimed secondary witness does not corroborate exact edited token')
+              elif basis not in ('printed_note_only','printed_note_only_secondary_disagrees'):
+                  raise SystemExit('Unsupported authority category in correction preview')
+          for hold in blocked_list:
+              caseid=hold['record_id']
+              if (caseid in ids_seen or caseid not in printed_contrasts
+                  or hold['source_original_label']!=printed_contrasts[caseid]['original_source_label']
+                  or not hold.get('reason') or hold['unlinked_preserved'] is not True
+                  or hold['editorial_approval'] is not None):
+                  raise SystemExit('Ambiguous printed reference was accidentally corrected')
+              ids_seen.add(caseid)
+          if ids_seen!=set(printed_contrasts):
+              raise SystemExit('19 printed contradictions not exhaustively reviewed')
+          print('Source-pinned original-verse parser checked 12 reversible unapproved editorial label proposals; 7 blocked; 0 source edits')
+          print('Persistent original-source unaddressable citation ledger verified:',len(current))
+          print('Unlinked 1910 source-citation classes:',dict(classes))
+          print('Review-only category examples:',examples)
+          print('Unattested-reference original note evidence (no editorial corrections):')
+          for entry in records:
+              if entry['parser_reason']=='unattested_reference_start':
+                  print('LSG_UNATTESTED_CITATION='+json.dumps(entry,ensure_ascii=False,separators=(',',':')))
+          PY
+      - name: Guard complete 54-case original printed-page inventory without granting editorial approval
+        run: |
+          python - <<'PY'
+          import json
+          from hashlib import sha256
+          from pathlib import Path
+          prefix=Path('sources/cleaned/bibles/fr/lsg-1910/editorial')
+          pages=json.loads((prefix/'PRINTED_1910_PAGE_LOCATORS_2026-11-23.json').read_text(encoding='utf-8'))
+          digital=json.loads((prefix/'SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json').read_text(encoding='utf-8'))
+          original=json.loads((prefix/'UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json').read_text(encoding='utf-8'))
+          witness=json.loads((prefix/'PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json').read_text(encoding='utf-8'))
+          usfx=Path('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip')
+          usfx_sha=sha256(usfx.read_bytes()).hexdigest()
+          if (pages['schema_version']!=1
+              or pages['source_usfx_sha256']!=usfx_sha
+              or pages['original_printed_djvu_sha256']!=witness['facsimile']['retrieved_djvu_sha256']
+              or pages['exact_djvu_page_count']!=1061
+              or pages['original_citation_changes_authorized']!=0
+              or pages['historical_printed_reference_note_readings_confirmed']!=len(witness['records'])
+              or pages['historical_printed_reference_note_readings_pending']!=54-len(witness['records'])
+              or len(pages['records'])!=54
+              or len(digital['records'])!=54
+              or len(original['records'])!=54):
+              raise SystemExit('Original 1910 printed-page batch inventory identity/count drift')
+          proofs={row['record_id'] for row in witness['records']}
+          seen=set()
+          for p,d,o in zip(pages['records'],digital['records'],original['records']):
+              key=(p['record_id'],p['original_usfm_book'],p['source_note_origin'],p['original_citation_label'])
+              if (key!=(d['record_id'],d['original_usfm_book'],d['source_note_origin'],d['original_citation_label'])
+                  or key!=(o['record_id'],o['original_usfm_book'],o['source_note_origin'],o['original_citation_label'])
+                  or key[0] in seen
+                  or p['secondary_citation_label']!=d['secondary_citation_label']
+                  or not 1<=p['original_1910_djvu_page']<=pages['exact_djvu_page_count']
+                  or not p['printed_page_url'].endswith('/'+str(p['original_1910_djvu_page']))
+                  or p['printed_reference_status']!=('historical_marginal_label_visually_verified_in_separate_citation_record' if key[0] in proofs else 'page_identified_marginal_label_not_certified')
+                  or p['source_citation_modified'] is not False or p['authorised_correction'] is not None):
+                  raise SystemExit('Original printed reference locator mismatches source, page identity or separate editorial proof')
+              seen.add(key[0])
+          assert len(seen)==54
+          print('Verified exact 54-case original facsimile page locators; only',len(proofs),
+                'historical note reference readings separately certified,',
+                54-len(proofs),'uncertified printed-note labels, 0 authorized changes')
+          PY
+      - name: Verify scoped printed 1910 reference token sightings without source edits or invented full-note certifications
+        run: |
+          python - <<'PY'
+          import json
+          from hashlib import sha256
+          from pathlib import Path
+          root=Path('sources/cleaned/bibles/fr/lsg-1910/editorial')
+          tokens=json.loads((root/'PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json').read_text(encoding='utf-8'))
+          locators=json.loads((root/'PRINTED_1910_PAGE_LOCATORS_2026-11-23.json').read_text(encoding='utf-8'))
+          digital=json.loads((root/'SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json').read_text(encoding='utf-8'))
+          fully=json.loads((root/'PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json').read_text(encoding='utf-8'))
+          digest=sha256(Path('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip').read_bytes()).hexdigest()
+          if (tokens['schema_version']!=1
+              or tokens['original_usfx_zip_sha256']!=digest
+              or tokens['original_printed_scan_sha256']!=locators['original_printed_djvu_sha256']
+              or tokens['original_printed_scan_sha256']!=fully['facsimile']['retrieved_djvu_sha256']
+              or tokens['original_scan_publication_year']!=1910
+              or tokens['status']!='original_printed_1910_individual_reference_tokens_verified_from_native_page_images_not_full_note_transcriptions'
+              or tokens['original_or_cleaned_text_changes_approved']!=0
+              or tokens['printed_token_observations_without_authorized_corrections']!=len(tokens['records'])
+              or tokens['confirmed_individual_printed_reference_token_sightings']!=len(tokens['records'])
+              or len(tokens['records'])>len(locators['records'])):
+              raise SystemExit('Physical print token evidence must remain exact-original and non-approved')
+          preliminary=[r for r in locators['records'] if r.get('preliminary_marginal_target_candidate')]
+          for r in preliminary:
+              candidate=r['preliminary_marginal_target_candidate']
+              if (candidate['status']!='visible_candidate_target_but_printed_note_callout_unconfirmed'
+                  or not candidate['raw_printed_reference_token']
+                  or not candidate['interpreted_target_candidate']
+                  or candidate['counted_as_certified_token'] is not False
+                  or candidate['permission_to_edit_original_text'] is not False
+                  or r['record_id'] in {x['record_id'] for x in tokens['records']}):
+                  raise SystemExit('Uncertain 1910 printed marginal targets must stay separate and non-certified')
+          if tokens.get('uncertified_marginal_target_candidates_separately_in_page_ledger',0)!=len(preliminary):
+              raise SystemExit('Missing or ambiguously classified printed marginal reference candidates')
+          lookup={r['record_id']:r for r in locators['records']}
+          digital_lookup={r['record_id']:r for r in digital['records']}
+          full_ids={r['record_id'] for r in fully['records']}
+          seen=set()
+          for row in tokens['records']:
+              id=row['record_id']
+              loc=lookup.get(id);dig=digital_lookup.get(id)
+              if (not loc or not dig or id in seen or id in full_ids
+                  or row['original_usfm_book']!=loc['original_usfm_book']
+                  or row['source_note_origin']!=loc['source_note_origin']
+                  or row['original_usfx_label']!=loc['original_citation_label']
+                  or row['original_usfx_label']!=dig['original_citation_label']
+                  or row['secondary_digital_label']!=dig['secondary_citation_label']
+                  or row['original_1910_print_page']!=loc['original_1910_djvu_page']
+                  or row['facsimile_page_url']!=loc['printed_page_url']
+                  or row['scope']!='identified_printed_margin_reference_token_not_full_digital_xt_collation'
+                  or row['printed_reference_token_visually_read'] is not True
+                  or row['printed_full_cross_reference_label_matches_eBible'] is not None
+                  or row['editorial_change_authorized'] is not None
+                  or not row['printed_note_callout'] or not row['printed_reference_token_or_local_group']
+                  or not row['interpreted_print_target_token']):
+                  raise SystemExit('Printed token proof is not matched to exact source note and original page')
+              seen.add(id)
+          print('Verified original 1910 printed token-only sightings:',len(seen),
+                '| full exact printed note readings:',len(full_ids),
+                '| still pending complete printed apparatus collation:',54-len(full_ids),
+                '| original authorial changes: 0')
+          PY
+      - name: Build second isolated candidate with one clickable reference per passage
+        run: |
+          SOURCE_HASH=$(python -c 'import json;print(json.load(open("/tmp/lsg-structural-report.json"))["candidate_sha256"])')
+          python scripts/segment_osis_reference_destinations.py \
+            --input /tmp/lsg-structural-candidate.osis.xml \
+            --original-usfx sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip \
+            --crosswalk config/standard_usfm_osis_66.json \
+            --alias-witness config/lsg-1910-printed-book-aliases.json \
+            --expected-input-sha256 "$SOURCE_HASH" \
+            --disambiguated-chapter-commas \
+            --named-single-chapter-refs \
+            --output /tmp/lsg-individual-reference-candidate.osis.xml \
+            --report /tmp/lsg-individual-reference-receipt.json
+      - name: Independently validate source text, XSD and both BRNP reference inventories
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,subprocess,sys
+          folder=Path('/tmp')
+          report=json.loads((folder/'lsg-individual-reference-receipt.json').read_text())
+          before=json.loads((folder/'lsg-structural-report.json').read_text())
+          assert report['original_note_text_and_punctuation_identical']
+          assert report['entire_bible_text_and_verse_order_identical']
+          assert report['source_original_destinations_and_order_identical']
+          assert (report['segmented_destination_labels'] ==
+                  before['multi_target_reference_labels'])
+          assert (report['individual_reference_elements_created'] ==
+                  before['resolved_destination_target_tokens']-
+                  before['resolved_original_destination_labels']+
+                  before['multi_target_reference_labels'])
+          assert (report['new_reference_elements'] ==
+                  before['resolved_destination_target_tokens']-
+                  before['resolved_original_destination_labels'])
+          assert not report.get('unsegmented_escaped_or_complex_source_labels',0)
+          result=subprocess.run([
+              sys.executable,'scripts/check_brnp.py',
+              str(folder/'lsg-individual-reference-candidate.osis.xml'),
+              '--kind','bible','--schema',
+              str(folder/'lsg-reviewed-osis/osisCore.2.1.1-cw-latest.xsd'),
+              '--report',str(folder/'lsg-individual-brnp.json')
+          ],capture_output=True,text=True)
+          if result.returncode not in (0,1):
+              raise SystemExit('OSIS BRNP checker failed: '+result.stderr)
+          ref=json.loads((folder/'lsg-brnp-candidate.json').read_text())
+          split=json.loads((folder/'lsg-individual-brnp.json').read_text())
+          assert split['official_osis']['status']=='validated'
+          assert ref['finding_codes']==split['finding_codes']
+          print('OSIS-valid per-reference candidate',report)
+          PY
+      - name: Produce and validate distinct owner-reviewed editorial candidate
+        run: |
+          python scripts/apply_reviewed_osis_editorial_corrections.py \
+            --input /tmp/lsg-structural-candidate.osis.xml \
+            --plan sources/cleaned/bibles/fr/lsg-1910/editorial/REVIEWED_REFERENCE_AND_INTRO_OVERLAY_2026-11-23.json \
+            --original-usfx sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip \
+            --alias-witness config/lsg-1910-printed-book-aliases.json \
+            --output /tmp/lsg-editorial-reviewed-grouped.osis.xml \
+            --report /tmp/lsg-editorial-reviewed-report.json
+          EDITED_SHA=$(python -c 'import json;print(json.load(open("/tmp/lsg-editorial-reviewed-report.json"))["candidate_sha256"])')
+          python scripts/segment_osis_reference_destinations.py \
+            --input /tmp/lsg-editorial-reviewed-grouped.osis.xml \
+            --original-usfx sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip \
+            --crosswalk config/standard_usfm_osis_66.json \
+            --alias-witness config/lsg-1910-printed-book-aliases.json \
+            --expected-input-sha256 "$EDITED_SHA" \
+            --disambiguated-chapter-commas \
+            --named-single-chapter-refs \
+            --output /tmp/lsg-editorial-reviewed-individual.osis.xml \
+            --report /tmp/lsg-editorial-reviewed-individual-report.json
+          python - <<'PY'
+          from pathlib import Path
+          import json,subprocess,sys
+          from lxml import etree
+          folder=Path('/tmp')
+          overlay=json.loads((folder/'lsg-editorial-reviewed-report.json').read_text())
+          separate=json.loads((folder/'lsg-editorial-reviewed-individual-report.json').read_text())
+          base=json.loads((folder/'lsg-structural-report.json').read_text())
+          if (overlay['edits_executed']!=15
+              or overlay['reference_fragment_edits']!=12
+              or overlay['intro_source_text_corrections']!=1
+              or overlay['intro_structural_link_splits']!=2
+              or overlay['input_sha256']!=base['candidate_sha256']
+              or separate['already_linked_destination_labels']!=9440
+              or separate['segmented_destination_labels']!=4909
+              or separate['original_note_text_and_punctuation_identical'] is not True
+              or separate['entire_bible_text_and_verse_order_identical'] is not True):
+              raise SystemExit('Reviewed editorial candidate/source segmentation regression')
+          candidate=folder/'lsg-editorial-reviewed-individual.osis.xml'
+          result=subprocess.run([sys.executable,'scripts/check_brnp.py',
+                str(candidate),'--kind','bible','--schema',
+                str(folder/'lsg-reviewed-osis/osisCore.2.1.1-cw-latest.xsd'),
+                '--report',str(folder/'lsg-editorial-reviewed-brnp.json')],
+                capture_output=True,text=True)
+          if result.returncode not in (0,1):
+              raise SystemExit('Reviewed editorial candidate XSD/BRNP checker failed: '+result.stderr)
+          checked=json.loads((folder/'lsg-editorial-reviewed-brnp.json').read_text())
+          if checked['official_osis']['status']!='validated':
+              raise SystemExit('Reviewed editorial candidate does not satisfy official OSIS XSD')
+          before=json.loads((folder/'lsg-brnp-candidate.json').read_text())
+          for code, count in checked['finding_codes'].items():
+              if count > before['finding_codes'].get(code, 0):
+                  raise SystemExit('Editorial overlay introduced new structural findings: '+code)
+          ns='{http://www.bibletechnologies.net/2003/OSIS/namespace}'
+          tree=etree.parse(str(candidate))
+          for name,ref,expected in [('Phil','Phil.1.27-Phil.1.30','1:27-30'),
+                ('Titus','Titus.1.1-Titus.1.4','1:1-4'),
+                ('1John','1John.1.1-1John.1.4','1:1-4'),
+                ('1John','John.1.1-John.1.18','Jn 1:1-18')]:
+              links=tree.xpath('//o:div[@type="book" and @osisID=$name]//o:reference[@osisRef=$ref]',
+                               namespaces={'o':ns[1:-1]},name=name,ref=ref)
+              if len(links)!=1 or ''.join(links[0].itertext())!=expected:
+                  raise SystemExit('Missing exact reviewed introductory link '+name+'/'+ref)
+          print('Reviewed isolated edition: 12 original-label corrections, 3 intros, 9440 linked notes, 311 unlinked; XSD and BRNP validated')
+          PY
+      - name: Exhaustively validate every authored target endpoint and introduction link
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from hashlib import sha256
+          from pathlib import Path
+          import json
+          from lxml import etree
+          candidate=Path('/tmp/lsg-editorial-reviewed-individual.osis.xml')
+          original=Path('/tmp/lsg-individual-reference-candidate.osis.xml')
+          parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                         no_network=True,recover=False,huge_tree=False)
+          ns='{http://www.bibletechnologies.net/2003/OSIS/namespace}'
+          current=etree.parse(str(candidate),parser=parser)
+          baseline=etree.parse(str(original),parser=parser)
+          def verses(tree):
+              return {key for verse in tree.iter(ns+'verse')
+                      for key in (verse.get('osisID') or '').split()}
+          verse_keys=verses(current)
+          if verse_keys!=verses(baseline):
+              raise SystemExit('Reviewed editorial overlay changed authored verse identifiers')
+          chapters={key for chapter in current.iter(ns+'chapter')
+                     for key in (chapter.get('osisID') or '').split()}
+          counters=Counter()
+          endpoint_keys=set()
+          missing=[]
+          for ref in current.iter(ns+'reference'):
+              value=ref.get('osisRef')
+              counters['all_reference_elements']+=1
+              if not value:
+                  counters['deliberately_unlinked_reference_elements']+=1
+                  if ref.getparent().tag!=ns+'note':
+                      raise SystemExit('An introduction/anchor was left without a target')
+                  continue
+              counters['linked_reference_elements']+=1
+              if ref.get('subType')=='x-introduction':
+                  counters['linked_introduction_fragments']+=1
+              for token in value.split():
+                  counters['target_tokens']+=1
+                  ends=token.split('-')
+                  if len(ends) not in (1,2):
+                      raise SystemExit('Invalid reference range structure')
+                  if len(ends)==2:
+                      a,b=ends
+                      ac,bc=a.rsplit('.',1),b.rsplit('.',1)
+                      if (a.split('.')[0]!=b.split('.')[0] or
+                          tuple(map(int,a.split('.')[1:]))>
+                          tuple(map(int,b.split('.')[1:]))):
+                          raise SystemExit('Reversed or cross-book original range')
+                      counters['range_tokens']+=1
+                  for endpoint in ends:
+                      counters['target_endpoint_occurrences']+=1
+                      endpoint_keys.add(endpoint)
+                      if endpoint in verse_keys:
+                          counters['attested_verse_endpoints']+=1
+                      elif endpoint in chapters:
+                          counters['attested_chapter_endpoints']+=1
+                      else:
+                          missing.append(endpoint)
+          if missing:
+              raise SystemExit('Source-absent OSIS reference endpoints: '+str(sorted(set(missing))[:10]))
+          if (len(verse_keys)!=31170 or len(chapters)!=1189 or
+              counters['linked_reference_elements']!=29687 or
+              counters['deliberately_unlinked_reference_elements']!=311 or
+              counters['linked_introduction_fragments']!=178 or
+              counters['attested_chapter_endpoints']!=17 or
+              counters['range_tokens']!=179):
+              raise SystemExit('Whole edition target/verse coverage changed unexpectedly')
+          report={
+              'status':'complete_original_source_endpoints_validated_no_missing_keys',
+              'candidate_sha256':sha256(candidate.read_bytes()).hexdigest(),
+              'source_verse_count':len(verse_keys),
+              'chapter_count':len(chapters),
+              'unique_linked_endpoints':len(endpoint_keys),
+              'source_missing_endpoints':0,
+              'source_verse_keys_preserved':True,
+              'not_native_versification_or_publication_approval':True,
+              'counts':dict(counters),
+          }
+          Path('/tmp/lsg-editorial-target-coverage.json').write_text(
+              json.dumps(report,sort_keys=True,indent=2)+'\n',encoding='utf-8')
+          print('All linked original target endpoints exist in the authored OSIS; no missing link key',dict(counters))
+          PY
+      - name: Install native SWORD compiler and independent raw XML reader
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libsword-dev libsword-utils
+          mkdir -p /tmp/lsg-native-witness
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_raw_corpus.cpp \
+            -o /tmp/lsg-native-witness/native-raw -lsword
+          command -v osis2mod
+      - name: Exercise actual libSWORD OSISHTMLHREF passage-link renderer
+        run: |
+          cat >/tmp/lsg-native-witness/osis-reference-html.cpp <<'CPP'
+          #include <sword/osishtmlhref.h>
+          #include <sword/swbuf.h>
+          #include <sword/versekey.h>
+          #include <iostream>
+          #include <string>
+          static int anchors(const std::string& text) {
+              int count=0;
+              const std::string needle="<a href=";
+              for (size_t pos=0;(pos=text.find(needle,pos))!=std::string::npos;
+                   pos+=needle.size()) ++count;
+              return count;
+          }
+          int main() {
+              sword::OSISHTMLHREF html;
+              sword::VerseKey key("Gen.1.1");
+              sword::SWBuf grouped(
+                  "<reference osisRef=\"Gen.1.1 Exod.2.1\">Ge 1:1; Ex 2:1</reference>");
+              sword::SWBuf individual(
+                  "<reference osisRef=\"Gen.1.1\">Ge 1:1</reference>; "
+                  "<reference osisRef=\"Exod.2.1\">Ex 2:1</reference>");
+              if (html.processText(grouped,&key) ||
+                  html.processText(individual,&key)) return 2;
+              std::string one(grouped.c_str()),two(individual.c_str());
+              std::cout << "SWORD grouped HTML anchors: " << anchors(one)
+                        << " | individual HTML anchors: " << anchors(two) << "\n";
+              if (anchors(one)!=1 || anchors(two)!=2) return 3;
+              if (two.find("Gen.1.1")==std::string::npos ||
+                  two.find("Exod.2.1")==std::string::npos) return 4;
+              return 0;
+          }
+          CPP
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            /tmp/lsg-native-witness/osis-reference-html.cpp \
+            -o /tmp/lsg-native-witness/osis-reference-html -lsword
+          /tmp/lsg-native-witness/osis-reference-html
+      - name: Compile original, grouped and individually linked candidates into isolated SWORD engines
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from hashlib import sha256
+          from itertools import zip_longest
+          from pathlib import Path
+          import json, shutil, sys, tempfile
+          from lxml import etree
+          sys.path.insert(0,'scripts')
+          from approved_osis_sword_candidate import (
+              _create_candidate_layout, _compile_osis, _read_native_frames)
+          original=Path('sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml')
+          candidate=Path('/tmp/lsg-structural-candidate.osis.xml')
+          individual=Path('/tmp/lsg-individual-reference-candidate.osis.xml')
+          compiler=Path(shutil.which('osis2mod'))
+          reader=Path('/tmp/lsg-native-witness/native-raw')
+          counters=Counter()
+          mismatches=[]
+          diagnostic={}
+          native_text_difference_examples=[]
+          def node(raw):
+              parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                       no_network=True,recover=False,huge_tree=False)
+              return etree.fromstring(b'<native>'+raw+b'</native>',parser=parser)
+          def without_new_targets(root):
+              removed=Counter()
+              for elem in root.iter():
+                  if not isinstance(elem.tag,str) or etree.QName(elem).localname!='reference':
+                      continue
+                  role=(
+                      'note_origin' if elem.get('type')=='annotateRef' and
+                      elem.get('subType')=='x-origin' else
+                      'introduction' if elem.get('subType')=='x-introduction' else None
+                  )
+                  if not role and elem.get('osisRef') and (
+                          elem.get('type') is None and
+                          elem.get('subType') is None and
+                          elem.getparent() is not None and
+                          isinstance(elem.getparent().tag,str) and
+                          etree.QName(elem.getparent()).localname=='note' and
+                          elem.getparent().get('type')=='crossReference'):
+                      role='printed_destination'
+                  if role and elem.get('osisRef'):
+                      del elem.attrib['osisRef']
+                      removed[role]+=1
+              return removed
+          with tempfile.TemporaryDirectory(prefix='lsg-sword-dual-source-') as directory:
+              folder=Path(directory)
+              instances=[]
+              for label, file, module in [
+                  ('original',original,'LSGRefOriginalResearch'),
+                  ('candidate',candidate,'LSGRefCandidateResearch'),
+                  ('individual',individual,'LSGRefIndividualResearch'),
+              ]:
+                  work=folder/label
+                  work.mkdir()
+                  payload,output=_create_candidate_layout(work,module,'Segond','fr')
+                  diagnostic[label]=_compile_osis(
+                      compiler,file,output,'Segond',work/'compiler.log')
+                  instances.append((module,work/'payload'))
+              a=_read_native_frames(reader,*instances[0])
+              b=_read_native_frames(reader,*instances[1])
+              c=_read_native_frames(reader,*instances[2])
+              def destination_target_sequence(note):
+                  return [target for e in note
+                      if isinstance(e.tag,str) and
+                      etree.QName(e).localname=='reference' and
+                      e.get('type') is None
+                      for target in (e.get('osisRef') or '').split()]
+              def strip_cross_reference_destination_markup(root):
+                  for note in root.iter():
+                      if (not isinstance(note.tag,str) or
+                          etree.QName(note).localname!='note' or
+                          note.get('type')!='crossReference'):
+                          continue
+                      for e in list(note):
+                          if (not isinstance(e.tag,str) or
+                              etree.QName(e).localname!='reference' or
+                              e.get('type') is not None):
+                              continue
+                          at=note.index(e)
+                          combined=(e.text or '')+(e.tail or '')
+                          if at:
+                              previous=note[at-1]
+                              previous.tail=(previous.tail or '')+combined
+                          else:
+                              note.text=(note.text or '')+combined
+                          note.remove(e)
+                  return etree.tostring(root)
+              for left,right,third in zip_longest(a,b,c):
+                  if left is None or right is None or third is None:
+                      raise SystemExit('Native reader entry count differs')
+                  kind, key, original_raw=left
+                  candidate_kind,candidate_key,candidate_raw=right
+                  individual_kind,individual_key,individual_raw=third
+                  if (kind!=candidate_kind or key!=candidate_key or
+                      individual_kind!=kind or individual_key!=key):
+                      raise SystemExit('Native ordered index differs')
+                  counters['native_frames_compared']+=1
+                  if kind=='K':counters['populated_verse_frames_compared']+=1
+                  if candidate_raw==individual_raw:
+                      counters['native_group_and_individual_frames_byte_identical']+=1
+                  else:
+                      grouped=node(candidate_raw)
+                      separated=node(individual_raw)
+                      grouped_notes=[n for n in grouped.iter() if
+                          isinstance(n.tag,str) and etree.QName(n).localname=='note'
+                          and n.get('type')=='crossReference']
+                      separated_notes=[n for n in separated.iter() if
+                          isinstance(n.tag,str) and etree.QName(n).localname=='note'
+                          and n.get('type')=='crossReference']
+                      if len(grouped_notes)!=len(separated_notes):
+                          raise SystemExit('Native cross-reference note cardinality changed')
+                      for first_note,second_note in zip(grouped_notes,separated_notes):
+                          if (dict(first_note.attrib)!=dict(second_note.attrib) or
+                              destination_target_sequence(first_note)!=
+                              destination_target_sequence(second_note)):
+                              raise SystemExit('Native original targets/anchors changed')
+                          counters['native_notes_with_source_equivalent_individual_links']+=1
+                      original_flat=''.join(grouped.itertext())
+                      segmented_flat=''.join(separated.itertext())
+                      if original_flat==segmented_flat:
+                          counters['native_individual_frames_identical_full_text']+=1
+                      else:
+                          counters['native_individual_frames_text_changed']+=1
+                      original_note_flat=[''.join(n.itertext()) for n in grouped_notes]
+                      segmented_note_flat=[''.join(n.itertext()) for n in separated_notes]
+                      if original_note_flat==segmented_note_flat:
+                          counters['native_individual_frames_identical_note_text']+=1
+                      else:
+                          counters['native_individual_frames_note_text_changed']+=1
+                          for p,q in zip(original_note_flat,segmented_note_flat):
+                              if p==q:
+                                  continue
+                              import re
+                              if re.sub(r'\s+','',p)==re.sub(r'\s+','',q):
+                                  counters['native_individual_note_text_whitespace_only_differences']+=1
+                              else:
+                                  counters['native_individual_note_text_material_differences']+=1
+                              if len(native_text_difference_examples)<12:
+                                  index=next((i for i in range(min(len(p),len(q)))
+                                              if p[i]!=q[i]),min(len(p),len(q)))
+                                  native_text_difference_examples.append({
+                                      'key':key,'offset':index,
+                                      'grouped_sample':repr(p[max(index-30,0):index+40]),
+                                      'individual_sample':repr(q[max(index-30,0):index+40]),
+                                  })
+                      if (strip_cross_reference_destination_markup(grouped)!=
+                          strip_cross_reference_destination_markup(separated)):
+                          counters['native_individual_frames_with_unrelated_markup_change']+=1
+                      else:
+                          counters['native_individual_frames_only_reference_markup_changed']+=1
+                  if original_raw==candidate_raw:
+                      counters['raw_frames_byte_identical']+=1
+                      continue
+                  old=node(original_raw)
+                  new=node(candidate_raw)
+                  added=without_new_targets(new)
+                  for name,n in added.items():
+                      counters['compiled_new_'+name+'_attributes']+=n
+                  if etree.tostring(old)!=etree.tostring(new):
+                      counters['native_frames_changed_beyond_allowed_targets']+=1
+                      if len(mismatches)<20:mismatches.append({'kind':kind,'reference':key})
+                  else:
+                      counters['native_frames_with_only_allowed_target_additions']+=1
+          split_receipt=json.loads(Path('/tmp/lsg-individual-reference-receipt.json').read_text())
+          print('Native text difference source-bound samples:',native_text_difference_examples)
+          print('Native individual reference structural diagnostics:',{
+              key:number for key,number in counters.items()
+              if key.startswith('native_individual') or
+              key.startswith('native_notes_with_source')})
+          if (counters['native_individual_frames_text_changed'] or
+              counters['native_individual_frames_note_text_changed'] or
+              counters['native_individual_frames_with_unrelated_markup_change'] or
+              not counters['native_individual_frames_only_reference_markup_changed']):
+              raise SystemExit('Native individually linked candidate changed authorial structure')
+          receipt=json.loads(Path('/tmp/lsg-structural-report.json').read_text())
+          assert counters['compiled_new_note_origin_attributes'] == receipt['original_cross_reference_notes']
+          assert counters['compiled_new_introduction_attributes'] == receipt['resolved_introduction_spans']
+          assert counters['compiled_new_printed_destination_attributes'] == receipt['resolved_original_destination_labels']
+          assert (counters['compiled_new_note_origin_attributes']+
+                  counters['compiled_new_introduction_attributes']+
+                  counters['compiled_new_printed_destination_attributes']==
+                  receipt['candidate_additions'])
+          report={
+              'status':'three_independent_temporary_sword_engines_compared',
+              'original_source_sha256':sha256(original.read_bytes()).hexdigest(),
+              'candidate_source_sha256':sha256(candidate.read_bytes()).hexdigest(),
+              'individual_source_sha256':sha256(individual.read_bytes()).hexdigest(),
+              'compiler':diagnostic,
+              'native_counts':dict(counters),
+              'bounded_mismatches_no_text':mismatches,
+              'originals_or_releases_replaced':False,
+              'native_binaries_retained':False,
+              'visual_reader_navigation_certified':False,
+          }
+          path=Path('/tmp/lsg-native-reference-parity.json')
+          path.write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          print('Native original/grouped/individual frame comparison:',dict(counters))
+          print('Bounded frame keys with unrelated changes:',mismatches)
+          if (counters['native_frames_changed_beyond_allowed_targets'] or
+              not counters['native_frames_compared'] or
+              not counters['populated_verse_frames_compared']):
+              raise SystemExit('Native original/candidate structural parity failed')
+          PY
+      - name: Native readback of separately corrected editorial candidate without publishing
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from hashlib import sha256
+          from itertools import zip_longest
+          from pathlib import Path
+          import json, shutil, tempfile, sys
+          from lxml import etree
+          sys.path.insert(0,'scripts')
+          from approved_osis_sword_candidate import (
+              _create_candidate_layout, _compile_osis, _read_native_frames)
+          before=Path('/tmp/lsg-individual-reference-candidate.osis.xml')
+          after=Path('/tmp/lsg-editorial-reviewed-individual.osis.xml')
+          editorial=json.loads(Path('/tmp/lsg-editorial-reviewed-report.json').read_text())
+          plan=json.loads(Path('sources/cleaned/bibles/fr/lsg-1910/editorial/REVIEWED_REFERENCE_AND_INTRO_OVERLAY_2026-11-23.json').read_text())
+          compiler=Path(shutil.which('osis2mod'))
+          native=Path('/tmp/lsg-native-witness/native-raw')
+          source_p=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                       no_network=True,recover=False,huge_tree=False)
+          def scripture_without_notes(raw):
+              root=etree.fromstring(b'<native>'+raw+b'</native>',parser=source_p)
+              for node in list(root.iter()):
+                  if not isinstance(node.tag,str) or etree.QName(node).localname!='note':
+                      continue
+                  parent=node.getparent()
+                  idx=parent.index(node)
+                  if idx:
+                      prior=parent[idx-1]
+                      prior.tail=(prior.tail or '')+(node.tail or '')
+                  else:
+                      parent.text=(parent.text or '')+(node.tail or '')
+                  parent.remove(node)
+              return ''.join(root.itertext())
+          counts=Counter()
+          source_root=etree.parse(str(after),parser=source_p)
+          baseline_root=etree.parse(str(before),parser=source_p)
+          osis_ns='{http://www.bibletechnologies.net/2003/OSIS/namespace}'
+          def authored_verse_keys(tree):
+              return {key for verse in tree.iter(osis_ns+'verse')
+                      for key in (verse.get('osisID') or '').split()}
+          authored_keys=authored_verse_keys(source_root)
+          if authored_keys!=authored_verse_keys(baseline_root):
+              raise SystemExit('Editorial review changed authorial source keyspace')
+          native_keys=set()
+          seen_markers=set()
+          markers={e['case_id']:e['new_fragment'].encode('utf-8')
+                   for e in plan['edits'] if e['type']=='cross_reference_fragment'}
+          with tempfile.TemporaryDirectory(prefix='lsg-editorially-reviewed-native-') as folder:
+              root=Path(folder)
+              instances=[]
+              compiled={}
+              for label,file,module in [
+                  ('pre_edit',before,'LSGEditBaselineResearch'),
+                  ('reviewed',after,'LSGEditReviewedResearch')]:
+                  working=root/label
+                  working.mkdir()
+                  payload,output=_create_candidate_layout(
+                      working,module,'Segond','fr')
+                  compiled[label]=_compile_osis(
+                      compiler,file,output,'Segond',working/'compiler.log')
+                  instances.append((module,working/'payload'))
+              left=_read_native_frames(native,*instances[0])
+              right=_read_native_frames(native,*instances[1])
+              for x,y in zip_longest(left,right):
+                  if x is None or y is None or x[:2]!=y[:2]:
+                      raise SystemExit('Editorial candidate changed native ordered verse/frame keys')
+                  kind,key,old_raw=x
+                  _kind,_key,new_raw=y
+                  counts['all_native_frames']+=1
+                  if kind=='K':
+                      counts['populated_verse_frames']+=1
+                      if key in native_keys:
+                          raise SystemExit('Duplicate populated native verse address')
+                      native_keys.add(key)
+                      if scripture_without_notes(old_raw)!=scripture_without_notes(new_raw):
+                          raise SystemExit('Unapproved Scripture verse-body change in editorial native edition: '+key)
+                  if old_raw!=new_raw:
+                      counts['frames_with_reviewed_editorial_or_link_changes']+=1
+                  for case_id,fragment in markers.items():
+                      if fragment in new_raw:
+                          seen_markers.add(case_id)
+          if (counts['all_native_frames']!=32426
+              or counts['populated_verse_frames']!=31169
+              or not counts['frames_with_reviewed_editorial_or_link_changes']
+              or seen_markers!=set(markers)):
+              raise SystemExit('Reviewed corrected targets were not all read back from native SWORD')
+          source_without_native=sorted(authored_keys-native_keys)
+          native_without_source=sorted(native_keys-authored_keys)
+          if len(native_keys)!=counts['populated_verse_frames']:
+              raise SystemExit('Native verse key index is not one-to-one')
+          coverage=json.loads(Path('/tmp/lsg-editorial-target-coverage.json').read_text())
+          if coverage['candidate_sha256']!=sha256(after.read_bytes()).hexdigest():
+              raise SystemExit('Target coverage and native source identity disagree')
+          # This verdict is deliberately independent of whether the legacy
+          # stock Segond v11n has a known incompatibility: a green workflow
+          # must not be mistaken for full verse-index release readiness.
+          target_keys={part for ref in source_root.iter(osis_ns+'reference')
+                       for token in (ref.get('osisRef') or '').split()
+                       for part in token.split('-')}
+          target_missing_in_native=sorted((target_keys & authored_keys)-native_keys)
+          native_index_reconciled=not source_without_native and not native_without_source
+          if native_without_source:
+              raise SystemExit('Compiled SWORD invented publisher-absent numbered verse keys')
+          outcome={
+              'status':'two_separate_temporary_engines_same_verse_body_and_keyspace',
+              'editorially_corrected_candidate_sha256':sha256(after.read_bytes()).hexdigest(),
+              'source_baseline_sha256':sha256(before.read_bytes()).hexdigest(),
+              'original_scripture_verse_body_identical':True,
+              'all_twelve_approved_fragments_present_in_native':True,
+              'source_note_callouts_and_book_order_preserved':True,
+              'source_edition_and_published_release_unchanged':True,
+              'editorial_approval_candidate_only':True,
+              'release_approved':False,
+              'native_index_release_ready':native_index_reconciled,
+              'source_native_addressability':{
+                  'authored_source_verse_count':len(authored_keys),
+                  'populated_native_verse_count':len(native_keys),
+                  'missing_source_keys_in_native':source_without_native[:20],
+                  'source_only_count':len(source_without_native),
+                  'unattested_extra_native_keys':native_without_source[:20],
+                  'native_only_count':len(native_without_source),
+                  'existing_link_endpoints_without_native_verse':target_missing_in_native[:20],
+                  'missing_link_endpoint_count':len(target_missing_in_native),
+                  'complete_source_to_native_verse_index':native_index_reconciled,
+              },
+              'counts':dict(counts),
+          }
+          Path('/tmp/lsg-editorial-reviewed-native.json').write_text(
+              json.dumps(outcome,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          print('Reviewed 12 notes and 3 intros: source verse bodies unchanged in separate native engine',dict(counts))
+          print('Independent native-index reconciliation (publication remains blocked when incomplete):',outcome['source_native_addressability'])
+          PY
+      - name: Upload candidate and complete structural provenance receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lsg-structural-reference-candidate-unpublished
+          path: |
+            /tmp/lsg-structural-candidate.osis.xml
+            /tmp/lsg-structural-report.json
+            /tmp/lsg-brnp-before.json
+            /tmp/lsg-brnp-candidate.json
+            /tmp/lsg-native-reference-parity.json
+            /tmp/lsg-citation-grammar-inventory.json
+            /tmp/lsg-individual-reference-candidate.osis.xml
+            /tmp/lsg-individual-reference-receipt.json
+            /tmp/lsg-individual-brnp.json
+            /tmp/lsg-source-citation-triage.json
+            /tmp/lsg-editorial-reviewed-grouped.osis.xml
+            /tmp/lsg-editorial-reviewed-report.json
+            /tmp/lsg-editorial-reviewed-individual.osis.xml
+            /tmp/lsg-editorial-reviewed-individual-report.json
+            /tmp/lsg-editorial-reviewed-brnp.json
+            /tmp/lsg-editorial-reviewed-native.json
+            /tmp/lsg-editorial-target-coverage.json
+          if-no-files-found: warn
+          retention-days: 14

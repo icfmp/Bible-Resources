@@ -17,6 +17,8 @@ The official OSIS schema review now uses the single pinned `fetch_reviewed_schem
 
 For a new resource, begin with the [canonical production pipeline](../docs/PRODUCTION_PIPELINE.md). Do not improvise a second importer or add a script for each individual verse or edition correction.
 
+The maintained `apply_reviewed_osis_editorial_corrections.py` command applies an explicitly owner-approved, source-hash-pinned editorial change ledger to a **separate OSIS candidate**. It refuses source/callout/verse drift, validates every new reference against actual source keys and never overwrites original USFX, approved cleaned masters or released binaries. The LSG source-normalization workflow exercises its strict regression suite and independent native compilation. Candidate editorial approval is distinct from publication approval.
+
 The former MHC and MHCC Modern stock-source reconstruction helpers were retired after their approved OSIS masters were archived under `sources/cleaned/`. The maintained tools validate those masters and their SWORD results; Git history retains the old exploratory code.
 
 ## Changing a script

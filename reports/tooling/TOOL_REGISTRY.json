@@ -5,6 +5,44 @@
       "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
+        "OSIS",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/apply_reviewed_osis_editorial_corrections.py",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
+      "purpose_first_line": "Apply owner-reviewed, source-pinned OSIS reference repairs to a separate candidate.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "hashlib",
+        "json",
+        "lxml",
+        "normalize_bible_references",
+        "os",
+        "pathlib",
+        "tempfile",
+        "xml"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "321f8da81cf295315e2880fcad9b1fed122d77cb2839f05be70b51503e48d36f",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/tool_registry.py",
+        ".github/workflows/lsg-reference-review.yml",
+        "tests/test_apply_reviewed_osis_editorial_corrections.py"
+      ]
+    },
+    {
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
         "zText",
         "OSIS"
       ],
@@ -37,10 +75,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
+        ".github/workflows/lsg-reference-review.yml",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "tests/test_approved_osis_sword_candidate.py",
@@ -271,11 +310,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/normalize_osis.py",
         "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
+        ".github/workflows/lsg-reference-review.yml",
         "docs/PRODUCTION_PIPELINE.md",
         "tests/test_brnp.py"
       ]
@@ -572,10 +612,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
+        ".github/workflows/lsg-reference-review.yml",
         ".github/workflows/osis-schema-review.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
@@ -670,6 +711,49 @@
         "tests/test_editorial_pipeline.py",
         "tests/test_guard_osis.py",
         "tests/test_schema_dependencies.py"
+      ]
+    },
+    {
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "OSIS",
+        "USFM",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/normalize_bible_references.py",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
+      "purpose_first_line": "Build a source-witness-pinned, byte-reversible OSIS reference candidate.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "json",
+        "lxml",
+        "os",
+        "pathlib",
+        "re",
+        "tempfile",
+        "zipfile"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "2fc568e605a9d00978e968cbc87b2023b67dd1739d79d9da11aaeeeba1107eed",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 6,
+      "static_references": [
+        "scripts/apply_reviewed_osis_editorial_corrections.py",
+        "scripts/segment_osis_reference_destinations.py",
+        "scripts/tool_registry.py",
+        ".github/workflows/lsg-reference-review.yml",
+        "tests/test_normalize_bible_references.py",
+        "tests/test_segment_osis_reference_destinations.py"
       ]
     },
     {
@@ -1433,6 +1517,44 @@
       "classification": "KEEP_GENERIC",
       "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/segment_osis_reference_destinations.py",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
+      "purpose_first_line": "Convert complete, source-verified OSIS cross-reference groups to distinct links.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "json",
+        "lxml",
+        "normalize_bible_references",
+        "os",
+        "pathlib",
+        "re",
+        "tempfile"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "f1993759088913125dc0ca3b404671b28a3f7933dcaa4c91c48ac34706c24ed0",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/tool_registry.py",
+        ".github/workflows/lsg-reference-review.yml",
+        "tests/test_segment_osis_reference_destinations.py"
+      ]
+    },
+    {
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
+      "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
@@ -1715,10 +1837,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
+        ".github/workflows/lsg-reference-review.yml",
         ".github/workflows/validate.yml",
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md"
@@ -1832,7 +1955,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "f1604fe6bda727973ec0680fb56da94da563c999262fe0bb418fcd55261558cd",
+      "sha256_at_inventory": "77e06694d645e325238236e763bcadca0e49bc011b09ea07e357fa576c2d2397",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
