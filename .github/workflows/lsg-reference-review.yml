@@ -347,7 +347,7 @@ jobs:
                               if p==q:
                                   continue
                               import re
-                              if re.sub(r'\\s+','',p)==re.sub(r'\\s+','',q):
+                              if re.sub(r'\s+','',p)==re.sub(r'\s+','',q):
                                   counters['native_individual_note_text_whitespace_only_differences']+=1
                               else:
                                   counters['native_individual_note_text_material_differences']+=1
