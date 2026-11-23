@@ -456,7 +456,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-002",
@@ -473,7 +474,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-003",
@@ -490,7 +492,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-004",
@@ -507,7 +510,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-005",
@@ -524,7 +528,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-006",
@@ -541,7 +546,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-007",
@@ -558,7 +564,8 @@
         "target_discrepancy_class": "number",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-008",
@@ -575,7 +582,8 @@
         "target_discrepancy_class": "book",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-009",
@@ -592,7 +600,8 @@
         "target_discrepancy_class": "chapter",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-010",
@@ -609,7 +618,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-011",
@@ -626,7 +636,8 @@
         "target_discrepancy_class": "book",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-012",
@@ -643,7 +654,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-013",
@@ -660,7 +672,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-014",
@@ -677,7 +690,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-015",
@@ -694,7 +708,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-016",
@@ -711,7 +726,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-017",
@@ -728,7 +744,8 @@
         "target_discrepancy_class": "number",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-018",
@@ -745,7 +762,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-019",
@@ -762,7 +780,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-020",
@@ -779,7 +798,8 @@
         "target_discrepancy_class": "chapter_and_group",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-021",
@@ -796,7 +816,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-022",
@@ -813,7 +834,8 @@
         "target_discrepancy_class": "number",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-023",
@@ -830,7 +852,8 @@
         "target_discrepancy_class": "number",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-024",
@@ -847,7 +870,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-025",
@@ -864,7 +888,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-026",
@@ -881,7 +906,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-027",
@@ -898,7 +924,8 @@
         "target_discrepancy_class": "historical_versification",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-028",
@@ -915,7 +942,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-029",
@@ -932,7 +960,8 @@
         "target_discrepancy_class": "book",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-030",
@@ -949,7 +978,8 @@
         "target_discrepancy_class": "book",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-031",
@@ -966,7 +996,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-032",
@@ -983,7 +1014,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-033",
@@ -1000,7 +1032,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-034",
@@ -1017,7 +1050,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-035",
@@ -1034,7 +1068,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-036",
@@ -1051,7 +1086,8 @@
         "target_discrepancy_class": "chapter_and_number",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-037",
@@ -1068,7 +1104,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-038",
@@ -1085,7 +1122,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-039",
@@ -1102,7 +1140,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-040",
@@ -1119,7 +1158,8 @@
         "target_discrepancy_class": "historical_versification",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-041",
@@ -1136,7 +1176,8 @@
         "target_discrepancy_class": "historical_versification",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-042",
@@ -1153,7 +1194,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-043",
@@ -1170,7 +1212,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-044",
@@ -1187,7 +1230,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-045",
@@ -1204,7 +1248,8 @@
         "target_discrepancy_class": "book",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-046",
@@ -1221,7 +1266,8 @@
         "target_discrepancy_class": "apparatus_target_scope",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-047",
@@ -1238,7 +1284,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-048",
@@ -1255,7 +1302,8 @@
         "target_discrepancy_class": "apparatus_numbering_scope",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-049",
@@ -1272,7 +1320,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-050",
@@ -1289,7 +1338,8 @@
         "target_discrepancy_class": "book",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-051",
@@ -1306,7 +1356,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-052",
@@ -1323,7 +1374,8 @@
         "target_discrepancy_class": "book",
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "not_in_29_case_fallback_scope"
       },
       {
         "record_id": "LSG-CR-053",
@@ -1340,7 +1392,8 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       },
       {
         "record_id": "LSG-CR-054",
@@ -1357,8 +1410,59 @@
         "target_discrepancy_class": null,
         "source_original_label_edited": false,
         "editorial_correction_approved": null,
-        "automatic_machine_link_approved": null
+        "automatic_machine_link_approved": null,
+        "follow_up_status": "closed_as_uncertified_print_source_retained_digital_witness"
       }
-    ]
+    ],
+    "provider_fallback_decision": {
+      "status": "owner_accepts_unverified_1910_print_notes_as_original_digital_provider_evidence_without_further_facsimile_search",
+      "decided_on": "2026-11-23",
+      "scope": "29 print-not-certified source notes only",
+      "source_preserved": "original_eBible_USFX_xt_labels",
+      "corroborating_digital_lineage": "54/54 identical xo/xt origin and label matches in public BibleCorps FLS10 USFM; not independent historical print proof",
+      "crosswire_reference_module": "FreSegond1910",
+      "crosswire_reference_module_version": "4.0",
+      "crosswire_reference_notes_available": false,
+      "crosswire_role": "Trusted SWORD interoperability/versioning reference, not a witness certifying these 29 xt citations",
+      "crosswire_module_info_url": "https://ftp.crosswire.org/sword/modules/ModInfo.jsp?modName=FreSegond1910",
+      "crosswire_original_note_absence_evidence_url": "https://www.crosswire.org/pipermail/sword-devel/attachments/20250906/f943b6d8/attachment-0001.htm",
+      "crosswire_redistribution_license": "Copyrighted; Permission to distribute granted to CrossWire",
+      "original_digital_labels_edit_authorized": false,
+      "machine_link_augmentation_authorized": false,
+      "printed_1910_equivalence_asserted": false,
+      "reader_release_approval": false,
+      "stop_rule": "No further 1910 margin work on these 29 absent genuinely new evidence or a source-specific user decision",
+      "affected_case_ids": [
+        "LSG-CR-004",
+        "LSG-CR-005",
+        "LSG-CR-010",
+        "LSG-CR-012",
+        "LSG-CR-013",
+        "LSG-CR-014",
+        "LSG-CR-015",
+        "LSG-CR-016",
+        "LSG-CR-018",
+        "LSG-CR-019",
+        "LSG-CR-021",
+        "LSG-CR-024",
+        "LSG-CR-025",
+        "LSG-CR-026",
+        "LSG-CR-028",
+        "LSG-CR-031",
+        "LSG-CR-032",
+        "LSG-CR-033",
+        "LSG-CR-034",
+        "LSG-CR-035",
+        "LSG-CR-037",
+        "LSG-CR-038",
+        "LSG-CR-039",
+        "LSG-CR-042",
+        "LSG-CR-043",
+        "LSG-CR-049",
+        "LSG-CR-051",
+        "LSG-CR-053",
+        "LSG-CR-054"
+      ]
+    }
   }
 }

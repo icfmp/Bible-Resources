@@ -579,6 +579,28 @@ jobs:
               or final_classes['verified_printed_token_only']!=len(tokens)-19
               or final_classes['print_page_screened_note_not_certified']!=len(expected)-len(tokens)-len(proven)):
               raise SystemExit('Printed target adjudication category counts invalid')
+          fallback=final.get('provider_fallback_decision')
+          if (not isinstance(fallback,dict)
+              or fallback.get('status')!='owner_accepts_unverified_1910_print_notes_as_original_digital_provider_evidence_without_further_facsimile_search'
+              or fallback.get('source_preserved')!='original_eBible_USFX_xt_labels'
+              or fallback.get('crosswire_reference_module')!='FreSegond1910'
+              or fallback.get('crosswire_reference_notes_available') is not False
+              or fallback.get('printed_1910_equivalence_asserted') is not False
+              or fallback.get('original_digital_labels_edit_authorized') is not False
+              or fallback.get('machine_link_augmentation_authorized') is not False
+              or fallback.get('reader_release_approval') is not False):
+              raise SystemExit('Unverified printed-note owner fallback cannot become authorial print certification or a release approval')
+          pending_cases=[r['record_id'] for r in final['records']
+                         if r['disposition']=='print_page_screened_note_not_certified']
+          if (len(pending_cases)!=29
+              or pending_cases!=fallback.get('affected_case_ids')):
+              raise SystemExit('Provider fallback scope must remain the exact 29 uncertified printed-note cases')
+          for r in final['records']:
+              expected_follow_up=('closed_as_uncertified_print_source_retained_digital_witness'
+                  if r['record_id'] in pending_cases else 'not_in_29_case_fallback_scope')
+              if r.get('follow_up_status')!=expected_follow_up:
+                  raise SystemExit('Uncertified printed-note fallback status drift')
+          print('Owner decision: 29 uncertified printed notes retained as original digital source, no invented 1910 proof or CrossWire note endorsement')
           print('All 54 original printed-page citation dispositions verified:',dict(final_classes))
           print('Persistent original-source unaddressable citation ledger verified:',len(current))
           print('Unlinked 1910 source-citation classes:',dict(classes))
