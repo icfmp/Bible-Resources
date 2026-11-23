@@ -246,7 +246,7 @@ class NormalizationTests(unittest.TestCase):
             ("Ge 1:1. Phm v. 1, 9, 13.",
              "Gen.1.1 Phlm.1.1 Phlm.1.9 Phlm.1.13"),
             ("Ab v. 10, 12.", "Obad.1.10 Obad.1.12"),
-            ("2 Jn v. 10.", "2John.1.10"),
+            ("Ge 1:1. 2 Jn v. 10.", "Gen.1.1 2John.1.10"),
         )
         for label, expected in checks:
             with self.subTest(label=label):
@@ -267,9 +267,14 @@ class NormalizationTests(unittest.TestCase):
             named_single_chapter_refs=True)[1])
         # Standalone 'Jud v. 11.' already has a separate verified
         # source-local resolution path; it is not a *new compound* link.
-        self.assertEqual("complete_printed_list", _complete_printed_destinations(
+        self.assertIsNone(_complete_printed_destinations(
             "Jud v. 11.", {"Jud": "Jude"},
-            {"Jude.1.11"}, named_single_chapter_refs=True)[1])
+            {"Jude.1.11"}, named_single_chapter_refs=True)[0])
+        self.assertEqual(
+            _explicit_source_local_reference(
+                "Jud v. 11.", {"Jud": "Jude"}, "1.1",
+                "Jude", {"Jude.1.1", "Jude.1.11"})[0],
+            "Jude.1.11")
 
     def test_named_one_chapter_verse_rejects_unknown_scope_and_any_etc(self):
         aliases = {"Jud": "Jude", "Phm": "Phlm", "Ge": "Gen",

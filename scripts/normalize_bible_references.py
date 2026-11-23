@@ -213,8 +213,10 @@ def _complete_printed_destinations(label: str, aliases: dict | None,
                 return None, "unverified_printed_book_alias", 0
             chapter, verse = int(direct["chapter"]), int(direct["verse"])
             pos = direct.end()
-        elif named_single_chapter_refs and (
-                named := NAMED_ONE_CHAPTER_VERSE.match(label, pos)):
+        elif (named_single_chapter_refs and
+                (named := NAMED_ONE_CHAPTER_VERSE.match(label, pos)) and
+                not (pos == 0 and label.endswith(".") and
+                     named.end() == len(label) - 1)):
             # The book is explicitly printed, but its chapter is omitted.
             # Do not infer chapter 1 from the book name alone: require the
             # *actual source edition* to attest exactly one chapter.
