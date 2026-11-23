@@ -1,0 +1,142 @@
+name: LSG 1910 original-print aligned bulk evidence (one-off; no editorial changes)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/lsg-1910-geometry-audit-once.yml
+permissions:
+  contents: read
+jobs:
+  batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install reviewed XML and printed DjVu readers
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y djvulibre-bin
+          python -m pip install -q rapidfuzz lxml Pillow
+      - uses: actions/cache@v4
+        with:
+          path: /tmp/lsg-print-1910.djvu
+          key: original-facsimile-1910-sha256-67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b
+      - name: Check original 1910 scan fingerprint
+        run: |
+          if [ ! -f /tmp/lsg-print-1910.djvu ]; then
+            curl --retry 3 --fail --location --silent --show-error 'https://upload.wikimedia.org/wikipedia/commons/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu' -o /tmp/lsg-print-1910.djvu
+          fi
+          echo '67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b  /tmp/lsg-print-1910.djvu' | sha256sum --check
+      - name: Recheck and position all 54 source-verse origins against actual printed page and margin
+        run: |
+          mkdir -p /tmp/lsg-geometry
+          python - <<'PY'
+          import re,json,unicodedata,subprocess
+          from pathlib import Path
+          from zipfile import ZipFile
+          from lxml import etree
+          from rapidfuzz import fuzz
+          src=Path('sources/cleaned/bibles/fr/lsg-1910/editorial')
+          ledger=json.loads((src/'PRINTED_1910_PAGE_LOCATORS_2026-11-23.json').read_text())
+          expected_sha='67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b'
+          assert ledger['original_printed_djvu_sha256']==expected_sha
+          def norm(s):
+              s=unicodedata.normalize('NFKD',s.casefold())
+              return ' '.join(re.findall(r'[a-z0-9]+',''.join(ch for ch in s if not unicodedata.combining(ch))))
+          wanted={(r['original_usfm_book'],r['source_note_origin']) for r in ledger['records']}
+          with ZipFile('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip') as z:
+              root=etree.fromstring(z.read('fraLSG_usfx.xml'))
+          verse_texts={}
+          for book in root.iter('book'):
+              chapter=None
+              for node in book.iter():
+                  if node.tag=='c':chapter=node.get('id')
+                  elif node.tag=='v' and chapter:
+                      key=(book.get('id'),chapter+'.'+str(node.get('id')))
+                      if key not in wanted:continue
+                      excerpt=node.tail or ''
+                      sib=node.getnext()
+                      while sib is not None and sib.tag not in ('c','v'):
+                          if sib.tag not in ('x','f'):excerpt+=' '+''.join(sib.itertext())
+                          excerpt+=' '+(sib.tail or '')
+                          sib=sib.getnext()
+                      verse_texts[key]=norm(excerpt)[:220]
+          assert set(verse_texts)==wanted, (len(verse_texts),len(wanted))
+          def page_text(n,detail=''):
+              args=['djvutxt']
+              if detail:args+=['-detail='+detail]
+              args+=['-page='+str(n),'/tmp/lsg-print-1910.djvu']
+              return subprocess.run(args,capture_output=True,check=True).stdout.decode('utf-8','replace')
+          def geometry(detail,query):
+              pat=re.compile(r'\(word\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+"((?:\\.|[^"\\])*)"\)')
+              words=[]
+              for m in pat.finditer(detail):
+                  x0,y0,x1,y1=map(int,m.group(1,2,3,4))
+                  t=m.group(5)
+                  if t:words.append((x0,y0,x1,y1,norm(t)))
+              # Original printed left and right scripture columns; narrow centre is references.
+              sections=[('left',[(a,b,c,d,t) for a,b,c,d,t in words if a<355]),
+                        ('right',[(a,b,c,d,t) for a,b,c,d,t in words if a>445])]
+              winner=(0,None,None,None)
+              if len(query.split())<7:return {'score':0,'column':None,'top':None,'bottom':None,'central_margin_lines':[]}
+              for name,section in sections:
+                  order=sorted(section,key=lambda w:(-(w[3]+w[1])//12,w[0]))
+                  # Preserve original OCR reading order, already organized line by line.
+                  if len(order)<10:continue
+                  for a in range(len(order)-5):
+                      phrase=' '.join(w[4] for w in order[a:a+min(36,len(query.split())+10)])
+                      score=fuzz.partial_ratio(query[:110],phrase)
+                      if score>winner[0]:
+                          group=order[a:a+min(36,len(query.split())+10)]
+                          winner=(score,name,1162-max(w[3] for w in group),1162-min(w[1] for w in group))
+              score,col,top,bottom=winner
+              margin=[(a,b,c,d,t) for a,b,c,d,t in words if 370<=a<=445]
+              # Margin note tokens are kept as suggestive OCR, not literal certified transcription.
+              center=int((top+bottom)/2) if top is not None else 581
+              candidates=sorted(margin,key=lambda w:abs((1162-(w[1]+w[3])/2)-center))[:36]
+              candidates.sort(key=lambda w:(-w[3],w[0]))
+              return {'score':round(score,2),'column':col,'top':top,'bottom':bottom,
+                      'central_margin_tokens_near_verse':[x[4] for x in candidates]}
+          results=[]
+          for row in ledger['records']:
+              key=(row['original_usfm_book'],row['source_note_origin'])
+              snippet=verse_texts[key]
+              estimate=row['original_1910_djvu_page']
+              scores=[]
+              for p in sorted(set(x for x in (estimate-2,estimate-1,estimate,estimate+1,estimate+2) if 1<=x<=1061)):
+                  txt=page_text(p)
+                  score=fuzz.partial_ratio(snippet[:150],norm(txt)) if len(snippet)>24 else 0
+                  scores.append({'page':p,'verse_text_similarity':round(score,2),'print_header':txt.splitlines()[0][:100] if txt.splitlines() else ''})
+              scores.sort(key=lambda x:-x['verse_text_similarity'])
+              best=scores[0]
+              if len(snippet)<25:
+                  best_page=estimate
+                  status='short_verse_requires_manual_page_confirmation'
+              elif best['verse_text_similarity']>=85 and best['verse_text_similarity']>=scores[1]['verse_text_similarity']+3:
+                  best_page=best['page']
+                  status='high_confidence_verse_text_locator_not_reference_certification'
+              else:
+                  best_page=estimate
+                  status='printed_page_requires_manual_verse_confirmation'
+              detail=page_text(best_page,'word')
+              geo=geometry(detail,snippet)
+              record={'record_id':row['record_id'],'book':key[0],'verse':key[1],
+                      'original_source_label':row['original_citation_label'],'original_printed_page_locator':estimate,
+                      'best_ocr_verse_page':best_page,'page_locator_status':status,
+                      'top_candidate_printed_pages':scores[:3],
+                      'geometry':geo,'certified_original_print_marginal_reference':False}
+              results.append(record)
+              print('LSG_PAGE_AND_MARGIN='+json.dumps(record,ensure_ascii=False,separators=(',',':')))
+          assert len(results)==54 and len({r['record_id'] for r in results})==54
+          outfile=Path('/tmp/lsg-geometry/print-geometry-all54.json')
+          outfile.write_text(json.dumps({'schema_version':1,'status':'source_verse_and_margin_geometry_candidates_only',
+              'original_print_djvu_sha256':expected_sha,'no_original_reference_labels_changed':True,
+              'no_editorial_approval_given':True,'records':results},ensure_ascii=False,indent=2)+'\n')
+          print('BULK_1910_PRINT_PAGE_AUDIT',len(results),'corrected_page_estimates',
+             [(r['record_id'],r['original_printed_page_locator'],r['best_ocr_verse_page'])
+                 for r in results if r['best_ocr_verse_page']!=r['original_printed_page_locator']])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lsg-1910-54-verse-and-marginal-geometry-preliminary
+          path: /tmp/lsg-geometry/print-geometry-all54.json
+          retention-days: 7
