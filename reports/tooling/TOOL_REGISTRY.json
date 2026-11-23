@@ -1829,7 +1829,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "e133443c18c6b27b9a6e782f2284f72b450e8d6ae5f0182b0c4490762c176813",
+      "sha256_at_inventory": "f1604fe6bda727973ec0680fb56da94da563c999262fe0bb418fcd55261558cd",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
