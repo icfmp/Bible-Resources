@@ -15,7 +15,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq -y djvulibre-bin
           python -m pip install -q Pillow
-      - name: Pin and render more original 1910 source scan pages 35 96 103
+      - name: Pin and render printed Genesis 35:10 and Genesis 9:4 with source-aligned bands
         run: |
           python - <<'PY'
           from urllib.request import Request,urlopen
@@ -40,7 +40,7 @@ jobs:
           print('1910_ORIGINAL_PRINT_SCAN',uri,'bytes',total,'sha256',h.hexdigest())
           if total < 200000000:
               raise SystemExit('Unexpectedly small original full scan: abort source proof')
-          for page in [35,96,103]:
+          for page in [36,13]:
               tiff=root/f'1910-original-page{page}.tif'
               subprocess.run(['ddjvu','-page='+str(page),'-format=tiff',str(archive),str(tiff)],check=True)
               im=Image.open(tiff).convert('RGB')
