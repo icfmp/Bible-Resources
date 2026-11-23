@@ -71,7 +71,8 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
     chapters_seen = set()
     books_seen = set()
     annotations = 0
-    verse_ids = set()
+    verse_ids = set()  # canonical OSIS IDs, never milestone pairing keys
+    verse_pair_ids = set()
     for element in root.iter():
         if not isinstance(element.tag, str):
             continue
@@ -85,10 +86,24 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
             errors.append({"code": "UNREVIEWED_ELEMENT", "line": line, "element": tag})
         if tag == "div" and element.get("type") == "book":
             book_id = element.get("osisID")
-            if kind == "bible" and (not book_id or book_id in books_seen):
+            if not book_id:
                 errors.append({"code": "BOOK_ID", "line": line})
+            elif book_id in books_seen:
+                # Repeated book containers in commentaries may reflect a
+                # provider's segmentation, but that needs explicit review.
+                errors.append({"code": "BOOK_ID" if kind == "bible"
+                               else "COMMENTARY_REPEATED_BOOK_DIVISION",
+                               "line": line})
             else:
                 books_seen.add(book_id)
+        # The official XSD checks much more; these non-negotiable local
+        # relationships must also hold in a schema-less pilot run.
+        parent = element.getparent()
+        parent_tag = parent.tag if parent is not None else None
+        expected_parent = {"row": "table", "cell": "row", "item": "list"}
+        if tag in expected_parent and parent_tag != NS + expected_parent[tag]:
+            errors.append({"code": "INVALID_STRUCTURAL_PARENT", "line": line,
+                           "element": tag, "expected": expected_parent[tag]})
         if tag == "chapter":
             start, end, identifier = element.get("sID"), element.get("eID"), element.get("osisID")
             if (start and end) or (end and identifier):
@@ -112,13 +127,17 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
             if start and end or (end and identifier):
                 errors.append({"code": "MIXED_VERSE_MILESTONE", "line": line})
             elif start:
-                if not identifier or identifier in verse_ids:
-                    # sID is a unique pairing key; OSIS does not require it
-                    # to equal the canonical osisID. MHC has distinct IDs.
-                    reason = "missing_osisID" if not identifier else "duplicate"
+                if not identifier or identifier in verse_ids or start in verse_pair_ids:
+                    # Canonical osisID and milestone pairing sID have separate
+                    # namespaces and separately enforced uniqueness.
+                    reason = ("missing_osisID" if not identifier else
+                              "duplicate_osisID" if identifier in verse_ids else
+                              "duplicate_sID")
                     errors.append({"code": "VERSE_START_ID", "line": line, "reason": reason})
                 active.append(start)
-                verse_ids.add(start)
+                verse_pair_ids.add(start)
+                if identifier:
+                    verse_ids.add(identifier)
             elif end:
                 if not active or active[-1] != end:
                     errors.append({"code": "VERSE_END_PAIR", "line": line})
@@ -161,6 +180,7 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         "status": "blocked" if errors else "pilot_structural_checks_passed",
         "element_counts": dict(sorted(counts.items())),
         "commentary_entry_count": annotations, "verse_identifier_count": len(verse_ids),
+        "verse_pair_identifier_count": len(verse_pair_ids),
         "book_identifier_count": len(books_seen), "chapter_identifier_count": len(chapters_seen),
         "findings": errors[:100], "finding_count": len(errors),
         "finding_codes": dict(sorted(Counter(e["code"] for e in errors).items())),
