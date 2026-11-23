@@ -8,9 +8,9 @@ pipeline or a current approval.
 
 - [Complete immutable pre-cleanup research and book-introduction snapshot](https://github.com/icfmp/Bible-Resources/tree/f7d5bac17adc0ab43734399f322d95c7532c0bf0/work/mhcc-modern/production)
 - [Immutable original 1,189 modern chapter manuscripts](https://github.com/icfmp/Bible-Resources/tree/c96bebf42d8e0eba62fa961f7f16a00806a50e2c/work/mhcc-modern/production/accepted)
-- [Approved current cleaned OSIS](../../../../sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml)
-- [Current editorial decision summary](../../../../sources/cleaned/commentaries/en/hmcc-modern/editorial/README.md)
-- [Approved module and release proofs](../../../../modules/hmcc-modern/)
+- [Approved current cleaned OSIS](../../../sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml)
+- [Current editorial decision summary](../../../sources/cleaned/commentaries/en/hmcc-modern/editorial/README.md)
+- [Approved module and release proofs](../../../modules/hmcc-modern/)
 - [Tracked owner decisions](OWNER_EDITORIAL_DECISIONS_2026-11-19.json)
 
 The three original source-anomaly records named by the owner decision manifest
