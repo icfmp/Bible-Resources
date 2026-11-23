@@ -1,34 +1,50 @@
-# Bible Resources Normalization Profile (BRNP) — proposal
+# Bible Resources Normalization Profile (BRNP) — working specification v0.1
 
-**Status: deferred to [issue #451](https://github.com/icfmp/Bible-Resources/issues/451). This is an architectural direction, not a normative XML profile or an active release gate.**
+**Status:** implementation under review in [#451](https://github.com/icfmp/Bible-Resources/issues/451). **Not a mandatory publication gate.** This document specifies conventions for reviewed *cleaned* masters, not for immutable source archives. The official OSIS 2.1.1 XSD remains authoritative for XML legality. A BRNP passing result alone never certifies an edition.
 
-## Purpose
+## Authority and fidelity
 
-Use a **shared technical representation** for all *new reviewed cleaned* Bible Resources modules so standard SWORD readers have predictable structure, independently of the upstream provider. Normalize the XML/markup representation of **existing authorial information**, without rewriting its content or making different editions appear identical.
+The governing editorial target is the **identified historical work and edition**, not the digital provider's arbitrary rendering. The provider supplies evidence and provenance, not editorial authority. Retain original upstream bytes separately. Distinguish (a) text and authorial intent, (b) historical edition apparatus and meaningful editorial choices, (c) third-party digital presentation, and (d) converter artifacts. Only (c)/(d) are potential cleanup candidates, with explicit evidence; never assume that a paragraph, punctuation mark, note, verse gap, title, quotation, italic or reference was invented by the digital provider.
 
-The project uses official OSIS 2.1.1 for relevant Bible/commentary masters, official USFM/USFX as source formats where applicable, and standard SWORD/TEI profiles for other supported resource types. BRNP must **not** invent a private XML dialect or bypass the official schema.
+When historical authorial intent or edition evidence is insufficient, mark the case **unresolved**, not silently removed. Preserve verbatim words and punctuation and the reviewed edition's textual variants, intentional omissions, versification, note anchors and semantically meaningful markup. A correction against the historical edition must have an independent witness, explicit before/after review, authorization and an audit trail. A source-to-cleaned comparison is a conversion-integrity check, **not** proof of authorial fidelity.
 
-## Non-negotiable boundaries
+## Canonical representation contracts
 
-- Keep exact words, punctuation, verse references, versification and intentional omissions.
-- Preserve authorial paragraphs, poetry, titles, introductions, commentary section/range coverage, notes, labels, cross-reference targets, lexical links and their positions.
-- Normalize only source-attested equivalent representations, with reversible, source-hash-bound approved transformations.
-- Block unfamiliar or ambiguous standard constructs pending review; do not silently flatten, discard, guess or move them.
-- Require independent checks of official schema validity, source-to-cleaned equivalence, cleaned-to-native SWORD round-trip, and multiple readers.
-- Prefer deterministic and idempotent rules; any canon change or material editorial adaptation is a **separate reviewed edition**, not an automatic normalizer operation.
+These conventions describe *how* to encode a given meaning. They do not require different editions to have the same paragraphs, headings, notes or verse ranges.
 
-## Planned specialization
-
-| Profile | Intended scope | Status |
+| Construct | Common convention | Do not do |
 | --- | --- | --- |
-| Common source-preservation rules | Origin, references, notes, authorial structure, metadata, provenance | Principles accepted; existing policies govern |
-| OSIS Bibles | Book/chapter/verse hierarchy, milestones, paragraphs, poetry, titles, lexical alignment | Detailed choices/testing deferred |
-| OSIS commentaries | Authorial units, `annotateRef` ranges, introductions and navigation | Detailed choices/testing deferred |
-| TEI dictionaries / general books | Format-specific hierarchy and entry semantics | Not specified |
-| Compiled SWORD | Correct driver/configuration, native key/data parity and reader interoperability | Existing production gates remain authoritative |
+| Document | One OSIS namespace `osis` root, one `osisText`, documented work identity and `header` | Mix XML namespaces or fabricate an edition identity |
+| Books | `div type="book"` with unique canonical `osisID`; book order follows approved canon | Merge or invent books |
+| Chapters | `chapter` with precise chapter `osisID`; milestone pairs use matching `sID`/`eID` and correct scope | Mix container and milestone representations for the same chapter or silently rearrange boundaries |
+| Verses | Unique `osisID`; when milestones are needed across paragraphs or other structures, a unique matching `sID`/`eID` pair | Treat an OSIS-valid milestone as text, infer missing verse IDs or force an edition into another versification |
+| Paragraphs | `p` only for evidence-supported paragraph units; milestones when needed to represent overlapping boundaries | Automatically insert paragraphs based on verse count |
+| Poetry | `lg` for evidenced groupings; `l` and `level` when attested, keeping order | Convert poetry to prose or invent stanzas/indentation |
+| Titles | `title` at the documented semantic location and type permitted by the official schema | Promote provider UI headings to authorial headings |
+| Quotes and emphasis | Preserve `q`, `hi`, `transChange`, `divineName` and intended extent | Infer quotation marks, italicization or divine-name conventions |
+| Notes | `note` with original meaningful type and association | Merge, re-anchor or delete content notes merely to simplify layout |
+| References | `reference` with reviewed `osisRef` where the target is independently established; unresolved targets must be reported | Invent a destination or turn plain prose into a guessed link |
+| Lexical alignment | `w` with verifiable lemma/morph associations and exact word extent | Invent Strong/MACULA mappings or split joined words heuristically |
+| Commentary | Dedicated `div` with `annotateType="commentary"` and reviewed `annotateRef`; preserve authored scope and introductions | Duplicate chapter-level commentary across verses in source or fabricate a verse-level scope |
 
-## How the profile becomes mandatory
+OSIS permits more than one representation for certain overlapping structures. BRNP chooses a deterministic representation **only after** equivalence has been proved with positive/negative fixtures and relevant real editions. Unknown, ambiguous or otherwise schema-valid constructs are reported for review, never auto-flattened. No edition-specific hidden exceptions.
 
-[Issue #451](https://github.com/icfmp/Bible-Resources/issues/451) must document exact permitted standard structures and attributes, gold fixtures, edge cases, deterministic normalizer rules, validator behavior, corpus-wide tests on several real Bibles/commentaries, native SWORD and reader evidence, migration impact, and an explicit owner decision before enforcement.
+## Validation is layered
 
-Until then, use the [normalization policy](../policies/NORMALIZATION_POLICY.md), [commentary policy](../policies/COMMENTARY_POLICY.md) and [production contract](../PRODUCTION_PIPELINE.md). **No experimental BRNP pilot should block or certify a publication.**
+1. Pin immutable upstream data, historical edition witnesses, rights and provenance.
+2. Validate **official OSIS 2.1.1 XSD** (pinned at `config/osis-policy.json`) and XML syntax. A document cannot pass BRNP by skipping the schema.
+3. Run the independent, read-only BRNP structural checker. Its currently recovered v0.1 subset checks identity, reviewed element names, verse pairs and commentary annotations; **it does not yet prove all hierarchy, target resolution or semantic conditions in this specification**.
+4. Review source-to-cleaned differences and, separately, historical edition-to-cleaned evidence. Record normalized markup, deleted digital-only artifacts, and every unresolved editorial case.
+5. Check clean-to-native SWORD text, notes, structure and key parity, then multiple readers; document unavoidable renderer differences.
+
+For each stage record input/output SHA-256, schema and checker version, diagnostic paths/locations (without copying copyrighted source prose), exact transformation plan and independent evidence. Failure at any mandatory existing gate blocks release. BRNP-specific enforcement requires acceptance of issue #451 and owner approval.
+
+## Deterministic normalizer requirements
+
+A future write-mode normalizer must (1) write to a separate output, (2) never mutate the original, (3) be idempotent, (4) accept only source-hash-bound reviewed rules, (5) preserve meaningful content and semantics with automated comparison, (6) report every operation and its rationale, (7) block unfamiliar structures instead of guessing, and (8) offer reproducible reversal from the original and declared transformation plan.
+
+**Do not run a normalizer on already released OSIS just because this spec exists.** Existing editions require an impact report and individually approved migration/republication.
+
+## Adoption criteria
+
+Issue #451 remains open until: XSD evidence, a fully specified and independently tested hierarchy validator, synthetic positive and negative fixtures, real-corpus audits of LSG/Darby/MHCC/MHC, source/historical-witness assessment, clean-to-SWORD proof, reader checks, and explicit owner adoption decision. An unexecuted or partial pilot is not certification.
