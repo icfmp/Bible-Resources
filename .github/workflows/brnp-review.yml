@@ -1,0 +1,71 @@
+name: BRNP advisory diagnostics (not publication conformance)
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/check_brnp.py'
+      - 'tests/test_brnp.py'
+      - 'docs/architecture/BRNP.md'
+      - '.github/workflows/brnp-review.yml'
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install reviewed validation dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run positive and negative synthetic fixtures
+        run: python -m unittest discover -s tests -p test_brnp.py -v
+      - name: Retrieve and verify pinned official OSIS schema
+        run: python scripts/fetch_reviewed_schema.py --directory "${RUNNER_TEMP}/reviewed-osis"
+      - name: Read-only real-edition inventory (diagnostic, not release approval)
+        shell: bash
+        run: |
+          mkdir -p "${RUNNER_TEMP}/brnp-reports"
+          paths=(
+            "bible|sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml|lsg"
+            "bible|sources/cleaned/bibles/fr/darby-jnd-2024/bible_jnd_2_0.osis.xml|darby"
+            "commentary|sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml|mhcc"
+            "commentary|sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml|mhc"
+          )
+          echo '## BRNP v0.2-draft inventory (not a certification)' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Edition | Diagnostic exit |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| --- | --- |' >> "$GITHUB_STEP_SUMMARY"
+          for entry in "${paths[@]}"; do
+            IFS='|' read -r kind input label <<< "$entry"
+            set +e
+            python scripts/check_brnp.py "$input" --kind "$kind" --schema "${RUNNER_TEMP}/reviewed-osis/osisCore.2.1.1-cw-latest.xsd" --report "${RUNNER_TEMP}/brnp-reports/$label.json"
+            status=$?
+            set -e
+            echo "| $label | $status |" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$status" -ge 2 ]; then
+              echo "::warning::BRNP pilot could not inspect $label (exit $status)"
+            fi
+          done
+          python - <<'PY'
+          import collections, json, os
+          from pathlib import Path
+          folder = Path(os.environ["RUNNER_TEMP"]) / "brnp-reports"
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+              print("### Full diagnostic category counts", file=summary)
+              for path in sorted(folder.glob("*.json")):
+                  report = json.loads(path.read_text(encoding="utf-8"))
+                  counts = report.get("finding_codes", {})
+                  print(path.stem, report.get("finding_count"), dict(counts), "tags:", report.get("unreviewed_elements", {}), "verse reasons:", report.get("verse_start_reasons", {}), "representative findings:", report.get("finding_examples_by_code", {}))
+                  print(f"- {path.stem}: total {report.get('finding_count', 0)}; categories {dict(counts)}; element tags {report.get('unreviewed_elements', {})}", file=summary)
+          PY
+          echo 'Nonzero finding counts indicate unresolved BRNP draft non-conformance; a green workflow means diagnostics executed, NOT resources passed. The official OSIS schema result is separate. These findings are non-gating until owner approval.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload diagnostics only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brnp-readonly-structural-inventory
+          path: ${{ runner.temp }}/brnp-reports/*.json
+          if-no-files-found: warn
+          retention-days: 30

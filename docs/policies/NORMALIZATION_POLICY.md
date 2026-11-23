@@ -1,6 +1,8 @@
 # Source normalization policy (OSIS-first)
 
-Normalize only the **technical representation** of source-attested structure. The identified edition's words, punctuation, readings, note bodies/anchors, verse mapping, commentary scopes, poetry, paragraphs and editorial meaning are not cosmetic noise.
+Normalize only the **technical representation** of historically verified authorial/edition structure. The governing fidelity target is the **identified work and historical edition**, not a digital provider's formatting decisions or converter artifacts. An upstream digital file is an immutable provenance/input witness and must be preserved as such; it is **not** sufficient evidence that all of its typography and notes belong to the author. Establish an independent historical witness for contested structure, and retain unresolved cases for review rather than guessing.
+
+The identified edition's words, punctuation, readings, meaningful historical notes and anchors, verse mapping, commentary scopes, poetry, paragraphs and editorial meaning are not cosmetic noise. Third-party navigation, branding and objectively digital-only presentation may be removed **only with a documented provenance classification and reversible edit ledger**; do not delete an ambiguous title, note, paragraph or quotation because it looks like a provider artifact.
 
 The [BRNP proposal](../architecture/BRNP.md) records a future shared target profile; implementation and enforcement are deferred to [issue #451](https://github.com/icfmp/Bible-Resources/issues/451). **Do not interpret it as an approved release gate today.**
 

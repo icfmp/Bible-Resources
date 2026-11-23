@@ -41,7 +41,7 @@ CORE = {
 # contracts: native auditors, imported helpers and manual OSIS diagnostics.
 # Retention is not editorial approval and does not prohibit later refactoring.
 REVIEWED_ACTIVE = frozenset({
-    "approved_osis_sword_candidate.py", "audit_osis.py",
+    "approved_osis_sword_candidate.py", "audit_osis.py", "check_brnp.py",
     "catalogue_profiles.py", "check_provider_parity.py", "check_updates.py",
     "fetch_reviewed_schema.py", "osis_semantic_fidelity.py",
     "pilot_subprocess.py", "published_reference_audit.py",

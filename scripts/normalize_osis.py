@@ -28,6 +28,7 @@ from guard_osis import (
     parse_xml, require_regular_file, write_report, ROOT,
 )
 from guard_commentary import inspect_commentary, COMMENTARY_POLICY
+from check_brnp import check as inspect_brnp
 
 NS = "{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 HEX = re.compile(r"^[0-9a-f]{64}$")
@@ -245,10 +246,27 @@ def _group_poetry(root, edit) -> dict:
             "lines": len(nodes)}
 
 
+def brnp_regressions(before: dict, after: dict) -> dict[str, int]:
+    """Reject newly introduced finding classes/counts, not just net totals.
+
+    Advisory BRNP does not certify the source. A reviewed structural edit may
+    remove findings, but may not introduce new violations while hiding them
+    behind a larger number of resolved diagnostics.
+    """
+    previous = before.get("finding_codes", {})
+    current = after.get("finding_codes", {})
+    if not isinstance(previous, dict) or not isinstance(current, dict):
+        raise EditorialError("BRNP diagnostics do not contain code counts")
+    return {code: number - previous.get(code, 0)
+            for code, number in current.items()
+            if type(number) is int and number > previous.get(code, 0)}
+
+
 def apply_plan(source_path: Path, plan_path: Path, output_path: Path,
                *, schema_path: Path, kind: str, osis_policy: Path = ROOT / "config/osis-policy.json",
                commentary_policy: Path = COMMENTARY_POLICY,
-               diff_path: Path | None = None) -> dict:
+               diff_path: Path | None = None,
+               brnp_diagnostic: bool = False) -> dict:
     source_path, plan_path, output_path = (Path(p).absolute()
                                           for p in (source_path, plan_path, output_path))
     if source_path == output_path or source_path.is_symlink() or (
@@ -301,6 +319,10 @@ def apply_plan(source_path: Path, plan_path: Path, output_path: Path,
         else:
             after = validate(candidate, schema_path, osis_policy)
         candidate_doc = parse_xml(candidate, result_bytes, "MALFORMED_XML")
+        if brnp_diagnostic:
+            # Advisory only until #451 is accepted. Never invent an editorial
+            # correction to silence the pilot, and never weaken official XSD.
+            brnp_candidate = inspect_brnp(candidate, kind)
         if _fingerprint(candidate_doc) != (baseline_text, baseline_items):
             raise EditorialError("Serialized output changed semantic content")
 
@@ -336,6 +358,27 @@ def apply_plan(source_path: Path, plan_path: Path, output_path: Path,
         "approved_for_publication": False,
         "real_SWORD_round_trip_passed": False,
     }
+    if brnp_diagnostic:
+        source_brnp = inspect_brnp(source_path, kind)
+        new_findings = brnp_regressions(source_brnp, brnp_candidate)
+        if new_findings:
+            raise EditorialError(
+                "Structural transformation introduced BRNP findings: "
+                + ", ".join(f"{name} +{value}" for name, value in
+                            sorted(new_findings.items()))
+            )
+        report["brnp_diagnostic"] = {
+            "status": "advisory_not_certification",
+            "profile_version": source_brnp["profile_version"],
+            "before_findings": source_brnp["finding_count"],
+            "after_findings": brnp_candidate["finding_count"],
+            "before_codes": source_brnp["finding_codes"],
+            "after_codes": brnp_candidate["finding_codes"],
+            "introduced_findings": new_findings,
+            "after_status": brnp_candidate["status"],
+            "historical_authorial_fidelity_verified": False,
+            "publication_approved": False,
+        }
     if not report["original_source_unchanged"]:
         raise EditorialError("Original source unexpectedly changed")
     # Atomic publication of *local candidate file*, never of a module.
@@ -377,11 +420,14 @@ def main(argv=None) -> int:
     parser.add_argument("--commentary-policy", type=Path, default=COMMENTARY_POLICY)
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--diff", type=Path, help="Private text-bearing unified diff; never upload without rights review")
+    parser.add_argument("--brnp-diagnostic", action="store_true",
+                        help="Record advisory BRNP structural findings; not a publication gate")
     args = parser.parse_args(argv)
     try:
         report = apply_plan(args.source, args.plan, args.output, schema_path=args.schema,
                             kind=args.kind, osis_policy=args.osis_policy,
-                            commentary_policy=args.commentary_policy, diff_path=args.diff)
+                            commentary_policy=args.commentary_policy, diff_path=args.diff,
+                            brnp_diagnostic=args.brnp_diagnostic)
         status = 0
     except (OSError, ValueError, StructureFailure, etree.LxmlError) as exc:
         report = {"status": "blocked", "error": str(exc),

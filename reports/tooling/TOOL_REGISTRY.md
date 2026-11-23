@@ -17,7 +17,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 
 - GENERALIZE: 1
 - HISTORICAL/ARCHIVE: 0
-- KEEP_GENERIC: 48
+- KEEP_GENERIC: 49
 - MERGE: 0
 - MODULE_LOCAL: 0
 - UNDECIDED: 0
@@ -32,16 +32,17 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/build.py`](../../scripts/build.py) | KEEP_GENERIC | not established | 11 | publication/release |
 | [`scripts/catalogue_profiles.py`](../../scripts/catalogue_profiles.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/catalogue_release_coverage.py`](../../scripts/catalogue_release_coverage.py) | KEEP_GENERIC | named test | 8 | publication/release |
+| [`scripts/check_brnp.py`](../../scripts/check_brnp.py) | KEEP_GENERIC | not established | 5 | not determined |
 | [`scripts/check_provider_parity.py`](../../scripts/check_provider_parity.py) | KEEP_GENERIC | not established | 5 | not determined |
 | [`scripts/check_updates.py`](../../scripts/check_updates.py) | KEEP_GENERIC | not established | 9 | not determined |
 | [`scripts/commentary_intake.py`](../../scripts/commentary_intake.py) | KEEP_GENERIC | named test | 6 | intake |
 | [`scripts/commentary_native_inventory.py`](../../scripts/commentary_native_inventory.py) | KEEP_GENERIC | not established | 4 | source/native audit |
 | [`scripts/commentary_native_raw_inventory.py`](../../scripts/commentary_native_raw_inventory.py) | KEEP_GENERIC | named test | 3 | source/native audit |
 | [`scripts/compiled_stock_commentary_proof.py`](../../scripts/compiled_stock_commentary_proof.py) | KEEP_GENERIC | named test | 3 | not determined |
-| [`scripts/fetch_reviewed_schema.py`](../../scripts/fetch_reviewed_schema.py) | KEEP_GENERIC | not established | 5 | not determined |
-| [`scripts/guard_commentary.py`](../../scripts/guard_commentary.py) | KEEP_GENERIC | not established | 6 | not determined |
-| [`scripts/guard_osis.py`](../../scripts/guard_osis.py) | KEEP_GENERIC | named test | 13 | not determined |
-| [`scripts/normalize_osis.py`](../../scripts/normalize_osis.py) | KEEP_GENERIC | not established | 5 | not determined |
+| [`scripts/fetch_reviewed_schema.py`](../../scripts/fetch_reviewed_schema.py) | KEEP_GENERIC | not established | 6 | not determined |
+| [`scripts/guard_commentary.py`](../../scripts/guard_commentary.py) | KEEP_GENERIC | not established | 7 | not determined |
+| [`scripts/guard_osis.py`](../../scripts/guard_osis.py) | KEEP_GENERIC | named test | 14 | not determined |
+| [`scripts/normalize_osis.py`](../../scripts/normalize_osis.py) | KEEP_GENERIC | not established | 7 | not determined |
 | [`scripts/osis_semantic_fidelity.py`](../../scripts/osis_semantic_fidelity.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/pilot_fetch.py`](../../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 6 | not determined |
 | [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | not established | 11 | not determined |
