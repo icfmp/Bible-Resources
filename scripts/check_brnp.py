@@ -249,7 +249,10 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         } if official is not None else {"status": "not_run"}),
         "publication_approved": False,
         "kind": kind, "sha256": sha256(content).hexdigest(),
-        "status": "blocked" if errors else "pilot_structural_checks_passed",
+        "status": ("findings_need_review" if errors else
+                   "draft_subset_no_findings" if official is not None else
+                   "diagnostic_only_schema_not_checked"),
+        "brnp_conformance_certified": False,
         "element_counts": dict(sorted(counts.items())),
         "commentary_entry_count": annotations, "verse_identifier_count": len(verse_ids),
         "verse_pair_identifier_count": len(verse_pair_ids),
