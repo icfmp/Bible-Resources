@@ -1,0 +1,173 @@
+name: LSG 1.0.2 actual Xiphos opening-title GUI QA (no release)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/lsg-1910-real-xiphos-headings.yml'
+      - 'modules/lsg-1910/payload/**'
+      - 'sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  gui:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install real Xiphos GTK and independent SWORD command-line reader
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y xiphos xvfb dbus-x11 xdotool xclip diatheke
+      - name: Verify source-locked SWORD and read Romans 1 and 2 through a real GUI
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from hashlib import sha256
+          from pathlib import Path
+          from collections import Counter
+          import json, os, re, shutil, signal, subprocess, tempfile, time, unicodedata
+          source=Path("sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml")
+          expected_source="2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd"
+          expected_zip="547d5b953c3a3720bf21bed0e48d515e1d9c581dc419bd4b0af5593286180f01"
+          payload=Path("modules/lsg-1910/payload").resolve()
+          out=Path(os.environ["RUNNER_TEMP"])/"lsg-real-xiphos"
+          out.mkdir(mode=0o700)
+          report={"source_sha256":expected_source,"planned_zip_sha256":expected_zip,
+                  "real_xiphos_window":False,"observations":{},
+                  "published":False,"status":"INCONCLUSIVE_NOT_READER_APPROVAL"}
+          if sha256(source.read_bytes()).hexdigest()!=expected_source:
+              raise SystemExit("Wrong original reviewed edition")
+          manifest=json.loads(Path("config/catalogue-import-lsg-1.0.2.json").read_text())
+          plan=json.loads(Path("config/release-plans/lsg-1.0.2.json").read_text())
+          if manifest["release_zip_sha256"]!=plan["package_sha256"] or plan["package_sha256"]!=expected_zip:
+              raise SystemExit("Unreviewed package digest")
+          for name in ("nt.bzs","nt.bzv","nt.bzz","ot.bzs","ot.bzv","ot.bzz"):
+              rel="modules/texts/ztext/brlsg1910/"+name
+              file=payload/rel
+              if not file.is_file() or sha256(file.read_bytes()).hexdigest()!=manifest["files"][rel]:
+                  raise SystemExit("Native SWORD file not attested: "+name)
+          conf=(payload/"mods.d/brlsg1910.conf").read_text()
+          if "Version=1.0.2" not in conf or "GlobalOptionFilter=OSISHeadings" not in conf:
+              raise SystemExit("Incorrect native SWORD configuration")
+          for cmd in ("Xvfb","dbus-run-session","xiphos","xdotool","xclip","diatheke"):
+              if shutil.which(cmd) is None: raise SystemExit("Missing real-reader dependency "+cmd)
+          def run(args,env,timeout=12,check=True):
+              done=subprocess.run(args,env=env,stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE,timeout=timeout)
+              if check and done.returncode:
+                  raise RuntimeError("Reader command unsuccessful: "+args[0]+" "+args[1])
+              if len(done.stdout)>350000: raise RuntimeError("Unbounded reader clipboard")
+              return done.stdout
+          def tokenize(value):
+              value=unicodedata.normalize("NFKD",value.casefold())
+              return re.findall(r"[a-z0-9]+","".join(x for x in value if not unicodedata.combining(x)))
+          def stop(p):
+              if p is not None and p.poll() is None:
+                  os.killpg(p.pid,signal.SIGTERM)
+                  try: p.wait(timeout=5)
+                  except subprocess.TimeoutExpired:
+                      os.killpg(p.pid,signal.SIGKILL); p.wait(timeout=5)
+          def main_window(env):
+              z=run(["xdotool","search","--onlyvisible","--class","[Xx]iphos"],env,check=False)
+              for wid in z.decode("ascii","ignore").splitlines()[::-1]:
+                  if not wid.isdigit():continue
+                  g=run(["xdotool","getwindowgeometry","--shell",wid],env,check=False).decode("ascii","ignore")
+                  d=dict(re.findall(r"^(WIDTH|HEIGHT)=([0-9]+)$",g,re.M))
+                  if int(d.get("WIDTH","0"))>=650 and int(d.get("HEIGHT","0"))>=400:
+                      return wid
+              return None
+          def copy_reader(env,window,x,y):
+              run(["xdotool","windowfocus","--sync",window],env)
+              run(["xdotool","mousemove",str(x),str(y),"click","1"],env)
+              subprocess.run(["xclip","-selection","clipboard","-i"],
+                             input=b"LSG_QA_UNRELATED_CLIPBOARD_SENTINEL",env=env,
+                             stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                             check=True,timeout=8)
+              run(["xdotool","key","--clearmodifiers","ctrl+a"],env)
+              run(["xdotool","key","--clearmodifiers","ctrl+c"],env)
+              time.sleep(0.8)
+              return run(["xclip","-selection","clipboard","-o"],env)
+          def prose_match(copied,native):
+              # Require a ten-word consecutive witness, not a window title or just a heading.
+              copied_words=tokenize(copied)
+              native_words=tokenize(native)
+              if len(copied_words)<30 or len(native_words)<15:return False
+              copied_set={tuple(copied_words[j:j+10]) for j in range(len(copied_words)-9)}
+              return any(tuple(native_words[i:i+10]) in copied_set
+                         for i in range(4,len(native_words)-9))
+          disp=app=None
+          with tempfile.TemporaryDirectory(prefix="isolated-lsg-xiphos-") as home:
+              home=Path(home)
+              for part in ("config","cache","data"):(home/part).mkdir()
+              env=dict(os.environ,HOME=str(home),XDG_CONFIG_HOME=str(home/"config"),
+                       XDG_CACHE_HOME=str(home/"cache"),XDG_DATA_HOME=str(home/"data"),
+                       SWORD_PATH=str(payload),GDK_BACKEND="x11",DISPLAY=":91",
+                       NO_AT_BRIDGE="1",LC_ALL="C.UTF-8")
+              samples=(("Rom.1.1","Rom 1:1","Adresse et salutation"),
+                       ("Rom.2.1","Rom 2:1","Les païens"))
+              try:
+                  native={key:run(["diatheke","-b","BRLSG1910","-f","plain","-k",ref],env)
+                          .decode("utf-8","replace") for key,ref,title in samples}
+                  disp=subprocess.Popen(["Xvfb",":91","-screen","0","1280x800x24","-nolisten","tcp"],
+                                        env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                                        start_new_session=True)
+                  time.sleep(1.5)
+                  if disp.poll() is not None:raise RuntimeError("No virtual X display")
+                  app=subprocess.Popen(["dbus-run-session","--","xiphos"],env=env,
+                                       stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                                       start_new_session=True)
+                  window=None
+                  for _ in range(90):
+                      if app.poll() is not None:raise RuntimeError("Real Xiphos exited")
+                      window=main_window(env)
+                      if window:break
+                      time.sleep(0.5)
+                  if not window:raise RuntimeError("Real Xiphos main reading window not visible")
+                  report["real_xiphos_window"]=True
+                  run(["xdotool","windowsize",window,"1216","736"],env)
+                  run(["xdotool","windowmove",window,"16","16"],env)
+                  time.sleep(1.2)
+                  for key,reference,title in samples:
+                      run(["xdotool","windowfocus","--sync",window],env)
+                      run(["xdotool","key","--clearmodifiers","ctrl+l"],env)
+                      run(["xdotool","type","--clearmodifiers","--delay","25",reference],env)
+                      run(["xdotool","key","Return"],env)
+                      time.sleep(2.5)
+                      record={"navigation_accepted":True,"heading_once":False,
+                              "native_verse_prose_match":False,"clipboard_bytes":0,
+                              "actual_copy_attempts":0}
+                      for x,y in ((535,290),(680,460),(390,550)):
+                          text=copy_reader(env,window,x,y)
+                          text_words=tokenize(text.decode("utf-8","replace"))
+                          title_words=tokenize(title)
+                          count=sum(text_words[i:i+len(title_words)]==title_words
+                                    for i in range(len(text_words)-len(title_words)+1))
+                          record["actual_copy_attempts"]+=1
+                          record["clipboard_bytes"]=len(text)
+                          record["heading_once"]=(count==1)
+                          record["native_verse_prose_match"]=prose_match(
+                              text.decode("utf-8","replace"),native[key])
+                          if record["heading_once"] and record["native_verse_prose_match"]:
+                              break
+                      report["observations"][key]=record
+                      print("Actual GUI title/prose confirmation:",key,json.dumps(record,sort_keys=True))
+                  if not all(v["heading_once"] and v["native_verse_prose_match"]
+                             for v in report["observations"].values()):
+                      raise RuntimeError("GUI clipboard did not confirm both source titles and verse prose")
+                  report["status"]="TWO_REAL_XIPHOS_HEADING_AND_NATIVE_VERSE_GUI_MATCHES"
+              finally:
+                  (out/"evidence.json").write_text(json.dumps(report,sort_keys=True,indent=2)+"\n")
+                  stop(app); stop(disp)
+          print("Actual isolated Xiphos result:",report["status"])
+          PY
+      - name: Retain only bounded metadata; no SWORD module or source text
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lsg-1.0.2-real-xiphos-heading-evidence
+          path: ${{ runner.temp }}/lsg-real-xiphos/evidence.json
+          retention-days: 14
+          if-no-files-found: warn
