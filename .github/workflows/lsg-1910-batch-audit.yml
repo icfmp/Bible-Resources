@@ -41,4 +41,6 @@ jobs:
               ch=next(c for c in book.iter('c') if c.get('id')==str(chapter))
               v=next((x for x in ch.iter('v') if x.get('id')==str(verse)),None)
               print('USFX',bid,chapter,verse,'FOUND',v is not None,'VERSE',repr(''.join(v.itertext())[:350]) if v is not None else '')
+              print('CHAPTER_CONTENT',bid,etree.tostring(ch,encoding='unicode')[:650])
+              print('FIRST_VERSE_ELEMENTS',bid,[(x.tag,x.attrib,repr(x.text or '')[:40],repr(x.tail or '')[:80]) for x in list(ch.iter()) if x.tag in ('v','verse')][:5])
           PY
