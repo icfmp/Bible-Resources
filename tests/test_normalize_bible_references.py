@@ -153,6 +153,8 @@ class NormalizationTests(unittest.TestCase):
         candidate, report = self.apply(aliases=self.aliases())
         self.assertIn(b'<reference osisRef="Gen.1.2">Ge 1:2.</reference>', candidate)
         self.assertEqual(report["resolved_original_destination_labels"], 1)
+        self.assertEqual(report["resolved_destination_target_tokens"], 1)
+        self.assertEqual(report["multi_target_reference_labels"], 0)
         self.assertEqual(report["unlinked_original_destination_labels_preserved"], 0)
         self.assertEqual(report["candidate_additions"], 3)
 
@@ -251,6 +253,8 @@ class NormalizationTests(unittest.TestCase):
                                 original_dest="Ge 1:1, 2; 2:1.")
         candidate, report = self.apply(aliases=self.aliases(), complete_lists=True)
         self.assertEqual(report["resolved_original_destination_labels"], 1)
+        self.assertEqual(report["resolved_destination_target_tokens"], 3)
+        self.assertEqual(report["multi_target_reference_labels"], 1)
         self.assertEqual(report["explicit_semicolon_contexts_used"], 1)
         self.assertEqual(report["candidate_additions"], 3)
         self.assertIn(
