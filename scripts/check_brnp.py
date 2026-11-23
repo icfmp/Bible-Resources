@@ -15,6 +15,8 @@ import sys
 
 from lxml import etree
 
+from guard_osis import StructureFailure, inspect as inspect_official_osis
+
 ROOT = Path(__file__).resolve().parents[1]
 POLICY = ROOT / "config" / "osis-policy.json"
 NS = "{http://www.bibletechnologies.net/2003/OSIS/namespace}"
@@ -22,9 +24,12 @@ MAX_BYTES = 128 * 1024 * 1024
 VERSION = "0.1"
 
 
-def check(path: Path, kind: str) -> dict:
+def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
     if path.is_symlink() or not path.is_file() or path.stat().st_size > MAX_BYTES:
         raise ValueError("input must be a regular XML file at most 128 MiB")
+    # The optional official-XSD check is independent of BRNP's narrower
+    # project profile. A BRNP-only result is never a publication certificate.
+    official = inspect_official_osis(path.absolute(), schema_path.absolute()) if schema_path else None
     content = path.read_bytes()
     policy = json.loads(POLICY.read_text(encoding="utf-8"))
     allowed = set(policy["supported_elements"])
@@ -122,6 +127,12 @@ def check(path: Path, kind: str) -> dict:
         errors.append({"code": "NO_NUMBERED_VERSES"})
     return {
         "profile": "BRNP", "profile_version": VERSION,
+        "official_osis": ({
+            "status": "validated",
+            "schema_sha256": official["schema_sha256"],
+            "source_sha256": official["source_sha256"],
+        } if official is not None else {"status": "not_run"}),
+        "publication_approved": False,
         "kind": kind, "sha256": sha256(content).hexdigest(),
         "status": "blocked" if errors else "pilot_structural_checks_passed",
         "element_counts": dict(sorted(counts.items())),
@@ -129,7 +140,7 @@ def check(path: Path, kind: str) -> dict:
         "book_identifier_count": len(books_seen), "chapter_identifier_count": len(chapters_seen),
         "findings": errors[:100], "finding_count": len(errors),
         "limitations": [
-            "NOT an OSIS XSD check or independent semantic fidelity proof",
+            "Official OSIS XSD is checked only when --schema is supplied; neither route proves historical/authorial fidelity",
             "NOT a complete verse hierarchy, reference target, annotation or reader validation",
             "NOT a production or publication approval gate",
         ],
@@ -141,12 +152,14 @@ def main() -> int:
     parser.add_argument("source", type=Path)
     parser.add_argument("--kind", choices=["bible", "commentary"], required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--schema", type=Path,
+                        help="Run existing pinned official XSD guard before BRNP; required for joint evidence")
     args = parser.parse_args()
     if args.report.resolve() == args.source.resolve():
         parser.error("report must not overwrite original")
     try:
-        result = check(args.source, args.kind)
-    except (ValueError, OSError, etree.XMLSyntaxError, KeyError) as exc:
+        result = check(args.source, args.kind, schema_path=args.schema)
+    except (ValueError, OSError, etree.XMLSyntaxError, StructureFailure, KeyError) as exc:
         print(f"BRNP pilot blocked: {exc}", file=sys.stderr)
         return 2
     args.report.parent.mkdir(parents=True, exist_ok=True)
