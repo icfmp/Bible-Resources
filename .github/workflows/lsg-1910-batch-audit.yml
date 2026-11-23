@@ -97,6 +97,11 @@ jobs:
             'records':results
           },indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
           print('PAGE_LOCATOR_COMPLETE',len(results),'unique_pages',len(set(r['candidate_pages'][0]['page'] for r in results if r['candidate_pages'])))
+          for lo,hi in [(558,568),(579,587),(620,634),(997,1008),(1035,1042)]:
+              for p in range(lo,hi+1):
+                  print('TARGET_CHAPTER_HEADER',p,repr(pages[p-1].splitlines()[:2])[:140])
+          detail=subprocess.run(['djvutxt','-detail=word','-page=29','/tmp/lsg-print-1910.djvu'],capture_output=True,check=True).stdout.decode('utf-8','replace')
+          print('EXAMPLE_GEOMETRIC_TEXT_29',repr(detail[:3800]))
           PY
       - uses: actions/upload-artifact@v4
         with:
