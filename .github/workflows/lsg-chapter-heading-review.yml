@@ -67,9 +67,9 @@ jobs:
           current_sha=sha256(current.read_bytes()).hexdigest()
           if current_sha not in (
               '1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d',
-              'c95c02c40de173b3ccdb396e62e917b96f90b12c8aebc82e1f3c7264c4f26c24'):
+              '2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd'):
               raise SystemExit('Unexpected current master source during staging or after merge')
-          if current_sha == 'c95c02c40de173b3ccdb396e62e917b96f90b12c8aebc82e1f3c7264c4f26c24':
+          if current_sha == '2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd':
               if current.read_bytes() != candidate.read_bytes():
                   raise SystemExit('Staged master differs from exact independently regenerated output')
           parser=etree.XMLParser(resolve_entities=False,load_dtd=False,

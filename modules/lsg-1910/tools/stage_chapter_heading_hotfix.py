@@ -21,7 +21,7 @@ from publish_reviewed_release import approved_release
 from release_preflight import inspect_approved_releases
 
 OLD="1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d"
-NEW="c95c02c40de173b3ccdb396e62e917b96f90b12c8aebc82e1f3c7264c4f26c24"
+NEW="2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd"
 USFX="fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e"
 OLD_ZIP="c7b7471cba433abf99c84c1a6968a7a07a1d1cb5d021ca3bf6fdb86f6f6adf63"
 TAG="lsg-1.0.2"
