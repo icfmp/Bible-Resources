@@ -4,7 +4,6 @@ on:
     paths:
       - '.github/workflows/lsg-rendering-regression.yml'
       - 'modules/lsg-1910/**'
-      - 'scripts/lsg_rendered_note_gate.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -77,7 +76,7 @@ jobs:
             return 0;
           }
           CPP
-          g++ -std=c++17 -O2 /tmp/lsg_render_probe.cpp -o /tmp/lsg_render_probe -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword /tmp/lsg_render_probe.cpp -o /tmp/lsg_render_probe -lsword
           SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg_render_probe BRLSG1910 | tee /tmp/lsg-rendering-probe.log
       - name: Store diagnostic report without publication
         uses: actions/upload-artifact@v4
