@@ -39,9 +39,16 @@ jobs:
           records=json.loads(Path('sources/cleaned/bibles/fr/lsg-1910/editorial/SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json').read_text())['records']
           original=Path('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip')
           with ZipFile(original) as z: doc=etree.fromstring(z.read('fraLSG_usfx.xml'))
-          raw=subprocess.run(['djvutxt','/tmp/lsg-print-1910.djvu'],check=True,capture_output=True).stdout.decode('utf-8','replace')
-          pages=raw.split('\f')
-          if len(pages)!=1061: raise SystemExit('Unexpected printed page inventory')
+          from concurrent.futures import ThreadPoolExecutor
+          # The full-text form-feed stream drifts relative to native image pages.
+          # Obtain each page by its explicit native DjVu index instead.
+          def read_native_page(number):
+              return subprocess.run(['djvutxt','-page='+str(number),'/tmp/lsg-print-1910.djvu'],
+                                    check=True,capture_output=True).stdout.decode('utf-8','replace')
+          with ThreadPoolExecutor(max_workers=12) as executor:
+              pages=list(executor.map(read_native_page,range(1,1062)))
+          if len(pages)!=1061: raise SystemExit('Unexpected native scanned page count')
+          print('NATIVE_PAGE_INDEX_PROVEN',len(pages),'first_ocr',repr(pages[0][:90]))
           def norm(s):
               s=unicodedata.normalize('NFKD',s.casefold())
               s=''.join(c for c in s if not unicodedata.combining(c))
