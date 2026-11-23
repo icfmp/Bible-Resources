@@ -79,7 +79,7 @@ class ApprovedProfileTests(unittest.TestCase):
             self._read()
 
     def test_mismatched_sword_module_and_version_fails(self):
-        self._modify_receipt(lambda x: x.update(module_version="0.1.1"))
+        self._modify_receipt(lambda x: x.update(module_version="0.0.0"))
         with self.assertRaisesRegex(ProfileError, "does not match released module"):
             self._read()
 
@@ -91,7 +91,8 @@ class ApprovedProfileTests(unittest.TestCase):
 
     def test_new_module_version_requires_separately_approved_profile(self):
         """An old original-only edition's approval cannot authorize revised text."""
-        next_edition = dict(self.module, version="0.1.1")
+        major, minor, patch = map(int, self.module["version"].split("."))
+        next_edition = dict(self.module, version=f"{major}.{minor}.{patch + 1}")
         with self.assertRaisesRegex(ProfileError, "does not match released module"):
             self._read(next_edition)
 
