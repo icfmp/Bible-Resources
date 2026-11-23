@@ -1,39 +1,46 @@
-# Louis Segond 1910 — 1.0.0 reviewed release staging (NOT YET PUBLISHED)
+# Louis Segond 1910 — Bible Resources 1.0.0
 
-**Owner direction, 23 November 2026:** prepare **1.0.0**, not 0.1.1. This document records an isolated, reproducible candidate build; it is **not** an approved publication plan, a release tag, or a new cleaned-master approval.
+The owner selected **version 1.0.0** for the consolidated LSG editorial and navigation improvements. This release is derived from the public-domain **eBible fraLSG** transcription of the Louis Segond 1910 and is distributed as a SWORD `zText` module.
 
-## Immutable input / exact source identity
+## Improvements
 
-- Publisher: eBible `fraLSG`; original USFX ZIP SHA-256 `fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e`.
-- Former approved cleaned OSIS SHA-256 `d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0`. It remains unchanged until explicit approved replacement. This former state is also preserved in Git history.
-- Reviewed, source-pinned, individually linked OSIS 1.0.0 **candidate** SHA-256 `1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d`.
-- [PR #543](https://github.com/icfmp/Bible-Resources/pull/543) merged (advisory BRNP subset); [PR #544](https://github.com/icfmp/Bible-Resources/pull/544) merged (reproducible cross-reference correction evidence); [PR #542](https://github.com/icfmp/Bible-Resources/pull/542) closed unmerged (old 0.1.1 display-only proposal superseded).
-- [Tracking issue #545](https://github.com/icfmp/Bible-Resources/issues/545).
+- Added source-attested clickable destinations for **9,440 of 9,751** original eBible parallel-reference notes; **311** deliberately remain visible but non-clickable rather than guessing unsupported destinations.
+- Individually clickable passages where one source note cites multiple biblical passages, without suppressing the original visible source citation wording except for the explicitly approved replacements.
+- Corrected **12 exact electronic reference fragments** where independently recorded printed 1910 marginal callout evidence supports the correction. The whole original digital apparatus is **not** represented as a verbatim transcription of the printed margin.
+- Resolved all three previously ambiguous introduction references: precise link fragments in Philippians and First John (source prose unchanged), and the publisher's **Titus 1:1-40 → Titus 1:1-4** introduction heading typo corrected.
+- Visible module name **Louis Segond 1910** and abbreviation **LSG1910**. Internal SWORD identity **BRLSG1910** remains stable for existing readers.
+- Fresh native `zText` compiled from the reviewed edition: this release does **not** recycle the earlier RawText binary or the canceled 0.1.1 metadata-only proposal.
 
-## Approved reviewed candidate scope
+## Text, editorial provenance and known limitations
 
-- 12 documented electronic reference-fragment substitutions, independently source-checked against historical marginal tokens and constrained to exact source note indices.
-- Philippians and First John: structural links only, exact source prose unchanged. Titus: the electronic intro typo `1:1-40` → `1:1-4` corrected in the separately reviewed candidate.
-- 9,440 of 9,751 original digital notes contain complete source-attested links. The remaining 311 remain visible and unlinked rather than guessed.
-- 29,687 linked reference elements; 29,866 link endpoints, all valid in the **original authoring OSIS source**; original verse content and order unchanged.
-- New candidate SWORD internal ID `BRLSG1910`; display name `Louis Segond 1910`, abbreviation `LSG1910`, `Version=1.0.0`. The workflow compiles **fresh zText** from the edited reviewed OSIS, not the obsolete 0.1.0 RawText data or the never-published 0.1.1 proposal.
+The edited OSIS retains **31,170 source-authored verse IDs across 66 books and 1,189 chapters**. Independent source-versus-native testing verified identical non-whitespace Scripture text for **all 31,169 indexed SWORD verse entries**, and matching note type, callout and non-whitespace note text for **all 9,751 notes**. No biblical wording was edited or supplied by Bible Resources.
 
-## Known SWORD compatibility blocker
+**Marc 10.52–53:** the eBible 1910 source numbers both verses independently, but the stable standard SWORD `Segond` registry ends chapter 10 at verse 52. The original content of 10.53 is **retained in the native Mark 10.52 entry**; readers cannot navigate directly to a separate Mark 10.53 slot. This is a documented, reviewed and reversible indexing compromise, **not** full source-native verse-address parity. The underlying reviewed OSIS preserves the independent source ID.
 
-The exact source has **31,170** verse IDs including `Mark.10.53`. Released stock SWORD `Segond` has **31,169 independently populated verse addresses**; the text of `Mark.10.53` is included under `Mark.10.52`. The source has **no `Job.34.37`** and it must not be invented.
+**Job 34.37:** this verse is absent from the exact eBible source. It was not fabricated or restored for the SWORD registry.
 
-The owner accepts Xiphos as the provisional reader for development. This does **not** establish independent GUI test evidence, full source-native key parity, JSword support or final publication approval. The candidate ZIP is therefore explicitly **not a distribution release**. Final release must state the mismatch clearly or use an independently verified supported versification providing exact source addressability, without changing original authored verse IDs.
+Some notes have open-ended `etc.` or source-ambiguous citations. Their wording is preserved and such citations remain unlinked. The project documents the distinction between the modern digital eBible cross-reference apparatus and the verified reference tokens in the 1910 printed edition. No claim is made of complete page-by-page print equivalence. Typography and navigation behavior may differ among SWORD applications; **Xiphos** is the project owner's accepted provisional reader, not independently GUI-certified for this release.
 
-## Reproducible build and release acceptance
+## Exact reproducible package identity
 
-The dedicated [GitHub Actions preview workflow](../../../../../../../.github/workflows/lsg-v1-reviewed-candidate.yml) executes all already-reviewed independent source transformations, binds the final XML SHA-256, validates the official OSIS schema and real references, compiles a **new** stock-SWORD zText module with `osis2mod`, reads back the entire native index, and produces a deterministic **preview-only** ZIP and its exact source/member hashes. Preview artifacts are temporary, not public assets.
+| Field | Value |
+| --- | --- |
+| Edition | Bible Resources Louis Segond 1910, version **1.0.0** |
+| SWORD technical module | `BRLSG1910` |
+| Visible abbreviation | `LSG1910` |
+| SWORD driver | `zText` |
+| Standard SWORD versification | `Segond` (one documented Mark 10:53 indexed merge) |
+| Original USFX SHA-256 | `fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e` |
+| Reviewed cleaned OSIS SHA-256 | `1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d` |
+| Deterministic ZIP SHA-256 | `cc3b57ab0b61476a77b42fa19004956085d7608a974724c770cc2211adc67499` |
+| Deterministic ZIP size | **4,267,040 bytes** |
+| Versioned tag | `lsg-1.0.0` |
+| Source rights | eBible `fraLSG`, **Public Domain** |
 
-Before creating a real release plan under `config/release-plans/lsg-1.0.0.json`, replacing the approved cleaned master or changing the catalogue: retain the exact generated module source and native compile receipts, independently verify all notes and verse text in the compiled package, reconcile the stock-SWORD versification exception, prepare the new source validation/manifests and published reader profile, obtain owner review and run the complete production publication gates. No package checksum or source validation is to be invented from intent.
+All **seven native package members**, source and compiled text/index metadata are bound to exact per-file hashes in [the 1.0.0 source import manifest](../../../../../../../config/catalogue-import-lsg-1.0.0.json). The [reviewed electronic correction ledger](../REVIEWED_REFERENCE_AND_INTRO_OVERLAY_2026-11-23.json) records the reversible replacements and printed witnesses. Full reference/navigation and native-verse validation are documented in [PR #544](https://github.com/icfmp/Bible-Resources/pull/544) and [release PR #546](https://github.com/icfmp/Bible-Resources/pull/546).
 
-**Release status: NOT YET AUTHORIZED; NO RELEASE TAG, NO PUBLIC MODULE OR CATALOGUE MODIFICATION.**
+## Historical releases and publication controls
 
-## Full reviewed native evidence
+The **0.1.0 historical GitHub release and Pages package remain immutable**; their previously known different fingerprints are retained in [the archived 0.1.0 legacy binding](LSG-0.1.0-LEGACY-BINDING.json). The superseded 0.1.1 proposal was closed without publication.
 
-- Scripture body parity: 31,169/31,169 native entries match the source, including the source-authored Mark.10.53 text in the available Mark.10.52 slot; 9,751/9,751 note contents and callers match.
-- Source SHA-256: 1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d. Released stable SWORD 1.9.0.
-- Publication remains gated on the exact final package, catalogue, and public approval. Source-original USFX is immutable.
+The new release ZIP, OSIS, profile, catalogue snapshot and release plan must pass the official validation and protected GitHub Pages publication workflow. A PR containing these files is **not itself proof that the public 1.0.0 release exists**; public distribution is confirmed only by verifying the exact tagged asset and live HTTPS catalogue after authorized merge.

@@ -1,6 +1,6 @@
 # Louis Segond 1910 — Bible Resources 1.0.0 (release review)
 
-**Not yet published.** New edition based on the complete source-verified candidate SHA-256 1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d. Actual SWORD is a new zText payload.
+This reviewed 1.0.0 edition is built from the complete source-verified OSIS SHA-256 1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d. Actual SWORD is a new zText payload.
 
 - 12 reviewed source-specific electronic reference-fragment repairs and 3 introduction decisions, fully source-proven and reversible.
 - 31,169/31,169 native verse bodies preserve the original Scripture text; 9,751/9,751 native note caller/type/bodies match the revised source.
