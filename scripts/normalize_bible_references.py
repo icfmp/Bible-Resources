@@ -488,7 +488,7 @@ def _source_bindings(cleaned, original, crosswalk: dict,
                 destination_target, status, carried = _complete_printed_destinations(
                     _label(xt), destination_aliases, verse_ids,
                     disambiguated_chapter_commas=disambiguated_chapter_commas)
-                counts["explicit_semicolon_contexts_used"] += carried
+                counts["source_contextual_followups_used"] += carried
             else:
                 destination_target, status = _single_explicit_destination(
                     _label(xt), destination_aliases, verse_ids)
