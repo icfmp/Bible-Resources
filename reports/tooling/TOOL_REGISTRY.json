@@ -242,17 +242,17 @@
       ]
     },
     {
-      "path": "scripts/check_brnp.py",
-      "purpose_first_line": "Read-only structural BRNP v0.1 pilot; not an OSIS XSD or release gate.",
-      "sha256_at_inventory": "13dc7b6947e5080569855bf5320e7c517aab602fd57ea44594e03f9afb70b224",
       "classification": "UNDECIDED",
       "confidence": "low",
-      "proposed_action": "Review source and callers before changing lifecycle.",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS"
       ],
-      "reader_tool_signals": [],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/check_brnp.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Read-only structural BRNP v0.1 pilot; not an OSIS XSD or release gate.",
       "python_imports": [
         "__future__",
         "argparse",
@@ -264,19 +264,19 @@
         "pathlib",
         "sys"
       ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "13dc7b6947e5080569855bf5320e7c517aab602fd57ea44594e03f9afb70b224",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 4,
       "static_references": [
         "scripts/normalize_osis.py",
         ".github/workflows/brnp-review.yml",
         "docs/PRODUCTION_PIPELINE.md",
         "tests/test_brnp.py"
-      ],
-      "static_reference_count": 4,
-      "has_direct_tests_by_filename": false,
-      "stage_hint": "not determined",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "release_approval": "never inferred from inventory",
-      "owner": "Bible Resources maintainers"
+      ]
     },
     {
       "classification": "KEEP_GENERIC",
