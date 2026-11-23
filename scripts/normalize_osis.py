@@ -246,6 +246,22 @@ def _group_poetry(root, edit) -> dict:
             "lines": len(nodes)}
 
 
+def brnp_regressions(before: dict, after: dict) -> dict[str, int]:
+    """Reject newly introduced finding classes/counts, not just net totals.
+
+    Advisory BRNP does not certify the source. A reviewed structural edit may
+    remove findings, but may not introduce new violations while hiding them
+    behind a larger number of resolved diagnostics.
+    """
+    previous = before.get("finding_codes", {})
+    current = after.get("finding_codes", {})
+    if not isinstance(previous, dict) or not isinstance(current, dict):
+        raise EditorialError("BRNP diagnostics do not contain code counts")
+    return {code: number - previous.get(code, 0)
+            for code, number in current.items()
+            if type(number) is int and number > previous.get(code, 0)}
+
+
 def apply_plan(source_path: Path, plan_path: Path, output_path: Path,
                *, schema_path: Path, kind: str, osis_policy: Path = ROOT / "config/osis-policy.json",
                commentary_policy: Path = COMMENTARY_POLICY,
@@ -344,11 +360,21 @@ def apply_plan(source_path: Path, plan_path: Path, output_path: Path,
     }
     if brnp_diagnostic:
         source_brnp = inspect_brnp(source_path, kind)
+        new_findings = brnp_regressions(source_brnp, brnp_candidate)
+        if new_findings:
+            raise EditorialError(
+                "Structural transformation introduced BRNP findings: "
+                + ", ".join(f"{name} +{value}" for name, value in
+                            sorted(new_findings.items()))
+            )
         report["brnp_diagnostic"] = {
             "status": "advisory_not_certification",
             "profile_version": source_brnp["profile_version"],
             "before_findings": source_brnp["finding_count"],
             "after_findings": brnp_candidate["finding_count"],
+            "before_codes": source_brnp["finding_codes"],
+            "after_codes": brnp_candidate["finding_codes"],
+            "introduced_findings": new_findings,
             "after_status": brnp_candidate["status"],
             "historical_authorial_fidelity_verified": False,
             "publication_approved": False,
