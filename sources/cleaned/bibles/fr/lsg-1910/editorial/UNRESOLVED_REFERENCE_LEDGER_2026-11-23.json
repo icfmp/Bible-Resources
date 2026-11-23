@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "unresolved_digital_source_citation_targets_pending_historical_print_collation",
+  "status": "54_unaddressable_source_labels_original_1910_verse_pages_screened_53_full_print_note_equivalences_uncertified",
   "source_original_usfx_zip_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
   "source_cleaned_osis_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
   "normalization_scope": "Only original eBible x/xt note labels whose candidate target references remain unaddressable under the reviewed complete citation and source-disambiguated chapter-comma grammar.",
