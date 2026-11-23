@@ -277,7 +277,9 @@ jobs:
               or print_witness['source_original_usfx_zip_sha256']!=sha256(orig.read_bytes()).hexdigest()
               or print_witness['authored_reference_label_edits_approved']!=0
               or print_witness['automatic_target_link_edits_approved']!=0
-              or print_witness['print_readings_requiring_no_change']!=len(proven)
+              or print_witness['print_readings_requiring_no_change']+print_witness['print_readings_with_original_usfx_discrepancy']!=len(proven)
+              or print_witness['print_readings_requiring_no_change']!=sum(1 for row in proven if row['printed_marginal_note_matches_original_usfx'])
+              or print_witness['print_readings_with_original_usfx_discrepancy']!=sum(1 for row in proven if not row['printed_marginal_note_matches_original_usfx'])
               or len(proof_map)!=len(proven)
               or len(proven)>len(expected)
               or source_scan['edition'].find('1910')<0
@@ -292,8 +294,9 @@ jobs:
                   or witness['original_usfm_book']!=source_record['original_usfm_book']
                   or witness['source_note_origin']!=source_record['source_note_origin']
                   or witness['original_usfx_reference_label']!=source_record['original_citation_label']
-                  or witness['normalized_marginal_citation']!=witness['original_usfx_reference_label']
-                  or witness['printed_marginal_note_matches_original_usfx'] is not True
+                  or not witness['normalized_marginal_citation']
+                  or witness['printed_marginal_note_matches_original_usfx'] is not
+                     (witness['normalized_marginal_citation']==witness['original_usfx_reference_label'])
                   or witness['print_reading_status']!='visually_verified_from_actual_original_1910_page'
                   or witness['original_1910_djvu_page']<1
                   or not witness['page_url'].endswith('/'+str(witness['original_1910_djvu_page']))
