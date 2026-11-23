@@ -1836,7 +1836,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 16,
+      "static_reference_count": 17,
       "static_references": [
         "scripts/build.py",
         "scripts/release_preflight.py",
@@ -1849,6 +1849,7 @@
         "docs/workflows/PUBLISHING.md",
         "tests/test_catalogue_update_contract.py",
         "tests/test_commentary_gate.py",
+        "tests/test_release_preflight.py",
         "tests/test_repository.py",
         "tests/test_reviewed_modern_commentary_rebuild.py",
         "tests/test_source_acquisition_and_schema.py",
