@@ -276,9 +276,9 @@
         "scripts/normalize_osis.py",
         "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
+        ".github/workflows/lsg-reference-review.yml",
         "docs/PRODUCTION_PIPELINE.md",
-        "tests/test_brnp.py",
-        ".github/workflows/lsg-reference-review.yml"
+        "tests/test_brnp.py"
       ]
     },
     {
@@ -577,11 +577,11 @@
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
+        ".github/workflows/lsg-reference-review.yml",
         ".github/workflows/osis-schema-review.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
-        "tests/test_source_acquisition_and_schema.py",
-        ".github/workflows/lsg-reference-review.yml"
+        "tests/test_source_acquisition_and_schema.py"
       ]
     },
     {
