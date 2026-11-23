@@ -1,0 +1,43 @@
+name: LSG 1910 full printed marginal apparatus batch study (unpublished evidence)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/lsg-1910-batch-audit.yml
+permissions:
+  contents: read
+jobs:
+  study:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install DjVu tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y djvulibre-bin
+      - name: Download and check immutable original 1910 printed edition
+        run: |
+          curl --retry 3 -fsSL 'https://upload.wikimedia.org/wikipedia/commons/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu' -o /tmp/lsg-print-1910.djvu
+          echo '67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b  /tmp/lsg-print-1910.djvu' | sha256sum --check
+      - name: Analyze original DjVu text layer for source verse locating
+        run: |
+          python - <<'PY'
+          from zipfile import ZipFile
+          from lxml import etree
+          from pathlib import Path
+          import subprocess,re,unicodedata,json
+          p='/tmp/lsg-print-1910.djvu'
+          raw=subprocess.run(['djvutxt',p],capture_output=True,check=True).stdout.decode('utf-8','replace')
+          pages=raw.split('\f')
+          print('TOTAL_PAGES',len(pages),'TOTAL_CHARS',len(raw))
+          for n in [13,29,36,96,103,300,500,900]:
+              t=pages[n-1]
+              print('PRINTED_PAGE',n,'LENGTH',len(t),'FIRST',repr(t[:450]),'LAST',repr(t[-250:]))
+          with ZipFile('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip') as z:
+              root=etree.fromstring(z.read('fraLSG_usfx.xml'))
+          for bid,chapter,verse in [('GEN',9,4),('GEN',28,12),('GEN',35,10),('LEV',10,18),('REV',20,12)]:
+              book=next(b for b in root.iter('book') if b.get('id')==bid)
+              ch=next(c for c in book.iter('c') if c.get('id')==str(chapter))
+              v=next((x for x in ch.iter('v') if x.get('id')==str(verse)),None)
+              print('USFX',bid,chapter,verse,'FOUND',v is not None,'VERSE',repr(''.join(v.itertext())[:350]) if v is not None else '')
+          PY
