@@ -26,7 +26,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 
 | Script | Classification | Tests | Static callers | Stage hint |
 | --- | --- | --- | ---: | --- |
-| [`scripts/approved_osis_sword_candidate.py`](../../scripts/approved_osis_sword_candidate.py) | KEEP_GENERIC | named test | 6 | not determined |
+| [`scripts/approved_osis_sword_candidate.py`](../../scripts/approved_osis_sword_candidate.py) | KEEP_GENERIC | named test | 7 | not determined |
 | [`scripts/audit_osis.py`](../../scripts/audit_osis.py) | KEEP_GENERIC | not established | 5 | source/native audit |
 | [`scripts/bible_intake.py`](../../scripts/bible_intake.py) | KEEP_GENERIC | named test | 4 | intake |
 | [`scripts/build.py`](../../scripts/build.py) | KEEP_GENERIC | not established | 11 | publication/release |
@@ -71,7 +71,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/sword_native_commentary_raw_corpus.cpp`](../../scripts/sword_native_commentary_raw_corpus.cpp) | KEEP_GENERIC | not established | 2 | not determined |
 | [`scripts/sword_native_index.cpp`](../../scripts/sword_native_index.cpp) | KEEP_GENERIC | not established | 8 | not determined |
 | [`scripts/sword_native_inventory.py`](../../scripts/sword_native_inventory.py) | KEEP_GENERIC | named test | 10 | source/native audit |
-| [`scripts/sword_native_raw_corpus.cpp`](../../scripts/sword_native_raw_corpus.cpp) | KEEP_GENERIC | not established | 5 | not determined |
+| [`scripts/sword_native_raw_corpus.cpp`](../../scripts/sword_native_raw_corpus.cpp) | KEEP_GENERIC | not established | 6 | not determined |
 | [`scripts/sword_native_raw_corpus_inventory.py`](../../scripts/sword_native_raw_corpus_inventory.py) | KEEP_GENERIC | named test | 6 | source/native audit |
 | [`scripts/sword_native_raw_entry.cpp`](../../scripts/sword_native_raw_entry.cpp) | KEEP_GENERIC | not established | 4 | not determined |
 | [`scripts/tool_registry.py`](../../scripts/tool_registry.py) | KEEP_GENERIC | named test | 2 | not determined |
