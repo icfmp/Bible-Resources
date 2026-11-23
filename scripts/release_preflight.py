@@ -68,10 +68,10 @@ def inspect_approved_releases(root: Path, module_ids: tuple[str, ...]) -> dict:
                 archive = checked["package"]
                 evidence_file = checked["evidence"]
             else:
-                # LSG is deliberately a *frozen historical* release binding:
-                # its public Pages ZIP and versioned GitHub asset have
-                # different, independently pinned checksums. Never make up
-                # an active plan or claim the old GitHub ZIP was downloaded.
+                # Frozen historical release bindings are explicitly
+                # source-pinned migration records, not a fallback for new
+                # versions. A historical GitHub ZIP and Pages ZIP may have
+                # distinct, independently verified SHA-256 identities.
                 archive = dist / "sword/packages" / (meta["sword_id"] + ".zip")
                 evidence_file = folder / "SOURCE_VALIDATION.json"
                 if not evidence_file.is_file():
