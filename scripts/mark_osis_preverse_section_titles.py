@@ -108,7 +108,7 @@ def annotate(source: bytes) -> tuple[bytes, dict]:
         "typed_chapter_first_titles": len(revisions),
         "changed_chapters": chapters,
         "sample": source_sample,
-        "only_change": "add type=\"section\" to existing untyped first titles",
+        "only_change": "add type=\"x-section\" to existing untyped first titles",
         "source_bytes_restorable": True,
         "verse_text_note_callouts_reference_targets_and_original_titles_unchanged": True,
         "published": False,
