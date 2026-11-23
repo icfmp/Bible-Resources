@@ -62,6 +62,22 @@ jobs:
               print(f'LSG_1910_ORIGINAL_PAGE_{page}_IMAGE_BEGIN')
               print(base64.b64encode(data).decode('ascii'))
               print(f'LSG_1910_ORIGINAL_PAGE_{page}_IMAGE_END')
+              bands=(
+                  [('upper',.20,.42),('middle',.39,.59)] if page==13
+                  else [('upper',.28,.49),('middle',.46,.65)]
+              )
+              for band,a,z in bands:
+                  region=im.crop((int(w*.24),int(height*a),int(w*.63),int(height*z)))
+                  region=ImageOps.grayscale(region)
+                  region=ImageEnhance.Contrast(region).enhance(1.85)
+                  region=region.resize((region.width*3,region.height*3),Image.Resampling.NEAREST)
+                  f=BytesIO()
+                  region.save(f,format='PNG',optimize=True)
+                  data=f.getvalue()
+                  (root/f'1910-original-page{page}-{band}-with-note-callouts.png').write_bytes(data)
+                  print(f'LSG_1910_PAGE_{page}_{band.upper()}_IMAGE_BEGIN')
+                  print(base64.b64encode(data).decode('ascii'))
+                  print(f'LSG_1910_PAGE_{page}_{band.upper()}_IMAGE_END')
               tiff.unlink(missing_ok=True)
           archive.unlink(missing_ok=True)
           PY
