@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "status": "independent_original_1910_printed_margin_visual_collation_without_editorial_changes",
+  "source_original_usfx_zip_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+  "facsimile": {
+    "edition": "La Sainte Bible, nouvelle edition revue avec paralleles, Paris, 1910",
+    "source_file_url": "https://commons.wikimedia.org/wiki/File:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu",
+    "retrieved_djvu_url": "https://upload.wikimedia.org/wikipedia/commons/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu",
+    "retrieved_djvu_bytes": 292950257,
+    "retrieved_djvu_sha256": "67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b",
+    "checked_scan_page_pixel_dimensions": [
+      821,
+      1162
+    ],
+    "extraction_run": "https://github.com/icfmp/Bible-Resources/actions/runs/45150806613",
+    "extraction_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/45150806613/artifacts/14806870281",
+    "extraction_is_non_authoritative": "Digitally cropped/contrast-adjusted image aids reading; authoritative witness remains the unmodified original printed page."
+  },
+  "print_readings_requiring_no_change": 1,
+  "authored_reference_label_edits_approved": 0,
+  "automatic_target_link_edits_approved": 0,
+  "records": [
+    {
+      "record_id": "LSG-CR-002",
+      "original_usfm_book": "GEN",
+      "source_note_origin": "28.12",
+      "original_usfx_reference_label": "Jn 1:52.",
+      "secondary_digital_reference_label": "Jn 1:51.",
+      "original_1910_djvu_page": 29,
+      "page_url": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/29",
+      "visually_read_marginal_citation": "Jn. 1. 52.",
+      "normalized_marginal_citation": "Jn 1:52.",
+      "source_note_context": "Genesis 28:12, Jacob's ladder; the marginal reference label is visible beside the episode in the 1910 printed source.",
+      "printed_marginal_note_matches_original_usfx": true,
+      "printed_marginal_note_matches_secondary_digital": false,
+      "print_reading_status": "visually_verified_from_actual_original_1910_page",
+      "addressability_status": "no_authorial_John_1_52_verse_in_this_source",
+      "interpretation": "original_printed_reference_not_a_digital_only_typographical_error",
+      "authorized_change": null
+    }
+  ]
+}
