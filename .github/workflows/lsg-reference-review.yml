@@ -37,13 +37,18 @@ jobs:
                   if 'usfx' in filename:
                       xml_candidates=[n for n in members if n.lower().endswith(('.xml','.usfx'))]
                       print('USFX XML candidates',[(n,archive.getinfo(n).file_size) for n in xml_candidates[:10]])
-                      for n in xml_candidates[:2]:
+                      for n in ['fraLSG_usfx.xml']:
                           data=archive.read(n)
                           parser=etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True)
                           root=etree.fromstring(data,parser=parser)
                           tags=Counter(etree.QName(e).localname for e in root.iter() if isinstance(e.tag,str))
                           print('USFX root, tag counts',etree.QName(root).localname,tags.most_common(25))
-                          for tag in ('x','xo','xt','ref','note','book','para','p','t','ex','f'):
+                          print('USFX package source first',etree.QName(root).localname)
+                          print('USFX xref parent chains',Counter(
+                              tuple(etree.QName(z).localname for z in list(e.iterancestors())[:3])
+                              for e in root.iter() if isinstance(e.tag,str) and
+                              etree.QName(e).localname=='xt').most_common(8))
+                          for tag in ('x','xo','xt','ref','note','book','para','p','t','ex','f','it','ca','w'):
                               xs=[e for e in root.iter() if isinstance(e.tag,str) and etree.QName(e).localname==tag]
                               print('USFX',tag,'count',len(xs),'attributes',Counter(tuple(sorted(e.attrib)) for e in xs).most_common(6))
                               for e in xs[:3]:
