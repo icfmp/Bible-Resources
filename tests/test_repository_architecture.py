@@ -9,6 +9,7 @@ import json
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -163,7 +164,22 @@ class RepositoryArchitectureGuardrails(unittest.TestCase):
 
     def test_reject_missing_active_config_and_untracked_workflow_inputs(self):
         with self.subTest("missing config"):
-            self.assertTrue(self.configuration_errors_on_synthetic())
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                file = root / "config/active.json"
+                file.parent.mkdir()
+                file.write_text(
+                    json.dumps({"source_decisions": "config/missing.json"}),
+                    encoding="utf-8",
+                )
+                errors = configuration_errors(root, {"config/active.json"})
+                self.assertEqual(len(errors), 1)
+                self.assertIn("Missing or unsafe", errors[0])
+                file.write_text("{not json", encoding="utf-8")
+                self.assertIn(
+                    "Malformed", configuration_errors(
+                        root, {"config/active.json"})[0]
+                )
         refs = workflow_reference_errors(
             {".github/workflows/sample.yml": (
                 "on:\n  pull_request:\n    paths:\n"
@@ -179,16 +195,6 @@ class RepositoryArchitectureGuardrails(unittest.TestCase):
              "paths:\n  - 'config/release-plans/*.json'\n"},
             {".github/workflows/sample.yml"},
         ))
-
-    @staticmethod
-    def configuration_errors_on_synthetic():
-        # No filesystem fixture is necessary to test the missing-path
-        # contract: compare a real valid configuration against a reduced
-        # tracked-path view.
-        return configuration_errors(ROOT, {
-            "config/commentary-rebuilds/hmcc-modern.json",
-        })
-
 
 if __name__ == "__main__":
     unittest.main()
