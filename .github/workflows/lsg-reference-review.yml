@@ -211,7 +211,7 @@ jobs:
             scripts/sword_native_raw_corpus.cpp \
             -o /tmp/lsg-native-witness/native-raw -lsword
           command -v osis2mod
-      - name: Compile original and normalized source into isolated temporary SWORD engines
+      - name: Compile original, grouped and individually linked candidates into isolated SWORD engines
         run: |
           python - <<'PY'
           from collections import Counter
@@ -225,6 +225,7 @@ jobs:
               _create_candidate_layout, _compile_osis, _read_native_frames)
           original=Path('sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml')
           candidate=Path('/tmp/lsg-structural-candidate.osis.xml')
+          individual=Path('/tmp/lsg-individual-reference-candidate.osis.xml')
           compiler=Path(shutil.which('osis2mod'))
           reader=Path('/tmp/lsg-native-witness/native-raw')
           counters=Counter()
@@ -262,6 +263,7 @@ jobs:
               for label, file, module in [
                   ('original',original,'LSGRefOriginalResearch'),
                   ('candidate',candidate,'LSGRefCandidateResearch'),
+                  ('individual',individual,'LSGRefIndividualResearch'),
               ]:
                   work=folder/label
                   work.mkdir()
@@ -271,15 +273,68 @@ jobs:
                   instances.append((module,work/'payload'))
               a=_read_native_frames(reader,*instances[0])
               b=_read_native_frames(reader,*instances[1])
-              for left,right in zip_longest(a,b):
-                  if left is None or right is None:
+              c=_read_native_frames(reader,*instances[2])
+              def destination_target_sequence(note):
+                  return [target for e in note
+                      if isinstance(e.tag,str) and
+                      etree.QName(e).localname=='reference' and
+                      e.get('type') is None
+                      for target in (e.get('osisRef') or '').split()]
+              def strip_cross_reference_destination_markup(root):
+                  for note in root.iter():
+                      if (not isinstance(note.tag,str) or
+                          etree.QName(note).localname!='note' or
+                          note.get('type')!='crossReference'):
+                          continue
+                      for e in list(note):
+                          if (not isinstance(e.tag,str) or
+                              etree.QName(e).localname!='reference' or
+                              e.get('type') is not None):
+                              continue
+                          at=note.index(e)
+                          combined=(e.text or '')+(e.tail or '')
+                          if at:
+                              previous=note[at-1]
+                              previous.tail=(previous.tail or '')+combined
+                          else:
+                              note.text=(note.text or '')+combined
+                          note.remove(e)
+                  return etree.tostring(root)
+              for left,right,third in zip_longest(a,b,c):
+                  if left is None or right is None or third is None:
                       raise SystemExit('Native reader entry count differs')
                   kind, key, original_raw=left
                   candidate_kind,candidate_key,candidate_raw=right
-                  if kind!=candidate_kind or key!=candidate_key:
+                  individual_kind,individual_key,individual_raw=third
+                  if (kind!=candidate_kind or key!=candidate_key or
+                      individual_kind!=kind or individual_key!=key):
                       raise SystemExit('Native ordered index differs')
                   counters['native_frames_compared']+=1
                   if kind=='K':counters['populated_verse_frames_compared']+=1
+                  if candidate_raw==individual_raw:
+                      counters['native_group_and_individual_frames_byte_identical']+=1
+                  else:
+                      grouped=node(candidate_raw)
+                      separated=node(individual_raw)
+                      grouped_notes=[n for n in grouped.iter() if
+                          isinstance(n.tag,str) and etree.QName(n).localname=='note'
+                          and n.get('type')=='crossReference']
+                      separated_notes=[n for n in separated.iter() if
+                          isinstance(n.tag,str) and etree.QName(n).localname=='note'
+                          and n.get('type')=='crossReference']
+                      if len(grouped_notes)!=len(separated_notes):
+                          raise SystemExit('Native cross-reference note cardinality changed')
+                      for first_note,second_note in zip(grouped_notes,separated_notes):
+                          if (dict(first_note.attrib)!=dict(second_note.attrib) or
+                              destination_target_sequence(first_note)!=
+                              destination_target_sequence(second_note)):
+                              raise SystemExit('Native original targets/anchors changed')
+                          counters['native_notes_with_source_equivalent_individual_links']+=1
+                      if (strip_cross_reference_destination_markup(grouped)!=
+                          strip_cross_reference_destination_markup(separated)):
+                          counters['native_individual_frames_with_unrelated_markup_change']+=1
+                      else:
+                          counters['native_individual_frames_only_reference_markup_changed']+=1
                   if original_raw==candidate_raw:
                       counters['raw_frames_byte_identical']+=1
                       continue
@@ -293,6 +348,10 @@ jobs:
                       if len(mismatches)<20:mismatches.append({'kind':kind,'reference':key})
                   else:
                       counters['native_frames_with_only_allowed_target_additions']+=1
+          split_receipt=json.loads(Path('/tmp/lsg-individual-reference-receipt.json').read_text())
+          if (counters['native_individual_frames_with_unrelated_markup_change'] or
+              not counters['native_individual_frames_only_reference_markup_changed']):
+              raise SystemExit('Native individually linked candidate changed authorial structure')
           receipt=json.loads(Path('/tmp/lsg-structural-report.json').read_text())
           assert counters['compiled_new_note_origin_attributes'] == receipt['original_cross_reference_notes']
           assert counters['compiled_new_introduction_attributes'] == receipt['resolved_introduction_spans']
@@ -302,9 +361,10 @@ jobs:
                   counters['compiled_new_printed_destination_attributes']==
                   receipt['candidate_additions'])
           report={
-              'status':'two_independent_temporary_sword_engines_compared',
+              'status':'three_independent_temporary_sword_engines_compared',
               'original_source_sha256':sha256(original.read_bytes()).hexdigest(),
               'candidate_source_sha256':sha256(candidate.read_bytes()).hexdigest(),
+              'individual_source_sha256':sha256(individual.read_bytes()).hexdigest(),
               'compiler':diagnostic,
               'native_counts':dict(counters),
               'bounded_mismatches_no_text':mismatches,
@@ -314,7 +374,7 @@ jobs:
           }
           path=Path('/tmp/lsg-native-reference-parity.json')
           path.write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
-          print('Native original/candidate frame comparison:',dict(counters))
+          print('Native original/grouped/individual frame comparison:',dict(counters))
           print('Bounded frame keys with unrelated changes:',mismatches)
           if (counters['native_frames_changed_beyond_allowed_targets'] or
               not counters['native_frames_compared'] or
