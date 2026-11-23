@@ -26,24 +26,24 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 
 | Script | Classification | Tests | Static callers | Stage hint |
 | --- | --- | --- | ---: | --- |
-| [`scripts/apply_reviewed_osis_editorial_corrections.py`](../../scripts/apply_reviewed_osis_editorial_corrections.py) | KEEP_GENERIC | named test | 3 | not determined |
-| [`scripts/approved_osis_sword_candidate.py`](../../scripts/approved_osis_sword_candidate.py) | KEEP_GENERIC | named test | 7 | not determined |
+| [`scripts/apply_reviewed_osis_editorial_corrections.py`](../../scripts/apply_reviewed_osis_editorial_corrections.py) | KEEP_GENERIC | named test | 4 | not determined |
+| [`scripts/approved_osis_sword_candidate.py`](../../scripts/approved_osis_sword_candidate.py) | KEEP_GENERIC | named test | 8 | not determined |
 | [`scripts/audit_osis.py`](../../scripts/audit_osis.py) | KEEP_GENERIC | not established | 5 | source/native audit |
 | [`scripts/bible_intake.py`](../../scripts/bible_intake.py) | KEEP_GENERIC | named test | 4 | intake |
 | [`scripts/build.py`](../../scripts/build.py) | KEEP_GENERIC | not established | 11 | publication/release |
 | [`scripts/catalogue_profiles.py`](../../scripts/catalogue_profiles.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/catalogue_release_coverage.py`](../../scripts/catalogue_release_coverage.py) | KEEP_GENERIC | named test | 8 | publication/release |
-| [`scripts/check_brnp.py`](../../scripts/check_brnp.py) | KEEP_GENERIC | not established | 6 | not determined |
+| [`scripts/check_brnp.py`](../../scripts/check_brnp.py) | KEEP_GENERIC | not established | 7 | not determined |
 | [`scripts/check_provider_parity.py`](../../scripts/check_provider_parity.py) | KEEP_GENERIC | not established | 5 | not determined |
 | [`scripts/check_updates.py`](../../scripts/check_updates.py) | KEEP_GENERIC | not established | 9 | not determined |
 | [`scripts/commentary_intake.py`](../../scripts/commentary_intake.py) | KEEP_GENERIC | named test | 6 | intake |
 | [`scripts/commentary_native_inventory.py`](../../scripts/commentary_native_inventory.py) | KEEP_GENERIC | not established | 4 | source/native audit |
 | [`scripts/commentary_native_raw_inventory.py`](../../scripts/commentary_native_raw_inventory.py) | KEEP_GENERIC | named test | 3 | source/native audit |
 | [`scripts/compiled_stock_commentary_proof.py`](../../scripts/compiled_stock_commentary_proof.py) | KEEP_GENERIC | named test | 3 | not determined |
-| [`scripts/fetch_reviewed_schema.py`](../../scripts/fetch_reviewed_schema.py) | KEEP_GENERIC | not established | 7 | not determined |
+| [`scripts/fetch_reviewed_schema.py`](../../scripts/fetch_reviewed_schema.py) | KEEP_GENERIC | not established | 8 | not determined |
 | [`scripts/guard_commentary.py`](../../scripts/guard_commentary.py) | KEEP_GENERIC | not established | 7 | not determined |
 | [`scripts/guard_osis.py`](../../scripts/guard_osis.py) | KEEP_GENERIC | named test | 14 | not determined |
-| [`scripts/normalize_bible_references.py`](../../scripts/normalize_bible_references.py) | KEEP_GENERIC | named test | 6 | not determined |
+| [`scripts/normalize_bible_references.py`](../../scripts/normalize_bible_references.py) | KEEP_GENERIC | named test | 7 | not determined |
 | [`scripts/normalize_osis.py`](../../scripts/normalize_osis.py) | KEEP_GENERIC | not established | 7 | not determined |
 | [`scripts/osis_semantic_fidelity.py`](../../scripts/osis_semantic_fidelity.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/pilot_fetch.py`](../../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 6 | not determined |
@@ -65,7 +65,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 7 | publication/release |
 | [`scripts/reviewed_modern_commentary_rebuild.py`](../../scripts/reviewed_modern_commentary_rebuild.py) | GENERALIZE | named test | 3 | publication/release |
 | [`scripts/reviewed_osis_commentary_rebuild.py`](../../scripts/reviewed_osis_commentary_rebuild.py) | KEEP_GENERIC | not established | 2 | publication/release |
-| [`scripts/segment_osis_reference_destinations.py`](../../scripts/segment_osis_reference_destinations.py) | KEEP_GENERIC | named test | 3 | not determined |
+| [`scripts/segment_osis_reference_destinations.py`](../../scripts/segment_osis_reference_destinations.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/smoke.py`](../../scripts/smoke.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/source_osis_inventory.py`](../../scripts/source_osis_inventory.py) | KEEP_GENERIC | named test | 10 | source/native audit |
 | [`scripts/stable_sword_refs.py`](../../scripts/stable_sword_refs.py) | KEEP_GENERIC | named test | 19 | not determined |
@@ -73,7 +73,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/sword_native_commentary_raw_corpus.cpp`](../../scripts/sword_native_commentary_raw_corpus.cpp) | KEEP_GENERIC | not established | 2 | not determined |
 | [`scripts/sword_native_index.cpp`](../../scripts/sword_native_index.cpp) | KEEP_GENERIC | not established | 8 | not determined |
 | [`scripts/sword_native_inventory.py`](../../scripts/sword_native_inventory.py) | KEEP_GENERIC | named test | 10 | source/native audit |
-| [`scripts/sword_native_raw_corpus.cpp`](../../scripts/sword_native_raw_corpus.cpp) | KEEP_GENERIC | not established | 6 | not determined |
+| [`scripts/sword_native_raw_corpus.cpp`](../../scripts/sword_native_raw_corpus.cpp) | KEEP_GENERIC | not established | 7 | not determined |
 | [`scripts/sword_native_raw_corpus_inventory.py`](../../scripts/sword_native_raw_corpus_inventory.py) | KEEP_GENERIC | named test | 6 | source/native audit |
 | [`scripts/sword_native_raw_entry.cpp`](../../scripts/sword_native_raw_entry.cpp) | KEEP_GENERIC | not established | 4 | not determined |
 | [`scripts/tool_registry.py`](../../scripts/tool_registry.py) | KEEP_GENERIC | named test | 2 | not determined |

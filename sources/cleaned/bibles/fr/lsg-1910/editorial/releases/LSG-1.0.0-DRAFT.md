@@ -26,7 +26,7 @@ The owner accepts Xiphos as the provisional reader for development. This does **
 
 ## Reproducible build and release acceptance
 
-The dedicated [GitHub Actions preview workflow](../../../../../../.github/workflows/lsg-v1-reviewed-candidate.yml) executes all already-reviewed independent source transformations, binds the final XML SHA-256, validates the official OSIS schema and real references, compiles a **new** stock-SWORD zText module with `osis2mod`, reads back the entire native index, and produces a deterministic **preview-only** ZIP and its exact source/member hashes. Preview artifacts are temporary, not public assets.
+The dedicated [GitHub Actions preview workflow](../../../../../../../.github/workflows/lsg-v1-reviewed-candidate.yml) executes all already-reviewed independent source transformations, binds the final XML SHA-256, validates the official OSIS schema and real references, compiles a **new** stock-SWORD zText module with `osis2mod`, reads back the entire native index, and produces a deterministic **preview-only** ZIP and its exact source/member hashes. Preview artifacts are temporary, not public assets.
 
 Before creating a real release plan under `config/release-plans/lsg-1.0.0.json`, replacing the approved cleaned master or changing the catalogue: retain the exact generated module source and native compile receipts, independently verify all notes and verse text in the compiled package, reconcile the stock-SWORD versification exception, prepare the new source validation/manifests and published reader profile, obtain owner review and run the complete production publication gates. No package checksum or source validation is to be invented from intent.
 
