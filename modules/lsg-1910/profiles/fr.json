@@ -2,7 +2,7 @@
   "schema_version": 1,
   "module_id": "lsg-1910",
   "sword_id": "BRLSG1910",
-  "module_version": "0.1.0",
+  "module_version": "0.1.1",
   "locale": "fr",
   "revision": "2026-11-10.1",
   "approved_at": "2026-11-10",
@@ -23,6 +23,6 @@
     "acts_20_28": "https://ebible.org/fraLSG/ACT20.htm",
     "john_1_18": "https://ebible.org/fraLSG/JHN01.htm",
     "original_source_rights": "https://ebible.org/fraLSG/copyright.htm",
-    "curated_release": "https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0"
+    "curated_release": "https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.1"
   }
 }

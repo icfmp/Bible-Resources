@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "tag": "lsg-0.1.1",
+  "module_id": "lsg-1910",
+  "sword_id": "BRLSG1910",
+  "version": "0.1.1",
+  "title": "Louis Segond 1910 — Bible Resources 0.1.1 (display metadata only)",
+  "zip_name": "BRLSG1910-0.1.1.zip",
+  "package_sha256": "383b0493341277ae1776184f13a8f722f48a5bff79566d1993c361229bab404e",
+  "package_size_bytes": 4042083,
+  "notes_path": "sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-0.1.1.md",
+  "evidence_path": "modules/lsg-1910/SOURCE_VALIDATION.json",
+  "editorial_path": "modules/lsg-1910/EDITORIAL.md",
+  "authorization": {
+    "reviewed_by": "Bible Resources project owner — source & rights approved 2026-11-09, requested display-label revision 2026-11-23",
+    "decision": "Owner-requested metadata-only display label correction in 0.1.1. Preserve SWORD technical ID BRLSG1910, approved OSIS/source hashes, four native RawText members and immutable version 0.1.0 artifacts. No textual, note, layout, versification or rights changes.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/pull/542",
+    "source_rights": "eBible fraLSG Public Domain original, no altered Bible text or annotations; already independently reviewed"
+  }
+}
