@@ -21,7 +21,7 @@
 
 ## Full-corpus execution: 2026-11-23
 
-The [strict full-list test and candidate build #45130871622](https://github.com/icfmp/Bible-Resources/actions/runs/45130871622) produced an isolated **unpublished** candidate: [XML + independent schema/BRNP/native reports artifact #14797444382](https://github.com/icfmp/Bible-Resources/actions/runs/45130871622/artifacts/14797444382).
+The [strict full-list and source-provider-variant test #45132279039](https://github.com/icfmp/Bible-Resources/actions/runs/45132279039) produced an isolated **unpublished** candidate: [XML + independent schema/BRNP/native reports artifact #14797713746](https://github.com/icfmp/Bible-Resources/actions/runs/45132279039/artifacts/14797713746).
 
 | Check | Original cleaned master | Candidate |
 | --- | ---: | ---: |
@@ -34,7 +34,7 @@ The [strict full-list test and candidate build #45130871622](https://github.com/
 
 - Candidate: 30,169,841 bytes, SHA-256 `35edf5611fe48a7521a558e717e7a37f7040f42728b6a7be2817391770e14f09`. Exactly 9,751 + 9,345 + 174 = 19,270 added attributes, **zero existing attributes rewritten**.
 - The parser follows the source shorthand in 2,531 semicolon book-context repetitions, each on a fully verified, fully consumed note. No unsupported label or unattested verse is assigned a guessed target.
-- Both source and candidate passed the independently pinned official OSIS schema check. BRNP now reports **443 unresolved destination labels and 3 unresolved introduction labels**, compared with 9,751/177 before; no new finding category was introduced.
+- Both source and candidate passed the independently pinned official OSIS schema check. BRNP now reports **406 unresolved destination labels and 3 unresolved introduction labels**, compared with 9,751/177 before; no new finding category was introduced.
 - The [native SWORD cross-compiler comparison in the same run](https://github.com/icfmp/Bible-Resources/actions/runs/45130871622) compiled the old and candidate files into **two isolated temporary SWORD modules** and compared **32,426** ordered raw frames, including **31,169** populated native verse entries. The source's 31,170 authored verses and the existing Segond SWORD Mark 10:52–53 indexing compromise must not be conflated.
 - All native differences were limited to the 9,751 expected origin `osisRef` attributes, 9,345 expected printed-destination `osisRef` attributes and 174 expected introduction `osisRef` attributes. **Zero unrelated raw native changes.** This proves engine preservation and scope of the changes, **not** actual clickable rendering in Xiphos, AndBible or Bible.
 - All authorial words, note captions, original destination labels, identifiers, poetry, text order and punctuation are preserved. No published module has been altered.
@@ -69,7 +69,7 @@ There are **19,532** individual explicit target address tokens distributed acros
 ## Remaining release/merge gates
 
 1. **Individual hyperlink usability:** compare representative one-target, multi-target, ranges, chapters and implicit-context references in real Xiphos and AndBible (and if applicable Bible); preserve exactly the printed punctuation. The native engine storing target lists is not proof of clicking the intended destination. Where readers cannot navigate a group, redesign the grouped reference **structure** with independent source-text parity, rather than weakening BRNP to suppress warnings.
-2. **443 unresolved destination notes:** decide via print/editorial witnesses which are genuine malformed labels, non-linkable but faithful printed constructs, and independently verified technical alias variants. Maintain reversible decisions; no source text changes merely to lower a count.
+2. **406 unresolved destination notes:** decide via print/editorial witnesses which are genuine malformed labels, non-linkable but faithful printed constructs, and independently verified technical alias variants. Maintain reversible decisions; no source text changes merely to lower a count.
 3. **Three introduction pointers:** compare printed source for any actual correction; retain unlinked when no trustworthy proof exists.
 4. **Publication and approved cleaned master:** only after the above plus complete source/native and reader checks and project-owner approval may a new edition-specific cleaned master be checked in and the accompanying source manifest/version be repinned. Existing release binaries must remain immutable.
 
