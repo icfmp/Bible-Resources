@@ -1,6 +1,6 @@
 # Workspace layout
 
-**Convention:** `<resource-type>/<language>/<resource-id>/` for original, cleaned and new working sources. Resource types are `bibles`, `commentaries`, `dictionaries`, `encyclopedias` and `other`. Use a registered lowercase ISO 639 language identifier (two letters where available, otherwise the appropriate three-letter code). Do not create empty category folders or fake source editions.
+**Convention:** `<resource-type>/<language>/<resource-id>/` for original and cleaned edition sources. New candidates use isolated Git branches, not a tracked work directory. Resource types are `bibles`, `commentaries`, `dictionaries`, `encyclopedias` and `other`. Use a registered lowercase ISO 639 language identifier (two letters where available, otherwise the appropriate three-letter code). Do not create empty category folders or fake source editions.
 
 ```text
 sources/

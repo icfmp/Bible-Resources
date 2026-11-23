@@ -1,7 +1,7 @@
 """Guard local links after documentation reorganization.
 
 This checks maintained project documentation and source/module entrypoints,
-not the 1,300+ active work-in-progress manuscript records. It validates local
+not the retired authoring manuscripts preserved in immutable Git revisions. It validates local
 Markdown targets, not the correctness of external URLs or the
 validity of editorial evidence. It does not read copyrighted source payloads.
 """

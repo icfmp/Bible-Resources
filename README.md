@@ -36,6 +36,7 @@ Previously published editions include:
 - [Darby — BRJND2024 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.1)
 - [Matthew Henry Concise Commentary — MHCC 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1)
 - [Matthew Henry Complete Commentary — MHC 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/mhc-0.1.0)
+- [Henry's Modern Concise Commentary — HMCCModern 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/hmcc-modern-0.1.0)
 
 These links are historical release references, not a substitute for checking the current public catalogue and its live package bytes. SWORD IDs may collide between providers; installing or updating a module is a deliberate client choice.
 
