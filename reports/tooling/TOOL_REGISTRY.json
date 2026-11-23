@@ -5,6 +5,44 @@
       "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
+        "OSIS",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/apply_reviewed_osis_editorial_corrections.py",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
+      "purpose_first_line": "Apply owner-reviewed, source-pinned OSIS reference repairs to a separate candidate.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "hashlib",
+        "json",
+        "lxml",
+        "normalize_bible_references",
+        "os",
+        "pathlib",
+        "tempfile",
+        "xml"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "321f8da81cf295315e2880fcad9b1fed122d77cb2839f05be70b51503e48d36f",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/tool_registry.py",
+        ".github/workflows/lsg-reference-review.yml",
+        "tests/test_apply_reviewed_osis_editorial_corrections.py"
+      ]
+    },
+    {
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
         "zText",
         "OSIS"
       ],
@@ -708,8 +746,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
+        "scripts/apply_reviewed_osis_editorial_corrections.py",
         "scripts/segment_osis_reference_destinations.py",
         "scripts/tool_registry.py",
         ".github/workflows/lsg-reference-review.yml",
@@ -1916,7 +1955,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "0ee58791df8d53a9e3991bbc992cc16fd30c904047ee56613a2e06d2bca7c8fc",
+      "sha256_at_inventory": "77e06694d645e325238236e763bcadca0e49bc011b09ea07e357fa576c2d2397",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
