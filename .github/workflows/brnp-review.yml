@@ -145,6 +145,17 @@ jobs:
                   print('MHCC repeated nested book attr sets:',Counter(
                       tuple(sorted(e.attrib)) for e in nested).most_common(5))
               if label=='mhc':
+                  original='sources/original/commentaries/en/mhc-crosswire/mhc.osis.xml'
+                  orig=etree.parse(original,etree.XMLParser(resolve_entities=False,
+                      load_dtd=False,no_network=True,huge_tree=False))
+                  orig_refs=[x.get('osisRef') for x in orig.iter(ns+'reference')
+                      if x.get('osisRef') and x.get('osisRef') !=
+                      x.get('osisRef').strip()]
+                  clean_refs=[x.get('osisRef') for x in whitespace]
+                  print('MHC original vs cleaned reference whitespace:',
+                        len(orig_refs),len(clean_refs),
+                        'identical_values:',orig_refs==clean_refs)
+              if label=='mhc':
                   print('MHC verse attributes first:',[dict(e.attrib) for e in verses[:6]])
                   print('MHC parent types of keyed verses:',Counter(
                       (etree.QName(e.getparent()).localname,e.getparent().get('type'))
