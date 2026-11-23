@@ -499,6 +499,7 @@ def _source_bindings(cleaned, original, crosswalk: dict,
                 if destination_target is not None:
                     counts["source_local_short_forms_resolved"] += 1
             if (destination_target is not None and
+                    status == "complete_printed_list" and
                     disambiguated_chapter_commas and complete_lists):
                 old_target, _old_reason, _old_context = _complete_printed_destinations(
                     _label(xt), destination_aliases, verse_ids)
@@ -566,6 +567,7 @@ def _source_bindings(cleaned, original, crosswalk: dict,
                 "resolved_original_destination_labels",
                 "resolved_destination_target_tokens",
                 "multi_target_reference_labels",
+                "source_disambiguated_chapter_comma_labels_resolved",
                 "original_introduction_spans", "resolved_introduction_spans",
                 "unlinked_introduction_spans_preserved"):
         counts.setdefault(key, 0)
