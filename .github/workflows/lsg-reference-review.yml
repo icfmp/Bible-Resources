@@ -17,9 +17,6 @@ on:
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_PAGE_LOCATORS_2026-11-23.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json'
-      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json'
-      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_PAGE_LOCATORS_2026-11-23.json'
-      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json'
 permissions:
   contents: read
 jobs:
