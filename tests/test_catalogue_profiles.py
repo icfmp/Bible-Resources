@@ -23,7 +23,7 @@ class ApprovedProfileTests(unittest.TestCase):
         self.assertEqual(set(profiles), {"fr"})
         p = profiles["fr"]
         self.assertEqual(p["approved_at"], "2026-11-23")
-        self.assertEqual(p["revision"], "2026-11-23.1")
+        self.assertEqual(p["revision"], "2026-11-23.2")
         self.assertEqual(self.module["version"], "1.0.1")
         self.assertIn("1.0.1", p["short_markdown"])
         self.assertIn("1 Timothée 3.16", p["short_markdown"])

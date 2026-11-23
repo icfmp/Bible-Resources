@@ -118,16 +118,18 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword modules/lsg-1910/tools/check_native_render.cpp -o /tmp/lsg-native-render-check -lsword
           SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg-native-render-check BRLSG1910
           python scripts/tool_registry.py --write
-          python -m unittest discover -s tests -q
-          python scripts/validate.py
-          python scripts/release_preflight.py --module-id lsg-1910 --report /tmp/lsg-1.0.1-preflight.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Track the superseding plan and the deleted prior active plan
+          # BEFORE topology tests inspect git ls-files; do not relax checks.
           git add -A modules/lsg-1910 sources/cleaned/bibles/fr/lsg-1910 \
             config/catalogue-import-lsg-1.0.1.json \
             config/release-plans/lsg-1.0.0.json config/release-plans/lsg-1.0.1.json \
             catalog/v1/catalog.json
           git add -u -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          python -m unittest discover -s tests -q
+          python scripts/validate.py
+          python scripts/release_preflight.py --module-id lsg-1910 --report /tmp/lsg-1.0.1-preflight.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git diff --cached --check
           git commit -m "release(lsg): stage verified configuration-only SWORD 1.0.1 package"
           git push origin HEAD:refs/heads/fix/lsg-1.0.1-note-rendering
