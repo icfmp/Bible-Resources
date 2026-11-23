@@ -288,6 +288,39 @@ The **other 18 mixed `v.`** cases remain untouched because their implicit scope 
 
 Expected result for the separate, unpublished complete-source candidate: **9,428** whole source notes linked by real verse targets, **323** original destination labels kept visible but unlinked (54 unattested, 242 open-ended, 18 ambiguous mixed-relative, 9 chapter-only/mixed). No textual character, note, callout, verse index or original cleaned master is rewritten. The independent individual-link segmenter now checks and splits the same named single-chapter syntax with exact source-slice and target-order parity; the earlier read-only grouped candidate alone was insufficient to establish navigable individual links. The latest workflow validates these corpus regression counts, official XSD, BRNP and native SWORD/HTML rendering in isolated engines; live Xiphos/AndBible GUI acceptance and publication remain separate decisions.
 
+## Owner-authorized source-bound reference repair and complete introduction review (2026-11-23)
+
+The owner explicitly requested completion of the pre-reviewed correction batch and all three remaining introduction pointers. The reviewed decision ledger is `REVIEWED_REFERENCE_AND_INTRO_OVERLAY_2026-11-23.json`: **12 exact electronic cross-reference substring repairs and three introduction decisions**. Approval concerns a **separate candidate only**, not modification of the pinned original eBible USFX, the approved 0.1.0 cleaned OSIS, any released SWORD payload, nor an automatic merge/publication.
+
+The twelve note-fragment repairs (digital publisher label → separately reviewed target) are:
+
+| Electronic original note at source verse | Reviewed correction |
+| --- | --- |
+| Deut 19.15 | `No 35:50` → `No 35:30` |
+| Josh 5.13 | `És 23:23` → `Ex 23:23` |
+| Josh 14.6 | `No 12:24` → `No 14:24` |
+| 2 Chr 35.7 | `2 R 30:24` → `2 Ch 30:24` |
+| Isa 11.6 | `És 65:26` → `És 65:25` |
+| Jer 32.29 | `Jé 21:20` → `Jé 21:10` |
+| Jer 41.1 | `2 R 25:35` → `2 R 25:25` |
+| Matt 19.14 | `Mc 18:3` → `Mt 18:3` |
+| Matt 20.27 | `Mc 23:11` → `Mt 23:11` |
+| Luke 22.69 | `Mc 15:62` → `Mc 16:19` |
+| 1 Thess 4.9 | `2 Pi 4:8` → `1 Pi 4:8` |
+| 1 John 3.1 | `1 Jn 1:12` → `Jn 1:12` |
+
+Each decision retains the *whole exact original electronic note*, selected source-fragment replacement, original verse and electronic callout, canonical real SWORD target, original printed-1910 page, scanned marginal callout and legible token. The printed 1910 apparatus and UBS/DBL-family electronic reference apparatus are **not presumed globally identical**: the repair is expressly part of an **editorially reviewed derivative candidate**, not a claim that the publisher eBible supplied this same annotation or that a complete note was copied from the print. The seven previously rejected apparatus-scope/versification cases and all 29 print-uncertifiable cases are **not changed**.
+
+### Three introduction pointers: content decisions
+
+1. **Philippians:** the original `1:27-30, et` is genuinely embedded in the phrase “Exhortation à la persévérance 1:27-30, et surtout à l’humilité…”; no source typo. An exact `Phil.1.27-Phil.1.30` link covers **only** `1:27-30`, and the original `, et` remains in adjacent prose, unaltered.
+2. **Titus:** the original digital title “Adresse et salutations 1:1-40” contains a real publisher-heading error. The section ends at 1:4 and the **next heading begins at 1:5** in the exact same eBible source; [the original publisher-facing eBible page](https://ebible.org/fraLSG/TIT01.htm) also shows the erroneous `1:1-40`. Only in the derived candidate, correct that label to `1:1-4` and link `Titus.1.1-Titus.1.4`. **No verse is added and the original preserved source remains unchanged.**
+3. **First John:** the original `1:1-4 (voir le prologue de l’évangile de Jn 1:1-18)` is correct editorial prose, **not a typo**. It receives two exact non-overlapping source-key links, `1John.1.1-1John.1.4` and `John.1.1-John.1.18`, while the explanatory text remains verbatim.
+
+The previous three introduction blockers are therefore resolved **in the candidate**: **177/177** original introduction references can be rendered with independently attested targets; one text correction and two strictly structural link splits. The electronic notes now have **9,440/9,751** complete linked groups, with **311** original notes intentionally unlinked (source-absent targets, open-ended references and ambiguous source grammar). The new generic `apply_reviewed_osis_editorial_corrections.py` script is strictly input-SHA-pinned to the already source-verified grouping candidate, anchored to exact OSIS reference indices, original book/origin/callout identities and literal former labels, and emits only a distinct output with a machine-readable reversible receipt. A separately invoked independent segmenter then produces per-passage links. Regression tests, the official OSIS XSD, BRNP checks and native SWORD compilation/verse-body comparison are explicit CI gates.
+
+**Important release boundary:** The corrected derivative candidate must not silently replace the approved `lsg-1910.osis.xml`/manifest or the existing public module. Native GUI checks (Xiphos/AndBible/Bible), separate source-provenance/versification interoperability and final owner publication approval remain outstanding.
+
 ## Remaining release/merge gates
 
 1. **Individual hyperlink usability:** compare representative one-target, multi-target, ranges, chapters and implicit-context references in real Xiphos and AndBible (and if applicable Bible); preserve exactly the printed punctuation. The stock libSWORD HTML renderer already confirms two independent anchors for two separated source citations; this is still not proof of each graphical reader's click/navigation behavior. Do not relax BRNP to suppress reader defects.

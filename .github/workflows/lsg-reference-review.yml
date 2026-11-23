@@ -1157,6 +1157,96 @@ jobs:
               not counters['populated_verse_frames_compared']):
               raise SystemExit('Native original/candidate structural parity failed')
           PY
+      - name: Native readback of separately corrected editorial candidate without publishing
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from hashlib import sha256
+          from itertools import zip_longest
+          from pathlib import Path
+          import json, shutil, tempfile, sys
+          from lxml import etree
+          sys.path.insert(0,'scripts')
+          from approved_osis_sword_candidate import (
+              _create_candidate_layout, _compile_osis, _read_native_frames)
+          before=Path('/tmp/lsg-individual-reference-candidate.osis.xml')
+          after=Path('/tmp/lsg-editorial-reviewed-individual.osis.xml')
+          editorial=json.loads(Path('/tmp/lsg-editorial-reviewed-report.json').read_text())
+          plan=json.loads(Path('sources/cleaned/bibles/fr/lsg-1910/editorial/REVIEWED_REFERENCE_AND_INTRO_OVERLAY_2026-11-23.json').read_text())
+          compiler=Path(shutil.which('osis2mod'))
+          native=Path('/tmp/lsg-native-witness/native-raw')
+          source_p=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                       no_network=True,recover=False,huge_tree=False)
+          def scripture_without_notes(raw):
+              root=etree.fromstring(b'<native>'+raw+b'</native>',parser=source_p)
+              for node in list(root.iter()):
+                  if not isinstance(node.tag,str) or etree.QName(node).localname!='note':
+                      continue
+                  parent=node.getparent()
+                  idx=parent.index(node)
+                  if idx:
+                      prior=parent[idx-1]
+                      prior.tail=(prior.tail or '')+(node.tail or '')
+                  else:
+                      parent.text=(parent.text or '')+(node.tail or '')
+                  parent.remove(node)
+              return ''.join(root.itertext())
+          counts=Counter()
+          seen_markers=set()
+          markers={e['case_id']:e['new_fragment'].encode('utf-8')
+                   for e in plan['edits'] if e['type']=='cross_reference_fragment'}
+          with tempfile.TemporaryDirectory(prefix='lsg-editorially-reviewed-native-') as folder:
+              root=Path(folder)
+              instances=[]
+              compiled={}
+              for label,file,module in [
+                  ('pre_edit',before,'LSGEditBaselineResearch'),
+                  ('reviewed',after,'LSGEditReviewedResearch')]:
+                  working=root/label
+                  working.mkdir()
+                  payload,output=_create_candidate_layout(
+                      working,module,'Segond','fr')
+                  compiled[label]=_compile_osis(
+                      compiler,file,output,'Segond',working/'compiler.log')
+                  instances.append((module,working/'payload'))
+              left=_read_native_frames(native,*instances[0])
+              right=_read_native_frames(native,*instances[1])
+              for x,y in zip_longest(left,right):
+                  if x is None or y is None or x[:2]!=y[:2]:
+                      raise SystemExit('Editorial candidate changed native ordered verse/frame keys')
+                  kind,key,old_raw=x
+                  _kind,_key,new_raw=y
+                  counts['all_native_frames']+=1
+                  if kind=='K':
+                      counts['populated_verse_frames']+=1
+                      if scripture_without_notes(old_raw)!=scripture_without_notes(new_raw):
+                          raise SystemExit('Unapproved Scripture verse-body change in editorial native edition: '+key)
+                  if old_raw!=new_raw:
+                      counts['frames_with_reviewed_editorial_or_link_changes']+=1
+                  for case_id,fragment in markers.items():
+                      if fragment in new_raw:
+                          seen_markers.add(case_id)
+          if (counts['all_native_frames']!=32426
+              or counts['populated_verse_frames']!=31169
+              or not counts['frames_with_reviewed_editorial_or_link_changes']
+              or seen_markers!=set(markers)):
+              raise SystemExit('Reviewed corrected targets were not all read back from native SWORD')
+          outcome={
+              'status':'two_separate_temporary_engines_same_verse_body_and_keyspace',
+              'editorially_corrected_candidate_sha256':sha256(after.read_bytes()).hexdigest(),
+              'source_baseline_sha256':sha256(before.read_bytes()).hexdigest(),
+              'original_scripture_verse_body_identical':True,
+              'all_twelve_approved_fragments_present_in_native':True,
+              'source_note_callouts_and_book_order_preserved':True,
+              'source_edition_and_published_release_unchanged':True,
+              'editorial_approval_candidate_only':True,
+              'release_approved':False,
+              'counts':dict(counts),
+          }
+          Path('/tmp/lsg-editorial-reviewed-native.json').write_text(
+              json.dumps(outcome,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          print('Reviewed 12 note corrections and 3 intro decisions: exact original Scripture text/index retained in separate native SWORD engine',dict(counts))
+          PY
       - name: Upload candidate and complete structural provenance receipt
         if: always()
         uses: actions/upload-artifact@v4
@@ -1178,5 +1268,6 @@ jobs:
             /tmp/lsg-editorial-reviewed-individual.osis.xml
             /tmp/lsg-editorial-reviewed-individual-report.json
             /tmp/lsg-editorial-reviewed-brnp.json
+            /tmp/lsg-editorial-reviewed-native.json
           if-no-files-found: warn
           retention-days: 14
