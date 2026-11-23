@@ -13,7 +13,7 @@ from lxml import etree
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from normalize_bible_references import ReviewError, run, _intro_target, _complete_printed_destinations  # noqa: E402
+from normalize_bible_references import ReviewError, run, _intro_target, _complete_printed_destinations, _explicit_source_local_reference  # noqa: E402
 
 NS = "http://www.bibletechnologies.net/2003/OSIS/namespace"
 
@@ -83,11 +83,13 @@ class NormalizationTests(unittest.TestCase):
         }))
         return path
 
-    def apply(self, output=None, aliases=None, complete_lists=False):
+    def apply(self, output=None, aliases=None, complete_lists=False,
+              short_forms=False):
         return run(cleaned_path=self.cleaned, usfx_zip=self.original,
                    manifest_path=self.manifest, crosswalk_path=self.crosswalk,
                    destination_aliases_path=aliases,
                    complete_citation_lists=complete_lists,
+                   source_local_short_forms=short_forms,
                    output_path=output)
 
     def test_preserves_every_original_byte_except_verified_additions(self):
@@ -351,6 +353,47 @@ class NormalizationTests(unittest.TestCase):
         path.write_text(json.dumps(doc))
         with self.assertRaisesRegex(ReviewError, "ambiguous provider-specific"):
             self.apply(aliases=path, complete_lists=True)
+
+    def test_source_local_verse_requires_exact_note_origin_and_real_target(self):
+        self.fixture(clean_dest="v. 2.", original_dest="v. 2.")
+        candidate,report=self.apply(
+            aliases=self.aliases(),complete_lists=True,short_forms=True)
+        self.assertIn(b'<reference osisRef="Gen.1.2">v. 2.</reference>',candidate)
+        self.assertEqual(report["source_local_short_forms_resolved"],1)
+        self.assertEqual(report["candidate_additions"],3)
+
+    def test_source_local_verse_missing_or_no_context_stays_unlinked(self):
+        verses={"Gen.1.1","Gen.1.2","Gen.2.1"}
+        target,reason=_explicit_source_local_reference(
+            "v. 99.",{"Ge":"Gen"},"1.1","Gen",verses)
+        self.assertIsNone(target)
+        self.assertEqual(reason,"unattested_source_relative_verse")
+
+    def test_named_relative_only_allowed_for_attested_one_chapter_book(self):
+        verses={"Jude.1.14","Jude.1.9","Gen.1.2","Gen.2.1"}
+        value,reason=_explicit_source_local_reference(
+            "Jud v. 14.",{"Jud":"Jude"},"1.2","Gen",verses)
+        self.assertEqual(value,"Jude.1.14")
+        self.assertEqual(reason,"explicit_one_chapter_book_verse")
+        value,reason=_explicit_source_local_reference(
+            "Ge v. 2.",{"Ge":"Gen"},"1.2","Gen",verses)
+        self.assertIsNone(value)
+        self.assertEqual(reason,"named_relative_requires_one_chapter_book")
+
+    def test_explicit_book_chapter_only_references_existing_chapter(self):
+        verses={"Gen.1.1","Gen.2.1"}
+        value,reason=_explicit_source_local_reference(
+            "Ge 2.",{"Ge":"Gen"},"1.1","Gen",verses)
+        self.assertEqual(value,"Gen.2")
+        self.assertEqual(reason,"explicit_source_chapter")
+        value,reason=_explicit_source_local_reference(
+            "Ge 99.",{"Ge":"Gen"},"1.1","Gen",verses)
+        self.assertIsNone(value)
+
+    def test_local_short_forms_cannot_run_without_complete_source_mode(self):
+        self.fixture()
+        with self.assertRaisesRegex(ReviewError,"requires full source-citation"):
+            self.apply(aliases=self.aliases(),short_forms=True)
 
     def test_wrong_source_sha_blocks(self):
         self.fixture()
