@@ -200,7 +200,7 @@ def _intro_target(label: str, book: str, verse_ids: set[str]) -> str | None:
     return first + "-" + last
 
 def _source_bindings(cleaned, original, crosswalk: dict,
-                     destination_aliases: dict | None = None) -> tuple[dict, dict, list]:
+                     destination_aliases: dict | None = None) -> tuple[dict, dict, list, list]:
     """Bind each exact cleaned reference to source-attested USFX semantics.
 
     Book identity is verified using the independent reviewed USFM->OSIS map.
@@ -216,6 +216,7 @@ def _source_bindings(cleaned, original, crosswalk: dict,
     changes = {}
     counts = Counter()
     unresolved = []
+    destination_findings = []
     for obook, cbook in zip(obooks, cbooks, strict=True):
         book = crosswalk.get(obook.get("id"))
         if not book or cbook.get("osisID") != book:
@@ -249,6 +250,15 @@ def _source_bindings(cleaned, original, crosswalk: dict,
                     raise ReviewError("Unreviewed printed destination already linked")
                 counts["unlinked_original_destination_labels_preserved"] += 1
                 counts["unlinked_destination_reason_" + status] += 1
+                if (status in {"unverified_printed_book_alias",
+                               "unattested_reference_start",
+                               "unattested_or_reversed_reference_end"} and
+                        len(destination_findings) < 100):
+                    destination_findings.append({
+                        "book": book, "source_origin": _label(xo),
+                        "printed_destination": _label(xt)[:240],
+                        "reason": status,
+                    })
             else:
                 if destination_refs[0].get("osisRef") not in (None, destination_target):
                     raise ReviewError("Printed destination conflicts with source-verified address")
@@ -298,7 +308,7 @@ def _source_bindings(cleaned, original, crosswalk: dict,
                          counts["resolved_original_destination_labels"] +
                          counts["resolved_introduction_spans"]):
         raise ReviewError("Duplicate source witness binding")
-    return changes, dict(counts), unresolved
+    return changes, dict(counts), unresolved, destination_findings
 
 
 def _patch_exact_start_tags(source: bytes, root, changes: dict) -> tuple[bytes, int]:
@@ -349,7 +359,7 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         _printed_book_aliases(destination_aliases_path, crosswalk)
         if destination_aliases_path is not None else (None, None)
     )
-    changes, counts, unresolved = _source_bindings(
+    changes, counts, unresolved, destination_findings = _source_bindings(
         source, original, crosswalk, aliases)
     candidate, edits = _patch_exact_start_tags(current, source, changes)
     # Validate actual candidate XML, every edited target, and the unchanged
@@ -383,6 +393,7 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         "source_unchanged": True,
         "candidate_additions": additions,
         "unresolved_source_introduction_spans": unresolved,
+        "unresolved_explicit_source_destination_findings": destination_findings,
         "existing_attributes_rewritten": 0,
         "authorial_destinations_inferred": 0,
         "printed_abbreviation_map_sha256": alias_digest,
