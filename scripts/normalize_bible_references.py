@@ -394,6 +394,10 @@ def _source_bindings(cleaned, original, crosswalk: dict,
                     raise ReviewError("Printed destination conflicts with source-verified address")
                 changes[destination_refs[0]] = destination_target
                 counts["resolved_original_destination_labels"] += 1
+                targets_in_label = len(destination_target.split())
+                counts["resolved_destination_target_tokens"] += targets_in_label
+                if targets_in_label > 1:
+                    counts["multi_target_reference_labels"] += 1
             target = _origin_target(_label(xo), book, verse_ids)
             if origin_refs[0].get("osisRef") not in (None, target):
                 raise ReviewError("Origin conflicts with an existing OSIS destination")
@@ -431,6 +435,8 @@ def _source_bindings(cleaned, original, crosswalk: dict,
     for key in ("original_cross_reference_notes",
                 "unlinked_original_destination_labels_preserved",
                 "resolved_original_destination_labels",
+                "resolved_destination_target_tokens",
+                "multi_target_reference_labels",
                 "original_introduction_spans", "resolved_introduction_spans",
                 "unlinked_introduction_spans_preserved"):
         counts.setdefault(key, 0)
