@@ -42,6 +42,9 @@ def check(path: Path, kind: str) -> dict:
         if not text.get("osisIDWork") or not text.get("osisRefWork"):
             errors.append({"code": "WORK_IDENTITY", "line": text.sourceline or 1})
     active = []
+    chapters_active = []
+    chapters_seen = set()
+    books_seen = set()
     annotations = 0
     verse_ids = set()
     for element in root.iter():
@@ -55,6 +58,30 @@ def check(path: Path, kind: str) -> dict:
         counts[tag] += 1
         if tag not in allowed:
             errors.append({"code": "UNREVIEWED_ELEMENT", "line": line, "element": tag})
+        if tag == "div" and element.get("type") == "book":
+            book_id = element.get("osisID")
+            if not book_id or book_id in books_seen:
+                errors.append({"code": "BOOK_ID", "line": line})
+            else:
+                books_seen.add(book_id)
+        if tag == "chapter":
+            start, end, identifier = element.get("sID"), element.get("eID"), element.get("osisID")
+            if (start and end) or (end and identifier):
+                errors.append({"code": "MIXED_CHAPTER_MILESTONE", "line": line})
+            elif start:
+                if not identifier or identifier != start or identifier in chapters_seen:
+                    errors.append({"code": "CHAPTER_START_ID", "line": line})
+                chapters_active.append(start)
+                chapters_seen.add(start)
+            elif end:
+                if not chapters_active or chapters_active[-1] != end:
+                    errors.append({"code": "CHAPTER_END_PAIR", "line": line})
+                else:
+                    chapters_active.pop()
+            elif not identifier or identifier in chapters_seen:
+                errors.append({"code": "CHAPTER_CONTAINER_ID", "line": line})
+            else:
+                chapters_seen.add(identifier)
         if tag == "verse":
             start, end, identifier = element.get("sID"), element.get("eID"), element.get("osisID")
             if start and end or (end and identifier):
@@ -85,6 +112,10 @@ def check(path: Path, kind: str) -> dict:
             errors.append({"code": "EMPTY_REFERENCE", "line": line})
     if active:
         errors.append({"code": "UNCLOSED_VERSE_MILESTONE", "count": len(active)})
+    if chapters_active:
+        errors.append({"code": "UNCLOSED_CHAPTER_MILESTONE", "count": len(chapters_active)})
+    if kind == "bible" and not books_seen:
+        errors.append({"code": "NO_BOOK_DIVISIONS"})
     if kind == "commentary" and not annotations:
         errors.append({"code": "NO_COMMENTARY_ENTRIES"})
     if kind == "bible" and not verse_ids:
@@ -95,6 +126,7 @@ def check(path: Path, kind: str) -> dict:
         "status": "blocked" if errors else "pilot_structural_checks_passed",
         "element_counts": dict(sorted(counts.items())),
         "commentary_entry_count": annotations, "verse_identifier_count": len(verse_ids),
+        "book_identifier_count": len(books_seen), "chapter_identifier_count": len(chapters_seen),
         "findings": errors[:100], "finding_count": len(errors),
         "limitations": [
             "NOT an OSIS XSD check or independent semantic fidelity proof",
