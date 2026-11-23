@@ -13,6 +13,7 @@ on:
       - 'config/standard_usfm_osis_66.json'
       - 'config/lsg-1910-printed-book-aliases.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json'
 permissions:
   contents: read
 jobs:
@@ -264,6 +265,42 @@ jobs:
                      for entry in parallel)):
               raise SystemExit('Parallel versification evidence must remain non-authoritative until actual print-note collation')
           print('Source text and nine historical numbering candidates kept independent:',len(parallel))
+          comparison=json.loads(Path(
+              'sources/cleaned/bibles/fr/lsg-1910/editorial/SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json'
+          ).read_text(encoding='utf-8'))
+          compared=comparison['records']
+          checks=[(row['record_id'],row['original_usfm_book'],
+                   row['source_note_origin'],row['original_citation_label'])
+                  for row in compared]
+          stable=[(row['record_id'],row['original_usfm_book'],
+                   row['source_note_origin'],row['original_citation_label'])
+                  for row in expected]
+          if (comparison['schema_version']!=1 or
+              comparison['original_usfx_sha256']!=sha256(orig.read_bytes()).hexdigest()
+              or comparison['original_cleaned_sha256']!=receipt['source_sha256']
+              or not comparison['status'].endswith('not_print_certification')
+              or comparison['printed_1910_facsimile_reference_collation_complete']
+              or comparison['authorial_corrections_approved']!=0
+              or comparison['auto_link_enrichment_authorized']
+              or checks!=stable or len(checks)!=54):
+              raise SystemExit('Digital witness comparison must remain exact-original, distinct from print certification and without silent edits')
+          compared_counts=Counter()
+          for row in compared:
+              source_label=row['original_citation_label']
+              other=row['secondary_citation_label']
+              computed=('text_identical_in_separately_hosted_digital_witness'
+                        if source_label==other else
+                        'digital_witness_disagrees_with_original_usfx')
+              if (row['comparison']!=computed or
+                  row['historical_print_status']!='not_collated_from_printed_1910_reference_note'
+                  or row['authorized_change'] is not None or not other
+                  or not row['secondary_uri'].startswith('https://biblia.com/bible/lsg/')):
+                  raise SystemExit('Secondary digital witness status/content invalid or wrongly editorially approved')
+              compared_counts[computed]+=1
+          if (compared_counts['digital_witness_disagrees_with_original_usfx']!=32
+              or compared_counts['text_identical_in_separately_hosted_digital_witness']!=22):
+              raise SystemExit('Secondary witness evidence coverage or comparison classification drifted')
+          print('Secondary digital apparatus comparison (NOT 1910 print certification):',dict(compared_counts))
           print('Persistent original-source unaddressable citation ledger verified:',len(current))
           print('Unlinked 1910 source-citation classes:',dict(classes))
           print('Review-only category examples:',examples)
