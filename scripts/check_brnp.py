@@ -68,11 +68,13 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
             errors.append({"code": "WORK_IDENTITY", "line": text.sourceline or 1})
     active = []
     chapters_active = []
-    chapters_seen = set()
+    chapters_seen = set()  # canonical chapter osisIDs
+    chapter_pair_ids = set()
     books_seen = set()
     annotations = 0
     verse_ids = set()  # canonical OSIS IDs, never milestone pairing keys
     verse_pair_ids = set()
+    verse_member_ids = set()  # individual canonical members in Bible compound IDs
     for element in root.iter():
         if not isinstance(element.tag, str):
             continue
@@ -136,15 +138,24 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
                     if not all(part.startswith(chapter_id + ".")
                                for part in element.get("osisID").split()):
                         errors.append({"code": "REFERENCE_CHAPTER_SCOPE", "line": line})
+                elif not chapter_containers and chapters_active:
+                    chapter_id = chapters_active[-1][2]
+                    if chapter_id and not all(
+                        part.startswith(chapter_id + ".")
+                        for part in element.get("osisID").split()
+                    ):
+                        errors.append({"code": "REFERENCE_CHAPTER_SCOPE", "line": line})
         if tag == "chapter":
             start, end, identifier = element.get("sID"), element.get("eID"), element.get("osisID")
             if (start and end) or (end and identifier):
                 errors.append({"code": "MIXED_CHAPTER_MILESTONE", "line": line})
             elif start:
-                if not identifier or identifier != start or identifier in chapters_seen:
+                if not identifier or identifier in chapters_seen or start in chapter_pair_ids:
                     errors.append({"code": "CHAPTER_START_ID", "line": line})
-                chapters_active.append((start, line))
-                chapters_seen.add(start)
+                chapters_active.append((start, line, identifier))
+                chapter_pair_ids.add(start)
+                if identifier:
+                    chapters_seen.add(identifier)
             elif end:
                 if not chapters_active or chapters_active[-1][0] != end:
                     errors.append({"code": "CHAPTER_END_PAIR", "line": line})
@@ -159,26 +170,35 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
             if start and end or (end and identifier):
                 errors.append({"code": "MIXED_VERSE_MILESTONE", "line": line})
             elif start:
-                if not identifier or identifier in verse_ids or start in verse_pair_ids:
-                    # Canonical osisID and milestone pairing sID have separate
-                    # namespaces and separately enforced uniqueness.
+                members = identifier.split() if identifier else []
+                duplicates = [m for m in members if kind == "bible" and
+                              m in verse_member_ids]
+                if (not identifier or identifier in verse_ids or start in verse_pair_ids
+                        or len(members) != len(set(members)) or duplicates):
                     reason = ("missing_osisID" if not identifier else
-                              "duplicate_osisID" if identifier in verse_ids else
-                              "duplicate_sID")
+                              "duplicate_osisID" if identifier in verse_ids or duplicates
+                              or len(members) != len(set(members)) else "duplicate_sID")
                     errors.append({"code": "VERSE_START_ID", "line": line, "reason": reason})
                 active.append(start)
                 verse_pair_ids.add(start)
                 if identifier:
                     verse_ids.add(identifier)
+                    if kind == "bible":
+                        verse_member_ids.update(members)
             elif end:
                 if not active or active[-1] != end:
                     errors.append({"code": "VERSE_END_PAIR", "line": line})
                 else:
                     active.pop()
-            elif not identifier or identifier in verse_ids:
+            elif (not identifier or identifier in verse_ids
+                  or (kind == "bible" and (
+                      len(identifier.split()) != len(set(identifier.split()))
+                      or any(m in verse_member_ids for m in identifier.split())))):
                 errors.append({"code": "VERSE_CONTAINER_ID", "line": line})
             else:
                 verse_ids.add(identifier)
+                if kind == "bible":
+                    verse_member_ids.update(identifier.split())
         if tag == "div" and element.get("annotateType") == "commentary":
             annotations += 1
             if kind != "commentary":
@@ -214,6 +234,8 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         "commentary_entry_count": annotations, "verse_identifier_count": len(verse_ids),
         "verse_pair_identifier_count": len(verse_pair_ids),
         "book_identifier_count": len(books_seen), "chapter_identifier_count": len(chapters_seen),
+        "chapter_pair_identifier_count": len(chapter_pair_ids),
+        "bible_verse_member_count": len(verse_member_ids),
         "findings": errors[:100], "finding_count": len(errors),
         "finding_codes": dict(sorted(Counter(e["code"] for e in errors).items())),
         "unreviewed_elements": dict(sorted(Counter(
