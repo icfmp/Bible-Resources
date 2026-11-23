@@ -21,32 +21,32 @@
 
 ## Full-corpus execution: 2026-11-23
 
-The [full source-citation and one-reference-per-passage trial #45136656184](https://github.com/icfmp/Bible-Resources/actions/runs/45136656184) produced two isolated **unpublished** candidate representations and all accompanying provenance: [OSIS, diagnostics, native comparisons and 360-case editorial triage](https://github.com/icfmp/Bible-Resources/actions/runs/45136656184/artifacts/14800056884).
+The [full source-citation and one-reference-per-passage trial #45136656184](https://github.com/icfmp/Bible-Resources/actions/runs/45136656184) produced two isolated **unpublished** candidate representations and all accompanying provenance: [OSIS, diagnostics, native comparisons and 359-case editorial triage](https://github.com/icfmp/Bible-Resources/actions/runs/45136656184/artifacts/14800056884).
 
 | Check | Original cleaned master | Candidate |
 | --- | ---: | ---: |
 | Note origins with verified machine address | 0 | **9,751** |
-| Note destinations with entire source label mapped | 0 | **9,391** |
-| Note destinations intentionally unlinked | 9,751 | **360** |
+| Note destinations with entire source label mapped | 0 | **9,392** |
+| Note destinations intentionally unlinked | 9,751 | **359** |
 | Introduction spans linked | 0 | **174** |
 | Introduction spans intentionally unlinked | 177 | **3** |
-| Total additional `osisRef` attributes | — | **19,316** |
+| Total additional `osisRef` attributes | — | **19,317** |
 
-- Candidate: 30,170,715 bytes, SHA-256 `5b135af3081aece3796ac8acf5364e28e252353b558c3d7e721b17fbf9ce28fe`. Exactly 9,751 + 9,391 + 174 = 19,316 added attributes, **zero existing attributes rewritten**.
-- The parser follows the source shorthand in 2,538 semicolon book-context repetitions, each on a fully verified, fully consumed note. No unsupported label or unattested verse is assigned a guessed target.
+- Candidate: 30,170,765 bytes, SHA-256 `e68f81b8298bcf364221af7f178e4f8e556a6b9452f9fd8780784cc76fbf2ac4`. Exactly 9,751 + 9,392 + 174 = 19,317 added attributes, **zero existing attributes rewritten**.
+- The parser follows source-defined shorthand in 2,539 verified contextual followups (including one disambiguated chapter-comma-verse group), each on a fully verified, fully consumed note. No unsupported label or unattested verse is assigned a guessed target.
 - Both source and candidate passed the independently pinned official OSIS schema check. BRNP now reports **360 unresolved destination labels and 3 unresolved introduction labels**, compared with 9,751/177 before; no new finding category was introduced.
 - The [native SWORD cross-compiler comparison in the same run](https://github.com/icfmp/Bible-Resources/actions/runs/45136656184) compiled the released cleaned master and both candidate files into **three isolated temporary SWORD modules** and compared **32,426** ordered raw frames, including **31,169** populated native verse entries. The source's 31,170 authored verses and the existing Segond SWORD Mark 10:52–53 indexing compromise must not be conflated.
-- All native differences were limited to the 9,751 expected origin `osisRef` attributes, 9,391 expected printed-destination `osisRef` attributes and 174 expected introduction `osisRef` attributes. **Zero unrelated raw native changes.** This proves engine preservation and scope of the changes, **not** actual clickable rendering in Xiphos, AndBible or Bible.
+- All native differences were limited to the 9,751 expected origin `osisRef` attributes, 9,392 expected printed-destination `osisRef` attributes and 174 expected introduction `osisRef` attributes. **Zero unrelated raw native changes.** This proves engine preservation and scope of the changes, **not** actual clickable rendering in Xiphos, AndBible or Bible.
 - All authorial words, note captions, original destination labels, identifiers, poetry, text order and punctuation are preserved. No published module has been altered.
 
 ### Unresolved original source cases — genuine questions, not test exceptions
 
-Of the 9,751 notes, **360** are intentionally left without machine destinations:
+Of the 9,751 notes, **359** are intentionally left without machine destinations:
 - **305** labels remain unlinked due to open-ended or embedded shorthand syntax: 242 `etc.` forms, 54 embedded `v.` forms and 9 other forms. Their original printed labels are preserved.
-- **55** complete-label attempts include at least one **source-absent** or contradictory target, such as `Jn 1:52` or `Ex 20:11, 31, 17`. A present-number/range mistake in the digital source or the printed edition must be independently checked; do not create an absent verse or omit the invalid part to make the link look complete.
+- **54** complete-label attempts include at least one **source-absent** or contradictory target, such as `Jn 1:52` or `Ex 20:11, 31, 17`. A present-number/range mistake in the digital source or the printed edition must be independently checked; do not create an absent verse or omit the invalid part to make the link look complete.
 - **37 additional notes** used the original eBible USFX spelling `Mal`, while the printed 1910 abbreviation table uses `Ma`. These are now linked under an **independently named source-provider variant**, pinned to the exact original USFX ZIP SHA-256 and verified against actual `xt` citation tokens. The source's literal `Mal` is preserved; the printed table remains unchanged. A provider alias can never override any historical printed alias.
 
-The 360 remaining unlinked labels consist of **242** open-ended `etc.` strings, **54** embedded relative-verse strings, **9** other literal grammars and **55** strings with at least one nonexistent source verse. No remaining literal book-abbreviation mismatch was observed in the tested LSG corpus.
+The 359 remaining unlinked labels consist of **242** open-ended `etc.` strings, **54** embedded relative-verse strings, **9** other literal grammars and **54** strings with at least one nonexistent source verse. No remaining literal book-abbreviation mismatch was observed in the tested LSG corpus.
 
 The candidate's JSON evidence includes a bounded set of exact `book` / `source_origin` / `printed_destination` / `reason` findings to resume the physical-edition review without repeating the audit.
 
@@ -68,18 +68,30 @@ The earlier [#45132279039](https://github.com/icfmp/Bible-Resources/actions/runs
 
 A second candidate, generated by `scripts/segment_osis_reference_destinations.py`, retains the entire first normalized candidate and converts the 4,865 multiple-target notes to **15,052 independently addressed `reference` elements**, adding 10,187 link elements inside notes without adding or removing a single original character. All other original text, verse IDs, note source anchors, target sequences and source element order remain unchanged. Every byte outside the reviewed `reference` elements is preserved.
 
-The whole-source XML source/individual comparison, official OSIS XSD, BRNP checks and **three isolated native SWORD compilations** all passed in [#45136656184](https://github.com/icfmp/Bible-Resources/actions/runs/45136656184). SWORD returned **32,426** ordered native entry frames, and **4,518** frames with altered reference markup were proven to contain **exactly the same compiled full text, note text, note origin and destination sequence**. An 81-frame trailing whitespace discrepancy discovered in the first experiment was repaired by preserving the literal original full stop and terminal blank inside the final reference element. The final trial has **zero** native note-text or unrelated markup differences.
+The whole-source XML source/individual comparison, official OSIS XSD, BRNP checks and **three isolated native SWORD compilations** all passed in [#45136656184](https://github.com/icfmp/Bible-Resources/actions/runs/45136656184). SWORD returned **32,426** ordered native entry frames, and **4,519** frames with altered reference markup were proven to contain **exactly the same compiled full text, note text, note origin and destination sequence**. An 81-frame trailing whitespace discrepancy discovered in the first experiment was repaired by preserving the literal original full stop and terminal blank inside the final reference element. The final trial has **zero** native note-text or unrelated markup differences.
 
 The real libSWORD `OSISHTMLHREF` rendering filter was also executed: a reference element containing two `osisRef` tokens rendered one HTML anchor; two individually marked references rendered **two independently targeted anchors**. This is a stock SWORD rendering-engine check, **not** verification of actual Xiphos, AndBible or Bible user interactions.
 
-The strict source-local citation rule also resolved **46** additional complete labels: 12 original `v. N.` forms with an attested source-note chapter, 18 named `Jud v. N.`/`Ab v. N.` forms within one-chapter biblical books, and 16 unambiguous `Lé 11.`-style whole-chapter references. No missing verse or ambiguous carry-over is inferred, and no historical authorial text has changed. The final normalized candidate has **9,391/9,751** linked cross-reference notes, **19,578** individual explicit destination tokens (including the single-target contextual forms), and 360 unlinked notes.
+The strict source-local citation rule also resolved **46** additional complete labels: 12 original `v. N.` forms with an attested source-note chapter, 18 named `Jud v. N.`/`Ab v. N.` forms within one-chapter biblical books, and 16 unambiguous `Lé 11.`-style whole-chapter references. No missing verse or ambiguous carry-over is inferred, and no historical authorial text has changed. The final normalized candidate has **9,392/9,751** linked cross-reference notes, **19,582** individual explicit destination tokens (including the single-target contextual forms), and 359 unlinked notes.
 
-The remaining **360** original cases were fully classified and retained in the source-hash-pinned `lsg-source-citation-triage.json` artifact: 242 open-ended `etc.`, 54 mixed embedded `v.`, 9 other compound/chapter shorthand strings and 55 labels with invalid or absent endpoints. Preserve the original source testimony; future partial markup of definitely attested explicit fragments must keep the `etc.` and other unresolved authorial qualifiers visible and unlinked, never invent an endpoint.
+The remaining **359** original cases were fully classified and retained in the source-hash-pinned `lsg-source-citation-triage.json` artifact: 242 open-ended `etc.`, 54 mixed embedded `v.`, 9 other compound/chapter shorthand strings and 54 labels with unresolved or absent source addresses. Preserve the original source testimony; future partial markup of definitely attested explicit fragments must keep the `etc.` and other unresolved authorial qualifiers visible and unlinked, never invent an endpoint.
+
+## Source-faithful correction to the apparent 55 missing-target findings
+
+A fresh read of the original `fraLSG_usfx.zip` revealed one source-reference form that the earlier parser wrongly treated as a nonexistent verse. At `Gen 2.2`, the exact printed-digital label `Ex 20:11, 31, 17.` designates **Exod.20.11 and Exod.31.17** when disambiguated using the attested source versification. The initial parser wrongly interpreted the second group as `Exod.20.31`, which is absent. This exact unchanged label is also visible in a separate [LSG-hosted cross-reference display](https://www.bibliaonline.com.br/lsg+fmar/gn/2); it does not constitute an independent visual certification of the physical printed 1910 page.
+
+The generic parser now recognizes comma-separated `chapter,verse` only when the same-chapter verse is genuinely absent, the alternate book/chapter/verse exists, and **the entire original citation label** is consumed and verified. If both alternatives are possible it retains the previous grammar rather than guessing a switch. The individual-link serializer preserves the exact source substring `31, 17`, including commas and spacing. Both candidates were compiled and compared in three isolated SWORD engines with source-authorial note text preserved. No original biblical text, original citation label or release is modified.
+
+The [full source-native run #45144018694](https://github.com/icfmp/Bible-Resources/actions/runs/45144018694) confirms **9,392 linked notes, 359 unlinked notes**, **19,317** additive reference attributes and **19,582** resolved destination address tokens. It found no new XML or native structural regressions.
+
+The **54 remaining source-addressability cases** (not 54 confirmed printed errors) have been preserved in the separate versioned and source-hash-pinned `UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json`: each record carries the source USFM book, note verse, literal citation, source and original file hashes, and a pending historical-print review status; none has an approved correction. The LSG CI now checks all 54 records against the exact original archive and fails on any silent change or accidental editorial approval.
+
+Several records may reflect genuine typographical mistakes **or historical versification differences**, not simply invalid text. In particular, source-unaddressable `Jon 1:17`, `Os 1:10` and `Na 1:15` appear with variant chapter/verse numbering in other published Segond representations. These are *candidates for printed-edition collation*, **not** authority to remap Scripture verses or invent references.
 
 ## Remaining release/merge gates
 
 1. **Individual hyperlink usability:** compare representative one-target, multi-target, ranges, chapters and implicit-context references in real Xiphos and AndBible (and if applicable Bible); preserve exactly the printed punctuation. The stock libSWORD HTML renderer already confirms two independent anchors for two separated source citations; this is still not proof of each graphical reader's click/navigation behavior. Do not relax BRNP to suppress reader defects.
-2. **360 unresolved destination notes:** decide via print/editorial witnesses which are genuine malformed labels, non-linkable but faithful printed constructs, and independently verified technical alias variants. Maintain reversible decisions; no source text changes merely to lower a count.
+2. **359 unresolved destination notes:** decide via print/editorial witnesses which are genuine malformed labels, non-linkable but faithful printed constructs, and independently verified technical alias variants. Maintain reversible decisions; no source text changes merely to lower a count.
 3. **Three introduction pointers:** compare printed source for any actual correction; retain unlinked when no trustworthy proof exists.
 4. **Publication and approved cleaned master:** only after the above plus complete source/native and reader checks and project-owner approval may a new edition-specific cleaned master be checked in and the accompanying source manifest/version be repinned. Existing release binaries must remain immutable.
 
