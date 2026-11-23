@@ -120,6 +120,28 @@ jobs:
 
       - name: Run source-attested normalizer negative and idempotence tests
         run: python -m unittest discover -s tests -p test_normalize_bible_references.py -v
+      - name: Classify every original introduction section span and origin label
+        run: |
+          python - <<'PY'
+          import re
+          from collections import Counter
+          from zipfile import ZipFile
+          from lxml import etree
+          zip_path='sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip'
+          with ZipFile(zip_path) as zipped:
+              doc=etree.fromstring(zipped.read('fraLSG_usfx.xml'),
+                  parser=etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True))
+          def label(node): return ' '.join(''.join(node.itertext()).split())
+          intro=[(b.get('id'),label(e)) for b in doc.iter('book') for e in b.iter('ior')]
+          starts=[(b.get('id'),label(e)) for b in doc.iter('book')
+                  for e in b.iter('xo')]
+          pattern=r'(\d+):(\d+)(?:\s*[-–]\s*(?:(\d+):)?(\d+))?'
+          unknown=[x for x in intro if not re.fullmatch(pattern,x[1])]
+          unknown_start=[x for x in starts if not re.fullmatch(r'(\d+)\.(\d+)',x[1])]
+          print('INTRO total/unknown:',len(intro),len(unknown),'unknown values:',unknown[:200])
+          print('ORIGIN total/unknown:',len(starts),len(unknown_start),'unknown values:',unknown_start[:35])
+          print('INTRO punctuation:',Counter(tuple(sorted({ch for ch in l if not ch.isdigit() and not ch.isspace()})) for b,l in intro))
+          PY
       - name: Fetch independently pinned official OSIS schema
         run: python scripts/fetch_reviewed_schema.py --directory /tmp/lsg-reviewed-osis
       - name: Build separate complete cleaned-source candidate and preservation ledger
