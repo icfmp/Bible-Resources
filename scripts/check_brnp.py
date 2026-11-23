@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 POLICY = ROOT / "config" / "osis-policy.json"
 NS = "{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 MAX_BYTES = 128 * 1024 * 1024
-VERSION = "0.1"
+VERSION = "0.2-draft"
 # OSIS 2.1.1 constructs already encountered in independently XSD-valid
 # resources. Preserve structured tables/lists and historical source metadata.
 # This is not a supplier-specific allowlist or permission to drop content.
@@ -257,6 +257,10 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         "chapter_pair_identifier_count": len(chapter_pair_ids),
         "bible_verse_member_count": len(verse_member_ids),
         "findings": errors[:100], "finding_count": len(errors),
+        "finding_examples_by_code": {
+            code: next(item for item in errors if item["code"] == code)
+            for code in sorted({item["code"] for item in errors})
+        },
         "finding_codes": dict(sorted(Counter(e["code"] for e in errors).items())),
         "unreviewed_elements": dict(sorted(Counter(
             e["element"] for e in errors if e["code"] == "UNREVIEWED_ELEMENT"
