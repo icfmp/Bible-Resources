@@ -48,6 +48,18 @@ jobs:
               echo "::warning::BRNP pilot could not inspect $label (exit $status)"
             fi
           done
+          python - <<'PY'
+          import collections, json, os
+          from pathlib import Path
+          folder = Path(os.environ["RUNNER_TEMP"]) / "brnp-reports"
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+              summary.write("\\n### Diagnostic code frequencies (first 100 findings only)\\n")
+              for path in sorted(folder.glob("*.json")):
+                  report = json.loads(path.read_text(encoding="utf-8"))
+                  counts = collections.Counter(f["code"] for f in report.get("findings", []))
+                  print(path.stem, report.get("finding_count"), dict(counts))
+                  summary.write(f"- {path.stem}: total {report.get('finding_count', 0)}; first-100 distribution {dict(counts)}\\n")
+          PY
           echo 'Exit 1 means pilot findings, not failed official OSIS validity. These results are non-blocking until BRNP is independently reviewed and approved.' >> "$GITHUB_STEP_SUMMARY"
       - name: Upload diagnostics only
         if: always()
