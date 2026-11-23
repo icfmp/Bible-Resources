@@ -100,6 +100,7 @@ jobs:
             --destination-aliases config/lsg-1910-printed-book-aliases.json \
             --complete-citation-lists \
             --source-local-short-forms \
+            --disambiguated-chapter-commas \
             --output /tmp/lsg-structural-candidate.osis.xml \
             --report /tmp/lsg-structural-report.json
       - name: Validate official schema plus BRNP diagnostic before/after
@@ -205,7 +206,7 @@ jobs:
                       raise SystemExit('Unexpected source USFX note shape')
                   label=_label(xt)
                   value,reason,_=_complete_printed_destinations(
-                      label,aliases,verse_ids)
+                      label,aliases,verse_ids,disambiguated_chapter_commas=True)
                   if value is None and reason=='compound_or_implicit_reference':
                       value,reason=_explicit_source_local_reference(
                           label,aliases,_label(xo),
@@ -248,6 +249,7 @@ jobs:
             --crosswalk config/standard_usfm_osis_66.json \
             --alias-witness config/lsg-1910-printed-book-aliases.json \
             --expected-input-sha256 "$SOURCE_HASH" \
+            --disambiguated-chapter-commas \
             --output /tmp/lsg-individual-reference-candidate.osis.xml \
             --report /tmp/lsg-individual-reference-receipt.json
       - name: Independently validate source text, XSD and both BRNP reference inventories
