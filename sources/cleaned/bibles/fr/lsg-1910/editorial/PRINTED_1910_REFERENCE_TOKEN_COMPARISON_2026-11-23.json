@@ -8,9 +8,9 @@
   "enlarged_evidence_run": "https://github.com/icfmp/Bible-Resources/actions/runs/45158131029",
   "enlarged_evidence_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/45158131029/artifacts/14809073411",
   "visual_review_scope": "Reference token and surrounding source-verse callout are checked from the original 821x1162 print page. The printed book frequently contains a longer grouped apparatus than a single digital xt; no statement that the entire USFX xt text is the literal printed note is implied.",
-  "confirmed_individual_printed_reference_token_sightings": 6,
+  "confirmed_individual_printed_reference_token_sightings": 10,
   "original_or_cleaned_text_changes_approved": 0,
-  "corrections_proposed_not_approved": 6,
+  "corrections_proposed_not_approved": 10,
   "records": [
     {
       "record_id": "LSG-CR-008",
@@ -64,6 +64,57 @@
       "editorial_change_authorized": null
     },
     {
+      "record_id": "LSG-CR-017",
+      "original_usfm_book": "ISA",
+      "source_note_origin": "11.6",
+      "original_usfx_label": "És 65:26. Os 2:17.",
+      "secondary_digital_label": "És 65:25. Os 2:17.",
+      "original_1910_print_page": 572,
+      "facsimile_page_url": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/572",
+      "printed_note_callout": "x",
+      "printed_reference_token_or_local_group": "65. 25.",
+      "interpreted_print_target_token": "Isa.65.25",
+      "scope": "identified_printed_margin_reference_token_not_full_digital_xt_collation",
+      "printed_reference_token_visually_read": true,
+      "printed_full_cross_reference_label_matches_eBible": null,
+      "clarification": "On the original Isaiah 11 printed margin, the contextual x-reference reads 65.25; eBible changes the numeric destination to unattested Isa 65:26.",
+      "editorial_change_authorized": null
+    },
+    {
+      "record_id": "LSG-CR-020",
+      "original_usfm_book": "JER",
+      "source_note_origin": "1.3",
+      "original_usfx_label": "2 R 5:23, 34. 2 Ch 36:4.",
+      "secondary_digital_label": "2 R 5:23, 27. 2 Ch 36:4.",
+      "original_1910_print_page": 619,
+      "facsimile_page_url": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/619",
+      "printed_note_callout": "i",
+      "printed_reference_token_or_local_group": "2 R. 23. 34.",
+      "interpreted_print_target_token": "2Kgs.23.34",
+      "scope": "identified_printed_margin_reference_token_not_full_digital_xt_collation",
+      "printed_reference_token_visually_read": true,
+      "printed_full_cross_reference_label_matches_eBible": null,
+      "clarification": "In the original printed Jeremiah 1 introductory chronology, the i-reference is 2 Kings 23:34, whereas both digital witnesses give a malformed 2 Kings 5 reference.",
+      "editorial_change_authorized": null
+    },
+    {
+      "record_id": "LSG-CR-023",
+      "original_usfm_book": "JER",
+      "source_note_origin": "41.1",
+      "original_usfx_label": "2 R 25:35.",
+      "secondary_digital_label": "2 R 25:25.",
+      "original_1910_print_page": 663,
+      "facsimile_page_url": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/663",
+      "printed_note_callout": "r",
+      "printed_reference_token_or_local_group": "2 R. 25. 25.",
+      "interpreted_print_target_token": "2Kgs.25.25",
+      "scope": "identified_printed_margin_reference_token_not_full_digital_xt_collation",
+      "printed_reference_token_visually_read": true,
+      "printed_full_cross_reference_label_matches_eBible": null,
+      "clarification": "The original marginal r-reference at the account of Ishmael and Gedaliah cites 2 Kings 25:25; eBible gives nonexistent 2 Kings 25:35.",
+      "editorial_change_authorized": null
+    },
+    {
       "record_id": "LSG-CR-029",
       "original_usfm_book": "MAT",
       "source_note_origin": "19.14",
@@ -78,6 +129,23 @@
       "printed_reference_token_visually_read": true,
       "printed_full_cross_reference_label_matches_eBible": null,
       "clarification": "The printed e note beside Jesus receiving the children includes an implicit Matthew 18:3, not the impossible Mark 18:3. The 1910 printed reference group also contains extra targets and differs in order; this records only the identified token.",
+      "editorial_change_authorized": null
+    },
+    {
+      "record_id": "LSG-CR-045",
+      "original_usfm_book": "1TH",
+      "source_note_origin": "4.9",
+      "original_usfx_label": "Lé 19:18. Mt 22:39. Jn 13:34; 15:12. Ép 5:2. 2 Pi 4:8. 1 Jn 3:23; 4:21.",
+      "secondary_digital_label": "Lé 19:18. Mt 22:39. Jn 13:34; 15:12. Ép 5:2. 2 Pi 3:8. 1 Jn 3:23; 4:21.",
+      "original_1910_print_page": 989,
+      "facsimile_page_url": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/989",
+      "printed_note_callout": "o",
+      "printed_reference_token_or_local_group": "1 Pi. 4. 8.",
+      "interpreted_print_target_token": "1Pet.4.8",
+      "scope": "identified_printed_margin_reference_token_not_full_digital_xt_collation",
+      "printed_reference_token_visually_read": true,
+      "printed_full_cross_reference_label_matches_eBible": null,
+      "clarification": "The original first Thessalonians 4 fraternal-love context visibly cites 1 Peter 4:8 in the margin; two digital witnesses mistakenly cite 2 Peter with different chapter numbers.",
       "editorial_change_authorized": null
     },
     {
@@ -114,5 +182,7 @@
       "clarification": "The original 1910 printed s reference beside sealing the servants reads Ez. 9. 4-6.; eBible and Biblia reference Ephesians, and the first digitization even cites a nonexistent Ephesians 9:4. Printed range details do not authorize creating a machine target without separate review.",
       "editorial_change_authorized": null
     }
-  ]
+  ],
+  "additional_enlarged_evidence_run": "https://github.com/icfmp/Bible-Resources/actions/runs/45159370757",
+  "additional_enlarged_evidence_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/45159370757/artifacts/14809543290"
 }
