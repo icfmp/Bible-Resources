@@ -78,19 +78,28 @@ edition-specific workaround.
 
 ## Merge controls and limits
 
-Require PR review and the always-running **Validate** and
-**Architecture guardrails** checks in GitHub branch protection/rulesets.
-Also require up-to-date checks and disallow force-pushes, direct pushes
-and bypasses as appropriate for the maintainers. The existing
-tool-registry maintenance job is path-filtered; it must not be marked
-as required without making it run for every PR.
+The [active `Protect Main` ruleset](https://github.com/icfmp/Bible-Resources/rules/26890406)
+was independently read through the GitHub Rulesets API on 2026-11-23.
+It requires pull requests, blocks branch deletion and non-fast-forward
+updates, and strictly requires the **`validate`** status. There are
+no bypass actors. The required Validate job runs the entire unit suite
+(including architecture regressions) **and** the source-bound script
+registry check, so an error in either prevents merging through the
+enforced status gate.
 
-The GitHub integration cannot currently read the `main` protection
-settings (API authorization denied). CI success proves the checks ran,
-**not** that a human administrator has enabled branch enforcement.
-Verify that setting directly under repository Settings → Rules/Branches
-and record confirmation separately. Never claim protection is enabled
-until verified.
+The separate always-running **Architecture guardrails** status is
+useful for fast diagnostics and weekly monitoring. It is **not yet**
+a required status in that ruleset. The path-filtered legacy registry
+maintenance job should not be marked as required without removing its
+path filter; the required Validate job independently guards that registry.
+
+**Administrator improvement still pending:** the current ruleset has
+`required_approving_review_count: 0`. For mandatory human code review,
+set this to at least one and consider adding the always-running
+`Architecture guardrails` status as a second required context under
+Settings → Rules → Protect Main. The connected GitHub tools can
+**read** this ruleset but cannot update its admin settings. CI success
+does not imply that the extra review requirement has been enabled.
 
 Do a brief, read-only periodic health check; escalate actual source
 drift, unresolved edition errors, or broken published URLs through
