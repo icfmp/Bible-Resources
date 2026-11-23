@@ -20,7 +20,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 - KEEP_GENERIC: 48
 - MERGE: 0
 - MODULE_LOCAL: 0
-- UNDECIDED: 0
+- UNDECIDED: 1
 
 ## All tracked tools
 
@@ -32,6 +32,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/build.py`](../../scripts/build.py) | KEEP_GENERIC | not established | 11 | publication/release |
 | [`scripts/catalogue_profiles.py`](../../scripts/catalogue_profiles.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/catalogue_release_coverage.py`](../../scripts/catalogue_release_coverage.py) | KEEP_GENERIC | named test | 8 | publication/release |
+| [`scripts/check_brnp.py`](../../scripts/check_brnp.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/check_provider_parity.py`](../../scripts/check_provider_parity.py) | KEEP_GENERIC | not established | 5 | not determined |
 | [`scripts/check_updates.py`](../../scripts/check_updates.py) | KEEP_GENERIC | not established | 9 | not determined |
 | [`scripts/commentary_intake.py`](../../scripts/commentary_intake.py) | KEEP_GENERIC | named test | 6 | intake |
