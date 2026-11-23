@@ -5,8 +5,8 @@ on:
     paths:
       - '.github/workflows/verify-previous-sword-release.yml'
       - 'scripts/publish_reviewed_release.py'
-      - 'config/release-plans/mhcc-0.1.0.json'
-      - 'config/release-plans/mhcc-0.1.1.json'
+      # Historical 0.1.0 is optional; listen for current and future MHCC plans.
+      - 'config/release-plans/mhcc-0.1.*.json'
       - 'modules/mhcc-crosswire/**'
   workflow_dispatch:
 

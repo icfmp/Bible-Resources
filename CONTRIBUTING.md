@@ -12,6 +12,12 @@ Begin with the [documentation guide](docs/README.md), the [production contract](
 
 If evidence is missing, mark the resource `BLOCKED`/`restricted` as applicable; do not publish an approximate replacement.
 
+## Architecture is a release-quality contract
+
+Before adding any file, consult the [maintained architecture guardrails](docs/architecture/MAINTENANCE_GUARDRAILS.md). Work in a temporary Git branch; do not commit a general `work/`, `history/` or `examples/` tree. Reuse the current source, tool, configuration or documentation path rather than creating an alternate pipeline. For tools, record the real consumer, positive and negative behavior, and regenerate the existing source-bound script registry. For configuration, document the active consumer and validate referenced paths. Use `docs/` for reusable guidance; individual editorial proof belongs beside the curated edition.
+
+An **Architecture guardrails** check runs on every PR and weekly, alongside the current source, release and test gates. It rejects unreviewed directory roots, disposable tracked files, missing active JSON/file references, and broken workflow references. A deliberate architecture exception requires updating the policy and regression tests in the same PR; do not add edition-specific bypass code. The existing PR template asks for source impact, changed consumers, test links and cleanup of superseded implementations.
+
 ## Verify before requesting review
 
 ```sh

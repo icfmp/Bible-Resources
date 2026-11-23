@@ -1,0 +1,29 @@
+name: Architecture guardrails
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  architecture:
+    name: Architecture guardrails
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check tracked layout, active configs and workflows
+        run: python -m unittest discover -s tests -p 'test_repository_architecture.py' -v
+      - name: Check documentation links
+        run: python -m unittest discover -s tests -p 'test_documentation_links.py' -v
+      - name: Verify source-bound script registry
+        run: python -m scripts.tool_registry --check

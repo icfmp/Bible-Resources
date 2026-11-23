@@ -34,6 +34,10 @@ jobs:
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
             install -y diatheke libsword-dev
+      # Main's active ruleset requires this job. Include the source-bound
+      # registry here so a stale inventory cannot slip through on any PR.
+      - name: Check source-bound tracked tool inventory
+        run: python -m scripts.tool_registry --check
       - run: python -m unittest discover -s tests -v
       - name: Independently scan the exact published SWORD module's native verse-index
         shell: bash
