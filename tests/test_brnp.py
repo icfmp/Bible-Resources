@@ -215,6 +215,41 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         self.assertNotIn("REFERENCE_CHAPTER_SCOPE", report["finding_codes"])
         self.assertEqual(report["finding_count"], 0)
 
+    def test_duplicate_member_of_compound_bible_verse_is_rejected(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1">'
+            '<verse osisID="Gen.1.1 Gen.1.2">Combined</verse>'
+            '<verse osisID="Gen.1.2">Duplicated member</verse>'
+            '</chapter>'
+        ))
+        self.assertIn("VERSE_CONTAINER_ID", report["finding_codes"])
+
+    def test_verse_scope_under_chapter_milestone(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1" sID="chapter-1"/>'
+            '<p><verse osisID="Gen.2.1" sID="v1"/>Wrong chapter'
+            '<verse eID="v1"/></p><chapter eID="chapter-1"/>'
+        ))
+        self.assertIn("REFERENCE_CHAPTER_SCOPE", report["finding_codes"])
+
+    def test_chapter_milestone_pair_id_can_differ_from_canonical(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1" sID="chapter-a"/>'
+            '<p><verse osisID="Gen.1.1" sID="v1"/>Correct'
+            '<verse eID="v1"/></p><chapter eID="chapter-a"/>'
+        ))
+        self.assertEqual(report["finding_count"], 0)
+        self.assertEqual(report["chapter_pair_identifier_count"], 1)
+
+    def test_duplicate_chapter_pair_key_is_rejected(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1" sID="chapter-a"/>'
+            '<verse osisID="Gen.1.1">First</verse><chapter eID="chapter-a"/>'
+            '<chapter osisID="Gen.2" sID="chapter-a"/>'
+            '<verse osisID="Gen.2.1">Second</verse><chapter eID="chapter-a"/>'
+        ))
+        self.assertIn("CHAPTER_START_ID", report["finding_codes"])
+
     def test_source_unchanged(self):
         content = document('<verse osisID="Gen.1.1">Test</verse>')
         self.path.write_text(content, encoding="utf-8")
