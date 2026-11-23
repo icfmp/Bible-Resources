@@ -96,10 +96,10 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
             elif start:
                 if not identifier or identifier != start or identifier in chapters_seen:
                     errors.append({"code": "CHAPTER_START_ID", "line": line})
-                chapters_active.append(start)
+                chapters_active.append((start, line))
                 chapters_seen.add(start)
             elif end:
-                if not chapters_active or chapters_active[-1] != end:
+                if not chapters_active or chapters_active[-1][0] != end:
                     errors.append({"code": "CHAPTER_END_PAIR", "line": line})
                 else:
                     chapters_active.pop()
@@ -112,9 +112,10 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
             if start and end or (end and identifier):
                 errors.append({"code": "MIXED_VERSE_MILESTONE", "line": line})
             elif start:
-                if not identifier or start != identifier or start in verse_ids:
-                    reason = ("missing_osisID" if not identifier else
-                              "sID_osisID_mismatch" if start != identifier else "duplicate")
+                if not identifier or identifier in verse_ids:
+                    # sID is a unique pairing key; OSIS does not require it
+                    # to equal the canonical osisID. MHC has distinct IDs.
+                    reason = "missing_osisID" if not identifier else "duplicate"
                     errors.append({"code": "VERSE_START_ID", "line": line, "reason": reason})
                 active.append(start)
                 verse_ids.add(start)
@@ -140,7 +141,8 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
     if active:
         errors.append({"code": "UNCLOSED_VERSE_MILESTONE", "count": len(active)})
     if chapters_active:
-        errors.append({"code": "UNCLOSED_CHAPTER_MILESTONE", "count": len(chapters_active)})
+        errors.append({"code": "UNCLOSED_CHAPTER_MILESTONE", "count": len(chapters_active),
+                       "line": chapters_active[-1][1]})
     if kind == "bible" and not books_seen:
         errors.append({"code": "NO_BOOK_DIVISIONS"})
     if kind == "commentary" and not annotations:
