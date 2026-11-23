@@ -22,6 +22,13 @@ POLICY = ROOT / "config" / "osis-policy.json"
 NS = "{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 MAX_BYTES = 128 * 1024 * 1024
 VERSION = "0.1"
+# OSIS 2.1.1 constructs already encountered in independently XSD-valid
+# resources. Preserve structured tables/lists and historical source metadata.
+# This is not a supplier-specific allowlist or permission to drop content.
+STANDARD_STRUCTURAL = frozenset({
+    "cell", "date", "description", "identifier", "item", "list",
+    "refSystem", "revisionDesc", "rights", "row", "table", "type",
+})
 
 
 def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
@@ -45,7 +52,7 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         official = {"schema_sha256": pinned_hash, "source_sha256": sha256(raw).hexdigest()}
     content = path.read_bytes()
     policy = json.loads(POLICY.read_text(encoding="utf-8"))
-    allowed = set(policy["supported_elements"])
+    allowed = set(policy["supported_elements"]) | STANDARD_STRUCTURAL
     parser = etree.XMLParser(resolve_entities=False, load_dtd=False,
                              no_network=True, recover=False, huge_tree=False)
     root = etree.fromstring(content, parser=parser)
@@ -78,7 +85,7 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
             errors.append({"code": "UNREVIEWED_ELEMENT", "line": line, "element": tag})
         if tag == "div" and element.get("type") == "book":
             book_id = element.get("osisID")
-            if not book_id or book_id in books_seen:
+            if kind == "bible" and (not book_id or book_id in books_seen):
                 errors.append({"code": "BOOK_ID", "line": line})
             else:
                 books_seen.add(book_id)
@@ -106,7 +113,9 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
                 errors.append({"code": "MIXED_VERSE_MILESTONE", "line": line})
             elif start:
                 if not identifier or start != identifier or start in verse_ids:
-                    errors.append({"code": "VERSE_START_ID", "line": line})
+                    reason = ("missing_osisID" if not identifier else
+                              "sID_osisID_mismatch" if start != identifier else "duplicate")
+                    errors.append({"code": "VERSE_START_ID", "line": line, "reason": reason})
                 active.append(start)
                 verse_ids.add(start)
             elif end:
@@ -155,6 +164,9 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         "finding_codes": dict(sorted(Counter(e["code"] for e in errors).items())),
         "unreviewed_elements": dict(sorted(Counter(
             e["element"] for e in errors if e["code"] == "UNREVIEWED_ELEMENT"
+        ).items())),
+        "verse_start_reasons": dict(sorted(Counter(
+            e["reason"] for e in errors if e["code"] == "VERSE_START_ID"
         ).items())),
         "limitations": [
             "Official OSIS XSD is checked only when --schema is supplied; neither route proves historical/authorial fidelity",
