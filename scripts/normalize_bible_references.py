@@ -230,6 +230,8 @@ def _complete_printed_destinations(label: str, aliases: dict | None,
             return None, "compound_or_implicit_reference", 0
         sep = label[pos]
         pos += 1
+        if len(targets) > 128:
+            return None, "overlong_printed_reference_sequence", 0
         if sep == ".":
             if pos == len(label):
                 return " ".join(targets), "complete_printed_list", contextual
@@ -481,6 +483,8 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         crosswalk_path: Path, output_path: Path | None = None,
         destination_aliases_path: Path | None = None,
         complete_citation_lists: bool = False) -> tuple[bytes, dict]:
+    if complete_citation_lists and destination_aliases_path is None:
+        raise ReviewError("Complete reference lists require a pinned original-edition abbreviation witness")
     manifest = json.loads(_bytes(manifest_path, 256 * 1024).decode("utf-8"))
     current = _bytes(cleaned_path, MAX_SOURCE)
     zipped = _bytes(usfx_zip, MAX_SOURCE)
