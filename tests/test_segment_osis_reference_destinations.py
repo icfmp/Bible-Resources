@@ -115,10 +115,18 @@ class SplitSourceReferencesTest(unittest.TestCase):
         candidate,_=self.build(label)
         split,receipt=segment_candidate(candidate,self.aliases)
         self.assertEqual(receipt["segmented_destination_labels"],1)
-        self.assertIn(b'> <reference osisRef="Gen.1.1">Ge 1:1</reference>; <reference osisRef="Gen.2.1">2:1</reference>. ',
+        self.assertIn(b'> <reference osisRef="Gen.1.1">Ge 1:1</reference>; <reference osisRef="Gen.2.1">2:1. </reference>',
                       split)
         self.assertEqual("".join(etree.fromstring(candidate).itertext()),
                          "".join(etree.fromstring(split).itertext()))
+
+    def test_terminal_original_source_space_stays_inside_last_link_for_native_sword(self):
+        candidate,_=self.build("Ge 1:1. Ge 1:2. ")
+        split,receipt=segment_candidate(candidate,self.aliases)
+        self.assertIn(b'<reference osisRef="Gen.1.2">Ge 1:2. </reference>',split)
+        self.assertEqual("".join(etree.fromstring(candidate).itertext()),
+                         "".join(etree.fromstring(split).itertext()))
+        self.assertEqual(receipt["segmented_destination_labels"],1)
 
     def test_idempotence(self):
         candidate,_=self.build()
