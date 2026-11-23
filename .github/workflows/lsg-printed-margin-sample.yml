@@ -1,4 +1,4 @@
-name: LSG 1910 printed-margin image feasibility (draft evidence only)
+name: LSG 1910 original printed reference scan evidence (draft only)
 on:
   pull_request:
     paths:
@@ -6,121 +6,68 @@ on:
 permissions:
   contents: read
 jobs:
-  probe:
+  original_print:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
-      - name: Read source scan excerpt without modifying biblical files
-        run: |
-          python -m pip install -q Pillow
-          python - <<'PY'
-          from urllib.request import Request, urlopen
-          from urllib.error import HTTPError
-          from PIL import Image, ImageOps, ImageEnhance
-          from io import BytesIO
-          import hashlib, base64, os
-          root='https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/'
-          name='La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu'
-          os.makedirs('/tmp/lsg-margins',exist_ok=True)
-          for page in [13,29]:
-              image=None
-              for width in [802,700,500]:
-                  url=f'{root}{name}/page{page}-{width}px-{name}.jpg'
-                  try:
-                      req=Request(url,headers={'User-Agent':'Bible-Resources-evidence/1.0 (https://github.com/icfmp/Bible-Resources)'})
-                      b=urlopen(req,timeout=25).read()
-                      image=Image.open(BytesIO(b)).convert('RGB')
-                      print('SCAN',page,'url',url,'pixels',image.size,'sha256',hashlib.sha256(b).hexdigest())
-                      break
-                  except Exception as exc:
-                      print('SOURCE_ATTEMPT_FAILED',page,width,type(exc).__name__,str(exc)[:130])
-              if image is None:
-                  raise SystemExit('Cannot retrieve actual historical scan; no transcription possible')
-              image.save(f'/tmp/lsg-margins/printed-1910-p{page}-full.png')
-              w,h=image.size
-              # A narrow gutter between two printed text columns contains the 1910 references.
-              # Enlarge pixels for visual examination; interpolation does not create new evidence.
-              left=int(w*0.42);right=int(w*0.59)
-              excerpt=image.crop((left,int(h*0.11),right,int(h*0.89)))
-              excerpt=ImageOps.grayscale(excerpt)
-              excerpt=ImageEnhance.Contrast(excerpt).enhance(1.8)
-              excerpt=excerpt.resize((excerpt.width*3,excerpt.height*3),Image.Resampling.NEAREST)
-              out=BytesIO()
-              excerpt.save(out,format='PNG',optimize=True)
-              payload=out.getvalue()
-              open(f'/tmp/lsg-margins/printed-1910-p{page}-gutter.png','wb').write(payload)
-              print(f'LSG_SCAN_CROP_{page}_BASE64_BEGIN')
-              print(base64.b64encode(payload).decode('ascii'))
-              print(f'LSG_SCAN_CROP_{page}_BASE64_END')
-          PY
-      - name: Locate reference-bearing pages in independent 1911 printed scan
+      - name: Install DjVu decoder and image cropping library
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq djvulibre-bin
+          sudo apt-get install -qq -y djvulibre-bin
+          python -m pip install -q Pillow
+      - name: Pin and render the actual 1910 source scan pages 13 and 29
+        run: |
           python - <<'PY'
-          from urllib.request import Request, urlopen
+          from urllib.request import Request,urlopen
           from pathlib import Path
           from io import BytesIO
-          import hashlib, subprocess, re, base64
-          from PIL import Image, ImageOps, ImageEnhance
-          uri='https://upload.wikimedia.org/wikipedia/commons/c/c5/La_Sainte_Bible%2C_1911.djvu'
+          from PIL import Image,ImageOps,ImageEnhance,ImageFilter
+          import hashlib,base64,subprocess
+          uri='https://upload.wikimedia.org/wikipedia/commons/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu'
+          root=Path('/tmp/lsg-printed-1910-evidence')
+          root.mkdir(parents=True,exist_ok=True)
+          archive=root/'original-1910.djvu'
           req=Request(uri,headers={'User-Agent':'Bible-Resources-evidence/1.0 (https://github.com/icfmp/Bible-Resources)'})
-          scan=Path('/tmp/lsg-margins/segond-revision-1910-printed-1911.djvu')
-          try:
-              with urlopen(req,timeout=90) as r,scan.open('wb') as f:
-                  while True:
-                      b=r.read(1024*1024)
-                      if not b:break
-                      f.write(b)
-          except Exception as exc:
-              print('1911_PRINT_SOURCE_UNAVAILABLE',type(exc).__name__,str(exc)[:300])
-              raise SystemExit(1)
-          print('1911_SCAN_URI',uri,'size',scan.stat().st_size,'sha256',hashlib.sha256(scan.read_bytes()).hexdigest())
-          proc=subprocess.run(['djvutxt',str(scan)],capture_output=True,check=True)
-          raw=proc.stdout.decode('utf-8','replace')
-          pages=raw.split('\f')
-          print('1911 OCR-layer pages',len(pages),'overall chars',len(raw))
-          if len(pages) < 1000:
-              raise SystemExit('Scan page separators were not parsed: refusing speculative page locators')
-          found={}
-          for i,page in enumerate(pages,1):
-              normalized=re.sub(r'\s+',' ',page.casefold())
-              if 'mangerez' in normalized and ('sang' in normalized or 'chair' in normalized):
-                  found.setdefault('Gen9.4',[]).append(i)
-              if 'songe' in normalized and ('échelle' in normalized or 'echelle' in normalized or 'ange' in normalized):
-                  found.setdefault('Gen28.12',[]).append(i)
-          print('1911 source-verse page hints from *existing* scan OCR layer (NOT accepted reference readings):',found)
-          chosen=[]
-          for case in ['Gen9.4','Gen28.12']:
-              nums=found.get(case,[])
-              if nums:
-                  chosen.append((case,nums[0]))
-          if len(chosen)<2:
-              print('Insufficient scan OCR to locate both historical source verses without guessed page numbers')
-              raise SystemExit(1)
-          for case,pageno in chosen:
-              dest=f'/tmp/lsg-margins/1911-{case}-p{pageno}.tif'
-              subprocess.run(['ddjvu','-page='+str(pageno),'-format=tiff',str(scan),dest],check=True)
-              image=Image.open(dest).convert('RGB')
-              print('1911_SOURCE_IMAGE',case,'page',pageno,'size',image.size)
-              image.save(f'/tmp/lsg-margins/1911-{case}-p{pageno}-full.png')
-              w,h=image.size
-              excerpt=image.crop((int(w*.35),int(h*.08),int(w*.65),int(h*.92)))
-              excerpt=ImageOps.grayscale(excerpt)
-              excerpt=ImageEnhance.Contrast(excerpt).enhance(1.65)
-              excerpt.thumbnail((600,1600),Image.Resampling.LANCZOS)
-              out=BytesIO()
-              excerpt.save(out,format='PNG',optimize=True)
-              data=out.getvalue()
-              print('LSG_1911_'+case+'_P'+str(pageno)+'_BASE64_BEGIN')
+          with urlopen(req,timeout=120) as response,archive.open('wb') as f:
+              h=hashlib.sha256()
+              total=0
+              while True:
+                  data=response.read(1024*1024)
+                  if not data:break
+                  h.update(data)
+                  f.write(data)
+                  total+=len(data)
+          print('1910_ORIGINAL_PRINT_SCAN',uri,'bytes',total,'sha256',h.hexdigest())
+          if total < 200000000:
+              raise SystemExit('Unexpectedly small original full scan: abort source proof')
+          for page in [13,29]:
+              tiff=root/f'1910-original-page{page}.tif'
+              subprocess.run(['ddjvu','-page='+str(page),'-format=tiff',str(archive),str(tiff)],check=True)
+              im=Image.open(tiff).convert('RGB')
+              w,height=im.size
+              print('1910_ORIGINAL_PAGE',page,'native_pixel_dimensions',w,height)
+              if w < 700 or height < 1000:
+                  raise SystemExit('Source image resolution insufficient, do not claim certainty')
+              im.save(root/f'1910-original-page{page}-full.png')
+              # Source verse + authentic marginal note, generous bounds for position verification.
+              top,bottom=(int(height*.39),int(height*.67)) if page==13 else (int(height*.44),int(height*.70))
+              crop=im.crop((int(w*.35),top,int(w*.63),bottom))
+              crop=ImageOps.grayscale(crop)
+              crop=ImageEnhance.Contrast(crop).enhance(1.75)
+              crop=crop.resize((crop.width*3,crop.height*3),Image.Resampling.NEAREST)
+              b=BytesIO()
+              crop.save(b,format='PNG',optimize=True)
+              data=b.getvalue()
+              (root/f'1910-original-page{page}-reference-region.png').write_bytes(data)
+              print(f'LSG_1910_ORIGINAL_PAGE_{page}_IMAGE_BEGIN')
               print(base64.b64encode(data).decode('ascii'))
-              print('LSG_1911_'+case+'_P'+str(pageno)+'_BASE64_END')
-              Path(dest).unlink(missing_ok=True)
-          scan.unlink(missing_ok=True)
+              print(f'LSG_1910_ORIGINAL_PAGE_{page}_IMAGE_END')
+              tiff.unlink(missing_ok=True)
+          archive.unlink(missing_ok=True)
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: lsg-1910-facsimile-margin-images-unreviewed
-          path: /tmp/lsg-margins/
+          name: lsg-printed-1910-original-image-excerpts-not-certified
+          path: /tmp/lsg-printed-1910-evidence/*png
           retention-days: 14
