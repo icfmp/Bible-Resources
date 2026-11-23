@@ -235,6 +235,53 @@ class NormalizationTests(unittest.TestCase):
         self.assertEqual(context, 1)
         self.assertEqual(reason, "complete_printed_list")
 
+    def test_named_single_chapter_compound_references_are_source_attested(self):
+        aliases = {"Ge": "Gen", "Jud": "Jude", "Phm": "Phlm",
+                   "Ab": "Obad", "2 Jn": "2John"}
+        targets = {"Gen.1.1", "Jude.1.11", "Phlm.1.1",
+                   "Phlm.1.9", "Phlm.1.13", "Obad.1.10",
+                   "Obad.1.12", "2John.1.10"}
+        checks = (
+            ("Ge 1:1. Jud v. 11.", "Gen.1.1 Jude.1.11"),
+            ("Ge 1:1. Phm v. 1, 9, 13.",
+             "Gen.1.1 Phlm.1.1 Phlm.1.9 Phlm.1.13"),
+            ("Ab v. 10, 12.", "Obad.1.10 Obad.1.12"),
+            ("2 Jn v. 10.", "2John.1.10"),
+        )
+        for label, expected in checks:
+            with self.subTest(label=label):
+                old, _, _ = _complete_printed_destinations(
+                    label, aliases, targets)
+                self.assertIsNone(old)
+                linked, reason, _ = _complete_printed_destinations(
+                    label, aliases, targets,
+                    named_single_chapter_refs=True)
+                self.assertEqual(linked, expected)
+                self.assertEqual(reason, "complete_printed_list")
+
+    def test_named_one_chapter_verse_rejects_unknown_scope_and_any_etc(self):
+        aliases = {"Jud": "Jude", "Phm": "Phlm", "Ge": "Gen",
+                   "Unknown": "Unknown"}
+        targets = {"Jude.1.11", "Phlm.1.24", "Gen.1.1", "Gen.2.1",
+                   "Gen.2.11", "Unknown.1.11", "Unknown.2.11"}
+        invalid = (
+            "Jud v. 99.",               # no such source verse
+            "Ge v. 11.",                # explicitly multi-chapter book
+            "Unknown v. 11.",           # attested two-chapter book
+            "Jud v. 11, 99.",           # one invalid member blocks the group
+            "Jud v. 11, etc.",          # never infer open-ended members
+            "Jud v. 11. v. 12.",        # ambiguous unnamed source local
+            "Jud v. 11. Ge 1:1; v. 2.", # ambiguous unnamed carried chapter
+            "Jud v. 11",               # source omits final punctuation
+        )
+        for label in invalid:
+            with self.subTest(label=label):
+                linked, reason, _ = _complete_printed_destinations(
+                    label, aliases, targets,
+                    named_single_chapter_refs=True)
+                self.assertIsNone(linked)
+                self.assertNotEqual(reason, "complete_printed_list")
+
     def test_every_missing_explicit_or_contextual_target_refuses_entire_note(self):
         labels = (
             "Ge 1:1. Ex 2:99.", "Ge 1:1, 99.", "Ge 1:1; 2:99.",

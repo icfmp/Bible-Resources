@@ -278,6 +278,16 @@ All 19 printed-target contradictions have been *separately* triaged. A **read-on
 
 The safe technical disposition of these 19 differences is complete as a reviewed proposal. Before any actual change to the author's/publisher's digital annotations, a separate editorial approval and reversible master-edition decision is required. The previously owner-closed 29 printed-unverifiable cases remain untouched; no renewed print-forensics work is planned for them.
 
+## Generic source-attested single-chapter book shorthand, compound `v.` syntax (2026-11-23)
+
+The 359 as-yet-unlinked labels have been inventoried from the successful actual three-engine native SWORD candidate artifact: **54** unattested original electronic targets (already individually triaged), **242** open-ended `etc.` references, **54** mixed labels containing `v.`, and **9** compound chapter-only/mixed constructs. This is a grammar triage, not a print-note transcription or a source correction.
+
+In the 54 mixed `v.` labels, **36** have an **explicit independently attested alias naming a one-chapter book**, such as `Jud v. 11.`, `Phm v. 24.`, `Ab v. 10, 12.` or `2 Jn v. 10.` The existing generic normalizer now accepts these only in the already opt-in `--source-local-short-forms` mode, only with that **book's entire attested verse inventory showing exactly one chapter**, and only if **every member of the original whole reference group** resolves. This is not a heuristic based on the name Jude/Philemon, and is not an exception hardcoded for LSG; it is a reusable parser rule applying to any book with one actual source chapter.
+
+The **other 18 mixed `v.`** cases remain untouched because their implicit scope is potentially ambiguous, e.g. standalone `v. 23.` after a different quoted book/chapter, or editorial prose `sous v. 20.`. The **242 `etc.`** and **9 chapter-only/mixed** notes are also deliberately preserved unlinked; partial linkification of an incomplete source citation would misrepresent its semantics. The **54 original electronically invalid destinations** (including the owner's 29 print-investigation closed notes) remain unchanged and unlinked.
+
+Expected result for the separate, unpublished complete-source candidate: **9,428** whole source notes linked by real verse targets, **323** original destination labels kept visible but unlinked (54 unattested, 242 open-ended, 18 ambiguous mixed-relative, 9 chapter-only/mixed). No textual character, note, callout, verse index or original cleaned master is rewritten. The latest workflow validates these corpus regression counts, official XSD, BRNP and native SWORD/HTML rendering in isolated engines; live Xiphos/AndBible GUI acceptance and publication remain separate decisions.
+
 ## Remaining release/merge gates
 
 1. **Individual hyperlink usability:** compare representative one-target, multi-target, ranges, chapters and implicit-context references in real Xiphos and AndBible (and if applicable Bible); preserve exactly the printed punctuation. The stock libSWORD HTML renderer already confirms two independent anchors for two separated source citations; this is still not proof of each graphical reader's click/navigation behavior. Do not relax BRNP to suppress reader defects.

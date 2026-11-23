@@ -40,6 +40,10 @@ BOOK_CITATION = re.compile(
 SAME_BOOK_CITATION = re.compile(
     r"(?P<chapter>[1-9]\d{0,3}):\s*(?P<verse>[1-9]\d{0,3})"
 )
+NAMED_ONE_CHAPTER_VERSE = re.compile(
+    r"(?P<alias>(?:[1-3]\s+)?[A-Za-zÀ-ÿ]{1,12})\s+v\.\s*"
+    r"(?P<verse>[1-9]\d{0,3})"
+)
 VERSES_ONLY = re.compile(r"[1-9]\d{0,3}")
 
 
@@ -177,15 +181,18 @@ def _single_explicit_destination(label: str, aliases: dict | None,
 
 def _complete_printed_destinations(label: str, aliases: dict | None,
                                    verse_ids: set[str],
-                                   disambiguated_chapter_commas: bool = False
+                                   disambiguated_chapter_commas: bool = False,
+                                   named_single_chapter_refs: bool = False
                                    ) -> tuple[str | None, str, int]:
     """Consume a complete printed reference list or refuse the whole label.
 
     Every book alias comes from the independently attested edition table;
     commas carry the explicitly preceding chapter, and semicolons carry the
     book when the following component is a chapter:verse. Full stops require
-    a fresh *explicit* book alias. 'etc.', 'v.', nonnumeric terms, unknown books,
-    source-absent keys, reversed ranges and any leftover punctuation block.
+    a fresh *explicit* book alias. In opt-in source-local mode, 'Jud v. 11.'
+    means Jude 1:11 only if the attested source has exactly one chapter for
+    the independently authenticated book alias. Unqualified 'v.', 'etc.',
+    prose, unknown aliases and nonexistent verse keys remain unlinked.
     Preserve source order, including repetitions, without editing printed text.
     """
     if aliases is None:
@@ -206,6 +213,21 @@ def _complete_printed_destinations(label: str, aliases: dict | None,
                 return None, "unverified_printed_book_alias", 0
             chapter, verse = int(direct["chapter"]), int(direct["verse"])
             pos = direct.end()
+        elif named_single_chapter_refs and (
+                named := NAMED_ONE_CHAPTER_VERSE.match(label, pos)):
+            # The book is explicitly printed, but its chapter is omitted.
+            # Do not infer chapter 1 from the book name alone: require the
+            # *actual source edition* to attest exactly one chapter.
+            book = aliases.get(" ".join(named["alias"].split()))
+            if not book:
+                return None, "unverified_printed_book_alias", 0
+            chapters = {key.split(".")[1] for key in verse_ids
+                        if key.startswith(book + ".")}
+            if chapters != {"1"}:
+                return None, "named_relative_requires_one_chapter_book", 0
+            chapter, verse = 1, int(named["verse"])
+            pos = named.end()
+            contextual += 1
         elif can_repeat_book and book:
             carried = SAME_BOOK_CITATION.match(label, pos)
             if not carried:
@@ -487,7 +509,8 @@ def _source_bindings(cleaned, original, crosswalk: dict,
             if complete_lists:
                 destination_target, status, carried = _complete_printed_destinations(
                     _label(xt), destination_aliases, verse_ids,
-                    disambiguated_chapter_commas=disambiguated_chapter_commas)
+                    disambiguated_chapter_commas=disambiguated_chapter_commas,
+                    named_single_chapter_refs=source_local_short_forms)
                 counts["source_contextual_followups_used"] += carried
             else:
                 destination_target, status = _single_explicit_destination(
@@ -502,7 +525,8 @@ def _source_bindings(cleaned, original, crosswalk: dict,
                     status == "complete_printed_list" and
                     disambiguated_chapter_commas and complete_lists):
                 old_target, _old_reason, _old_context = _complete_printed_destinations(
-                    _label(xt), destination_aliases, verse_ids)
+                    _label(xt), destination_aliases, verse_ids,
+                    named_single_chapter_refs=source_local_short_forms)
                 if old_target is None:
                     counts["source_disambiguated_chapter_comma_labels_resolved"] += 1
             if destination_target is None:
@@ -524,6 +548,9 @@ def _source_bindings(cleaned, original, crosswalk: dict,
                     raise ReviewError("Printed destination conflicts with source-verified address")
                 changes[destination_refs[0]] = destination_target
                 counts["resolved_original_destination_labels"] += 1
+                if (source_local_short_forms and complete_lists and
+                        NAMED_ONE_CHAPTER_VERSE.search(_label(xt))):
+                    counts["source_named_one_chapter_compound_notes_resolved"] += 1
                 targets_in_label = len(destination_target.split())
                 counts["resolved_destination_target_tokens"] += targets_in_label
                 if targets_in_label > 1:

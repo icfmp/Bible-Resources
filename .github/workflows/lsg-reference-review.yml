@@ -211,7 +211,8 @@ jobs:
                       raise SystemExit('Unexpected source USFX note shape')
                   label=_label(xt)
                   value,reason,_=_complete_printed_destinations(
-                      label,aliases,verse_ids,disambiguated_chapter_commas=True)
+                      label,aliases,verse_ids,disambiguated_chapter_commas=True,
+                      named_single_chapter_refs=True)
                   if value is None and reason=='compound_or_implicit_reference':
                       value,reason=_explicit_source_local_reference(
                           label,aliases,_label(xo),
@@ -231,6 +232,9 @@ jobs:
                   if len(examples.get(category,[]))<4:
                       examples.setdefault(category,[]).append(label[:100])
           receipt=json.loads(Path('/tmp/lsg-structural-report.json').read_text())
+          if (receipt.get('source_named_one_chapter_compound_notes_resolved')!=36
+              or receipt['unlinked_original_destination_labels_preserved']!=323):
+              raise SystemExit('Expected exactly 36 fully source-attested named single-chapter compound links; ambiguous 323 remain untouched')
           if len(records)!=receipt['unlinked_original_destination_labels_preserved']:
               raise SystemExit('Original citation triage and normalized report diverge')
           report={'original_zip_sha256':sha256(orig.read_bytes()).hexdigest(),
