@@ -3,8 +3,6 @@ on:
   pull_request:
     paths:
       - '.github/workflows/lsg-reference-review.yml'
-      - 'scripts/normalize_cross_references.py'
-      - 'tests/test_normalize_cross_references.py'
 permissions:
   contents: read
 jobs:
@@ -97,7 +95,7 @@ jobs:
                   n.get('n') != x.get('caller')):
                   problems.append((i,'content_or_callout'))
           print('SOURCE/CLEANED xref witness mismatches:',len(problems),problems[:12])
-          patt=r'^\d+\.\d+
+          patt=r'^\d+\.\d+'
           invalid=[t for t in origin_labels if not re.fullmatch(patt,t)]
           print('ORIGIN grammar matched/unmatched:',len(origin_labels)-len(invalid),len(invalid),
                 'unmatched samples',invalid[:28])
@@ -107,9 +105,9 @@ jobs:
           print('INTRO preserved:',len(intro_labels),len(source_intros),
                 intro_labels==source_intros)
           patterns={
-              'range_two_full':r'^\d+:\d+\s*[-–]\s*\d+:\d+,
-              'range_same_chapter':r'^\d+:\d+\s*[-–]\s*\d+,
-              'single':r'^\d+:\d+,
+              'range_two_full':r'^\d+:\d+\s*[-–]\s*\d+:\d+',
+              'range_same_chapter':r'^\d+:\d+\s*[-–]\s*\d+',
+              'single':r'^\d+:\d+',
           }
           shapes=Counter(next((k for k,v in patterns.items() if re.fullmatch(v,t)),
                'other') for t in intro_labels)
