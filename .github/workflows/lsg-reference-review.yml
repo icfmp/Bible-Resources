@@ -74,4 +74,46 @@ jobs:
           print('REFERENCE STRUCTURES',len(refs),Counter((e.get('type'),e.get('subType')) for e in refs))
           intro=[e for e in refs if e.get('subType')=='x-introduction']
           print('INTRO REFERENCES',len(intro),'sample',[(dict(e.attrib),repr(''.join(e.itertext())[:45])) for e in intro[:8]])
+          with ZipFile(base/'fraLSG_usfx.zip') as z:
+              original=etree.fromstring(z.read('fraLSG_usfx.xml'),
+                  etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True))
+          source_notes=[x for x in original.iter() if isinstance(x.tag,str)
+              and etree.QName(x).localname=='x']
+          cleaned_notes=[n for n in notes if n.get('type')=='crossReference']
+          print('SOURCE/CLEANED note counts:',len(source_notes),len(cleaned_notes))
+          def normal(s):return ' '.join((s or '').split())
+          problems=[]
+          origin_labels=[]
+          for i,(x,n) in enumerate(zip(source_notes,cleaned_notes)):
+              xo=next((e for e in x if etree.QName(e).localname=='xo'),None)
+              xt=next((e for e in x if etree.QName(e).localname=='xt'),None)
+              children=[e for e in n if e.tag==ns+'reference']
+              if xo is None or xt is None or len(children)!=2:
+                  problems.append((i,'shape')); continue
+              label=normal(''.join(xo.itertext()))
+              origin_labels.append(label)
+              if (normal(''.join(children[0].itertext()))!=label or
+                  normal(''.join(children[1].itertext()))!=normal(''.join(xt.itertext())) or
+                  n.get('n') != x.get('caller')):
+                  problems.append((i,'content_or_callout'))
+          print('SOURCE/CLEANED xref witness mismatches:',len(problems),problems[:12])
+          patt=r'^\d+\.\d+
+          invalid=[t for t in origin_labels if not re.fullmatch(patt,t)]
+          print('ORIGIN grammar matched/unmatched:',len(origin_labels)-len(invalid),len(invalid),
+                'unmatched samples',invalid[:28])
+          intro_labels=[normal(''.join(x.itertext())) for x in intro]
+          source_intros=[normal(''.join(x.itertext())) for x in original.iter()
+               if isinstance(x.tag,str) and etree.QName(x).localname=='ior']
+          print('INTRO preserved:',len(intro_labels),len(source_intros),
+                intro_labels==source_intros)
+          patterns={
+              'range_two_full':r'^\d+:\d+\s*[-–]\s*\d+:\d+,
+              'range_same_chapter':r'^\d+:\d+\s*[-–]\s*\d+,
+              'single':r'^\d+:\d+,
+          }
+          shapes=Counter(next((k for k,v in patterns.items() if re.fullmatch(v,t)),
+               'other') for t in intro_labels)
+          print('INTRO grammar:',dict(shapes))
+          print('INTRO unmatched:',[t for t in intro_labels
+               if not any(re.fullmatch(v,t) for v in patterns.values())][:30])
           PY
