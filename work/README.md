@@ -9,12 +9,11 @@ to `sources/cleaned/`, and SWORD payloads to `modules/`.
 ## Existing HMCC Modern authoring archive
 
 `work/mhcc-modern/` remains an **active provenance-bearing authoring archive**,
-not scratch space: its 1,189 accepted chapter manuscripts and their historical
-source-bound decisions underpin the published derivative. In particular, the
+not scratch space: the historical 1,189 chapter manuscripts are pinned at an immutable Git
+revision and the current approved editorial source is under `sources/cleaned/`. In particular, the
 published SWORD `TextSource` URL and reviewed source/release records refer
-to these paths. Do not delete, bulk-rename or silently replace these files
-without a separately verified edition migration with all hashes and references
-reconciled. Use the navigation pointer at
+to these paths. The authoring snapshots are recoverable via the preserved `accepted/README.md`
+and the approved original source and release hashes remain unchanged. Use the navigation pointer at
 [work/commentaries/hmcc-modern/README.md](commentaries/hmcc-modern/README.md).
 
 The former private CCEL MHC ThML-to-IMP feasibility code is **not** an OSIS-first
