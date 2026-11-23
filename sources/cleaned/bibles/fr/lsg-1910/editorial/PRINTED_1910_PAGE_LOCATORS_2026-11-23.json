@@ -715,15 +715,23 @@
         "page_reference_full_note_certified": false
       },
       "original_print_case_review": {
-        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
         "inspected_exact_print_verse_on_page": 607,
-        "printed_token": "Na. 2. 1.",
-        "printed_token_target_hint": "Nah.2.1",
-        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
         "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
         "source_note_edited": false,
         "machine_link_authorized": false,
         "authorial_print_notation_interpretation_approved": false
+      },
+      "preliminary_marginal_target_candidate": {
+        "status": "visible_candidate_target_but_printed_note_callout_unconfirmed",
+        "raw_printed_reference_token": "Na. 2. 1.",
+        "interpreted_target_candidate": "Nah.2.1",
+        "evidence_run": "https://github.com/icfmp/Bible-Resources/actions/runs/45166535509",
+        "permission_to_edit_original_text": false,
+        "counted_as_certified_token": false
       }
     },
     {
@@ -981,15 +989,23 @@
         "page_reference_full_note_certified": false
       },
       "original_print_case_review": {
-        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
         "inspected_exact_print_verse_on_page": 799,
-        "printed_token": "És. 66. 1.",
-        "printed_token_target_hint": "Isa.66.1",
-        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
         "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
         "source_note_edited": false,
         "machine_link_authorized": false,
         "authorial_print_notation_interpretation_approved": false
+      },
+      "preliminary_marginal_target_candidate": {
+        "status": "visible_candidate_target_but_printed_note_callout_unconfirmed",
+        "raw_printed_reference_token": "És. 66. 1.",
+        "interpreted_target_candidate": "Isa.66.1",
+        "evidence_run": "https://github.com/icfmp/Bible-Resources/actions/runs/45166535509",
+        "permission_to_edit_original_text": false,
+        "counted_as_certified_token": false
       }
     },
     {
@@ -2067,12 +2083,13 @@
     "status": "first_pass_full_1910_original_image_screening_completed_not_full_editorial_certification",
     "totals": {
       "full_print_citation_verified": 1,
-      "partial_marginal_reference_token_read_only": 26,
-      "original_page_and_verse_examined_but_printed_citation_not_certified": 27
+      "partial_marginal_reference_token_read_only": 24,
+      "original_page_and_verse_examined_but_printed_citation_not_certified": 29
     },
     "reviewed_source_note_origins": 54,
     "source_label_edits_authorized": 0,
     "source_reference_links_authorized": 0,
-    "original_scan_provenance_sha256": "67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b"
+    "original_scan_provenance_sha256": "67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b",
+    "unconfirmed_callout_candidates_in_uncertified_category": 2
   }
 }
