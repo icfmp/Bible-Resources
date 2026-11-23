@@ -271,13 +271,14 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/normalize_osis.py",
         "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
         "docs/PRODUCTION_PIPELINE.md",
-        "tests/test_brnp.py"
+        "tests/test_brnp.py",
+        ".github/workflows/lsg-reference-review.yml"
       ]
     },
     {
@@ -572,14 +573,15 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
         ".github/workflows/osis-schema-review.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
-        "tests/test_source_acquisition_and_schema.py"
+        "tests/test_source_acquisition_and_schema.py",
+        ".github/workflows/lsg-reference-review.yml"
       ]
     },
     {
@@ -670,6 +672,45 @@
         "tests/test_editorial_pipeline.py",
         "tests/test_guard_osis.py",
         "tests/test_schema_dependencies.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "OSIS",
+        "USFM",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/normalize_bible_references.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Build a source-witness-pinned, byte-reversible OSIS reference candidate.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "json",
+        "lxml",
+        "os",
+        "pathlib",
+        "re",
+        "tempfile",
+        "zipfile"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "412b5e66bd590d7e41095616ad8c805ab13cf77b2b5cb220742274755df10061",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/lsg-reference-review.yml",
+        "tests/test_normalize_bible_references.py"
       ]
     },
     {
