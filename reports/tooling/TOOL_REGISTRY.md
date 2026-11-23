@@ -17,7 +17,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 
 - GENERALIZE: 1
 - HISTORICAL/ARCHIVE: 0
-- KEEP_GENERIC: 50
+- KEEP_GENERIC: 51
 - MERGE: 0
 - MODULE_LOCAL: 0
 - UNDECIDED: 0
@@ -42,7 +42,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/fetch_reviewed_schema.py`](../../scripts/fetch_reviewed_schema.py) | KEEP_GENERIC | not established | 7 | not determined |
 | [`scripts/guard_commentary.py`](../../scripts/guard_commentary.py) | KEEP_GENERIC | not established | 7 | not determined |
 | [`scripts/guard_osis.py`](../../scripts/guard_osis.py) | KEEP_GENERIC | named test | 14 | not determined |
-| [`scripts/normalize_bible_references.py`](../../scripts/normalize_bible_references.py) | KEEP_GENERIC | named test | 3 | not determined |
+| [`scripts/normalize_bible_references.py`](../../scripts/normalize_bible_references.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/normalize_osis.py`](../../scripts/normalize_osis.py) | KEEP_GENERIC | not established | 7 | not determined |
 | [`scripts/osis_semantic_fidelity.py`](../../scripts/osis_semantic_fidelity.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/pilot_fetch.py`](../../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 6 | not determined |
@@ -64,6 +64,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 7 | publication/release |
 | [`scripts/reviewed_modern_commentary_rebuild.py`](../../scripts/reviewed_modern_commentary_rebuild.py) | GENERALIZE | named test | 3 | publication/release |
 | [`scripts/reviewed_osis_commentary_rebuild.py`](../../scripts/reviewed_osis_commentary_rebuild.py) | KEEP_GENERIC | not established | 2 | publication/release |
+| [`scripts/segment_osis_reference_destinations.py`](../../scripts/segment_osis_reference_destinations.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/smoke.py`](../../scripts/smoke.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/source_osis_inventory.py`](../../scripts/source_osis_inventory.py) | KEEP_GENERIC | named test | 10 | source/native audit |
 | [`scripts/stable_sword_refs.py`](../../scripts/stable_sword_refs.py) | KEEP_GENERIC | named test | 19 | not determined |
