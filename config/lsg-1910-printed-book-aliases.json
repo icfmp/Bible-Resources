@@ -75,5 +75,13 @@
     "3 Jn": "3John",
     "Jud": "Jude",
     "Ap": "Rev"
+  },
+  "source_attested_digital_variants": {
+    "witness_usfx_zip_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+    "status": "source_provider_spelling_not_printed_1910_abbreviation",
+    "aliases": {
+      "Mal": "Mal"
+    },
+    "evidence": "Every prior unmatched literal book alias among the 9751 original eBible USFX x/xt notes is the literal Mal; all 37 affected notes are in the source-bound 2026-11-23 diagnostic and mapped only when the exact canonical verse exists. Printed table instead gives Ma."
   }
 }
