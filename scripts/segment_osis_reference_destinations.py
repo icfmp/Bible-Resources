@@ -31,7 +31,9 @@ MAX_PARTS = 128
 
 
 def _exact_reference_spans(label: str, aliases: dict,
-                           verse_ids: set[str]) -> list[tuple[int, int, str]]:
+                           verse_ids: set[str],
+                           disambiguated_chapter_commas: bool = False
+                           ) -> list[tuple[int, int, str]]:
     """Parse every source character, yielding raw display offsets + OSIS keys.
 
     The existing, separately tested canonical full-label parser is an
@@ -39,7 +41,9 @@ def _exact_reference_spans(label: str, aliases: dict,
     """
     start_padding = len(label) - len(label.lstrip())
     label = label.strip()
-    expected, reason, _ = _complete_printed_destinations(label, aliases, verse_ids)
+    expected, reason, _ = _complete_printed_destinations(
+        label, aliases, verse_ids,
+        disambiguated_chapter_commas=disambiguated_chapter_commas)
     if expected is None:
         raise ReviewError(f"Cannot split incompletely parsed original label: {label[:120]!r}, reason={reason}")
     position = 0
@@ -98,8 +102,24 @@ def _exact_reference_spans(label: str, aliases: dict,
             extra = VERSES_ONLY.match(label, j)
             if extra is None:
                 raise ReviewError("Incomplete source comma verse")
-            spans.append((extra.start(), extra.end(),
-                          f"{book}.{chapter}.{int(extra.group())}"))
+            current = f"{book}.{chapter}.{int(extra.group())}"
+            if current not in verse_ids and disambiguated_chapter_commas:
+                k = extra.end()
+                while k < len(label) and label[k].isspace():
+                    k += 1
+                if k < len(label) and label[k] == ",":
+                    k += 1
+                    while k < len(label) and label[k].isspace():
+                        k += 1
+                    second = VERSES_ONLY.match(label, k)
+                    if second:
+                        next_key = f"{book}.{int(extra.group())}.{int(second.group())}"
+                        if next_key in verse_ids:
+                            chapter = int(extra.group())
+                            spans.append((extra.start(), second.end(), next_key))
+                            position = second.end()
+                            continue
+            spans.append((extra.start(), extra.end(), current))
             position = extra.end()
         while position < len(label) and label[position].isspace():
             position += 1
@@ -159,7 +179,9 @@ def _patched_reference(label: str, spans: list[tuple[int, int, str]]) -> bytes:
     return "".join(pieces).encode("utf-8")
 
 
-def segment_candidate(input_xml: bytes, aliases: dict) -> tuple[bytes, dict]:
+def segment_candidate(input_xml: bytes, aliases: dict,
+                      disambiguated_chapter_commas: bool = False
+                      ) -> tuple[bytes, dict]:
     root = _parse(input_xml)
     if root.tag != OSIS + "osis":
         raise ReviewError("Expected canonical OSIS input")
@@ -201,7 +223,9 @@ def segment_candidate(input_xml: bytes, aliases: dict) -> tuple[bytes, dict]:
         if source_label != (node.text or ""):
             counts["unsegmented_escaped_or_complex_source_labels"] += 1
             continue
-        spans = _exact_reference_spans(source_label, aliases, verse_ids)
+        spans = _exact_reference_spans(
+            source_label, aliases, verse_ids,
+            disambiguated_chapter_commas=disambiguated_chapter_commas)
         if len(spans) != len(parts) or [x[2] for x in spans] != parts:
             raise ReviewError("Printed citation segmentation differs from original source-verified target list")
         fragment = _patched_reference(source_label, spans)
@@ -279,6 +303,8 @@ def main() -> int:
     parser.add_argument("--original-usfx", type=Path, required=True)
     parser.add_argument("--crosswalk", type=Path, required=True)
     parser.add_argument("--alias-witness", type=Path, required=True)
+    parser.add_argument("--disambiguated-chapter-commas", action="store_true",
+                        help="Segment uniquely attested comma chapter,verse references too")
     parser.add_argument("--expected-input-sha256", required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
@@ -296,7 +322,9 @@ def main() -> int:
         aliases, alias_sha = _printed_book_aliases(
             args.alias_witness, _crosswalk(args.crosswalk),
             sha256(zipped).hexdigest(), original)
-        result, receipt = segment_candidate(source, aliases)
+        result, receipt = segment_candidate(
+            source, aliases,
+            disambiguated_chapter_commas=args.disambiguated_chapter_commas)
         receipt["source_provider_usfx_zip_sha256"] = sha256(zipped).hexdigest()
         receipt["printed_alias_witness_sha256"] = alias_sha
         args.output.parent.mkdir(parents=True, exist_ok=True)
