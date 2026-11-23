@@ -181,9 +181,13 @@ jobs:
           assert receipt['only_source_attested_reference_osisRef_attributes_added']
           assert receipt['candidate_additions'] == (
               old.get('NONCANONICAL_REFERENCE_ORIGIN',0)+
-              old.get('UNRESOLVED_INTRODUCTION_SPAN',0))
+              receipt['resolved_introduction_spans'])
+          assert (receipt['original_introduction_spans'] ==
+                  receipt['resolved_introduction_spans']+
+                  receipt['unlinked_introduction_spans_preserved'])
           assert not new.get('NONCANONICAL_REFERENCE_ORIGIN',0)
-          assert not new.get('UNRESOLVED_INTRODUCTION_SPAN',0)
+          assert (new.get('UNRESOLVED_INTRODUCTION_SPAN',0) ==
+                  receipt['unlinked_introduction_spans_preserved'])
           assert new.get('UNRESOLVED_REFERENCE_TARGET',0)==old.get('UNRESOLVED_REFERENCE_TARGET',0)
           for code,number in new.items():
               assert number <= old.get(code,0),f'New or increased BRNP diagnostic: {code}'
