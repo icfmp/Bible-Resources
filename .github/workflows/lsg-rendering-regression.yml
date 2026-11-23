@@ -1,16 +1,24 @@
 name: LSG native rendered-note regression (no publish)
 on:
+  push:
+    branches: ['fix/lsg-1.0.1-note-rendering']
+    paths:
+      - '.github/workflows/lsg-rendering-regression.yml'
+      - 'modules/lsg-1910/tools/stage_filter_hotfix.py'
   pull_request:
     paths:
       - '.github/workflows/lsg-rendering-regression.yml'
       - 'modules/lsg-1910/**'
+      - 'tests/test_catalogue_profiles.py'
+      - 'tests/test_release_preflight.py'
+      - 'tests/test_published_reference_audit.py'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   render-probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - name: Install independent stable SWORD compiler and renderer
@@ -88,7 +96,7 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword /tmp/lsg_render_probe.cpp -o /tmp/lsg_render_probe -lsword
           echo '===== LSG 0.1.0 previous immutable RawText =====' | tee /tmp/lsg-rendering-probe.log
           SWORD_PATH=/tmp/lsg-0.1.0 /tmp/lsg_render_probe BRLSG1910 | tee -a /tmp/lsg-rendering-probe.log
-          echo '===== LSG 1.0.0 reviewed zText (published filter) =====' | tee -a /tmp/lsg-rendering-probe.log
+          echo '===== Current LSG zText with checked-in filter =====' | tee -a /tmp/lsg-rendering-probe.log
           SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg_render_probe BRLSG1910 | tee -a /tmp/lsg-rendering-probe.log
           echo '===== LSG 1.0.0 exact binary with historical valid OSISScripref filter =====' | tee -a /tmp/lsg-rendering-probe.log
           cp -a "$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg-valid-filter
@@ -96,12 +104,38 @@ jobs:
           from pathlib import Path
           conf=Path('/tmp/lsg-valid-filter/mods.d/brlsg1910.conf')
           original=conf.read_text()
-          assert original.count('GlobalOptionFilter=OSISXRefs')==1
-          assert 'GlobalOptionFilter=OSISScripref' not in original
+          assert original.count('GlobalOptionFilter=OSISXRefs') + original.count('GlobalOptionFilter=OSISScripref') == 1
           conf.write_text(original.replace('GlobalOptionFilter=OSISXRefs',
                                            'GlobalOptionFilter=OSISScripref'))
           PY
           SWORD_PATH=/tmp/lsg-valid-filter /tmp/lsg_render_probe BRLSG1910 | tee -a /tmp/lsg-rendering-probe.log
+      - name: Prepare a new reviewed 1.0.1 release on the dedicated branch only
+        if: github.event_name == 'push' && github.ref == 'refs/heads/fix/lsg-1.0.1-note-rendering'
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          python modules/lsg-1910/tools/stage_filter_hotfix.py
+          g++ -std=c++17 -O2 -I/usr/include/sword modules/lsg-1910/tools/check_native_render.cpp -o /tmp/lsg-native-render-check -lsword
+          SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg-native-render-check BRLSG1910
+          python scripts/tool_registry.py --write
+          python -m unittest discover -s tests -q
+          python scripts/validate.py
+          python scripts/release_preflight.py --module-id lsg-1910 --report /tmp/lsg-1.0.1-preflight.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A modules/lsg-1910 sources/cleaned/bibles/fr/lsg-1910 \
+            config/catalogue-import-lsg-1.0.1.json \
+            config/release-plans/lsg-1.0.0.json config/release-plans/lsg-1.0.1.json \
+            catalog/v1/catalog.json
+          git add -u -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git diff --cached --check
+          git commit -m "release(lsg): stage verified configuration-only SWORD 1.0.1 package"
+          git push origin HEAD:refs/heads/fix/lsg-1.0.1-note-rendering
+      - name: Fail-closed complete SWORD plain display check for all 31,169 native verses
+        if: github.event_name != 'push'
+        run: |
+          g++ -std=c++17 -O2 -I/usr/include/sword modules/lsg-1910/tools/check_native_render.cpp -o /tmp/lsg-native-render-check -lsword
+          SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg-native-render-check BRLSG1910
       - name: Store diagnostic report without publication
         uses: actions/upload-artifact@v4
         with:
