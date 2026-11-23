@@ -71,7 +71,9 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
     chapters_active = []
     chapters_seen = set()  # canonical chapter osisIDs
     chapter_pair_ids = set()
-    books_seen = set()
+    books_seen = set()  # real book containers, not paired milestones
+    book_pair_ids = set()
+    books_active = []
     annotations = 0
     verse_ids = set()  # canonical OSIS IDs, never milestone pairing keys
     verse_pair_ids = set()
@@ -89,16 +91,40 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
             errors.append({"code": "UNREVIEWED_ELEMENT", "line": line, "element": tag})
         if tag == "div" and element.get("type") == "book":
             book_id = element.get("osisID")
-            if not book_id:
-                errors.append({"code": "BOOK_ID", "line": line})
-            elif book_id in books_seen:
-                # Repeated book containers in commentaries may reflect a
-                # provider's segmentation, but that needs explicit review.
-                errors.append({"code": "BOOK_ID" if kind == "bible"
-                               else "COMMENTARY_REPEATED_BOOK_DIVISION",
-                               "line": line})
+            start_id, end_id = element.get("sID"), element.get("eID")
+            containing_book = any(
+                ancestor.tag == NS + "div" and ancestor.get("type") == "book"
+                and not ancestor.get("sID") and not ancestor.get("eID")
+                for ancestor in element.iterancestors()
+            )
+            if start_id and end_id:
+                errors.append({"code": "MIXED_BOOK_MILESTONE", "line": line})
+            elif start_id:
+                if not book_id:
+                    errors.append({"code": "BOOK_MILESTONE_MISSING_CANONICAL_ID",
+                                   "line": line})
+                if start_id in book_pair_ids:
+                    errors.append({"code": "DUPLICATE_BOOK_MILESTONE_KEY",
+                                   "line": line})
+                book_pair_ids.add(start_id)
+                books_active.append(start_id)
+                if containing_book:
+                    errors.append({"code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+                                   "line": line})
+            elif end_id:
+                if not books_active or books_active[-1] != end_id:
+                    errors.append({"code": "BOOK_END_PAIR", "line": line})
+                else:
+                    books_active.pop()
             else:
-                books_seen.add(book_id)
+                if not book_id or book_id in books_seen:
+                    errors.append({"code": "BOOK_ID" if kind == "bible"
+                                   else "COMMENTARY_REPEATED_BOOK_DIVISION",
+                                   "line": line})
+                else:
+                    books_seen.add(book_id)
+                if containing_book:
+                    errors.append({"code": "NESTED_BOOK", "line": line})
         # The official XSD checks much more; these non-negotiable local
         # relationships must also hold in a schema-less pilot run.
         parent = element.getparent()
@@ -107,10 +133,6 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         if tag in expected_parent and parent_tag != NS + expected_parent[tag]:
             errors.append({"code": "INVALID_STRUCTURAL_PARENT", "line": line,
                            "element": tag, "expected": expected_parent[tag]})
-        if tag == "div" and element.get("type") == "book":
-            if any(ancestor.tag == NS + "div" and ancestor.get("type") == "book"
-                   for ancestor in element.iterancestors()):
-                errors.append({"code": "NESTED_BOOK", "line": line})
         if tag in {"chapter", "verse"} and kind == "bible":
             book_ancestors = [
                 ancestor.get("osisID") for ancestor in element.iterancestors()
@@ -222,13 +244,25 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
             # Report missing/unreviewed destinations; never guess one.
             target = element.get("osisRef")
             if not target or not target.strip():
-                errors.append({"code": "UNRESOLVED_REFERENCE_TARGET", "line": line})
+                if (element.get("type") == "annotateRef"
+                        and element.get("subType") == "x-origin"):
+                    # Origin is a reference *source*, not a link destination.
+                    # Its transport-specific markup still needs reviewed
+                    # canonical mapping; it is not a missing link target.
+                    code = "NONCANONICAL_REFERENCE_ORIGIN"
+                elif element.get("subType") == "x-introduction":
+                    code = "UNRESOLVED_INTRODUCTION_SPAN"
+                else:
+                    code = "UNRESOLVED_REFERENCE_TARGET"
+                errors.append({"code": code, "line": line})
             elif target != target.strip():
                 errors.append({"code": "REFERENCE_TARGET_WHITESPACE", "line": line})
         if tag == "l" and not any(
             ancestor.tag == NS + "lg" for ancestor in element.iterancestors()
         ):
             errors.append({"code": "POETRY_LINE_OUTSIDE_GROUP", "line": line})
+    if books_active:
+        errors.append({"code": "UNCLOSED_BOOK_MILESTONE", "count": len(books_active)})
     if active:
         errors.append({"code": "UNCLOSED_VERSE_MILESTONE", "count": len(active)})
     if chapters_active:
@@ -256,7 +290,8 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         "element_counts": dict(sorted(counts.items())),
         "commentary_entry_count": annotations, "verse_identifier_count": len(verse_ids),
         "verse_pair_identifier_count": len(verse_pair_ids),
-        "book_identifier_count": len(books_seen), "chapter_identifier_count": len(chapters_seen),
+        "book_identifier_count": len(books_seen),
+        "book_milestone_pair_identifier_count": len(book_pair_ids), "chapter_identifier_count": len(chapters_seen),
         "chapter_pair_identifier_count": len(chapter_pair_ids),
         "bible_verse_member_count": len(verse_member_ids),
         "findings": errors[:100], "finding_count": len(errors),
