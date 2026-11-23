@@ -15,6 +15,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq -y djvulibre-bin
+          python -m pip install -q lxml rapidfuzz Pillow
       - name: Download and check immutable original 1910 printed edition
         run: |
           curl --retry 3 -fsSL 'https://upload.wikimedia.org/wikipedia/commons/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu' -o /tmp/lsg-print-1910.djvu
