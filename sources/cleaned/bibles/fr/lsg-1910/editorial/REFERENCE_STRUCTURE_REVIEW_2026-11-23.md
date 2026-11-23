@@ -14,7 +14,7 @@
 - Match each exact USFX `x/xo/xt` source note to one cleaned OSIS note, preserving callout, book, origin, printed destination text, paragraph/poetry/verse layout and note placement. Refuse any original↔cleaned count, identity, label or order mismatch.
 - Add `osisRef` to a corresponding `x-origin` element **only when the original `xo` gives an exact existing book/chapter/verse**. These 9,751 additions represent note origins, **not** destination hyperlinks.
 - For original `xt` text, interpret **only the complete printed citation string** using exact source-edition abbreviations, explicit book/chapter/verse groups, comma-delimited additional verses, semicolon-delimited chapter/verse contexts, full stops between explicit book groups, and source-attested, endpoint-verified ranges. Preserve reference order/repetitions. All tokens and punctuation must be consumed; an unfamiliar or missing target blocks the **whole note**, never just an inconvenient part.
-- A whole-note target list may be serialized as a whitespace-delimited, OSIS-valid `osisRef` on the existing `reference` element. **This is a technical candidate only:** native SWORD preservation does *not* prove that all individual passages can be clicked. If reader UX requires individual links, a separate reviewed retyping into individually linked references must preserve **all original printed text and punctuation**.
+- A whole-note target list may be serialized as a whitespace-delimited, OSIS-valid `osisRef` in the intermediate grouped candidate. **This is not the final reader-facing target:** a second, independently tested OSIS candidate segments each such complete label into individual `reference` elements, retaining every original character, target, and all surrounding source markup. This is preferred for supported graphical-reader navigation, subject to real GUI acceptance.
 - Original `ior` spans are machine-linked only when the complete literal grammar and all requested endpoints are verified. Preserve the three originals that cannot safely be resolved.
 - All changes are **additive `osisRef` attributes on pre-existing start tags**, with every other original XML byte unchanged. Before/after full XML comparisons verify exact element count/order, text/tails, every original attribute and structural association. No missing Scripture verse, note, word or punctuation is invented.
 - Original USFX/USFM archives, release SWORD binaries and the current approved `sources/cleaned` file are never overwritten. The new XML is generated separately with its own SHA-256 and review receipt.
@@ -33,9 +33,9 @@ The [full source-citation and one-reference-per-passage trial #45136656184](http
 | Total additional `osisRef` attributes | — | **19,316** |
 
 - Candidate: 30,170,715 bytes, SHA-256 `5b135af3081aece3796ac8acf5364e28e252353b558c3d7e721b17fbf9ce28fe`. Exactly 9,751 + 9,391 + 174 = 19,316 added attributes, **zero existing attributes rewritten**.
-- The parser follows the source shorthand in 2,531 semicolon book-context repetitions, each on a fully verified, fully consumed note. No unsupported label or unattested verse is assigned a guessed target.
-- Both source and candidate passed the independently pinned official OSIS schema check. BRNP now reports **406 unresolved destination labels and 3 unresolved introduction labels**, compared with 9,751/177 before; no new finding category was introduced.
-- The [native SWORD cross-compiler comparison in the same run](https://github.com/icfmp/Bible-Resources/actions/runs/45130871622) compiled the old and candidate files into **two isolated temporary SWORD modules** and compared **32,426** ordered raw frames, including **31,169** populated native verse entries. The source's 31,170 authored verses and the existing Segond SWORD Mark 10:52–53 indexing compromise must not be conflated.
+- The parser follows the source shorthand in 2,538 semicolon book-context repetitions, each on a fully verified, fully consumed note. No unsupported label or unattested verse is assigned a guessed target.
+- Both source and candidate passed the independently pinned official OSIS schema check. BRNP now reports **360 unresolved destination labels and 3 unresolved introduction labels**, compared with 9,751/177 before; no new finding category was introduced.
+- The [native SWORD cross-compiler comparison in the same run](https://github.com/icfmp/Bible-Resources/actions/runs/45136656184) compiled the released cleaned master and both candidate files into **three isolated temporary SWORD modules** and compared **32,426** ordered raw frames, including **31,169** populated native verse entries. The source's 31,170 authored verses and the existing Segond SWORD Mark 10:52–53 indexing compromise must not be conflated.
 - All native differences were limited to the 9,751 expected origin `osisRef` attributes, 9,391 expected printed-destination `osisRef` attributes and 174 expected introduction `osisRef` attributes. **Zero unrelated raw native changes.** This proves engine preservation and scope of the changes, **not** actual clickable rendering in Xiphos, AndBible or Bible.
 - All authorial words, note captions, original destination labels, identifiers, poetry, text order and punctuation are preserved. No published module has been altered.
 
@@ -60,11 +60,9 @@ The candidate's JSON evidence includes a bounded set of exact `book` / `source_o
 
 These three texts were inherited from the original USFX, not introduced by source normalization. A historical-print correction needs a separate reviewed editorial dossier and source-preserving before/after decision.
 
-## Last corpus checkpoint: provider-variant review
+## Earlier provider-variant-only checkpoint (superseded by full source-local pass)
 
-The [isolated whole-corpus Actions #45132279039](https://github.com/icfmp/Bible-Resources/actions/runs/45132279039) compared two compiled SWORD engines after incorporating the exact `Mal` source-provider spelling. It confirmed **9,391** completely interpreted reference labels, **360** intentionally preserved without `osisRef`, and **zero unexpected native markup changes** across all 32,426 raw SWORD frames. Candidate SHA-256 is `5b135af3081aece3796ac8acf5364e28e252353b558c3d7e721b17fbf9ce28fe`.
-
-There are **19,578** individual explicit target address tokens distributed across the 9,391 linked note labels; **4,865** note labels have multiple target tokens. A list of addresses inside one valid `osisRef` is not equivalent to separately clickable links across readers. Do not equate native XML storage with cross-reader user-facing navigation.
+The earlier [#45132279039](https://github.com/icfmp/Bible-Resources/actions/runs/45132279039) confirmed that the eBible-original `Mal` spelling could be recognized against the exact original USFX hash without changing the printed `Ma` abbreviation. At that intermediate stage, **9,345** destination labels were linked, **406** remained unlinked and no other native content changed. That is a historical intermediate result; the authoritative **9,391 linked / 360 unlinked** full-corpus result is recorded above.
 
 ## Independently verified per-passage presentation and source-local forms
 
@@ -80,8 +78,8 @@ The remaining **360** original cases were fully classified and retained in the s
 
 ## Remaining release/merge gates
 
-1. **Individual hyperlink usability:** compare representative one-target, multi-target, ranges, chapters and implicit-context references in real Xiphos and AndBible (and if applicable Bible); preserve exactly the printed punctuation. The native engine storing target lists is not proof of clicking the intended destination. Where readers cannot navigate a group, redesign the grouped reference **structure** with independent source-text parity, rather than weakening BRNP to suppress warnings.
-2. **406 unresolved destination notes:** decide via print/editorial witnesses which are genuine malformed labels, non-linkable but faithful printed constructs, and independently verified technical alias variants. Maintain reversible decisions; no source text changes merely to lower a count.
+1. **Individual hyperlink usability:** compare representative one-target, multi-target, ranges, chapters and implicit-context references in real Xiphos and AndBible (and if applicable Bible); preserve exactly the printed punctuation. The stock libSWORD HTML renderer already confirms two independent anchors for two separated source citations; this is still not proof of each graphical reader's click/navigation behavior. Do not relax BRNP to suppress reader defects.
+2. **360 unresolved destination notes:** decide via print/editorial witnesses which are genuine malformed labels, non-linkable but faithful printed constructs, and independently verified technical alias variants. Maintain reversible decisions; no source text changes merely to lower a count.
 3. **Three introduction pointers:** compare printed source for any actual correction; retain unlinked when no trustworthy proof exists.
 4. **Publication and approved cleaned master:** only after the above plus complete source/native and reader checks and project-owner approval may a new edition-specific cleaned master be checked in and the accompanying source manifest/version be repinned. Existing release binaries must remain immutable.
 
