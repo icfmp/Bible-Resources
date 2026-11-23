@@ -157,10 +157,16 @@ class NormalizationTests(unittest.TestCase):
         with self.assertRaisesRegex(ReviewError, "Unrecognized"):
             self.apply()
 
-    def test_missing_introduction_endpoint_blocks(self):
-        self.fixture(include_last=False)
-        with self.assertRaisesRegex(ReviewError, "Unattested introduction end"):
-            self.apply()
+    def test_missing_introduction_endpoint_is_preserved_and_reported(self):
+        original = self.fixture(include_last=False)
+        candidate, report = self.apply()
+        self.assertEqual(report["candidate_additions"], 1)
+        self.assertEqual(report["unlinked_introduction_spans_preserved"], 1)
+        self.assertEqual(report["unresolved_source_introduction_spans"][0]["reason"], "unattested_end")
+        self.assertIn(b'<reference subType="x-introduction">', candidate)
+        self.assertIn(b'osisRef="Gen.1.1"', candidate)
+        self.assertEqual("".join(etree.fromstring(original).itertext()),
+                         "".join(etree.fromstring(candidate).itertext()))
 
     def test_reversed_introduction_range_blocks(self):
         self.fixture(intro="2:1–1:1")
