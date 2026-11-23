@@ -13,7 +13,7 @@ from lxml import etree
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from normalize_bible_references import ReviewError, run  # noqa: E402
+from normalize_bible_references import ReviewError, run, _intro_target  # noqa: E402
 
 NS = "http://www.bibletechnologies.net/2003/OSIS/namespace"
 
@@ -105,6 +105,36 @@ class NormalizationTests(unittest.TestCase):
         twice, report = self.apply()
         self.assertEqual(twice, candidate)
         self.assertEqual(report["candidate_additions"], 0)
+
+    def test_attested_em_dash_and_dot_endpoints_are_resolved(self):
+        target = _intro_target("1:57—2.40", "Luke", {
+            "Luke.1.57", "Luke.2.40",
+        })
+        self.assertEqual(target, "Luke.1.57-Luke.2.40")
+
+    def test_single_chapter_verse_ranges_do_not_imply_other_books(self):
+        self.assertEqual(_intro_target("1-3", "Phlm", {
+            "Phlm.1.1", "Phlm.1.3",
+        }), "Phlm.1.1-Phlm.1.3")
+        with self.assertRaises(ReviewError):
+            _intro_target("1-3", "Gen", {
+                "Gen.1.1", "Gen.1.3", "Gen.2.1",
+            })
+
+    def test_chapter_only_section_pointer_is_supported(self):
+        self.assertEqual(_intro_target("5", "John", {
+            "John.4.1", "John.5.1",
+        }), "John.5")
+
+    def test_mixed_narrative_introduction_label_is_not_invented(self):
+        source = self.fixture(intro="1:1–2:1 (voir un autre passage)")
+        candidate, report = self.apply()
+        self.assertEqual(report["unlinked_introduction_spans_preserved"], 1)
+        self.assertEqual(report["resolved_introduction_spans"], 0)
+        self.assertEqual(report["candidate_additions"], 1)
+        self.assertIn(b' subType="x-introduction">', candidate)
+        self.assertIn("1:1–2:1 (voir un autre passage)".encode(), candidate)
+        self.assertEqual(source.count(b'osisRef'), 0)
 
     def test_wrong_source_sha_blocks(self):
         self.fixture()
