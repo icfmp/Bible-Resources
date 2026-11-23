@@ -165,6 +165,12 @@ jobs:
                       if len(mismatches)<20:mismatches.append({'kind':kind,'reference':key})
                   else:
                       counters['native_frames_with_only_allowed_target_additions']+=1
+          receipt=json.loads(Path('/tmp/lsg-structural-report.json').read_text())
+          assert counters['compiled_new_note_origin_attributes'] == receipt['original_cross_reference_notes']
+          assert counters['compiled_new_introduction_attributes'] == receipt['resolved_introduction_spans']
+          assert (counters['compiled_new_note_origin_attributes']+
+                  counters['compiled_new_introduction_attributes']==
+                  receipt['candidate_additions'])
           report={
               'status':'two_independent_temporary_sword_engines_compared',
               'original_source_sha256':sha256(original.read_bytes()).hexdigest(),
