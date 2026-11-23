@@ -427,7 +427,7 @@ jobs:
               or tokens['original_or_cleaned_text_changes_approved']!=0
               or tokens['corrections_proposed_not_approved']!=len(tokens['records'])
               or tokens['confirmed_individual_printed_reference_token_sightings']!=len(tokens['records'])
-              or len(tokens['records'])!=6):
+              or len(tokens['records'])!=10):
               raise SystemExit('Physical print token evidence must remain exact-original and non-approved')
           lookup={r['record_id']:r for r in locators['records']}
           digital_lookup={r['record_id']:r for r in digital['records']}
