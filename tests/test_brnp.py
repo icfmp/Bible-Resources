@@ -307,6 +307,47 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         ))
         self.assertNotIn("POETRY_LINE_OUTSIDE_GROUP", report["finding_codes"])
 
+    def test_book_milestone_inside_book_is_not_a_second_container(self):
+        report = self.inspect(document(
+            '<div type="book" osisID="Gen" sID="gen-marker"/>'
+            '<chapter osisID="Gen.1"><verse osisID="Gen.1.1">Text</verse></chapter>'
+            '<div type="book" osisID="Gen" eID="gen-marker"/>'
+        ))
+        self.assertNotIn("NESTED_BOOK", report["finding_codes"])
+        self.assertNotIn("BOOK_ID", report["finding_codes"])
+        self.assertEqual(report["finding_codes"]["BOOK_MILESTONE_WITHIN_CONTAINER"], 1)
+        self.assertEqual(report["book_identifier_count"], 1)
+
+    def test_repeated_book_milestone_pair_key_is_flagged(self):
+        report = self.inspect(document(
+            '<div type="book" osisID="Gen" sID="same"/>'
+            '<div type="book" osisID="Gen" sID="same"/>'
+            '<chapter osisID="Gen.1"><verse osisID="Gen.1.1">Text</verse></chapter>'
+            '<div type="book" osisID="Gen" eID="same"/>'
+            '<div type="book" osisID="Gen" eID="same"/>'
+        ))
+        self.assertEqual(report["finding_codes"]["DUPLICATE_BOOK_MILESTONE_KEY"], 1)
+        self.assertNotIn("UNCLOSED_BOOK_MILESTONE", report["finding_codes"])
+
+    def test_origin_metadata_is_not_a_missing_link_target(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><verse osisID="Gen.1.1">'
+            '<note type="crossReference"><reference type="annotateRef" '
+            'subType="x-origin">1.1</reference>'
+            '<reference>Other chapter</reference></note>'
+            '</verse></chapter>'
+        ))
+        self.assertEqual(report["finding_codes"]["NONCANONICAL_REFERENCE_ORIGIN"], 1)
+        self.assertEqual(report["finding_codes"]["UNRESOLVED_REFERENCE_TARGET"], 1)
+
+    def test_intro_span_is_not_misreported_as_note_crosslink(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><verse osisID="Gen.1.1">Text</verse>'
+            '<list><item><reference subType="x-introduction">'
+            '1:1–2:23</reference></item></list></chapter>'
+        ))
+        self.assertEqual(report["finding_codes"]["UNRESOLVED_INTRODUCTION_SPAN"], 1)
+
     def test_source_unchanged(self):
         content = document('<verse osisID="Gen.1.1">Test</verse>')
         self.path.write_text(content, encoding="utf-8")
