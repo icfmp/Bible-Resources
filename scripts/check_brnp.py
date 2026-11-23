@@ -104,6 +104,38 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         if tag in expected_parent and parent_tag != NS + expected_parent[tag]:
             errors.append({"code": "INVALID_STRUCTURAL_PARENT", "line": line,
                            "element": tag, "expected": expected_parent[tag]})
+        if tag == "div" and element.get("type") == "book":
+            if any(ancestor.tag == NS + "div" and ancestor.get("type") == "book"
+                   for ancestor in element.iterancestors()):
+                errors.append({"code": "NESTED_BOOK", "line": line})
+        if tag in {"chapter", "verse"} and kind == "bible":
+            book_ancestors = [
+                ancestor.get("osisID") for ancestor in element.iterancestors()
+                if ancestor.tag == NS + "div" and ancestor.get("type") == "book"
+            ]
+            if len(book_ancestors) != 1:
+                errors.append({"code": "BOOK_SCOPE", "line": line, "element": tag})
+            else:
+                # Compound OSIS identifiers must retain their established
+                # original versification; every member belongs to this book.
+                canonical = element.get("osisID")
+                if canonical and not all(
+                    part.startswith(book_ancestors[0] + ".")
+                    for part in canonical.split()
+                ):
+                    errors.append({"code": "REFERENCE_BOOK_SCOPE", "line": line,
+                                   "element": tag})
+            if tag == "verse" and element.get("osisID"):
+                chapter_containers = [
+                    ancestor.get("osisID") for ancestor in element.iterancestors()
+                    if ancestor.tag == NS + "chapter" and ancestor.get("osisID")
+                       and not ancestor.get("sID") and not ancestor.get("eID")
+                ]
+                if len(chapter_containers) == 1:
+                    chapter_id = chapter_containers[0]
+                    if not all(part.startswith(chapter_id + ".")
+                               for part in element.get("osisID").split()):
+                        errors.append({"code": "REFERENCE_CHAPTER_SCOPE", "line": line})
         if tag == "chapter":
             start, end, identifier = element.get("sID"), element.get("eID"), element.get("osisID")
             if (start and end) or (end and identifier):
