@@ -833,17 +833,17 @@
       ]
     },
     {
-      "path": "scripts/mark_osis_preverse_section_titles.py",
-      "purpose_first_line": "Mark source-attested chapter-opening section titles for SWORD pre-verse import.",
-      "sha256_at_inventory": "b21adf31be58f505b3d4efbe85b0b4010de952807e591e828aeb4bc7315ae62b",
       "classification": "KEEP_GENERIC",
       "confidence": "medium",
-      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS"
       ],
-      "reader_tool_signals": [],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/mark_osis_preverse_section_titles.py",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
+      "purpose_first_line": "Mark source-attested chapter-opening section titles for SWORD pre-verse import.",
       "python_imports": [
         "__future__",
         "argparse",
@@ -855,18 +855,18 @@
         "tempfile",
         "xml"
       ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "b21adf31be58f505b3d4efbe85b0b4010de952807e591e828aeb4bc7315ae62b",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/lsg-chapter-heading-review.yml",
         "tests/test_mark_osis_preverse_section_titles.py"
-      ],
-      "static_reference_count": 3,
-      "has_direct_tests_by_filename": true,
-      "stage_hint": "not determined",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "release_approval": "never inferred from inventory",
-      "owner": "Bible Resources maintainers"
+      ]
     },
     {
       "classification": "KEEP_GENERIC",
