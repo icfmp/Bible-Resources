@@ -10,7 +10,6 @@
   "visual_review_scope": "Reference token and surrounding source-verse callout are checked from the original 821x1162 print page. The printed book frequently contains a longer grouped apparatus than a single digital xt; no statement that the entire USFX xt text is the literal printed note is implied.",
   "confirmed_individual_printed_reference_token_sightings": 24,
   "original_or_cleaned_text_changes_approved": 0,
-  "corrections_proposed_not_approved": 24,
   "records": [
     {
       "record_id": "LSG-CR-001",
@@ -425,5 +424,6 @@
   "additional_enlarged_evidence_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/45159370757/artifacts/14809543290",
   "third_enlarged_evidence_run": "https://github.com/icfmp/Bible-Resources/actions/runs/45166535509",
   "third_enlarged_evidence_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/45166535509/artifacts/14814633213",
-  "uncertified_marginal_target_candidates_separately_in_page_ledger": 2
+  "uncertified_marginal_target_candidates_separately_in_page_ledger": 2,
+  "printed_token_observations_without_authorized_corrections": 24
 }
