@@ -78,11 +78,13 @@ jobs:
           print('1911_SCAN_URI',uri,'size',scan.stat().st_size,'sha256',hashlib.sha256(scan.read_bytes()).hexdigest())
           proc=subprocess.run(['djvutxt',str(scan)],capture_output=True,check=True)
           raw=proc.stdout.decode('utf-8','replace')
-          pages=raw.split('\\f')
+          pages=raw.split('\f')
           print('1911 OCR-layer pages',len(pages),'overall chars',len(raw))
+          if len(pages) < 1000:
+              raise SystemExit('Scan page separators were not parsed: refusing speculative page locators')
           found={}
           for i,page in enumerate(pages,1):
-              normalized=re.sub(r'\\s+',' ',page.casefold())
+              normalized=re.sub(r'\s+',' ',page.casefold())
               if 'mangerez' in normalized and ('sang' in normalized or 'chair' in normalized):
                   found.setdefault('Gen9.4',[]).append(i)
               if 'songe' in normalized and ('échelle' in normalized or 'echelle' in normalized or 'ange' in normalized):
@@ -113,6 +115,8 @@ jobs:
               print('LSG_1911_'+case+'_P'+str(pageno)+'_BASE64_BEGIN')
               print(base64.b64encode(data).decode('ascii'))
               print('LSG_1911_'+case+'_P'+str(pageno)+'_BASE64_END')
+              Path(dest).unlink(missing_ok=True)
+          scan.unlink(missing_ok=True)
           PY
       - uses: actions/upload-artifact@v4
         if: always()
