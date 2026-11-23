@@ -549,6 +549,7 @@ def _source_bindings(cleaned, original, crosswalk: dict,
                 changes[destination_refs[0]] = destination_target
                 counts["resolved_original_destination_labels"] += 1
                 if (source_local_short_forms and complete_lists and
+                        status == "complete_printed_list" and
                         NAMED_ONE_CHAPTER_VERSE.search(_label(xt))):
                     counts["source_named_one_chapter_compound_notes_resolved"] += 1
                 targets_in_label = len(destination_target.split())

@@ -259,6 +259,18 @@ class NormalizationTests(unittest.TestCase):
                 self.assertEqual(linked, expected)
                 self.assertEqual(reason, "complete_printed_list")
 
+    def test_only_new_compound_named_book_links_are_counted_as_compound(self):
+        self.assertEqual("complete_printed_list", _complete_printed_destinations(
+            "Ge 1:1. Jud v. 11.",
+            {"Ge": "Gen", "Jud": "Jude"},
+            {"Gen.1.1", "Jude.1.11"},
+            named_single_chapter_refs=True)[1])
+        # Standalone 'Jud v. 11.' already has a separate verified
+        # source-local resolution path; it is not a *new compound* link.
+        self.assertEqual("complete_printed_list", _complete_printed_destinations(
+            "Jud v. 11.", {"Jud": "Jude"},
+            {"Jude.1.11"}, named_single_chapter_refs=True)[1])
+
     def test_named_one_chapter_verse_rejects_unknown_scope_and_any_etc(self):
         aliases = {"Jud": "Jude", "Phm": "Phlm", "Ge": "Gen",
                    "Unknown": "Unknown"}
