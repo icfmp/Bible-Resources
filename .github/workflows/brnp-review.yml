@@ -57,7 +57,7 @@ jobs:
               for path in sorted(folder.glob("*.json")):
                   report = json.loads(path.read_text(encoding="utf-8"))
                   counts = report.get("finding_codes", {})
-                  print(path.stem, report.get("finding_count"), dict(counts))
+                  print(path.stem, report.get("finding_count"), dict(counts), "tags:", report.get("unreviewed_elements", {}))
                   summary.write(f"- {path.stem}: total {report.get('finding_count', 0)}; first-100 distribution {dict(counts)}; element tags {report.get('unreviewed_elements', {})}\\n")
           PY
           echo 'Exit 1 means pilot findings, not failed official OSIS validity. These results are non-blocking until BRNP is independently reviewed and approved.' >> "$GITHUB_STEP_SUMMARY"
