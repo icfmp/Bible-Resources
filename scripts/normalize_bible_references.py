@@ -87,8 +87,14 @@ def _crosswalk(path: Path) -> dict:
     return mapping
 
 
-def _printed_book_aliases(path: Path, crosswalk: dict) -> tuple[dict, str]:
-    """Interpret exact source-edition printed abbreviations only, never fuzzy ones."""
+def _printed_book_aliases(path: Path, crosswalk: dict,
+                          original_usfx_zip_sha256: str) -> tuple[dict, str]:
+    """Keep independently printed aliases distinct from digital-source variants.
+
+    Provider variants are supported only with exact original archive identity,
+    explicit provider-specific evidence and the same canonical target as the
+    printed edition. Never call a provider spelling a 1910 print abbreviation.
+    """
     raw = _bytes(path, 256 * 1024)
     doc = json.loads(raw.decode("utf-8"))
     mapping = doc.get("aliases")
@@ -107,7 +113,25 @@ def _printed_book_aliases(path: Path, crosswalk: dict) -> tuple[dict, str]:
                 re.fullmatch(r"(?:[1-3] )?[A-Za-zÀ-ÿ]{1,12}", alias) is None or
                 not isinstance(book, str)):
             raise ReviewError("Invalid printed edition abbreviation")
-    return mapping, sha256(raw).hexdigest()
+    result = dict(mapping)
+    variants = doc.get("source_attested_digital_variants")
+    if variants is not None:
+        if (not isinstance(variants, dict) or
+                variants.get("status") !=
+                    "source_provider_spelling_not_printed_1910_abbreviation" or
+                variants.get("witness_usfx_zip_sha256") != original_usfx_zip_sha256 or
+                not isinstance(variants.get("evidence"), str) or
+                len(variants["evidence"]) < 32 or
+                not isinstance(variants.get("aliases"), dict) or
+                not variants["aliases"]):
+            raise ReviewError("Digital-source alias variants lack pinned original evidence")
+        for alias, book in variants["aliases"].items():
+            if (not isinstance(alias, str) or
+                    re.fullmatch(r"(?:[1-3] )?[A-Za-zÀ-ÿ]{1,12}", alias) is None or
+                    alias in result or book not in mapping.values()):
+                raise ReviewError("Invalid or ambiguous provider-specific alias")
+            result[alias] = book
+    return result, sha256(raw).hexdigest()
 
 
 def _single_explicit_destination(label: str, aliases: dict | None,
@@ -497,7 +521,8 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         raise ReviewError("Expected canonical OSIS and original USFX document")
     crosswalk = _crosswalk(crosswalk_path)
     aliases, alias_digest = (
-        _printed_book_aliases(destination_aliases_path, crosswalk)
+        _printed_book_aliases(destination_aliases_path, crosswalk,
+                              sha256(zipped).hexdigest())
         if destination_aliases_path is not None else (None, None)
     )
     changes, counts, unresolved, destination_findings = _source_bindings(
