@@ -156,7 +156,7 @@ jobs:
               f.write(f"Before: {old}\n\nAfter: {new}\n\n")
               f.write('Original source, translation text, note callouts, existing markup, authorial reference labels and compiled releases are unchanged.\n')
           PY
-      - name: Classify all 406 unresolved original citation labels without creating links
+      - name: Classify each still-unresolved original citation label without creating links
         run: |
           python - <<'PY'
           from collections import Counter
@@ -166,8 +166,8 @@ jobs:
           import json,re,sys
           sys.path.insert(0,'scripts')
           from normalize_bible_references import (
-              _complete_printed_destinations,_printed_book_aliases,
-              _crosswalk,_parse,_usfx_bytes,_label,OSIS)
+              _complete_printed_destinations,_explicit_source_local_reference,
+              _printed_book_aliases,_crosswalk,_parse,_usfx_bytes,_label,OSIS)
           orig=Path('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip')
           with ZipFile(orig) as z:
               doc=_parse(z.read('fraLSG_usfx.xml'))
@@ -206,6 +206,11 @@ jobs:
                   label=_label(xt)
                   value,reason,_=_complete_printed_destinations(
                       label,aliases,verse_ids)
+                  if value is None and reason=='compound_or_implicit_reference':
+                      value,reason=_explicit_source_local_reference(
+                          label,aliases,_label(xo),
+                          _crosswalk(Path('config/standard_usfm_osis_66.json'))[book.get('id')],
+                          verse_ids)
                   if value is not None:continue
                   category=group(label,reason)
                   causes[reason]+=1
