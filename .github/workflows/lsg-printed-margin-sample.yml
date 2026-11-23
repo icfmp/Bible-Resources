@@ -15,7 +15,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq -y djvulibre-bin
           python -m pip install -q Pillow
-      - name: Pin and render the actual 1910 source scan pages 13 and 29
+      - name: Pin and render more original 1910 source scan pages 35 96 103
         run: |
           python - <<'PY'
           from urllib.request import Request,urlopen
@@ -40,7 +40,7 @@ jobs:
           print('1910_ORIGINAL_PRINT_SCAN',uri,'bytes',total,'sha256',h.hexdigest())
           if total < 200000000:
               raise SystemExit('Unexpectedly small original full scan: abort source proof')
-          for page in [13,29]:
+          for page in [35,96,103]:
               tiff=root/f'1910-original-page{page}.tif'
               subprocess.run(['ddjvu','-page='+str(page),'-format=tiff',str(archive),str(tiff)],check=True)
               im=Image.open(tiff).convert('RGB')
@@ -50,7 +50,7 @@ jobs:
                   raise SystemExit('Source image resolution insufficient, do not claim certainty')
               im.save(root/f'1910-original-page{page}-full.png')
               # Source verse + authentic marginal note, generous bounds for position verification.
-              top,bottom=(int(height*.39),int(height*.67)) if page==13 else (int(height*.44),int(height*.70))
+              top,bottom=(int(height*.12),int(height*.88))
               crop=im.crop((int(w*.35),top,int(w*.63),bottom))
               crop=ImageOps.grayscale(crop)
               crop=ImageEnhance.Contrast(crop).enhance(1.75)
@@ -62,10 +62,7 @@ jobs:
               print(f'LSG_1910_ORIGINAL_PAGE_{page}_IMAGE_BEGIN')
               print(base64.b64encode(data).decode('ascii'))
               print(f'LSG_1910_ORIGINAL_PAGE_{page}_IMAGE_END')
-              bands=(
-                  [('upper',.20,.42),('middle',.39,.59)] if page==13
-                  else [('upper',.28,.49),('middle',.46,.65)]
-              )
+              bands=[('upper',.10,.40),('middle',.36,.68),('lower',.65,.90)]
               for band,a,z in bands:
                   region=im.crop((int(w*.24),int(height*a),int(w*.63),int(height*z)))
                   region=ImageOps.grayscale(region)
