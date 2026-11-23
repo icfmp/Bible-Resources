@@ -126,7 +126,7 @@ def _intro_target(label: str, book: str, verse_ids: set[str]) -> str | None:
         raise ReviewError("Invalid introduction start")
     first = f"{book}.{chapter}.{verse}"
     if first not in verse_ids:
-        raise ReviewError("Unattested introduction start")
+        raise ReviewError(f"Unattested introduction start: {book}, {label!r}, {first}")
     if match[4] is None:
         return first
     last_chapter = int(match[3]) if match[3] else chapter
@@ -135,7 +135,7 @@ def _intro_target(label: str, book: str, verse_ids: set[str]) -> str | None:
         raise ReviewError("Reversed introduction range")
     last = f"{book}.{last_chapter}.{last_verse}"
     if last not in verse_ids:
-        raise ReviewError("Unattested introduction end")
+        raise ReviewError(f"Unattested introduction end: {book}, {label!r}, {last}")
     return first + "-" + last
 
 def _source_bindings(cleaned, original, crosswalk: dict) -> tuple[dict, dict]:
