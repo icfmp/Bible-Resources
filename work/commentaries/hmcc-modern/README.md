@@ -5,7 +5,9 @@
 The 1,189 historical accepted chapter manuscripts are preserved at a
 [pinned immutable Git revision](https://github.com/icfmp/Bible-Resources/tree/c96bebf42d8e0eba62fa961f7f16a00806a50e2c/work/mhcc-modern/production/accepted), not duplicated in the active tree.
 The current approved OSIS master lives under `sources/cleaned/`.
-Source-bound decisions and review receipts remain in `work/mhcc-modern/production/`.
+Approved editorial decisions and their three source anomaly manifests remain in
+`work/mhcc-modern/production/`; historical review receipts are linked to an
+immutable Git revision from that folder's README.
 
 This is a **navigation entrypoint**, not a second or duplicate copy of the
 modern text. The reviewed, published SWORD module and licensing metadata
@@ -15,7 +17,7 @@ Useful locations in the existing historical folder:
 
 - [Historical manuscripts — immutable snapshot and current source](../../mhcc-modern/production/accepted/README.md)
 - First-pass chapter and book-introduction drafts, along with pilot experiments, are recoverable at [the immutable pre-cleanup revision](https://github.com/icfmp/Bible-Resources/tree/ccf422270a2e42eaa1200e0341d8d7d3886747ff/work/mhcc-modern/)
-- [Unresolved source-anchored book-introduction candidates](../../mhcc-modern/production/)
+- [Historical book-introduction candidates and source-bound receipts](../../mhcc-modern/production/README.md)
 - [Audits, editorial decisions and production receipts](../../mhcc-modern/production/)
 - [Release/source validation records](../../../modules/hmcc-modern/)
 
