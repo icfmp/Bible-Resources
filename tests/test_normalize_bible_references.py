@@ -277,6 +277,31 @@ class NormalizationTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(report["candidate_additions"], 0)
 
+    def test_complete_list_mode_requires_printed_witness(self):
+        self.fixture()
+        with self.assertRaisesRegex(ReviewError, "require a pinned"):
+            self.apply(complete_lists=True)
+
+    def test_real_1910_printed_table_has_unambiguous_full_book_identity(self):
+        source = json.loads(
+            (ROOT / "config/lsg-1910-printed-book-aliases.json").read_text(
+                encoding="utf-8"))
+        crosswalk = json.loads(
+            (ROOT / "config/standard_usfm_osis_66.json").read_text(
+                encoding="utf-8"))
+        mapping = source["aliases"]
+        self.assertEqual(len(mapping), 66)
+        self.assertEqual(len(set(mapping.values())), 66)
+        self.assertEqual(set(mapping.values()),
+                         {entry["osis"] for entry in crosswalk["books"]})
+        self.assertEqual(mapping["Ph"], "Phil")
+        self.assertEqual(mapping["Phm"], "Phlm")
+        self.assertEqual(mapping["Ma"], "Mal")
+        self.assertEqual(mapping["Jé"], "Jer")
+        self.assertEqual(mapping["1 Co"], "1Cor")
+        self.assertEqual(mapping["2 Co"], "2Cor")
+        self.assertNotIn("Mal", mapping)  # not the printed 1910 abbreviation
+
     def test_wrong_source_sha_blocks(self):
         self.fixture()
         self.manifest.write_text('{"cleaned_osis_sha256": "wrong"}')
