@@ -199,6 +199,21 @@ The other **47** of the 54 cases do not yet have a print token independently cer
 
 The temporary scan-download and image/OCR forensics workflows were deleted after their evidence runs to avoid accidentally introducing large downloads into the regular production pipeline. The permanent image source URL, SHA-256, page positions and individual reference observations are in the editorial registry and can be reproduced using the documented native `ddjvu` command.
 
+## Second print token batch — four more verified reference identities
+
+The read-only [second original-margin image run #45159370757](https://github.com/icfmp/Bible-Resources/actions/runs/45159370757) ([artifact #14809543290](https://github.com/icfmp/Bible-Resources/actions/runs/45159370757/artifacts/14809543290)) checked 13 further original 1910 page contexts. Four additional *printed reference tokens* were readable with the source passage and distinct marginal sign:
+
+| Case | Original 1910 reference token and note | eBible original digitization | Secondary Biblia |
+| --- | --- | --- | --- |
+| `LSG-CR-017` Isa 11:6, [p. 572](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/572) | contextual `65. 25.` (Isaiah) | `És 65:26` | `És 65:25` |
+| `LSG-CR-020` Jer 1:3, [p. 619](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/619) | `2 R. 23. 34.` | `2 R 5:23, 34` | `2 R 5:23, 27` |
+| `LSG-CR-023` Jer 41:1, [p. 663](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/663) | `2 R. 25. 25.` | `2 R 25:35` | `2 R 25:25` |
+| `LSG-CR-045` 1 Th 4:9, [p. 989](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/989) | `1 Pi. 4. 8.` | `2 Pi 4:8` | `2 Pi 3:8` |
+
+**Combined, non-overlapping editorial evidence counts:** all **54 original cases** have original-print page locators; **10 cases** have a verified individual printed reference token that materially clarifies a problematic digital destination; **one different case** (Genesis 28:12) has a visually checked printed marginal citation agreeing with eBible but referring to an unattested destination. The remaining **43 cases** do not yet have a source-note-specific printed token verified. Only **one complete cited marginal label** has a separately documented verified reading; 53 cases remain pending *full apparatus-to-digital-note* collation. These different levels of evidence must not be equated.
+
+The second printed-token sightings are appended to the same original-scan-SHA-256-pinned `PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json` with `editorial_change_authorized: null`. No digital `xt` is rewritten, no nonexistent verse is created, no inferred destination is added and no released or cleaned master changes. Apart from the ten recorded tokens, the second review did not certify the other examined page-column candidates because the exact note marker/group boundary was not securely established. The temporary 293-MB source-download CI is not retained as a standing production workflow.
+
 ## Remaining release/merge gates
 
 1. **Individual hyperlink usability:** compare representative one-target, multi-target, ranges, chapters and implicit-context references in real Xiphos and AndBible (and if applicable Bible); preserve exactly the printed punctuation. The stock libSWORD HTML renderer already confirms two independent anchors for two separated source citations; this is still not proof of each graphical reader's click/navigation behavior. Do not relax BRNP to suppress reader defects.
