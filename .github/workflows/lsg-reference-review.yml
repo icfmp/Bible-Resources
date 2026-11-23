@@ -9,6 +9,7 @@ on:
       - 'sources/cleaned/bibles/fr/lsg-1910/CLEANUP_MANIFEST.json'
       - 'sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip'
       - 'config/standard_usfm_osis_66.json'
+      - 'config/lsg-1910-printed-book-aliases.json'
 permissions:
   contents: read
 jobs:
@@ -81,6 +82,7 @@ jobs:
             --original-usfx sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip \
             --manifest sources/cleaned/bibles/fr/lsg-1910/CLEANUP_MANIFEST.json \
             --crosswalk config/standard_usfm_osis_66.json \
+            --destination-aliases config/lsg-1910-printed-book-aliases.json \
             --output /tmp/lsg-structural-candidate.osis.xml \
             --report /tmp/lsg-structural-report.json
       - name: Validate official schema plus BRNP diagnostic before/after
@@ -112,14 +114,21 @@ jobs:
           assert receipt['candidate_additions'] == (
               old.get('NONCANONICAL_REFERENCE_ORIGIN',0)+
               old.get('UNRESOLVED_INTRODUCTION_SPAN',0)-
-              receipt['unlinked_introduction_spans_preserved'])
+              receipt['unlinked_introduction_spans_preserved']+
+              receipt['resolved_original_destination_labels'])
+          assert (receipt['original_cross_reference_notes'] ==
+                  receipt['resolved_original_destination_labels']+
+                  receipt['unlinked_original_destination_labels_preserved'])
+          assert receipt['printed_abbreviation_map_sha256']
           assert (receipt['original_introduction_spans'] ==
                   receipt['resolved_introduction_spans']+
                   receipt['unlinked_introduction_spans_preserved'])
           assert not new.get('NONCANONICAL_REFERENCE_ORIGIN',0)
           assert (new.get('UNRESOLVED_INTRODUCTION_SPAN',0) ==
                   receipt['unlinked_introduction_spans_preserved'])
-          assert new.get('UNRESOLVED_REFERENCE_TARGET',0)==old.get('UNRESOLVED_REFERENCE_TARGET',0)
+          assert new.get('UNRESOLVED_REFERENCE_TARGET',0)==(
+              old.get('UNRESOLVED_REFERENCE_TARGET',0)-
+              receipt['resolved_original_destination_labels'])
           for code,number in new.items():
               assert number <= old.get(code,0),f'New or increased BRNP diagnostic: {code}'
           assert after['official_osis']['status']=='validated'
@@ -172,6 +181,14 @@ jobs:
                       elem.get('subType')=='x-origin' else
                       'introduction' if elem.get('subType')=='x-introduction' else None
                   )
+                  if not role and elem.get('osisRef') and (
+                          elem.get('type') is None and
+                          elem.get('subType') is None and
+                          elem.getparent() is not None and
+                          isinstance(elem.getparent().tag,str) and
+                          etree.QName(elem.getparent()).localname=='note' and
+                          elem.getparent().get('type')=='crossReference'):
+                      role='printed_destination'
                   if role and elem.get('osisRef'):
                       del elem.attrib['osisRef']
                       removed[role]+=1
@@ -216,8 +233,10 @@ jobs:
           receipt=json.loads(Path('/tmp/lsg-structural-report.json').read_text())
           assert counters['compiled_new_note_origin_attributes'] == receipt['original_cross_reference_notes']
           assert counters['compiled_new_introduction_attributes'] == receipt['resolved_introduction_spans']
+          assert counters['compiled_new_printed_destination_attributes'] == receipt['resolved_original_destination_labels']
           assert (counters['compiled_new_note_origin_attributes']+
-                  counters['compiled_new_introduction_attributes']==
+                  counters['compiled_new_introduction_attributes']+
+                  counters['compiled_new_printed_destination_attributes']==
                   receipt['candidate_additions'])
           report={
               'status':'two_independent_temporary_sword_engines_compared',
