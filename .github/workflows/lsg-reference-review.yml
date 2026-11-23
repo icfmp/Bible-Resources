@@ -82,6 +82,109 @@ jobs:
               f.write(f"Before: {old}\n\nAfter: {new}\n\n")
               f.write('Original source, translation text, note callouts, existing markup, authorial reference labels and compiled releases are unchanged.\n')
           PY
+      - name: Install native SWORD compiler and independent raw XML reader
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libsword-dev libsword-utils
+          mkdir -p /tmp/lsg-native-witness
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_raw_corpus.cpp \
+            -o /tmp/lsg-native-witness/native-raw -lsword
+          command -v osis2mod
+      - name: Compile original and normalized source into isolated temporary SWORD engines
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from hashlib import sha256
+          from itertools import zip_longest
+          from pathlib import Path
+          import json, shutil, sys, tempfile
+          from lxml import etree
+          sys.path.insert(0,'scripts')
+          from approved_osis_sword_candidate import (
+              _create_candidate_layout, _compile_osis, _read_native_frames)
+          original=Path('sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml')
+          candidate=Path('/tmp/lsg-structural-candidate.osis.xml')
+          compiler=Path(shutil.which('osis2mod'))
+          reader=Path('/tmp/lsg-native-witness/native-raw')
+          counters=Counter()
+          mismatches=[]
+          diagnostic={}
+          def node(raw):
+              parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                       no_network=True,recover=False,huge_tree=False)
+              return etree.fromstring(b'<native>'+raw+b'</native>',parser=parser)
+          def without_new_targets(root):
+              removed=Counter()
+              for elem in root.iter():
+                  if not isinstance(elem.tag,str) or etree.QName(elem).localname!='reference':
+                      continue
+                  role=(
+                      'note_origin' if elem.get('type')=='annotateRef' and
+                      elem.get('subType')=='x-origin' else
+                      'introduction' if elem.get('subType')=='x-introduction' else None
+                  )
+                  if role and elem.get('osisRef'):
+                      del elem.attrib['osisRef']
+                      removed[role]+=1
+              return removed
+          with tempfile.TemporaryDirectory(prefix='lsg-sword-dual-source-') as directory:
+              folder=Path(directory)
+              instances=[]
+              for label, file, module in [
+                  ('original',original,'LSGRefOriginalResearch'),
+                  ('candidate',candidate,'LSGRefCandidateResearch'),
+              ]:
+                  work=folder/label
+                  work.mkdir()
+                  payload,output=_create_candidate_layout(work,module,'Segond','fr')
+                  diagnostic[label]=_compile_osis(
+                      compiler,file,output,'Segond',work/'compiler.log')
+                  instances.append((module,work/'payload'))
+              a=_read_native_frames(reader,*instances[0])
+              b=_read_native_frames(reader,*instances[1])
+              for left,right in zip_longest(a,b):
+                  if left is None or right is None:
+                      raise SystemExit('Native reader entry count differs')
+                  kind, key, original_raw=left
+                  candidate_kind,candidate_key,candidate_raw=right
+                  if kind!=candidate_kind or key!=candidate_key:
+                      raise SystemExit('Native ordered index differs')
+                  counters['native_frames_compared']+=1
+                  if kind=='K':counters['populated_verse_frames_compared']+=1
+                  if original_raw==candidate_raw:
+                      counters['raw_frames_byte_identical']+=1
+                      continue
+                  old=node(original_raw)
+                  new=node(candidate_raw)
+                  added=without_new_targets(new)
+                  for name,n in added.items():
+                      counters['compiled_new_'+name+'_attributes']+=n
+                  if etree.tostring(old)!=etree.tostring(new):
+                      counters['native_frames_changed_beyond_allowed_targets']+=1
+                      if len(mismatches)<20:mismatches.append({'kind':kind,'reference':key})
+                  else:
+                      counters['native_frames_with_only_allowed_target_additions']+=1
+          report={
+              'status':'two_independent_temporary_sword_engines_compared',
+              'original_source_sha256':sha256(original.read_bytes()).hexdigest(),
+              'candidate_source_sha256':sha256(candidate.read_bytes()).hexdigest(),
+              'compiler':diagnostic,
+              'native_counts':dict(counters),
+              'bounded_mismatches_no_text':mismatches,
+              'originals_or_releases_replaced':False,
+              'native_binaries_retained':False,
+              'visual_reader_navigation_certified':False,
+          }
+          path=Path('/tmp/lsg-native-reference-parity.json')
+          path.write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          print('Native original/candidate frame comparison:',dict(counters))
+          print('Bounded frame keys with unrelated changes:',mismatches)
+          if (counters['native_frames_changed_beyond_allowed_targets'] or
+              not counters['native_frames_compared'] or
+              not counters['populated_verse_frames_compared']):
+              raise SystemExit('Native original/candidate structural parity failed')
+          PY
       - name: Upload candidate and complete structural provenance receipt
         if: always()
         uses: actions/upload-artifact@v4
@@ -92,5 +195,6 @@ jobs:
             /tmp/lsg-structural-report.json
             /tmp/lsg-brnp-before.json
             /tmp/lsg-brnp-candidate.json
+            /tmp/lsg-native-reference-parity.json
           if-no-files-found: warn
           retention-days: 14
