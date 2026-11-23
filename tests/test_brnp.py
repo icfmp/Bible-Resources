@@ -73,6 +73,8 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         self.assertIn("UNREVIEWED_ELEMENT", [f["code"] for f in report["findings"]])
         self.assertEqual(report["finding_codes"]["UNREVIEWED_ELEMENT"], 1)
         self.assertEqual(report["unreviewed_elements"]["invented"], 1)
+        self.assertEqual(report["finding_examples_by_code"]["UNREVIEWED_ELEMENT"]["element"], "invented")
+        self.assertEqual(report["profile_version"], "0.2-draft")
         self.assertIn("<invented>word</invented>", self.path.read_text(encoding="utf-8"))
 
     def test_commentary_missing_reference_is_blocked(self):
