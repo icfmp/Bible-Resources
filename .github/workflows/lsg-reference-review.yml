@@ -15,6 +15,7 @@ on:
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_PAGE_LOCATORS_2026-11-23.json'
 permissions:
   contents: read
 jobs:
@@ -360,6 +361,49 @@ jobs:
           for entry in records:
               if entry['parser_reason']=='unattested_reference_start':
                   print('LSG_UNATTESTED_CITATION='+json.dumps(entry,ensure_ascii=False,separators=(',',':')))
+          PY
+      - name: Guard complete 54-case original printed-page inventory without granting editorial approval
+        run: |
+          python - <<'PY'
+          import json
+          from hashlib import sha256
+          from pathlib import Path
+          prefix=Path('sources/cleaned/bibles/fr/lsg-1910/editorial')
+          pages=json.loads((prefix/'PRINTED_1910_PAGE_LOCATORS_2026-11-23.json').read_text(encoding='utf-8'))
+          digital=json.loads((prefix/'SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json').read_text(encoding='utf-8'))
+          original=json.loads((prefix/'UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json').read_text(encoding='utf-8'))
+          witness=json.loads((prefix/'PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json').read_text(encoding='utf-8'))
+          usfx=Path('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip')
+          usfx_sha=sha256(usfx.read_bytes()).hexdigest()
+          if (pages['schema_version']!=1
+              or pages['source_usfx_sha256']!=usfx_sha
+              or pages['original_printed_djvu_sha256']!=witness['facsimile']['retrieved_djvu_sha256']
+              or pages['exact_djvu_page_count']!=1061
+              or pages['original_citation_changes_authorized']!=0
+              or pages['historical_printed_reference_note_readings_confirmed']!=len(witness['records'])
+              or pages['historical_printed_reference_note_readings_pending']!=54-len(witness['records'])
+              or len(pages['records'])!=54
+              or len(digital['records'])!=54
+              or len(original['records'])!=54):
+              raise SystemExit('Original 1910 printed-page batch inventory identity/count drift')
+          proofs={row['record_id'] for row in witness['records']}
+          seen=set()
+          for p,d,o in zip(pages['records'],digital['records'],original['records']):
+              key=(p['record_id'],p['original_usfm_book'],p['source_note_origin'],p['original_citation_label'])
+              if (key!=(d['record_id'],d['original_usfm_book'],d['source_note_origin'],d['original_citation_label'])
+                  or key!=(o['record_id'],o['original_usfm_book'],o['source_note_origin'],o['original_citation_label'])
+                  or key[0] in seen
+                  or p['secondary_citation_label']!=d['secondary_citation_label']
+                  or not 1<=p['original_1910_djvu_page']<=pages['exact_djvu_page_count']
+                  or not p['printed_page_url'].endswith('/'+str(p['original_1910_djvu_page']))
+                  or p['printed_reference_status']!=('historical_marginal_label_visually_verified_in_separate_citation_record' if key[0] in proofs else 'page_identified_marginal_label_not_certified')
+                  or p['source_citation_modified'] is not False or p['authorised_correction'] is not None):
+                  raise SystemExit('Original printed reference locator mismatches source, page identity or separate editorial proof')
+              seen.add(key[0])
+          assert len(seen)==54
+          print('Verified exact 54-case original facsimile page locators; only',len(proofs),
+                'historical note reference readings separately certified,',
+                54-len(proofs),'uncertified printed-note labels, 0 authorized changes')
           PY
       - name: Build second isolated candidate with one clickable reference per passage
         run: |
