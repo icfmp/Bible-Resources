@@ -41,6 +41,38 @@ These conventions describe *how* to encode a given meaning. They do not require 
 
 OSIS permits more than one representation for certain overlapping structures. BRNP chooses a deterministic representation **only after** equivalence has been proved with positive/negative fixtures and relevant real editions. Unknown, ambiguous or otherwise schema-valid constructs are reported for review, never auto-flattened. No edition-specific hidden exceptions.
 
+## Decision order: editorial meaning before XML convenience
+
+Apply these rules in order. A later step must never override an earlier one simply to make an OSIS validator or SWORD reader happy.
+
+1. **Identify the work and exact edition.** Record the original author/translator, edition, canon, versification and independently checked historical witnesses. Source-provider OSIS is evidence of a digital transmission, **not** proof of authorial structure.
+2. **Build an editorial structure inventory.** Record every evidenced book/chapter/verse unit, introduction, section, paragraph, poetry line and grouping, title, table/list, note, cross-reference label and target, quotation, emphasis and lexical association. Distinguish authorial text, historical publisher apparatus, provider-only metadata, and rendering artifacts. If attribution is uncertain, preserve and flag it.
+3. **Select the single canonical logical hierarchy** described below. Prefer semantic containers when the unit's boundaries can be represented without overlap; use OSIS milestones **only when structural overlap or source-attested boundaries require them**, not merely because upstream used milestones. Convert equivalent encodings only with a recorded, tested transformation.
+4. **Preserve all semantic associations.** A change of representation must not re-anchor a note, merge commentary scopes, reshape poetry, add a heading, relocate a verse, invent an `osisRef`, silently lose a cross-reference label, or change the authorial/publisher distinction.
+5. **Validate the output independently.** Official OSIS XSD establishes legality only. BRNP establishes the reviewed technical hierarchy. Historical-witness comparison establishes editorial fidelity. SWORD whole-corpus readback and independent readers establish native usability. None substitutes for the others.
+
+## Canonical representation selection and ambiguities
+
+| Question | BRNP target | If source evidence is insufficient |
+| --- | --- | --- |
+| Chapter/verse fully contained in a single logical parent? | Container representation where the official standard and downstream importer permit it; no unnecessary pairing keys | Report the unresolved overlap; do not force a container or insert a missing boundary |
+| Boundaries cross authorial paragraphs or poetry? | Matched `sID`/`eID` milestones with unique keys, exact starts/ends, canonical `osisID` and reviewed ownership | Preserve original boundaries and flag any missing pair; never fabricate a new verse |
+| Is a title/paragraph/poetic stanza from the reviewed edition? | Preserve exact structure, position, order and meaningful type | Do not derive it from the digital provider's headings or line wrapping |
+| Is a note content or a provider navigation instruction? | Retain authorial/historical content and its anchor; isolate provider-only controls in provenance/transport, not authored body | Leave unchanged and flag for editorial review |
+| Is a visible cross-reference only a label, with no verified destination? | Preserve its original literal label and scope. Require evidence before encoding a navigable `osisRef`; unresolved targets remain explicitly reported | Never synthesize a target from matching words, and never delete the label or disguise the missing destination |
+| Are repeated or nested book wrappers merely segmentation artifacts? | One logical book container, child commentary units preserved and ordered with original scope and headings | Keep the raw source and report nonconformity; no resource-specific allowlist |
+| Can a commentary section be mapped from verse milestones to `annotateRef`? | One section per **authored unit**, with exact reviewed book/chapter/verse/range association and introductions kept separate | Do not guess or duplicate the commentary across verses |
+
+The *same* mapping rules apply to all editions. Differences in authorial paragraphing, canon, versification, note apparatus or section extent are retained as genuine differences between editions, not normalized away. If a client needs fallback display (e.g. chapter-only commentary shown while viewing a verse), implement it in the reader; do not rewrite the underlying resource.
+
+## Checks that must be independent of the corpus under test
+
+The validator must include positive and negative synthetic fixtures for: noncanonical book wrapping, duplicate canonical/compound IDs, reuse of milestone keys, missing/reversed boundaries, incorrect book/chapter ownership, title/paragraph/poetry scope, note-anchor retention, malformed/missing/unverifiable reference targets, commentary book/chapter/verse/range mapping and loss of authorial scope. Include a case that is valid under the official OSIS XSD but **rejected by the BRNP canonical target**, and a case that is BRNP-shaped but XSD-invalid. This prevents reducing BRNP to a synonym for OSIS validity.
+
+For every migration, capture a pre-approved transformation plan with pinned input hash and historical evidence; compare **all** original and proposed textual tokens, punctuation, canonical keys and omissions, section/paragraph/poetry boundaries, note and reference labels/anchors/targets, commentary spans, lexical associations and metadata. Validate idempotence, reproduce the same output hash, and retain the original bytes for reversal. Any difference not explicitly described in the reviewed ledger blocks the candidate, even if BRNP diagnostic counts decrease.
+
+A lower diagnostic count is **never** proof of greater fidelity. A BRNP result can become a publication gate only when these checks and real-corpus/native-reader parity are implemented and independently accepted.
+
 ## Severity and evidence policy
 
 A diagnostic is not automatically an error in the historical source. It is a **failure to demonstrate conformity of the cleaned representation** until resolved. Distinguish: (a) malformed OSIS/XSD-invalid input, (b) a proven BRNP structural violation (such as duplicate canonical IDs or unmatched milestones), and (c) an **unresolved semantic/editorial association** (such as a visible cross-reference label without an independently established target). Do not suppress (c) to obtain an empty report, but do not invent destinations merely to satisfy BRNP either.
