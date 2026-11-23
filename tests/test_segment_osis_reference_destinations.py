@@ -104,6 +104,31 @@ class SplitSourceReferencesTest(unittest.TestCase):
                       b'<reference osisRef="Gen.2.1">Ge 2:1</reference>.',split)
         self.assertEqual(report["individual_reference_elements_created"],2)
 
+    def test_named_single_chapter_compound_segments_and_preserves_source_slices(self):
+        label = "Ge 1:1. Jud v. 11. Phm v. 10, 13."
+        aliases = {"Ge": "Gen", "Jud": "Jude", "Phm": "Phlm"}
+        verses = {"Gen.1.1", "Jude.1.11", "Phlm.1.10", "Phlm.1.13"}
+        with self.assertRaisesRegex(ReviewError, "Cannot split"):
+            _exact_reference_spans(label, aliases, verses)
+        spans = _exact_reference_spans(
+            label, aliases, verses, named_single_chapter_refs=True)
+        self.assertEqual([x[2] for x in spans],
+                         ["Gen.1.1", "Jude.1.11", "Phlm.1.10", "Phlm.1.13"])
+        self.assertEqual([label[a:b] for a, b, _target in spans],
+                         ["Ge 1:1", "Jud v. 11", "Phm v. 10", "13"])
+
+    def test_named_compound_cannot_segment_non_single_chapter_or_missing_verse(self):
+        aliases = {"Ge": "Gen", "Jud": "Jude"}
+        verses = {"Gen.1.1", "Gen.2.1", "Jude.1.11"}
+        for label in ("Ge 1:1. Ge v. 11.", "Ge 1:1. Jud v. 99.",
+                      "Ge 1:1. Jud v. 11, etc.",
+                      "Ge 1:1. Jud v. 11. v. 12."):
+            with self.subTest(label=label):
+                with self.assertRaisesRegex(ReviewError, "Cannot split"):
+                    _exact_reference_spans(
+                        label, aliases, verses,
+                        named_single_chapter_refs=True)
+
     def test_disambiguated_chapter_verse_is_one_explicit_source_slice(self):
         verses={"Exod.20.11","Exod.31.17"}
         spans=_exact_reference_spans(

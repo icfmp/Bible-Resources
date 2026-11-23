@@ -798,6 +798,7 @@ jobs:
             --alias-witness config/lsg-1910-printed-book-aliases.json \
             --expected-input-sha256 "$SOURCE_HASH" \
             --disambiguated-chapter-commas \
+            --named-single-chapter-refs \
             --output /tmp/lsg-individual-reference-candidate.osis.xml \
             --report /tmp/lsg-individual-reference-receipt.json
       - name: Independently validate source text, XSD and both BRNP reference inventories

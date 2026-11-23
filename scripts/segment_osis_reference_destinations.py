@@ -21,7 +21,8 @@ import os
 from lxml import etree
 
 from normalize_bible_references import (
-    BOOK_CITATION, SAME_BOOK_CITATION, VERSES_ONLY, OPEN_REFERENCE,
+    BOOK_CITATION, SAME_BOOK_CITATION, NAMED_ONE_CHAPTER_VERSE,
+    VERSES_ONLY, OPEN_REFERENCE,
     OSIS, ReviewError, _bytes, _parse, _crosswalk, _usfx_bytes,
     _printed_book_aliases, _complete_printed_destinations,
 )
@@ -32,7 +33,8 @@ MAX_PARTS = 128
 
 def _exact_reference_spans(label: str, aliases: dict,
                            verse_ids: set[str],
-                           disambiguated_chapter_commas: bool = False
+                           disambiguated_chapter_commas: bool = False,
+                           named_single_chapter_refs: bool = False
                            ) -> list[tuple[int, int, str]]:
     """Parse every source character, yielding raw display offsets + OSIS keys.
 
@@ -43,7 +45,8 @@ def _exact_reference_spans(label: str, aliases: dict,
     label = label.strip()
     expected, reason, _ = _complete_printed_destinations(
         label, aliases, verse_ids,
-        disambiguated_chapter_commas=disambiguated_chapter_commas)
+        disambiguated_chapter_commas=disambiguated_chapter_commas,
+        named_single_chapter_refs=named_single_chapter_refs)
     if expected is None:
         raise ReviewError(f"Cannot split incompletely parsed original label: {label[:120]!r}, reason={reason}")
     position = 0
@@ -61,6 +64,21 @@ def _exact_reference_spans(label: str, aliases: dict,
             verse = int(direct["verse"])
             start = position
             position = direct.end()
+        elif (named_single_chapter_refs and
+                (named := NAMED_ONE_CHAPTER_VERSE.match(label, position)) and
+                not (position == 0 and label.endswith(".") and
+                     named.end() == len(label) - 1)):
+            book = aliases.get(" ".join(named["alias"].split()))
+            if not book:
+                raise ReviewError("Unverified one-chapter book alias in source segmentation")
+            chapters = {key.split(".")[1] for key in verse_ids
+                        if key.startswith(book + ".")}
+            if chapters != {"1"}:
+                raise ReviewError("Source segmentation may only infer the unique attested chapter")
+            chapter = 1
+            verse = int(named["verse"])
+            start = position
+            position = named.end()
         elif repeat_book and book:
             carried = SAME_BOOK_CITATION.match(label, position)
             if carried is None:
@@ -180,7 +198,8 @@ def _patched_reference(label: str, spans: list[tuple[int, int, str]]) -> bytes:
 
 
 def segment_candidate(input_xml: bytes, aliases: dict,
-                      disambiguated_chapter_commas: bool = False
+                      disambiguated_chapter_commas: bool = False,
+                      named_single_chapter_refs: bool = False
                       ) -> tuple[bytes, dict]:
     root = _parse(input_xml)
     if root.tag != OSIS + "osis":
@@ -225,12 +244,15 @@ def segment_candidate(input_xml: bytes, aliases: dict,
             continue
         spans = _exact_reference_spans(
             source_label, aliases, verse_ids,
-            disambiguated_chapter_commas=disambiguated_chapter_commas)
+            disambiguated_chapter_commas=disambiguated_chapter_commas,
+            named_single_chapter_refs=named_single_chapter_refs)
         if len(spans) != len(parts) or [x[2] for x in spans] != parts:
             raise ReviewError("Printed citation segmentation differs from original source-verified target list")
         fragment = _patched_reference(source_label, spans)
         patches.append((start.start(), close + len(b"</reference>"), fragment))
         counts["segmented_destination_labels"] += 1
+        if named_single_chapter_refs and NAMED_ONE_CHAPTER_VERSE.search(source_label):
+            counts["named_one_chapter_compound_labels_segmented"] += 1
         counts["individual_reference_elements_created"] += len(spans)
         counts["new_reference_elements"] += len(spans) - 1
     cursor = 0
@@ -305,6 +327,8 @@ def main() -> int:
     parser.add_argument("--alias-witness", type=Path, required=True)
     parser.add_argument("--disambiguated-chapter-commas", action="store_true",
                         help="Segment uniquely attested comma chapter,verse references too")
+    parser.add_argument("--named-single-chapter-refs", action="store_true",
+                        help="Segment exact source-attested one-chapter book v. verse tokens")
     parser.add_argument("--expected-input-sha256", required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
@@ -324,7 +348,8 @@ def main() -> int:
             sha256(zipped).hexdigest(), original)
         result, receipt = segment_candidate(
             source, aliases,
-            disambiguated_chapter_commas=args.disambiguated_chapter_commas)
+            disambiguated_chapter_commas=args.disambiguated_chapter_commas,
+            named_single_chapter_refs=args.named_single_chapter_refs)
         receipt["source_provider_usfx_zip_sha256"] = sha256(zipped).hexdigest()
         receipt["printed_alias_witness_sha256"] = alias_sha
         args.output.parent.mkdir(parents=True, exist_ok=True)
