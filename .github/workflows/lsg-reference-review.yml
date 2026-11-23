@@ -602,6 +602,74 @@ jobs:
                   raise SystemExit('Uncertified printed-note fallback status drift')
           print('Owner decision: 29 uncertified printed notes retained as original digital source, no invented 1910 proof or CrossWire note endorsement')
           print('All 54 original printed-page citation dispositions verified:',dict(final_classes))
+          # Source-attested preview only; never edits a source label or OSIS.
+          repairs=printed_tokens.get('target_repair_preview')
+          if (not isinstance(repairs,dict)
+              or repairs.get('schema_version')!=1
+              or repairs.get('status')!='individually_reviewable_unapproved_target_repair_proposals_not_applied'
+              or repairs.get('source_usfx_sha256')!=sha256(orig.read_bytes()).hexdigest()
+              or repairs.get('scan_sha256')!=source_scan['retrieved_djvu_sha256']
+              or repairs.get('original_source_labels_modified')!=0
+              or repairs.get('cleaned_master_modified') is not False
+              or repairs.get('compiled_release_modified') is not False
+              or repairs.get('editorial_replacement_authorized') is not False
+              or repairs.get('machine_link_generation_authorized') is not False
+              or repairs.get('approval_required_for_any_actual_label_change') is not True):
+              raise SystemExit('Editorial correction preview must remain source-pinned and unapproved')
+          candidate_list=repairs.get('individually_proposed_replacements',[])
+          blocked_list=repairs.get('deliberately_unmodified_cases',[])
+          printed_contrasts={r['record_id']:r for r in final['records']
+              if r['disposition']=='confirmed_printed_target_contrast'}
+          if len(candidate_list)!=12 or len(blocked_list)!=7 or len(printed_contrasts)!=19:
+              raise SystemExit('19 printed contrasts must have exactly 12 review candidates and 7 holds')
+          ids_seen=set()
+          by_secondary={r['record_id']:r for r in compared}
+          for edit in candidate_list:
+              caseid=edit['record_id']
+              if caseid in ids_seen or caseid not in printed_contrasts:
+                  raise SystemExit('Duplicate/unproven suggested printed correction')
+              ids_seen.add(caseid)
+              old=printed_contrasts[caseid]
+              prior=edit['original_literal_label']
+              before=edit['original_fragment']
+              after=edit['candidate_fragment']
+              if (edit['original_usfm_book']!=old['original_usfm_book']
+                  or edit['source_note_origin']!=old['source_note_origin']
+                  or prior!=old['original_source_label']
+                  or before!=old['contrasted_original_digital_excerpt']
+                  or prior.count(before)!=1
+                  or not after or after==before
+                  or edit['entire_candidate_label']!=prior.replace(before,after,1)
+                  or edit['printed_note_callout']!=old['verified_printed_callout']
+                  or edit['printed_target_observation']!=old['verified_printed_fragment']
+                  or edit['review_status']!='unapproved_isolated_candidate_never_original_source'
+                  or edit['original_label_changed'] is not False
+                  or edit['editorial_approval'] is not None
+                  or edit['release_approval'] is not False):
+                  raise SystemExit('Proposed target edit is not an exact reversible source-bound change')
+              resolved,reason,n_targets=_complete_printed_destinations(
+                  edit['entire_candidate_label'],aliases,verse_ids,
+                  disambiguated_chapter_commas=True)
+              if not resolved or edit['exact_printed_target_osis'] not in resolved.split():
+                  raise SystemExit('Proposed target does not resolve as a whole under original source versification: '+caseid+' ('+reason+')')
+              sec=by_secondary[caseid]['secondary_citation_label']
+              basis=edit['evidence_basis']
+              if basis=='printed_and_secondary_digital':
+                  if after not in sec:
+                      raise SystemExit('Claimed secondary witness does not corroborate exact edited token')
+              elif basis not in ('printed_note_only','printed_note_only_secondary_disagrees'):
+                  raise SystemExit('Unsupported authority category in correction preview')
+          for hold in blocked_list:
+              caseid=hold['record_id']
+              if (caseid in ids_seen or caseid not in printed_contrasts
+                  or hold['source_original_label']!=printed_contrasts[caseid]['original_source_label']
+                  or not hold.get('reason') or hold['unlinked_preserved'] is not True
+                  or hold['editorial_approval'] is not None):
+                  raise SystemExit('Ambiguous printed reference was accidentally corrected')
+              ids_seen.add(caseid)
+          if ids_seen!=set(printed_contrasts):
+              raise SystemExit('19 printed contradictions not exhaustively reviewed')
+          print('Source-pinned original-verse parser checked 12 reversible unapproved editorial label proposals; 7 blocked; 0 source edits')
           print('Persistent original-source unaddressable citation ledger verified:',len(current))
           print('Unlinked 1910 source-citation classes:',dict(classes))
           print('Review-only category examples:',examples)
