@@ -152,6 +152,20 @@ The read-only outputs are retrievable in [run #45151836311](https://github.com/i
 
 In particular, **do not conflate a single neighboring printed marginal token with the complete eBible `xt` label**. Printed reference apparatus entries can span several neighboring cross-reference pointers. Both original verse marker and original note symbol must be aligned before the text can be reported as an edition-specific witness. If the print truly differs from eBible, the separate collation ledger accepts the discrepancy as evidence, **without granting permission to rewrite the authorial words or to add a target**. The CI compares a declared agreement/disagreement outcome to the printed citation and independently verifies source labels and zero approved changes.
 
+### Reproducing original-print image evidence without retaining a CI download job
+
+The short-lived exploratory GitHub Actions workflow is **not a production normalization dependency**. Future independent reviewers can use the pinned original scan directly:
+
+```sh
+curl --fail --location --retry 3 \
+  'https://upload.wikimedia.org/wikipedia/commons/1/17/La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu' \
+  --output original-printed-lsg-1910.djvu
+echo '67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b  original-printed-lsg-1910.djvu' | sha256sum --check
+ddjvu -page=29 -format=tiff original-printed-lsg-1910.djvu original-1910-page29.tif
+```
+
+The page image and original scan checksum must agree with the recorded witness; resized/contrast-enhanced regions help human inspection but are **not** replacement sources. This manual evidence command deliberately does not edit any original Bible text or write into `sources/cleaned`.
+
 ## Remaining release/merge gates
 
 1. **Individual hyperlink usability:** compare representative one-target, multi-target, ranges, chapters and implicit-context references in real Xiphos and AndBible (and if applicable Bible); preserve exactly the printed punctuation. The stock libSWORD HTML renderer already confirms two independent anchors for two separated source citations; this is still not proof of each graphical reader's click/navigation behavior. Do not relax BRNP to suppress reader defects.
