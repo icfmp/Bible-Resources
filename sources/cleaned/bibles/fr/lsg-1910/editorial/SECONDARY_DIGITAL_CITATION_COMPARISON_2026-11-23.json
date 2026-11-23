@@ -604,5 +604,273 @@
       "historical_print_status": "not_collated_from_printed_1910_reference_note",
       "authorized_change": null
     }
-  ]
+  ],
+  "additional_public_usfm_witness": {
+    "status": "direct_public_usfm_xo_xt_comparison_exact_for_all_54_cases_not_1910_print_certification",
+    "observed_date": "2026-11-23",
+    "repository": "BibleCorps/FRA-B-LSG1910-PD-UBS",
+    "repository_url": "https://github.com/BibleCorps/FRA-B-LSG1910-PD-UBS",
+    "ref_observed": "main",
+    "metadata_path": "p.sfm/metadata.xml",
+    "metadata_git_blob_sha": "fdbb00cc3fcdac65d187ed42c08f7366dcf19326",
+    "metadata_identity": {
+      "paratext_name": "FLS10",
+      "paratext_full_name": "Français Louis Segond 1910",
+      "archived_at": "2012-09-27T19:17:07.5577248+00:00",
+      "last_updated_at": "2013-05-08T21:09:16.646618",
+      "archive_comment": "Updated version abbreviation. Added toc1 and toc2. (Updated to DBL 4.0)"
+    },
+    "testimony_urls": [
+      "https://crosswire.org/pipermail/sword-devel/2024-November/050249.html",
+      "https://crosswire.org/pipermail/sword-devel/2024-November/050251.html"
+    ],
+    "method": "For each source ledger record, locate an exact USFM cross-reference \\x ... \\xo chapter:verse \\xt full literal label \\x* in the pinned public book blob; compare both chapter:verse and complete label verbatim. Multiple cross-references at the same origin remain distinct.",
+    "book_files": [
+      {
+        "usfm_book": "GEN",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-01-GEN.p.sfm",
+        "git_blob_sha": "229138d912d25d3c57704ad040bad45f9d9c5e74",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-001",
+          "LSG-CR-002",
+          "LSG-CR-003"
+        ]
+      },
+      {
+        "usfm_book": "LEV",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-03-LEV.p.sfm",
+        "git_blob_sha": "89c38ba3c2ed45dbab17933c387b77af89967543",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-004",
+          "LSG-CR-005",
+          "LSG-CR-006"
+        ]
+      },
+      {
+        "usfm_book": "DEU",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-05-DEU.p.sfm",
+        "git_blob_sha": "86a249c091bfdbaba35a2b4244b83254bff7d076",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-007"
+        ]
+      },
+      {
+        "usfm_book": "JOS",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-06-JOS.p.sfm",
+        "git_blob_sha": "4b5092b1c279f4781f04918a1b4d146aedaf1e93",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-008",
+          "LSG-CR-009"
+        ]
+      },
+      {
+        "usfm_book": "2KI",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-12-2KI.p.sfm",
+        "git_blob_sha": "d7903b53ab3417f1511c66ee24b77ab638f0a79a",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-010"
+        ]
+      },
+      {
+        "usfm_book": "2CH",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-14-2CH.p.sfm",
+        "git_blob_sha": "0c51c57323c3af49eccb37890311eaed05b4e6b5",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-011"
+        ]
+      },
+      {
+        "usfm_book": "NEH",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-16-NEH.p.sfm",
+        "git_blob_sha": "8f11bf4d80cdaab4afc0178ad994df4df40f3ea9",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-012"
+        ]
+      },
+      {
+        "usfm_book": "PRO",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-20-PRO.p.sfm",
+        "git_blob_sha": "50ab9bd267ae08500ab2e6f30a781eaa4aa65332",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-013",
+          "LSG-CR-014"
+        ]
+      },
+      {
+        "usfm_book": "ECC",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-21-ECC.p.sfm",
+        "git_blob_sha": "f6b56f1e5d6ce689265070dda76431c7116f2bab",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-015"
+        ]
+      },
+      {
+        "usfm_book": "SNG",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-22-SNG.p.sfm",
+        "git_blob_sha": "cf785a76a06d3d0fa673936a3cb7cd145cdf1cdc",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-016"
+        ]
+      },
+      {
+        "usfm_book": "ISA",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-23-ISA.p.sfm",
+        "git_blob_sha": "953c6e6fad0b801a93712df3fc5b9446dd5c97f4",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-017",
+          "LSG-CR-018",
+          "LSG-CR-019"
+        ]
+      },
+      {
+        "usfm_book": "JER",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-24-JER.p.sfm",
+        "git_blob_sha": "d9676e9294bdd27c6cdff1432744956eac35d63e",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-020",
+          "LSG-CR-021",
+          "LSG-CR-022",
+          "LSG-CR-023"
+        ]
+      },
+      {
+        "usfm_book": "HOS",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-28-HOS.p.sfm",
+        "git_blob_sha": "11667757e6859b8883c42b9777712987d8702fa2",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-024"
+        ]
+      },
+      {
+        "usfm_book": "MAL",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-39-MAL.p.sfm",
+        "git_blob_sha": "877caf9d1581b04967018536c02e7aec3f09ba9e",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-025"
+        ]
+      },
+      {
+        "usfm_book": "MAT",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-41-MAT.p.sfm",
+        "git_blob_sha": "0297a127764817a50ec754a710c6d49adb1b99a8",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-026",
+          "LSG-CR-027",
+          "LSG-CR-028",
+          "LSG-CR-029",
+          "LSG-CR-030",
+          "LSG-CR-031"
+        ]
+      },
+      {
+        "usfm_book": "MRK",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-42-MRK.p.sfm",
+        "git_blob_sha": "48f5926849ceaf3a10810130c13fc4583c7e26c3",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-032"
+        ]
+      },
+      {
+        "usfm_book": "LUK",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-43-LUK.p.sfm",
+        "git_blob_sha": "79ca1da14568a23eee84ecc74172002d501360e3",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-033",
+          "LSG-CR-034",
+          "LSG-CR-035",
+          "LSG-CR-036",
+          "LSG-CR-037"
+        ]
+      },
+      {
+        "usfm_book": "JHN",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-44-JHN.p.sfm",
+        "git_blob_sha": "eca3d16f34c74a23acbcdf8486c46b951b6d9616",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-038",
+          "LSG-CR-039"
+        ]
+      },
+      {
+        "usfm_book": "ROM",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-46-ROM.p.sfm",
+        "git_blob_sha": "b4bfada4b21248ea6dabca8417d0c9fe0111c152",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-040",
+          "LSG-CR-041"
+        ]
+      },
+      {
+        "usfm_book": "1CO",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-47-1CO.p.sfm",
+        "git_blob_sha": "5fb0c1c9a68401b5c7b4170a8606d00d0a1d7328",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-042"
+        ]
+      },
+      {
+        "usfm_book": "GAL",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-49-GAL.p.sfm",
+        "git_blob_sha": "c0256371b28eaea8e223c1844f83075ea943b138",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-043"
+        ]
+      },
+      {
+        "usfm_book": "1TH",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-53-1TH.p.sfm",
+        "git_blob_sha": "63bfa19327aa7781950231a625d4c0b8f32201cd",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-044",
+          "LSG-CR-045"
+        ]
+      },
+      {
+        "usfm_book": "HEB",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-59-HEB.p.sfm",
+        "git_blob_sha": "ed20014725aee0857ad32e1deb0d5b82499fd662",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-046",
+          "LSG-CR-047"
+        ]
+      },
+      {
+        "usfm_book": "1PE",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-61-1PE.p.sfm",
+        "git_blob_sha": "720039e34bee3f591d315b781518e3d8085a3943",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-048",
+          "LSG-CR-049"
+        ]
+      },
+      {
+        "usfm_book": "1JN",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-63-1JN.p.sfm",
+        "git_blob_sha": "7a904ac3b5c79a6aa688dff81a4a5f394d96d011",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-050",
+          "LSG-CR-051"
+        ]
+      },
+      {
+        "usfm_book": "REV",
+        "path": "p.sfm/FRA[B]LSG1910[PD]UBS-67-REV.p.sfm",
+        "git_blob_sha": "38e734422d11ed0f4cbf0b7ba6931c98280dda1a",
+        "exact_xo_xt_case_ids": [
+          "LSG-CR-052",
+          "LSG-CR-053",
+          "LSG-CR-054"
+        ]
+      }
+    ],
+    "exact_complete_digital_labels_matched": 54,
+    "compared_original_source_labels": 54,
+    "metadata_years_do_not_date_each_reference": true,
+    "independent_transcription_from_1910_print_proven": false,
+    "exact_UBS_DBL_archive_identity_proven": false,
+    "eBible_direct_parent_archive_proven": false,
+    "upstream_label_edit_approved": 0,
+    "machine_link_edits_approved": 0,
+    "interpretation": "Strong common digital ancestry evidence; not proof of the exact editorial ancestor, the original 1910 margin, authenticity of each cross-reference, or rights to republish a later annotated edition."
+  }
 }

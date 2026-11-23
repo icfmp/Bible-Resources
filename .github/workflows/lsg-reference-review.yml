@@ -355,6 +355,43 @@ jobs:
               or compared_counts['text_identical_in_separately_hosted_digital_witness']!=22):
               raise SystemExit('Secondary witness evidence coverage or comparison classification drifted')
           print('Secondary digital apparatus comparison (NOT 1910 print certification):',dict(compared_counts))
+          # A pinned external witness corroborates digital ancestry, not the 1910 print.
+          ext=comparison.get('additional_public_usfm_witness')
+          if (not isinstance(ext,dict)
+              or ext.get('status')!='direct_public_usfm_xo_xt_comparison_exact_for_all_54_cases_not_1910_print_certification'
+              or ext.get('repository')!='BibleCorps/FRA-B-LSG1910-PD-UBS'
+              or ext.get('ref_observed')!='main'
+              or ext.get('exact_complete_digital_labels_matched')!=54
+              or ext.get('compared_original_source_labels')!=54
+              or ext.get('upstream_label_edit_approved')!=0
+              or ext.get('machine_link_edits_approved')!=0
+              or ext.get('independent_transcription_from_1910_print_proven') is not False
+              or ext.get('exact_UBS_DBL_archive_identity_proven') is not False
+              or ext.get('eBible_direct_parent_archive_proven') is not False
+              or not re.fullmatch(r'[0-9a-f]{40}',ext.get('metadata_git_blob_sha',''))):
+              raise SystemExit('Public-USFM witness identity or certification boundary changed')
+          files=ext.get('book_files',[])
+          seen_cases=set()
+          seen_books=set()
+          original_cases={r['record_id']:r for r in expected}
+          if not isinstance(files,list) or len(files)!=26:
+              raise SystemExit('Public-USFM witness must pin 26 source book blobs')
+          for item in files:
+              book=item['usfm_book']
+              if (book in seen_books
+                  or not re.fullmatch(r'[0-9a-f]{40}',item.get('git_blob_sha',''))
+                  or not re.fullmatch(r'p[.]sfm/FRA\\[B\\]LSG1910\\[PD\\]UBS-[0-9]{2}-[A-Z0-9]{3}[.]p[.]sfm',item.get('path',''))
+                  or not item['path'].endswith('-'+book+'.p.sfm')):
+                  raise SystemExit('Public-USFM witness unpinned, duplicate or malformed book')
+              seen_books.add(book)
+              for case_id in item['exact_xo_xt_case_ids']:
+                  if (case_id in seen_cases or case_id not in original_cases
+                      or original_cases[case_id]['original_usfm_book']!=book):
+                      raise SystemExit('Public-USFM cross-reference case duplicated or wrong book')
+                  seen_cases.add(case_id)
+          if seen_cases!=set(original_cases):
+              raise SystemExit('Public-USFM witness does not cover the same 54 original citations')
+          print('Pinned independent public USFM witness: 54 exact digital label observations across 26 immutable Git blobs; no historical-print certification')
           page_data=json.loads(Path(
               'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_PAGE_LOCATORS_2026-11-23.json'
           ).read_text(encoding='utf-8'))
