@@ -180,6 +180,41 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         ))
         self.assertGreaterEqual(report["finding_codes"]["INVALID_STRUCTURAL_PARENT"], 3)
 
+    def test_bible_chapter_cannot_be_in_wrong_book(self):
+        report = self.inspect(document(
+            '<chapter osisID="Exod.1"><verse osisID="Exod.1.1">Text</verse></chapter>'
+        ))
+        self.assertIn("REFERENCE_BOOK_SCOPE", report["finding_codes"])
+
+    def test_bible_verse_cannot_claim_different_chapter(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><verse osisID="Gen.2.1">Text</verse></chapter>'
+        ))
+        self.assertIn("REFERENCE_CHAPTER_SCOPE", report["finding_codes"])
+
+    def test_bible_verse_cannot_appear_outside_book(self):
+        report = self.inspect(
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            f'<osis xmlns="{NS}"><osisText osisIDWork="Demo" osisRefWork="Bible">'
+            '<header/><verse osisID="Gen.1.1">Text</verse></osisText></osis>'
+        )
+        self.assertIn("BOOK_SCOPE", report["finding_codes"])
+
+    def test_nested_book_is_rejected(self):
+        report = self.inspect(document(
+            '<div type="book" osisID="Exod"><chapter osisID="Exod.1">'
+            '<verse osisID="Exod.1.1">Text</verse></chapter></div>'
+        ))
+        self.assertIn("NESTED_BOOK", report["finding_codes"])
+
+    def test_distinct_verse_pair_id_does_not_change_chapter_scope(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><p><verse osisID="Gen.1.1" sID="verse-a"/>'
+            'Text<verse eID="verse-a"/></p></chapter>'
+        ))
+        self.assertNotIn("REFERENCE_CHAPTER_SCOPE", report["finding_codes"])
+        self.assertEqual(report["finding_count"], 0)
+
     def test_source_unchanged(self):
         content = document('<verse osisID="Gen.1.1">Test</verse>')
         self.path.write_text(content, encoding="utf-8")
