@@ -176,7 +176,9 @@ def _single_explicit_destination(label: str, aliases: dict | None,
 
 
 def _complete_printed_destinations(label: str, aliases: dict | None,
-                                   verse_ids: set[str]) -> tuple[str | None, str, int]:
+                                   verse_ids: set[str],
+                                   disambiguated_chapter_commas: bool = False
+                                   ) -> tuple[str | None, str, int]:
     """Consume a complete printed reference list or refuse the whole label.
 
     Every book alias comes from the independently attested edition table;
@@ -253,6 +255,29 @@ def _complete_printed_destinations(label: str, aliases: dict | None,
             if extra is None:
                 return None, "compound_or_implicit_reference", 0
             key = f"{book}.{chapter}.{int(extra.group())}"
+            if key not in verse_ids and disambiguated_chapter_commas:
+                # Historical printed labels can use comma both for another
+                # verse and for an explicit subsequent chapter,verse.
+                # A chapter switch is accepted ONLY when the first number
+                # is not an attested verse in the current chapter, the
+                # next comma+number is actually present, and the entire
+                # original label remains fully consumed. Never guess.
+                k = extra.end()
+                while k < len(label) and label[k].isspace():
+                    k += 1
+                if k < len(label) and label[k] == ",":
+                    k += 1
+                    while k < len(label) and label[k].isspace():
+                        k += 1
+                    second = VERSES_ONLY.match(label, k)
+                    if second is not None:
+                        candidate = f"{book}.{int(extra.group())}.{int(second.group())}"
+                        if candidate in verse_ids:
+                            chapter = int(extra.group())
+                            targets.append(candidate)
+                            contextual += 1
+                            pos = second.end()
+                            continue
             if key not in verse_ids:
                 return None, "unattested_reference_start", 0
             targets.append(key)
@@ -414,7 +439,9 @@ def _intro_target(label: str, book: str, verse_ids: set[str]) -> str | None:
 def _source_bindings(cleaned, original, crosswalk: dict,
                      destination_aliases: dict | None = None,
                      complete_lists: bool = False,
-                     source_local_short_forms: bool = False) -> tuple[dict, dict, list, list]:
+                     source_local_short_forms: bool = False,
+                     disambiguated_chapter_commas: bool = False
+                     ) -> tuple[dict, dict, list, list]:
     """Bind each exact cleaned reference to source-attested USFX semantics.
 
     Book identity is verified using the independent reviewed USFM->OSIS map.
@@ -459,7 +486,8 @@ def _source_bindings(cleaned, original, crosswalk: dict,
                 raise ReviewError("Mismatch in callout, note origin or printed destination")
             if complete_lists:
                 destination_target, status, carried = _complete_printed_destinations(
-                    _label(xt), destination_aliases, verse_ids)
+                    _label(xt), destination_aliases, verse_ids,
+                    disambiguated_chapter_commas=disambiguated_chapter_commas)
                 counts["explicit_semicolon_contexts_used"] += carried
             else:
                 destination_target, status = _single_explicit_destination(
@@ -576,11 +604,14 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         crosswalk_path: Path, output_path: Path | None = None,
         destination_aliases_path: Path | None = None,
         complete_citation_lists: bool = False,
-        source_local_short_forms: bool = False) -> tuple[bytes, dict]:
+        source_local_short_forms: bool = False,
+        disambiguated_chapter_commas: bool = False) -> tuple[bytes, dict]:
     if complete_citation_lists and destination_aliases_path is None:
         raise ReviewError("Complete reference lists require a pinned original-edition abbreviation witness")
     if source_local_short_forms and not complete_citation_lists:
         raise ReviewError("Local shorthand requires full source-citation review mode")
+    if disambiguated_chapter_commas and not complete_citation_lists:
+        raise ReviewError("Contextual comma chapter grammar requires full source-citation review")
     manifest = json.loads(_bytes(manifest_path, 256 * 1024).decode("utf-8"))
     current = _bytes(cleaned_path, MAX_SOURCE)
     zipped = _bytes(usfx_zip, MAX_SOURCE)
@@ -600,7 +631,8 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
     changes, counts, unresolved, destination_findings = _source_bindings(
         source, original, crosswalk, aliases,
         complete_lists=complete_citation_lists,
-        source_local_short_forms=source_local_short_forms)
+        source_local_short_forms=source_local_short_forms,
+        disambiguated_chapter_commas=disambiguated_chapter_commas)
     candidate, edits = _patch_exact_start_tags(current, source, changes)
     # Validate actual candidate XML, every edited target, and the unchanged
     # ordered contents of every text/tail/element. No lossy reserialization.
@@ -638,6 +670,7 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         "unverified_authorial_destinations_guessed": 0,
         "complete_citation_lists_enabled": complete_citation_lists,
         "source_local_short_forms_enabled": source_local_short_forms,
+        "disambiguated_chapter_commas_enabled": disambiguated_chapter_commas,
         "printed_abbreviation_map_sha256": alias_digest,
         "machine_destinations_interpreted_from_complete_explicit_labels":
             counts["resolved_original_destination_labels"],
@@ -675,6 +708,8 @@ def main() -> int:
                         help="Parse only fully consumed source-attested citation grammar")
     parser.add_argument("--source-local-short-forms", action="store_true",
                         help="Review only explicit v./one-chapter/chapter-only citations with original anchors")
+    parser.add_argument("--disambiguated-chapter-commas", action="store_true",
+                        help="Interpret comma chapter,verse only when current-chapter verse is absent and exact target exists")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
@@ -691,6 +726,7 @@ def main() -> int:
             destination_aliases_path=args.destination_aliases,
             complete_citation_lists=args.complete_citation_lists,
             source_local_short_forms=args.source_local_short_forms,
+            disambiguated_chapter_commas=args.disambiguated_chapter_commas,
             output_path=args.output,
         )
     except (ReviewError, OSError, ValueError, etree.XMLSyntaxError) as exc:
