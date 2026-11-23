@@ -261,6 +261,20 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         after = {"finding_codes": {"BOOK_SCOPE": 1}}
         self.assertEqual(brnp_regressions(before, after), {})
 
+    def test_reversed_commentary_range_is_rejected_by_shared_guard(self):
+        report = self.inspect(document(
+            '<div type="section" annotateType="commentary" '
+            'annotateRef="Gen.1.9-Gen.1.2"><p>Note.</p></div>'
+        ), kind="commentary")
+        self.assertIn("COMMENTARY_REFERENCE_INVALID", report["finding_codes"])
+
+    def test_unreviewed_commentary_work_prefix_is_rejected(self):
+        report = self.inspect(document(
+            '<div type="section" annotateType="commentary" '
+            'annotateRef="Bible:Gen.1.1"><p>Note.</p></div>'
+        ), kind="commentary")
+        self.assertIn("COMMENTARY_REFERENCE_INVALID", report["finding_codes"])
+
     def test_source_unchanged(self):
         content = document('<verse osisID="Gen.1.1">Test</verse>')
         self.path.write_text(content, encoding="utf-8")
