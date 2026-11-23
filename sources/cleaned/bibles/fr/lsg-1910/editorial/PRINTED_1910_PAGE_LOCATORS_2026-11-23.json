@@ -41,6 +41,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 13,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -68,6 +79,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": true
+      },
+      "original_print_case_review": {
+        "case_examination_status": "full_print_citation_verified",
+        "inspected_exact_print_verse_on_page": 29,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": "PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -95,6 +117,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 36,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -122,6 +155,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 96,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -149,6 +193,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 101,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -176,6 +231,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 103,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -203,6 +269,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 171,
+        "printed_token": "No. 35. 30.",
+        "printed_token_target_hint": "Num.35.30",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -230,6 +307,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 190,
+        "printed_token": "Ex. 23. 23.",
+        "printed_token_target_hint": "Exod.23.23",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -257,6 +345,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 198,
+        "printed_token": "No. 14. 24. De. 1. 36.",
+        "printed_token_target_hint": "Num.14.24",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -284,6 +383,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 326,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -311,6 +421,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 394,
+        "printed_token": "30. 24. Éz. 45. 17.",
+        "printed_token_target_hint": "2Chr.30.24",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -338,6 +459,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 412,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -365,6 +497,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 525,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -389,6 +532,17 @@
         "estimated_top_bottom_pixels": null,
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 533,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -416,6 +570,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 554,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -440,6 +605,17 @@
         "estimated_top_bottom_pixels": null,
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 559,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -464,6 +640,17 @@
         "estimated_top_bottom_pixels": null,
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 572,
+        "printed_token": "65. 25.",
+        "printed_token_target_hint": "Isa.65.25",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -488,6 +675,17 @@
         "estimated_top_bottom_pixels": null,
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 580,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -515,6 +713,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 607,
+        "printed_token": "Na. 2. 1.",
+        "printed_token_target_hint": "Nah.2.1",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -542,6 +751,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 619,
+        "printed_token": "2 R. 23. 34.",
+        "printed_token_target_hint": "2Kgs.23.34",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -569,6 +789,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 627,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -596,6 +827,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 655,
+        "printed_token": "21. 10.",
+        "printed_token_target_hint": "Jer.21.10",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -623,6 +865,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 663,
+        "printed_token": "2 R. 25. 25.",
+        "printed_token_target_hint": "2Kgs.25.25",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -650,6 +903,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 747,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -677,6 +941,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 791,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -704,6 +979,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 799,
+        "printed_token": "És. 66. 1.",
+        "printed_token_target_hint": "Isa.66.1",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -731,6 +1017,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 807,
+        "printed_token": "Jon. 2. 1.",
+        "printed_token_target_hint": "Jonah.2.1",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -758,6 +1055,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 811,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -785,6 +1093,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 814,
+        "printed_token": "11. 25; 18. 3. 1 Pi. 2. 1, 2. 1 Co. 14. 20.",
+        "printed_token_target_hint": "Matt.18.3",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -812,6 +1131,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 815,
+        "printed_token": "23. 11.",
+        "printed_token_target_hint": "Matt.23.11",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -839,6 +1169,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 819,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -866,6 +1207,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 827,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -893,6 +1245,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 846,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -920,6 +1283,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 862,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -947,6 +1321,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 863,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -974,6 +1359,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 876,
+        "printed_token": "Mc. 16. 19.",
+        "printed_token_target_hint": "Mark.16.19",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1001,6 +1397,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 878,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1028,6 +1435,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 884,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1055,6 +1473,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 899,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1082,6 +1511,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 943,
+        "printed_token": "Os. 2. 1.",
+        "printed_token_target_hint": "Hos.2.1",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1109,6 +1549,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 944,
+        "printed_token": "Na. 2. 1.",
+        "printed_token_target_hint": "Nah.2.1",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1136,6 +1587,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 960,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1163,6 +1625,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 972,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1190,6 +1663,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 988,
+        "printed_token": "Ro. 1. 10-12.",
+        "printed_token_target_hint": "Rom.1.10-Rom.1.12",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1217,6 +1701,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 989,
+        "printed_token": "1 Pi. 4. 8.",
+        "printed_token_target_hint": "1Pet.4.8",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1241,6 +1736,17 @@
         "estimated_top_bottom_pixels": null,
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 1001,
+        "printed_token": "† És. 8. 17, 18.",
+        "printed_token_target_hint": "Isa.8.17-Isa.8.18",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1268,6 +1774,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 1010,
+        "printed_token": "Lé. 4. 12, 21; 16. 27.",
+        "printed_token_target_hint": "Lev.4.12;Lev.4.21;Lev.16.27",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1295,6 +1812,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 1016,
+        "printed_token": "† Os. 2. 1, 25.",
+        "printed_token_target_hint": "Hos.2.1;Hos.2.25",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1322,6 +1850,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 1017,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1349,6 +1888,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 1022,
+        "printed_token": "Jn. 1. 12.",
+        "printed_token_target_hint": "John.1.12",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1376,6 +1926,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 1022,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1403,6 +1964,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "partial_marginal_reference_token_read_only",
+        "inspected_exact_print_verse_on_page": 1031,
+        "printed_token": "Éz. 9. 4-6.",
+        "printed_token_target_hint": "Ezek.9.4-Ezek.9.6",
+        "print_proof_source": "PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json",
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1430,6 +2002,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 1039,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     },
     {
@@ -1457,6 +2040,17 @@
         ],
         "original_djvu_image_rendered_and_preserved": true,
         "page_reference_full_note_certified": false
+      },
+      "original_print_case_review": {
+        "case_examination_status": "original_page_and_verse_examined_but_printed_citation_not_certified",
+        "inspected_exact_print_verse_on_page": 1040,
+        "printed_token": null,
+        "printed_token_target_hint": null,
+        "print_proof_source": null,
+        "editorial_disposition": "preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review",
+        "source_note_edited": false,
+        "machine_link_authorized": false,
+        "authorial_print_notation_interpretation_approved": false
       }
     }
   ],
@@ -1468,5 +2062,17 @@
     "source_verse_text_locator_high_confidence": 48,
     "source_verse_text_locator_needing_special_caution": 6,
     "historical_marginal_full_note_approved_for_change": 0
+  },
+  "batch_review_disposition": {
+    "status": "first_pass_full_1910_original_image_screening_completed_not_full_editorial_certification",
+    "totals": {
+      "full_print_citation_verified": 1,
+      "partial_marginal_reference_token_read_only": 23,
+      "original_page_and_verse_examined_but_printed_citation_not_certified": 30
+    },
+    "reviewed_source_note_origins": 54,
+    "source_label_edits_authorized": 0,
+    "source_reference_links_authorized": 0,
+    "original_scan_provenance_sha256": "67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b"
   }
 }
