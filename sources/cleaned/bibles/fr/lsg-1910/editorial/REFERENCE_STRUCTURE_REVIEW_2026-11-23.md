@@ -113,6 +113,23 @@ All **54** remaining source-unaddressable USFX `x/xt` citation labels have now b
 
 **Publication protection:** all 54 literal original USFX labels remain untouched; all 54 remain unlinked until separately approved. The comparison file marks `historical_print_status: not_collated_from_printed_1910_reference_note` and `authorized_change: null` for each record. The GitHub CI verifies the exact original archive identity, labels, secondary comparison classification and continued absence of editorial approval. This is a complete **digital-to-digital audit**, not completion of the required **digital-to-1910-print collation**.
 
+## Printed facsimile location and legibility checkpoint (2026-11-23)
+
+The **exact 1910 printed facsimile** is indexed at [Wikisource](https://fr.wikisource.org/wiki/Livre:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu) and [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu). Its currently listed scan is **802 × 1,104 pixels per page** (1,061 pages). The text's Wikisource transcription omits the marginal cross-reference apparatus and is not proof of a printed `xt` label.
+
+Two *original print page locations*, verified by the visible **source verse text** in the Wikisource page transcription, are now pinned for the first conflicting cases:
+
+| Case | Source verse physically located | Original 1910 scan page | Editorial evidence status |
+| --- | --- | --- | --- |
+| `LSG-CR-001` | Genesis 9:4 | [DjVu image page 13](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/13) | Page and source verse confirmed; tiny adjacent printed reference type **not confidently deciphered** from the available 500 px preview |
+| `LSG-CR-002` | Genesis 28:12 | [DjVu image page 29](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/29) | Page and source verse confirmed; printed note **not confidently deciphered** from the available 500 px preview |
+
+These are **page-location verifications only**, not two completed citation collations. No `historical_print_status` is cleared, no edit is approved, and the 54-record source registry remains untouched.
+
+A distinct, potentially clearer **1911 printed edition of the 1910 revision** is also identified at [Commons: La Sainte Bible, 1911.djvu](https://commons.wikimedia.org/wiki/File:La_Sainte_Bible,_1911.djvu), currently listed at 1,423 × 2,001 pixels (1,043 pages); its Commons history also records an earlier 2,480 × 3,508 scan revision. It may become useful as an *additional independent printed witness*, provided its exact reference-apparatus edition and page/verse correspondences are checked first. **The 1911 printing cannot silently substitute for the requested 1910 witness.** No marginal reference has yet been certified from it.
+
+To certify a case, record the exact 1910 print scan page, a legible transcription of the physical marginal citation, the exact source-note origin, whether the source and 1910 print match, and the distinction between textual typo, edition-level printed anomaly, and legitimate verse numbering. Maintain each `authorized_change: null` until that evidence exists and an editorial decision is approved.
+
 ## Remaining release/merge gates
 
 1. **Individual hyperlink usability:** compare representative one-target, multi-target, ranges, chapters and implicit-context references in real Xiphos and AndBible (and if applicable Bible); preserve exactly the printed punctuation. The stock libSWORD HTML renderer already confirms two independent anchors for two separated source citations; this is still not proof of each graphical reader's click/navigation behavior. Do not relax BRNP to suppress reader defects.
