@@ -1,0 +1,61 @@
+name: LSG 1910 printed-margin image feasibility (draft evidence only)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/lsg-printed-margin-sample.yml'
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Read source scan excerpt without modifying biblical files
+        run: |
+          python -m pip install -q Pillow
+          python - <<'PY'
+          from urllib.request import Request, urlopen
+          from urllib.error import HTTPError
+          from PIL import Image, ImageOps, ImageEnhance
+          from io import BytesIO
+          import hashlib, base64, os
+          root='https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/'
+          name='La_Sainte_Bible%2C_trad._Segond%2C_ed._1910.djvu'
+          os.makedirs('/tmp/lsg-margins',exist_ok=True)
+          for page in [13,29]:
+              image=None
+              for width in [802,700,500]:
+                  url=f'{root}{name}/page{page}-{width}px-{name}.jpg'
+                  try:
+                      req=Request(url,headers={'User-Agent':'Bible-Resources-evidence/1.0 (https://github.com/icfmp/Bible-Resources)'})
+                      b=urlopen(req,timeout=25).read()
+                      image=Image.open(BytesIO(b)).convert('RGB')
+                      print('SCAN',page,'url',url,'pixels',image.size,'sha256',hashlib.sha256(b).hexdigest())
+                      break
+                  except Exception as exc:
+                      print('SOURCE_ATTEMPT_FAILED',page,width,type(exc).__name__,str(exc)[:130])
+              if image is None:
+                  raise SystemExit('Cannot retrieve actual historical scan; no transcription possible')
+              image.save(f'/tmp/lsg-margins/printed-1910-p{page}-full.png')
+              w,h=image.size
+              # A narrow gutter between two printed text columns contains the 1910 references.
+              # Enlarge pixels for visual examination; interpolation does not create new evidence.
+              left=int(w*0.42);right=int(w*0.59)
+              excerpt=image.crop((left,int(h*0.11),right,int(h*0.89)))
+              excerpt=ImageOps.grayscale(excerpt)
+              excerpt=ImageEnhance.Contrast(excerpt).enhance(1.8)
+              excerpt=excerpt.resize((excerpt.width*3,excerpt.height*3),Image.Resampling.NEAREST)
+              out=BytesIO()
+              excerpt.save(out,format='PNG',optimize=True)
+              payload=out.getvalue()
+              open(f'/tmp/lsg-margins/printed-1910-p{page}-gutter.png','wb').write(payload)
+              print(f'LSG_SCAN_CROP_{page}_BASE64_BEGIN')
+              print(base64.b64encode(payload).decode('ascii'))
+              print(f'LSG_SCAN_CROP_{page}_BASE64_END')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lsg-1910-facsimile-margin-images-unreviewed
+          path: /tmp/lsg-margins/
+          retention-days: 14
