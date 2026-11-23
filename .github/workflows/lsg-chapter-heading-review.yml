@@ -15,7 +15,7 @@ on:
       - 'tests/**'
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 jobs:
   headings:
     runs-on: ubuntu-latest
@@ -139,7 +139,7 @@ jobs:
           from approved_osis_sword_candidate import _read_native_frames,_native_notes
           from research.bible.native_raw_main_text import native_raw_main_text
           from research.bible.source_osis_verse_notes import original_osis_verses_and_notes,_nonspace
-          original=Path('sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml').read_bytes()
+          original=Path('/tmp/lsg-1.0.1-original.osis.xml').read_bytes()
           candidate=Path('/tmp/lsg-preverse-section-candidate.osis.xml').read_bytes()
           expected={}
           for match in DIRECT_UNTYPED.finditer(original):
@@ -213,24 +213,47 @@ jobs:
           PY
           SWORD_PATH=/tmp/lsg-chapter-heading-sword/payload \
             /tmp/lsg-heading-native-display BRLSG1910
-      - name: Stage new source and full native module in the review branch only
-        if: github.event_name == 'push' && github.ref == 'refs/heads/fix/lsg-chapter-opening-headings'
+      - name: Verify checked-in 1.0.2 module matches independently compiled native payload (read-only)
         run: |
-          set -euo pipefail
-          python modules/lsg-1910/tools/stage_chapter_heading_hotfix.py
-          python scripts/tool_registry.py --write
+          python - <<'PY'
+          from hashlib import sha256
+          from pathlib import Path
+          import json
+          source=Path('sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml')
+          candidate=Path('/tmp/lsg-preverse-section-candidate.osis.xml')
+          expected_sha='2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd'
+          if sha256(source.read_bytes()).hexdigest()!=expected_sha or source.read_bytes()!=candidate.read_bytes():
+              raise SystemExit('The committed cleaned master is not the exactly verified 1.0.2 source')
+          rel=Path('modules/texts/ztext/brlsg1910')
+          staged=Path('modules/lsg-1910/payload')/rel
+          compiled=Path('/tmp/lsg-chapter-heading-sword/payload')/rel
+          required={'ot.bzs','ot.bzv','ot.bzz','nt.bzs','nt.bzv','nt.bzz'}
+          if ({p.name for p in staged.iterdir() if p.is_file()}!=required or
+              {p.name for p in compiled.iterdir() if p.is_file()}!=required):
+              raise SystemExit('Unexpected SWORD native payload member set')
+          for name in sorted(required):
+              if staged.joinpath(name).read_bytes()!=compiled.joinpath(name).read_bytes():
+                  raise SystemExit('The committed native payload differs from independent SWORD compilation: '+name)
+          conf=Path('modules/lsg-1910/payload/mods.d/brlsg1910.conf').read_text()
+          if ('Version=1.0.2' not in conf or
+              'GlobalOptionFilter=OSISHeadings' not in conf or
+              'GlobalOptionFilter=OSISScripref' not in conf or
+              'GlobalOptionFilter=OSISXRefs' in conf):
+              raise SystemExit('1.0.2 native reader configuration mismatch')
+          import_plan=json.loads(Path('config/catalogue-import-lsg-1.0.2.json').read_text())
+          release_plan=json.loads(Path('config/release-plans/lsg-1.0.2.json').read_text())
+          if (import_plan['release_tag']!='lsg-1.0.2' or
+              release_plan['tag']!='lsg-1.0.2' or
+              import_plan['release_zip_sha256']!=release_plan['package_sha256']):
+              raise SystemExit('Release package identity mismatch')
+          for name in sorted(required):
+              key=(rel/name).as_posix()
+              if import_plan['files'].get(key)!=sha256(staged.joinpath(name).read_bytes()).hexdigest():
+                  raise SystemExit('Release manifest member digest mismatch: '+key)
+          print('Committed 1.0.2 OSIS and all six SWORD native files match exact independently rebuilt candidate')
+          PY
           python scripts/validate.py
           python scripts/release_preflight.py --module-id lsg-1910 --report /tmp/lsg-1.0.2-preflight.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A modules/lsg-1910 sources/cleaned/bibles/fr/lsg-1910 \
-            config/catalogue-import-lsg-1.0.2.json \
-            config/release-plans/lsg-1.0.1.json config/release-plans/lsg-1.0.2.json \
-            catalog/v1/catalog.json
-          git add -u -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
-          git diff --cached --check
-          git commit -m "release(lsg): stage reviewed 1.0.2 source and new heading-correct SWORD module for approval"
-          git push origin HEAD:refs/heads/fix/lsg-chapter-opening-headings
       - name: Upload temporary source and native validation receipts only
         uses: actions/upload-artifact@v4
         with:
