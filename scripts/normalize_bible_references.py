@@ -208,6 +208,11 @@ def _source_bindings(cleaned, original, crosswalk: dict) -> tuple[dict, dict]:
             changes[ref] = target
             counts["resolved_introduction_spans"] += 1
 
+    for key in ("original_cross_reference_notes",
+                "unlinked_original_destination_labels_preserved",
+                "original_introduction_spans", "resolved_introduction_spans",
+                "unlinked_introduction_spans_preserved"):
+        counts.setdefault(key, 0)
     if len(changes) != (counts["original_cross_reference_notes"] +
                          counts["resolved_introduction_spans"]):
         raise ReviewError("Duplicate source witness binding")
