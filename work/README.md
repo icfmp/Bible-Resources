@@ -9,8 +9,9 @@ to `sources/cleaned/`, and SWORD payloads to `modules/`.
 ## Existing HMCC Modern authoring archive
 
 `work/mhcc-modern/` remains an **active provenance-bearing authoring archive**,
-not scratch space: the historical 1,189 chapter manuscripts are pinned at an immutable Git
-revision and the current approved editorial source is under `sources/cleaned/`. In particular, the
+not scratch space: the historical 1,189 chapter manuscripts and preliminary research/intro
+candidates are pinned at immutable Git revisions. The approved modern
+editorial source is under `sources/cleaned/`. In particular, the
 published SWORD `TextSource` URL and reviewed source/release records refer
 to these paths. The authoring snapshots are recoverable via the preserved `accepted/README.md`
 and the approved original source and release hashes remain unchanged. Use the navigation pointer at
@@ -24,3 +25,5 @@ do not run that historical experiment as an active compiler.
 Consult the current
 [workspace architecture](../docs/architecture/WORKSPACE_LAYOUT.md)
 and [production contract](../docs/PRODUCTION_PIPELINE.md).
+
+For modern HMCC release evidence see [the retained working-index](mhcc-modern/production/README.md).
