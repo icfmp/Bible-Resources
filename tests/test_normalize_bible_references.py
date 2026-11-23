@@ -73,9 +73,20 @@ class NormalizationTests(unittest.TestCase):
         }))
         return source
 
-    def apply(self, output=None):
+    def aliases(self):
+        path = self.root / "printed-aliases.json"
+        path.write_text(json.dumps({
+            "schema_version": 1,
+            "crosswalk": "config/standard_usfm_osis_66.json",
+            "printed_sources": ["https://example.org/printed-page"],
+            "aliases": {"Ge": "Gen"},
+        }))
+        return path
+
+    def apply(self, output=None, aliases=None):
         return run(cleaned_path=self.cleaned, usfx_zip=self.original,
                    manifest_path=self.manifest, crosswalk_path=self.crosswalk,
+                   destination_aliases_path=aliases,
                    output_path=output)
 
     def test_preserves_every_original_byte_except_verified_additions(self):
@@ -135,6 +146,73 @@ class NormalizationTests(unittest.TestCase):
         self.assertIn(b' subType="x-introduction">', candidate)
         self.assertIn("1:1–2:1 (voir un autre passage)".encode(), candidate)
         self.assertEqual(source.count(b' osisRef="'), 0)
+
+    def test_exact_printed_single_destination_is_source_verified(self):
+        self.fixture(clean_dest="Ge 1:2.", original_dest="Ge 1:2.")
+        candidate, report = self.apply(aliases=self.aliases())
+        self.assertIn(b'<reference osisRef="Gen.1.2">Ge 1:2.</reference>', candidate)
+        self.assertEqual(report["resolved_original_destination_labels"], 1)
+        self.assertEqual(report["unlinked_original_destination_labels_preserved"], 0)
+        self.assertEqual(report["candidate_additions"], 3)
+
+    def test_printed_single_destination_idempotence(self):
+        self.fixture(clean_dest="Ge 1:2.", original_dest="Ge 1:2.")
+        aliases = self.aliases()
+        candidate, report = self.apply(aliases=aliases)
+        self.cleaned.write_bytes(candidate)
+        manifest = json.loads(self.manifest.read_text())
+        manifest["cleaned_osis_sha256"] = sha256(candidate).hexdigest()
+        self.manifest.write_text(json.dumps(manifest))
+        twice, report = self.apply(aliases=aliases)
+        self.assertEqual(candidate, twice)
+        self.assertEqual(report["candidate_additions"], 0)
+
+    def test_explicit_printed_range_requires_both_real_verses(self):
+        self.fixture(clean_dest="Ge 1:1-2.", original_dest="Ge 1:1-2.")
+        candidate, report = self.apply(aliases=self.aliases())
+        self.assertIn(b'osisRef="Gen.1.1-Gen.1.2">Ge 1:1-2.', candidate)
+        self.assertEqual(report["resolved_original_destination_labels"], 1)
+
+    def test_printed_compound_label_never_receives_partial_link(self):
+        self.fixture(clean_dest="Ge 1:2. Ps 3:1.",
+                     original_dest="Ge 1:2. Ps 3:1.")
+        candidate, report = self.apply(aliases=self.aliases())
+        self.assertIn(b'<reference>Ge 1:2. Ps 3:1.</reference>', candidate)
+        self.assertEqual(report["resolved_original_destination_labels"], 0)
+        self.assertEqual(report["unlinked_original_destination_labels_preserved"], 1)
+        self.assertEqual(report["candidate_additions"], 2)
+
+    def test_unknown_abbreviation_or_missing_verse_is_not_guessed(self):
+        for printed in ("Gé 1:2.", "Ge 1:99.", "Ge 1:2-99.",
+                        "Ge 1:2; 2.", "v. 2."):
+            with self.subTest(printed=printed):
+                self.fixture(clean_dest=printed, original_dest=printed)
+                candidate, report = self.apply(aliases=self.aliases())
+                self.assertEqual(report["resolved_original_destination_labels"], 0)
+                self.assertEqual(report["candidate_additions"], 2)
+                self.assertIn(("<reference>"+printed+"</reference>").encode(),
+                              candidate)
+
+    def test_printed_crosswalk_must_cover_exact_approved_books(self):
+        self.fixture(clean_dest="Ge 1:2.", original_dest="Ge 1:2.")
+        alias_path = self.aliases()
+        doc = json.loads(alias_path.read_text())
+        doc["aliases"] = {"Ge": "Exod"}
+        alias_path.write_text(json.dumps(doc))
+        with self.assertRaisesRegex(ReviewError, "one-to-one"):
+            self.apply(aliases=alias_path)
+
+    def test_existing_conflicting_destination_is_blocked(self):
+        self.fixture(clean_dest="Ge 1:2.", original_dest="Ge 1:2.")
+        clean = self.cleaned.read_bytes().replace(
+            b"<reference>Ge 1:2.</reference>",
+            b'<reference osisRef="Gen.1.1">Ge 1:2.</reference>')
+        self.cleaned.write_bytes(clean)
+        manifest = json.loads(self.manifest.read_text())
+        manifest["cleaned_osis_sha256"] = sha256(clean).hexdigest()
+        self.manifest.write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ReviewError, "conflicts"):
+            self.apply(aliases=self.aliases())
 
     def test_wrong_source_sha_blocks(self):
         self.fixture()
