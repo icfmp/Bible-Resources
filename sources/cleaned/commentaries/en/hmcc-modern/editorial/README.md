@@ -20,4 +20,6 @@
 | How modernization is reviewed generally | [Generic translation procedure](../../../../../../docs/workflows/COMMENTARY_TRANSLATION_FROM_CLEAN_SOURCE.md) |
 | Historical difficult decisions | [Short edition-specific decision record](HISTORICAL_PROTOCOL.md) |
 
+The 1,189 original modern-English Markdown manuscripts are preserved at [the exact pre-cleanup Git revision](https://github.com/icfmp/Bible-Resources/tree/c96bebf42d8e0eba62fa961f7f16a00806a50e2c/work/mhcc-modern/production/accepted), instead of being redundantly checked into the current tree. The pinned cleaned OSIS master is the current edition source of truth; signed SWORD metadata and release hashes have not been rewritten. The historical Markdown is evidence of authorship, not a byte-identical equivalent of the released OSIS.
+
 The long obsolete progress narrative is not the current workflow. New updates must cite exact original/modern passages, reviewer decisions and native-reader receipts.
