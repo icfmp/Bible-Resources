@@ -200,7 +200,15 @@
       "source_resolution": "unattested_reference_start",
       "decision": "preserve_source_label_unlinked",
       "printed_witness_status": "pending_manual_facsimile_collation",
-      "editorial_change": null
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Na 1:15",
+        "possible_1910_print_body_key": "Nah.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Nahum",
+        "reason": "The 1910 print-derived chapter text places the messenger-on-mountains line at Nahum 2:1; alternative digital numbering has Nahum 1:15.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
     },
     {
       "record_id": "LSG-CR-020",
@@ -250,7 +258,15 @@
       "source_resolution": "unattested_reference_start",
       "decision": "preserve_source_label_unlinked",
       "printed_witness_status": "pending_manual_facsimile_collation",
-      "editorial_change": null
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Os 1:10",
+        "possible_1910_print_body_key": "Hos.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Os%C3%A9e",
+        "reason": "The 1910 print-derived chapter text starts the descendants-as-sand promise at Osée 2:1; another digital edition labels this verse Osée 1:10.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
     },
     {
       "record_id": "LSG-CR-025",
@@ -280,7 +296,15 @@
       "source_resolution": "unattested_reference_start",
       "decision": "preserve_source_label_unlinked",
       "printed_witness_status": "pending_manual_facsimile_collation",
-      "editorial_change": null
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Jon 1:17",
+        "possible_1910_print_body_key": "Jonah.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Jonas",
+        "reason": "The 1910 print-derived chapter text starts the great-fish passage at Jonas 2:1 whereas other digital editions label the identical passage 1:17; any other note reference, including Jon 2:10, needs its own complete review.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
     },
     {
       "record_id": "LSG-CR-028",
@@ -290,7 +314,15 @@
       "source_resolution": "unattested_reference_start",
       "decision": "preserve_source_label_unlinked",
       "printed_witness_status": "pending_manual_facsimile_collation",
-      "editorial_change": null
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Jon 1:17",
+        "possible_1910_print_body_key": "Jonah.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Jonas",
+        "reason": "The 1910 print-derived chapter text starts the great-fish passage at Jonas 2:1 whereas other digital editions label the identical passage 1:17; any other note reference, including Jon 2:10, needs its own complete review.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
     },
     {
       "record_id": "LSG-CR-029",
@@ -350,7 +382,15 @@
       "source_resolution": "unattested_reference_start",
       "decision": "preserve_source_label_unlinked",
       "printed_witness_status": "pending_manual_facsimile_collation",
-      "editorial_change": null
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Jon 1:17",
+        "possible_1910_print_body_key": "Jonah.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Jonas",
+        "reason": "The 1910 print-derived chapter text starts the great-fish passage at Jonas 2:1 whereas other digital editions label the identical passage 1:17; any other note reference, including Jon 2:10, needs its own complete review.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
     },
     {
       "record_id": "LSG-CR-035",
@@ -410,7 +450,15 @@
       "source_resolution": "unattested_reference_start",
       "decision": "preserve_source_label_unlinked",
       "printed_witness_status": "pending_manual_facsimile_collation",
-      "editorial_change": null
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Os 1:10",
+        "possible_1910_print_body_key": "Hos.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Os%C3%A9e",
+        "reason": "The 1910 print-derived chapter text starts the descendants-as-sand promise at Osée 2:1; another digital edition labels this verse Osée 1:10.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
     },
     {
       "record_id": "LSG-CR-041",
@@ -420,7 +468,15 @@
       "source_resolution": "unattested_reference_start",
       "decision": "preserve_source_label_unlinked",
       "printed_witness_status": "pending_manual_facsimile_collation",
-      "editorial_change": null
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Na 1:15",
+        "possible_1910_print_body_key": "Nah.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Nahum",
+        "reason": "The 1910 print-derived chapter text places the messenger-on-mountains line at Nahum 2:1; alternative digital numbering has Nahum 1:15.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
     },
     {
       "record_id": "LSG-CR-042",
@@ -430,7 +486,15 @@
       "source_resolution": "unattested_reference_start",
       "decision": "preserve_source_label_unlinked",
       "printed_witness_status": "pending_manual_facsimile_collation",
-      "editorial_change": null
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Jon 1:17",
+        "possible_1910_print_body_key": "Jonah.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Jonas",
+        "reason": "The 1910 print-derived chapter text starts the great-fish passage at Jonas 2:1 whereas other digital editions label the identical passage 1:17; any other note reference, including Jon 2:10, needs its own complete review.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
     },
     {
       "record_id": "LSG-CR-043",
@@ -490,7 +554,15 @@
       "source_resolution": "unattested_reference_start",
       "decision": "preserve_source_label_unlinked",
       "printed_witness_status": "pending_manual_facsimile_collation",
-      "editorial_change": null
+      "editorial_change": null,
+      "parallel_versification_review": {
+        "status": "candidate_only_requires_actual_printed_note_collation",
+        "digital_source_token": "Os 1:10",
+        "possible_1910_print_body_key": "Hos.2.1",
+        "print_derived_chapter_transcription": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Os%C3%A9e",
+        "reason": "The 1910 print-derived chapter text starts the descendants-as-sand promise at Osée 2:1; another digital edition labels this verse Osée 1:10.",
+        "warning": "This demonstrates possible verse numbering variation, not the actual 1910 printed cross-reference note and not permission to remap or correct the original source."
+      }
     },
     {
       "record_id": "LSG-CR-049",
@@ -552,5 +624,7 @@
       "printed_witness_status": "pending_manual_facsimile_collation",
       "editorial_change": null
     }
-  ]
+  ],
+  "independent_parallel_versification_candidates": 9,
+  "independent_printed_note_corrections_certified": 0
 }
