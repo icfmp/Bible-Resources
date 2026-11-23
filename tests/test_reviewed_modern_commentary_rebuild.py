@@ -20,6 +20,30 @@ class ModernCommentaryReleaseContract(unittest.TestCase):
         self.conf = parse_conf(
             self.module / "payload/mods.d/hmccmodern.conf")[1]
 
+    def test_owner_decision_evidence_is_edition_owned_and_complete(self):
+        """Keep the four release evidence records with their canonical edition."""
+        evidence = ROOT / "sources/cleaned/commentaries/en/hmcc-modern/editorial/evidence"
+        required = (
+            "OWNER_EDITORIAL_DECISIONS_2026-11-19.json",
+            "ADDITIONAL_ORIGINAL_LINK_TARGET_ERRATA_2026-11-18.json",
+            "FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json",
+            "PRIMARY_SOURCE_STRICT_TWO_SECTION_QUARANTINE_2026-11-19.json",
+        )
+        for name in required:
+            with self.subTest(name=name):
+                path = evidence / name
+                self.assertTrue(path.is_file())
+                self.assertFalse(path.is_symlink())
+                self.assertIsInstance(json.loads(path.read_text(encoding="utf-8")), dict)
+        plan = json.loads(
+            (ROOT / "config/commentary-rebuilds/hmcc-modern.json").read_text(
+                encoding="utf-8"))
+        self.assertEqual(
+            plan["source_decisions"],
+            "sources/cleaned/commentaries/en/hmcc-modern/editorial/evidence/"
+            "OWNER_EDITORIAL_DECISIONS_2026-11-19.json")
+        self.assertFalse((ROOT / "work").exists())
+
     def test_real_authenticated_binary_and_provenance_pass(self):
         self.assertEqual(
             reviewed_modern_commentary_errors(

@@ -13,7 +13,6 @@ sources/
       profiles/                                      # edition-specific reader metadata
       releases/                                      # approved or explicitly draft receipts
       history/                                       # edition-specific historical decisions
-work/<type>/<language>/<resource-id>/                # new drafts and local investigations
 modules/<resource-id>/                              # native SWORD and approved metadata
   tools/                                             # only still-needed edition-specific QA/replay scripts
 scripts/                                            # reusable production and audit commands
@@ -32,7 +31,7 @@ Preserve original source bytes and identity, archive contents, version, exact ed
 
 Create independent candidates outside the original tree. **A source-derived curated master** under `sources/cleaned/` requires its own pinned hashes and reversible transformation ledger. An edition distributed as **byte-identical upstream stock SWORD** may have edition-specific rights/reader evidence and an editorial index without a reconstructed OSIS master; do not create fictitious source files just to fill the example tree. Verify all text, punctuation, verse mappings, notes, citations, headings, paragraphs, poetry, lexical markup and commentary scopes as applicable. Store resource-specific decisions and test receipts in `editorial/` — **not in global `docs/`**.
 
-Existing historical `work/` layouts may differ. Keep existing paths required to reproduce or resume work until their references have been audited; they are not templates for new resources.
+Prepare source candidates in a Git branch and disposable local directories, not in a permanent tracked `work/` tree. Commit a reviewed candidate to the edition-owned `sources/cleaned/` only with a reversible transformation ledger in its `editorial/` folder. Historical research remains available in immutable Git revisions. The released HMCC Modern SWORD `TextSource` historically references the old manuscript tree; that exact historic content is recoverable at commit `c96bebf42d8e0eba62fa961f7f16a00806a50e2c` without altering signed module bytes.
 
 Shared read-only Bible/OSIS evidence with no independent CLI belongs under [`scripts/research/bible/`](../../scripts/research/bible/README.md). Historical cross-resource research is available through immutable Git revisions, not maintained as an alternate production path. The [document relocation provenance ledger](../technical/DOCUMENT_RELOCATIONS.json) preserves original file identities. These tools never substitute for editorial or publication approval. Keep the actual stable producer/validator commands in `scripts/` and edition-owned scripts under `modules/<resource-id>/tools/`, after verifying real workflow and test consumers.
 

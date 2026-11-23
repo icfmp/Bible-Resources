@@ -8,7 +8,7 @@ Bible Resources is a **source-first editorial and SWORD distribution repository*
 | --- | --- | --- |
 | `sources/original/` | Keep acquired publisher/source files unchanged, with edition identity and checksums | Normalize in place |
 | `sources/cleaned/` | Hold the curated master and the edition's `editorial/` decisions, evidence and release notes | Conceal editorial decisions in global docs |
-| `work/` | Generate disposable or reviewable candidates | Become an untracked authoritative source |
+| Git branches and ignored temporary directories | Develop and review isolated source candidates | Modify immutable originals or bypass approval |
 | `modules/` | Package native SWORD output and build metadata | Replace original source evidence |
 | `catalog/v1/` and `sword/` | Distribute approved, versioned module artifacts | Publish draft/research outputs |
 | `docs/` | Explain lasting, edition-independent architecture, policies, procedures and verification | Store individual-module histories or transient audit results |

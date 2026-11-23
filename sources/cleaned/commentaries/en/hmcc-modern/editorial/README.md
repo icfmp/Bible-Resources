@@ -23,3 +23,7 @@
 The 1,189 original modern-English Markdown manuscripts are preserved at [the exact pre-cleanup Git revision](https://github.com/icfmp/Bible-Resources/tree/c96bebf42d8e0eba62fa961f7f16a00806a50e2c/work/mhcc-modern/production/accepted), instead of being redundantly checked into the current tree. The pinned cleaned OSIS master is the current edition source of truth; signed SWORD metadata and release hashes have not been rewritten. The historical Markdown is evidence of authorship, not a byte-identical equivalent of the released OSIS.
 
 The long obsolete progress narrative is not the current workflow. New updates must cite exact original/modern passages, reviewer decisions and native-reader receipts.
+
+## Active evidence and archived manuscripts
+
+The four original, byte-identical owner-decision and source-anomaly records required by the publication validator now live in [this edition's evidence directory](evidence/). The historical manuscript source paths recorded in `CLEANUP_MANIFEST.json` and the already published SWORD `TextSource` are retained as provenance rather than rewritten. Recover the actual 1,189 authoring manuscripts at [immutable commit `c96bebf`](https://github.com/icfmp/Bible-Resources/tree/c96bebf42d8e0eba62fa961f7f16a00806a50e2c/work/mhcc-modern/production/accepted) and retired private reviews at [immutable commit `f7d5bac`](https://github.com/icfmp/Bible-Resources/tree/f7d5bac17adc0ab43734399f322d95c7532c0bf0/work/mhcc-modern/production). Those manuscripts are historical inputs, **not** a second current approved OSIS master.

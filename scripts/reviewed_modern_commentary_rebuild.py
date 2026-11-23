@@ -45,8 +45,8 @@ def reviewed_modern_commentary_errors(directory: Path, root: Path,
         plan = load(root / "config/commentary-rebuilds" / (ident + ".json"))
         proof = load(directory / "SOURCE_VALIDATION.json")
         artifact = load(directory / "RELEASE_ARTIFACT_PROOF.json")
-        decisions = load(root / "work/mhcc-modern/production/"
-                         "OWNER_EDITORIAL_DECISIONS_2026-11-19.json")
+        decisions = load(root / "sources/cleaned/commentaries/en/hmcc-modern/"
+                         "editorial/evidence/OWNER_EDITORIAL_DECISIONS_2026-11-19.json")
         if (plan.get("schema_version") != 1
                 or plan.get("status") != "owner_authorized_for_release"
                 or plan.get("module_id") != ident
@@ -57,7 +57,7 @@ def reviewed_modern_commentary_errors(directory: Path, root: Path,
                     decisions.get("source_native_corpus_sha256")
                 or not sha(plan.get("source_approved_osis_sha256"))
                 or plan.get("source_decisions") !=
-                    "work/mhcc-modern/production/OWNER_EDITORIAL_DECISIONS_2026-11-19.json"
+                    "sources/cleaned/commentaries/en/hmcc-modern/editorial/evidence/OWNER_EDITORIAL_DECISIONS_2026-11-19.json"
                 or plan.get("approved_link_cases") != 15
                 or plan.get("approved_link_destinations") != 28
                 or plan.get("historical_authorial_restorations") != 2
