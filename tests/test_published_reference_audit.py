@@ -194,14 +194,55 @@ class HistoricalIndexProofTests(unittest.TestCase):
         self.assertTrue(self.errors())
 
     def test_real_published_module_attestation(self):
+        """Validate the *current* publication route and the immutable old one.
+
+        An edition upgrade must never attempt to read archived RawText bytes
+        through a new zText module or silently drop the prior release hashes.
+        """
         module = ROOT / "modules/lsg-1910"
         if not module.is_dir():
             self.skipTest("Repository has not published an audited module")
         metadata = json.loads((module / "metadata.json").read_text())
         source = json.loads((module / "SOURCE_VALIDATION.json").read_text())
-        self.assertEqual(archived_release_errors(
-            module, ROOT, metadata["index_audit"]["manifest"],
-            metadata, source["source_sha256"]), [])
+        mode = metadata["index_audit"]["mode"]
+        if mode == "published_source_audit":
+            self.assertEqual(archived_release_errors(
+                module, ROOT, metadata["index_audit"]["manifest"],
+                metadata, source["source_sha256"]), [])
+            return
+        self.assertEqual(mode, "stock_reader_keys")
+        self.assertEqual(metadata["version"], "1.0.0")
+        self.assertEqual(source["source_sha256"],
+                         "1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d")
+        current = json.loads((module / "SWORD_COMPATIBILITY.json").read_text())
+        self.assertEqual(current["source_osis_sha256"], source["source_sha256"])
+        self.assertEqual(current["status"],
+                         "stable_reference_index_verified_with_reviewed_merges")
+        self.assertEqual(current["reviewed_merges"], [{
+            "original_osis_ref": "Mark.10.53",
+            "stock_reader_osis_ref": "Mark.10.52",
+        }])
+        self.assertEqual(current["source_to_native_full_body_mismatch_count"], 0)
+        self.assertEqual(current["source_to_native_note_mismatch_count"], 0)
+
+        legacy = json.loads((ROOT /
+            "sources/cleaned/bibles/fr/lsg-1910/editorial/releases/"
+            "LSG-0.1.0-LEGACY-BINDING.json").read_text())
+        historic_manifest = json.loads((ROOT /
+            "config/catalogue-import-lsg-0.1.0.json").read_text())
+        old = legacy["original_entry"]
+        self.assertEqual(legacy["status"],
+                         "immutable_historic_publication_not_current_catalogue_route")
+        self.assertEqual(old["version"], "0.1.0")
+        self.assertEqual(old["release_sha256"],
+                         historic_manifest["release_zip_sha256"])
+        self.assertEqual(old["release_size_bytes"], 3881106)
+        self.assertEqual(old["catalogue_sha256"],
+                         "f3f74a1016f708e10263b5628e606a73b727c0e80fbb7e131d195c4b11d86c51")
+        self.assertEqual(sha((module / "SOURCE_AUDIT.json").read_bytes()),
+                         historic_manifest["release_audit_sha256"])
+        self.assertEqual(historic_manifest["provenance"]["final_candidate_osis_sha256"],
+                         "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0")
 
 
 if __name__ == "__main__":

@@ -19,20 +19,22 @@ class CrossEditionReleasePreflightTests(unittest.TestCase):
         cls.ids = ("lsg-1910", "darby-jnd-2024", "mhcc-crosswire")
         cls.report = inspect_approved_releases(ROOT, cls.ids)
 
-    def test_actual_rawtext_ztext_zcom_published_modules_share_the_same_interface(self):
+    def test_actual_new_ztext_and_older_zcom_publication_drivers_share_the_same_interface(self):
         report = self.report
         self.assertEqual(report["status"],
                          "OFFLINE_APPROVED_RELEASE_PREFLIGHT_NOT_PUBLICATION")
         by_id = {r["resource_id"]: r for r in report["modules"]}
         self.assertEqual(set(by_id), set(self.ids))
-        self.assertEqual(by_id["lsg-1910"]["driver"], "RawText")
+        self.assertEqual(by_id["lsg-1910"]["driver"], "zText")
+        self.assertEqual(by_id["lsg-1910"]["version"], "1.0.0")
+        self.assertEqual(by_id["lsg-1910"]["release_tag"], "lsg-1.0.0")
         self.assertEqual(by_id["darby-jnd-2024"]["driver"], "zText")
         self.assertEqual(by_id["mhcc-crosswire"]["driver"], "zCom")
         for record in by_id.values():
             self.assertRegex(record["package_sha256"], r"^[a-f0-9]{64}$")
             self.assertGreater(record["package_size_bytes"], 0)
             self.assertTrue(record["native_payload_member_identity_verified"])
-            if record["resource_id"] in ("lsg-1910", "darby-jnd-2024"):
+            if record["resource_id"] == "darby-jnd-2024":
                 self.assertEqual(record["release_route"], "frozen_historical_binding")
                 self.assertFalse(record["release_authorization_verified_in_current_plan"])
                 self.assertTrue(record["frozen_historical_evidence_verified"])
