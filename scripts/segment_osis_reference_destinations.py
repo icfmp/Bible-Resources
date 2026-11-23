@@ -139,9 +139,16 @@ def _patched_reference(label: str, spans: list[tuple[int, int, str]]) -> bytes:
     pieces = []
     position = 0
     recovered = []
-    for start, end, target in spans:
+    for index,(start, end, target) in enumerate(spans):
         pieces.append(label[position:start])
         pieces.append(f'<reference osisRef="{target}">')
+        # SWORD's native OSIS importer retains a trailing blank following
+        # the final in-reference full stop differently from a blank outside
+        # </reference>. Keep the exact source tail *inside* the last link
+        # only for that original-attested punctuation+whitespace form.
+        # No character is added, removed, normalized or reordered.
+        if index == len(spans)-1 and re.fullmatch(r"\.\s+",label[end:]):
+            end = len(label)
         pieces.append(label[start:end])
         pieces.append("</reference>")
         recovered.append(label[start:end])
