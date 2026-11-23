@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - '.github/workflows/lsg-reference-review.yml'
+      - 'scripts/normalize_bible_references.py'
+      - 'tests/test_normalize_bible_references.py'
 permissions:
   contents: read
 jobs:
@@ -115,3 +117,71 @@ jobs:
           print('INTRO unmatched:',[t for t in intro_labels
                if not any(re.fullmatch(v,t) for v in patterns.values())][:30])
           PY
+
+      - name: Run source-attested normalizer negative and idempotence tests
+        run: python -m unittest discover -s tests -p test_normalize_bible_references.py -v
+      - name: Fetch independently pinned official OSIS schema
+        run: python scripts/fetch_reviewed_schema.py --directory /tmp/lsg-reviewed-osis
+      - name: Build separate complete cleaned-source candidate and preservation ledger
+        run: |
+          python scripts/normalize_bible_references.py \
+            --cleaned sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml \
+            --original-usfx sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip \
+            --manifest sources/cleaned/bibles/fr/lsg-1910/CLEANUP_MANIFEST.json \
+            --crosswalk config/standard_usfm_osis_66.json \
+            --output /tmp/lsg-structural-candidate.osis.xml \
+            --report /tmp/lsg-structural-report.json
+      - name: Validate official schema plus BRNP diagnostic before/after
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json, os, subprocess, sys
+          original='sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml'
+          folder=Path('/tmp')
+          candidate=folder/'lsg-structural-candidate.osis.xml'
+          schema=folder/'lsg-reviewed-osis/osisCore.2.1.1-cw-latest.xsd'
+          reports=[]
+          for label, file in [('before',original),('candidate',str(candidate))]:
+              report=folder/f'lsg-brnp-{label}.json'
+              result=subprocess.run([sys.executable,'scripts/check_brnp.py',file,
+                  '--kind','bible','--schema',str(schema),'--report',str(report)],
+                  capture_output=True,text=True)
+              if result.returncode not in (0,1):
+                  raise SystemExit(f'BRNP failed for {label}: {result.stderr}')
+              reports.append(json.loads(report.read_text(encoding='utf-8')))
+          before, after=reports
+          receipt=json.loads((folder/'lsg-structural-report.json').read_text())
+          old=before['finding_codes'];new=after['finding_codes']
+          print('Before categories',old)
+          print('After categories',new)
+          print('Normalization candidate proof',receipt)
+          assert receipt['exact_original_xml_text_and_element_order_preserved']
+          assert receipt['only_source_attested_reference_osisRef_attributes_added']
+          assert receipt['candidate_additions'] == (
+              old.get('NONCANONICAL_REFERENCE_ORIGIN',0)+
+              old.get('UNRESOLVED_INTRODUCTION_SPAN',0))
+          assert not new.get('NONCANONICAL_REFERENCE_ORIGIN',0)
+          assert not new.get('UNRESOLVED_INTRODUCTION_SPAN',0)
+          assert new.get('UNRESOLVED_REFERENCE_TARGET',0)==old.get('UNRESOLVED_REFERENCE_TARGET',0)
+          for code,number in new.items():
+              assert number <= old.get(code,0),f'New or increased BRNP diagnostic: {code}'
+          assert after['official_osis']['status']=='validated'
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8') as f:
+              f.write('## LSG source-attested reference candidate (unpublished)\n\n')
+              f.write(f"Exact added osisRef targets: {receipt['candidate_additions']}\n\n")
+              f.write(f"Unlinked authored destination labels retained: {receipt['unlinked_original_destination_labels_preserved']}\n\n")
+              f.write(f"Before: {old}\n\nAfter: {new}\n\n")
+              f.write('Original source, translation text, note callouts, existing markup, authorial reference labels and compiled releases are unchanged.\n')
+          PY
+      - name: Upload candidate and complete structural provenance receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lsg-structural-reference-candidate-unpublished
+          path: |
+            /tmp/lsg-structural-candidate.osis.xml
+            /tmp/lsg-structural-report.json
+            /tmp/lsg-brnp-before.json
+            /tmp/lsg-brnp-candidate.json
+          if-no-files-found: warn
+          retention-days: 14
