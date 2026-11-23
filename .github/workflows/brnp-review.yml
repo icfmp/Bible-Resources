@@ -124,6 +124,31 @@ jobs:
               divs=[e for e in doc.iter(ns+'div') if e.get('annotateRef')]
               verses=[e for e in doc.iter(ns+'verse') if e.get('osisID')]
               print('scoped annotation divs, keyed verse starts:',len(divs),len(verses))
+              if label=='lsg':
+                  print('LSG note reference tag distributions:',Counter(
+                      (e.get('type'),e.get('subType')) for e in no_target).most_common(10))
+                  for parent_type in ('note','item'):
+                      sample=[e for e in no_target
+                              if etree.QName(e.getparent()).localname==parent_type][:5]
+                      print('LSG sample labels under',parent_type,[
+                          ''.join(e.itertext()).strip()[:48] for e in sample])
+                  print('LSG sample note attributes:',[dict(e.getparent().attrib)
+                      for e in no_target[:5]])
+              if label=='mhcc':
+                  for e in [b for b in books if b.get('osisID')=='Gen'][:6]:
+                      ancestry=[(a.get('type'),a.get('osisID')) for a in
+                                e.iterancestors() if a.tag==ns+'div']
+                      print('MHCC Gen book wrapper:',dict(e.attrib),'parents:',ancestry,
+                            'children:',Counter((etree.QName(x).localname,
+                            x.get('type')) for x in e).most_common(8),
+                            'direct_text_length:',len(e.text or ''))
+                  print('MHCC repeated nested book attr sets:',Counter(
+                      tuple(sorted(e.attrib)) for e in nested).most_common(5))
+              if label=='mhc':
+                  print('MHC verse attributes first:',[dict(e.attrib) for e in verses[:6]])
+                  print('MHC parent types of keyed verses:',Counter(
+                      (etree.QName(e.getparent()).localname,e.getparent().get('type'))
+                      for e in verses).most_common(10))
           PY
       - name: Upload diagnostics only
         if: always()
