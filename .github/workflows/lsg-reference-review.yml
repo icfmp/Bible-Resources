@@ -904,6 +904,89 @@ jobs:
                   raise SystemExit('Missing exact reviewed introductory link '+name+'/'+ref)
           print('Reviewed isolated edition: 12 original-label corrections, 3 intros, 9440 linked notes, 311 unlinked; XSD and BRNP validated')
           PY
+      - name: Exhaustively validate every authored target endpoint and introduction link
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from hashlib import sha256
+          from pathlib import Path
+          import json
+          from lxml import etree
+          candidate=Path('/tmp/lsg-editorial-reviewed-individual.osis.xml')
+          original=Path('/tmp/lsg-individual-reference-candidate.osis.xml')
+          parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                         no_network=True,recover=False,huge_tree=False)
+          ns='{http://www.bibletechnologies.net/2003/OSIS/namespace}'
+          current=etree.parse(str(candidate),parser=parser)
+          baseline=etree.parse(str(original),parser=parser)
+          def verses(tree):
+              return {key for verse in tree.iter(ns+'verse')
+                      for key in (verse.get('osisID') or '').split()}
+          verse_keys=verses(current)
+          if verse_keys!=verses(baseline):
+              raise SystemExit('Reviewed editorial overlay changed authored verse identifiers')
+          chapters={key for chapter in current.iter(ns+'chapter')
+                     for key in (chapter.get('osisID') or '').split()}
+          counters=Counter()
+          endpoint_keys=set()
+          missing=[]
+          for ref in current.iter(ns+'reference'):
+              value=ref.get('osisRef')
+              counters['all_reference_elements']+=1
+              if not value:
+                  counters['deliberately_unlinked_reference_elements']+=1
+                  if ref.getparent().tag!=ns+'note':
+                      raise SystemExit('An introduction/anchor was left without a target')
+                  continue
+              counters['linked_reference_elements']+=1
+              if ref.get('subType')=='x-introduction':
+                  counters['linked_introduction_fragments']+=1
+              for token in value.split():
+                  counters['target_tokens']+=1
+                  ends=token.split('-')
+                  if len(ends) not in (1,2):
+                      raise SystemExit('Invalid reference range structure')
+                  if len(ends)==2:
+                      a,b=ends
+                      ac,bc=a.rsplit('.',1),b.rsplit('.',1)
+                      if (a.split('.')[0]!=b.split('.')[0] or
+                          tuple(map(int,a.split('.')[1:]))>
+                          tuple(map(int,b.split('.')[1:]))):
+                          raise SystemExit('Reversed or cross-book original range')
+                      counters['range_tokens']+=1
+                  for endpoint in ends:
+                      counters['target_endpoint_occurrences']+=1
+                      endpoint_keys.add(endpoint)
+                      if endpoint in verse_keys:
+                          counters['attested_verse_endpoints']+=1
+                      elif endpoint in chapters:
+                          counters['attested_chapter_endpoints']+=1
+                      else:
+                          missing.append(endpoint)
+          if missing:
+              raise SystemExit('Source-absent OSIS reference endpoints: '+str(sorted(set(missing))[:10]))
+          if (len(verse_keys)!=31170 or len(chapters)!=1189 or
+              counters['linked_reference_elements']!=29687 or
+              counters['deliberately_unlinked_reference_elements']!=311 or
+              counters['linked_introduction_fragments']!=178 or
+              counters['attested_chapter_endpoints']!=17 or
+              counters['range_tokens']!=179):
+              raise SystemExit('Whole edition target/verse coverage changed unexpectedly')
+          report={
+              'status':'complete_original_source_endpoints_validated_no_missing_keys',
+              'candidate_sha256':sha256(candidate.read_bytes()).hexdigest(),
+              'source_verse_count':len(verse_keys),
+              'chapter_count':len(chapters),
+              'unique_linked_endpoints':len(endpoint_keys),
+              'source_missing_endpoints':0,
+              'source_verse_keys_preserved':True,
+              'not_native_versification_or_publication_approval':True,
+              'counts':dict(counters),
+          }
+          Path('/tmp/lsg-editorial-target-coverage.json').write_text(
+              json.dumps(report,sort_keys=True,indent=2)+'\n',encoding='utf-8')
+          print('All linked original target endpoints exist in the authored OSIS; no missing link key',dict(counters))
+          PY
       - name: Install native SWORD compiler and independent raw XML reader
         run: |
           sudo apt-get update -qq
@@ -1192,6 +1275,16 @@ jobs:
                   parent.remove(node)
               return ''.join(root.itertext())
           counts=Counter()
+          source_root=etree.parse(str(after),parser=source_p)
+          baseline_root=etree.parse(str(before),parser=source_p)
+          osis_ns='{http://www.bibletechnologies.net/2003/OSIS/namespace}'
+          def authored_verse_keys(tree):
+              return {key for verse in tree.iter(osis_ns+'verse')
+                      for key in (verse.get('osisID') or '').split()}
+          authored_keys=authored_verse_keys(source_root)
+          if authored_keys!=authored_verse_keys(baseline_root):
+              raise SystemExit('Editorial review changed authorial source keyspace')
+          native_keys=set()
           seen_markers=set()
           markers={e['case_id']:e['new_fragment'].encode('utf-8')
                    for e in plan['edits'] if e['type']=='cross_reference_fragment'}
@@ -1219,6 +1312,9 @@ jobs:
                   counts['all_native_frames']+=1
                   if kind=='K':
                       counts['populated_verse_frames']+=1
+                      if key in native_keys:
+                          raise SystemExit('Duplicate populated native verse address')
+                      native_keys.add(key)
                       if scripture_without_notes(old_raw)!=scripture_without_notes(new_raw):
                           raise SystemExit('Unapproved Scripture verse-body change in editorial native edition: '+key)
                   if old_raw!=new_raw:
@@ -1231,6 +1327,23 @@ jobs:
               or not counts['frames_with_reviewed_editorial_or_link_changes']
               or seen_markers!=set(markers)):
               raise SystemExit('Reviewed corrected targets were not all read back from native SWORD')
+          source_without_native=sorted(authored_keys-native_keys)
+          native_without_source=sorted(native_keys-authored_keys)
+          if len(native_keys)!=counts['populated_verse_frames']:
+              raise SystemExit('Native verse key index is not one-to-one')
+          coverage=json.loads(Path('/tmp/lsg-editorial-target-coverage.json').read_text())
+          if coverage['candidate_sha256']!=sha256(after.read_bytes()).hexdigest():
+              raise SystemExit('Target coverage and native source identity disagree')
+          # This verdict is deliberately independent of whether the legacy
+          # stock Segond v11n has a known incompatibility: a green workflow
+          # must not be mistaken for full verse-index release readiness.
+          target_keys={part for ref in source_root.iter(osis_ns+'reference')
+                       for token in (ref.get('osisRef') or '').split()
+                       for part in token.split('-')}
+          target_missing_in_native=sorted((target_keys & authored_keys)-native_keys)
+          native_index_reconciled=not source_without_native and not native_without_source
+          if native_without_source:
+              raise SystemExit('Compiled SWORD invented publisher-absent numbered verse keys')
           outcome={
               'status':'two_separate_temporary_engines_same_verse_body_and_keyspace',
               'editorially_corrected_candidate_sha256':sha256(after.read_bytes()).hexdigest(),
@@ -1241,11 +1354,24 @@ jobs:
               'source_edition_and_published_release_unchanged':True,
               'editorial_approval_candidate_only':True,
               'release_approved':False,
+              'native_index_release_ready':native_index_reconciled,
+              'source_native_addressability':{
+                  'authored_source_verse_count':len(authored_keys),
+                  'populated_native_verse_count':len(native_keys),
+                  'missing_source_keys_in_native':source_without_native[:20],
+                  'source_only_count':len(source_without_native),
+                  'unattested_extra_native_keys':native_without_source[:20],
+                  'native_only_count':len(native_without_source),
+                  'existing_link_endpoints_without_native_verse':target_missing_in_native[:20],
+                  'missing_link_endpoint_count':len(target_missing_in_native),
+                  'complete_source_to_native_verse_index':native_index_reconciled,
+              },
               'counts':dict(counts),
           }
           Path('/tmp/lsg-editorial-reviewed-native.json').write_text(
               json.dumps(outcome,indent=2,sort_keys=True)+'\n',encoding='utf-8')
-          print('Reviewed 12 note corrections and 3 intro decisions: exact original Scripture text/index retained in separate native SWORD engine',dict(counts))
+          print('Reviewed 12 notes and 3 intros: source verse bodies unchanged in separate native engine',dict(counts))
+          print('Independent native-index reconciliation (publication remains blocked when incomplete):',outcome['source_native_addressability'])
           PY
       - name: Upload candidate and complete structural provenance receipt
         if: always()
@@ -1269,5 +1395,6 @@ jobs:
             /tmp/lsg-editorial-reviewed-individual-report.json
             /tmp/lsg-editorial-reviewed-brnp.json
             /tmp/lsg-editorial-reviewed-native.json
+            /tmp/lsg-editorial-target-coverage.json
           if-no-files-found: warn
           retention-days: 14
