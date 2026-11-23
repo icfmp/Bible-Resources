@@ -1,3 +1,9 @@
+# Louis Segond 1910 — Bible Resources 1.0.1
+
+Module configuration-only hotfix: replace OSISXRefs with the registered OSISScripref filter. Native binary data and reviewed Bible source are byte-identical to v1.0.0. Plain-text cross-reference On rendering remains a known upstream limitation. Old tagged releases are not rewritten.
+
+## Historical 1.0.0 editorial record
+
 # Louis Segond 1910 — Bible Resources 1.0.0 (release review)
 
 This reviewed 1.0.0 edition is built from the complete source-verified OSIS SHA-256 1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d. Actual SWORD is a new zText payload.

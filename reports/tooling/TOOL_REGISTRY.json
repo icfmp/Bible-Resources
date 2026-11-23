@@ -3,6 +3,71 @@
     {
       "classification": "MODULE_LOCAL",
       "confidence": "high",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "zText",
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "modules/lsg-1910/tools/check_native_render.cpp",
+      "proposed_action": "Keep with the owning module only while its pinned maintenance/replay workflow and regression checks remain necessary.",
+      "purpose_first_line": "Module-owned complete stable-SWORD text-rendering regression gate.",
+      "python_imports": [],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "bf301ce6c5eef067566d1c625e8f5373ec8dd5fc2bdc4887b71b0f1002e90e08",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 1,
+      "static_references": [
+        ".github/workflows/lsg-rendering-regression.yml"
+      ]
+    },
+    {
+      "classification": "MODULE_LOCAL",
+      "confidence": "high",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "zText",
+        "OSIS",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "modules/lsg-1910/tools/stage_filter_hotfix.py",
+      "proposed_action": "Keep with the owning module only while its pinned maintenance/replay workflow and regression checks remain necessary.",
+      "purpose_first_line": "Stage LSG 1.0.1 SWORD configuration-only hotfix; never publish by itself.",
+      "python_imports": [
+        "__future__",
+        "build",
+        "catalogue_release_coverage",
+        "copy",
+        "hashlib",
+        "json",
+        "pathlib",
+        "publish_reviewed_release",
+        "release_preflight",
+        "stable_sword_refs",
+        "sys",
+        "tempfile",
+        "validate"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "9efcf0ce715f374f9c4068649798f9a33bf23217d097c5d4bd996561693efedc",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 1,
+      "static_references": [
+        ".github/workflows/lsg-rendering-regression.yml"
+      ]
+    },
+    {
+      "classification": "MODULE_LOCAL",
+      "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "zText",
@@ -240,8 +305,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 12,
+      "static_reference_count": 13,
       "static_references": [
+        "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
@@ -313,8 +379,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
+        "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
@@ -1030,8 +1097,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 10,
+      "static_reference_count": 11,
       "static_references": [
+        "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/release_preflight.py",
         "scripts/tool_registry.py",
@@ -1116,10 +1184,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 5,
+      "static_reference_count": 7,
       "static_references": [
+        "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/tool_registry.py",
+        ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "tests/test_release_preflight.py",
         "tests/test_tool_registry.py"
@@ -1713,8 +1783,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 20,
+      "static_reference_count": 21,
       "static_references": [
+        "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/approved_osis_sword_candidate.py",
         "scripts/published_reference_audit.py",
@@ -2018,8 +2089,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
+        ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         ".github/workflows/tool-registry-maintenance.yml",
         "tests/test_tool_registry.py"
@@ -2064,13 +2136,15 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 18,
+      "static_reference_count": 20,
       "static_references": [
+        "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/build.py",
         "scripts/release_preflight.py",
         "scripts/smoke.py",
         "scripts/tool_registry.py",
+        ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         ".github/workflows/pages.yml",
         ".github/workflows/validate.yml",

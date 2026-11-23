@@ -1,10 +1,10 @@
 {
-  "approval_url": "https://github.com/icfmp/Bible-Resources/pull/546",
+  "approval_url": "https://github.com/icfmp/Bible-Resources/pull/548",
   "approved_at": "2026-11-23",
   "approved_by": "Bible Resources project owner",
   "evidence_urls": {
     "acts_20_28": "https://ebible.org/fraLSG/ACT20.htm",
-    "curated_release": "https://github.com/icfmp/Bible-Resources/releases/tag/lsg-1.0.0",
+    "curated_release": "https://github.com/icfmp/Bible-Resources/releases/tag/lsg-1.0.1",
     "john_1_18": "https://ebible.org/fraLSG/JHN01.htm",
     "one_timothy_3_16": "https://ebible.org/fraLSG/1TI03.htm",
     "original_source_rights": "https://ebible.org/fraLSG/copyright.htm",
@@ -14,15 +14,15 @@
   },
   "locale": "fr",
   "module_id": "lsg-1910",
-  "module_version": "1.0.0",
-  "revision": "2026-11-23.1",
+  "module_version": "1.0.1",
+  "revision": "2026-11-23.2",
   "schema_version": 1,
   "sections": {
     "end": "## Three distinct provenance layers",
     "long": "## Présentation longue — détails de la ressource (texte soumis à validation éditoriale)",
     "short": "## Présentation courte — bibliothèque (texte soumis à validation éditoriale)"
   },
-  "source_git_blob_sha1": "e3a06d7d4af40d86fd0d99640885521406825b41",
+  "source_git_blob_sha1": "e24e781f47249169dd64f5f0e2f2cd61dc7f3476",
   "source_path": "sources/cleaned/bibles/fr/lsg-1910/editorial/profiles/fr-segond-1910.md",
   "sword_id": "BRLSG1910"
 }
