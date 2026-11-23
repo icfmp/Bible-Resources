@@ -35,3 +35,20 @@ The remaining MHC finding is a BRNP canonical-commentary representation question
 5. Obtain project-owner approval before making BRNP mandatory for all newly published resources.
 
 **Status:** partial implementation with passing pilot tests and transparent open findings. This document must not be cited as full BRNP certification.
+
+## v0.2-draft strictness audit and source-only regression (2026-11-23)
+
+**Latest diagnostic evidence:** [BRNP advisory run #45122380252](https://github.com/icfmp/Bible-Resources/actions/runs/45122380252). The 34 positive/negative fixtures passed. This profile is **not** publication conformance; its limits and unresolved issues are explicit. Pinned official XSD validation runs independently before the BRNP inventory.
+
+| Source | Findings | Independently classified meaning |
+| --- | ---: | --- |
+| LSG | 19,679 | All are `UNRESOLVED_REFERENCE_TARGET`: a `reference` element with no `osisRef`. Preserve labels; research exact historical cross-reference targets and independently verify before introducing links |
+| Darby | 0 | No findings under implemented draft rules only; no authorial or full native certification implied |
+| MHC | 11 | One noncanonical verse-milestone-only commentary scope (`NO_COMMENTARY_ENTRIES`), plus 10 `osisRef` values with surrounding whitespace; investigate source authority and SWORD behavior |
+| MHCC | 529 | 264 repeated `div type="book"` and **the same 264 nested divisions** (two diagnostics per structural occurrence), plus one diagnostic for **two** unclosed chapter milestones |
+
+The 529 MHCC findings do **not** mean 529 independent editorial errors. The exact two unclosed chapter starts are `1Sam.25` and `Ps.95`, documented above. The nested/repeated book structural discrepancies require checking the full subtree, note/reference associations, and original authored coverage before a reversible grouping transformation is approved.
+
+**Controls added after the initial pilot:** duplicate canonical verse identifiers (including members of compound IDs); distinct milestone-key uniqueness for chapters and verses; correct Bible book and chapter ownership, including active chapter milestones; no nested books in the canonical representation; explicit detection of repeated commentary book divisions; standard table/list containment; grouping of poetry lines; unresolved cross-reference targets; and the existing reviewed commentary reference grammar, rather than a permissive second parser. The normalizer's optional BRNP diagnostic detects newly introduced finding classes/counts and blocks its *local candidate* when enabled. None of these checks silently rewrites a released resource.
+
+**Acceptance boundaries:** A zero under these checks means *no findings in the implemented draft subset*, not independently verified printed-edition fidelity, reference target resolution, native SWORD parity, or reader acceptance. Do not suppress any findings to make this table green; create source-hash-bound transformation plans with full before/after equivalence evidence. No editorial/publishing sign-off is implied.
