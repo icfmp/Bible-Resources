@@ -21,6 +21,8 @@ These conventions describe *how* to encode a given meaning. They do not require 
 | Paragraphs | `p` only for evidence-supported paragraph units; milestones when needed to represent overlapping boundaries | Automatically insert paragraphs based on verse count |
 | Poetry | `lg` for evidenced groupings; `l` and `level` when attested, keeping order | Convert poetry to prose or invent stanzas/indentation |
 | Titles | `title` at the documented semantic location and type permitted by the official schema | Promote provider UI headings to authorial headings |
+| Tables and lists | Preserve evidenced `table`/`row`/`cell` and `list`/`item` content and order, including historically meaningful apparatus | Flatten structured content to prose or call it "noise" simply because a digital source uses tables |
+| Header metadata | Preserve standard `identifier`, `description`, `date`, `rights`, `type`, `refSystem`, `revisionDesc` and their provenance separately from authorial content | Present a provider revision log as a title/note written by the biblical author |
 | Quotes and emphasis | Preserve `q`, `hi`, `transChange`, `divineName` and intended extent | Infer quotation marks, italicization or divine-name conventions |
 | Notes | `note` with original meaningful type and association | Merge, re-anchor or delete content notes merely to simplify layout |
 | References | `reference` with reviewed `osisRef` where the target is independently established; unresolved targets must be reported | Invent a destination or turn plain prose into a guessed link |
