@@ -88,7 +88,8 @@ def _crosswalk(path: Path) -> dict:
 
 
 def _printed_book_aliases(path: Path, crosswalk: dict,
-                          original_usfx_zip_sha256: str) -> tuple[dict, str]:
+                          original_usfx_zip_sha256: str,
+                          original_usfx) -> tuple[dict, str]:
     """Keep independently printed aliases distinct from digital-source variants.
 
     Provider variants are supported only with exact original archive identity,
@@ -125,11 +126,22 @@ def _printed_book_aliases(path: Path, crosswalk: dict,
                 not isinstance(variants.get("aliases"), dict) or
                 not variants["aliases"]):
             raise ReviewError("Digital-source alias variants lack pinned original evidence")
+        source_labels = [_label(x) for x in original_usfx.iter("xt")]
         for alias, book in variants["aliases"].items():
             if (not isinstance(alias, str) or
                     re.fullmatch(r"(?:[1-3] )?[A-Za-zÀ-ÿ]{1,12}", alias) is None or
                     alias in result or book not in mapping.values()):
                 raise ReviewError("Invalid or ambiguous provider-specific alias")
+            # A valid archive checksum alone is insufficient: the purported
+            # provider alias must be attested as a *book citation token* in
+            # an actual source cross-reference, not merely in a comment or
+            # a human-written configuration explanation.
+            pattern = re.compile(
+                r"(?<![A-Za-zÀ-ÿ0-9])" + re.escape(alias) +
+                r"\s+[1-9][0-9]*:\s*[1-9][0-9]*"
+            )
+            if not any(pattern.search(label) for label in source_labels):
+                raise ReviewError("Source-witness alias not present in original citation labels")
             result[alias] = book
     return result, sha256(raw).hexdigest()
 
@@ -522,7 +534,7 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
     crosswalk = _crosswalk(crosswalk_path)
     aliases, alias_digest = (
         _printed_book_aliases(destination_aliases_path, crosswalk,
-                              sha256(zipped).hexdigest())
+                              sha256(zipped).hexdigest(), original)
         if destination_aliases_path is not None else (None, None)
     )
     changes, counts, unresolved, destination_findings = _source_bindings(
