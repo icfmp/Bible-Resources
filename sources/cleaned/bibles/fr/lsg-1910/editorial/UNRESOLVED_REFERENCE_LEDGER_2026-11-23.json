@@ -5,7 +5,7 @@
   "source_cleaned_osis_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
   "normalization_scope": "Only original eBible x/xt note labels whose candidate target references remain unaddressable under the reviewed complete citation and source-disambiguated chapter-comma grammar.",
   "authoritative_print_editions_collated": 0,
-  "printed_page_evidence_not_yet_recorded": true,
+  "printed_page_evidence_not_yet_recorded": false,
   "corrections_approved": 0,
   "published_osis_modified": false,
   "references_original_count": 54,
@@ -626,5 +626,18 @@
     }
   ],
   "independent_parallel_versification_candidates": 9,
-  "independent_printed_note_corrections_certified": 0
+  "independent_printed_note_corrections_certified": 0,
+  "first_pass_actual_1910_source_verse_screening": {
+    "status": "all_54_source_verses_screened_not_all_54_full_marginal_citations_certified",
+    "historical_scan_sha256": "67854882ec0e88defa5fea2d76a53ef479d2173467cdfa9b57f94a91c470643b",
+    "source_record_count": 54,
+    "original_printed_full_note_certified_count": 1,
+    "original_printed_marginal_token_with_callout_only_count": 24,
+    "original_printed_page_reviewed_no_verified_note_token_count": 29,
+    "pending_full_printed_note_equivalence_count": 53,
+    "evidence_registry": "PRINTED_1910_PAGE_LOCATORS_2026-11-23.json",
+    "authored_reference_changes_approved": 0,
+    "machine_links_added_to_unresolved_original_notes": 0,
+    "conclusion": "Source eBible digital x/xt groups and the 1910 printed marginal apparatus differ in grouping and selection. The first-pass printed-page audit is complete; unverified whole-note identities are retained without speculative targets."
+  }
 }
