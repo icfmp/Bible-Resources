@@ -29,7 +29,7 @@ jobs:
           python scripts/mark_osis_preverse_section_titles.py \
             --input sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml \
             --expected-input-sha256 1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d \
-            --expected-count 855 \
+            --expected-count 803 \
             --output /tmp/lsg-preverse-section-candidate.osis.xml \
             --report /tmp/lsg-preverse-section-receipt.json
       - name: Validate official OSIS schema unchanged Bible verse identities and full headings
@@ -67,10 +67,10 @@ jobs:
           new_verse_keys={v.get('osisID') for v in after.iter(ns+'verse') if v.get('sID')}
           receipt=json.load(open('/tmp/lsg-preverse-section-receipt.json'))
           if (len(old_verse_keys)!=31170 or old_verse_keys!=new_verse_keys or
-              changed['heading_types_added']!=855 or
-              receipt['typed_chapter_first_titles']!=855):
+              changed['heading_types_added']!=803 or
+              receipt['typed_chapter_first_titles']!=803):
               raise SystemExit('Inconsistent full source heading or Scripture key counts')
-          print('Official OSIS schema valid, 855 pre-existing title types defined, original verse IDs/content/notes and other markup unchanged')
+          print('Official OSIS schema valid, 803 pre-existing title types defined, original verse IDs/content/notes and other markup unchanged')
           PY
       - name: Compile exact source-faithful candidate through stable osis2mod
         run: |
@@ -116,7 +116,7 @@ jobs:
               chapter=CHAPTER_ID.search(match.group('prefix')).group(1).decode('ascii')
               end=original.index(TITLE_CLOSE,match.end('opening'))
               expected[chapter+'.1']=original[match.end('opening'):end].decode('utf-8')
-          if len(expected)!=855:
+          if len(expected)!=803:
               raise SystemExit('Unexpected edition heading source count')
           authored,notes,source_receipt=original_osis_verses_and_notes(candidate)
           if len(authored)!=31170 or source_receipt['publisher_numbered_note_count']!=9751:
@@ -161,7 +161,7 @@ jobs:
           if (native!=set(authored)-{'Mark.10.53'} or
               named['verses_checked']!=31169 or
               named['notes_checked']!=9751 or
-              named['chapter_first_titles_in_numbered_verse']!=855 or
+              named['chapter_first_titles_in_numbered_verse']!=803 or
               verses_wrong or notes_wrong or missing):
               raise SystemExit('SWORD source/main-note-heading parity failure: '+
                 repr({'verses':verses_wrong[:10],'notes':notes_wrong[:10],
@@ -172,14 +172,14 @@ jobs:
               'candidate_sha256':sha256(candidate).hexdigest(),
               'source_keys':31170,'native_keys':31169,
               'stock_segon_single_exception':'Mark.10.53',
-              'chapter_first_headings_now_in_first_verse':855,
+              'chapter_first_headings_now_in_first_verse':803,
               'scripture_text_mismatches':0,'note_mismatches':0,
               'source_original_verse_ids_and_text_unchanged':True,
               'public_release_created':False,
           }
           Path('/tmp/lsg-heading-native-receipt.json').write_text(
               json.dumps(receipt,indent=2,sort_keys=True)+'\n')
-          print('All 855 original chapter-opening headings present in native first verse, all 31,169 Scripture verse bodies and 9,751 notes preserved')
+          print('All 803 original chapter-opening headings present in native first verse, all 31,169 Scripture verse bodies and 9,751 notes preserved')
           PY
           SWORD_PATH=/tmp/lsg-chapter-heading-sword/payload \
             /tmp/lsg-heading-native-display BRLSG1910

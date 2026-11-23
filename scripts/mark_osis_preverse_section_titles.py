@@ -87,10 +87,9 @@ def annotate(source: bytes) -> tuple[bytes, dict]:
     # Reversibility by exact byte-span editing; no serialization, whitespace
     # normalization, title duplication, callout or verse mutation occurs.
     undo = candidate
-    for start, _end, _replacement in reversed(revisions):
-        # Undo coordinates in the output shift after the first inserted token.
-        pos = start + len(b' type="section"') * revisions.index(
-            next(x for x in revisions if x[0] == start))
+    for index, (start, _end, _replacement) in reversed(list(enumerate(revisions))):
+        # Earlier inserted attributes still shift this later opening tag.
+        pos = start + len(b' type="section"') * index
         if undo[pos:pos + len(b'<title type="section">')] != b'<title type="section">':
             raise PreverseSectionError("Failed reversible source byte check")
         undo = undo[:pos] + b"<title>" + undo[pos + len(b'<title type="section">'):]
