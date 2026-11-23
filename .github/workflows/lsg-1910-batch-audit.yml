@@ -103,8 +103,103 @@ jobs:
           detail=subprocess.run(['djvutxt','-detail=word','-page=29','/tmp/lsg-print-1910.djvu'],capture_output=True,check=True).stdout.decode('utf-8','replace')
           print('EXAMPLE_GEOMETRIC_TEXT_29',repr(detail[:3800]))
           PY
+      - name: Extract all 54 actual printed page evidence regions in one pass
+        run: |
+          python - <<'PY'
+          import re,json,base64,subprocess
+          from pathlib import Path
+          from io import BytesIO
+          from PIL import Image
+          from rapidfuzz import fuzz
+          from unicodedata import normalize,combining
+          root=Path('/tmp/lsg1910batch')
+          doc=json.loads((root/'all-candidate-page-locators.json').read_text())
+          overrides={
+            'LSG-CR-016':559,  # Song 2:15, SNG chapter 2
+            'LSG-CR-018':580,  # Isaiah 23:1, print page Isaiah 22-24
+            'LSG-CR-021':627,  # Jeremiah 7:16, avoid identical phrase at Jeremiah 11
+            'LSG-CR-046':1001, # Hebrews 2:13, only short snippet
+            'LSG-CR-054':1039, # Revelation 20:12, reject a misleading repeated passage at chapter 7
+          }
+          def norm(s):
+              s=normalize('NFKD',s.casefold())
+              s=''.join(c for c in s if not combining(c))
+              return ' '.join(re.findall('[a-z0-9]+',s))
+          entries=[]
+          for case in doc['records']:
+              id=case['record_id']
+              predicted=case['candidate_pages'][0]['page'] if case['candidate_pages'] else None
+              page=overrides.get(id,predicted)
+              if page is None or not 1<=page<=1061:raise SystemExit('No print locator for '+id)
+              assert len([v for v in doc['records'] if v['record_id']==id])==1
+              # The page locator is an OCR finding; never label it as visual reference proof.
+              target=root/f'{id}-original-page{page}.tif'
+              subprocess.run(['ddjvu','-page='+str(page),'-format=tiff','/tmp/lsg-print-1910.djvu',str(target)],check=True)
+              im=Image.open(target).convert('RGB')
+              width,height=im.size
+              detail=subprocess.run(['djvutxt','-detail=word','-page='+str(page),'/tmp/lsg-print-1910.djvu'],
+                                    check=True,capture_output=True).stdout.decode('utf-8','replace')
+              line_re=r'^\s*\(line (\d+) (\d+) (\d+) (\d+) ([^\n]*)\)'
+              lines=[]
+              for m in re.finditer(line_re,detail,re.M):
+                  words=re.findall(r'\(word \d+ \d+ \d+ \d+ "((?:[^"\\]|\\.)*)"\)',m.group(5))
+                  content=norm(' '.join(words))
+                  if content:lines.append((int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),content))
+              snippet=case['source_excerpt'][:105]
+              candidates=[]
+              if len(snippet)>=30:
+                  for k in range(len(lines)):
+                      window=' '.join(t[4] for t in lines[k:k+6])
+                      if len(window)<max(45,len(snippet)*.7):continue
+                      score=fuzz.partial_ratio(snippet,window)
+                      candidates.append((score,k))
+              score,k=max(candidates,default=(0,0))
+              if score>=69 and lines:
+                  selected=lines[k:k+6]
+                  source_y_top=height-max(t[3] for t in selected)
+                  source_y_bottom=height-min(t[1] for t in selected)
+                  # Keep both original Scripture text and marginal column, with 100px context.
+                  top=max(0,source_y_top-110)
+                  bottom=min(height,source_y_bottom+120)
+                  if bottom-top<280:
+                      top=max(0,top-55);bottom=min(height,bottom+55)
+                  location='verse_text_geo_candidate_not_historically_certified'
+              else:
+                  top=0;bottom=height
+                  location='full_page_when_exact_verse_geometry_unreliable'
+              snippet_crop=im.crop((0,top,width,bottom))
+              out=root/f'{id}-printed-page{page}-source-context.jpg'
+              snippet_crop.save(out,format='JPEG',quality=87,optimize=True)
+              data=out.read_bytes()
+              record={
+                'record_id':id,'source_book':case['source_usfm_book'],
+                'source_note_origin':case['source_note_origin'],
+                'original_scan_page':page,'page_url':f'https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/{page}',
+                'source_excerpt':case['source_excerpt'],
+                'locator_type':('explicit_historical_chapter_page_hint' if id in overrides else 'automated_source_verse_text_match'),
+                'image_crop_coordinates_original_pixels':[0,top,width,bottom],
+                'approximate_source_verse_image_match_score':round(score,2),
+                'image_anchor_status':location,'historical_print_reference_certified':False,
+                'crop_filename':out.name,
+              }
+              entries.append(record)
+              print('LSG_1910_CASE_SUMMARY='+json.dumps(record,ensure_ascii=False,separators=(',',':')))
+              print(f'LSG_1910_CASE_IMAGE_{id}_BEGIN')
+              print(base64.b64encode(data).decode('ascii'))
+              print(f'LSG_1910_CASE_IMAGE_{id}_END')
+              target.unlink()
+          if len(entries)!=54 or len({r['record_id'] for r in entries})!=54:
+              raise SystemExit('Missing exact-source printed case evidence')
+          (root/'all-54-original-print-page-excerpts-ledger.json').write_text(
+              json.dumps({'status':'images_extracted_from_original_1910_print_not_manual_reference_certification',
+                  'original_djvu_sha256':doc['scan_sha256'],'records':entries},indent=2,ensure_ascii=False)+'\n',
+              encoding='utf-8')
+          print('PRINTED_PAGE_EXTRACTION_COMPLETE',len(entries),'distinct_printed_pages',len(set(x['original_scan_page'] for x in entries)))
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: lsg-1910-source-verse-to-original-print-OCR-page-candidates-unapproved
-          path: /tmp/lsg1910batch/all-candidate-page-locators.json
+          path: |
+            /tmp/lsg1910batch/*.json
+            /tmp/lsg1910batch/*.jpg
           retention-days: 7
