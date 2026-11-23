@@ -8,10 +8,27 @@
   "enlarged_evidence_run": "https://github.com/icfmp/Bible-Resources/actions/runs/45158131029",
   "enlarged_evidence_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/45158131029/artifacts/14809073411",
   "visual_review_scope": "Reference token and surrounding source-verse callout are checked from the original 821x1162 print page. The printed book frequently contains a longer grouped apparatus than a single digital xt; no statement that the entire USFX xt text is the literal printed note is implied.",
-  "confirmed_individual_printed_reference_token_sightings": 10,
+  "confirmed_individual_printed_reference_token_sightings": 17,
   "original_or_cleaned_text_changes_approved": 0,
-  "corrections_proposed_not_approved": 10,
+  "corrections_proposed_not_approved": 17,
   "records": [
+    {
+      "record_id": "LSG-CR-007",
+      "original_usfm_book": "DEU",
+      "source_note_origin": "19.15",
+      "original_usfx_label": "No 35:50. De 17:6. Mt 18:16.",
+      "secondary_digital_label": "No 35:30. De 17:6. Mt 18:16.",
+      "original_1910_print_page": 171,
+      "facsimile_page_url": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/171",
+      "printed_note_callout": "c",
+      "printed_reference_token_or_local_group": "No. 35. 30.",
+      "interpreted_print_target_token": "Num.35.30",
+      "scope": "identified_printed_margin_reference_token_not_full_digital_xt_collation",
+      "printed_reference_token_visually_read": true,
+      "printed_full_cross_reference_label_matches_eBible": null,
+      "clarification": "The printed reference at Deuteronomy 19:15 cites Numbers 35:30, not the unaddressable eBible Numbers 35:50. Biblia's shortened digital note also cites 35:30.",
+      "editorial_change_authorized": null
+    },
     {
       "record_id": "LSG-CR-008",
       "original_usfm_book": "JOS",
@@ -81,6 +98,23 @@
       "editorial_change_authorized": null
     },
     {
+      "record_id": "LSG-CR-019",
+      "original_usfm_book": "ISA",
+      "source_note_origin": "52.7",
+      "original_usfx_label": "Na 1:15. Ro 10:15.",
+      "secondary_digital_label": "Na 1:15. Ro 10:15.",
+      "original_1910_print_page": 607,
+      "facsimile_page_url": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/607",
+      "printed_note_callout": null,
+      "printed_reference_token_or_local_group": "Na. 2. 1.",
+      "interpreted_print_target_token": "Nah.2.1",
+      "scope": "identified_printed_margin_reference_token_not_full_digital_xt_collation",
+      "printed_reference_token_visually_read": true,
+      "printed_full_cross_reference_label_matches_eBible": null,
+      "clarification": "Isaiah 52:7 has the printed parallel Nahum 2:1, while both digital witnesses use Nahum 1:15; this belongs to documented alternative verse division and is not an authorized numeric rewrite.",
+      "editorial_change_authorized": null
+    },
+    {
       "record_id": "LSG-CR-020",
       "original_usfm_book": "JER",
       "source_note_origin": "1.3",
@@ -95,6 +129,23 @@
       "printed_reference_token_visually_read": true,
       "printed_full_cross_reference_label_matches_eBible": null,
       "clarification": "In the original printed Jeremiah 1 introductory chronology, the i-reference is 2 Kings 23:34, whereas both digital witnesses give a malformed 2 Kings 5 reference.",
+      "editorial_change_authorized": null
+    },
+    {
+      "record_id": "LSG-CR-022",
+      "original_usfm_book": "JER",
+      "source_note_origin": "32.29",
+      "original_usfx_label": "Jé 21:20.",
+      "secondary_digital_label": "Jé 21:10.",
+      "original_1910_print_page": 655,
+      "facsimile_page_url": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/655",
+      "printed_note_callout": "f",
+      "printed_reference_token_or_local_group": "21. 10.",
+      "interpreted_print_target_token": "Jer.21.10",
+      "scope": "identified_printed_margin_reference_token_not_full_digital_xt_collation",
+      "printed_reference_token_visually_read": true,
+      "printed_full_cross_reference_label_matches_eBible": null,
+      "clarification": "Jeremiah 32:29's printed context cites Jeremiah 21:10 within a longer marginal note, while eBible gives the nonexistent Jeremiah 21:20.",
       "editorial_change_authorized": null
     },
     {
@@ -115,6 +166,40 @@
       "editorial_change_authorized": null
     },
     {
+      "record_id": "LSG-CR-026",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "5.35",
+      "original_usfx_label": "Jé 66:1.",
+      "secondary_digital_label": "Jé 66:1.",
+      "original_1910_print_page": 799,
+      "facsimile_page_url": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/799",
+      "printed_note_callout": null,
+      "printed_reference_token_or_local_group": "És. 66. 1.",
+      "interpreted_print_target_token": "Isa.66.1",
+      "scope": "identified_printed_margin_reference_token_not_full_digital_xt_collation",
+      "printed_reference_token_visually_read": true,
+      "printed_full_cross_reference_label_matches_eBible": null,
+      "clarification": "Matthew 5:35's printed cross-reference identifies Isaiah 66:1, not Jeremiah 66:1 as in both digital witnesses.",
+      "editorial_change_authorized": null
+    },
+    {
+      "record_id": "LSG-CR-027",
+      "original_usfm_book": "MAT",
+      "source_note_origin": "12.40",
+      "original_usfx_label": "Jon 1:17; 2:10.",
+      "secondary_digital_label": "Jon 1:17; 2:10.",
+      "original_1910_print_page": 807,
+      "facsimile_page_url": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/807",
+      "printed_note_callout": null,
+      "printed_reference_token_or_local_group": "Jon. 2. 1.",
+      "interpreted_print_target_token": "Jonah.2.1",
+      "scope": "identified_printed_margin_reference_token_not_full_digital_xt_collation",
+      "printed_reference_token_visually_read": true,
+      "printed_full_cross_reference_label_matches_eBible": null,
+      "clarification": "Matthew 12:40's printed Jonah reference uses the original-1910 Jonah 2:1 numbering; the two digital witnesses cite Jonah 1:17, a known alternate versification token.",
+      "editorial_change_authorized": null
+    },
+    {
       "record_id": "LSG-CR-029",
       "original_usfm_book": "MAT",
       "source_note_origin": "19.14",
@@ -129,6 +214,40 @@
       "printed_reference_token_visually_read": true,
       "printed_full_cross_reference_label_matches_eBible": null,
       "clarification": "The printed e note beside Jesus receiving the children includes an implicit Matthew 18:3, not the impossible Mark 18:3. The 1910 printed reference group also contains extra targets and differs in order; this records only the identified token.",
+      "editorial_change_authorized": null
+    },
+    {
+      "record_id": "LSG-CR-040",
+      "original_usfm_book": "ROM",
+      "source_note_origin": "9.26",
+      "original_usfx_label": "Os 1:10. 1 Pi 2:10.",
+      "secondary_digital_label": "Os 1:10. 1 Pi 2:10.",
+      "original_1910_print_page": 943,
+      "facsimile_page_url": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/943",
+      "printed_note_callout": null,
+      "printed_reference_token_or_local_group": "Os. 2. 1.",
+      "interpreted_print_target_token": "Hos.2.1",
+      "scope": "identified_printed_margin_reference_token_not_full_digital_xt_collation",
+      "printed_reference_token_visually_read": true,
+      "printed_full_cross_reference_label_matches_eBible": null,
+      "clarification": "Romans 9:26 cites Hosea 2:1 in the printed margin rather than Hosea 1:10 in both digital witnesses. The passage is an established alternate-versification case.",
+      "editorial_change_authorized": null
+    },
+    {
+      "record_id": "LSG-CR-041",
+      "original_usfm_book": "ROM",
+      "source_note_origin": "10.15",
+      "original_usfx_label": "És 52:7. Na 1:15.",
+      "secondary_digital_label": "És 52:7. Na 1:15.",
+      "original_1910_print_page": 944,
+      "facsimile_page_url": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/944",
+      "printed_note_callout": null,
+      "printed_reference_token_or_local_group": "Na. 2. 1.",
+      "interpreted_print_target_token": "Nah.2.1",
+      "scope": "identified_printed_margin_reference_token_not_full_digital_xt_collation",
+      "printed_reference_token_visually_read": true,
+      "printed_full_cross_reference_label_matches_eBible": null,
+      "clarification": "Romans 10:15 contains a printed marginal Nahum 2:1 cross-reference, whereas both digital witnesses say Nahum 1:15. This is a verse-numbering difference, not permission to alter the source.",
       "editorial_change_authorized": null
     },
     {
@@ -184,5 +303,7 @@
     }
   ],
   "additional_enlarged_evidence_run": "https://github.com/icfmp/Bible-Resources/actions/runs/45159370757",
-  "additional_enlarged_evidence_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/45159370757/artifacts/14809543290"
+  "additional_enlarged_evidence_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/45159370757/artifacts/14809543290",
+  "third_enlarged_evidence_run": "https://github.com/icfmp/Bible-Resources/actions/runs/45166535509",
+  "third_enlarged_evidence_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/45166535509/artifacts/14814633213"
 }
