@@ -1,4 +1,4 @@
-# Bible Resources Normalization Profile (BRNP) — working specification v0.1
+# Bible Resources Normalization Profile (BRNP) — working specification v0.2-draft
 
 **Status:** implementation under review in [#451](https://github.com/icfmp/Bible-Resources/issues/451). **Not a mandatory publication gate.** This document specifies conventions for reviewed *cleaned* masters, not for immutable source archives. The official OSIS 2.1.1 XSD remains authoritative for XML legality. A BRNP passing result alone never certifies an edition.
 
@@ -41,11 +41,17 @@ These conventions describe *how* to encode a given meaning. They do not require 
 
 OSIS permits more than one representation for certain overlapping structures. BRNP chooses a deterministic representation **only after** equivalence has been proved with positive/negative fixtures and relevant real editions. Unknown, ambiguous or otherwise schema-valid constructs are reported for review, never auto-flattened. No edition-specific hidden exceptions.
 
+## Severity and evidence policy
+
+A diagnostic is not automatically an error in the historical source. It is a **failure to demonstrate conformity of the cleaned representation** until resolved. Distinguish: (a) malformed OSIS/XSD-invalid input, (b) a proven BRNP structural violation (such as duplicate canonical IDs or unmatched milestones), and (c) an **unresolved semantic/editorial association** (such as a visible cross-reference label without an independently established target). Do not suppress (c) to obtain an empty report, but do not invent destinations merely to satisfy BRNP either.
+
+An OSIS-valid source representation may be different from the canonical cleaned target. The original remains immutable. Migration requires a reviewed and SHA-bound operation, a text/markup/reference-preserving equivalence proof, and correct native SWORD readback. The BRNP inspector remains a partial, read-only diagnostic until the complete profile and independent evidence are accepted.
+
 ## Validation is layered
 
 1. Pin immutable upstream data, historical edition witnesses, rights and provenance.
 2. Validate **official OSIS 2.1.1 XSD** (pinned at `config/osis-policy.json`) and XML syntax. A document cannot pass BRNP by skipping the schema.
-3. Run the independent, read-only BRNP structural checker. Its currently recovered v0.1 subset checks identity, reviewed element names, unique canonical IDs, book scope, verse pairs and commentary annotations; **it does not yet prove all hierarchy, target resolution or semantic conditions in this specification**.
+3. Run the independent, read-only BRNP structural checker. Its current v0.2-draft subset checks identity, reviewed element names, unique canonical IDs, book/chapter scope, compound verse membership, verse pairs, commentary reference grammar, poetry grouping and unresolved cross-reference targets; **it does not yet prove all hierarchy, target resolution or semantic conditions in this specification**.
 4. Review source-to-cleaned differences and, separately, historical edition-to-cleaned evidence. Record normalized markup, deleted digital-only artifacts, and every unresolved editorial case.
 5. Check clean-to-native SWORD text, notes, structure and key parity, then multiple readers; document unavoidable renderer differences.
 
