@@ -34,6 +34,10 @@ class ReviewError(ValueError):
     """A source fidelity or non-authorized transformation blocker."""
 
 
+class UnresolvedSourceTarget(ReviewError):
+    """The original printed label is retained, but its target is unverified."""
+
+
 def _bytes(path: Path, maximum: int) -> bytes:
     if path.is_symlink() or not path.is_file() or path.stat().st_size > maximum:
         raise ReviewError("Missing, symlinked or oversized source/witness")
@@ -107,7 +111,7 @@ def _intro_target(label: str, book: str, verse_ids: set[str]) -> str | None:
     if label.isdigit():
         chapter = int(label)
         if chapter < 1 or chapter not in chapters:
-            raise ReviewError("Unattested introduction chapter")
+            raise UnresolvedSourceTarget("unattested_chapter")
         return f"{book}.{chapter}"
     verse_only = VERSE_ONLY_RANGE.fullmatch(label)
     if verse_only and chapters == {1}:
@@ -116,7 +120,7 @@ def _intro_target(label: str, book: str, verse_ids: set[str]) -> str | None:
             raise ReviewError("Reversed or invalid single-chapter introduction range")
         first, last = f"{book}.1.{first_v}", f"{book}.1.{last_v}"
         if first not in verse_ids or last not in verse_ids:
-            raise ReviewError("Unattested single-chapter introduction endpoints")
+            raise UnresolvedSourceTarget("unattested_single_chapter_endpoint")
         return first + "-" + last
     match = INTRO.fullmatch(label)
     if not match:
@@ -126,7 +130,7 @@ def _intro_target(label: str, book: str, verse_ids: set[str]) -> str | None:
         raise ReviewError("Invalid introduction start")
     first = f"{book}.{chapter}.{verse}"
     if first not in verse_ids:
-        raise ReviewError(f"Unattested introduction start: {book}, {label!r}, {first}")
+        raise UnresolvedSourceTarget("unattested_start")
     if match[4] is None:
         return first
     last_chapter = int(match[3]) if match[3] else chapter
@@ -135,10 +139,10 @@ def _intro_target(label: str, book: str, verse_ids: set[str]) -> str | None:
         raise ReviewError("Reversed introduction range")
     last = f"{book}.{last_chapter}.{last_verse}"
     if last not in verse_ids:
-        raise ReviewError(f"Unattested introduction end: {book}, {label!r}, {last}")
+        raise UnresolvedSourceTarget("unattested_end")
     return first + "-" + last
 
-def _source_bindings(cleaned, original, crosswalk: dict) -> tuple[dict, dict]:
+def _source_bindings(cleaned, original, crosswalk: dict) -> tuple[dict, dict, list]:
     """Bind each exact cleaned reference to source-attested USFX semantics.
 
     Book identity is verified using the independent reviewed USFM->OSIS map.
@@ -153,6 +157,7 @@ def _source_bindings(cleaned, original, crosswalk: dict) -> tuple[dict, dict]:
                  (e.get("osisID") or "").split()}
     changes = {}
     counts = Counter()
+    unresolved = []
     for obook, cbook in zip(obooks, cbooks, strict=True):
         book = crosswalk.get(obook.get("id"))
         if not book or cbook.get("osisID") != book:
@@ -196,12 +201,20 @@ def _source_bindings(cleaned, original, crosswalk: dict) -> tuple[dict, dict]:
         for src, ref in zip(original_spans, clean_spans, strict=True):
             if _label(src) != _label(ref):
                 raise ReviewError("Source/cleaned introduction span label differs")
-            target = _intro_target(_label(src), book, verse_ids)
+            label = _label(src)
+            reason = None
+            try:
+                target = _intro_target(label, book, verse_ids)
+            except UnresolvedSourceTarget as exc:
+                target, reason = None, str(exc)
+                counts["unattested_introduction_targets_preserved"] += 1
             counts["original_introduction_spans"] += 1
             if target is None:
                 if ref.get("osisRef"):
-                    raise ReviewError("Unresolved prose span already has an unsafe target")
+                    raise ReviewError("Unresolved original span already has an unsafe target")
                 counts["unlinked_introduction_spans_preserved"] += 1
+                unresolved.append({"book": book, "source_label": label,
+                                   "reason": reason or "compound_or_narrative"})
                 continue
             if ref.get("osisRef") not in (None, target):
                 raise ReviewError("Introduction span conflicts with existing target")
@@ -216,7 +229,7 @@ def _source_bindings(cleaned, original, crosswalk: dict) -> tuple[dict, dict]:
     if len(changes) != (counts["original_cross_reference_notes"] +
                          counts["resolved_introduction_spans"]):
         raise ReviewError("Duplicate source witness binding")
-    return changes, dict(counts)
+    return changes, dict(counts), unresolved
 
 
 def _patch_exact_start_tags(source: bytes, root, changes: dict) -> tuple[bytes, int]:
@@ -261,7 +274,7 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
     original = _parse(_usfx_bytes(usfx_zip))
     if source.tag != OSIS + "osis" or original.tag != "usfx":
         raise ReviewError("Expected canonical OSIS and original USFX document")
-    changes, counts = _source_bindings(source, original, _crosswalk(crosswalk_path))
+    changes, counts, unresolved = _source_bindings(source, original, _crosswalk(crosswalk_path))
     candidate, edits = _patch_exact_start_tags(current, source, changes)
     # Validate actual candidate XML, every edited target, and the unchanged
     # ordered contents of every text/tail/element. No lossy reserialization.
@@ -293,6 +306,7 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         "only_source_attested_reference_osisRef_attributes_added": True,
         "source_unchanged": True,
         "candidate_additions": additions,
+        "unresolved_source_introduction_spans": unresolved,
         "existing_attributes_rewritten": 0,
         "authorial_destinations_inferred": 0,
         "original_note_text_deleted": 0,
@@ -301,7 +315,8 @@ def run(*, cleaned_path: Path, usfx_zip: Path, manifest_path: Path,
         **counts,
     }
     if output_path is not None:
-        if output_path.resolve() == cleaned_path.resolve():
+        if output_path.resolve() in {p.resolve() for p in (
+                cleaned_path, usfx_zip, manifest_path, crosswalk_path)}:
             raise ReviewError("Refusing to overwrite cleaned or original source")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         fd, temp = tempfile.mkstemp(prefix=".candidate-", dir=output_path.parent)
@@ -325,7 +340,7 @@ def main() -> int:
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
     if args.output.resolve() in {args.cleaned.resolve(), args.original_usfx.resolve(),
-                                 args.manifest.resolve(), args.report.resolve()}:
+                                 args.manifest.resolve(), args.crosswalk.resolve(), args.report.resolve()}:
         parser.error("All sources, candidate and report must be separate paths")
     try:
         _, report = run(
