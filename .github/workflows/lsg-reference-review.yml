@@ -16,6 +16,7 @@ on:
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_PAGE_LOCATORS_2026-11-23.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json'
 permissions:
   contents: read
 jobs:
@@ -404,6 +405,57 @@ jobs:
           print('Verified exact 54-case original facsimile page locators; only',len(proofs),
                 'historical note reference readings separately certified,',
                 54-len(proofs),'uncertified printed-note labels, 0 authorized changes')
+          PY
+      - name: Verify scoped printed 1910 reference token sightings without source edits or invented full-note certifications
+        run: |
+          python - <<'PY'
+          import json
+          from hashlib import sha256
+          from pathlib import Path
+          root=Path('sources/cleaned/bibles/fr/lsg-1910/editorial')
+          tokens=json.loads((root/'PRINTED_1910_REFERENCE_TOKEN_COMPARISON_2026-11-23.json').read_text(encoding='utf-8'))
+          locators=json.loads((root/'PRINTED_1910_PAGE_LOCATORS_2026-11-23.json').read_text(encoding='utf-8'))
+          digital=json.loads((root/'SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json').read_text(encoding='utf-8'))
+          fully=json.loads((root/'PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json').read_text(encoding='utf-8'))
+          digest=sha256(Path('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip').read_bytes()).hexdigest()
+          if (tokens['schema_version']!=1
+              or tokens['original_usfx_zip_sha256']!=digest
+              or tokens['original_printed_scan_sha256']!=locators['original_printed_djvu_sha256']
+              or tokens['original_printed_scan_sha256']!=fully['facsimile']['retrieved_djvu_sha256']
+              or tokens['original_scan_publication_year']!=1910
+              or tokens['status']!='original_printed_1910_individual_reference_tokens_verified_from_native_page_images_not_full_note_transcriptions'
+              or tokens['original_or_cleaned_text_changes_approved']!=0
+              or tokens['corrections_proposed_not_approved']!=len(tokens['records'])
+              or tokens['confirmed_individual_printed_reference_token_sightings']!=len(tokens['records'])
+              or len(tokens['records'])!=6):
+              raise SystemExit('Physical print token evidence must remain exact-original and non-approved')
+          lookup={r['record_id']:r for r in locators['records']}
+          digital_lookup={r['record_id']:r for r in digital['records']}
+          full_ids={r['record_id'] for r in fully['records']}
+          seen=set()
+          for row in tokens['records']:
+              id=row['record_id']
+              loc=lookup.get(id);dig=digital_lookup.get(id)
+              if (not loc or not dig or id in seen or id in full_ids
+                  or row['original_usfm_book']!=loc['original_usfm_book']
+                  or row['source_note_origin']!=loc['source_note_origin']
+                  or row['original_usfx_label']!=loc['original_citation_label']
+                  or row['original_usfx_label']!=dig['original_citation_label']
+                  or row['secondary_digital_label']!=dig['secondary_citation_label']
+                  or row['original_1910_print_page']!=loc['original_1910_djvu_page']
+                  or row['facsimile_page_url']!=loc['printed_page_url']
+                  or row['scope']!='identified_printed_margin_reference_token_not_full_digital_xt_collation'
+                  or row['printed_reference_token_visually_read'] is not True
+                  or row['printed_full_cross_reference_label_matches_eBible'] is not None
+                  or row['editorial_change_authorized'] is not None
+                  or not row['printed_note_callout'] or not row['printed_reference_token_or_local_group']
+                  or not row['interpreted_print_target_token']):
+                  raise SystemExit('Printed token proof is not matched to exact source note and original page')
+              seen.add(id)
+          print('Verified original 1910 printed token-only sightings:',len(seen),
+                '| full exact printed note readings:',len(full_ids),
+                '| still pending complete printed apparatus collation:',54-len(full_ids),
+                '| original authorial changes: 0')
           PY
       - name: Build second isolated candidate with one clickable reference per passage
         run: |
