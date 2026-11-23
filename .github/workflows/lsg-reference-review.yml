@@ -436,6 +436,42 @@ jobs:
                   or r['printed_full_cross_reference_label_matches_eBible'] is not None
                   or r['editorial_change_authorized'] is not None):
                   raise SystemExit('An individual printed citation token is missing evidence or implies full-note certification')
+          disposition=page_data['batch_review_disposition']
+          verified_total=0
+          partial_total=0
+          screen_only_total=0
+          token_ids={r['record_id'] for r in tokens}
+          full_ids=set(proof_map)
+          if (disposition['original_scan_provenance_sha256']!=source_scan['retrieved_djvu_sha256']
+              or disposition['reviewed_source_note_origins']!=len(expected)
+              or disposition['source_label_edits_authorized']!=0
+              or disposition['source_reference_links_authorized']!=0):
+              raise SystemExit('Full-batch printed page screening disposition not evidence bound')
+          for r in page_data['records']:
+              record=r['original_print_case_review']
+              caseid=r['record_id']
+              expected_scope=('full_print_citation_verified' if caseid in full_ids else
+                              'partial_marginal_reference_token_read_only' if caseid in token_ids else
+                              'original_page_and_verse_examined_but_printed_citation_not_certified')
+              if (record['case_examination_status']!=expected_scope
+                  or record['inspected_exact_print_verse_on_page']!=r['original_1910_djvu_page']
+                  or record['source_note_edited'] is not False
+                  or record['machine_link_authorized'] is not False
+                  or record['authorial_print_notation_interpretation_approved'] is not False
+                  or record['editorial_disposition']!='preserve_original_usfx_note_literal_unlinked_until_full_source_specific_review'
+                  or record['printed_token']!=(next((p['printed_reference_token_or_local_group']
+                                                     for p in tokens if p['record_id']==caseid),None))
+                  or record['printed_token_target_hint']!=(next((p['interpreted_print_target_token']
+                                                                 for p in tokens if p['record_id']==caseid),None))):
+                  raise SystemExit('Full-batch disposition must preserve unapproved source note and recorded printed evidence')
+          disposition_count=Counter(r['original_print_case_review']['case_examination_status'] for r in page_data['records'])
+          if (disposition['totals']!=dict(disposition_count)
+              or sum(disposition_count.values())!=len(expected)
+              or disposition_count['full_print_citation_verified']!=len(proven)
+              or disposition_count['partial_marginal_reference_token_read_only']!=len(tokens)
+              or disposition_count['original_page_and_verse_examined_but_printed_citation_not_certified']!=len(expected)-len(proven)-len(tokens)):
+              raise SystemExit('Batch review disposition is not complete or is wrongly certified')
+          print('All 54 cases assigned evidence-scoped print screening disposition:',dict(disposition_count))
           print('Physical 1910 print page coverage and authorial source-verse alignment: ',
                 len(page_data['records']),'of',len(expected),
                 'individual printed reference token findings:',len(tokens),
