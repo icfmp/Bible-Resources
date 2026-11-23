@@ -231,6 +231,7 @@ jobs:
           counters=Counter()
           mismatches=[]
           diagnostic={}
+          native_text_difference_examples=[]
           def node(raw):
               parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
                        no_network=True,recover=False,huge_tree=False)
@@ -342,6 +343,22 @@ jobs:
                           counters['native_individual_frames_identical_note_text']+=1
                       else:
                           counters['native_individual_frames_note_text_changed']+=1
+                          for p,q in zip(original_note_flat,segmented_note_flat):
+                              if p==q:
+                                  continue
+                              import re
+                              if re.sub(r'\\s+','',p)==re.sub(r'\\s+','',q):
+                                  counters['native_individual_note_text_whitespace_only_differences']+=1
+                              else:
+                                  counters['native_individual_note_text_material_differences']+=1
+                              if len(native_text_difference_examples)<12:
+                                  index=next((i for i in range(min(len(p),len(q)))
+                                              if p[i]!=q[i]),min(len(p),len(q)))
+                                  native_text_difference_examples.append({
+                                      'key':key,'offset':index,
+                                      'grouped_sample':repr(p[max(index-30,0):index+40]),
+                                      'individual_sample':repr(q[max(index-30,0):index+40]),
+                                  })
                       if (strip_cross_reference_destination_markup(grouped)!=
                           strip_cross_reference_destination_markup(separated)):
                           counters['native_individual_frames_with_unrelated_markup_change']+=1
@@ -361,6 +378,7 @@ jobs:
                   else:
                       counters['native_frames_with_only_allowed_target_additions']+=1
           split_receipt=json.loads(Path('/tmp/lsg-individual-reference-receipt.json').read_text())
+          print('Native text difference source-bound samples:',native_text_difference_examples)
           print('Native individual reference structural diagnostics:',{
               key:number for key,number in counters.items()
               if key.startswith('native_individual') or
