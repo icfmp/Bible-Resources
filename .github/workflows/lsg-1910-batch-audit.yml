@@ -137,6 +137,10 @@ jobs:
               subprocess.run(['ddjvu','-page='+str(page),'-format=tiff','/tmp/lsg-print-1910.djvu',str(target)],check=True)
               im=Image.open(target).convert('RGB')
               width,height=im.size
+              if id in ['LSG-CR-001','LSG-CR-031','LSG-CR-032','LSG-CR-033','LSG-CR-040','LSG-CR-053']:
+                  actual=subprocess.run(['djvutxt','-page='+str(page),'/tmp/lsg-print-1910.djvu'],
+                                        capture_output=True,check=True).stdout.decode('utf-8','replace')
+                  print('PAGE_TEXT_IDENTITY_CHECK',id,page,'single_page_first',repr(actual[:100]),'whole_split_header',repr(case['candidate_pages'][0]['header'] if case['candidate_pages'] else ''))
               detail=subprocess.run(['djvutxt','-detail=word','-page='+str(page),'/tmp/lsg-print-1910.djvu'],
                                     check=True,capture_output=True).stdout.decode('utf-8','replace')
               line_re=r'^\s*\(line (\d+) (\d+) (\d+) (\d+) ([^\n]*)\)'
