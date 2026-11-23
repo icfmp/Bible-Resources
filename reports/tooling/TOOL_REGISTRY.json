@@ -706,11 +706,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 7,
       "static_references": [
+        "scripts/tool_registry.py",
         "docs/PRODUCTION_PIPELINE.md",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/policies/QUALITY_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
-        "scripts/tool_registry.py",
         "tests/test_brnp.py",
         "tests/test_editorial_pipeline.py"
       ]
