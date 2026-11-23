@@ -39,7 +39,7 @@ def _exact_reference_spans(label: str, aliases: dict,
     """
     expected, reason, _ = _complete_printed_destinations(label, aliases, verse_ids)
     if expected is None:
-        raise ReviewError("Cannot split an unresolved or incompletely parsed original label")
+        raise ReviewError(f"Cannot split incompletely parsed original label: {label[:120]!r}, reason={reason}")
     position = 0
     book = None
     chapter = None
