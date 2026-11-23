@@ -13,7 +13,7 @@ from lxml import etree
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from normalize_bible_references import ReviewError, run, _intro_target  # noqa: E402
+from normalize_bible_references import ReviewError, run, _intro_target, _complete_printed_destinations  # noqa: E402
 
 NS = "http://www.bibletechnologies.net/2003/OSIS/namespace"
 
@@ -83,10 +83,11 @@ class NormalizationTests(unittest.TestCase):
         }))
         return path
 
-    def apply(self, output=None, aliases=None):
+    def apply(self, output=None, aliases=None, complete_lists=False):
         return run(cleaned_path=self.cleaned, usfx_zip=self.original,
                    manifest_path=self.manifest, crosswalk_path=self.crosswalk,
                    destination_aliases_path=aliases,
+                   complete_citation_lists=complete_lists,
                    output_path=output)
 
     def test_preserves_every_original_byte_except_verified_additions(self):
@@ -213,6 +214,64 @@ class NormalizationTests(unittest.TestCase):
         self.manifest.write_text(json.dumps(manifest))
         with self.assertRaisesRegex(ReviewError, "conflicts"):
             self.apply(aliases=self.aliases())
+
+    def test_full_compound_book_list_maps_every_explicit_printed_part(self):
+        targets = {"Gen.1.1", "Exod.2.1"}
+        linked, reason, context = _complete_printed_destinations(
+            "Ge 1:1. Ex 2:1.", {"Ge":"Gen", "Ex":"Exod"}, targets)
+        self.assertEqual(linked, "Gen.1.1 Exod.2.1")
+        self.assertEqual(reason, "complete_printed_list")
+        self.assertEqual(context, 0)
+
+    def test_full_semicolon_context_and_comma_repetition(self):
+        targets={"Gen.1.1", "Gen.1.2", "Gen.2.1"}
+        linked, reason, context = _complete_printed_destinations(
+            "Ge 1:1, 2; 2:1.", {"Ge":"Gen"}, targets)
+        self.assertEqual(linked, "Gen.1.1 Gen.1.2 Gen.2.1")
+        self.assertEqual(context, 1)
+        self.assertEqual(reason, "complete_printed_list")
+
+    def test_every_missing_explicit_or_contextual_target_refuses_entire_note(self):
+        labels = (
+            "Ge 1:1. Ex 2:99.", "Ge 1:1, 99.", "Ge 1:1; 2:99.",
+            "Ge 1:1. Unknown 2:1.", "Ge 1:1; v. 2.",
+            "Ge 1:1, etc.", "Ge 1:2, 1:1.",
+        )
+        aliases = {"Ge":"Gen","Ex":"Exod"}
+        verses={"Gen.1.1","Gen.1.2","Gen.2.1","Exod.2.1"}
+        for label in labels:
+            with self.subTest(label=label):
+                linked, reason, _ = _complete_printed_destinations(
+                    label, aliases, verses)
+                self.assertIsNone(linked)
+                self.assertNotEqual(reason, "complete_printed_list")
+
+    def test_multi_target_list_writes_only_one_safe_reference_attribute(self):
+        original = self.fixture(clean_dest="Ge 1:1, 2; 2:1.",
+                                original_dest="Ge 1:1, 2; 2:1.")
+        candidate, report = self.apply(aliases=self.aliases(), complete_lists=True)
+        self.assertEqual(report["resolved_original_destination_labels"], 1)
+        self.assertEqual(report["explicit_semicolon_contexts_used"], 1)
+        self.assertEqual(report["candidate_additions"], 3)
+        self.assertIn(
+            b'osisRef="Gen.1.1 Gen.1.2 Gen.2.1">Ge 1:1, 2; 2:1.',
+            candidate)
+        self.assertEqual("".join(etree.fromstring(original).itertext()),
+                         "".join(etree.fromstring(candidate).itertext()))
+
+    def test_multi_target_compilation_candidate_is_idempotent(self):
+        self.fixture(clean_dest="Ge 1:1. Ge 1:2.",
+                     original_dest="Ge 1:1. Ge 1:2.")
+        aliases = self.aliases()
+        first, report = self.apply(aliases=aliases, complete_lists=True)
+        self.assertEqual(report["resolved_original_destination_labels"], 1)
+        self.cleaned.write_bytes(first)
+        manifest = json.loads(self.manifest.read_text())
+        manifest["cleaned_osis_sha256"] = sha256(first).hexdigest()
+        self.manifest.write_text(json.dumps(manifest))
+        second, report = self.apply(aliases=aliases, complete_lists=True)
+        self.assertEqual(first, second)
+        self.assertEqual(report["candidate_additions"], 0)
 
     def test_wrong_source_sha_blocks(self):
         self.fixture()
