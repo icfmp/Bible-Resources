@@ -549,8 +549,20 @@ jobs:
               or tokens['original_or_cleaned_text_changes_approved']!=0
               or tokens['corrections_proposed_not_approved']!=len(tokens['records'])
               or tokens['confirmed_individual_printed_reference_token_sightings']!=len(tokens['records'])
-              or len(tokens['records'])!=10):
+              or len(tokens['records'])>len(locators['records'])):
               raise SystemExit('Physical print token evidence must remain exact-original and non-approved')
+          preliminary=[r for r in locators['records'] if r.get('preliminary_marginal_target_candidate')]
+          for r in preliminary:
+              candidate=r['preliminary_marginal_target_candidate']
+              if (candidate['status']!='visible_candidate_target_but_printed_note_callout_unconfirmed'
+                  or not candidate['raw_printed_reference_token']
+                  or not candidate['interpreted_target_candidate']
+                  or candidate['counted_as_certified_token'] is not False
+                  or candidate['permission_to_edit_original_text'] is not False
+                  or r['record_id'] in {x['record_id'] for x in tokens['records']}):
+                  raise SystemExit('Uncertain 1910 printed marginal targets must stay separate and non-certified')
+          if tokens.get('uncertified_marginal_target_candidates_separately_in_page_ledger',0)!=len(preliminary):
+              raise SystemExit('Missing or ambiguously classified printed marginal reference candidates')
           lookup={r['record_id']:r for r in locators['records']}
           digital_lookup={r['record_id']:r for r in digital['records']}
           full_ids={r['record_id'] for r in fully['records']}
