@@ -77,6 +77,33 @@ class CrossEditionReleasePreflightTests(unittest.TestCase):
                     self.assertEqual(record["sword_id"], plan["sword_id"])
                     self.assertEqual(record["version"], plan["version"])
 
+    def test_segond_metadata_update_preserves_native_source_and_internal_id(self):
+        """A visible SWORD label must not silently change a published edition ID."""
+        from validate import parse_conf
+        module = ROOT / "modules/lsg-1910"
+        meta = json.loads((module / "metadata.json").read_text(encoding="utf-8"))
+        old = json.loads((ROOT / "config/catalogue-import-lsg-0.1.0.json")
+                         .read_text(encoding="utf-8"))
+        current = json.loads((ROOT / "config/catalogue-import-lsg-0.1.1.json")
+                             .read_text(encoding="utf-8"))
+        internal, conf = parse_conf(module / "payload/mods.d/brlsg1910.conf")
+        self.assertEqual(internal, meta["sword_id"])
+        self.assertEqual(internal, "BRLSG1910")
+        self.assertEqual(meta["version"], "0.1.1")
+        self.assertEqual(conf["Version"], meta["version"])
+        self.assertEqual(conf["Description"], meta["title"]["fr"])
+        self.assertEqual(conf["Description"], "Louis Segond 1910")
+        self.assertEqual(conf["Abbreviation"], "LSG1910")
+        self.assertEqual(old["release_tag"], "lsg-0.1.0")
+        self.assertEqual(current["release_tag"], "lsg-0.1.1")
+        self.assertEqual(set(old["files"]), set(current["files"]))
+        for path in old["files"]:
+            if path.endswith(".conf"):
+                self.assertNotEqual(old["files"][path], current["files"][path])
+            else:
+                self.assertEqual(old["files"][path], current["files"][path])
+        self.assertEqual(old["provenance"], current["provenance"])
+
     def test_current_pages_pipeline_owns_release_and_catalogue_checks(self):
         """Current publication remains behind the shared release gate."""
         workflow = (ROOT / ".github/workflows/pages.yml").read_text(

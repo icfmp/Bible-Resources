@@ -1,6 +1,6 @@
 # Louis Segond 1910 — editorial decisions
 
-**Release:** `BRLSG1910` 0.1.0. This index explains the maintained edition; it does not authorize another text change.
+**Current prepared release:** `BRLSG1910` 0.1.1, display metadata only; historical 0.1.0 remains immutable. This index does not authorize a Bible text change.
 
 ## What matters
 
@@ -13,7 +13,8 @@
 | Question | Authoritative record |
 | --- | --- |
 | What was the exact cleaned source? | [Source and transformation manifest](../CLEANUP_MANIFEST.json) |
-| What was released and authorized? | [LSG 0.1.0 release](releases/LSG-0.1.0.md) |
+| What was first released and authorized? | [Historical LSG 0.1.0](releases/LSG-0.1.0.md) |
+| What changed in the visible labels? | [LSG 0.1.1 metadata-only release record](releases/LSG-0.1.1.md) |
 | How was the native module audited? | [Native source audit](../../../../../../modules/lsg-1910/SOURCE_AUDIT.json) |
 | What are the reader-facing editorial descriptions? | [Approved French profile](profiles/fr-segond-1910.md) |
 | What did the early experimental work establish? | [Historical research handoff](history/LSG_AUDIT_RESEARCH_HANDOFF.md), for reproducibility only |

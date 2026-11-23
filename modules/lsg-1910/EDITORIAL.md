@@ -28,3 +28,7 @@
 - The publisher's Public Domain translation declaration is https://ebible.org/fraLSG/copyright.htm ; independently authored future enrichments will require their own rights evidence before inclusion.
 
 This is an **initial reading edition**, not a final textual-critical or print-edition certification. All changes and discovered anomalies must be documented and reversible. The full source and binary audit remain separate from the GitHub publication.
+
+## Metadata-only 0.1.1 revision (2026-11-23)
+
+The owner requested a clean public title `Louis Segond 1910` and short label `LSG1910`. The installed technical SWORD ID `BRLSG1910` remains unchanged. No Biblical wording, source OSIS, verse, note, heading, versification or native SWORD binary data changed. The [edition-owned 0.1.1 record](../../sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-0.1.1.md) documents the full independent OSIS structural inspection, package-member fingerprints and historic 0.1.0 ZIP distinction. Source and reader limitations from the original release remain in force.
