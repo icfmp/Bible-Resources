@@ -70,6 +70,8 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         )
         report = self.inspect(content)
         self.assertIn("UNREVIEWED_ELEMENT", [f["code"] for f in report["findings"]])
+        self.assertEqual(report["finding_codes"]["UNREVIEWED_ELEMENT"], 1)
+        self.assertEqual(report["unreviewed_elements"]["invented"], 1)
         self.assertIn("<invented>word</invented>", self.path.read_text(encoding="utf-8"))
 
     def test_commentary_missing_reference_is_blocked(self):
@@ -83,6 +85,8 @@ class BRNPStructuralPilotTests(unittest.TestCase):
             '<verse osisID="Gen.1.1">Private sentinel phrase</verse>'
         ))
         self.assertNotIn("Private sentinel phrase", json.dumps(report))
+        self.assertFalse(report["publication_approved"])
+        self.assertEqual(report["official_osis"]["status"], "not_run")
 
 
     def test_duplicate_book_is_blocked(self):
