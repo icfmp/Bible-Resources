@@ -29,13 +29,23 @@ These conventions describe *how* to encode a given meaning. They do not require 
 | Lexical alignment | `w` with verifiable lemma/morph associations and exact word extent | Invent Strong/MACULA mappings or split joined words heuristically |
 | Commentary | Dedicated `div` with `annotateType="commentary"` and reviewed `annotateRef`; preserve authored scope and introductions | Duplicate chapter-level commentary across verses in source or fabricate a verse-level scope |
 
+## Canonical hierarchy: normative target, distinct from XSD legality
+
+**Bible target** (for source-derived, reviewed *cleaned* masters): one `osisText`, then one `div type="book"` per canonical book in the chosen versification. Book divisions are not nested or repeated; chapters and their verse scopes belong to the correct book. A chapter container cannot contain canonical IDs from another chapter. For milestone-based verses spanning paragraphs, `sID`/`eID` must pair uniquely, in order; the canonical `osisID` is unique independently of the pairing key. A different pairing key is **not** a relaxation of canonical reference requirements. Compound IDs remain edition-specific and must be checked member by member. No missing verse is synthesized.
+
+**Commentary target:** one logical book division per book and source-attested commentary units represented by `div annotateType="commentary" annotateRef="…"`. One entry may cover a book, chapter, verse or reviewed passage range; it is not redistributed or duplicated to individual verses just to suit a reader. Cross-book references require explicit versification/review. Unnumbered introductions remain distinct. The MHC verse-milestone encoding is a **source representation to be migrated and proved equivalent**, not a second unconditionally accepted canonical target. The repeated MHCC book divisions are **noncanonical** and need a reversible structural grouping proof, preserving entry ordering, references, and authored titles.
+
+**OSIS-valid but BRNP-noncanonical structures:** classify the discrepancy; retain it in the immutable original, do not hide it in a validator allowlist. A new representation may be approved only by changing this common contract with a standard-based rationale, positive/negative tests and all affected real-corpus regression results. Do not introduce exceptions keyed to a resource ID or a fixed diagnostic count.
+
+**Minimal mandatory validation invariants:** correct document/work identity, no nested/repeated Bible books, no nested canonical commentary book segments in the cleaned target, correct book/chapter ownership of references, unique canonical verse IDs and separately unique milestone keys, proper pairing and closure, evidence-backed paragraphs/poetry/notes, reviewed commentary range associations, and correct containment for `table/row/cell` and `list/item`. The XSD enforces XML-level grammar **in addition**, not in place of these controls. Unknown reference grammar or unverified authorial structure blocks a certification claim.
+
 OSIS permits more than one representation for certain overlapping structures. BRNP chooses a deterministic representation **only after** equivalence has been proved with positive/negative fixtures and relevant real editions. Unknown, ambiguous or otherwise schema-valid constructs are reported for review, never auto-flattened. No edition-specific hidden exceptions.
 
 ## Validation is layered
 
 1. Pin immutable upstream data, historical edition witnesses, rights and provenance.
 2. Validate **official OSIS 2.1.1 XSD** (pinned at `config/osis-policy.json`) and XML syntax. A document cannot pass BRNP by skipping the schema.
-3. Run the independent, read-only BRNP structural checker. Its currently recovered v0.1 subset checks identity, reviewed element names, verse pairs and commentary annotations; **it does not yet prove all hierarchy, target resolution or semantic conditions in this specification**.
+3. Run the independent, read-only BRNP structural checker. Its currently recovered v0.1 subset checks identity, reviewed element names, unique canonical IDs, book scope, verse pairs and commentary annotations; **it does not yet prove all hierarchy, target resolution or semantic conditions in this specification**.
 4. Review source-to-cleaned differences and, separately, historical edition-to-cleaned evidence. Record normalized markup, deleted digital-only artifacts, and every unresolved editorial case.
 5. Check clean-to-native SWORD text, notes, structure and key parity, then multiple readers; document unavoidable renderer differences.
 
