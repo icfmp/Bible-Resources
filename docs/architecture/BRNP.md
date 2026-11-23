@@ -17,7 +17,7 @@ These conventions describe *how* to encode a given meaning. They do not require 
 | Document | One OSIS namespace `osis` root, one `osisText`, documented work identity and `header` | Mix XML namespaces or fabricate an edition identity |
 | Books | `div type="book"` with unique canonical `osisID`; book order follows approved canon | Merge or invent books |
 | Chapters | `chapter` with precise chapter `osisID`; milestone pairs use matching `sID`/`eID` and correct scope | Mix container and milestone representations for the same chapter or silently rearrange boundaries |
-| Verses | Unique `osisID`; when milestones are needed across paragraphs or other structures, a unique matching `sID`/`eID` pair | Treat an OSIS-valid milestone as text, infer missing verse IDs or force an edition into another versification |
+| Verses | Unique `osisID`; when milestones are needed across paragraphs or other structures, a unique matching `sID`/`eID` pair (the pair key may differ from the canonical `osisID`) | Treat an OSIS-valid milestone as text, infer missing verse IDs or force an edition into another versification |
 | Paragraphs | `p` only for evidence-supported paragraph units; milestones when needed to represent overlapping boundaries | Automatically insert paragraphs based on verse count |
 | Poetry | `lg` for evidenced groupings; `l` and `level` when attested, keeping order | Convert poetry to prose or invent stanzas/indentation |
 | Titles | `title` at the documented semantic location and type permitted by the official schema | Promote provider UI headings to authorial headings |
