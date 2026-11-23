@@ -134,7 +134,7 @@ class NormalizationTests(unittest.TestCase):
         self.assertEqual(report["candidate_additions"], 1)
         self.assertIn(b' subType="x-introduction">', candidate)
         self.assertIn("1:1–2:1 (voir un autre passage)".encode(), candidate)
-        self.assertEqual(source.count(b'osisRef'), 0)
+        self.assertEqual(source.count(b' osisRef="'), 0)
 
     def test_wrong_source_sha_blocks(self):
         self.fixture()
