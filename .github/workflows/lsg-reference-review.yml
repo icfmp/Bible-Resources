@@ -330,6 +330,18 @@ jobs:
                               destination_target_sequence(second_note)):
                               raise SystemExit('Native original targets/anchors changed')
                           counters['native_notes_with_source_equivalent_individual_links']+=1
+                      original_flat=''.join(grouped.itertext())
+                      segmented_flat=''.join(separated.itertext())
+                      if original_flat==segmented_flat:
+                          counters['native_individual_frames_identical_full_text']+=1
+                      else:
+                          counters['native_individual_frames_text_changed']+=1
+                      original_note_flat=[''.join(n.itertext()) for n in grouped_notes]
+                      segmented_note_flat=[''.join(n.itertext()) for n in separated_notes]
+                      if original_note_flat==segmented_note_flat:
+                          counters['native_individual_frames_identical_note_text']+=1
+                      else:
+                          counters['native_individual_frames_note_text_changed']+=1
                       if (strip_cross_reference_destination_markup(grouped)!=
                           strip_cross_reference_destination_markup(separated)):
                           counters['native_individual_frames_with_unrelated_markup_change']+=1
@@ -349,7 +361,13 @@ jobs:
                   else:
                       counters['native_frames_with_only_allowed_target_additions']+=1
           split_receipt=json.loads(Path('/tmp/lsg-individual-reference-receipt.json').read_text())
-          if (counters['native_individual_frames_with_unrelated_markup_change'] or
+          print('Native individual reference structural diagnostics:',{
+              key:number for key,number in counters.items()
+              if key.startswith('native_individual') or
+              key.startswith('native_notes_with_source')})
+          if (counters['native_individual_frames_text_changed'] or
+              counters['native_individual_frames_note_text_changed'] or
+              counters['native_individual_frames_with_unrelated_markup_change'] or
               not counters['native_individual_frames_only_reference_markup_changed']):
               raise SystemExit('Native individually linked candidate changed authorial structure')
           receipt=json.loads(Path('/tmp/lsg-structural-report.json').read_text())
