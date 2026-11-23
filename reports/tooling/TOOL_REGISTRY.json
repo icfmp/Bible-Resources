@@ -265,9 +265,9 @@
         "sys"
       ],
       "static_references": [
+        "scripts/normalize_osis.py",
         ".github/workflows/brnp-review.yml",
         "docs/PRODUCTION_PIPELINE.md",
-        "scripts/normalize_osis.py",
         "tests/test_brnp.py"
       ],
       "static_reference_count": 4,
@@ -572,11 +572,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
+        "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
         ".github/workflows/osis-schema-review.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
-        "scripts/tool_registry.py",
         "tests/test_source_acquisition_and_schema.py"
       ]
     },
@@ -653,16 +653,16 @@
       "stage_hint": "not determined",
       "static_reference_count": 14,
       "static_references": [
-        ".github/workflows/osis-schema-review.yml",
-        "docs/policies/NORMALIZATION_POLICY.md",
-        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
-        "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
         "scripts/audit_osis.py",
         "scripts/check_brnp.py",
         "scripts/fetch_reviewed_schema.py",
         "scripts/guard_commentary.py",
         "scripts/normalize_osis.py",
         "scripts/tool_registry.py",
+        ".github/workflows/osis-schema-review.yml",
+        "docs/policies/NORMALIZATION_POLICY.md",
+        "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
+        "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
         "tests/test_commentary_gate.py",
         "tests/test_editorial_pipeline.py",
         "tests/test_guard_osis.py",
@@ -705,11 +705,11 @@
       "stage_hint": "not determined",
       "static_reference_count": 6,
       "static_references": [
+        "scripts/tool_registry.py",
         "docs/PRODUCTION_PIPELINE.md",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/policies/QUALITY_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
-        "scripts/tool_registry.py",
         "tests/test_editorial_pipeline.py"
       ]
     },
