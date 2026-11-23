@@ -49,9 +49,22 @@ class ScriptInventoryTests(unittest.TestCase):
         """All currently retained tools need an actual reviewer decision."""
         rows = self.result["files"]
         names = {r["path"].rsplit("/", 1)[-1] for r in rows}
+        # Maintained source-bound module-local tools have a reviewed
+        # lifecycle of their own. Do not force them into shared-script roles
+        # or weaken the repository's exact script-inventory check.
+        module_local = {
+            row["path"].rsplit("/", 1)[-1]: row for row in rows
+            if row["classification"] == "MODULE_LOCAL"
+        }
+        for name, entry in module_local.items():
+            self.assertTrue(entry["path"].startswith("modules/"))
+            self.assertIn("/tools/", entry["path"])
+            self.assertEqual(entry["confidence"], "high")
+            self.assertTrue(entry["static_references"], name)
         self.assertEqual(
             names,
-            (CORE | REVIEWED_ACTIVE | REVIEWED_EDITION_COUPLED) & names,
+            (CORE | REVIEWED_ACTIVE | REVIEWED_EDITION_COUPLED |
+             set(module_local)) & names,
         )
         self.assertEqual(
             len([r for r in rows if r["classification"] == "UNDECIDED"]), 0

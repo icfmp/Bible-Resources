@@ -1,6 +1,48 @@
 {
   "files": [
     {
+      "classification": "MODULE_LOCAL",
+      "confidence": "high",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "zText",
+        "OSIS",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "modules/lsg-1910/tools/stage_reviewed_release.py",
+      "proposed_action": "Keep with the owning module only while its pinned maintenance/replay workflow and regression checks remain necessary.",
+      "purpose_first_line": "Reproducibly stage reviewed LSG release files on a PR branch, never publish.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "build",
+        "catalogue_release_coverage",
+        "hashlib",
+        "json",
+        "lxml",
+        "pathlib",
+        "publish_reviewed_release",
+        "release_preflight",
+        "shutil",
+        "stable_sword_refs",
+        "sword_native_inventory",
+        "sys",
+        "validate"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "4de0c725fffa632649ad7e3818a2cea295685040ed60402fd4f9360a39e84a40",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "publication/release",
+      "static_reference_count": 1,
+      "static_references": [
+        ".github/workflows/lsg-v1-reviewed-candidate.yml"
+      ]
+    },
+    {
       "classification": "KEEP_GENERIC",
       "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
@@ -31,10 +73,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/lsg-reference-review.yml",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "tests/test_apply_reviewed_osis_editorial_corrections.py"
       ]
     },
@@ -75,11 +118,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
         ".github/workflows/lsg-reference-review.yml",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "tests/test_approved_osis_sword_candidate.py",
@@ -196,8 +240,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 11,
+      "static_reference_count": 12,
       "static_references": [
+        "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
         "scripts/tool_registry.py",
@@ -268,8 +313,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 8,
+      "static_reference_count": 9,
       "static_references": [
+        "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
         "scripts/tool_registry.py",
@@ -310,12 +356,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/normalize_osis.py",
         "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
         ".github/workflows/lsg-reference-review.yml",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "docs/PRODUCTION_PIPELINE.md",
         "tests/test_brnp.py"
       ]
@@ -612,11 +659,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
         ".github/workflows/lsg-reference-review.yml",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         ".github/workflows/osis-schema-review.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/workflows/EDITORIAL_AUDIT_WORKFLOW.md",
@@ -746,12 +794,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/apply_reviewed_osis_editorial_corrections.py",
         "scripts/segment_osis_reference_destinations.py",
         "scripts/tool_registry.py",
         ".github/workflows/lsg-reference-review.yml",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "tests/test_normalize_bible_references.py",
         "tests/test_segment_osis_reference_destinations.py"
       ]
@@ -981,8 +1030,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
+        "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/release_preflight.py",
         "scripts/tool_registry.py",
         ".github/workflows/pages.yml",
@@ -1066,9 +1116,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 3,
+      "static_reference_count": 5,
       "static_references": [
+        "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/tool_registry.py",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "tests/test_release_preflight.py",
         "tests/test_tool_registry.py"
       ]
@@ -1162,11 +1214,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/approved_osis_sword_candidate.py",
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "tests/test_native_raw_main_text.py",
         "tests/test_native_sword_markup_census.py",
@@ -1398,11 +1451,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/approved_osis_sword_candidate.py",
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md",
         "docs/technical/SOURCE_NATIVE_NOTES_AUDIT.md",
         "tests/test_source_osis_verse_notes.py"
@@ -1544,10 +1598,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/lsg-reference-review.yml",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "tests/test_segment_osis_reference_destinations.py"
       ]
     },
@@ -1658,8 +1713,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 19,
+      "static_reference_count": 20,
       "static_references": [
+        "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/approved_osis_sword_candidate.py",
         "scripts/published_reference_audit.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
@@ -1759,11 +1815,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/sword_native_inventory.py",
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         ".github/workflows/validate.yml",
         "docs/technical/NATIVE_SWORD_INDEX_INVENTORY.md",
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
@@ -1803,8 +1860,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 10,
+      "static_reference_count": 11,
       "static_references": [
+        "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/approved_osis_sword_candidate.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
         "scripts/research/bible/native_sword_markup_census.py",
@@ -1837,11 +1895,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
         ".github/workflows/lsg-reference-review.yml",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         ".github/workflows/validate.yml",
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
         "docs/technical/SOURCE_NATIVE_MAIN_TEXT.md"
@@ -1959,8 +2018,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 2,
+      "static_reference_count": 3,
       "static_references": [
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         ".github/workflows/tool-registry-maintenance.yml",
         "tests/test_tool_registry.py"
       ]
@@ -2004,12 +2064,14 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 16,
+      "static_reference_count": 18,
       "static_references": [
+        "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/build.py",
         "scripts/release_preflight.py",
         "scripts/smoke.py",
         "scripts/tool_registry.py",
+        ".github/workflows/lsg-v1-reviewed-candidate.yml",
         ".github/workflows/pages.yml",
         ".github/workflows/validate.yml",
         "docs/policies/COMMENTARY_POLICY.md",

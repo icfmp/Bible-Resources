@@ -1,0 +1,42 @@
+{
+  "engine_release": "stable",
+  "exact_reference_key_parity": false,
+  "first_outside_refs": [
+    "Mark.10.53"
+  ],
+  "first_unexpected_reader_refs": [],
+  "first_unreachable_refs": [
+    "Mark.10.53"
+  ],
+  "full_readback_chapter_count": 1189,
+  "full_readback_evidence_sha256": "9c8a797b946fcbc3ba10915879c6698509211906010ceb4c2a12284a88b2483a",
+  "full_source_chapter_character_streams_verified": true,
+  "module_payload_sha256": "8f5f84f4d8ebcc27a4c51cd77469f98a5ff45d7687640c7d0537f75328b34b0b",
+  "original_publisher_document_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+  "outside_registered_versification_count": 1,
+  "published": false,
+  "reader_engine": "libsword",
+  "reader_version": "1.9.0",
+  "registry_source": "installed_sword_versification_mgr",
+  "resolved_reader_reference_count": 31169,
+  "reviewed_by": "Bible Resources project owner — source-bound Mark 10:53 stock Segond compromise continued for v1.0.0, 2026-11-23",
+  "reviewed_index_compromise_verified": true,
+  "reviewed_merge_count": 1,
+  "reviewed_merge_policy_sha256": "dbf90275cd1bba5ff9e17b8ac73e01cbd5cf1fc606d7d6a6027881d0833df518",
+  "reviewed_merges": [
+    {
+      "original_osis_ref": "Mark.10.53",
+      "stock_reader_osis_ref": "Mark.10.52"
+    }
+  ],
+  "source_osis_sha256": "1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d",
+  "source_reference_count": 31170,
+  "source_references_unreachable_count": 1,
+  "source_to_native_full_body_mismatch_count": 0,
+  "source_to_native_note_mismatch_count": 0,
+  "status": "stable_reference_index_verified_with_reviewed_merges",
+  "text_notes_markup_and_visuals_verified": false,
+  "unexpected_populated_reader_references_count": 0,
+  "unoccupied_registered_slots_count": 1,
+  "versification": "Segond"
+}

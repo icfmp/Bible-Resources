@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "Owner-requested v1.0.0 derivative with independent source/reader text and note parity; explicit known temporary Mark.10.53 stock Segond index merge; no fabricated publisher verse",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/pull/546",
+    "reviewed_by": "Bible Resources project owner — continuation to v1.0.0 requested on 2026-11-23",
+    "source_rights": "eBible fraLSG public-domain source; independently reviewed original electronic reference citations and historical printed evidence"
+  },
+  "editorial_path": "modules/lsg-1910/EDITORIAL.md",
+  "evidence_path": "modules/lsg-1910/SOURCE_VALIDATION.json",
+  "module_id": "lsg-1910",
+  "notes_path": "sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-1.0.0.md",
+  "package_sha256": "cc3b57ab0b61476a77b42fa19004956085d7608a974724c770cc2211adc67499",
+  "package_size_bytes": 4267040,
+  "schema_version": 1,
+  "sword_id": "BRLSG1910",
+  "tag": "lsg-1.0.0",
+  "title": "Louis Segond 1910 — 1.0.0",
+  "version": "1.0.0",
+  "zip_name": "BRLSG1910-1.0.0.zip"
+}

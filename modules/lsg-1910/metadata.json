@@ -2,6 +2,9 @@
   "canonical_edition_id": "louis-segond-1910-ebible",
   "category": "bible",
   "id": "lsg-1910",
+  "index_audit": {
+    "mode": "stock_reader_keys"
+  },
   "language": "fr",
   "origin": {
     "publisher": "eBible.org / Louis Segond",
@@ -10,7 +13,7 @@
   },
   "quality": {
     "edition": "reader_optimized",
-    "reviewed_by": "Bible Resources project owner, release approval 2026-11-09",
+    "reviewed_by": "Bible Resources project owner — reviewed 1.0.0 continuation requested 2026-11-23",
     "smoke_key": "John 3:16",
     "status": "approved"
   },
@@ -35,9 +38,5 @@
     }
   ],
   "versification": "Segond",
-  "version": "0.1.0",
-  "index_audit": {
-    "mode": "published_source_audit",
-    "manifest": "config/catalogue-import-lsg-0.1.0.json"
-  }
+  "version": "1.0.0"
 }

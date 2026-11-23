@@ -1,28 +1,22 @@
 {
-  "schema_version": 1,
-  "source_edition": "eBible fraLSG (Louis Segond 1910)",
-  "source_format": "USFX",
-  "source_document_sha256": "90a53c3a61f0c07a329d8fc19c593b8c353f2b3e5a6830dbf4c53d2b08fd2141",
-  "versification": "Segond",
-  "policy": "approved_explicit_temporary_adjacent_verse_index_merge",
-  "authorization": {
-    "who": "Bible Resources project owner",
-    "date": "2026-11-08",
-    "record": "User instruction: merge the two verses, indicate 52-53 if possible, and record upstream blockers for later.",
-    "scope": "Index compromise only; original Bible text and original publisher files must remain unchanged."
-  },
   "allowed_merges": [
     {
-      "authorial_source_key": "MRK.10.53",
-      "reader_source_key": "MRK.10.52",
-      "osis_source_key": "Mark.10.53",
-      "osis_reader_key": "Mark.10.52",
-      "preferred_display_label": "52–53",
-      "reason": "The stock Segond v11n has no Mark 10:53 key; the official SWORD importer appends the entire verse to Mark 10:52.",
-      "source_content_preserved": true,
       "independent_reference_access_lost": true,
+      "osis_reader_key": "Mark.10.52",
+      "osis_source_key": "Mark.10.53",
       "reversible": true,
+      "source_content_preserved": true,
       "status": "temporarily_authorized_versification_compromise"
     }
-  ]
+  ],
+  "authorization": {
+    "basis": "Reversible Mark 10:52-53 mapping previously approved for 0.1.0 and continued with user informed for version 1.0.0",
+    "date": "2026-11-23",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/545",
+    "who": "Bible Resources project owner"
+  },
+  "policy": "approved_explicit_temporary_adjacent_verse_index_merge",
+  "schema_version": 1,
+  "source_document_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+  "versification": "Segond"
 }

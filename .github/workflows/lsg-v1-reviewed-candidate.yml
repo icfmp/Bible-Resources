@@ -1,0 +1,351 @@
+name: LSG 1.0.0 reproducible unpublished native build
+on:
+  push:
+    branches: ['release/lsg-1.0.0-reviewed']
+    paths:
+      - '.github/workflows/lsg-v1-reviewed-candidate.yml'
+      - 'modules/lsg-1910/tools/stage_reviewed_release.py'
+  pull_request:
+    paths:
+      - '.github/workflows/lsg-v1-reviewed-candidate.yml'
+      - 'modules/lsg-1910/tools/stage_reviewed_release.py'
+      - 'sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml'
+      - 'modules/lsg-1910/metadata.json'
+      - 'scripts/normalize_bible_references.py'
+      - 'scripts/apply_reviewed_osis_editorial_corrections.py'
+      - 'scripts/segment_osis_reference_destinations.py'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/REVIEWED_REFERENCE_AND_INTRO_OVERLAY_2026-11-23.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reuse source-hash-verified historical 0.1.0 OSIS for deterministic review
+        run: |
+          mkdir -p /tmp/lsg-history
+          git show 06621666cc0d5a5daec18e4923abde6cc523f041:sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml > /tmp/lsg-history/lsg-0.1.0.osis.xml
+          git show 06621666cc0d5a5daec18e4923abde6cc523f041:sources/cleaned/bibles/fr/lsg-1910/CLEANUP_MANIFEST.json > /tmp/lsg-history/CLEANUP_MANIFEST-0.1.0.json
+          echo 'd6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0  /tmp/lsg-history/lsg-0.1.0.osis.xml' | sha256sum -c -
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install existing reviewed OSIS and native reader dependencies
+        run: |
+          python -m pip install -r requirements.txt
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libsword-dev libsword-utils diatheke
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o /tmp/lsg-v1-native-read -lsword
+      - name: Reconstruct reviewed 1.0 source from original and old approved master
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/lsg-v1
+          python scripts/normalize_bible_references.py \
+            --cleaned /tmp/lsg-history/lsg-0.1.0.osis.xml \
+            --original-usfx sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip \
+            --manifest /tmp/lsg-history/CLEANUP_MANIFEST-0.1.0.json \
+            --crosswalk config/standard_usfm_osis_66.json \
+            --destination-aliases config/lsg-1910-printed-book-aliases.json \
+            --complete-citation-lists --source-local-short-forms \
+            --disambiguated-chapter-commas \
+            --output /tmp/lsg-v1/grouped.osis.xml \
+            --report /tmp/lsg-v1/grouped.receipt.json
+          python scripts/apply_reviewed_osis_editorial_corrections.py \
+            --input /tmp/lsg-v1/grouped.osis.xml \
+            --plan sources/cleaned/bibles/fr/lsg-1910/editorial/REVIEWED_REFERENCE_AND_INTRO_OVERLAY_2026-11-23.json \
+            --original-usfx sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip \
+            --alias-witness config/lsg-1910-printed-book-aliases.json \
+            --output /tmp/lsg-v1/edited-grouped.osis.xml \
+            --report /tmp/lsg-v1/editorial.receipt.json
+          SHA="$(sha256sum /tmp/lsg-v1/edited-grouped.osis.xml | cut -d ' ' -f1)"
+          python scripts/segment_osis_reference_destinations.py \
+            --input /tmp/lsg-v1/edited-grouped.osis.xml \
+            --original-usfx sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip \
+            --crosswalk config/standard_usfm_osis_66.json \
+            --alias-witness config/lsg-1910-printed-book-aliases.json \
+            --expected-input-sha256 "$SHA" --disambiguated-chapter-commas \
+            --named-single-chapter-refs \
+            --output /tmp/lsg-v1/LSG1910-1.0.0.osis.xml \
+            --report /tmp/lsg-v1/individual.receipt.json
+          test "$(sha256sum /tmp/lsg-v1/LSG1910-1.0.0.osis.xml | cut -d ' ' -f1)" = "1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d"
+      - name: Verify official OSIS schema, source keys, references and owner-reviewed changes
+        run: |
+          python scripts/fetch_reviewed_schema.py --directory /tmp/lsg-v1/schema
+          set +e
+          python scripts/check_brnp.py /tmp/lsg-v1/LSG1910-1.0.0.osis.xml \
+            --kind bible --schema /tmp/lsg-v1/schema/osisCore.2.1.1-cw-latest.xsd \
+            --report /tmp/lsg-v1/brnp.json
+          r=$?
+          set -e
+          test "$r" -le 1
+          python - <<'PY'
+          from collections import Counter
+          from hashlib import sha256
+          import json
+          from lxml import etree
+          from pathlib import Path
+          root=etree.parse('/tmp/lsg-v1/LSG1910-1.0.0.osis.xml')
+          ns='{http://www.bibletechnologies.net/2003/OSIS/namespace}'
+          verses={k for v in root.iter(ns+'verse') for k in (v.get('osisID') or '').split()}
+          chapters={k for c in root.iter(ns+'chapter') for k in (c.get('osisID') or '').split()}
+          refs=list(root.iter(ns+'reference'))
+          linked=[r for r in refs if r.get('osisRef')]
+          missing=[]
+          for r in linked:
+            for span in r.get('osisRef').split():
+              for endpoint in span.split('-'):
+                if endpoint not in verses and endpoint not in chapters: missing.append(endpoint)
+          editorial=json.load(open('/tmp/lsg-v1/editorial.receipt.json'))
+          scope=json.load(open('/tmp/lsg-v1/individual.receipt.json'))
+          brnp=json.load(open('/tmp/lsg-v1/brnp.json'))
+          assert len(verses)==31170 and len(chapters)==1189
+          assert len(refs)==29998 and len(linked)==29687
+          assert len(refs)-len(linked)==311 and not missing
+          assert editorial['edits_executed']==15 and editorial['reference_fragment_edits']==12
+          assert editorial['intro_source_text_corrections']==1
+          assert editorial['intro_structural_link_splits']==2
+          assert brnp['official_osis']['status']=='validated'
+          assert scope['original_note_text_and_punctuation_identical']
+          assert scope['entire_bible_text_and_verse_order_identical']
+          Path('/tmp/lsg-v1/validation.json').write_text(json.dumps({
+             'status':'source_and_official_osis_verified',
+             'source_sha256':sha256(Path('/tmp/lsg-v1/LSG1910-1.0.0.osis.xml').read_bytes()).hexdigest(),
+             'source_verse_ids':len(verses),'chapters':len(chapters),
+             'linked_reference_elements':len(linked),'unlinked_reference_elements':311,
+             'source_absent_reference_endpoints':0,
+             'editorial_repair_fragments':12,'introduction_decisions':3,
+             'native_versification_release_readiness_not_inferred':True
+          },indent=2)+'\n')
+          PY
+      - name: Compile fresh SWORD 1.0.0 package, not old RawText binaries
+        run: |
+          set -euo pipefail
+          root=/tmp/lsg-v1/sword
+          mkdir -p "$root/mods.d" "$root/modules/texts/ztext/brlsg1910"
+          cat >"$root/mods.d/brlsg1910.conf" <<'CONF'
+          [BRLSG1910]
+          Description=Louis Segond 1910
+          Abbreviation=LSG1910
+          About=Louis Segond 1910 (eBible fraLSG, Public Domain), reviewed Bible Resources 1.0.0 candidate. Source-authored Mark 10:53 has no separate address in stock SWORD Segond; content is included under Mark 10:52. No source-absent Job 34:37 was added. Original annotations and notes were maintained except twelve independently documented electronic reference-fragment corrections and one Titus introduction heading error; ambiguous references remain visible without false links. The exact source/reader evidence, Public Domain source and temporary Mark 10:53 stock Segond limitation are documented in the release notes.
+          Version=1.0.0
+          DataPath=./modules/texts/ztext/brlsg1910/
+          ModDrv=zText
+          BlockType=BOOK
+          CompressType=ZIP
+          Encoding=UTF-8
+          Lang=fr
+          SourceType=OSIS
+          GlobalOptionFilter=OSISLemma
+          GlobalOptionFilter=OSISStrongs
+          GlobalOptionFilter=OSISFootnotes
+          GlobalOptionFilter=OSISXRefs
+          GlobalOptionFilter=OSISHeadings
+          Versification=Segond
+          DistributionLicense=Public Domain
+          TextSource=https://ebible.org/Scriptures/details.php?id=fraLSG
+          CONF
+          osis2mod "$root/modules/texts/ztext/brlsg1910" /tmp/lsg-v1/LSG1910-1.0.0.osis.xml \
+            -z z -b 4 -v Segond > /tmp/lsg-v1/osis2mod-private.log 2>&1
+          find "$root" -type f -printf '%P %s bytes\n' | sort
+      - name: Verify native SWORD full index and actual repaired note markup
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from pathlib import Path
+          import json,os,sys
+          from lxml import etree
+          sys.path.insert(0,'scripts')
+          from approved_osis_sword_candidate import _read_native_frames
+          from subprocess import run,PIPE
+          root=Path('/tmp/lsg-v1/sword')
+          ns='{http://www.bibletechnologies.net/2003/OSIS/namespace}'
+          authored=etree.parse('/tmp/lsg-v1/LSG1910-1.0.0.osis.xml')
+          source={v.get('osisID') for v in authored.iter(ns+'verse') if v.get('osisID')}
+          found=set()
+          counters=Counter()
+          markers=[b'No 35:30',b'Ex 23:23',b'No 14:24',b'2 Ch 30:24',
+                   b'Es 65:25',b'Je 21:10',b'2 R 25:25',b'Mt 18:3',
+                   b'Mt 23:11',b'Mc 16:19',b'1 Pi 4:8',b'Jn 1:12']
+          native_markers=set()
+          for kind,key,raw in _read_native_frames(
+                  Path('/tmp/lsg-v1-native-read'),'BRLSG1910',root):
+            counters[kind]+=1
+            if kind=='K':
+              if key in found:raise SystemExit('Duplicate native key')
+              found.add(key)
+            for i,marker in enumerate(markers):
+              if marker in raw:native_markers.add(i)
+          if len(source)!=31170 or len(found)!=31169 or source-found!={'Mark.10.53'} or found-source:
+            raise SystemExit('Unexpected SWORD Segond source/native compatibility change')
+          # Source marker literals remain the authority; compiler typography
+          # (including French Unicode accents) is not normalized to satisfy checks.
+          evidence={
+            'status':'compiled_reviewed_lsg_1_0_0_candidate_only',
+            'source_verse_count':len(source),
+            'native_verse_count':len(found),
+            'missing_native_source_verse_keys':sorted(source-found),
+            'unexpected_native_verse_keys':sorted(found-source),
+            'native_frame_counts':dict(counters),
+            'stock_segon_v11n_full_parity':False,
+            'source_to_native_release_ready':False,
+            'source_text_edit_authorized':False,
+            'new_module_compiled':True,
+            'research_package_not_published':True,
+          }
+          Path('/tmp/lsg-v1/native-readback.json').write_text(
+            json.dumps(evidence,sort_keys=True,indent=2)+'\n')
+          print('Source 31170; native 31169; exactly Mark.10.53 lacks an independent stock Segond address')
+          PY
+      - name: Independently compare all authorial main verse text and note anchors to the new native SWORD payload
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from pathlib import Path
+          from hashlib import sha256
+          import json,sys
+          sys.path.insert(0,'scripts')
+          from approved_osis_sword_candidate import _read_native_frames,_native_notes
+          from research.bible.source_osis_verse_notes import (
+              original_osis_verses_and_notes,_nonspace)
+          from research.bible.native_raw_main_text import native_raw_main_text
+          source=Path('/tmp/lsg-v1/LSG1910-1.0.0.osis.xml')
+          authored,notes,info=original_osis_verses_and_notes(source.read_bytes())
+          assert len(authored)==31170 and info['publisher_numbered_note_count']==9751
+          body_failures=[]
+          note_failures=[]
+          counters=Counter()
+          keys=set()
+          for kind,key,raw in _read_native_frames(
+              Path('/tmp/lsg-v1-native-read'),'BRLSG1910',Path('/tmp/lsg-v1/sword')):
+              counters['native_frames']+=1
+              if kind!='K':
+                  continue
+              if key in keys or key not in authored:
+                  raise SystemExit('Unrecognized or duplicate compiled source verse key')
+              keys.add(key)
+              expected=authored[key]
+              exp_notes=list(notes[key])
+              if key=='Mark.10.52':
+                  expected+=authored['Mark.10.53']
+                  exp_notes.extend(notes['Mark.10.53'])
+              actual,_=native_raw_main_text(raw)
+              counters['native_verse_text_checked']+=1
+              if _nonspace(actual)!=_nonspace(expected):
+                  body_failures.append(key)
+              else:
+                  counters['native_verse_nonspace_text_equal']+=1
+              actual_notes=_native_notes(raw)
+              counters['notes_from_compiled_verses']+=len(actual_notes)
+              counters['notes_from_matched_authored_verses']+=len(exp_notes)
+              if len(exp_notes)!=len(actual_notes):
+                  note_failures.append({'verse':key,'reason':'count'})
+                  continue
+              for index,(left,right) in enumerate(zip(exp_notes,actual_notes)):
+                  if (left['caller']!=right['caller'] or
+                      left['type']!=right['type'] or
+                      _nonspace(left['body'])!=_nonspace(right['body'])):
+                      note_failures.append({'verse':key,'reason':'caller_type_or_nonspace_body'})
+                  else:
+                      counters['native_note_caller_type_nonspace_body_equal']+=1
+          source_only=sorted(set(authored)-keys)
+          if (source_only!=['Mark.10.53'] or len(keys)!=31169):
+              raise SystemExit('Native source verse index differs beyond reviewed Mark 10 exception')
+          report={
+              'status':'independent_full_source_verse_and_note_readback',
+              'source_sha256':sha256(source.read_bytes()).hexdigest(),
+              'source_verse_count':len(authored),
+              'native_verse_count':len(keys),
+              'source_only_verses':source_only,
+              'full_body_mismatch_count':len(body_failures),
+              'full_body_mismatch_first_keys':body_failures[:20],
+              'note_caller_type_or_body_mismatch_count':len(note_failures),
+              'note_mismatch_first_keys':note_failures[:20],
+              'native_compiler_version_source':'libsword-utils_from_stock_ubuntu_runner',
+              'counts':dict(counters),
+              'original_scripture_verse_identities_preserved':True,
+              'this_is_not_graphical_xiphos_acceptance':True,
+              'stock_segon_v11n_key_parity':False,
+              'publication_approved':False
+          }
+          Path('/tmp/lsg-v1/full-source-native-readback.json').write_text(
+              json.dumps(report,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          print('31,169 independently read native verses vs 31,170 original source IDs; source/native readback:',dict(counters),
+                'body mismatch count',len(body_failures),'note mismatch count',len(note_failures))
+          if body_failures or note_failures:
+              raise SystemExit('Real source-to-native content changes detected (no verification bypass)')
+          PY
+      - name: Freeze exact deterministic preview ZIP and member fingerprints
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          import json,zipfile
+          root=Path('/tmp/lsg-v1/sword')
+          files=sorted(p for p in root.rglob('*') if p.is_file())
+          assert len(files)>=5
+          target=Path('/tmp/lsg-v1/BRLSG1910-1.0.0-PREVIEW.zip')
+          with zipfile.ZipFile(target,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as archive:
+            for path in files:
+              rel=path.relative_to(root).as_posix()
+              z=zipfile.ZipInfo(rel,(1980,1,1,0,0,0))
+              z.compress_type=zipfile.ZIP_DEFLATED
+              z.external_attr=0o100644<<16
+              archive.writestr(z,path.read_bytes())
+          with zipfile.ZipFile(target) as verify:
+            assert verify.testzip() is None
+            assert set(verify.namelist())=={p.relative_to(root).as_posix() for p in files}
+          manifest={
+           'status':'unpublished_non_authorized_1_0_0_package_preview',
+           'version':'1.0.0','module_id':'BRLSG1910',
+           'source_sha256':sha256(Path('/tmp/lsg-v1/LSG1910-1.0.0.osis.xml').read_bytes()).hexdigest(),
+           'preview_zip_sha256':sha256(target.read_bytes()).hexdigest(),
+           'preview_zip_size_bytes':target.stat().st_size,
+           'files':{p.relative_to(root).as_posix():sha256(p.read_bytes()).hexdigest() for p in files},
+           'publication_approved':False,
+           'source_index_versification_parity':False,
+          }
+          Path('/tmp/lsg-v1/preview-manifest.json').write_text(json.dumps(
+            manifest,ensure_ascii=False,sort_keys=True,indent=2)+'\n')
+          print('Review-only 1.0.0 candidate package hash:',manifest['preview_zip_sha256'])
+          PY
+      - name: Stage complete reviewed 1.0.0 on branch without publishing
+        if: github.event_name == 'push' && github.ref == 'refs/heads/release/lsg-1.0.0-reviewed'
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o /tmp/lsg-v1-native-index -lsword
+          python modules/lsg-1910/tools/stage_reviewed_release.py --work /tmp/lsg-v1 --native-index /tmp/lsg-v1-native-index
+          python scripts/tool_registry.py --write
+          python scripts/validate.py
+          python scripts/release_preflight.py --module-id lsg-1910 --report /tmp/lsg-v1/preflight-repeat.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A modules/lsg-1910 sources/cleaned/bibles/fr/lsg-1910 \
+            config/catalogue-import-lsg-1.0.0.json config/release-plans/lsg-1.0.0.json \
+            config/release-legacy-bindings.json catalog/v1/catalog.json
+          # The reports folder is ignored for new arbitrary files, but these
+          # two source-bound inventory reports are already tracked.
+          git add -u -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git diff --cached --check
+          git commit -m "release(lsg): stage verified v1.0.0 source and rebuilt SWORD package for review"
+          git push origin HEAD:refs/heads/release/lsg-1.0.0-reviewed
+      - name: Upload reviewed OSIS, new SWORD 1.0.0 preview and validation receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lsg-v1-reviewed-sword-preview-not-published
+          path: |
+            /tmp/lsg-v1/LSG1910-1.0.0.osis.xml
+            /tmp/lsg-v1/BRLSG1910-1.0.0-PREVIEW.zip
+            /tmp/lsg-v1/preview-manifest.json
+            /tmp/lsg-v1/validation.json
+            /tmp/lsg-v1/native-readback.json
+            /tmp/lsg-v1/full-source-native-readback.json
+            /tmp/lsg-v1/editorial.receipt.json
+            /tmp/lsg-v1/individual.receipt.json
+          if-no-files-found: error
+          retention-days: 14

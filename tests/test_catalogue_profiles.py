@@ -22,8 +22,10 @@ class ApprovedProfileTests(unittest.TestCase):
         profiles = approved_profiles(ROOT, ROOT / "modules/lsg-1910", self.module)
         self.assertEqual(set(profiles), {"fr"})
         p = profiles["fr"]
-        self.assertEqual(p["approved_at"], "2026-11-10")
-        self.assertEqual(p["revision"], "2026-11-10.1")
+        self.assertEqual(p["approved_at"], "2026-11-23")
+        self.assertEqual(p["revision"], "2026-11-23.1")
+        self.assertEqual(self.module["version"], "1.0.0")
+        self.assertIn("1.0.0", p["short_markdown"])
         self.assertIn("1 Timothée 3.16", p["short_markdown"])
         self.assertIn("Actes 20.28", p["long_markdown"])
         self.assertIn("Jean 1.18", p["long_markdown"])
