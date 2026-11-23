@@ -14,6 +14,7 @@ on:
       - 'config/lsg-1910-printed-book-aliases.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/UNRESOLVED_REFERENCE_LEDGER_2026-11-23.json'
       - 'sources/cleaned/bibles/fr/lsg-1910/editorial/SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json'
+      - 'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json'
 permissions:
   contents: read
 jobs:
@@ -265,6 +266,48 @@ jobs:
                      for entry in parallel)):
               raise SystemExit('Parallel versification evidence must remain non-authoritative until actual print-note collation')
           print('Source text and nine historical numbering candidates kept independent:',len(parallel))
+          print_witness=json.loads(Path(
+              'sources/cleaned/bibles/fr/lsg-1910/editorial/PRINTED_1910_REFERENCE_COLLATION_2026-11-23.json'
+          ).read_text(encoding='utf-8'))
+          proven=print_witness['records']
+          proof_map={r['record_id']:r for r in proven}
+          original_by_id={r['record_id']:r for r in expected}
+          source_scan=print_witness['facsimile']
+          if (print_witness['schema_version']!=1
+              or print_witness['source_original_usfx_zip_sha256']!=sha256(orig.read_bytes()).hexdigest()
+              or print_witness['authored_reference_label_edits_approved']!=0
+              or print_witness['automatic_target_link_edits_approved']!=0
+              or print_witness['print_readings_requiring_no_change']!=len(proven)
+              or len(proof_map)!=len(proven)
+              or len(proven)>len(expected)
+              or source_scan['edition'].find('1910')<0
+              or source_scan['retrieved_djvu_bytes']<200000000
+              or len(source_scan['retrieved_djvu_sha256'])!=64
+              or not source_scan['source_file_url'].startswith('https://commons.wikimedia.org/wiki/')
+              or not source_scan['extraction_run'].startswith('https://github.com/icfmp/Bible-Resources/actions/runs/')):
+              raise SystemExit('Original 1910 printed-witness evidence has changed identity or implied unapproved edits')
+          for record_id, witness in proof_map.items():
+              source_record=original_by_id.get(record_id)
+              if (source_record is None
+                  or witness['original_usfm_book']!=source_record['original_usfm_book']
+                  or witness['source_note_origin']!=source_record['source_note_origin']
+                  or witness['original_usfx_reference_label']!=source_record['original_citation_label']
+                  or witness['normalized_marginal_citation']!=witness['original_usfx_reference_label']
+                  or witness['printed_marginal_note_matches_original_usfx'] is not True
+                  or witness['print_reading_status']!='visually_verified_from_actual_original_1910_page'
+                  or witness['original_1910_djvu_page']<1
+                  or not witness['page_url'].endswith('/'+str(witness['original_1910_djvu_page']))
+                  or not witness['visually_read_marginal_citation']
+                  or witness['authorized_change'] is not None):
+                  raise SystemExit('Printed 1910 witness must be attested per original note with an unchanged citation')
+          for row in expected:
+              historical=('visually_verified_from_actual_original_1910_page'
+                          if row['record_id'] in proof_map
+                          else 'pending_manual_facsimile_collation')
+              if row['printed_witness_status']!=historical:
+                  raise SystemExit('Unresolved source note print status changed without an exact visual evidence record')
+          print('Independent actual 1910 printed-note page readings:',len(proven),
+                'pending:',len(expected)-len(proven))
           comparison=json.loads(Path(
               'sources/cleaned/bibles/fr/lsg-1910/editorial/SECONDARY_DIGITAL_CITATION_COMPARISON_2026-11-23.json'
           ).read_text(encoding='utf-8'))
@@ -286,13 +329,19 @@ jobs:
               raise SystemExit('Digital witness comparison must remain exact-original, distinct from print certification and without silent edits')
           compared_counts=Counter()
           for row in compared:
+              if row['record_id'] in proof_map:
+                  witness=proof_map[row['record_id']]
+                  if (witness['secondary_digital_reference_label']!=row['secondary_citation_label']
+                      or witness['printed_marginal_note_matches_secondary_digital'] is not
+                          (witness['normalized_marginal_citation']==row['secondary_citation_label'])):
+                      raise SystemExit('Printed citation disagrees with the secondary comparison record')
               source_label=row['original_citation_label']
               other=row['secondary_citation_label']
               computed=('text_identical_in_separately_hosted_digital_witness'
                         if source_label==other else
                         'digital_witness_disagrees_with_original_usfx')
               if (row['comparison']!=computed or
-                  row['historical_print_status']!='not_collated_from_printed_1910_reference_note'
+                  row['historical_print_status']!=('visually_verified_from_actual_original_1910_page' if row['record_id'] in proof_map else 'not_collated_from_printed_1910_reference_note')
                   or row['authorized_change'] is not None or not other
                   or not row['secondary_uri'].startswith('https://biblia.com/bible/lsg/')):
                   raise SystemExit('Secondary digital witness status/content invalid or wrongly editorially approved')
