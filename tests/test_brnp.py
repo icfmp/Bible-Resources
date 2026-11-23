@@ -275,6 +275,35 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         ), kind="commentary")
         self.assertIn("COMMENTARY_REFERENCE_INVALID", report["finding_codes"])
 
+    def test_unresolved_cross_reference_must_not_be_guessed(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><verse osisID="Gen.1.1">'
+            '<reference>See some passage</reference></verse></chapter>'
+        ))
+        self.assertIn("UNRESOLVED_REFERENCE_TARGET", report["finding_codes"])
+
+    def test_reviewed_cross_reference_is_accepted(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><verse osisID="Gen.1.1">'
+            '<reference osisRef="Gen.1.2">See another verse</reference>'
+            '</verse></chapter>'
+        ))
+        self.assertNotIn("UNRESOLVED_REFERENCE_TARGET", report["finding_codes"])
+
+    def test_poetry_line_requires_reviewed_stanza_group(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><l>Ungrouped line</l>'
+            '<verse osisID="Gen.1.1">Text</verse></chapter>'
+        ))
+        self.assertIn("POETRY_LINE_OUTSIDE_GROUP", report["finding_codes"])
+
+    def test_grouped_poetry_is_accepted(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><lg><l>First line</l>'
+            '<l>Second line</l></lg><verse osisID="Gen.1.1">Text</verse></chapter>'
+        ))
+        self.assertNotIn("POETRY_LINE_OUTSIDE_GROUP", report["finding_codes"])
+
     def test_source_unchanged(self):
         content = document('<verse osisID="Gen.1.1">Test</verse>')
         self.path.write_text(content, encoding="utf-8")
