@@ -211,6 +211,44 @@ jobs:
             scripts/sword_native_raw_corpus.cpp \
             -o /tmp/lsg-native-witness/native-raw -lsword
           command -v osis2mod
+      - name: Exercise actual libSWORD OSISHTMLHREF passage-link renderer
+        run: |
+          cat >/tmp/lsg-native-witness/osis-reference-html.cpp <<'CPP'
+          #include <sword/osishtmlhref.h>
+          #include <sword/swbuf.h>
+          #include <sword/versekey.h>
+          #include <iostream>
+          #include <string>
+          static int anchors(const std::string& text) {
+              int count=0;
+              const std::string needle="<a href=";
+              for (size_t pos=0;(pos=text.find(needle,pos))!=std::string::npos;
+                   pos+=needle.size()) ++count;
+              return count;
+          }
+          int main() {
+              sword::OSISHTMLHREF html;
+              sword::VerseKey key("Gen.1.1");
+              sword::SWBuf grouped(
+                  "<reference osisRef=\"Gen.1.1 Exod.2.1\">Ge 1:1; Ex 2:1</reference>");
+              sword::SWBuf individual(
+                  "<reference osisRef=\"Gen.1.1\">Ge 1:1</reference>; "
+                  "<reference osisRef=\"Exod.2.1\">Ex 2:1</reference>");
+              if (html.processText(grouped,&key) ||
+                  html.processText(individual,&key)) return 2;
+              std::string one(grouped.c_str()),two(individual.c_str());
+              std::cout << "SWORD grouped HTML anchors: " << anchors(one)
+                        << " | individual HTML anchors: " << anchors(two) << "\n";
+              if (anchors(one)!=1 || anchors(two)!=2) return 3;
+              if (two.find("Gen.1.1")==std::string::npos ||
+                  two.find("Exod.2.1")==std::string::npos) return 4;
+              return 0;
+          }
+          CPP
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            /tmp/lsg-native-witness/osis-reference-html.cpp \
+            -o /tmp/lsg-native-witness/osis-reference-html -lsword
+          /tmp/lsg-native-witness/osis-reference-html
       - name: Compile original, grouped and individually linked candidates into isolated SWORD engines
         run: |
           python - <<'PY'
