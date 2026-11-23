@@ -68,7 +68,7 @@ jobs:
                   raise SystemExit('OSIS content/punctuation/structure altered beyond the first title type')
               if x.attrib!=y.attrib:
                   if (x.tag!=ns+'title' or 'type' in x.attrib or
-                      dict(y.attrib)!={**dict(x.attrib),'type':'section'}):
+                      dict(y.attrib)!={**dict(x.attrib),'type':'x-section'}):
                       raise SystemExit('Unapproved OSIS attribute alteration')
                   changed['heading_types_added']+=1
           old_verse_keys={v.get('osisID') for v in before.iter(ns+'verse') if v.get('sID')}

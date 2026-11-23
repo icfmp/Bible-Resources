@@ -5,7 +5,7 @@ OSIS 2.1.1 permits explicit section title types. The stable SWORD osis2mod
 compiler otherwise stores an untyped title immediately after a chapter sID in
 a chapter intro (verse 0), not with verse 1. That makes it invisible in verse-
 indexed readers. This generic, source-pinned candidate overlay adds only
-type="section" to *existing* first title tags. No heading text is changed.
+type="x-section" to *existing* first title tags. No heading text is changed.
 
 Historical original and approved cleaned files are never modified in place.
 """
@@ -68,7 +68,7 @@ def annotate(source: bytes) -> tuple[bytes, dict]:
         label = source[match.end("opening"):following].decode("utf-8")
         if not label.strip():
             raise PreverseSectionError("Empty source heading at " + name)
-        revisions.append((start, match.end("opening"), b'<title type="section">'))
+        revisions.append((start, match.end("opening"), b'<title type="x-section">'))
         chapters.append(name)
         if len(source_sample) < 12:
             source_sample.append({"chapter": name, "original_title": label})
@@ -89,10 +89,10 @@ def annotate(source: bytes) -> tuple[bytes, dict]:
     undo = candidate
     for index, (start, _end, _replacement) in reversed(list(enumerate(revisions))):
         # Earlier inserted attributes still shift this later opening tag.
-        pos = start + len(b' type="section"') * index
-        if undo[pos:pos + len(b'<title type="section">')] != b'<title type="section">':
+        pos = start + len(b' type="x-section"') * index
+        if undo[pos:pos + len(b'<title type="x-section">')] != b'<title type="x-section">':
             raise PreverseSectionError("Failed reversible source byte check")
-        undo = undo[:pos] + b"<title>" + undo[pos + len(b'<title type="section">'):]
+        undo = undo[:pos] + b"<title>" + undo[pos + len(b'<title type="x-section">'):]
     if undo != source:
         raise PreverseSectionError("Source cannot be restored byte-identically")
     try:

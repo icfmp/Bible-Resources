@@ -41,14 +41,14 @@ class PreverseSectionTests(unittest.TestCase):
         self.assertEqual(report["changed_chapters"],["Rom.1","Rom.2"])
         self.assertEqual(report["original_sha256"],sha256(original).hexdigest())
         self.assertEqual(report["candidate_sha256"],sha256(revised).hexdigest())
-        self.assertIn(b'<title type="section">Adresse et salutation</title>',revised)
-        self.assertIn(b'<title type="section">Les paiens</title>',revised)
+        self.assertIn(b'<title type="x-section">Adresse et salutation</title>',revised)
+        self.assertIn(b'<title type="x-section">Les paiens</title>',revised)
         self.assertIn(b'<title>Milieu du chapitre</title>',revised)
         self.assertIn(b'<title type="chapter">Un vrai titre de chapitre</title>',revised)
         self.assertIn(b'<title type="parallel">V. 1-7: cf.</title>',revised)
-        self.assertEqual(revised.count(b'type="section"'),2)
+        self.assertEqual(revised.count(b'type="x-section"'),2)
         self.assertEqual(
-            revised.replace(b'<title type="section">',b'<title>'),original)
+            revised.replace(b'<title type="x-section">',b'<title>'),original)
         self.assertEqual(
             [x.text for x in ET.fromstring(revised).iter("title")],
             [x.text for x in ET.fromstring(original).iter("title")])
