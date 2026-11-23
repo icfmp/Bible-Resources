@@ -239,6 +239,10 @@ jobs:
               json.dumps(report,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
           print('Unlinked 1910 source-citation classes:',dict(classes))
           print('Review-only category examples:',examples)
+          print('Unattested-reference original note evidence (no editorial corrections):')
+          for entry in records:
+              if entry['parser_reason']=='unattested_reference_start':
+                  print('LSG_UNATTESTED_CITATION='+json.dumps(entry,ensure_ascii=False,separators=(',',':')))
           PY
       - name: Build second isolated candidate with one clickable reference per passage
         run: |
