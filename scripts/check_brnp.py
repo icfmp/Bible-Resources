@@ -217,8 +217,18 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
                                    "line": line, "guard_code": exc.code})
         if tag == "div" and element.get("annotateRef") and element.get("annotateType") != "commentary":
             errors.append({"code": "ANNOTATION_TYPE", "line": line})
-        if tag == "reference" and element.get("osisRef") == "":
-            errors.append({"code": "EMPTY_REFERENCE", "line": line})
+        if tag == "reference":
+            # A printed reference label is not a verified OSIS target.
+            # Report missing/unreviewed destinations; never guess one.
+            target = element.get("osisRef")
+            if not target or not target.strip():
+                errors.append({"code": "UNRESOLVED_REFERENCE_TARGET", "line": line})
+            elif target != target.strip():
+                errors.append({"code": "REFERENCE_TARGET_WHITESPACE", "line": line})
+        if tag == "l" and not any(
+            ancestor.tag == NS + "lg" for ancestor in element.iterancestors()
+        ):
+            errors.append({"code": "POETRY_LINE_OUTSIDE_GROUP", "line": line})
     if active:
         errors.append({"code": "UNCLOSED_VERSE_MILESTONE", "count": len(active)})
     if chapters_active:
