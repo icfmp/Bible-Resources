@@ -267,6 +267,41 @@ def main():
           'evidence_url':'https://github.com/icfmp/Bible-Resources/pull/546',
           'source_rights':'eBible fraLSG public-domain source; independently reviewed original electronic reference citations and historical printed evidence'}})
     # Fail-closed offline release preflight; never calls the publishing API.
+    # The historical 0.1.0 publication is immutable but ceases to be the
+    # ACTIVE distribution route when 1.0.0 takes its place. Move its exact
+    # old binding into an edition-owned archived record. Do not change a
+    # single byte of its existing Release, ZIP hashes or print evidence.
+    legacy_path=ROOT/'config/release-legacy-bindings.json'
+    legacy=read(legacy_path)
+    old_entries=[e for e in legacy.get('entries',[])
+                 if e.get('module_id')=='lsg-1910']
+    if (len(old_entries)!=1 or old_entries[0].get('version')!='0.1.0' or
+        old_entries[0].get('tag')!='lsg-0.1.0' or
+        old_entries[0].get('release_sha256')!=
+        'af2f80ea84f40a6bf62993c9e65c2e2061e1ec20b34b0772a4eb775dd47723c1' or
+        old_entries[0].get('catalogue_sha256')!=
+        'f3f74a1016f708e10263b5628e606a73b727c0e80fbb7e131d195c4b11d86c51'):
+        raise SystemExit('Historic published LSG 0.1.0 record identity differs')
+    archive=editorial/'releases/LSG-0.1.0-LEGACY-BINDING.json'
+    if archive.exists():
+        raise SystemExit('A previous historical legacy record is already archived')
+    write(archive,{
+        'schema_version':1,
+        'status':'immutable_historic_publication_not_current_catalogue_route',
+        'prior_registry_path':'config/release-legacy-bindings.json',
+        'superseded_by_current_tag':TAG,
+        'original_entry':old_entries[0],
+        'original_entry_sha256':sha(json.dumps(old_entries[0],
+                                ensure_ascii=False,sort_keys=True).encode()),
+        'reason':'Historical publication still accessible by lsg-0.1.0; '
+                 'current curated catalogue must have exactly one active '
+                 'release plan, v1.0.0. Original approved 0.1.0 hashes preserved.',
+    })
+    legacy['entries']=[e for e in legacy['entries']
+                       if e.get('module_id')!='lsg-1910']
+    write(legacy_path,legacy)
+    # Re-run existing production coverage unaltered. It will reject either
+    # a missing current plan or an unarchived duplicate route.
     contract=coverage(ROOT,built=dist)
     if not any(plan['tag']==TAG for _,plan in contract['planned']):
         raise SystemExit('Reviewed release plan missing from exact catalogue coverage')
