@@ -26,25 +26,27 @@ The [strict full-list test and candidate build #45130871622](https://github.com/
 | Check | Original cleaned master | Candidate |
 | --- | ---: | ---: |
 | Note origins with verified machine address | 0 | **9,751** |
-| Note destinations with entire source label mapped | 0 | **9,308** |
-| Note destinations intentionally unlinked | 9,751 | **443** |
+| Note destinations with entire source label mapped | 0 | **9,345** |
+| Note destinations intentionally unlinked | 9,751 | **406** |
 | Introduction spans linked | 0 | **174** |
 | Introduction spans intentionally unlinked | 177 | **3** |
-| Total additional `osisRef` attributes | — | **19,233** |
+| Total additional `osisRef` attributes | — | **19,270** |
 
-- Candidate: 30,168,504 bytes, SHA-256 `289548b4a3fdabbf8c8edc4b3722aa1ee870385a830d2ed8a271a7a282281f36`. Exactly 9,751 + 9,308 + 174 = 19,233 added attributes, **zero existing attributes rewritten**.
+- Candidate: 30,169,841 bytes, SHA-256 `35edf5611fe48a7521a558e717e7a37f7040f42728b6a7be2817391770e14f09`. Exactly 9,751 + 9,345 + 174 = 19,270 added attributes, **zero existing attributes rewritten**.
 - The parser follows the source shorthand in 2,531 semicolon book-context repetitions, each on a fully verified, fully consumed note. No unsupported label or unattested verse is assigned a guessed target.
 - Both source and candidate passed the independently pinned official OSIS schema check. BRNP now reports **443 unresolved destination labels and 3 unresolved introduction labels**, compared with 9,751/177 before; no new finding category was introduced.
 - The [native SWORD cross-compiler comparison in the same run](https://github.com/icfmp/Bible-Resources/actions/runs/45130871622) compiled the old and candidate files into **two isolated temporary SWORD modules** and compared **32,426** ordered raw frames, including **31,169** populated native verse entries. The source's 31,170 authored verses and the existing Segond SWORD Mark 10:52–53 indexing compromise must not be conflated.
-- All native differences were limited to the 9,751 expected origin `osisRef` attributes, 9,308 expected printed-destination `osisRef` attributes and 174 expected introduction `osisRef` attributes. **Zero unrelated raw native changes.** This proves engine preservation and scope of the changes, **not** actual clickable rendering in Xiphos, AndBible or Bible.
+- All native differences were limited to the 9,751 expected origin `osisRef` attributes, 9,345 expected printed-destination `osisRef` attributes and 174 expected introduction `osisRef` attributes. **Zero unrelated raw native changes.** This proves engine preservation and scope of the changes, **not** actual clickable rendering in Xiphos, AndBible or Bible.
 - All authorial words, note captions, original destination labels, identifiers, poetry, text order and punctuation are preserved. No published module has been altered.
 
 ### Unresolved original source cases — genuine questions, not test exceptions
 
-Of the 9,751 notes, **443** are intentionally left without machine destinations:
+Of the 9,751 notes, **406** are intentionally left without machine destinations:
 - **351** complete labels do not fit the approved, fully consumed reference grammar (e.g. `etc.`, `v.`, chapter-only or other mixed text); the printed label itself is preserved.
 - **55** complete-label attempts include at least one **source-absent** or contradictory target, such as `Jn 1:52` or `Ex 20:11, 31, 17`. A present-number/range mistake in the digital source or the printed edition must be independently checked; do not create an absent verse or omit the invalid part to make the link look complete.
-- **37** use a source-digitization abbreviation not established by the independent printed 1910 table; e.g. `Mal` rather than the edition-table abbreviation `Ma`. Preserve the source's spelling until a verified provider-specific alias decision exists.
+- **37 additional notes** used the original eBible USFX spelling `Mal`, while the printed 1910 abbreviation table uses `Ma`. These are now linked under an **independently named source-provider variant**, pinned to the exact original USFX ZIP SHA-256 and verified against actual `xt` citation tokens. The source's literal `Mal` is preserved; the printed table remains unchanged. A provider alias can never override any historical printed alias.
+
+The 406 remaining unlinked labels consist of **351** complete strings outside the reviewed unambiguous grammar and **55** strings with one or more nonexistent source target verses. No remaining literal book-abbreviation mismatch was observed in the tested LSG corpus.
 
 The candidate's JSON evidence includes a bounded set of exact `book` / `source_origin` / `printed_destination` / `reason` findings to resume the physical-edition review without repeating the audit.
 
@@ -57,6 +59,12 @@ The candidate's JSON evidence includes a bounded set of exact `book` / `source_o
 | 1 John | `1:1-4 (voir le prologue de l’évangile de Jn 1:1-18)` | Two embedded references and descriptive text |
 
 These three texts were inherited from the original USFX, not introduced by source normalization. A historical-print correction needs a separate reviewed editorial dossier and source-preserving before/after decision.
+
+## Last corpus checkpoint: provider-variant review
+
+The [isolated whole-corpus Actions #45132279039](https://github.com/icfmp/Bible-Resources/actions/runs/45132279039) compared two compiled SWORD engines after incorporating the exact `Mal` source-provider spelling. It confirmed **9,345** completely interpreted reference labels, **406** intentionally preserved without `osisRef`, and **zero unexpected native markup changes** across all 32,426 raw SWORD frames. Candidate SHA-256 is `35edf5611fe48a7521a558e717e7a37f7040f42728b6a7be2817391770e14f09`.
+
+There are **19,532** individual explicit target address tokens distributed across the 9,345 linked note labels; **4,865** note labels have multiple target tokens. A list of addresses inside one valid `osisRef` is not equivalent to separately clickable links across readers. Do not equate native XML storage with cross-reader user-facing navigation.
 
 ## Remaining release/merge gates
 
