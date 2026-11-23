@@ -118,7 +118,7 @@ def _printed_book_aliases(path: Path, crosswalk: dict,
     if variants is not None:
         if (not isinstance(variants, dict) or
                 variants.get("status") !=
-                    "source_provider_spelling_not_printed_1910_abbreviation" or
+                    "source_provider_spelling_not_printed_edition_abbreviation" or
                 variants.get("witness_usfx_zip_sha256") != original_usfx_zip_sha256 or
                 not isinstance(variants.get("evidence"), str) or
                 len(variants["evidence"]) < 32 or
