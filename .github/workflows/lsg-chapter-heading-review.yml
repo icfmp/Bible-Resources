@@ -35,6 +35,13 @@ jobs:
       - name: Validate official OSIS schema unchanged Bible verse identities and full headings
         run: |
           python scripts/fetch_reviewed_schema.py --directory /tmp/lsg-heading-schema
+          set +e
+          python scripts/check_brnp.py /tmp/lsg-preverse-section-candidate.osis.xml \
+            --kind bible --schema /tmp/lsg-heading-schema/osisCore.2.1.1-cw-latest.xsd \
+            --report /tmp/lsg-heading-official-xsd.json
+          check_exit=$?
+          set -e
+          test "$check_exit" -le 1
           python - <<'PY'
           from pathlib import Path
           from hashlib import sha256
@@ -47,8 +54,9 @@ jobs:
                                  no_network=True,recover=False,huge_tree=False)
           before=etree.parse(str(original),parser=parser)
           after=etree.parse(str(candidate),parser=parser)
-          schema=etree.XMLSchema(etree.parse('/tmp/lsg-heading-schema/osisCore.2.1.1-cw-latest.xsd'))
-          schema.assertValid(after)
+          official=json.load(open('/tmp/lsg-heading-official-xsd.json'))
+          if official['official_osis']['status']!='validated':
+              raise SystemExit('Independent pinned official OSIS XSD validation failed')
           ns='{http://www.bibletechnologies.net/2003/OSIS/namespace}'
           old_tags=list(before.iter())
           new_tags=list(after.iter())
