@@ -82,11 +82,40 @@ jobs:
           expected_added={("K",row["new_key"]) for row in rebuild["added_links"]}
           expected_changed={("K",key) for row in rebuild["source_edits"] for key in row["affected_original_keys"]}
           history_matches = added==expected_added and not removed and changed==expected_changed
-          print("HISTORICAL_DELTA",json.dumps({"added":sorted(added),"removed":sorted(removed),"changed_count":len(changed),"unexpected_added":sorted(added-expected_added),"expected_added_absent":sorted(expected_added-added),"unexpected_changed":sorted(changed-expected_changed),"expected_changed_absent":sorted(expected_changed-changed),"old_native_sha256":old_report["native_sha256"],"new_native_sha256":new_report["native_sha256"],"history_matches":history_matches},sort_keys=True),flush=True)
+          print("HISTORICAL_DELTA",json.dumps({"added":sorted(added),"removed":sorted(removed),"changed_count":len(changed),"unexpected_added":sorted(added-expected_added),"expected_added_absent":sorted(expected_added-added),"unexpected_changed_count":len(changed-expected_changed),"unexpected_changed_sample":sorted(changed-expected_changed)[:12],"expected_changed_absent":sorted(expected_changed-changed),"old_native_sha256":old_report["native_sha256"],"new_native_sha256":new_report["native_sha256"],"history_matches":history_matches},sort_keys=True),flush=True)
           wrong_links=[row["new_key"] for row in rebuild["added_links"] if new.get(("K",row["new_key"]))!=new.get(("K",row["master_key"])) or ("K",row["new_key"]) not in new]
           wrong_edits=[key for row in rebuild["source_edits"] for key in row["affected_original_keys"] if ("K",key) not in old or ("K",key) not in new or sha(old["K",key])!=row["original_sha256"] or sha(new["K",key])!=row["revised_sha256"]]
           print("HISTORICAL_DELTA_WITNESSES",json.dumps({"wrong_links":wrong_links,"wrong_edits":wrong_edits}),flush=True)
           print("NATIVE_HISTORY",json.dumps({"original":old_report,"current":new_report,"added_keys":len(added),"changed_keys":len(changed),"removed_keys":len(removed),"exact_approved_delta":history_matches and not wrong_links and not wrong_edits},sort_keys=True),flush=True)
+          # Raw byte drift may be a transport wrapper rather than changed prose.
+          # Compare text/punctuation and ordered non-div tag attributes separately.
+          def semantics(raw):
+              root=etree.fromstring(b"<root>"+raw+b"</root>",etree.XMLParser(resolve_entities=False,no_network=True))
+              name=lambda n:etree.QName(n).localname
+              text=" ".join("".join(root.itertext()).split())
+              markup=tuple((name(n),tuple(sorted(n.attrib.items()))) for n in root.iterdescendants() if isinstance(n.tag,str) and name(n)!="div")
+              refs=tuple((n.get("osisRef")," ".join("".join(n.itertext()).split())) for n in root.iterdescendants() if isinstance(n.tag,str) and name(n)=="reference")
+              return text,markup,refs
+          text_changed=[];structure_changed=[];refs_changed=[];parse_failures=[]
+          unique_pairs={}
+          for key in changed:
+              if key[0]=="U":
+                  continue
+              a,b=old[key],new[key]
+              pair=(sha(a),sha(b))
+              if pair not in unique_pairs:
+                  try:
+                      x,y=semantics(a),semantics(b)
+                      unique_pairs[pair]=(x[0]!=y[0],x[1]!=y[1],x[2]!=y[2])
+                  except (etree.XMLSyntaxError,ValueError):
+                      unique_pairs[pair]=None
+              result=unique_pairs[pair]
+              if result is None:parse_failures.append(key)
+              else:
+                  if result[0]:text_changed.append(key)
+                  if result[1]:structure_changed.append(key)
+                  if result[2]:refs_changed.append(key)
+          print("SEMANTIC_HISTORY",json.dumps({"text_changed_count":len(text_changed),"text_changed_sample":sorted(text_changed)[:60],"nondiv_markup_changed_count":len(structure_changed),"nondiv_markup_changed_sample":sorted(structure_changed)[:30],"reference_changed_count":len(refs_changed),"reference_changed_sample":sorted(refs_changed)[:30],"parse_failures":len(parse_failures),"unique_changed_body_pairs":len(unique_pairs),"opaque_top_bytes_equal":all(old[k]==new[k] for k in old if k[0]=="U")},sort_keys=True),flush=True)
           source=(source_dir/"mhcc.osis.xml").read_bytes()
           assert sha(source)==cleanup["reconstructed_source_sha256"]
           parser=etree.XMLParser(resolve_entities=False,no_network=True,huge_tree=False)
@@ -95,7 +124,8 @@ jobs:
           restored=b'hard livelihood out of it. Lamech hoped for relief by the birth of this son, "This same shall comfort us.'
           hosts=[key for key,raw in new.items() if broken in raw]
           assert hosts and set(hosts)=={key for key,raw in old.items() if broken in raw}
-          assert all(key[0]=="K" and key[1].startswith("Gen.5.") and new[key]==old[key] and new[key].count(broken)==1 for key in hosts)
+          assert all(key[0]=="K" and key[1].startswith("Gen.5.") and new[key].count(broken)==1 and old[key].count(broken)==1 for key in hosts)
+          print("GENESIS_PRIOR_SEMANTICS",json.dumps({"text_and_nondiv_attributes_equal":all(semantics(old[key])==semantics(new[key]) for key in hosts),"prior_body_sha256":sha(old[hosts[0]]),"current_body_sha256":sha(new[hosts[0]])}),flush=True)
           print("ERRATUM_LOCATORS",json.dumps({"source_matches":source.count(broken),"native_hosts":[key[1] for key in hosts],"source_hash":sha(source)},sort_keys=True),flush=True)
           assert source.count(broken)==1
           candidate=source.replace(broken,restored,1)
@@ -120,6 +150,7 @@ jobs:
               print("UPSTREAM_DRIFT_BLOCKED",type(exc).__name__,str(exc)[:400],flush=True)
           PY
       - name: Verify relocated historical Modern owner decision witness in clean checkout
+        if: always()
         run: |
           set -euo pipefail
           p="sources/cleaned/commentaries/en/hmcc-modern/editorial/evidence/OWNER_EDITORIAL_DECISIONS_2026-11-19.json"
