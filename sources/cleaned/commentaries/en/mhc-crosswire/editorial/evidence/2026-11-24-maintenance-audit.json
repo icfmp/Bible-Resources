@@ -1,0 +1,599 @@
+{
+  "schema_version": 1,
+  "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45437564914",
+  "tested_commit": "badf41c310d0474719e8d7920a672c4605cf7cd0",
+  "published_audit": {
+    "brnp_codes": {
+      "NO_COMMENTARY_ENTRIES": 1,
+      "REFERENCE_TARGET_WHITESPACE": 10
+    },
+    "intro_comparison": {
+      "all_source_and_native_introductions_indexed": true,
+      "bounded_reference_only_cases": [],
+      "counts": {
+        "authored_intro_word_tokens": 197295,
+        "source_intro_no_visible_text": 143,
+        "source_intro_note_body_metadata_missing_from_native": 0,
+        "source_intro_note_elements": 0,
+        "source_intro_records": 1255,
+        "source_intro_reference_body_metadata_missing_from_native": 0,
+        "source_intro_reference_elements": 6727,
+        "source_intro_text_equal_after_nfc_whitespace_folding": 1112
+      },
+      "editorial_or_licensing_approved": false,
+      "original_text_or_notes_exposed": false,
+      "schema_version": 1,
+      "status": "PRIVATE_INTRO_TEXT_NOTE_LINK_AUDIT_NOT_EDITION_PARITY"
+    },
+    "issue_290_anchors": [
+      {
+        "cleaned_owners": [],
+        "exact_owner_text_present": false,
+        "linked_same_body_as_first": false,
+        "occupied": false,
+        "original_owners": [],
+        "reference": "1Sam.25.1"
+      },
+      {
+        "cleaned_owners": [],
+        "exact_owner_text_present": false,
+        "linked_same_body_as_first": false,
+        "occupied": false,
+        "original_owners": [],
+        "reference": "2Sam.22.1"
+      },
+      {
+        "cleaned_owners": [],
+        "exact_owner_text_present": false,
+        "linked_same_body_as_first": false,
+        "occupied": false,
+        "original_owners": [],
+        "reference": "Josh.18.1"
+      }
+    ],
+    "issue_295_chapters": [
+      {
+        "chapter": "2Pet.2",
+        "cleaned_groups": 4,
+        "intro_occupied": true,
+        "native_groups_checked": 4,
+        "word_counts": {
+          "authored_groups_checked": 4,
+          "authored_word_tokens_checked": 5965,
+          "groups_with_contiguous_full_source_word_stream": 4
+        }
+      },
+      {
+        "chapter": "2Thess.2",
+        "cleaned_groups": 4,
+        "intro_occupied": true,
+        "native_groups_checked": 4,
+        "word_counts": {
+          "authored_groups_checked": 4,
+          "authored_word_tokens_checked": 4975,
+          "groups_with_contiguous_full_source_word_stream": 4
+        }
+      },
+      {
+        "chapter": "Deut.34",
+        "cleaned_groups": 3,
+        "intro_occupied": true,
+        "native_groups_checked": 3,
+        "word_counts": {
+          "authored_groups_checked": 3,
+          "authored_word_tokens_checked": 4264,
+          "groups_with_contiguous_full_source_word_stream": 3
+        }
+      },
+      {
+        "chapter": "John.21",
+        "cleaned_groups": 3,
+        "intro_occupied": true,
+        "native_groups_checked": 3,
+        "word_counts": {
+          "authored_groups_checked": 3,
+          "authored_word_tokens_checked": 15107,
+          "groups_with_contiguous_full_source_word_stream": 3
+        }
+      },
+      {
+        "chapter": "Mal.4",
+        "cleaned_groups": 2,
+        "intro_occupied": true,
+        "native_groups_checked": 2,
+        "word_counts": {
+          "authored_groups_checked": 2,
+          "authored_word_tokens_checked": 5206,
+          "groups_with_contiguous_full_source_word_stream": 2
+        }
+      },
+      {
+        "chapter": "Ps.95",
+        "cleaned_groups": 2,
+        "intro_occupied": true,
+        "native_groups_checked": 2,
+        "word_counts": {
+          "authored_groups_checked": 2,
+          "authored_word_tokens_checked": 3281,
+          "groups_with_contiguous_full_source_word_stream": 2
+        }
+      },
+      {
+        "chapter": "Rev.4",
+        "cleaned_groups": 2,
+        "intro_occupied": true,
+        "native_groups_checked": 2,
+        "word_counts": {
+          "authored_groups_checked": 2,
+          "authored_word_tokens_checked": 2571,
+          "groups_with_contiguous_full_source_word_stream": 2
+        }
+      },
+      {
+        "chapter": "Rom.4",
+        "cleaned_groups": 4,
+        "intro_occupied": true,
+        "native_groups_checked": 4,
+        "word_counts": {
+          "authored_groups_checked": 4,
+          "authored_word_tokens_checked": 6250,
+          "groups_with_contiguous_full_source_word_stream": 4
+        }
+      },
+      {
+        "chapter": "Rom.7",
+        "cleaned_groups": 3,
+        "intro_occupied": true,
+        "native_groups_checked": 3,
+        "word_counts": {
+          "authored_groups_checked": 3,
+          "authored_word_tokens_checked": 7442,
+          "groups_with_contiguous_full_source_word_stream": 3
+        }
+      },
+      {
+        "chapter": "Song.8",
+        "cleaned_groups": 4,
+        "intro_occupied": true,
+        "native_groups_checked": 4,
+        "word_counts": {
+          "authored_groups_checked": 4,
+          "authored_word_tokens_checked": 6517,
+          "groups_with_contiguous_full_source_word_stream": 4
+        }
+      }
+    ],
+    "missing_first_keys": [],
+    "missing_scope_keys": [],
+    "native_corpus_sha256": "ea20737b3612cb183921c48beca96a728317dcbb5b4e5ff142308b6d974169b4",
+    "native_counts": {
+      "I": 1255,
+      "K": 31098,
+      "TOP": 2
+    },
+    "new_group_hashes": 0,
+    "original_group_hashes_absent": 1,
+    "original_source_groups": 4256,
+    "publication_changed": false,
+    "published_payload_equals_git": true,
+    "published_zip_sha256": "d0d401220ffba3de98dd9e9cab5dfe58030ca38ac7b196291838a472f3f6e07a",
+    "relocated_source_group_candidates": [
+      {
+        "chapter_intro_contains_exact_text": true,
+        "source_sid": "2Chr.1.1",
+        "word_count": 636
+      }
+    ],
+    "schema_version": 1,
+    "semantic_comparison": {
+      "all_source_groups_examined": true,
+      "bounded_reference_only_findings": [
+        {
+          "aligned_punctuation": {
+            "bounded_symbol_category_examples": [],
+            "class": "boundary_punctuation_differs",
+            "counts": {
+              "exact_interword_gaps": 1205,
+              "whitespace_only_interword_gaps": 6
+            },
+            "native_prefix_symbols": {
+              "nonspace_symbols": 0,
+              "symbol_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "unicode_category_counts": {}
+            },
+            "native_suffix_symbols": {
+              "nonspace_symbols": 14,
+              "symbol_sha256": "9e07ac1eea19c05f7184e4bba6108af8f40231b872c33b47a3a14f3246610b84",
+              "unicode_category_counts": {
+                "Ll": 9,
+                "Lu": 1,
+                "Po": 1,
+                "Sm": 3
+              }
+            },
+            "prefix_symbols_equal_ignoring_whitespace": true,
+            "source_prefix_symbols": {
+              "nonspace_symbols": 0,
+              "symbol_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "unicode_category_counts": {}
+            },
+            "source_suffix_symbols": {
+              "nonspace_symbols": 4,
+              "symbol_sha256": "4eb937fe7d18bd53340738ab854281f92d8d96d0c6de92423920311b34d3641f",
+              "unicode_category_counts": {
+                "Po": 1,
+                "Sm": 3
+              }
+            },
+            "suffix_symbols_equal_ignoring_whitespace": false,
+            "unreviewed_boundary_text": true,
+            "word_run_start_native_ordinal": 1
+          },
+          "category": "source_text_punctuation_or_spacing_diff",
+          "source_line": 14079,
+          "source_ref": "Deut.34.9-12",
+          "source_text_sha256": "27902036f66764ee6bef4ee513bf90886628803a8825816ea34308d67777447d"
+        },
+        {
+          "aligned_punctuation": {
+            "bounded_symbol_category_examples": [],
+            "class": "word_internal_gaps_equal_or_whitespace_only",
+            "counts": {
+              "exact_interword_gaps": 928,
+              "whitespace_only_interword_gaps": 6
+            },
+            "native_prefix_symbols": {
+              "nonspace_symbols": 0,
+              "symbol_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "unicode_category_counts": {}
+            },
+            "native_suffix_symbols": {
+              "nonspace_symbols": 5,
+              "symbol_sha256": "9d0161a069e3e2628418955b35a4e2e686fbbceb11c1a9189bccd7f523c8dde4",
+              "unicode_category_counts": {
+                "Po": 1,
+                "Sm": 4
+              }
+            },
+            "prefix_symbols_equal_ignoring_whitespace": true,
+            "source_prefix_symbols": {
+              "nonspace_symbols": 0,
+              "symbol_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "unicode_category_counts": {}
+            },
+            "source_suffix_symbols": {
+              "nonspace_symbols": 5,
+              "symbol_sha256": "9d0161a069e3e2628418955b35a4e2e686fbbceb11c1a9189bccd7f523c8dde4",
+              "unicode_category_counts": {
+                "Po": 1,
+                "Sm": 4
+              }
+            },
+            "suffix_symbols_equal_ignoring_whitespace": true,
+            "unreviewed_boundary_text": false,
+            "word_run_start_native_ordinal": 1
+          },
+          "category": "source_text_punctuation_or_spacing_diff",
+          "source_line": 31400,
+          "source_ref": "Esth.10.1-3",
+          "source_text_sha256": "5013f1cdaee6e26f2f3a78faf6e9d1be04c0f5537c0fef06d78abaa8bf2c0e34"
+        },
+        {
+          "aligned_punctuation": {
+            "bounded_symbol_category_examples": [],
+            "class": "boundary_punctuation_differs",
+            "counts": {
+              "exact_interword_gaps": 1162,
+              "whitespace_only_interword_gaps": 4
+            },
+            "native_prefix_symbols": {
+              "nonspace_symbols": 0,
+              "symbol_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "unicode_category_counts": {}
+            },
+            "native_suffix_symbols": {
+              "nonspace_symbols": 11,
+              "symbol_sha256": "a0bbd97e7f75bd5f991d55258b5c724ec34e5338379bb8b2882ef54dfd51fade",
+              "unicode_category_counts": {
+                "Lu": 7,
+                "Po": 1,
+                "Sm": 3
+              }
+            },
+            "prefix_symbols_equal_ignoring_whitespace": true,
+            "source_prefix_symbols": {
+              "nonspace_symbols": 0,
+              "symbol_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "unicode_category_counts": {}
+            },
+            "source_suffix_symbols": {
+              "nonspace_symbols": 4,
+              "symbol_sha256": "c90220bfb8807d353c448a03bf780ed6fbefeb432e482eb4878b257ad590e172",
+              "unicode_category_counts": {
+                "Po": 1,
+                "Sm": 3
+              }
+            },
+            "suffix_symbols_equal_ignoring_whitespace": false,
+            "unreviewed_boundary_text": true,
+            "word_run_start_native_ordinal": 1
+          },
+          "category": "source_text_punctuation_or_spacing_diff",
+          "source_line": 52674,
+          "source_ref": "Song.8.13-14",
+          "source_text_sha256": "8ef05273f6aa99988d810f2a60473ddcd0a988c412069b0ba35e414f3edc3d00"
+        },
+        {
+          "aligned_punctuation": {
+            "bounded_symbol_category_examples": [],
+            "class": "boundary_punctuation_differs",
+            "counts": {
+              "exact_interword_gaps": 2330,
+              "whitespace_only_interword_gaps": 9
+            },
+            "native_prefix_symbols": {
+              "nonspace_symbols": 0,
+              "symbol_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "unicode_category_counts": {}
+            },
+            "native_suffix_symbols": {
+              "nonspace_symbols": 12,
+              "symbol_sha256": "87da473bce68eb2b12310155e130b26a135139688c33a3ff0a5cd57457d822ca",
+              "unicode_category_counts": {
+                "Lu": 7,
+                "Po": 1,
+                "Sm": 4
+              }
+            },
+            "prefix_symbols_equal_ignoring_whitespace": true,
+            "source_prefix_symbols": {
+              "nonspace_symbols": 0,
+              "symbol_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "unicode_category_counts": {}
+            },
+            "source_suffix_symbols": {
+              "nonspace_symbols": 5,
+              "symbol_sha256": "75dbaa9826be39dbb69b59e6d7c7d4cd5d2d3217fbd8d709c68a24e6679ccaf8",
+              "unicode_category_counts": {
+                "Po": 1,
+                "Sm": 4
+              }
+            },
+            "suffix_symbols_equal_ignoring_whitespace": false,
+            "unreviewed_boundary_text": true,
+            "word_run_start_native_ordinal": 1
+          },
+          "category": "source_text_punctuation_or_spacing_diff",
+          "source_line": 71962,
+          "source_ref": "Mal.4.4-6",
+          "source_text_sha256": "94fbf87740bbeec45d3682788ed395cf4b36f4378c67f4da2b3bbeac5a44d1cc"
+        },
+        {
+          "aligned_punctuation": {
+            "bounded_symbol_category_examples": [],
+            "class": "boundary_punctuation_differs",
+            "counts": {
+              "exact_interword_gaps": 4704,
+              "whitespace_only_interword_gaps": 21
+            },
+            "native_prefix_symbols": {
+              "nonspace_symbols": 0,
+              "symbol_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "unicode_category_counts": {}
+            },
+            "native_suffix_symbols": {
+              "nonspace_symbols": 14,
+              "symbol_sha256": "799a3ee30e1785b15102ff98992ea8c60d4c69fcdede5484e2bf430f79b1b682",
+              "unicode_category_counts": {
+                "Ll": 9,
+                "Lu": 1,
+                "Po": 1,
+                "Sm": 3
+              }
+            },
+            "prefix_symbols_equal_ignoring_whitespace": true,
+            "source_prefix_symbols": {
+              "nonspace_symbols": 0,
+              "symbol_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "unicode_category_counts": {}
+            },
+            "source_suffix_symbols": {
+              "nonspace_symbols": 4,
+              "symbol_sha256": "e37f6b8b12cd99ce0309a36866f85b8cd3e01c832d8d2bdc1ea130087381c525",
+              "unicode_category_counts": {
+                "Po": 1,
+                "Sm": 3
+              }
+            },
+            "suffix_symbols_equal_ignoring_whitespace": false,
+            "unreviewed_boundary_text": true,
+            "word_run_start_native_ordinal": 1
+          },
+          "category": "source_text_punctuation_or_spacing_diff",
+          "source_line": 96083,
+          "source_ref": "John.21.20-25",
+          "source_text_sha256": "3f251b7fea3ac8c79c8807ccc3712d0eea9562d4b2b5489b0e67a9014c347af5"
+        },
+        {
+          "aligned_punctuation": {
+            "bounded_symbol_category_examples": [],
+            "class": "word_internal_gaps_equal_or_whitespace_only",
+            "counts": {
+              "exact_interword_gaps": 662,
+              "whitespace_only_interword_gaps": 5
+            },
+            "native_prefix_symbols": {
+              "nonspace_symbols": 0,
+              "symbol_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "unicode_category_counts": {}
+            },
+            "native_suffix_symbols": {
+              "nonspace_symbols": 4,
+              "symbol_sha256": "e37f6b8b12cd99ce0309a36866f85b8cd3e01c832d8d2bdc1ea130087381c525",
+              "unicode_category_counts": {
+                "Po": 1,
+                "Sm": 3
+              }
+            },
+            "prefix_symbols_equal_ignoring_whitespace": true,
+            "source_prefix_symbols": {
+              "nonspace_symbols": 0,
+              "symbol_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "unicode_category_counts": {}
+            },
+            "source_suffix_symbols": {
+              "nonspace_symbols": 4,
+              "symbol_sha256": "e37f6b8b12cd99ce0309a36866f85b8cd3e01c832d8d2bdc1ea130087381c525",
+              "unicode_category_counts": {
+                "Po": 1,
+                "Sm": 3
+              }
+            },
+            "suffix_symbols_equal_ignoring_whitespace": true,
+            "unreviewed_boundary_text": false,
+            "word_run_start_native_ordinal": 1
+          },
+          "category": "source_text_punctuation_or_spacing_diff",
+          "source_line": 114307,
+          "source_ref": "Rev.22.20-21",
+          "source_text_sha256": "94bb2b88d5690cab0df0af6106801414aa79c8544be7228cb4fe4ec8cbf2d3db"
+        }
+      ],
+      "counts": {
+        "native_note_elements_seen_on_source_first_keys": 32,
+        "native_reference_elements_seen_on_source_first_keys": 62445,
+        "source_group_full_punctuation_or_spacing_needs_review": 6,
+        "source_groups": 4255,
+        "source_note_bodies_missing_from_native": 0,
+        "source_note_body_and_metadata_not_exactly_in_native": 0,
+        "source_note_elements": 0,
+        "source_reference_bodies_missing_from_native": 0,
+        "source_reference_body_and_metadata_not_exactly_in_native": 0,
+        "source_reference_elements": 61404,
+        "source_text_codepoints": 37611899,
+        "source_text_equal_after_nfc_whitespace_folding": 4249
+      },
+      "editorial_changes": false,
+      "publication_approved": false,
+      "raw_xml_or_note_bodies_exported": false,
+      "schema_version": 1,
+      "status": "PRIVATE_SOURCE_NATIVE_PUNCTUATION_NOTE_LINK_TRIAGE_NOT_EDITION_PARITY"
+    },
+    "source_cleaned_sha256": "c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4",
+    "source_groups": 4255,
+    "source_original_sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
+    "word_comparison": {
+      "bounded_reference_only_missing_word_cases": [],
+      "counts": {
+        "authored_groups_checked": 4255,
+        "authored_word_tokens_checked": 7072587,
+        "groups_with_contiguous_full_source_word_stream": 4255
+      },
+      "entire_authorial_source_reviewed_against_native_keys": true,
+      "exact_note_and_markup_parity_verified": false,
+      "published": false,
+      "schema_version": 1,
+      "status": "PRIVATE_ALL_AUTHORED_GROUP_WORD_BLOCKS_PRESENT_NOT_NOTE_PARITY"
+    }
+  },
+  "whitespace_source_trial": {
+    "all_text_and_nonreference_attributes_equal": true,
+    "brnp_after": {
+      "NO_COMMENTARY_ENTRIES": 1
+    },
+    "candidate_sha256": "46e1c04206b274b1dd58d2d043bedc121089f74bb0c78250339e5991a1999982",
+    "edits": [
+      {
+        "after": "Judg.1.28 Judg.1.30 Judg.1.33 Judg.1.35",
+        "before": " Judg.1.28 Judg.1.30 Judg.1.33 Judg.1.35",
+        "input_offset": 528139,
+        "output_offset": 528139
+      },
+      {
+        "after": "John.11.6 John.11.15",
+        "before": " John.11.6 John.11.15",
+        "input_offset": 771535,
+        "output_offset": 771534
+      },
+      {
+        "after": "Ps.88.7 Ps.88.15-Ps.88.16",
+        "before": " Ps.88.7 Ps.88.15-Ps.88.16",
+        "input_offset": 14061692,
+        "output_offset": 14061690
+      },
+      {
+        "after": "Hos.14.3 Ps.20.7",
+        "before": "Hos.14.3 Ps.20.7 ",
+        "input_offset": 15030020,
+        "output_offset": 15030017
+      },
+      {
+        "after": "Prov.28.6 Prov.28.11",
+        "before": " Prov.28.6 Prov.28.11",
+        "input_offset": 20374245,
+        "output_offset": 20374241
+      },
+      {
+        "after": "Matt.10.34-Matt.10.35",
+        "before": "Matt.10.34-Matt.10.35 ",
+        "input_offset": 24736870,
+        "output_offset": 24736865
+      },
+      {
+        "after": "Ezek.34.16",
+        "before": "Ezek.34.16 ",
+        "input_offset": 30294208,
+        "output_offset": 30294202
+      },
+      {
+        "after": "Prov.28.27",
+        "before": "Prov.28.27 ",
+        "input_offset": 32088670,
+        "output_offset": 32088663
+      },
+      {
+        "after": "1Sam.9.13 Acts.2.46-Acts.2.47",
+        "before": "1Sam.9.13 Acts.2.46-Acts.2.47 ",
+        "input_offset": 33016851,
+        "output_offset": 33016843
+      },
+      {
+        "after": "Isa.54.5-Isa.54.6 Isa.54.13",
+        "before": "Isa.54.5-Isa.54.6 Isa.54.13 ",
+        "input_offset": 35639730,
+        "output_offset": 35639721
+      }
+    ],
+    "reversible": true,
+    "schema_validated": true,
+    "source_sha256": "c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4"
+  },
+  "whitespace_native_trial": {
+    "baseline_native_sha256": "ea20737b3612cb183921c48beca96a728317dcbb5b4e5ff142308b6d974169b4",
+    "candidate_changed_raw_entries": 88,
+    "candidate_extra_keys": 0,
+    "candidate_link_topology_equal": true,
+    "candidate_missing_keys": 0,
+    "candidate_native_sha256": "2d8663f64ef554c5805a2bfb364b24a887c98d08aaac3812c6b9b5fd0f562e68",
+    "limits": "Changed native frames still require precise attribute-only semantic diff; verse-milestone representation remains open.",
+    "publication_changed": false,
+    "published_baseline_exact": true,
+    "published_baseline_link_topology_equal": true,
+    "published_native_sha256": "ea20737b3612cb183921c48beca96a728317dcbb5b4e5ff142308b6d974169b4"
+  },
+  "artifact": [
+    {
+      "id": 14942496246,
+      "name": "mhc-complete-maintenance-audit",
+      "digest": "sha256:00b89bea72f3245586037a160ffd0193175a3b7218e96bc9c5d93faaf7b189b3",
+      "expired": false
+    }
+  ],
+  "pending": [
+    "Three CCEL anchor witnesses compared against source-introduction placement",
+    "Six punctuation and boundary cases classified against original source",
+    "Native exact attribute-only verification of 88 changed frames",
+    "Canonical commentary section representation and reader tests"
+  ],
+  "published_changes": false
+}
