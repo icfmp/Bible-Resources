@@ -366,3 +366,87 @@ class RebuiltCommentaryContractTests(unittest.TestCase):
         self.assertFalse(list(validator.iter_errors(full)))
         del full["index_audit"]["manifest"]
         self.assertTrue(list(validator.iter_errors(full)))
+
+    def incremental_fixture(self):
+        """Use two distinct invented source revisions, never real-module exceptions."""
+        self.meta["language"] = "en"
+        edition = self.root / "sources/cleaned/commentaries/en/synthetic"
+        old = edition / "editorial/evidence/release-0.1.1"
+        old.mkdir(parents=True)
+        (old / "review-manifest.json").write_bytes(self.review_path.read_bytes())
+        (old / "SOURCE_AUDIT.json").write_bytes((self.module / "SOURCE_AUDIT.json").read_bytes())
+        old_source = b"<osis>original synthetic text</osis>"
+        new_source = b"<osis>corrected synthetic text</osis>"
+        (old / "CLEANUP_MANIFEST.json").write_text(json.dumps({
+            "reconstructed_source_sha256": digest(old_source),
+            "source_native_corpus_sha256": self.review["candidate_native_corpus_sha256"],
+        }))
+        (edition / "synthetic.osis.xml").write_bytes(new_source)
+        evdir = edition / "editorial/evidence/release-0.1.2"
+        evdir.mkdir()
+        evidence = {
+            "schema_version": 1, "previous_source_sha256": digest(old_source),
+            "candidate_source_sha256": digest(new_source),
+            "previous_native_corpus_sha256": self.review["candidate_native_corpus_sha256"],
+            "candidate_native_corpus_sha256": "2" * 64,
+            "candidate_native_counts": self.review["candidate_native_counts"],
+            "payload_sha256": self.review["payload_sha256"],
+            "semantic_changed_keys": ["Gen.1.1"], "reference_changed_keys": [],
+            "missing_keys": [], "extra_keys": [], "changed_alias_links": [],
+            "parse_failures": 0, "brnp_findings": 0,
+            "official_osis_schema_validated": True, "native_link_topology_equal": True,
+            "opaque_top_bytes_equal": True, "source_reversible": True,
+            "source_idempotent_normalization": True, "remaining_source_text_and_markup_equal": True,
+            "all_native_entries_compared": True, "reader_checks_passed": True,
+        }
+        evfile = evdir / "incremental-native-reader.json"
+        evfile.write_text(json.dumps(evidence))
+        revision = {
+            "previous_version": "0.1.1", "previous_review_sha256": digest((old/"review-manifest.json").read_bytes()),
+            "previous_cleanup_sha256": digest((old/"CLEANUP_MANIFEST.json").read_bytes()),
+            "previous_native_corpus_sha256": evidence["previous_native_corpus_sha256"],
+            "previous_source_sha256": digest(old_source), "source_name": "synthetic.osis.xml",
+            "candidate_source_sha256": digest(new_source), "evidence_sha256": digest(evfile.read_bytes()),
+            "semantic_changed_keys": ["Gen.1.1"], "reference_changed_keys": [],
+        }
+        self.meta["version"] = self.conf["Version"] = "0.1.2"
+        self.review.update(schema_version=2, version="0.1.2",
+                           candidate_native_corpus_sha256="2"*64, incremental_revision=revision)
+        self.audit.update(schema_version=2, status="complete_native_semantic_rebuild_comparison",
+                          candidate_native_corpus_sha256="2"*64, incremental_revision=revision)
+        self.audit.pop("all_other_original_K_bytes_identical")
+        self.audit.pop("all_original_I_bytes_identical")
+        self.proof.update(schema_version=2, curated_version="0.1.2",
+                          candidate_native_corpus_sha256="2"*64,
+                          candidate_source_sha256=digest(new_source), incremental_evidence_sha256=digest(evfile.read_bytes()))
+        self.write()
+        return edition, evfile, evidence
+
+    def test_incremental_source_and_native_review_passes(self):
+        self.incremental_fixture()
+        self.assertEqual(self.errors(), [])
+
+    def test_incremental_source_and_previous_review_are_bound(self):
+        edition, _, _ = self.incremental_fixture()
+        (edition/"synthetic.osis.xml").write_bytes(b"tampered")
+        self.assertIn("Canonical OSIS source checksum mismatch", str(self.errors()))
+        (edition/"synthetic.osis.xml").write_bytes(b"<osis>corrected synthetic text</osis>")
+        old = edition/"editorial/evidence/release-0.1.1/review-manifest.json"
+        old.write_bytes(old.read_bytes()+b" ")
+        self.assertIn("Prior immutable review", str(self.errors()))
+
+    def test_incremental_semantic_proof_rejects_false_byte_identity_and_failed_checks(self):
+        _, evfile, evidence = self.incremental_fixture()
+        self.audit["all_original_I_bytes_identical"] = True
+        self.write()
+        self.assertIn("must not claim", str(self.errors()))
+        self.audit.pop("all_original_I_bytes_identical")
+        self.write()
+        evidence["reader_checks_passed"] = False
+        evfile.write_text(json.dumps(evidence))
+        fingerprint = digest(evfile.read_bytes())
+        self.review["incremental_revision"]["evidence_sha256"] = fingerprint
+        self.audit["incremental_revision"]["evidence_sha256"] = fingerprint
+        self.proof["incremental_evidence_sha256"] = fingerprint
+        self.write()
+        self.assertIn("Incremental native/source/reader proof differs", str(self.errors()))
