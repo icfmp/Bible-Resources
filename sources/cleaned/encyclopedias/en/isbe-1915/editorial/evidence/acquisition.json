@@ -1,0 +1,58 @@
+{
+  "SWORD": {
+    "archive_sha256": "9d41edc06c3ebd916f3aaa5b3b12f2a495b069b36f2cb26b8e0dab4bdac15df7",
+    "archive_size_bytes": 11734786,
+    "members": {
+      "mods.d/brisbe1915.conf": {
+        "sha256": "1ad616360dac90d7a2842de6079b479924fefae37d1c3e21efa5a2adca222f65",
+        "size_bytes": 385
+      },
+      "modules/lexdict/zld/brisbe1915/dict.dat": {
+        "sha256": "25fb739067c21447299bb6be94b49d5c181bef2dca52c3d9a22d99eaba5b09a2",
+        "size_bytes": 200952
+      },
+      "modules/lexdict/zld/brisbe1915/dict.idx": {
+        "sha256": "5806b07781998578972df1fa6b8870798abdae2ac11d763b83b91fe794f92ddf",
+        "size_bytes": 75040
+      },
+      "modules/lexdict/zld/brisbe1915/dict.zdt": {
+        "sha256": "d93324666352f80c9a389db88a0053b8b4118a0562d4025d2a366b0dcc99a80d",
+        "size_bytes": 11940748
+      },
+      "modules/lexdict/zld/brisbe1915/dict.zdx": {
+        "sha256": "55cf0941615a4f73f79ed582b35f5d7db05d595b372708f41622b3eb8bf70ccf",
+        "size_bytes": 2504
+      }
+    }
+  },
+  "source": {
+    "archive_sha256": "52ac2b3db91b49adab94db2fd6d6d009bf836efe11e993516c33434bb5c56365",
+    "archive_size_bytes": 10901183,
+    "members": {
+      "source/ACQUISITION_MANIFEST.json": {
+        "sha256": "9d9d9f5d171fdb0ac1a22d6dbcc7741524ee75279412836ce773596a876a7058",
+        "size_bytes": 893
+      },
+      "source/CLEANUP_MANIFEST.json": {
+        "sha256": "334aec1c25c596aff08253d4c25fa6c6628eaec46dc025acf3c2eaca0399ef29",
+        "size_bytes": 1703
+      },
+      "source/CROSSWIRE_PROVENANCE.json": {
+        "sha256": "f2b8ea39c38124b235b1597fdabbc64a12758ceaff95448c03c181fe2f6cc2fe",
+        "size_bytes": 672
+      },
+      "source/EDITORIAL_ASSESSMENT.md": {
+        "sha256": "f352124d19777dede47d6090bdf106c06701db11d3782f23906e25105a4568b2",
+        "size_bytes": 5055
+      },
+      "source/ISBE.xml": {
+        "sha256": "5df8a6d1311e3f5a83a6d961c6e09c27e042b0c68b4a9da54cb98821cb878d2c",
+        "size_bytes": 37062851
+      },
+      "source/README.md": {
+        "sha256": "c6b98ff0f26bb79cb16286736ba48113a9c25bb11973ba5deed9eb6dc6c30d05",
+        "size_bytes": 1374
+      }
+    }
+  }
+}

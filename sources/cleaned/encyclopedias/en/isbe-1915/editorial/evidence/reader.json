@@ -1,0 +1,26 @@
+{
+  "AARON": {
+    "bytes": 12382,
+    "sha256": "1bdc42aa05e447874265592dd0ad8a820df085a523855e31961e9d0029cccabe"
+  },
+  "ABIDE": {
+    "bytes": 2063,
+    "sha256": "dc7f7349fc82dea72d391c24aef36f3bb96836bfaac8d83f5db911b1f2f10a16"
+  },
+  "GAINSAY": {
+    "bytes": 2075,
+    "sha256": "183120a550161ffc103925df23a85139ca808f4160b450de132220161e1ea056"
+  },
+  "ZEBIDAH": {
+    "bytes": 1597,
+    "sha256": "feba5aff3c858e75891cf003acc31c1c1d7c3c7e1b83b1aca5a1107fcc428215"
+  },
+  "ARK": {
+    "bytes": 464,
+    "sha256": "e308c3c0136b471dbedb9080f8d7cf72e11a9a44c7d292387118ca9e6ceb9269"
+  },
+  "ARK OF BULRUSHES": {
+    "bytes": 2943,
+    "sha256": "588d19cb425c47d7da61215c7660eda2961d54ab8423f943c19a586f0e77dc5c"
+  }
+}
