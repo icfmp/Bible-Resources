@@ -1,0 +1,32 @@
+name: Temporary self-removing registry finalization
+on:
+  push:
+    branches:
+      - fix/generic-sword-osis-option-filter-validation
+    paths:
+      - '.github/workflows/temporary-self-removing-registry-finalize.yml'
+permissions:
+  contents: write
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate durable registry without temporary workflow
+        run: |
+          set -euo pipefail
+          git rm -f -- .github/workflows/temporary-self-removing-registry-finalize.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git add -f -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore(tools): register reviewed reusable SWORD filter guard'
+          git push origin HEAD:refs/heads/fix/generic-sword-osis-option-filter-validation
