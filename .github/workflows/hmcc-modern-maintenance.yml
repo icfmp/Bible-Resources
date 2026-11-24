@@ -63,13 +63,14 @@ jobs:
           from pathlib import Path
           from lxml import etree
           from check_brnp import check
+          from guard_osis import _schema, POLICY_PATH
           from commentary_native_raw_inventory import private_crosscheck,NativeCommentaryMarkupCensus
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           t=Path(os.environ["RUNNER_TEMP"]);ns="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
           source=Path("sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml")
           emit=lambda label,data:print(label,json.dumps(data,ensure_ascii=False,sort_keys=True),flush=True)
           root=etree.parse(str(source));schema=t/"schema/osisCore.2.1.1-cw-latest.xsd"
-          xsd=etree.XMLSchema(etree.parse(str(schema)))
+          xsd,_=_schema(json.loads(POLICY_PATH.read_text()),schema.absolute())
           valid=xsd.validate(root)
           diag=check(source,"commentary",schema_path=schema if valid else None)
           emit("MODERN_BRNP",{"schema_validated":valid,"schema_error_count":len(xsd.error_log),"schema_first_errors":[{"line":e.line,"type":e.type_name} for e in list(xsd.error_log)[:10]],"sha256":diag["sha256"],"findings":diag["finding_codes"],"examples":diag["finding_examples_by_code"],"entries":diag["commentary_entry_count"],"element_counts":diag["element_counts"]})
