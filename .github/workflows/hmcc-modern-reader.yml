@@ -1,0 +1,137 @@
+name: Verify modern commentary candidate references and actual readers
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/hmcc-modern-reader.yml'
+permissions:
+  contents: read
+jobs:
+  reader:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare immutable candidate and historical reader harness
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin refs/pull/275/head
+          test "$(git rev-parse FETCH_HEAD)" = 30d6cd7a26de8cf8982877eee06a19b8b163d937
+          git worktree add --detach "$RUNNER_TEMP/historical-reader" FETCH_HEAD
+          python -m pip install -r requirements.txt
+          if test -f /etc/apt/apt-mirrors.txt; then
+            sudo sed -i -E 's#https?://[A-Za-z0-9.-]*ec2.archive.ubuntu.com/ubuntu#http://archive.ubuntu.com/ubuntu#g' /etc/apt/apt-mirrors.txt
+          fi
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke xiphos xvfb dbus-x11 xdotool xclip openbox
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_TEMP/native" -lsword
+          echo "784dadcb4800c7e8d0fede02aa6116ee55d4f835b25168c4b3ba3ff530e1fb38  sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml" | sha256sum -c
+      - name: Verify all approved reference cases and source body against native corpus
+        run: |
+          set -euo pipefail
+          PYTHONPATH=scripts python - <<'PY'
+          import os,json,io,subprocess,shutil,re,collections,hashlib,unicodedata
+          from pathlib import Path
+          from lxml import etree
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          t=Path(os.environ["RUNNER_TEMP"]);root=t/"qa/sword";root.parent.mkdir();shutil.copytree("modules/hmcc-modern/payload",root)
+          entries={}
+          raw=subprocess.check_output([str(t/"native"),"HMCCModern"],env=dict(os.environ,SWORD_PATH=str(root)),timeout=90)
+          stats,*_=parse_native_raw_corpus(io.BytesIO(raw),on_entry=lambda k,r,b:entries.__setitem__((k,r),b))
+          assert stats["all_native_raw_entries_ordered_sha256"]=="7810173dfad96c3284925187b08eb283a9ea5f4cfb9ad445d00cae7d4bf71f27"
+          def parse(b):return etree.fromstring(b"<root>"+b+b"</root>")
+          def refs(e):return collections.Counter(n.get("osisRef") for n in e.iter() if isinstance(n.tag,str) and etree.QName(n).localname=="reference" and n.get("osisRef"))
+          def norm(s):return " ".join(unicodedata.normalize("NFC",s).split())
+          def words(s):return re.findall(r"\w+",norm(s).casefold())
+          p=Path("sources/cleaned/commentaries/en/hmcc-modern")
+          d=json.loads((p/"editorial/evidence/OWNER_EDITORIAL_DECISIONS_2026-11-19.json").read_text())
+          cases=[]
+          for n,x in enumerate(d["link_cases"],1):
+              targets=x["approved_derived_destinations"];k=x["source_first_key"];actual=refs(parse(entries["K",k]));cases.append({"case":n,"key":k,"expected":targets,"missing":[v for v in targets if not actual[v]]})
+          ns="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
+          doc=etree.parse(str(p/"hmcc-modern.osis.xml"));ann=[]
+          for e in doc.iter(ns+"div"):
+              ref=e.get("annotateRef")
+              if not ref:continue
+              # Every annotation with a numbered scope is independently read at its first address.
+              first=ref.split()[0].split("-")[0]
+              if first.count(".")==2 and ("K",first) in entries:
+                  native=parse(entries["K",first]);a=words(" ".join(e.itertext()));b=words(" ".join(native.itertext()))
+                  # Exact contiguous words, with any renderer metadata/heading prefix allowed.
+                  text_equal=not a or (" "+" ".join(a)+" ") in (" "+" ".join(b)+" ")
+                  required=refs(e);actual=refs(native)
+                  ann.append({"ref":ref,"first":first,"words":len(a),"text_contiguous":text_equal,"missing_refs":list((required-actual).elements())})
+              else:ann.append({"ref":ref,"first":first,"unresolved_scope":True})
+          report={"native_sha256":stats["all_native_raw_entries_ordered_sha256"],"approved_cases":cases,"approved_targets":sum(len(x["expected"]) for x in cases),"annotations_checked":len(ann),"exact_contiguous_word_matches":sum(x.get("text_contiguous",False) for x in ann),"unresolved_scope":[x for x in ann if x.get("unresolved_scope")],"noncontiguous_text":[x for x in ann if not x.get("unresolved_scope") and not x.get("text_contiguous")],"missing_reference_occurrences":[x for x in ann if x.get("missing_refs")],"limitations":"Word stream and first-address target containment are screening, not exhaustive semantic or markup parity."}
+          (t/"modern-source-native.json").write_text(json.dumps(report,sort_keys=True,indent=2)+"\n")
+          print("MODERN_SOURCE_NATIVE",json.dumps({**report,"noncontiguous_text":report["noncontiguous_text"][:15],"missing_reference_occurrences":report["missing_reference_occurrences"][:15],"unresolved_scope":report["unresolved_scope"][:15],"noncontiguous_total":len(report["noncontiguous_text"]),"missing_reference_total":len(report["missing_reference_occurrences"]),"unresolved_scope_total":len(report["unresolved_scope"])}),flush=True)
+          assert len(cases)==15 and report["approved_targets"]==28
+          PY
+      - name: Actual Xiphos and Diatheke passage comparisons
+        run: |
+          set -euo pipefail
+          export PYTHONPATH="$RUNNER_TEMP/historical-reader/scripts"
+          python - <<'PY'
+          import hashlib,io,json,os,re,shutil,signal,subprocess,time
+          from pathlib import Path
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          from commentary_xiphos_dual_reader import verify_and_install_reviewed_bible,attempt_real_xiphos_passage_copy
+          import commentary_xiphos_dual_reader as reader
+          from pilot_subprocess import query
+          from reader_xiphos_headless_smoke import _dismiss_transient_xiphos_notice
+          t=Path(os.environ["RUNNER_TEMP"]);root=t/"qa/sword"
+          raw=subprocess.check_output([str(t/"native"),"HMCCModern"],env=dict(os.environ,SWORD_PATH=str(root)),timeout=90)
+          entries={};report,*_=parse_native_raw_corpus(io.BytesIO(raw),on_entry=lambda k,r,b:entries.__setitem__((k,r),b))
+          assert report["all_native_raw_entries_ordered_sha256"]=="7810173dfad96c3284925187b08eb283a9ea5f4cfb9ad445d00cae7d4bf71f27"
+          verify_and_install_reviewed_bible(root)
+          keys=["Gen.5.25","Lev.19.1","Lev.19.37","Ps.108.1","Ps.108.13","1Sam.25.39","Ps.95.11","Gen.12.6","Num.29.1"]
+          comparisons={}
+          for key in keys:
+              book,ch,v=key.split(".");ref=f"{book} {ch}:{v}";c,body=query("HMCCModern",ref,fmt="plain",root=root);bc,bible=query("BRLSG1910",ref,fmt="plain",root=root)
+              assert c==bc==0 and len(body)>64 and len(bible)>16,key
+              comparisons[ref]={"commentary":body,"bible":bible,"commentary_internal":entries["K",key]}
+          home=t/"qa-home";home.mkdir()
+          for d in ("config","cache","data"):(home/d).mkdir()
+          env=dict(os.environ,HOME=str(home),XDG_CONFIG_HOME=str(home/"config"),XDG_CACHE_HOME=str(home/"cache"),XDG_DATA_HOME=str(home/"data"),SWORD_PATH=str(root),DISPLAY=":91",GDK_BACKEND="x11",LC_ALL="C.UTF-8",NO_AT_BRIDGE="1",WEBKIT_DISABLE_COMPOSITING_MODE="1")
+          procs=[];log=t/"xiphos-startup.log"
+          def launch(args,output):
+              p=subprocess.Popen(args,env=env,stdout=output,stderr=output,start_new_session=True);procs.append(p);return p
+          try:
+              with log.open("wb") as stream:
+                  launch(["Xvfb",":91","-screen","0","1280x800x24","-nolisten","tcp"],stream);time.sleep(1.5)
+                  launch(["openbox"],stream);time.sleep(1)
+                  app=launch(["dbus-run-session","--","xiphos"],stream);win=None
+                  for _ in range(110):
+                      if app.poll() is not None:raise RuntimeError("Xiphos exited")
+                      win=reader._main_xiphos_window(env)
+                      if win:break
+                      ids=subprocess.run(["xdotool","search","--onlyvisible","--class","[Xx]iphos"],env=env,capture_output=True).stdout.decode().split()
+                      for wid in ids:
+                          g=subprocess.run(["xdotool","getwindowgeometry","--shell",wid],env=env,capture_output=True).stdout.decode()
+                          dims=dict(re.findall(r"^(WIDTH|HEIGHT)=(\d+)$",g,re.M))
+                          if int(dims.get("WIDTH",0))>=420 and int(dims.get("HEIGHT",0))>=300:subprocess.run(["xdotool","windowsize",wid,"1216","736"],env=env,capture_output=True)
+                      time.sleep(.5)
+                  assert win,"Xiphos main window not visible"
+                  subprocess.run(["xdotool","windowsize",win,"1216","736"],env=env,check=True);subprocess.run(["xdotool","windowmove",win,"16","16"],env=env,check=True);time.sleep(2);_dismiss_transient_xiphos_notice(env)
+                  result=attempt_real_xiphos_passage_copy(env,comparisons)
+                  receipt={"schema_version":1,"native_sha256":report["all_native_raw_entries_ordered_sha256"],"keys":keys,"xiphos":result,"actual_note_click_verified":False,"android_gui_verified":False}
+                  (t/"modern-reader.json").write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n");print("MODERN_READER",json.dumps(receipt,sort_keys=True),flush=True)
+                  assert result["actual_passage_commands_accepted"] and result["independent_gui_commentary_excerpt_match_count"]==len(keys)
+          finally:
+              for p in reversed(procs):
+                  if p.poll() is None:
+                      os.killpg(p.pid,signal.SIGTERM)
+                      try:p.wait(timeout=5)
+                      except subprocess.TimeoutExpired:os.killpg(p.pid,signal.SIGKILL);p.wait()
+              if not (t/"modern-reader.json").exists():print("XIPHOS_STARTUP",log.read_text(errors="replace")[-3000:])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: modern-candidate-reader-evidence
+          path: |
+            ${{ runner.temp }}/modern-source-native.json
+            ${{ runner.temp }}/modern-reader.json
+          retention-days: 90
