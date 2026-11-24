@@ -138,7 +138,11 @@ jobs:
                       print("ORIGINAL_SOURCE_SHA256", m["id"], original_hash, flush=True)
               refs = [m["quality"]["smoke_key"]]
               if m.get("index_audit", {}).get("mode") == "stock_reader_keys":
+                  from remove_reviewed_empty_osis_paragraphs import inspect_empty_paragraphs
                   cfg, source = approved_source_for(m["id"])
+                  empty = inspect_empty_paragraphs(source)
+                  print("CLEANED_OSIS_EMPTY_PARAGRAPH_AUDIT", m["id"], json.dumps(empty, sort_keys=True), flush=True)
+                  assert empty["bare_empty_paragraph_count"] == 0, (m["id"], empty)
                   verses, notes, _ = original_osis_verses_and_notes(source)
                   source_sha = hashlib.sha256(source).hexdigest()
                   proof_failures = proof_errors(folder, m["versification"], source_sha)
@@ -182,10 +186,12 @@ jobs:
                           "source_not_modified": True,
                       }
                       print("REVIEWED_MERGE_NATIVE_DIAGNOSTIC", json.dumps(merged_result, sort_keys=True), flush=True)
-                      # Actual full numbered-slot parity passed on the first real
-                      # run. Make that proof mandatory independently of the still
-                      # diagnostic whole-book layout comparison.
+                      # The reviewed merge changes only the reader-slot index,
+                      # not the expected full-book editorial structure.
                       assert merged_result["numbered_slot_text_and_note_parity_verified"], m["id"]
+                      assert merged_result["source_native_body_boundary_positions"]["all_book_body_nonspace_and_boundary_events_equal"], m["id"]
+                      assert merged_result["original_to_compiled_body_opening_order"]["same_order_and_kind_in_every_mapped_book"], m["id"]
+                      assert target_report["all_original_explicit_targets_index_addressable"], m["id"]
                   else:
                       body, body_counts = authorial_body_opening_sequences(source)
                       result = _candidate_result(

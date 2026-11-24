@@ -21,6 +21,24 @@ from stable_sword_refs import KEY
 EMPTY = re.compile(rb"<p\s*/>|<p>([ \t\r\n]*)</p>")
 
 
+def bare_empty_paragraphs(root):
+    """Find every attribute-free, child-free, whitespace-only OSIS paragraph.
+
+    Detection is separate from the much narrower reviewed removal rule.
+    Do not classify annotated, milestone or foreign-namespace nodes as empty.
+    """
+    return [p for p in root.iter(OSIS + "p")
+            if not p.attrib and not len(p) and not (p.text or "").strip()]
+
+
+def inspect_empty_paragraphs(source: bytes):
+    root = _source_tree(source)
+    nodes = bare_empty_paragraphs(root)
+    return {"bare_empty_paragraph_count": len(nodes),
+            "first_source_lines": [p.sourceline for p in nodes[:20]],
+            "source_sha256": sha256(source).hexdigest()}
+
+
 def clean(source: bytes, expected_sha256: str, reviewed_refs: list[str]):
     if sha256(source).hexdigest() != expected_sha256:
         raise ValueError("Reviewed input hash mismatch")
@@ -29,9 +47,7 @@ def clean(source: bytes, expected_sha256: str, reviewed_refs: list[str]):
         raise ValueError("Require distinct reviewed source verse references")
     root = _source_tree(source)
     expected = []
-    for p in root.iter(OSIS + "p"):
-        if p.attrib or len(p) or (p.text or "").strip():
-            continue
+    for p in bare_empty_paragraphs(root):
         previous, following = p.getprevious(), p.getnext()
         if (previous is None or previous.tag != OSIS + "title"
                 or previous.get("type") != "parallel"

@@ -4,7 +4,7 @@ from pathlib import Path
 from hashlib import sha256
 import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"scripts"))
-from remove_reviewed_empty_osis_paragraphs import clean
+from remove_reviewed_empty_osis_paragraphs import clean, inspect_empty_paragraphs
 
 SOURCE = (b'<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">'
           b'<osisText><div type="book" osisID="Gen"><title type="parallel">Parallel</title>'
@@ -13,6 +13,12 @@ SOURCE = (b'<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">'
 
 
 class EmptyParagraphTests(unittest.TestCase):
+    def test_detector_reports_bare_empty_nodes_independently_of_removal_context(self):
+        data = SOURCE.replace(b'type="parallel"', b'type="section"')
+        self.assertEqual(inspect_empty_paragraphs(data)["bare_empty_paragraph_count"], 1)
+        data = data.replace(b'<p> \n</p>', b'<p><note>Note</note></p><p type="x-spacer"/>')
+        self.assertEqual(inspect_empty_paragraphs(data)["bare_empty_paragraph_count"], 0)
+
     def test_exact_reversible_markup_only_edit(self):
         result, receipt = clean(SOURCE, sha256(SOURCE).hexdigest(), ["Gen.1.1"])
         self.assertEqual(result, SOURCE.replace(b'<p> \n</p>', b' \n'))
