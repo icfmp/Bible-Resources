@@ -85,6 +85,14 @@ jobs:
               }
               print("CANDIDATE_FINGERPRINT", json.dumps(receipt, sort_keys=True), flush=True)
               old = legacy.get(m["id"])
+              release_proof = folder / "RELEASE_PROVENANCE.json"
+              config_only = False
+              if release_proof.is_file():
+                  proof = json.loads(release_proof.read_text())
+                  config_only = proof.get("candidate_scope") == "configuration_only"
+                  if config_only:
+                      old = proof["prior_release_binding"]
+                      assert old["module_id"] == m["id"] and old["sword_id"] == m["sword_id"]
               if old and old["version"] != m["version"]:
                   previous = tmp / old["asset_name"]
                   subprocess.run(["gh", "release", "download", old["tag"],
@@ -99,6 +107,8 @@ jobs:
                       assert set(z.namelist()) == set(members)
                       changed = sorted(name for name in members
                                        if hashlib.sha256(z.read(name)).hexdigest() != members[name])
+                  if config_only:
+                      assert changed == ["mods.d/" + m["sword_id"].lower() + ".conf"], (m["id"], changed)
                   print("PREVIOUS_RELEASE_COMPARISON", json.dumps({
                       "resource_id": m["id"], "previous_tag": old["tag"],
                       "previous_zip_sha256": old["release_sha256"], "changed_members": changed,
@@ -123,25 +133,36 @@ jobs:
                       authorial_structures(source), body, body_counts,
                       authorial_book_streams(source), authorial_outside_book_titles(source))
                   print("EXACT_NATIVE_AUDIT", json.dumps(result, sort_keys=True), flush=True)
-                  refs += [ref for ref, rows in notes.items()
-                           if any(row["targets"] for row in rows)][:12]
+                  linked = [ref for ref, rows in notes.items() if any(row["targets"] for row in rows)]
+                  xref_hosts = [ref for ref, rows in notes.items()
+                                if any(row["type"] == "crossReference" and row["targets"] for row in rows)]
+                  refs += linked[:6] + linked[-6:] + xref_hosts[:6]
                   assert result["candidate_status"] == "full_numbered_text_and_note_preflight_equal_not_approved"
                   assert result["source_native_body_boundary_positions"]["all_title_text_and_nonspace_placement_equal"]
+                  assert result["explicit_note_target_index_addressability"]["all_original_explicit_targets_index_addressable"]
               tag = re.compile(rb"</?(?:reference|note|verse|div|title|seg|milestone|hi)\b", re.I)
-              off_leaks = []
-              on_leaks = []
+              modes = {"default": "", "cross_references": "x",
+                       "footnotes": "n", "footnotes_and_cross_references": "nx"}
+              leaks = {mode: [] for mode in modes}
+              changed_from_default = {mode: 0 for mode in modes}
               for ref in dict.fromkeys(refs):
-                  for mode, opt, leaks in (("off", "", off_leaks), ("on", "x", on_leaks)):
+                  default_data = None
+                  for mode, opt in modes.items():
                       code, data = query(m["sword_id"], ref, fmt="plain", root=payload.resolve(), options=opt)
                       assert reader_failure_class(code, data.decode("utf-8")) is None, (m["id"], ref, mode)
+                      if default_data is None:
+                          default_data = data
+                      elif data != default_data:
+                          changed_from_default[mode] += 1
                       if tag.search(data):
-                          leaks.append(ref)
+                          leaks[mode].append(ref)
               print("DIATHEKE_REFERENCE_MODES", json.dumps({
                   "resource_id": m["id"], "checked_references": list(dict.fromkeys(refs)),
-                  "default_markup_leaks": off_leaks, "explicit_on_markup_leaks": on_leaks,
+                  "literal_markup_leaks_by_mode": leaks,
+                  "output_changed_from_default_count": changed_from_default,
                   "visual_reader_verified": False,
               }), flush=True)
-              assert not off_leaks, (m["id"], "default plain-text markup leak", off_leaks)
+              assert not leaks["default"], (m["id"], "default plain-text markup leak", leaks["default"])
           PY
       # Main's active ruleset requires this job. Include the source-bound
       # registry here so a stale inventory cannot slip through on any PR.
