@@ -1,14 +1,15 @@
-name: MHC first-verse witness and canonical migration boundary audit
+name: MHC reproducible first-verse alias repair and canonical structure proof
 on:
   pull_request:
     paths:
       - '.github/workflows/mhc-complete-maintenance-audit.yml'
 permissions:
   contents: read
+  actions: read
 jobs:
   audit:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 12
     env:
       PYTHONPATH: scripts
     steps:
@@ -16,118 +17,145 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install comparison prerequisites
+      - name: Install native tools and authenticate whitespace candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/14942496246/zip" > "$RUNNER_TEMP/prior.zip"
+          echo "00b89bea72f3245586037a160ffd0193175a3b7218e96bc9c5d93faaf7b189b3  $RUNNER_TEMP/prior.zip" | sha256sum -c
+          unzip -q "$RUNNER_TEMP/prior.zip" -d "$RUNNER_TEMP/prior"
           python -m pip install -r requirements.txt
-          git fetch --no-tags --depth=1 origin 066c92af91b50b9df5c54fe0b66e3ea816eba0de
-          test "$(git rev-parse FETCH_HEAD)" = 066c92af91b50b9df5c54fe0b66e3ea816eba0de
-          git worktree add --detach "$RUNNER_TEMP/historical" FETCH_HEAD
-          sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
-          sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke
+          python scripts/fetch_reviewed_schema.py --directory "$RUNNER_TEMP/schema"
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
+          timeout 120s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_index.cpp -o "$RUNNER_TEMP/index" -lsword
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_TEMP/raw" -lsword
-      - name: Compare all CCEL anchor words against neighboring source and published native bodies
+      - name: Build strictly source-attested first-verse coverage candidate
         run: |
           set -euo pipefail
           python - <<'PY'
-          import hashlib,json,os,re,subprocess,sys,urllib.request
+          import hashlib,json,os,re,shutil,subprocess
           from collections import Counter
-          from difflib import SequenceMatcher
           from pathlib import Path
           from lxml import etree
+          from check_brnp import check
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
-          tmp=Path(os.environ["RUNNER_TEMP"]);out=tmp/"mhc-anchor-final";out.mkdir()
-          sys.path.insert(0,str(tmp/"historical/scripts"))
-          from audit_osis import source_commentary_introductions,source_commentary_overlap_witness
-          src=Path("sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml")
-          original=Path("sources/original/commentaries/en/mhc-crosswire/mhc.osis.xml")
+          from commentary_native_raw_inventory import private_crosscheck
+          tmp=Path(os.environ["RUNNER_TEMP"]);out=tmp/"mhc-alias-trial";out.mkdir()
+          source=tmp/"prior/mhc-whitespace.osis.xml";raw=source.read_bytes()
           sha=lambda b:hashlib.sha256(b).hexdigest()
-          assert sha(src.read_bytes())=="c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4"
-          assert sha(original.read_bytes())=="3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6"
-          keys=["Josh.18.1","1Sam.25.1","2Sam.22.1"]
-          chapters={k.rsplit(".",1)[0] for k in keys}
-          orig_groups=[];source_commentary_overlap_witness(original,groups_out=orig_groups)
-          groups=[];source_commentary_overlap_witness(src,groups_out=groups)
-          intro=source_commentary_introductions(src)
-          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())["commentary_source"]["xml_witness_volumes"][1]
-          with urllib.request.urlopen(urllib.request.Request(manifest["url"],headers={"User-Agent":"Bible Resources source audit"}),timeout=35) as response:
-              raw=response.read(12_000_001)
-          assert sha(raw)==manifest["sha256"]
-          parser=lambda:etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True,huge_tree=True)
-          ccel=etree.fromstring(raw,parser());doc=etree.parse(str(src),parser())
-          ns="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
-          source_markers={n.get("sID"):n for n in doc.iter(ns+"verse") if n.get("sID")}
-          def words(text):return re.findall(r"\w+",text.casefold())
-          def folded(text):return " ".join(text.split())
-          def visible(raw):return "".join(etree.fromstring(b"<fragment>"+raw+b"</fragment>",parser()).itertext())
-          bodies={};native_keys=set()
-          p=subprocess.Popen([str(tmp/"raw"),"MHC"],env=dict(os.environ,SWORD_PATH=str(Path("modules/mhc-crosswire/payload").resolve())),stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
-          def receive(k,r,b):
-              native_keys.add((k,r))
-              if (k=="K" and r.rsplit(".",1)[0] in chapters) or (k=="I" and r in chapters):bodies[k,r]=b
-          try:
-              receipt,*_=parse_native_raw_corpus(p.stdout,on_entry=receive)
-              assert p.wait(timeout=60)==0
-          finally:
-              p.stdout.close()
-              if p.poll() is None:p.kill();p.wait()
-          assert receipt["all_native_raw_entries_ordered_sha256"]=="ea20737b3612cb183921c48beca96a728317dcbb5b4e5ff142308b6d974169b4"
-          result=[]
-          for key in keys:
-              chapter=key.rsplit(".",1)[0]
-              marker=[n for n in ccel.iter() if isinstance(n.tag,str) and etree.QName(n).localname=="scripCom" and n.get("osisRef")=="Bible:"+key]
-              assert len(marker)==1
-              node=marker[0];body=node.getnext();assert etree.QName(body).localname=="div"
-              witness="".join(body.itertext());w=words(witness)
-              gs=[g for g in groups if g["keys"][0].rsplit(".",1)[0]==chapter]
-              assert gs and ("K",key) not in native_keys
-              first=gs[0];assert first["keys"][0].endswith(".2")
-              joined=" ".join([intro[chapter]["text"]]+[g["text"] for g in gs])
-              book=next(n for n in doc.iter(ns+"div") if n.get("type")=="book" and n.get("osisID")==chapter.split(".")[0])
-              bookwords=" "+" ".join(words("".join(book.itertext())))+" "
-              def coverage(v):
-                  v=words(v)
-                  sm=SequenceMatcher(None,w,v,autojunk=False)
-                  matches=[m for m in sm.get_matching_blocks() if m.size]
-                  covered=sum(m.size for m in matches)
-                  missing=[{"start_word":op[1]+1,"count":op[2]-op[1]} for op in sm.get_opcodes() if op[0] in ("delete","replace") and op[2]>op[1]]
-                  windows=[w[i:i+12] for i in range(max(0,len(w)-11))]
-                  full=" "+" ".join(v)+" "
-                  hits=sum(" "+" ".join(x)+" " in full for x in windows)
-                  return {"source_tokens":len(w),"target_tokens":len(v),"ordered_words_matched":covered,"longest_exact_word_run":max((m.size for m in matches),default=0),"missing_or_replaced_word_runs":missing[:25],"sliding_12word_windows_matched":hits,"sliding_12word_windows_total":len(windows),"book_12word_windows_matched":sum(" "+" ".join(x)+" " in bookwords for x in windows)}
-              next_body=visible(bodies["K",first["keys"][0]])
-              orig=next(g for g in orig_groups if g["sID"]==first["sID"])
-              marker=source_markers[first["sID"]]
-              # Only original scope metadata and content-comparison counts.
-              # The labels are source-authored passage labels, not guessed keys.
-              result.append({"key":key,"master":first["keys"][0],"original_scope_label":marker.get("n"),"original_scope_ids":list(first["keys"]),"ccel_marker_line":node.sourceline,"ccel_witness_sha256":sha(witness.encode()),"ccel_vs_first_source":coverage(first["text"]),"ccel_vs_entire_chapter":coverage(joined),"ccel_vs_first_native":coverage(next_body),"source_first_text_unchanged_from_original":orig["text"]==first["text"],"native_contains_complete_first_source":"".join(first["text"].split()) in "".join(next_body.split()),"native_intro_matches_source":folded(intro[chapter]["text"]) in folded(visible(bodies["I",chapter])),"source_first_verse_occupied":False})
-          (out/"anchor-alignment.json").write_text(json.dumps(result,indent=2,sort_keys=True)+"\n")
-          print("MHC_ANCHOR_ALIGNMENT",json.dumps(result,sort_keys=True),flush=True)
-          # Classify boundary crossings: converting annotations to containers
-          # would change real paragraphs/poetry when they contain text on both sides.
+          assert sha(raw)=="46e1c04206b274b1dd58d2d043bedc121089f74bb0c78250339e5991a1999982"
+          proof=json.loads(Path("sources/cleaned/commentaries/en/mhc-crosswire/editorial/evidence/2026-11-24-first-verse-alignment.json").read_text())
+          approved={r["master"]:r for r in proof["anchor_alignment"]}
+          assert len(approved)==3
+          for r in approved.values():
+              w=r["ccel_vs_first_native"]
+              assert w["ordered_words_matched"]==w["source_tokens"]==w["longest_exact_word_run"]
+              assert r["native_contains_complete_first_source"] and not r["source_first_verse_occupied"]
+          parser=lambda:etree.XMLParser(resolve_entities=False,no_network=True,load_dtd=False,huge_tree=True)
+          doc=etree.fromstring(raw,parser());ns="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
           start={n.get("sID"):n for n in doc.iter(ns+"verse") if n.get("sID")}
           end={n.get("eID"):n for n in doc.iter(ns+"verse") if n.get("eID")}
-          assert set(start)==set(end) and len(start)==4255
+          assert len(start)==4255 and set(start)==set(end)
+          # Inventory existing common ancestors and boundary text without
+          # treating XML comments as visible prose or altering their tails.
+          def visible_child(n):
+              return ("".join(n.itertext()) if isinstance(n.tag,str) else "")+(n.tail or "")
           def before(n):
-              p=n.getparent()
-              return (p.text or "")+"".join("".join(x.itertext())+(x.tail or "") for x in list(p)[:p.index(n)])
+              p=n.getparent();return (p.text or "")+"".join(visible_child(x) for x in list(p)[:p.index(n)])
           def after(n):
-              p=n.getparent()
-              return (n.tail or "")+"".join("".join(x.itertext())+(x.tail or "") for x in list(p)[p.index(n)+1:])
-          counts=Counter();examples={}
+              p=n.getparent();return (n.tail or "")+"".join(visible_child(x) for x in list(p)[p.index(n)+1:])
+          counts=Counter();ancestor_owners=Counter();examples={}
           for sid,a in start.items():
-              b=end[sid]
-              p,q=a.getparent(),b.getparent()
-              signature=(etree.QName(p).localname,etree.QName(q).localname,bool(before(a).strip()),bool(after(b).strip()))
-              counts[signature]+=1;examples.setdefault(signature,sid)
-          census=[{"start_parent":k[0],"end_parent":k[1],"text_before_start_within_parent":k[2],"text_after_end_within_parent":k[3],"count":n,"example":examples[k]} for k,n in counts.items()]
-          (out/"paragraph-boundaries.json").write_text(json.dumps(census,indent=2,sort_keys=True)+"\n")
-          print("MHC_BOUNDARY_CENSUS",json.dumps(census,sort_keys=True),flush=True)
+              b=end[sid];p,q=a.getparent(),b.getparent()
+              parents=set(b.iterancestors());lca=next(x for x in a.iterancestors() if x in parents)
+              ancestor_owners[lca]+=1
+              sig=(etree.QName(p).localname,etree.QName(q).localname,bool(before(a).strip()),bool(after(b).strip()),etree.QName(lca).localname,lca.get("type") or "")
+              counts[sig]+=1;examples.setdefault(sig,sid)
+          geometry={"groups":len(start),"shapes":[{"start_parent":k[0],"end_parent":k[1],"visible_before":k[2],"visible_after":k[3],"common_ancestor":k[4],"common_ancestor_type":k[5],"count":v,"example":examples[k]} for k,v in counts.items()],"common_ancestor_ownership_counts":dict(Counter(ancestor_owners.values())),"single_owner_common_ancestors":sum(v==1 for v in ancestor_owners.values())}
+          (out/"scope-geometry.json").write_text(json.dumps(geometry,indent=2,sort_keys=True)+"\n")
+          print("MHC_SCOPE_GEOMETRY_FINAL",json.dumps(geometry,sort_keys=True),flush=True)
+          # Test extending compiler coverage only: keep original visible n,
+          # sID/eID, prose, reference labels, paragraphs and source positions.
+          # The first-verse exposition is already in the compiled master as
+          # witnessed by the complete independent CCEL token run.
+          edits=[]
+          pattern=re.compile(rb'<verse\b(?:[^>"\x27]|"[^"]*"|\x27[^\x27]*\x27)*>')
+          attr=re.compile(rb'\bosisID="([^"]+)"')
+          def replace(m):
+              a=attr.search(m.group())
+              if not a:return m.group()
+              ids=a.group(1).decode().split()
+              if not ids or ids[0] not in approved:return m.group()
+              plan=approved[ids[0]]
+              assert ids==plan["original_scope_ids"] and plan["key"].rsplit(".",1)[0]==ids[0].rsplit(".",1)[0]
+              assert plan["key"].endswith(".1") and ids[0].endswith(".2")
+              assert not any(plan["key"] in (n.get("osisID") or "").split() for n in start.values())
+              new=plan["key"].encode()+b" "+a.group(1)
+              edits.append({"input_offset":m.start()+a.start(1),"before":a.group(1).decode(),"after":new.decode(),"alias":plan["key"],"master":ids[0]})
+              return m.group()[:a.start(1)]+new+m.group()[a.end(1):]
+          candidate=pattern.sub(replace,raw);assert len(edits)==3
+          rev=candidate;shift=0
+          for e in edits:
+              e["output_offset"]=e["input_offset"]+shift;shift+=len(e["after"])-len(e["before"])
+          for e in reversed(edits):
+              p=e["output_offset"];after=e["after"].encode();assert rev[p:p+len(after)]==after
+              rev=rev[:p]+e["before"].encode()+rev[p+len(after):]
+          assert rev==raw and pattern.sub(replace,candidate)==candidate
+          changed=etree.fromstring(candidate,parser())
+          count=0
+          for a,b in zip(doc.iter(),changed.iter(),strict=True):
+              assert a.tag==b.tag and a.text==b.text and a.tail==b.tail
+              if a.attrib!=b.attrib:
+                  x,y=dict(a.attrib),dict(b.attrib)
+                  assert a.tag==ns+"verse" and x.pop("osisID").split()==y.pop("osisID").split()[1:] and x==y
+                  count+=1
+          assert count==3
+          dest=out/"mhc.osis.xml";dest.write_bytes(candidate)
+          brnp=check(dest,"commentary",schema_path=tmp/"schema/osisCore.2.1.1-cw-latest.xsd")
+          assert brnp["finding_codes"]=={"NO_COMMENTARY_ENTRIES":1}
+          (out/"brnp.json").write_text(json.dumps(brnp,indent=2,sort_keys=True)+"\n")
+          def compile_source(name,src):
+              root=tmp/name;data=root/"modules/comments/zcom4/mhc";data.mkdir(parents=True);(root/"mods.d").mkdir()
+              shutil.copyfile("modules/mhc-crosswire/payload/mods.d/mhc.conf",root/"mods.d/mhc.conf")
+              subprocess.run(["osis2mod",str(data),str(src),"-C","-z","z","-s","4","-b","3","-v","KJV","-N"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,timeout=240)
+              return root
+          def scan(root):
+              env=dict(os.environ,SWORD_PATH=str(root));frames={};rows=[]
+              p=subprocess.Popen([str(tmp/"raw"),"MHC"],env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+              def collect(k,r,b):frames[k,r]=sha(b);rows.append((k,r))
+              try:
+                  report,*_=parse_native_raw_corpus(p.stdout,on_entry=collect);assert p.wait(timeout=60)==0
+              finally:
+                  p.stdout.close()
+                  if p.poll() is None:p.kill();p.wait()
+              idx=subprocess.run([str(tmp/"index"),"MHC"],env=env,capture_output=True,check=True,timeout=90).stdout
+              private_crosscheck(idx,"MHC",rows,report)
+              link=subprocess.run([str(tmp/"index"),"MHC","--adjacent-links"],env=env,capture_output=True,check=True,timeout=90).stdout.decode().splitlines()
+              return frames,report["all_native_raw_entries_ordered_sha256"],set(x for x in link if x.startswith("L\t"))
+          base=compile_source("trim",source);root=compile_source("alias",dest)
+          a,ah,at=scan(base);b,bh,bt=scan(root)
+          assert ah=="2d8663f64ef554c5805a2bfb364b24a887c98d08aaac3812c6b9b5fd0f562e68"
+          expected={("K",e["alias"]) for e in edits}
+          missing=sorted(a.keys()-b.keys());extra=sorted(b.keys()-a.keys());different=sorted(k for k in a.keys()&b.keys() if a[k]!=b[k])
+          aliases=[]
+          for e in edits:
+              k,m=("K",e["alias"]),("K",e["master"])
+              proc=subprocess.run([str(tmp/"index"),"MHC","--is-linked",e["alias"],e["master"]],env=dict(os.environ,SWORD_PATH=str(root)),capture_output=True,timeout=15)
+              aliases.append({"alias":e["alias"],"master":e["master"],"identical_to_previous_master":b.get(k)==a[m],"identical_to_candidate_master":k in b and b[k]==b[m],"native_linked":proc.returncode==0 and proc.stdout.endswith(b"\t1\n")})
+          result={"source_sha256":sha(raw),"candidate_source_sha256":sha(candidate),"reversible":True,"exact_text_and_other_attributes_equal":True,"edits":edits,"baseline_native_sha256":ah,"candidate_native_sha256":bh,"missing_keys":missing,"extra_keys":extra,"changed_old_native_keys":different[:100],"changed_old_native_key_count":len(different),"all_prior_native_link_edges_unchanged":at<=bt,"new_link_edges":sorted(bt-at),"alias_checks":aliases,"brnp_codes":brnp["finding_codes"],"official_schema_validated":True,"published":False}
+          (out/"alias-trial.json").write_text(json.dumps(result,indent=2,sort_keys=True)+"\n")
+          print("MHC_ALIAS_TRIAL",json.dumps(result,sort_keys=True),flush=True)
+          assert not missing and set(extra)==expected and not different and at<=bt
+          assert all(x["identical_to_previous_master"] and x["identical_to_candidate_master"] and x["native_linked"] for x in aliases)
+          shutil.copytree(root,out/"payload")
           PY
-      - uses: actions/upload-artifact@v4
+      - name: Retain exact source and native candidate with proof
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: mhc-first-verse-final-audit
-          path: ${{ runner.temp }}/mhc-anchor-final/
+          name: mhc-alias-trial
+          path: ${{ runner.temp }}/mhc-alias-trial/
           if-no-files-found: warn
           retention-days: 90
