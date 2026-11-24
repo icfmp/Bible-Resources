@@ -1473,6 +1473,7 @@
       "purpose_first_line": "Private original OSIS vs native SWORD structural nonspace-boundary screen.",
       "python_imports": [
         "__future__",
+        "bisect",
         "collections",
         "hashlib",
         "lxml",
@@ -1484,7 +1485,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "87c18275bbf894514bae47008706cf4f2250e77183e61081be05afc67c19c169",
+      "sha256_at_inventory": "40d4b91ecc9e91c7ae102059062513a22d844a57891b59b435cc36f9877fa847",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
