@@ -111,19 +111,20 @@ jobs:
           # not a manually invented list of expected title words.
           # Each selected source book is independently represented once.
           chapter_title = re.compile(
-              rb'(?P<prefix><chapter\\b(?=[^<>]*\\bsID="[^"]+")'
-              rb'(?=[^<>]*\\bosisID="[^"]+")[^<>]*/>'
-              rb'(?:\\s*<!--[^>]*-->\\s*)*)'
+              rb'(?P<prefix><chapter\b(?=[^<>]*\bsID="[^"]+")'
+              rb'(?=[^<>]*\bosisID="[^"]+")[^<>]*/>'
+              rb'(?:\s*<!--[^>]*-->\s*)*)'
               rb'(?P<opening><title type="x-section">)')
-          chapter_id = re.compile(rb'\\bsID="([^"]+)"')
+          chapter_id = re.compile(rb'\bsID="([^"]+)"')
           all_titles = {}
-          for found in chapter_title.finditer(source.read_bytes()):
+          source_bytes = source.read_bytes()
+          for found in chapter_title.finditer(source_bytes):
               chapter = chapter_id.search(found.group("prefix"))
               if chapter is None:
                   raise SystemExit("Ambiguous source-attested first heading")
               chapter = chapter.group(1).decode("ascii")
-              end = source.read_bytes().find(b"</title>", found.end("opening"))
-              if end < 0 or b"<" in source.read_bytes()[found.end("opening"):end]:
+              end = source_bytes.find(b"</title>", found.end("opening"))
+              if end < 0 or b"<" in source_bytes[found.end("opening"):end]:
                   raise SystemExit("Unexpected mixed heading")
               title = source.read_bytes()[found.end("opening"):end].decode("utf-8")
               if chapter in all_titles or not title.strip():
