@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "Owner requested promotion to 1.0.0 in issue #561; publication pending final authorization. Exact immutable 0.1.2 package authenticated; only Version in SWORD configuration changed. All six binary members unchanged; existing reader limitations retained.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/561",
+    "reviewed_by": "Bible Resources project owner — previously approved BPC 2024 revision 2.0 source and editorial overlays (#241); conditional 0.1.2 publication authorization recorded on PR #554",
+    "source_rights": "Exact BPC 2024 rev. 2.0 Public Domain source; unchanged from reviewed 0.1.1."
+  },
+  "editorial_path": "modules/darby-jnd-2024/EDITORIAL.md",
+  "evidence_path": "modules/darby-jnd-2024/SOURCE_VALIDATION.json",
+  "module_id": "darby-jnd-2024",
+  "notes_path": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/releases/DARBY-JND-2024-1.0.0.md",
+  "package_sha256": "81acdfdfbbb18135a49609c045b293ce495a200b37f667f55c190925544b9553",
+  "package_size_bytes": 1960800,
+  "schema_version": 1,
+  "sword_id": "BRJND2024",
+  "tag": "darby-jnd-2024-1.0.0",
+  "title": "Bible J. N. Darby (2024) — 1.0.0",
+  "version": "1.0.0",
+  "zip_name": "BRJND2024-1.0.0.zip"
+}
