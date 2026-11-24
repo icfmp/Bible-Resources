@@ -6,11 +6,12 @@ on:
       - '.github/workflows/lsg-empty-paragraph-candidate.yml'
       - 'scripts/remove_reviewed_empty_osis_paragraphs.py'
       - 'tests/test_remove_reviewed_empty_osis_paragraphs.py'
+      - 'modules/lsg-1910/tools/review_empty_paragraph_xiphos.py'
 permissions:
   contents: read
 jobs:
   candidate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -96,7 +97,12 @@ jobs:
           PY
       - name: Compare actual Xiphos reading panes at all eight reviewed sites
         run: |
-          sudo apt-get install -y -qq xiphos xvfb dbus-x11 xdotool xclip
+          if test -f /etc/apt/apt-mirrors.txt; then
+            sudo sed -i -E 's#https?://[A-Za-z0-9.-]*ec2.archive.ubuntu.com/ubuntu#http://archive.ubuntu.com/ubuntu#g' /etc/apt/apt-mirrors.txt
+          fi
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y -qq xiphos xvfb dbus-x11 xdotool xclip x11-utils
+          dpkg-query -W xiphos libsword-dev
           python modules/lsg-1910/tools/review_empty_paragraph_xiphos.py
       - uses: actions/upload-artifact@v4
         if: always()

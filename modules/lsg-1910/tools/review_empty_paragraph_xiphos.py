@@ -88,15 +88,20 @@ def main():
                 disp=subprocess.Popen(["Xvfb",":91","-screen","0","1280x800x24","-nolisten","tcp"],
                                        env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
                 time.sleep(1.5)
+                # Keep startup diagnostics private to this run, not the corpus.
+                # The established Xiphos 4.2 reader test uses Ubuntu 24.04.
                 app=subprocess.Popen(["dbus-run-session","--","xiphos"],env=env,stdout=subprocess.DEVNULL,
-                                     stderr=subprocess.DEVNULL,start_new_session=True)
+                                     stderr=None,start_new_session=True)
                 window=None
                 for _ in range(90):
                     if app.poll() is not None: raise RuntimeError("Real Xiphos exited")
                     window=main_window(env)
                     if window: break
                     time.sleep(.5)
-                if not window: raise RuntimeError("No real Xiphos reader window")
+                if not window:
+                    print("XIPHOS_STARTUP_DIAGNOSTIC", label,
+                          run(["xwininfo","-root","-tree"],env,check=False).decode("utf-8","replace")[:5000],flush=True)
+                    raise RuntimeError("No real Xiphos reader window: "+label)
                 run(["xdotool","windowsize",window,"1216","736"],env)
                 run(["xdotool","windowmove",window,"16","16"],env)
                 time.sleep(1.2)
