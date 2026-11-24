@@ -1,0 +1,26 @@
+name: Refresh source-bound tool inventory for TEI integration
+on:
+  push:
+    branches: [integration/published-isbe-1915]
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Regenerate inventory without retaining this one-shot workflow
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/integration/published-isbe-1915
+          git rm .github/workflows/isbe-registry-refresh.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git commit -m 'Regenerate canonical tool inventory and retire one-shot refresh'
+          git push origin HEAD:refs/heads/integration/published-isbe-1915

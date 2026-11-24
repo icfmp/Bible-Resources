@@ -120,6 +120,11 @@ def approved_release(root: Path, plan_file: Path, built: Path) -> dict:
             or not editorial.read_text(encoding="utf-8").strip()
             or len(notes.read_bytes()) < 100):
         raise ReleaseError("Original-source evidence or release notes not reviewed")
+    if metadata.get("category") == "dictionary":
+        upstream = proof.get("upstream_release", {})
+        if (upstream.get("package_sha256") != plan["package_sha256"]
+                or upstream.get("package_size_bytes") != plan["package_size_bytes"]):
+            raise ReleaseError("Published dictionary ZIP differs from independently authenticated upstream bytes")
     catalogue = json.loads((root / "catalog/v1/catalog.json").read_text(encoding="utf-8"))
     entries = [m for m in catalogue["modules"] if m["id"] == module_id]
     if len(entries) != 1:
