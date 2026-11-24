@@ -25,14 +25,14 @@
   "prior_private_0_1_1_zip_sha256": "631f97956ba1b83def91fdba84f83ff9dcb0486a4097e5102a9b3a937f0abba6",
   "promoted_and_public_zip_member_bytes_identical": false,
   "public_zip_format": "canonical_Bible_Resources_catalogue_build",
-  "publication_authorized": false,
+  "publication_authorized": true,
   "published": false,
   "reader_replay_workflow_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45379658739",
   "release_tag": "darby-jnd-2024-1.0.0",
   "release_zip_bytes": 1960800,
   "release_zip_sha256": "81acdfdfbbb18135a49609c045b293ce495a200b37f667f55c190925544b9553",
   "six_ztext_payload_files_byte_identical_to_full_native_audit": true,
-  "status": "version_only_candidate",
+  "status": "version_only_validated_release_candidate",
   "xiphos_note_popup_fresh_verification": false,
   "xiphos_reading_pane_clipboard_parity": true,
   "xiphos_reading_pane_sample_count": 7,
@@ -50,5 +50,7 @@
     "sword_id": "BRJND2024",
     "tag": "darby-jnd-2024-0.1.2",
     "version": "0.1.2"
-  }
+  },
+  "owner_publication_authorization_url": "https://github.com/icfmp/Bible-Resources/issues/561#issuecomment-7144060806",
+  "version_promotion_final_validation_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45483939494"
 }

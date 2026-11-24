@@ -39,4 +39,4 @@ The real Xiphos replay on the exact 0.1.2 package and the immutable 0.1.1 archiv
 
 ## Version-only promotion 1.0.0 — 2026-11-24
 
-The installed identity and all six zText data files are unchanged from the authenticated public 0.1.2 package. Only the Version field changes. See [receipt](../../sources/cleaned/bibles/fr/darby-jnd-2024/editorial/evidence/darby-2024-1.0.0-version-receipt.json) and [release notes](../../sources/cleaned/bibles/fr/darby-jnd-2024/editorial/releases/DARBY-JND-2024-1.0.0.md). Final publication authorization pending.
+The installed identity and all six zText data files are unchanged from the authenticated public 0.1.2 package. Only the Version field changes. See [receipt](../../sources/cleaned/bibles/fr/darby-jnd-2024/editorial/evidence/darby-2024-1.0.0-version-receipt.json) and [release notes](../../sources/cleaned/bibles/fr/darby-jnd-2024/editorial/releases/DARBY-JND-2024-1.0.0.md). Owner's publication instruction recorded: https://github.com/icfmp/Bible-Resources/issues/561#issuecomment-7144060806. Final full-corpus and 534-test validation passed; public deployment remains to be verified.

@@ -1,8 +1,8 @@
 {
   "authorization": {
-    "decision": "Owner requested promotion to 1.0.0 in issue #561; publication pending final authorization. Exact immutable 0.1.2 package authenticated; only Version in SWORD configuration changed. All six binary members unchanged; existing reader limitations retained.",
-    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/561",
-    "reviewed_by": "Bible Resources project owner — previously approved BPC 2024 revision 2.0 source and editorial overlays (#241); conditional 0.1.2 publication authorization recorded on PR #554",
+    "decision": "Owner requested 1.0.0 promotion and continued after publication was identified as the remaining step; version-only release authorized. Exact immutable 0.1.2 package authenticated; only Version in SWORD configuration changed. All six data members unchanged; full native audit and 534 tests passed; existing reader limitations retained.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/561#issuecomment-7144060806",
+    "reviewed_by": "Bible Resources project owner — 2026-11-24; prior source and editorial approvals retained",
     "source_rights": "Exact BPC 2024 rev. 2.0 Public Domain source; unchanged from reviewed 0.1.1."
   },
   "editorial_path": "modules/darby-jnd-2024/EDITORIAL.md",
