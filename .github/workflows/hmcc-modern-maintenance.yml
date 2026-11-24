@@ -73,7 +73,7 @@ jobs:
           xsd,_=_schema(json.loads(POLICY_PATH.read_text()),schema.absolute())
           valid=xsd.validate(root)
           diag=check(source,"commentary",schema_path=schema if valid else None)
-          emit("MODERN_BRNP",{"schema_validated":valid,"schema_error_count":len(xsd.error_log),"schema_first_errors":[{"line":e.line,"type":e.type_name} for e in list(xsd.error_log)[:10]],"sha256":diag["sha256"],"findings":diag["finding_codes"],"examples":diag["finding_examples_by_code"],"entries":diag["commentary_entry_count"],"element_counts":diag["element_counts"]})
+          emit("MODERN_BRNP",{"schema_validated":valid,"schema_error_count":len(xsd.error_log),"schema_first_errors":[{"line":e.line,"type":e.type_name,"message":e.message} for e in list(xsd.error_log)[:10]],"sha256":diag["sha256"],"findings":diag["finding_codes"],"examples":diag["finding_examples_by_code"],"entries":diag["commentary_entry_count"],"element_counts":diag["element_counts"]})
           def census(path):
               tree=etree.parse(str(path))
               result=collections.Counter()
@@ -89,6 +89,7 @@ jobs:
                       if re.search(r"(?:^|[\s:])Gen\.5(?:\.|$)",a):
                           sample.append({"ref":a,"words":len(" ".join(e.itertext()).split()),"text":" ".join(" ".join(e.itertext()).split())[:3000]})
               return {"annotation_count":result["annotations"],"annotated_chapter_count":len(chapters),"annotated_chapters":chapters,"gen5":sample}
+          emit("MODERN_HEADER",{"header":etree.tostring(root.find(".//"+ns+"header"),encoding="unicode"),"schema_work_children":xsd.error_log[0].message if not valid else ""})
           c=census(Path("sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml"));m=census(source)
           emit("MODERN_SCOPES",{"classic_annotations":c["annotation_count"],"modern_annotations":m["annotation_count"],"classic_annotated_chapters":c["annotated_chapter_count"],"modern_annotated_chapters":m["annotated_chapter_count"],"classic_chapters_without_modern_annotateRef":sorted(c["annotated_chapters"]-m["annotated_chapters"]),"modern_chapters_without_classic_annotateRef":sorted(m["annotated_chapters"]-c["annotated_chapters"]),"gen5_classic":c["gen5"],"gen5_modern":m["gen5"]})
           def native(folder,module):
@@ -108,6 +109,14 @@ jobs:
               return rows,links,summary
           p,pl,ps=native("published","HMCCModern");r,rl,rs=native("rebuild","HMCCModern");c,cl,cs=native("classic","MHCC")
           emit("MODERN_NATIVE",{"published":ps,"rebuild":rs,"classic":cs,"rebuild_missing_keys":sorted(p.keys()-r.keys()),"rebuild_extra_keys":sorted(r.keys()-p.keys()),"changed_native_raw_count":sum(p[k]!=r[k] for k in p.keys()&r.keys()),"link_stream_equal":pl==rl,"classic_only_numbered_keys":sorted(k[1] for k in c.keys()-p.keys() if k[0]=="K")[:100],"modern_only_numbered_key_count":sum(k[0]=="K" for k in p.keys()-c.keys()),"classic_only_numbered_key_count":sum(k[0]=="K" for k in c.keys()-p.keys()),"scope_samples":{key:{"classic_present":("K",key) in c,"modern_present":("K",key) in p,"modern_words":len(re.sub(r"<[^>]+>"," ",p.get(("K",key),b"").decode()).split()),"modern_note_targets":re.findall(r'osisRef="([^"]+)"',p.get(("K",key),b"").decode())[:20]} for key in ["Gen.5.25","Num.29.1","Lev.19.1","Lev.19.37","Ps.108.1","Ps.108.13"]}})
+          extra=sorted(k[1] for k in p.keys()-c.keys() if k[0]=="K")
+          expected=sorted([f"Lev.19.{i}" for i in range(1,38)]+[f"Ps.108.{i}" for i in range(1,14)])
+          env=dict(os.environ,SWORD_PATH=str(t/"published"))
+          chapter_links={}
+          for chapter,end in [("Lev.19",37),("Ps.108",13)]:
+              master=chapter+".1"
+              chapter_links[chapter]={"same_raw":all(p[("K",f"{chapter}.{i}")]==p[("K",master)] for i in range(1,end+1)),"link_probes":[subprocess.check_output([str(t/"index"),"HMCCModern","--is-linked",master,f"{chapter}.{i}"],env=env,timeout=10).decode().strip() for i in range(2,end+1)]}
+          emit("MODERN_CHAPTER_ONLY",{"extra_exact_expected":extra==expected,"extra_keys":extra,"chapter_links":chapter_links})
           for folder,rows in [("classic",c),("published",p)]:
               raw=rows.get(("K","Gen.5.25"),b"").decode()
               emit("MODERN_GEN5_NATIVE",{"edition":folder,"body":re.sub(r"<[^>]+>"," ",raw)[:6000]})
