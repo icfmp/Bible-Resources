@@ -1,28 +1,17 @@
-name: LSG source-pinned chapter-opening section heading and SWORD audit
+name: Historical LSG 1.0.2 chapter-opening section heading replay
 on:
-  push:
-    branches: ['fix/lsg-chapter-opening-headings']
-    paths:
-      - '.github/workflows/lsg-chapter-heading-review.yml'
-      - 'modules/lsg-1910/tools/stage_chapter_heading_hotfix.py'
-  pull_request:
-    paths:
-      - '.github/workflows/lsg-chapter-heading-review.yml'
-      - 'scripts/mark_osis_preverse_section_titles.py'
-      - 'tests/test_mark_osis_preverse_section_titles.py'
-      - 'sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml'
-      - 'modules/lsg-1910/**'
-      - 'tests/**'
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   headings:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 22
     steps:
       - uses: actions/checkout@v4
         with:
+          # Historical exact-source replay, not a gate pinned to an obsolete current version.
+          ref: 5ea881265ba9cd525cd03fccc7925c1d5e5530c6
           fetch-depth: 0
       - name: Restore immutable approved 1.0.1 source before deriving the new heading edition
         run: |

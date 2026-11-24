@@ -7,8 +7,9 @@ on:
       - 'scripts/remove_reviewed_empty_osis_paragraphs.py'
       - 'tests/test_remove_reviewed_empty_osis_paragraphs.py'
       - 'modules/lsg-1910/tools/review_empty_paragraph_xiphos.py'
+      - 'modules/lsg-1910/tools/stage_empty_paragraph_hotfix.py'
 permissions:
-  contents: read
+  contents: write
 jobs:
   candidate:
     runs-on: ubuntu-24.04
@@ -104,6 +105,25 @@ jobs:
           timeout 180s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y -qq xiphos xvfb dbus-x11 xdotool xclip x11-utils
           dpkg-query -W xiphos libsword-dev
           python modules/lsg-1910/tools/review_empty_paragraph_xiphos.py
+      - name: Stage the validated 1.0.3 candidate only on its private correction branch
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/fix/lsg-empty-paragraphs
+          python modules/lsg-1910/tools/stage_empty_paragraph_hotfix.py
+          python -m unittest discover -s tests -v
+          # Retire the two one-shot workflows; receipts remain in the source history.
+          git rm .github/workflows/lsg-empty-paragraph-context.yml .github/workflows/lsg-empty-paragraph-candidate.yml
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -u
+          git add -f -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git add -- config/catalogue-import-lsg-1.0.3.json config/release-plans/lsg-1.0.3.json
+          git add -- sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-1.0.3* sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-1.0.2-RELEASE-PLAN.json
+          git diff --cached --stat
+          git commit -m 'Stage independently validated LSG 1.0.3 candidate and refresh registry'
+          git push origin HEAD:refs/heads/fix/lsg-empty-paragraphs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

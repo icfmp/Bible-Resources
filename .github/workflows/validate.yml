@@ -49,7 +49,7 @@ jobs:
           from pathlib import Path
           from approved_osis_sword_candidate import (
               approved_source_for, _candidate_result, original_osis_verses_and_notes,
-              project_reviewed_merge_slots,
+              project_reviewed_merge_slots, _read_native_frames,
               authorial_structures, authorial_body_opening_sequences,
               authorial_book_streams, authorial_outside_book_titles,
           )
@@ -58,6 +58,8 @@ jobs:
           from stable_sword_refs import (module_payload_digest, proof_errors, load_approved_merge_policy,
                                          inspect_references, parse_keys, parse_registry)
           from sword_native_inventory import collect_native_inventory
+          from source_osis_inventory import _source_tree, OSIS
+          from lxml import etree
           tmp = Path(os.environ["RUNNER_TEMP"])
           legacy = json.loads(Path("config/release-legacy-bindings.json").read_text())["entries"]
           legacy = {row["module_id"]: row for row in legacy}
@@ -203,6 +205,35 @@ jobs:
                       assert result["candidate_status"] == "full_numbered_text_and_note_preflight_equal_not_approved"
                       assert result["source_native_body_boundary_positions"]["all_title_text_and_nonspace_placement_equal"]
                       assert result["explicit_note_target_index_addressability"]["all_original_explicit_targets_index_addressable"]
+                  # A title's book-wide position alone cannot prove verse-zero
+                  # versus numbered-verse placement. Check explicitly authored
+                  # first section titles after chapter-opening milestones.
+                  root = _source_tree(source)
+                  expected_first_titles = {}
+                  for chapter in root.iter(OSIS+"chapter"):
+                      ident = chapter.get("sID")
+                      if not ident or chapter.get("osisID") != ident:
+                          continue
+                      title = chapter.getnext()
+                      while title is not None and not isinstance(title.tag, str):
+                          title = title.getnext()
+                      if title is not None and title.tag == OSIS+"title" and title.get("type") == "x-section":
+                          key = ident+".1"
+                          assert key in verses and key not in expected_first_titles
+                          expected_first_titles[key] = "".join(title.itertext())
+                  if expected_first_titles:
+                      seen = set()
+                      for kind,key,raw in _read_native_frames(tmp/"candidate-raw",m["sword_id"],payload.resolve()):
+                          if kind != "K" or key not in expected_first_titles:
+                              continue
+                          native = etree.fromstring(b"<private_root>"+raw+b"</private_root>",
+                              etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True))
+                          titles = ["".join(t.itertext()) for t in native.iter()
+                                    if isinstance(t.tag,str) and etree.QName(t).localname=="title"]
+                          assert expected_first_titles[key] in titles, (m["id"],key)
+                          seen.add(key)
+                      assert seen == set(expected_first_titles), (m["id"],sorted(set(expected_first_titles)-seen)[:20])
+                      print("NUMBERED_CHAPTER_FIRST_TITLES",m["id"],len(seen),flush=True)
                   linked = [ref for ref, rows in notes.items() if any(row["targets"] for row in rows)]
                   xref_hosts = [ref for ref, rows in notes.items()
                                 if any(row["type"] == "crossReference" and row["targets"] for row in rows)]
