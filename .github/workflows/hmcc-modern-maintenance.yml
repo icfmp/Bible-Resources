@@ -67,9 +67,9 @@ jobs:
           from check_brnp import check
           t=Path(os.environ["RUNNER_TEMP"]);p=Path("sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml");raw=p.read_bytes()
           ns="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
-          match=re.search(rb"(<language\b[^>]*>[^<]*</language>)(<description\b[^>]*>[^<]*</description>)",raw)
+          match=re.search(rb"(<identifier\b[^>]*>[^<]*</identifier>)(<language\b[^>]*>[^<]*</language>)(<description\b[^>]*>[^<]*</description>)",raw)
           assert match and match.start()<raw.index(b"</header>") and len(list(re.finditer(rb"<language\b",raw)))==1
-          before=match.group();after=match.group(2)+match.group(1)
+          before=match.group();after=match.group(3)+match.group(1)+match.group(2)
           out=raw[:match.start()]+after+raw[match.end():]
           assert out[:match.start()]+before+out[match.start()+len(after):]==raw
           a=etree.fromstring(raw);b=etree.fromstring(out)
