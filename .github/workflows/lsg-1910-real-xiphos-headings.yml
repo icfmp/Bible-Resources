@@ -24,7 +24,7 @@ jobs:
           fi
           timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
           timeout 180s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y xiphos xvfb dbus-x11 xdotool xclip diatheke
-      - name: Verify source-locked SWORD and read Romans 1 and 2 through a real GUI
+      - name: Source-stratified real Xiphos first-chapter heading audit across both Testaments
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: |
@@ -107,6 +107,48 @@ jobs:
                          for i in range(4,len(native_words)-span+1)):
                       return span
               return 0
+          # Select original chapter-first titles from the exact pinned candidate,
+          # not a manually invented list of expected title words.
+          # Each selected source book is independently represented once.
+          chapter_title = re.compile(
+              rb'(?P<prefix><chapter\\b(?=[^<>]*\\bsID="[^"]+")'
+              rb'(?=[^<>]*\\bosisID="[^"]+")[^<>]*/>'
+              rb'(?:\\s*<!--[^>]*-->\\s*)*)'
+              rb'(?P<opening><title type="x-section">)')
+          chapter_id = re.compile(rb'\\bsID="([^"]+)"')
+          all_titles = {}
+          for found in chapter_title.finditer(source.read_bytes()):
+              chapter = chapter_id.search(found.group("prefix"))
+              if chapter is None:
+                  raise SystemExit("Ambiguous source-attested first heading")
+              chapter = chapter.group(1).decode("ascii")
+              end = source.read_bytes().find(b"</title>", found.end("opening"))
+              if end < 0 or b"<" in source.read_bytes()[found.end("opening"):end]:
+                  raise SystemExit("Unexpected mixed heading")
+              title = source.read_bytes()[found.end("opening"):end].decode("utf-8")
+              if chapter in all_titles or not title.strip():
+                  raise SystemExit("Repeated or empty original chapter-first heading")
+              all_titles[chapter] = title
+          if len(all_titles) != 803:
+              raise SystemExit("Changed source-authored chapter-first title inventory")
+          preferred_books = (
+              "Gen", "Exod", "Ps", "Prov", "Isa", "Jer", "Dan", "Hag",
+              "Matt", "Mark", "Luke", "John", "Acts", "Rom", "1Cor", "Rev")
+          first_per_book = {}
+          for chapter, heading in all_titles.items():
+              book, number = chapter.rsplit(".", 1)
+              first_per_book.setdefault(book, (chapter + ".1", book + " " + number + ":1", heading))
+          missing = sorted(set(preferred_books) - set(first_per_book))
+          if missing:
+              raise SystemExit("Missing source-attested heading in planned book: " + ",".join(missing))
+          samples = tuple(first_per_book[book] for book in preferred_books)
+          report["stratification"] = {
+              "authored_chapter_opening_titles": len(all_titles),
+              "sample_count": len(samples),
+              "source_books": list(preferred_books),
+              "old_testament_books": 8, "new_testament_books": 8,
+              "source_attested_selection": True,
+          }
           disp=app=None
           with tempfile.TemporaryDirectory(prefix="isolated-lsg-xiphos-") as home:
               home=Path(home)
@@ -115,8 +157,6 @@ jobs:
                        XDG_CACHE_HOME=str(home/"cache"),XDG_DATA_HOME=str(home/"data"),
                        SWORD_PATH=str(payload),GDK_BACKEND="x11",DISPLAY=":91",
                        NO_AT_BRIDGE="1",LC_ALL="C.UTF-8")
-              samples=(("Rom.1.1","Rom 1:1","Adresse et salutation"),
-                       ("Rom.2.1","Rom 2:1","Les païens"))
               try:
                   native={key:run(["diatheke","-b","BRLSG1910","-f","plain","-k",ref],env)
                           .decode("utf-8","replace") for key,ref,title in samples}
@@ -185,8 +225,8 @@ jobs:
                       print("Actual GUI title/prose diagnostic:",key,json.dumps(record,sort_keys=True))
                   if not all(v["heading_once"] and v["native_verse_prose_match"]
                              for v in report["observations"].values()):
-                      raise RuntimeError("GUI clipboard did not confirm both source titles and verse prose")
-                  report["status"]="TWO_REAL_XIPHOS_HEADING_AND_NATIVE_VERSE_GUI_MATCHES"
+                      raise RuntimeError("Real GUI did not confirm all 16 source-attested chapter headings and verse prose")
+                  report["status"]="SIXTEEN_STRATIFIED_SOURCE_HEADING_AND_NATIVE_GUI_MATCHES"
               finally:
                   (out/"evidence.json").write_text(json.dumps(report,sort_keys=True,indent=2)+"\n")
                   stop(app); stop(disp)
@@ -196,7 +236,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lsg-1.0.2-real-xiphos-heading-evidence
+          name: lsg-1.0.2-stratified-real-xiphos-heading-evidence
           path: ${{ runner.temp }}/lsg-real-xiphos/evidence.json
           retention-days: 14
           if-no-files-found: warn
