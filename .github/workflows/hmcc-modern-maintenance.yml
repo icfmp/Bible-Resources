@@ -55,6 +55,35 @@ jobs:
           PY
           echo 'Both public ZIPs and exact modern source verified'
           osis2mod "$RUNNER_TEMP/rebuild/modules/comments/zcom/hmccmodern" sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml -z z -b 3 > "$RUNNER_TEMP/compile.log" 2>&1 || { tail -15 "$RUNNER_TEMP/compile.log"; exit 1; }
+      - name: Prepare reversible metadata-only XML correction
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p test_brnp.py -v
+          python - <<'PY'
+          import hashlib,json,os,shutil,re
+          from pathlib import Path
+          from lxml import etree
+          from guard_osis import _schema,POLICY_PATH
+          from check_brnp import check
+          t=Path(os.environ["RUNNER_TEMP"]);p=Path("sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml");raw=p.read_bytes()
+          ns="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
+          match=re.search(rb"(<language\b[^>]*>[^<]*</language>)(<description\b[^>]*>[^<]*</description>)",raw)
+          assert match and match.start()<raw.index(b"</header>") and len(list(re.finditer(rb"<language\b",raw)))==1
+          before=match.group();after=match.group(2)+match.group(1)
+          out=raw[:match.start()]+after+raw[match.end():]
+          assert out[:match.start()]+before+out[match.start()+len(after):]==raw
+          a=etree.fromstring(raw);b=etree.fromstring(out)
+          assert etree.tostring(a.find(ns+"osisText"),encoding="unicode").split("</header>",1)[1]==etree.tostring(b.find(ns+"osisText"),encoding="unicode").split("</header>",1)[1]
+          schema=t/"schema/osisCore.2.1.1-cw-latest.xsd";xsd,_=_schema(json.loads(POLICY_PATH.read_text()),schema.absolute());assert xsd.validate(b),str(xsd.error_log)
+          candidate=t/"hmcc-modern-candidate.osis.xml";candidate.write_bytes(out);d=check(candidate,"commentary",schema_path=schema);assert d["finding_count"]==0,d["finding_codes"]
+          report={"source_sha256":hashlib.sha256(raw).hexdigest(),"candidate_sha256":hashlib.sha256(out).hexdigest(),"offset":match.start(),"before":before.decode(),"after":after.decode(),"source_reversible":True,"body_byte_identical":True,"official_schema_validated":True,"brnp":d}
+          (t/"header-correction.json").write_text(json.dumps(report,indent=2)+"\n");print("MODERN_HEADER_TRIAL",json.dumps(report),flush=True)
+          for kind,slug,file in [("bible","lsg-1910","lsg-1910.osis.xml"),("bible","darby-jnd-2024","bible_jnd_2_0.osis.xml"),("commentary","mhcc-crosswire","mhcc.osis.xml"),("commentary","mhc-crosswire","mhc.osis.xml")]:
+              q=Path("sources/cleaned")/("bibles/fr" if kind=="bible" else "commentaries/en")/slug/file
+              v=check(q,kind,schema_path=schema);print("MODERN_BRNP_REGRESSION",slug,json.dumps(v["finding_codes"]),flush=True)
+          (t/"corrected/modules/comments/zcom/hmccmodern").mkdir(parents=True);shutil.copytree(t/"published/mods.d",t/"corrected/mods.d")
+          PY
+          osis2mod "$RUNNER_TEMP/corrected/modules/comments/zcom/hmccmodern" "$RUNNER_TEMP/hmcc-modern-candidate.osis.xml" -z z -b 3 > "$RUNNER_TEMP/corrected.log" 2>&1
       - name: Full native corpus, linked addresses, chapter scopes, and BRNP diagnostic
         run: |
           set -euo pipefail
@@ -109,6 +138,10 @@ jobs:
               return rows,links,summary
           p,pl,ps=native("published","HMCCModern");r,rl,rs=native("rebuild","HMCCModern");c,cl,cs=native("classic","MHCC")
           emit("MODERN_NATIVE",{"published":ps,"rebuild":rs,"classic":cs,"rebuild_missing_keys":sorted(p.keys()-r.keys()),"rebuild_extra_keys":sorted(r.keys()-p.keys()),"changed_native_raw_count":sum(p[k]!=r[k] for k in p.keys()&r.keys()),"link_stream_equal":pl==rl,"classic_only_numbered_keys":sorted(k[1] for k in c.keys()-p.keys() if k[0]=="K")[:100],"modern_only_numbered_key_count":sum(k[0]=="K" for k in p.keys()-c.keys()),"classic_only_numbered_key_count":sum(k[0]=="K" for k in c.keys()-p.keys()),"scope_samples":{key:{"classic_present":("K",key) in c,"modern_present":("K",key) in p,"modern_words":len(re.sub(r"<[^>]+>"," ",p.get(("K",key),b"").decode()).split()),"modern_note_targets":re.findall(r'osisRef="([^"]+)"',p.get(("K",key),b"").decode())[:20]} for key in ["Gen.5.25","Num.29.1","Lev.19.1","Lev.19.37","Ps.108.1","Ps.108.13"]}})
+          fix,fl,fs=native("corrected","HMCCModern")
+          result={"native":fs,"all_raw_equal":p==fix,"links_equal":pl==fl,"changed_keys":[list(k) for k in p.keys()&fix.keys() if p[k]!=fix[k]],"missing_keys":[list(k) for k in p.keys()-fix.keys()],"extra_keys":[list(k) for k in fix.keys()-p.keys()]}
+          print("MODERN_HEADER_NATIVE_TRIAL",json.dumps(result,sort_keys=True),flush=True)
+          assert p==fix and pl==fl
           extra=sorted(k[1] for k in p.keys()-c.keys() if k[0]=="K")
           expected=sorted([f"Lev.19.{i}" for i in range(1,38)]+[f"Ps.108.{i}" for i in range(1,14)])
           env=dict(os.environ,SWORD_PATH=str(t/"published"))
@@ -121,3 +154,11 @@ jobs:
               raw=rows.get(("K","Gen.5.25"),b"").decode()
               emit("MODERN_GEN5_NATIVE",{"edition":folder,"body":re.sub(r"<[^>]+>"," ",raw)[:6000]})
           PY
+      - name: Retain reversible candidate and metadata proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: modern-header-correction-trial
+          path: |
+            ${{ runner.temp }}/hmcc-modern-candidate.osis.xml
+            ${{ runner.temp }}/header-correction.json
+          retention-days: 30
