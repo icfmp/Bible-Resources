@@ -5,6 +5,45 @@
       "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "modules/lsg-1910/tools/review_empty_paragraph_xiphos.py",
+      "proposed_action": "Keep with the owning module only while its pinned maintenance/replay workflow and regression checks remain necessary.",
+      "purpose_first_line": "Targeted real Xiphos QA of reviewed empty-paragraph sites, old vs candidate.",
+      "python_imports": [
+        "hashlib",
+        "json",
+        "lxml",
+        "os",
+        "pathlib",
+        "re",
+        "shutil",
+        "signal",
+        "subprocess",
+        "tempfile",
+        "time",
+        "unicodedata"
+      ],
+      "reader_tool_signals": [
+        "xiphos"
+      ],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "5c8fcd48757c05606a0331ae011e18478c78721ac6c858c406a72cf864fed1f3",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 1,
+      "static_references": [
+        "docs/workflows/BIBLE_7_STAGE_WORKFLOW.md"
+      ]
+    },
+    {
+      "classification": "MODULE_LOCAL",
+      "confidence": "high",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
         "OSIS",
         "USFX"
       ],
@@ -39,7 +78,50 @@
       "stage_hint": "not determined",
       "static_reference_count": 1,
       "static_references": [
-        ".github/workflows/lsg-chapter-heading-review.yml"
+        "docs/workflows/BIBLE_7_STAGE_WORKFLOW.md"
+      ]
+    },
+    {
+      "classification": "MODULE_LOCAL",
+      "confidence": "high",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "OSIS",
+        "USFM",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "modules/lsg-1910/tools/stage_empty_paragraph_hotfix.py",
+      "proposed_action": "Keep with the owning module only while its pinned maintenance/replay workflow and regression checks remain necessary.",
+      "purpose_first_line": "Stage the validated LSG 1.0.3 empty-paragraph candidate in a PR only.",
+      "python_imports": [
+        "__future__",
+        "build",
+        "catalogue_release_coverage",
+        "copy",
+        "hashlib",
+        "json",
+        "pathlib",
+        "publish_reviewed_release",
+        "release_preflight",
+        "shutil",
+        "stable_sword_refs",
+        "sys",
+        "tempfile",
+        "validate"
+      ],
+      "reader_tool_signals": [
+        "xiphos"
+      ],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "372cb6f992edc13499a4cfa36294ef1f8ca60c6078c96697d7019d7c073534fb",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 1,
+      "static_references": [
+        "docs/workflows/BIBLE_7_STAGE_WORKFLOW.md"
       ]
     },
     {
@@ -324,9 +406,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 14,
+      "static_reference_count": 15,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
+        "modules/lsg-1910/tools/stage_empty_paragraph_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/publish_reviewed_release.py",
@@ -399,9 +482,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 11,
+      "static_reference_count": 12,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
+        "modules/lsg-1910/tools/stage_empty_paragraph_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/publish_reviewed_release.py",
@@ -1159,9 +1243,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 12,
+      "static_reference_count": 13,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
+        "modules/lsg-1910/tools/stage_empty_paragraph_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/release_preflight.py",
@@ -1248,9 +1333,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
+        "modules/lsg-1910/tools/stage_empty_paragraph_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/tool_registry.py",
@@ -1259,6 +1345,42 @@
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "tests/test_release_preflight.py",
         "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/remove_reviewed_empty_osis_paragraphs.py",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
+      "purpose_first_line": "Source-pinned, reversible removal of reviewed redundant OSIS paragraphs.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "hashlib",
+        "json",
+        "lxml",
+        "pathlib",
+        "re",
+        "source_osis_inventory",
+        "stable_sword_refs"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "2f5d06ed6b6c3a10705b1f12b86b1be621bb2329ca3bc34c7447b0c338d3377d",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/tool_registry.py",
+        ".github/workflows/validate.yml",
+        "tests/test_remove_reviewed_empty_osis_paragraphs.py"
       ]
     },
     {
@@ -1844,14 +1966,16 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 10,
+      "static_reference_count": 12,
       "static_references": [
         "scripts/approved_osis_sword_candidate.py",
         "scripts/osis_semantic_fidelity.py",
+        "scripts/remove_reviewed_empty_osis_paragraphs.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
         "scripts/research/bible/source_native_osis_structure_screen.py",
         "scripts/research/bible/source_osis_verse_notes.py",
         "scripts/tool_registry.py",
+        ".github/workflows/validate.yml",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
         "docs/technical/SOURCE_OSIS_INVENTORY.md",
         "tests/test_osis_semantic_fidelity.py",
@@ -1886,13 +2010,15 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 22,
+      "static_reference_count": 24,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
+        "modules/lsg-1910/tools/stage_empty_paragraph_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/approved_osis_sword_candidate.py",
         "scripts/published_reference_audit.py",
+        "scripts/remove_reviewed_empty_osis_paragraphs.py",
         "scripts/research/bible/native_milestone_pair_audit.py",
         "scripts/research/bible/source_native_note_positions.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
@@ -2254,7 +2380,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "bc667b487130d6e0ae8e2f834bd14cc19ec1bda8162995cb0e83a90bed2f96eb",
+      "sha256_at_inventory": "1d47ce538651334dc0c969773b5f9e76232f2b4b37c66876b35cf3b4c019a2b8",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -2309,9 +2435,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 22,
+      "static_reference_count": 23,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
+        "modules/lsg-1910/tools/stage_empty_paragraph_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/build.py",
