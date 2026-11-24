@@ -324,7 +324,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 14,
+      "static_reference_count": 15,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
@@ -332,6 +332,7 @@
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
         "scripts/tool_registry.py",
+        ".github/workflows/mhcc-promotion.yml",
         ".github/workflows/pages.yml",
         ".github/workflows/validate.yml",
         "docs/architecture/RESOURCE_PROFILES.md",
@@ -1246,7 +1247,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
@@ -1255,6 +1256,7 @@
         ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
+        ".github/workflows/mhcc-promotion.yml",
         "tests/test_release_preflight.py",
         "tests/test_tool_registry.py"
       ]
@@ -1621,16 +1623,17 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "ea0c87ba82f44ac46875012089e6b76cdb343e40e1815b863d036392b889e993",
+      "sha256_at_inventory": "5d4dcb08bf5b2cd24c790f6b2e44406bc99368b78264622050444c02d84e7b68",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 7,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/reviewed_modern_commentary_rebuild.py",
         "scripts/reviewed_osis_commentary_rebuild.py",
         "scripts/tool_registry.py",
         "scripts/validate.py",
+        ".github/workflows/mhcc-promotion.yml",
         "docs/workflows/PUBLISHING.md",
         "tests/test_reviewed_compiled_commentary_rebuild.py",
         "tests/test_tool_registry.py"
@@ -2220,10 +2223,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
+        ".github/workflows/mhcc-promotion.yml",
         ".github/workflows/tool-registry-maintenance.yml",
         "tests/test_tool_registry.py"
       ]
@@ -2268,7 +2272,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 22,
+      "static_reference_count": 23,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
@@ -2280,6 +2284,7 @@
         ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
+        ".github/workflows/mhcc-promotion.yml",
         ".github/workflows/pages.yml",
         ".github/workflows/validate.yml",
         "docs/policies/COMMENTARY_POLICY.md",

@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "Owner requested metadata-only name harmonization and promotion to 1.0.0; exact 0.1.2 content and source proof retained.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/557",
+    "reviewed_by": "Bible Resources project owner",
+    "source_rights": "CrossWire Public Domain — Copy Freely; Genesis phrase independently witnessed in Bible Truth Forum public-domain concise text; no separate CCEL edition or project relicensing."
+  },
+  "editorial_path": "modules/mhcc-crosswire/EDITORIAL.md",
+  "evidence_path": "modules/mhcc-crosswire/SOURCE_VALIDATION.json",
+  "module_id": "mhcc-crosswire",
+  "notes_path": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/releases/MHCC-1.0.0.md",
+  "package_sha256": "04bdbeb103e3b766b723c0aa627e4ceab29adaacc657f3070bb5c99fb5df08b3",
+  "package_size_bytes": 2474083,
+  "schema_version": 1,
+  "sword_id": "MHCC",
+  "tag": "mhcc-1.0.0",
+  "title": "Matthew Henry's Concise Commentary — MHCC 1.0.0",
+  "version": "1.0.0",
+  "zip_name": "MHCC-1.0.0.zip"
+}
