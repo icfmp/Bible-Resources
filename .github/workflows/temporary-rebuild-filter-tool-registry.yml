@@ -28,7 +28,7 @@ jobs:
           python scripts/tool_registry.py --check
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          git add -f -- reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
           git diff --cached --check
           if ! git diff --cached --quiet; then
             git commit -m 'chore(tools): register generic SWORD option-filter validation'
