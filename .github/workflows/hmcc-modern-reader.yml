@@ -185,7 +185,7 @@ jobs:
           set -euo pipefail
           export COMMENTARY_JSWORD_MODULE_ROOT="$RUNNER_TEMP/commentary-andbible-jsword-private-modern"
           export COMMENTARY_JSWORD_MODULE_ID=HMCCModern
-          export COMMENTARY_JSWORD_SAMPLES='Genesis 5:25;Leviticus 19:1;Leviticus 19:37;Psalms 108:1;Psalms 108:13;1 Samuel 25:39;Psalms 95:11;Genesis 12:6;Numbers 29:1'
+          export COMMENTARY_JSWORD_SAMPLES='Genesis 5:25;Leviticus 19:1;Leviticus 19:37;Psalms 108:1;Psalms 108:13;1Sam 25:39;Psalms 95:11;Genesis 12:6;Numbers 29:1'
           export SWORD_PATH="$COMMENTARY_JSWORD_MODULE_ROOT"
           export HOME="$RUNNER_TEMP/modern-java-home"
           export GRADLE_USER_HOME="$RUNNER_TEMP/modern-gradle-home"
@@ -206,6 +206,15 @@ jobs:
           t=ET.parse(p).getroot()
           counts={k:int(t.attrib.get(k,"0")) for k in ("tests","errors","failures","skipped")}
           assert t.tag=="testsuite"
+          # Report only fixed assertion labels from the reviewed probe, never prose or stack traces.
+          allowed={"Pinned private module directory required","Exact original module identity required","Real diatheke-checked sample references required","An isolated SWORD directory is required","Never read a global SWORD library","Exact original SWORD config missing","At least two independent real entries required","Invalid independent probe reference","The original CrossWire commentary is not visible to JSword","A different module was selected","JSword could not resolve a confirmed stock key","JSword could not locate an actually occupied stock slot","JSword returned no raw commentary","JSword returned an unexpectedly small commentary entry","Original SWORD comment OSIS fragment absent","Structured commentary rendered to null","Structured commentary had no substantive prose","A distinct original book address was conflated"}
+          diagnostics=[]
+          for case in t.findall("testcase"):
+              for failure in list(case.findall("failure"))+list(case.findall("error")):
+                  message=failure.attrib.get("message","")
+                  labels=[label for label in sorted(allowed) if label in message]
+                  diagnostics.append({"case":case.attrib.get("name","unknown"),"assertion_labels":labels})
+          print("JSWORD_ASSERTION_DIAGNOSTICS",json.dumps(diagnostics))
           receipt={"schema_version":1,"module_id":"HMCCModern","version":"1.0.0","candidate_conf_sha256":"d76a68c39cb3137b0334bebbde358b3089078a5349b269f7bce5097847d61e6d","candidate_source_sha256":"784dadcb4800c7e8d0fede02aa6116ee55d4f835b25168c4b3ba3ff530e1fb38","jsword_commit":"6ebd10a005fa7761e611c048ececea1430e22546","probe_revision":"7fdb347e073a96464a70290ef87d90c43dcf02c2","samples":os.environ["COMMENTARY_JSWORD_SAMPLES"].split(";"),"junit":counts,"gradle_exit_code":int(os.environ["PROBE_RC"]),"android_gui_verified":False,"actual_note_click_verified":False,"limitation":"Substantive raw and structured entries and distinct book keys; not full cross-engine text parity."}
           (Path(os.environ["RUNNER_TEMP"])/"modern-jsword-receipt.json").write_text(json.dumps(receipt,indent=2)+"\n")
           print(json.dumps(receipt))
