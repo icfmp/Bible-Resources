@@ -222,8 +222,22 @@ jobs:
               book,ch,v=key.split(".")
               ref=f"{book} {ch}:{v}"
               code,data=query("MHCC",ref,fmt="plain",root=qa_root)
-              assert present_key(ref,data,code)
               is_edit=key in {k[1] for k in hosts}
+              old_code,old_data=query("MHCC",ref,fmt="plain",root=published)
+              # Natural commentary prose can contain words such as "not found".
+              # Do not use a generic textual heuristic as sole proof of retrieval.
+              source_words=lambda raw: " ".join(semantics(raw)[0].split()).casefold()
+              plain_words=lambda raw: " ".join(raw.decode("utf-8","strict").split()).casefold()
+              expected=source_words(revised["K",key]); actual=plain_words(data)
+              old_expected=source_words(new["K",key]); old_actual=plain_words(old_data)
+              # Preserve a distinctive source prose run; headings or whitespace can differ.
+              def witness(expected,actual):
+                  words=expected.split()
+                  return any(" ".join(words[i:i+12]) in actual for i in range(max(0,len(words)-11)))
+              ok=code==0 and len(data)>64 and witness(expected,actual)
+              old_ok=old_code==0 and len(old_data)>64 and witness(old_expected,old_actual)
+              print("DIATHEKE_WITNESS",json.dumps({"reference":key,"code":code,"bytes":len(data),"source_prose_witness":ok,"old_source_prose_witness":old_ok,"generic_heuristic":present_key(ref,data,code)},sort_keys=True),flush=True)
+              assert ok and old_ok, key
               if is_edit:
                   assert b"Lamech hoped for relief by the birth of this son" in data
                   assert broken not in data
@@ -283,7 +297,7 @@ jobs:
               ref=f"{book} {ch}:{v}"
               code,commentary=query("MHCC",ref,fmt="plain",root=root)
               bc,bible_text=query("BRLSG1910",ref,fmt="plain",root=root)
-              assert present_key(ref,commentary,code) and present_key(ref,bible_text,bc)
+              assert code==0 and len(commentary)>64 and present_key(ref,bible_text,bc), key
               comparisons[ref]={"commentary":commentary,"bible":bible_text,"commentary_internal":entries["K",key]}
           # Require the restored sentence itself in the GUI selection, not only
           # any unrelated long excerpt from the same chapter.
