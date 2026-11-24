@@ -1,0 +1,71 @@
+name: Compare actual OSIS and native SWORD editorial scope inventory
+on:
+  push:
+    branches: [research/osis-editorial-inline-inventory]
+    paths: ['.github/workflows/osis-editorial-inline-inventory.yml']
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Install actual stock SWORD reader and compile independent raw inspector
+        run: |
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o /tmp/native-raw -lsword
+      - name: Compare all source and native inline and introduction scope inventories without exposing text
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from collections import Counter
+          from hashlib import sha256
+          import json
+          from lxml import etree
+          from approved_osis_sword_candidate import approved_source_for,_read_native_frames
+          from source_osis_inventory import _source_tree, OSIS
+          from research.bible.native_milestone_pair_audit import _strict_root
+          TAGS={"q","quote","speech","speaker","hi","foreign","transChange","divineName","name","seg","lb","reference","div","milestone","inscription","closer","signed","salute","title","p"}
+          TYPES={"introduction","x-introduction","section","x-section","book","bookGroup","chapter","x-p","x-milestone","parallel","main","sub","chapter","canonical","x-preverse","italic","bold","small-caps","super","sub","added","deleted","acrostic","crossReference","x-cross-ref","x-sel","x-strongs","x-extra","x-psalm"}
+          def local(n):
+              return etree.QName(n).localname if isinstance(n.tag,str) else ""
+          def collect(root,counts,scopes,kind):
+              def visit(n,scope):
+                  name=local(n)
+                  if not name: return
+                  if name=="header": return
+                  if name in {"note","title"}: scope=name
+                  typ=n.get("type")
+                  if name in TAGS and (name!="div" or typ not in {"book","bookGroup","x-p","x-milestone"}):
+                      attrs=tuple(sorted(etree.QName(k).localname for k in n.attrib))
+                      # Fixed labels only. Unknown values are counted, never printed.
+                      safe_type=typ if typ in TYPES else ("other" if typ else "none")
+                      if n.get("sID") is not None: form="open"
+                      elif n.get("eID") is not None: form="close"
+                      else: form="container"
+                      key="|".join((scope,name,safe_type,form,",".join(attrs)))
+                      counts[key]+=1
+                      scopes[kind+"|"+scope+"|"+name]+=1
+                  for c in n: visit(c,scope)
+              visit(root,"body")
+          for folder in sorted(Path("modules").iterdir()):
+              metadata=folder/"metadata.json"
+              if not metadata.is_file(): continue
+              m=json.loads(metadata.read_text())
+              if m.get("category")!="bible" or m.get("quality",{}).get("status")!="approved" or m.get("index_audit",{}).get("mode")!="stock_reader_keys": continue
+              cfg,xml=approved_source_for(m["id"])
+              source,native,source_scope,native_scope=Counter(),Counter(),Counter(),Counter()
+              collect(_source_tree(xml),source,source_scope,"source")
+              frames=Counter()
+              for kind,ref,raw in _read_native_frames(Path("/tmp/native-raw"),m["sword_id"],(folder/"payload").resolve()):
+                  frames[kind]+=1
+                  collect(_strict_root(raw),native,native_scope,kind)
+              report={"resource":m["id"],"source_sha256":sha256(xml).hexdigest(),"native_frame_counts":dict(frames),"source_markup_signatures":dict(sorted(source.items())),"native_markup_signatures":dict(sorted(native.items())),"native_entry_scope_counts":dict(sorted(native_scope.items())),"scope":"inventory only, not quotation or introduction fidelity approval"}
+              print("EDITORIAL_SCOPE_INVENTORY",json.dumps(report,sort_keys=True),flush=True)
+          PY
