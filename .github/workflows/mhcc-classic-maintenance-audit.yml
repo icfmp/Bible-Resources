@@ -1,262 +1,139 @@
-name: MHCC classic BRNP normalization trial
+name: MHCC 0.1.2 final independent reader verification
 on:
   pull_request:
     paths:
       - '.github/workflows/mhcc-classic-maintenance-audit.yml'
 permissions:
   contents: read
+  actions: read
 jobs:
-  inspect:
-    runs-on: ubuntu-latest
+  reader:
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
-    env:
-      PYTHONPATH: scripts
-      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install reviewed dependencies and native SWORD
+      - name: Obtain exact previously validated structural candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/14920876777/zip" > "$RUNNER_${{ runner.temp }}/mhcc-structural.zip"
+          echo "e27b710c907275e6dd842b685caa95a552e84a2f73efce5faef0391bccd2d360  $RUNNER_${{ runner.temp }}/mhcc-structural.zip" | sha256sum -c
+          unzip -q "$RUNNER_${{ runner.temp }}/mhcc-structural.zip" -d "$RUNNER_${{ runner.temp }}/verified"
+          echo "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e  $RUNNER_${{ runner.temp }}/verified/mhcc.osis.xml" | sha256sum -c
+          git fetch --no-tags --depth=1 origin refs/pull/275/head
+          test "$(git rev-parse FETCH_HEAD)" = 30d6cd7a26de8cf8982877eee06a19b8b163d937
+          git worktree add --detach "$RUNNER_${{ runner.temp }}/historical-reader" FETCH_HEAD
           python -m pip install -r requirements.txt
-          python -m unittest discover -s tests -p test_brnp.py -v
-          python scripts/fetch_reviewed_schema.py --directory "$RUNNER_TEMP/reviewed-osis"
-      - name: Reversible structural normalization, independent BRNP and full native comparison
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import hashlib,io,json,os,re,subprocess,zipfile
-          from collections import Counter,defaultdict
-          from pathlib import Path
-          from xml.parsers import expat
-          from lxml import etree
-          from check_brnp import check
-          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
-          from commentary_native_raw_inventory import private_crosscheck
-          tmp=Path(os.environ["RUNNER_TEMP"])
-          bundle=tmp/"mhcc-brnp-candidate"
-          bundle.mkdir()
-          sha=lambda data:hashlib.sha256(data).hexdigest()
-          ns="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
-          parser=lambda:etree.XMLParser(resolve_entities=False,no_network=True,load_dtd=False)
-          source=Path("sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml").read_bytes()
-          assert sha(source)=="6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39"
-          broken=b"hard livelihood out comfort us."
-          restored=b'hard livelihood out of it. Lamech hoped for relief by the birth of this son, "This same shall comfort us.'
-          assert source.count(broken)==1
-          base=source.replace(broken,restored,1)
-          assert sha(base)=="690184e2cdac0e6160bddb256149f2111d51b946caf29622e3b7f2ea358835e0"
-          # Generic trial of empty redundant book milestones and missing chapter
-          # closures in explicit, matching logical containers. Never remove content.
-          def normalize(data):
-              root=etree.fromstring(data,parser())
-              items=list(root.iter())
-              assert all(isinstance(n.tag,str) for n in items)
-              p=expat.ParserCreate(namespace_separator="}")
-              spans=[];stack=[];text_events=[]
-              start_tag=re.compile(rb'<(?:[^>"\x27]|"[^"]*"|\x27[^\x27]*\x27)*>')
-              def start(name,attrs):
-                  pos=p.CurrentByteIndex
-                  # Locate the complete start tag while respecting quoted attributes.
-                  m=start_tag.match(data,pos)
-                  assert m
-                  end=m.end()
-                  idx=len(spans)
-                  spans.append([pos,end,None,None,m.group().endswith(b"/>")])
-                  stack.append(idx)
-              def end(name):
-                  idx=stack.pop(); rec=spans[idx]
-                  rec[2]=p.CurrentByteIndex
-                  rec[3]=p.CurrentByteIndex if rec[4] else data.index(b">",p.CurrentByteIndex)+1
-              p.StartElementHandler=start;p.EndElementHandler=end
-              p.CharacterDataHandler=lambda text:text_events.append((p.CurrentByteIndex,bool(text.strip()),len(text)))
-              p.Parse(data,True)
-              assert len(items)==len(spans) and not stack
-              mapping={node:span for node,span in zip(items,spans)}
-              from bisect import bisect_left
-              offsets=[sp[0] for sp in spans]
-              event_offsets=[event[0] for event in text_events]
-              assert offsets==sorted(offsets) and event_offsets==sorted(event_offsets)
-              patches=[]; removed=[]; closures=[]; gaps=[]
-              books=[n for n in items if n.tag==ns+"div" and n.get("type")=="book" and not(n.get("sID") or n.get("eID"))]
-              ids=[n.get("osisID") for n in books]
-              assert all(ids) and len(ids)==len(set(ids))
-              for book in books:
-                  book_id=book.get("osisID")
-                  marks=[n for n in book.iterdescendants(ns+"div") if n.get("type")=="book" and (n.get("sID") or n.get("eID"))]
-                  if not marks:continue
-                  # Each start/end pair has the same identity and canonical flag.
-                  # Require the duplicate role to be represented by the enclosing book.
-                  starts=[];ends=[];active=[]
-                  for n in marks:
-                      a=dict(n.attrib);sid=n.get("sID");eid=n.get("eID")
-                      assert bool(sid)!=bool(eid) and n.get("osisID")==book_id
-                      assert set(a)<= {"type","osisID","sID","eID","canonical"}
-                      assert n.get("canonical") in (None,"true") and len(n)==0 and not n.text
-                      assert next(x for x in n.iterancestors(ns+"div") if x.get("type")=="book" and not(x.get("sID") or x.get("eID")))==book
-                      role=(sid or eid,n.get("canonical"))
-                      if sid:active.append(role);starts.append(role)
-                      else:
-                          assert active and active.pop()==role
-                          ends.append(role)
-                      st,en,_,_,empty=mapping[n]
-                      assert empty
-                      patches.append((st,en,b"",data[st:en]))
-                      removed.append({"book":book_id,"role":"start" if sid else "end","attributes":a})
-                  assert not active and Counter(starts)==Counter(ends)
-                  # The paired duplicate flag variants must span the same content.
-                  assert len(starts)==2 and {x[1] for x in starts}=={None,"true"}, (book_id,starts)
-                  # No authored text/section starts between duplicate starts or ends.
-                  a,b,c,d=marks
-                  for left,right in ((a,b),(c,d)):
-                      lo=mapping[left][1];hi=mapping[right][0]
-                      between=items[bisect_left(offsets,lo):bisect_left(offsets,hi)]
-                      visible=sum(length for pos,nonempty,length in text_events[bisect_left(event_offsets,lo):bisect_left(event_offsets,hi)] if nonempty)
-                      gaps.append({"book":book_id,"nonwhitespace_characters":visible,"intervening_tags":dict(Counter(etree.QName(n).localname+":"+str(n.get("type","")) for n in between))})
-              print("BOOK_PAIR_GAPS",json.dumps({"distinct_gap_shapes":list({json.dumps({k:v for k,v in g.items() if k!="book"},sort_keys=True) for g in gaps}),"nonempty_gaps":[g for g in gaps if g["nonwhitespace_characters"]][:10]},sort_keys=True),flush=True)
-              assert all(not g["nonwhitespace_characters"] and all(tag.startswith("milestone:") or tag in {"div:bookGroup","div:book","div:chapter","div:section"} for tag in g["intervening_tags"]) for g in gaps), "Book milestone pair variants differ in content or semantic scope"
-              chapters=[n for n in items if n.tag==ns+"div" and n.get("type")=="chapter" and n.get("osisID") and not(n.get("sID") or n.get("eID"))]
-              for ch in chapters:
-                  own=ch.get("osisID")
-                  milestones=[n for n in ch.iterdescendants(ns+"chapter") if n.get("sID") or n.get("eID")]
-                  starts=[n for n in milestones if n.get("sID")]
-                  ends=[n for n in milestones if n.get("eID")]
-                  if not starts and not ends:continue
-                  assert len(starts)==1 and starts[0].get("osisID")==own
-                  sid=starts[0].get("sID")
-                  if ends:
-                      assert len(ends)==1 and ends[0].get("eID")==sid
-                      continue
-                  assert re.fullmatch(r"[A-Za-z0-9_.:-]+",sid)
-                  assert starts[0].getparent() is ch, own
-                  print("CHAPTER_CLOSURE_LOCATION",json.dumps({"chapter":own,"start_child_index":ch.index(starts[0]),"last_child_tag":etree.QName(ch[-1]).localname,"parent_osis_id":ch.get("osisID")}),flush=True)
-                  st,en,close,_,empty=mapping[ch]
-                  assert not empty and data[close:close+2]==b"</"
-                  added=('<chapter eID="'+sid+'"/>').encode()
-                  patches.append((close,close,added,b""))
-                  closures.append({"chapter":own,"pair_id":sid})
-              out=bytearray(); pos=0; ledger=[]
-              for st,en,repl,original in sorted(patches):
-                  assert pos<=st and data[st:en]==original
-                  out.extend(data[pos:st]);offset=len(out);out.extend(repl);pos=en
-                  ledger.append({"input_offset":st,"output_offset":offset,"removed":original.decode(),"inserted":repl.decode()})
-              out.extend(data[pos:]);result=bytes(out)
-              reverse=result
-              for rec in reversed(ledger):
-                  off=rec["output_offset"];ins=rec["inserted"].encode()
-                  assert reverse[off:off+len(ins)]==ins
-                  reverse=reverse[:off]+rec["removed"].encode()+reverse[off+len(ins):]
-              assert reverse==data
-              # Exact visible character stream, full nontransport hierarchy and
-              # attributes, including every annotation and reference, retained.
-              after=etree.fromstring(result,parser())
-              assert "".join(root.itertext())=="".join(after.itertext())
-              def signature(tree):
-                  return [(n.tag,tuple(sorted(n.attrib.items())),tuple((a.tag,tuple(sorted(a.attrib.items()))) for a in n.iterancestors())) for n in tree.iter() if not (n.tag==ns+"div" and n.get("type")=="book" and (n.get("sID") or n.get("eID"))) and not(n.tag==ns+"chapter" and n.get("eID") in {c["pair_id"] for c in closures})]
-              assert signature(root)==signature(after)
-              return result,ledger,removed,closures
-          normalized,ledger,removed,closures=normalize(base)
-          again,again_ledger,*_=normalize(normalized)
-          assert again==normalized and not again_ledger
-          assert len(removed)==264 and {c["chapter"] for c in closures}=={"1Sam.25","Ps.95"}
-          (bundle/"mhcc.osis.xml").write_bytes(normalized)
-          old_path=tmp/"erratum-only.osis.xml";old_path.write_bytes(base)
-          schema=tmp/"reviewed-osis/osisCore.2.1.1-cw-latest.xsd"
-          before=check(old_path,"commentary",schema_path=schema)
-          after=check(bundle/"mhcc.osis.xml","commentary",schema_path=schema)
-          (bundle/"brnp-before.json").write_text(json.dumps(before,indent=2,sort_keys=True)+"\n")
-          (bundle/"brnp-after.json").write_text(json.dumps(after,indent=2,sort_keys=True)+"\n")
-          structure={"base_sha256":sha(base),"normalized_sha256":sha(normalized),"removed_book_milestones":len(removed),"closed_chapters":closures,"reversible":True,"idempotent":True,"exact_visible_character_stream_equal":True,"other_element_hierarchy_and_attributes_equal":True,"before_findings":before["finding_codes"],"after_findings":after["finding_codes"],"official_schema":after["official_osis"],"annotation_count_before":before["commentary_entry_count"],"annotation_count_after":after["commentary_entry_count"]}
-          print("BRNP_STRUCTURE",json.dumps(structure,sort_keys=True),flush=True)
-          (bundle/"structure-ledger.json").write_text(json.dumps({"structure":structure,"byte_edits":ledger},sort_keys=True,indent=2)+"\n")
-          assert after["finding_count"]==0 and before["commentary_entry_count"]==after["commentary_entry_count"]
-          PY
-      - name: Install native SWORD for successful structural trial
-        run: |
-          set -euo pipefail
+          if test -f /etc/apt/apt-mirrors.txt; then
+            sudo sed -i -E 's#https?://[A-Za-z0-9.-]*ec2.archive.ubuntu.com/ubuntu#http://archive.ubuntu.com/ubuntu#g' /etc/apt/apt-mirrors.txt
+          fi
           timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
-          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke
-          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_index.cpp -o "$RUNNER_TEMP/mhcc-index" -lsword
-          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_TEMP/mhcc-raw" -lsword
-      - name: Recompile and compare all native entries
+          timeout 180s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke xiphos xvfb dbus-x11 xdotool xclip openbox
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_${{ runner.temp }}/native" -lsword
+      - name: Compare actual diatheke and Xiphos passage text, including repaired chapters
+        env:
+          PYTHONPATH: ${{ runner.temp }}/historical-reader/scripts
         run: |
           set -euo pipefail
           python - <<'PY'
-          import hashlib,io,json,os,subprocess
-          from collections import Counter
+          import hashlib,io,json,os,re,shutil,signal,subprocess,time
           from pathlib import Path
-          from lxml import etree
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
-          from commentary_native_raw_inventory import private_crosscheck
+          from commentary_xiphos_dual_reader import verify_and_install_reviewed_bible,attempt_real_xiphos_passage_copy
+          import commentary_xiphos_dual_reader as reader
+          from pilot_subprocess import query
+          from reader_xiphos_headless_smoke import _dismiss_transient_xiphos_notice
           tmp=Path(os.environ["RUNNER_TEMP"])
-          bundle=tmp/"mhcc-brnp-candidate"
-          base=(tmp/"erratum-only.osis.xml").read_bytes()
-          normalized=(bundle/"mhcc.osis.xml").read_bytes()
-          structure=json.loads((bundle/"structure-ledger.json").read_text())["structure"]
-          closures=structure["closed_chapters"]
-          sha=lambda data:hashlib.sha256(data).hexdigest()
-          assert sha(base)==structure["base_sha256"] and sha(normalized)==structure["normalized_sha256"]
-          parser=lambda:etree.XMLParser(resolve_entities=False,no_network=True,load_dtd=False)
-          def compile_source(label,raw):
-              root=tmp/label;payload=root/"modules/comments/zcom/mhcc"
-              payload.mkdir(parents=True);(root/"mods.d").mkdir()
-              (root/"mods.d/mhcc.conf").write_bytes(Path("modules/mhcc-crosswire/payload/mods.d/mhcc.conf").read_bytes())
-              xml=root/"source.osis.xml";xml.write_bytes(raw)
-              run=subprocess.run(["osis2mod",str(payload),str(xml),"-z","z","-b","3","-v","KJV"],capture_output=True,timeout=180)
-              assert run.returncode==0
-              return root
-          def scan(root):
-              env=dict(os.environ,SWORD_PATH=str(root))
-              raw=subprocess.run([str(tmp/"mhcc-raw"),"MHCC"],env=env,capture_output=True,check=True,timeout=90).stdout
-              entries={}
-              report,*_=parse_native_raw_corpus(io.BytesIO(raw),on_entry=lambda k,r,b:entries.__setitem__((k,r),b))
-              index=subprocess.run([str(tmp/"mhcc-index"),"MHCC"],env=env,capture_output=True,check=True,timeout=90).stdout
-              private_crosscheck(index,"MHCC",list(entries),report)
-              topology=subprocess.run([str(tmp/"mhcc-index"),"MHCC","--adjacent-links"],env=env,capture_output=True,check=True,timeout=90).stdout
-              return entries,report["all_native_raw_entries_ordered_sha256"],topology
-          a_root=compile_source("erratum-only",base);b_root=compile_source("normalized",normalized)
-          a,ah,at=scan(a_root);b,bh,bt=scan(b_root)
-          assert ah=="ec00e36c0d0cdaefccddd1db164731c49087f43b68676a6a5cd0c6bd699ab263"
-          def sem(raw):
-              root=etree.fromstring(b"<root>"+raw+b"</root>",parser())
-              # Only book milestones and the two repaired chapter eIDs are
-              # authorized transport differences. Compiler can add div wrappers;
-              # all non-div elements, text and reference labels stay exact.
-              seq=tuple((n.tag,tuple(sorted(n.attrib.items())),n.text) for n in root.iterdescendants() if isinstance(n.tag,str) and n.tag!="div" and not(n.tag=="chapter" and n.get("eID") in {c["pair_id"] for c in closures}))
-              return " ".join("".join(root.itertext()).split()),seq
-          rawdiff=[];semanticdiff=[];badxml=[];cache={}
-          for k in sorted(a.keys()&b.keys()):
-              if a[k]==b[k]:continue
-              rawdiff.append(k)
-              if k[0]=="U":semanticdiff.append(k);continue
-              pair=(sha(a[k]),sha(b[k]))
-              if pair not in cache:
-                  try:cache[pair]=sem(a[k])==sem(b[k])
-                  except (ValueError,etree.XMLSyntaxError):cache[pair]=None
-              if cache[pair] is None:badxml.append(k)
-              elif not cache[pair]:semanticdiff.append(k)
-          aliases=[]
-          review=json.loads(Path("config/commentary-rebuilds/mhcc-crosswire.json").read_text())
-          for link in review["added_links"]:
-              def linked(root):
-                  return subprocess.run([str(tmp/"mhcc-index"),"MHCC","--is-linked",link["master_key"],link["new_key"]],env=dict(os.environ,SWORD_PATH=str(root)),capture_output=True,check=True,timeout=10).stdout
-              if linked(a_root)!=linked(b_root):aliases.append(link["new_key"])
-          receipt={"baseline_native_sha256":ah,"normalized_native_sha256":bh,"counts":dict(Counter(k for k,r in b)),"missing":sorted(a.keys()-b.keys())[:30],"extra":sorted(b.keys()-a.keys())[:30],"raw_changed":len(rawdiff),"semantic_changed_count":len(semanticdiff),"semantic_changed_sample":semanticdiff[:40],"xml_parse_errors":len(badxml),"adjacent_link_topology_equal":at==bt,"changed_reviewed_alias_links":aliases,"opaque_top_equal":all(a[k]==b.get(k) for k in a if k[0]=="U"),"publication":False}
-          print("BRNP_NATIVE",json.dumps(receipt,sort_keys=True),flush=True)
-          (bundle/"native-receipt.json").write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n")
-          assert a.keys()==b.keys() and not semanticdiff and not badxml and at==bt and not aliases
-          # Keep exact compiled candidate only after both independent gates pass.
-          import shutil
-          shutil.copytree(b_root/"modules",bundle/"payload/modules")
-          shutil.copytree(b_root/"mods.d",bundle/"payload/mods.d")
+          source=tmp/"verified"
+          root=tmp/"qa/sword";root.parent.mkdir()
+          shutil.copytree(source/"payload",root)
+          raw=subprocess.run([str(tmp/"native"),"MHCC"],env=dict(os.environ,SWORD_PATH=str(root)),capture_output=True,check=True,timeout=90).stdout
+          entries={}
+          report,*_=parse_native_raw_corpus(io.BytesIO(raw),on_entry=lambda kind,key,body:entries.__setitem__((kind,key),body))
+          assert report["all_native_raw_entries_ordered_sha256"]=="957ef1f956f804ae67d0563969a2e2a4a9e567fe0153550c45015cb14310a5d6"
+          bible=verify_and_install_reviewed_bible(root)
+          keys=["Gen.5.25","Gen.5.32","1Sam.25.1","1Sam.26.1","Ps.95.1","Ps.96.1","Eccl.4.8","Matt.13.36","Rev.22.21"]
+          comparisons={}
+          for key in keys:
+              assert ("K",key) in entries,key
+              book,ch,v=key.split(".");ref=f"{book} {ch}:{v}"
+              code,commentary=query("MHCC",ref,fmt="plain",root=root)
+              bc,bible_text=query("BRLSG1910",ref,fmt="plain",root=root)
+              assert code==bc==0 and len(commentary)>64 and len(bible_text)>16,key
+              # Check a distinctive real source body excerpt, not merely a successful command.
+              words=reader._normalized_words(entries["K",key])
+              rendered=reader._normalized_words(commentary)
+              # The historical GUI helper will independently compare against native prose.
+              assert len(rendered)>12
+              if key.startswith("Gen.5."):
+                  assert b"Lamech hoped for relief by the birth of this son" in commentary
+              comparisons[ref]={"commentary":commentary,"bible":bible_text,"commentary_internal":entries["K",key]}
+          original_match=reader._long_commentary_excerpt_is_on_gui_clipboard
+          restored=b"Lamech hoped for relief by the birth of this son"
+          def strict_match(original,bible,selected):
+              if not original_match(original,bible,selected):return False
+              if restored in original:
+                  expected=reader._normalized_words(restored);words=reader._normalized_words(selected)
+                  return any(words[i:i+len(expected)]==expected for i in range(len(words)-len(expected)+1))
+              return True
+          reader._long_commentary_excerpt_is_on_gui_clipboard=strict_match
+          home=tmp/"qa-home";home.mkdir()
+          for d in ("config","cache","data"):(home/d).mkdir()
+          env=dict(os.environ,HOME=str(home),XDG_CONFIG_HOME=str(home/"config"),XDG_CACHE_HOME=str(home/"cache"),XDG_DATA_HOME=str(home/"data"),SWORD_PATH=str(root),DISPLAY=":91",GDK_BACKEND="x11",LC_ALL="C.UTF-8",NO_AT_BRIDGE="1",WEBKIT_DISABLE_COMPOSITING_MODE="1")
+          procs=[]
+          log=tmp/"xiphos-startup.log"
+          def launch(args,output):
+              p=subprocess.Popen(args,env=env,stdout=output,stderr=output,start_new_session=True)
+              procs.append(p);return p
+          try:
+              with log.open("wb") as stream:
+                  xv=launch(["Xvfb",":91","-screen","0","1280x800x24","-nolisten","tcp"],stream)
+                  time.sleep(1.5)
+                  wm=launch(["openbox"],stream)
+                  time.sleep(1)
+                  app=launch(["dbus-run-session","--","xiphos"],stream)
+                  win=None
+                  for _ in range(110):
+                      if app.poll() is not None:raise RuntimeError("Xiphos exited")
+                      win=reader._main_xiphos_window(env)
+                      if win:break
+                      # Resize any actual visible Xiphos window that is too
+                      # small for the historical main-window threshold.
+                      ids=subprocess.run(["xdotool","search","--onlyvisible","--class","[Xx]iphos"],env=env,capture_output=True).stdout.decode().split()
+                      for wid in ids:
+                          g=subprocess.run(["xdotool","getwindowgeometry","--shell",wid],env=env,capture_output=True).stdout.decode()
+                          dims=dict(re.findall(r"^(WIDTH|HEIGHT)=(\d+)$",g,re.M))
+                          if int(dims.get("WIDTH",0))>=420 and int(dims.get("HEIGHT",0))>=300:
+                              subprocess.run(["xdotool","windowsize",wid,"1216","736"],env=env,capture_output=True)
+                      time.sleep(.5)
+                  assert win,"Xiphos main window did not become visible"
+                  subprocess.run(["xdotool","windowsize",win,"1216","736"],env=env,check=True)
+                  subprocess.run(["xdotool","windowmove",win,"16","16"],env=env,check=True)
+                  time.sleep(2)
+                  _dismiss_transient_xiphos_notice(env)
+                  result=attempt_real_xiphos_passage_copy(env,comparisons)
+                  receipt={"schema_version":1,"native_corpus_sha256":report["all_native_raw_entries_ordered_sha256"],"source_sha256":hashlib.sha256((source/"mhcc.osis.xml").read_bytes()).hexdigest(),"source_structure_run":45394900192,"diatheke_samples":keys,"xiphos":result,"xiphos_window_visible":True,"restored_phrase_required_in_gui":True,"published":False}
+                  (source/"reader-receipt.json").write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n")
+                  print("FINAL_READER",json.dumps(receipt,sort_keys=True),flush=True)
+                  assert result["actual_passage_commands_accepted"] and result["independent_gui_commentary_excerpt_match_count"]==len(keys)
+          finally:
+              for p in reversed(procs):
+                  if p.poll() is None:
+                      os.killpg(p.pid,signal.SIGTERM)
+                      try:p.wait(timeout=5)
+                      except subprocess.TimeoutExpired:os.killpg(p.pid,signal.SIGKILL);p.wait()
+              if not (source/"reader-receipt.json").exists():
+                  print("XIPHOS_STARTUP_DIAGNOSTIC",log.read_text(errors="replace")[-3000:])
           PY
-      - name: Retain trial receipts and candidate
+      - name: Retain final independent reader receipt
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: mhcc-brnp-structural-trial
-          path: ${{ runner.temp }}/mhcc-brnp-candidate/
-          retention-days: 90
+          name: mhcc-final-reader-proof
+          path: ${{ runner.temp }}/verified/reader-receipt.json
           if-no-files-found: warn
+          retention-days: 90
