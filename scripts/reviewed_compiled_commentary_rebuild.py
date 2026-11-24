@@ -247,6 +247,74 @@ def _check_incremental_revision(module_dir: Path, root: Path, metadata: dict,
             "incremental_evidence_sha256": evidence_sha}
 
 
+
+def metadata_promotion_inputs(module_dir, root, metadata, review, proof, audit_sha):
+    """Reuse the exact prior content review for a reversible display-only release.
+
+    No new native/content attestations are fabricated. All previous review
+    fields and data member hashes remain identical, and the old config hash
+    is reconstructed from the current config by reversing the allowed edits.
+    """
+    promotion = review["metadata_promotion"]
+    version = metadata["version"]
+    previous_version = promotion["previous_version"]
+    if not all(isinstance(v, str) and re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", v)
+               for v in (previous_version, version)) or tuple(map(int, previous_version.split("."))) >= tuple(map(int, version.split("."))):
+        raise ValueError("Invalid metadata promotion version sequence")
+    if not re.fullmatch(r"[a-z0-9-]+", module_dir.name) or not re.fullmatch(r"[a-z]{2,3}", metadata["language"]):
+        raise ValueError("Unsafe metadata promotion identity")
+    archive = root / "sources/cleaned/commentaries" / metadata["language"] / module_dir.name / "editorial/evidence" / ("release-" + previous_version)
+    prior, prior_sha = _object(archive/"review-manifest.json", 1_000_000)
+    prior_meta, meta_sha = _object(archive/"metadata.json", 256_000)
+    prior_proof, proof_sha = _object(archive/"SOURCE_VALIDATION.json", 256_000)
+    if (prior_sha != promotion["previous_review_sha256"]
+            or meta_sha != promotion["previous_metadata_sha256"]
+            or proof_sha != promotion["previous_proof_sha256"]
+            or prior.get("metadata_promotion") is not None
+            or prior.get("version") != previous_version
+            or prior_meta.get("version") != previous_version
+            or prior.get("source_audit_sha256") != audit_sha
+            or prior.get("status") != "owner_authorized_for_release"
+            or prior.get("schema_version") != 2):
+        raise ValueError("Unverified prior content review")
+    conf_key = "mods.d/" + metadata["sword_id"].lower() + ".conf"
+    permitted = dict(prior, version=version, authorization=review["authorization"],
+                     metadata_promotion=promotion,
+                     payload_sha256=dict(prior["payload_sha256"]))
+    permitted["payload_sha256"][conf_key] = review["payload_sha256"][conf_key]
+    if permitted != review:
+        raise ValueError("Promotion changed original content proof or binary member hashes")
+    expected_meta = dict(prior_meta, version=version, title=dict(prior_meta["title"]))
+    expected_meta["title"]["en"] = promotion["new_display_name"]
+    if metadata != expected_meta:
+        raise ValueError("Promotion changed unrelated catalogue metadata")
+    if proof != dict(prior_proof, curated_version=version, metadata_promotion=promotion):
+        raise ValueError("Promotion changed historical source validation")
+    old_conf = archive/"module.conf"
+    if old_conf.is_symlink() or not old_conf.is_file() or old_conf.stat().st_size > 256_000:
+        raise ValueError("Missing prior native configuration")
+    old_bytes = old_conf.read_bytes()
+    if sha256(old_bytes).hexdigest() != prior["payload_sha256"][conf_key]:
+        raise ValueError("Prior native configuration differs from reviewed hash")
+    old_name = promotion["old_display_name"]
+    new_name = promotion["new_display_name"]
+    if old_name != prior_meta["title"]["en"] or not isinstance(new_name, str) or not new_name.strip() or any(c in new_name for c in "\r\n"):
+        raise ValueError("Unreviewed display name")
+    expected = old_bytes
+    for before, after in (
+        (("Version="+previous_version+"\n").encode(), ("Version="+version+"\n").encode()),
+        (("Description="+old_name+"\n").encode(), ("Description="+new_name+"\n").encode()),
+        ((" version "+previous_version+".").encode(), (" version "+version+".").encode()),
+    ):
+        if expected.count(before) != 1:
+            raise ValueError("Ambiguous version/display config change")
+        expected = expected.replace(before, after, 1)
+    current = module_dir/"payload"/conf_key
+    if current.is_symlink() or current.read_bytes() != expected or sha256(expected).hexdigest() != review["payload_sha256"][conf_key]:
+        raise ValueError("Unexpected configuration changes during metadata promotion")
+    return prior_meta, prior
+
+
 def reviewed_rebuilt_commentary_errors(
         module_dir: Path, root: Path, metadata: dict,
         conf: dict) -> list[str]:
@@ -314,7 +382,10 @@ def reviewed_rebuilt_commentary_errors(
                 or not GITHUB_ISSUE.fullmatch(authorization["evidence_url"])):
             raise ValueError("Explicit per-edition owner review unavailable")
         incremental = review["schema_version"] == 2
-        extra_proof = (_check_incremental_revision(module_dir, root, metadata, review, audit)
+        content_meta, content_review = (metadata, review)
+        if "metadata_promotion" in review:
+            content_meta, content_review = metadata_promotion_inputs(module_dir, root, metadata, review, proof, audit_sha)
+        extra_proof = (_check_incremental_revision(module_dir, root, content_meta, content_review, audit)
                        if incremental else {})
         expected_proof = {
             "schema_version": review["schema_version"],
