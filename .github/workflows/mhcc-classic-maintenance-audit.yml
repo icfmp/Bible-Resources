@@ -59,13 +59,14 @@ jobs:
               items=list(root.iter())
               assert all(isinstance(n.tag,str) for n in items)
               p=expat.ParserCreate(namespace_separator="}")
-              spans=[];stack=[]
+              spans=[];stack=[];text_events=[]
+              start_tag=re.compile(rb'<(?:[^>"\x27]|"[^"]*"|\x27[^\x27]*\x27)*>')
               def start(name,attrs):
                   pos=p.CurrentByteIndex
                   # Locate the complete start tag while respecting quoted attributes.
-                  m=re.match(rb'<(?:[^>"\x27]|"[^"]*"|\x27[^\x27]*\x27)*>',data[pos:])
+                  m=start_tag.match(data,pos)
                   assert m
-                  end=pos+m.end()
+                  end=m.end()
                   idx=len(spans)
                   spans.append([pos,end,None,None,m.group().endswith(b"/>")])
                   stack.append(idx)
@@ -73,10 +74,12 @@ jobs:
                   idx=stack.pop(); rec=spans[idx]
                   rec[2]=p.CurrentByteIndex
                   rec[3]=p.CurrentByteIndex if rec[4] else data.index(b">",p.CurrentByteIndex)+1
-              p.StartElementHandler=start;p.EndElementHandler=end;p.Parse(data,True)
+              p.StartElementHandler=start;p.EndElementHandler=end
+              p.CharacterDataHandler=lambda text:text_events.append((p.CurrentByteIndex,bool(text.strip()),len(text)))
+              p.Parse(data,True)
               assert len(items)==len(spans) and not stack
               mapping={node:span for node,span in zip(items,spans)}
-              patches=[]; removed=[]; closures=[]
+              patches=[]; removed=[]; closures=[]; gaps=[]
               books=[n for n in items if n.tag==ns+"div" and n.get("type")=="book" and not(n.get("sID") or n.get("eID"))]
               ids=[n.get("osisID") for n in books]
               assert all(ids) and len(ids)==len(set(ids))
@@ -107,7 +110,13 @@ jobs:
                   assert len(starts)==2 and starts[0][0]==starts[1][0] and {x[1] for x in starts}=={None,"true"}
                   # No authored text/section starts between duplicate starts or ends.
                   a,b,c,d=marks
-                  assert not a.tail and not c.tail and a.getnext() is b and c.getnext() is d
+                  for left,right in ((a,b),(c,d)):
+                      lo=mapping[left][1];hi=mapping[right][0]
+                      between=[n for n in items if lo<=mapping[n][0]<hi]
+                      visible=sum(length for pos,nonempty,length in text_events if lo<=pos<hi and nonempty)
+                      gaps.append({"book":book_id,"nonwhitespace_characters":visible,"intervening_tags":dict(Counter(etree.QName(n).localname+":"+str(n.get("type","")) for n in between))})
+              print("BOOK_PAIR_GAPS",json.dumps({"distinct_gap_shapes":list({json.dumps({k:v for k,v in g.items() if k!="book"},sort_keys=True) for g in gaps}),"nonempty_gaps":[g for g in gaps if g["nonwhitespace_characters"]][:10]},sort_keys=True),flush=True)
+              assert all(not g["nonwhitespace_characters"] and all(tag.startswith("milestone:") or tag in {"div:bookGroup","div:book","div:chapter"} for tag in g["intervening_tags"]) for g in gaps), "Book milestone pair variants differ in content or semantic scope"
               chapters=[n for n in items if n.tag==ns+"div" and n.get("type")=="chapter" and n.get("osisID") and not(n.get("sID") or n.get("eID"))]
               for ch in chapters:
                   own=ch.get("osisID")
