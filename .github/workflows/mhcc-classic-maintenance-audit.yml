@@ -1,139 +1,220 @@
-name: MHCC 0.1.2 final independent reader verification
+name: MHCC 0.1.2 release staging (branch only)
 on:
   pull_request:
     paths:
       - '.github/workflows/mhcc-classic-maintenance-audit.yml'
 permissions:
-  contents: read
+  contents: write
   actions: read
 jobs:
-  reader:
+  stage:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'audit/mhcc-classic-maintenance'
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Obtain exact previously validated structural candidate
+      - name: Retrieve authenticated reviewed artifacts
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/14920876777/zip" > "$RUNNER_TEMP/mhcc-structural.zip"
-          echo "e27b710c907275e6dd842b685caa95a552e84a2f73efce5faef0391bccd2d360  $RUNNER_TEMP/mhcc-structural.zip" | sha256sum -c
-          unzip -q "$RUNNER_TEMP/mhcc-structural.zip" -d "$RUNNER_TEMP/verified"
-          echo "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e  $RUNNER_TEMP/verified/mhcc.osis.xml" | sha256sum -c
-          git fetch --no-tags --depth=1 origin refs/pull/275/head
-          test "$(git rev-parse FETCH_HEAD)" = 30d6cd7a26de8cf8982877eee06a19b8b163d937
-          git worktree add --detach "$RUNNER_TEMP/historical-reader" FETCH_HEAD
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/14920876777/zip" > "$RUNNER_TEMP/mhcc.zip"
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/14921536973/zip" > "$RUNNER_TEMP/reader.zip"
+          echo "e27b710c907275e6dd842b685caa95a552e84a2f73efce5faef0391bccd2d360  $RUNNER_TEMP/mhcc.zip" | sha256sum -c
+          echo "7de2ce4c7a716f60e171f7b43aa8bf7a5243d608682217a35e27f2aad1d21267  $RUNNER_TEMP/reader.zip" | sha256sum -c
+          unzip -q "$RUNNER_TEMP/mhcc.zip" -d "$RUNNER_TEMP/verified"
+          unzip -q "$RUNNER_TEMP/reader.zip" -d "$RUNNER_TEMP/reader"
           python -m pip install -r requirements.txt
-          if test -f /etc/apt/apt-mirrors.txt; then
-            sudo sed -i -E 's#https?://[A-Za-z0-9.-]*ec2.archive.ubuntu.com/ubuntu#http://archive.ubuntu.com/ubuntu#g' /etc/apt/apt-mirrors.txt
-          fi
-          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
-          timeout 180s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke xiphos xvfb dbus-x11 xdotool xclip openbox
+          sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
+          sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_TEMP/native" -lsword
-      - name: Compare actual diatheke and Xiphos passage text, including repaired chapters
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_index.cpp -o "$RUNNER_TEMP/index" -lsword
+      - name: Bind exact final source and native comparison to release contract
         env:
-          PYTHONPATH: ${{ runner.temp }}/historical-reader/scripts
+          PYTHONPATH: scripts
         run: |
           set -euo pipefail
           python - <<'PY'
-          import hashlib,io,json,os,re,shutil,signal,subprocess,time
+          import hashlib,io,json,os,re,shutil,subprocess,zipfile
+          from collections import Counter
           from pathlib import Path
+          from lxml import etree
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
-          from commentary_xiphos_dual_reader import verify_and_install_reviewed_bible,attempt_real_xiphos_passage_copy
-          import commentary_xiphos_dual_reader as reader
-          from pilot_subprocess import query
-          from reader_xiphos_headless_smoke import _dismiss_transient_xiphos_notice
-          tmp=Path(os.environ["RUNNER_TEMP"])
-          source=tmp/"verified"
-          root=tmp/"qa/sword";root.parent.mkdir()
-          shutil.copytree(source/"payload",root)
-          raw=subprocess.run([str(tmp/"native"),"MHCC"],env=dict(os.environ,SWORD_PATH=str(root)),capture_output=True,check=True,timeout=90).stdout
-          entries={}
-          report,*_=parse_native_raw_corpus(io.BytesIO(raw),on_entry=lambda kind,key,body:entries.__setitem__((kind,key),body))
-          assert report["all_native_raw_entries_ordered_sha256"]=="957ef1f956f804ae67d0563969a2e2a4a9e567fe0153550c45015cb14310a5d6"
-          bible=verify_and_install_reviewed_bible(root)
-          keys=["Gen.5.25","Gen.5.32","1Sam.25.1","1Sam.26.1","Ps.95.1","Ps.96.1","Eccl.4.8","Matt.13.36","Rev.22.21"]
-          comparisons={}
-          for key in keys:
-              assert ("K",key) in entries,key
-              book,ch,v=key.split(".");ref=f"{book} {ch}:{v}"
-              code,commentary=query("MHCC",ref,fmt="plain",root=root)
-              bc,bible_text=query("BRLSG1910",ref,fmt="plain",root=root)
-              assert code==bc==0 and len(commentary)>64 and len(bible_text)>16,key
-              # Check a distinctive real source body excerpt, not merely a successful command.
-              words=reader._normalized_words(entries["K",key])
-              rendered=reader._normalized_words(commentary)
-              # The historical GUI helper will independently compare against native prose.
-              assert len(rendered)>12
-              if key.startswith("Gen.5."):
-                  assert b"Lamech hoped for relief by the birth of this son" in commentary
-              comparisons[ref]={"commentary":commentary,"bible":bible_text,"commentary_internal":entries["K",key]}
-          original_match=reader._long_commentary_excerpt_is_on_gui_clipboard
-          restored=b"Lamech hoped for relief by the birth of this son"
-          def strict_match(original,bible,selected):
-              if not original_match(original,bible,selected):return False
-              if restored in original:
-                  expected=reader._normalized_words(restored);words=reader._normalized_words(selected)
-                  return any(words[i:i+len(expected)]==expected for i in range(len(words)-len(expected)+1))
-              return True
-          reader._long_commentary_excerpt_is_on_gui_clipboard=strict_match
-          home=tmp/"qa-home";home.mkdir()
-          for d in ("config","cache","data"):(home/d).mkdir()
-          env=dict(os.environ,HOME=str(home),XDG_CONFIG_HOME=str(home/"config"),XDG_CACHE_HOME=str(home/"cache"),XDG_DATA_HOME=str(home/"data"),SWORD_PATH=str(root),DISPLAY=":91",GDK_BACKEND="x11",LC_ALL="C.UTF-8",NO_AT_BRIDGE="1",WEBKIT_DISABLE_COMPOSITING_MODE="1")
-          procs=[]
-          log=tmp/"xiphos-startup.log"
-          def launch(args,output):
-              p=subprocess.Popen(args,env=env,stdout=output,stderr=output,start_new_session=True)
-              procs.append(p);return p
-          try:
-              with log.open("wb") as stream:
-                  xv=launch(["Xvfb",":91","-screen","0","1280x800x24","-nolisten","tcp"],stream)
-                  time.sleep(1.5)
-                  wm=launch(["openbox"],stream)
-                  time.sleep(1)
-                  app=launch(["dbus-run-session","--","xiphos"],stream)
-                  win=None
-                  for _ in range(110):
-                      if app.poll() is not None:raise RuntimeError("Xiphos exited")
-                      win=reader._main_xiphos_window(env)
-                      if win:break
-                      # Resize any actual visible Xiphos window that is too
-                      # small for the historical main-window threshold.
-                      ids=subprocess.run(["xdotool","search","--onlyvisible","--class","[Xx]iphos"],env=env,capture_output=True).stdout.decode().split()
-                      for wid in ids:
-                          g=subprocess.run(["xdotool","getwindowgeometry","--shell",wid],env=env,capture_output=True).stdout.decode()
-                          dims=dict(re.findall(r"^(WIDTH|HEIGHT)=(\d+)$",g,re.M))
-                          if int(dims.get("WIDTH",0))>=420 and int(dims.get("HEIGHT",0))>=300:
-                              subprocess.run(["xdotool","windowsize",wid,"1216","736"],env=env,capture_output=True)
-                      time.sleep(.5)
-                  assert win,"Xiphos main window did not become visible"
-                  subprocess.run(["xdotool","windowsize",win,"1216","736"],env=env,check=True)
-                  subprocess.run(["xdotool","windowmove",win,"16","16"],env=env,check=True)
-                  time.sleep(2)
-                  _dismiss_transient_xiphos_notice(env)
-                  result=attempt_real_xiphos_passage_copy(env,comparisons)
-                  receipt={"schema_version":1,"native_corpus_sha256":report["all_native_raw_entries_ordered_sha256"],"source_sha256":hashlib.sha256((source/"mhcc.osis.xml").read_bytes()).hexdigest(),"source_structure_run":45394900192,"diatheke_samples":keys,"xiphos":result,"xiphos_window_visible":True,"restored_phrase_required_in_gui":True,"published":False}
-                  (source/"reader-receipt.json").write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n")
-                  print("FINAL_READER",json.dumps(receipt,sort_keys=True),flush=True)
-                  assert result["actual_passage_commands_accepted"] and result["independent_gui_commentary_excerpt_match_count"]==len(keys)
-          finally:
-              for p in reversed(procs):
-                  if p.poll() is None:
-                      os.killpg(p.pid,signal.SIGTERM)
-                      try:p.wait(timeout=5)
-                      except subprocess.TimeoutExpired:os.killpg(p.pid,signal.SIGKILL);p.wait()
-              if not (source/"reader-receipt.json").exists():
-                  print("XIPHOS_STARTUP_DIAGNOSTIC",log.read_text(errors="replace")[-3000:])
+          from commentary_native_raw_inventory import private_crosscheck
+          root=Path.cwd();tmp=Path(os.environ["RUNNER_TEMP"]);verified=tmp/"verified"
+          module=root/"modules/mhcc-crosswire";edition=root/"sources/cleaned/commentaries/en/mhcc-crosswire"
+          review_path=root/"config/commentary-rebuilds/mhcc-crosswire.json"
+          old_plan_path=root/"config/release-plans/mhcc-0.1.1.json"
+          sha=lambda b:hashlib.sha256(b).hexdigest()
+          digest=lambda p:sha(p.read_bytes())
+          load=lambda p:json.loads(p.read_bytes())
+          def write(p,data):
+              p.parent.mkdir(parents=True,exist_ok=True)
+              p.write_text(json.dumps(data,ensure_ascii=False,sort_keys=True,indent=2)+"\n",encoding="utf-8")
+          prior=load(review_path);prior_audit=load(module/"SOURCE_AUDIT.json");prior_cleanup=load(edition/"CLEANUP_MANIFEST.json")
+          historical=edition/"editorial/evidence/release-0.1.1";historical.mkdir(exist_ok=True)
+          for src,name in ((review_path,"review-manifest.json"),(module/"SOURCE_AUDIT.json","SOURCE_AUDIT.json"),(module/"SOURCE_VALIDATION.json","SOURCE_VALIDATION.json"),(edition/"CLEANUP_MANIFEST.json","CLEANUP_MANIFEST.json"),(module/"EDITORIAL.md","EDITORIAL.md"),(old_plan_path,"release-plan.json")):
+              dst=historical/name
+              if dst.exists():assert dst.read_bytes()==src.read_bytes()
+              else:shutil.copyfile(src,dst)
+          assert digest(historical/"SOURCE_AUDIT.json")==prior["source_audit_sha256"]
+          previous_source=(edition/"mhcc.osis.xml").read_bytes()
+          normalized=(verified/"mhcc.osis.xml").read_bytes()
+          assert sha(previous_source)==prior_cleanup["reconstructed_source_sha256"]=="6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39"
+          assert sha(normalized)=="6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e"
+          ledger=load(verified/"structure-ledger.json");structure=ledger["structure"]
+          native_proof=load(verified/"native-receipt.json")
+          reader=load(tmp/"reader/reader-receipt.json")
+          assert structure["after_findings"]=={} and structure["official_schema"]["status"]=="validated" and structure["reversible"] and structure["idempotent"]
+          assert structure["exact_visible_character_stream_equal"] and structure["other_element_hierarchy_and_attributes_equal"]
+          assert structure["normalized_sha256"]==sha(normalized)
+          assert reader["source_sha256"]==sha(normalized) and reader["native_corpus_sha256"]==native_proof["normalized_native_sha256"]
+          assert reader["xiphos_window_visible"] and reader["xiphos"]["actual_passage_commands_accepted"] and reader["xiphos"]["independent_gui_commentary_excerpt_match_count"]==len(reader["diatheke_samples"])==9
+          assert reader["restored_phrase_required_in_gui"]
+          # Replay the exact ledger against the previous source; verify reversibility
+          # including the approved single authorial erratum.
+          old=b"hard livelihood out comfort us."
+          new=b'hard livelihood out of it. Lamech hoped for relief by the birth of this son, "This same shall comfort us.'
+          assert previous_source.count(old)==1
+          erratum_only=previous_source.replace(old,new,1)
+          assert sha(erratum_only)==structure["base_sha256"]
+          reverse=normalized
+          for patch in reversed(ledger["byte_edits"]):
+              pos=patch["output_offset"];inserted=patch["inserted"].encode();removed=patch["removed"].encode()
+              assert reverse[pos:pos+len(inserted)]==inserted
+              reverse=reverse[:pos]+removed+reverse[pos+len(inserted):]
+          assert reverse==erratum_only and reverse.replace(new,old,1)==previous_source
+          # Direct comparison with the previous checked-in, publicly released payload.
+          def scan(path):
+              env=dict(os.environ,SWORD_PATH=str(path))
+              raw=subprocess.run([str(tmp/"native"),"MHCC"],env=env,capture_output=True,check=True,timeout=120).stdout
+              entries={}
+              report,*_=parse_native_raw_corpus(io.BytesIO(raw),on_entry=lambda k,r,b:entries.__setitem__((k,r),b))
+              idx=subprocess.run([str(tmp/"index"),"MHCC"],env=env,capture_output=True,check=True,timeout=90).stdout
+              private_crosscheck(idx,"MHCC",list(entries),report)
+              links=subprocess.run([str(tmp/"index"),"MHCC","--adjacent-links"],env=env,capture_output=True,check=True,timeout=90).stdout
+              return entries,report["all_native_raw_entries_ordered_sha256"],links
+          a,ah,at=scan(module/"payload");b,bh,bt=scan(verified/"payload")
+          assert ah==prior["candidate_native_corpus_sha256"] and bh==native_proof["normalized_native_sha256"]=="957ef1f956f804ae67d0563969a2e2a4a9e567fe0153550c45015cb14310a5d6"
+          assert a.keys()==b.keys() and at==bt
+          counts=dict(Counter("TOP" if k=="U" else k for k,r in b))
+          assert counts==prior["candidate_native_counts"]
+          expected={("K",f"Gen.5.{v}") for v in range(25,33)}
+          parser=lambda:etree.XMLParser(resolve_entities=False,no_network=True,load_dtd=False)
+          closed={c["pair_id"] for c in structure["closed_chapters"]}
+          def semantics(body):
+              doc=etree.fromstring(b"<root>"+body+b"</root>",parser())
+              text=" ".join("".join(doc.itertext()).split())
+              markup=tuple((n.tag,tuple(sorted(n.attrib.items()))) for n in doc.iterdescendants() if isinstance(n.tag,str) and n.tag!="div" and not(n.tag=="chapter" and n.get("eID") in closed))
+              references=tuple((n.get("osisRef")," ".join("".join(n.itertext()).split())) for n in doc.iterdescendants("reference"))
+              return text,markup,references
+          delta=[];refs=[];bad_markup=[];cache={}
+          for key in sorted(a):
+              if a[key]==b[key]:continue
+              assert key[0]!="U"
+              pair=(sha(a[key]),sha(b[key]))
+              if pair not in cache:
+                  s,t=semantics(a[key]),semantics(b[key])
+                  cache[pair]=(s[0]!=t[0],s[1]!=t[1],s[2]!=t[2],s[0].replace(old.decode(),new.decode(),1)==t[0] and old.decode() in s[0])
+              diff,markup,ref,exact=cache[pair]
+              if diff:
+                  delta.append(key)
+                  assert key in expected and exact
+              if markup:bad_markup.append(key)
+              if ref:refs.append(key)
+          assert set(delta)==expected and not refs and not bad_markup
+          for link in prior["added_links"]:
+              def is_linked(p):
+                  return subprocess.run([str(tmp/"index"),"MHCC","--is-linked",link["master_key"],link["new_key"]],env=dict(os.environ,SWORD_PATH=str(p)),capture_output=True,check=True,timeout=10).stdout
+              assert is_linked(module/"payload")==is_linked(verified/"payload")
+          print("DIRECT_FINAL_COMPARISON",json.dumps({"previous_native":ah,"new_native":bh,"changed_text_keys":delta,"other_markup_differences":bad_markup,"reference_differences":refs,"counts":counts,"links_equal":True}),flush=True)
+          # Install exactly the six authenticated compiled files, then update metadata only.
+          payload=module/"payload"
+          assert set(prior["payload_sha256"])=={p.relative_to(verified/"payload").as_posix() for p in (verified/"payload").rglob("*") if p.is_file()}
+          for rel in prior["payload_sha256"]:
+              shutil.copyfile(verified/"payload"/rel,payload/rel)
+          conf=payload/"mods.d/mhcc.conf"
+          text=conf.read_text()
+          assert text.count("\nVersion=0.1.1\n")==1
+          text=text.replace("\nVersion=0.1.1\n","\nVersion=0.1.2\n").replace("SwordVersionDate=2026-11-16","SwordVersionDate=2026-11-24")
+          text=text.replace("Bible Resources edited module MHCC version 0.1.1. Reviewed index navigation and two documented source spelling and citation corrections.","Bible Resources edited module MHCC version 0.1.2. Retains the reviewed navigation and earlier errata; restores the attested omitted wording in Genesis 5:25-32 and normalizes redundant OSIS milestones without changing commentary scope.")
+          text=re.sub(r"(?m)^InstallSize=\d+$","InstallSize="+str(sum(p.stat().st_size for p in (payload/"modules").rglob("*") if p.is_file())),text)
+          text=text.rstrip()+"\nHistory_0.1.2=Restore attested Genesis 5:25-32 lacuna and normalize redundant book milestones and two unclosed chapters; all prior commentary scopes retained.\n"
+          conf.write_text(text)
+          members={rel:digest(payload/rel) for rel in prior["payload_sha256"]}
+          after,afterhash,afterlinks=scan(payload)
+          assert after==b and afterhash==bh and afterlinks==bt
+          (edition/"mhcc.osis.xml").write_bytes(normalized)
+          evdir=edition/"editorial/evidence/release-0.1.2";evdir.mkdir(exist_ok=True)
+          for src in (verified/"structure-ledger.json",verified/"brnp-before.json",verified/"brnp-after.json",verified/"native-receipt.json",tmp/"reader/reader-receipt.json"):
+              shutil.copyfile(src,evdir/src.name)
+          proof={"schema_version":1,"previous_source_sha256":sha(previous_source),"candidate_source_sha256":sha(normalized),"previous_native_corpus_sha256":ah,"candidate_native_corpus_sha256":bh,"candidate_native_counts":counts,"payload_sha256":members,"semantic_changed_keys":sorted(k[1] for k in delta),"reference_changed_keys":[],"missing_keys":[],"extra_keys":[],"changed_alias_links":[],"parse_failures":0,"brnp_findings":0,"official_osis_schema_validated":True,"native_link_topology_equal":True,"opaque_top_bytes_equal":True,"source_reversible":True,"source_idempotent_normalization":True,"remaining_source_text_and_markup_equal":True,"all_native_entries_compared":True,"reader_checks_passed":True,"source_structure_evidence_url":"https://github.com/icfmp/Bible-Resources/actions/runs/45394900192","reader_evidence_url":"https://github.com/icfmp/Bible-Resources/actions/runs/45397093858","comparison_evidence_url":"https://github.com/icfmp/Bible-Resources/actions/runs/"+os.environ["GITHUB_RUN_ID"],"source_erratum":{"master_key":"Gen.5.25","affected_keys":sorted(k[1] for k in delta),"previous_raw_body_sha256":sha(a["K","Gen.5.25"]),"revised_raw_body_sha256":sha(b["K","Gen.5.25"]),"historical_witness":"https://dir.sermon-online.com/english/MatthewHenry/Matthew_Henrys_Concise_Commentary_On_The_Bible.pdf","pdf_page":26},"limitations":"Independent real Xiphos passage-prose and restored phrase readback passed; titles, all hyperlink clicks and Android GUI are not certified. BRNP v0.2-draft has zero findings, not complete future-profile certification."}
+          ep=evdir/"incremental-native-reader.json";write(ep,proof)
+          rev={"previous_version":"0.1.1","previous_review_sha256":digest(historical/"review-manifest.json"),"previous_cleanup_sha256":digest(historical/"CLEANUP_MANIFEST.json"),"previous_native_corpus_sha256":ah,"previous_source_sha256":sha(previous_source),"source_name":"mhcc.osis.xml","candidate_source_sha256":sha(normalized),"evidence_sha256":digest(ep),"semantic_changed_keys":proof["semantic_changed_keys"],"reference_changed_keys":[]}
+          scope="Owner explicitly authorized publication after satisfactory checks in issue #291; one attested Genesis 5:25-32 correction and reviewed reversible BRNP normalization; prior 0.1.1 source and historical aliases unchanged in scope."
+          review=dict(prior,schema_version=2,version="0.1.2",candidate_native_corpus_sha256=bh,payload_sha256=members,incremental_revision=rev,authorization={"approved_by":"Bible Resources project owner","evidence_url":"https://github.com/icfmp/Bible-Resources/issues/291","scope":scope})
+          audit=dict(prior_audit,schema_version=2,status="complete_native_semantic_rebuild_comparison",candidate_native_corpus_sha256=bh,incremental_revision=rev)
+          audit.pop("all_other_original_K_bytes_identical");audit.pop("all_original_I_bytes_identical")
+          write(module/"SOURCE_AUDIT.json",audit)
+          review["source_audit_sha256"]=digest(module/"SOURCE_AUDIT.json");write(review_path,review)
+          validation={"schema_version":2,"status":"validated","source_kind":"reviewed_compiled_commentary_rebuild","review_manifest":"config/commentary-rebuilds/mhcc-crosswire.json","source_audit_sha256":review["source_audit_sha256"],"original_archive_sha256":review["original_archive_sha256"],"candidate_native_corpus_sha256":bh,"curated_module_id":"MHCC","curated_version":"0.1.2","candidate_source_sha256":sha(normalized),"incremental_evidence_sha256":digest(ep)}
+          write(module/"SOURCE_VALIDATION.json",validation)
+          cleanup=dict(prior_cleanup,edition="MHCC classic CrossWire-derived 0.1.2",reconstructed_source_sha256=sha(normalized),reconstructed_source_size=len(normalized),source_native_corpus_sha256=bh,source_native_edition_version="0.1.2",approved_prose_reference_errata_already_in_source=3,source_approval_basis=scope,previous_reconstructed_source_sha256=sha(previous_source),brnp_draft_findings=0,structural_normalization_evidence=str(ep.relative_to(root)))
+          write(edition/"CLEANUP_MANIFEST.json",cleanup)
+          meta=load(module/"metadata.json");meta["version"]="0.1.2";meta["quality"]["reviewed_by"]="Bible Resources project owner — 2026-11-24 authorized conditional publication; pinned source/whole native comparison, zero BRNP findings and nine independent Xiphos and diatheke passages verified."
+          write(module/"metadata.json",meta)
+          notes=edition/"editorial/releases/MHCC-0.1.2.md"
+          notes.write_text("# MHCC 0.1.2\n\nThe classic English Matthew Henry Concise Commentary, not the modern English derivative. Restores the missing historical words in Genesis 5:25–32, documented in #291, and removes 264 redundant empty book milestones and closes the two unpaired chapter milestones in 1 Samuel 25 and Psalm 95. The official pinned OSIS schema and all implemented BRNP v0.2-draft checks pass. Whole-corpus native readback confirms 28,742 numbered addresses, 1,255 introductions, two opaque TOP entries, no lost/added addresses, unchanged native adjacent link topology and all 24 previous aliases. Exactly the eight addresses sharing the repaired Genesis section differ in visible text; no other text or reference changes. The previous 0.1.1 and 0.1.0 GitHub Releases remain immutable. Real Xiphos passage prose and diatheke readback verified at nine selected passages; exhaustive GUI link-click/title and Android verification not claimed. CrossWire Public Domain rights and attribution retained. Source, reversible ledger and proof in edition editorial evidence; original upstream archive and metadata fingerprints unchanged.\n\n- Structural evidence: https://github.com/icfmp/Bible-Resources/actions/runs/45394900192\n- Real reader evidence: https://github.com/icfmp/Bible-Resources/actions/runs/45397093858\n- Owner authorization: https://github.com/icfmp/Bible-Resources/issues/291#issuecomment-7131921663\n",encoding="utf-8")
+          (module/"EDITORIAL.md").write_text("# MHCC 0.1.2 — source-attested incremental review\n\n"+notes.read_text()+"\nThe 0.1.1 editorial and rights record is preserved verbatim in the edition's editorial/evidence/release-0.1.1/EDITORIAL.md. The historical byte-identical comparison referred to the intermediate compiler transport baseline, not a direct comparison with the original stock archive; the new version's separate semantic proof does not claim raw-byte equality. No separate CCEL edition is incorporated. No full printed-edition collation is claimed.\n",encoding="utf-8")
+          # Build the same deterministic ZIP as production, update only this entry.
+          archive=tmp/"MHCC-0.1.2.zip"
+          with zipfile.ZipFile(archive,"w",compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+              for rel in sorted(members):
+                  info=zipfile.ZipInfo(rel,(1980,1,1,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=0o100644<<16
+                  z.writestr(info,(payload/rel).read_bytes())
+          cat_path=root/"catalog/v1/catalog.json";cat=load(cat_path)
+          entry=next(m for m in cat["modules"] if m["id"]=="mhcc-crosswire")
+          entry["version"]="0.1.2";entry["download"].update(sha256=digest(archive),size_bytes=archive.stat().st_size)
+          write(cat_path,cat)
+          plan=load(old_plan_path)
+          plan.update(tag="mhcc-0.1.2",version="0.1.2",title="Matthew Henry Concise Commentary — Bible Resources MHCC 0.1.2",zip_name=archive.name,package_sha256=digest(archive),package_size_bytes=archive.stat().st_size,notes_path=str(notes.relative_to(root)),authorization={"reviewed_by":"Bible Resources project owner","decision":scope,"evidence_url":"https://github.com/icfmp/Bible-Resources/issues/291#issuecomment-7131921663","source_rights":"CrossWire Public Domain — Copy Freely; Genesis phrase independently witnessed in Bible Truth Forum public-domain concise text; no separate CCEL edition or project relicensing."})
+          write(root/"config/release-plans/mhcc-0.1.2.json",plan);old_plan_path.unlink()
+          # Preserve the source-integrity test's independent pin and archived ancestor.
+          test=root/"tests/test_recovered_cleaned_source_integrity.py"
+          body=test.read_text()
+          assert body.count("6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39")==1
+          body=body.replace('self.assertEqual(digest.hexdigest(), "6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39")','self.assertEqual(digest.hexdigest(), "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e")\n        previous = json.loads((path.parent / "editorial/evidence/release-0.1.1/CLEANUP_MANIFEST.json").read_text())\n        self.assertEqual(previous["reconstructed_source_sha256"], "6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39")\n        self.assertEqual(manifest["previous_reconstructed_source_sha256"], previous["reconstructed_source_sha256"])')
+          test.write_text(body)
+          print("FINAL_PACKAGE",json.dumps({"sha256":digest(archive),"size":archive.stat().st_size,"native":bh,"source":sha(normalized)},sort_keys=True),flush=True)
           PY
-      - name: Retain final independent reader receipt
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: mhcc-final-reader-proof
-          path: ${{ runner.temp }}/verified/reader-receipt.json
-          if-no-files-found: warn
-          retention-days: 90
+      - name: Run repository tests and release preflight without temporary workflow
+        run: |
+          set -euo pipefail
+          # Generate inventory for the final tree; temporary workflow removed via
+          # separate connector commit (Actions token cannot edit workflows).
+          git rm .github/workflows/mhcc-classic-maintenance-audit.yml
+          git add -A
+          python scripts/tool_registry.py --write
+          python -m unittest discover -s tests -v
+          python scripts/validate.py
+          python scripts/release_preflight.py --module-id mhcc-crosswire --report "$RUNNER_TEMP/preflight.json"
+          python scripts/build.py --output dist
+          python scripts/smoke.py
+          python scripts/catalogue_release_coverage.py --built dist
+          python scripts/tool_registry.py --check
+      - name: Commit only verified release files to existing audit branch
+        run: |
+          set -euo pipefail
+          # Leave workflow deletion to authorized connector; do not publish or touch main here.
+          git restore --source=HEAD --staged --worktree .github/workflows/mhcc-classic-maintenance-audit.yml
+          git add -A -- ':!dist'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git diff --cached --stat
+          git commit -m "Stage independently validated MHCC 0.1.2 source and release payload"
+          git push origin HEAD:refs/heads/audit/mhcc-classic-maintenance
