@@ -504,7 +504,8 @@
         "RawCom",
         "RawCom4",
         "zCom",
-        "zCom4"
+        "zCom4",
+        "zLD"
       ],
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
@@ -1154,7 +1155,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "fcd80bef49e7b7ba91918413c072a0e39dc300c9efc7a543be3de352910e3d48",
+      "sha256_at_inventory": "05d158498873caece6c9dd8a8794790a2719797e7e6bbaeb42bf96b13de3f4da",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
@@ -1220,7 +1221,8 @@
         "RawCom",
         "RawCom4",
         "zCom",
-        "zCom4"
+        "zCom4",
+        "zLD"
       ],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
@@ -1242,7 +1244,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "7d011ea2441cf7116ab3169058caf1b8397fec2eee4c9eb87e4d4049c885609a",
+      "sha256_at_inventory": "02321a58a7ef99a7768c54c8d0c4379339d7a9fc6bc1a904303e2b2e115075cb",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
@@ -1703,6 +1705,38 @@
       "static_references": [
         "scripts/tool_registry.py",
         "scripts/validate.py"
+      ]
+    },
+    {
+      "classification": "KEEP_GENERIC",
+      "confidence": "high",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "TEI",
+        "zLD"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/reviewed_tei_dictionary.py",
+      "proposed_action": "Retain stable verified interface; extend test fixtures.",
+      "purpose_first_line": "Validate reviewed, source-bound TEI dictionary payload and full native receipts.",
+      "python_imports": [
+        "hashlib",
+        "json",
+        "pathlib",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "1c0fa509c78af3870b3aeaae3c9058defa084e844dea86a7bd1195bc251e847b",
+      "side_effects": "consult the documented core tool contract",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/tool_registry.py",
+        "scripts/validate.py",
+        "tests/test_reviewed_tei_dictionary.py"
       ]
     },
     {
@@ -2192,7 +2226,9 @@
         "OSIS",
         "USFM",
         "USFX",
-        "ThML"
+        "ThML",
+        "TEI",
+        "zLD"
       ],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
@@ -2217,7 +2253,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "184635f62fb3d6a95a8b368e042f55e1821059f16c94da23a2ebaf4f520e3b11",
+      "sha256_at_inventory": "bc667b487130d6e0ae8e2f834bd14cc19ec1bda8162995cb0e83a90bed2f96eb",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -2240,7 +2276,9 @@
         "RawCom4",
         "zCom",
         "zCom4",
-        "OSIS"
+        "OSIS",
+        "TEI",
+        "zLD"
       ],
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
@@ -2259,13 +2297,14 @@
         "reviewed_compiled_commentary_rebuild",
         "reviewed_modern_commentary_rebuild",
         "reviewed_osis_commentary_rebuild",
+        "reviewed_tei_dictionary",
         "stable_sword_refs",
         "sword_option_filters",
         "sys"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "f0b8c272ac083e62abadf167a8b82a51cf7f5bef00eb4525d5437b6bc609a1d9",
+      "sha256_at_inventory": "c6e9a92933b4ee249fcaaa58c0f9eabade874bfdd76fc91933df94cd1ad80953",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",

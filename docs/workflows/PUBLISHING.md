@@ -13,7 +13,9 @@ Choose the correct proof route:
 - **Unchanged stock SWORD:** preserve exact upstream bytes and independently verify the original compiled archive and complete native entry/key identity.
 - **Source-derived Bible/commentary rebuild:** compare source and reviewed master, build and independently read back *all* native entries and metadata. A changed compiled commentary uses the distinct `reviewed_compiled_commentary_rebuild` route and must not impersonate original `stock_reader_keys` identity. Require original-to-candidate I/K/TOP topology, explicit approved corrections and aliases, source-bound comparison SHA-256 and exact driver-appropriate payload-member hashes. See `scripts/reviewed_compiled_commentary_rebuild.py`.
 
-Neither path authorizes a textual correction by itself. See [editorial policy](../policies/EDITORIAL_RULES.md), [rights](../policies/RIGHTS.md), and [production contract](../PRODUCTION_PIPELINE.md).
+- **Reviewed published TEI dictionary:** independently validate the exact historical master against pinned official TEI P5 RELAX NG and Schematron, preserve the original source archive and source-bound adapter, compare every native dictionary key and XML/text record, and bind the reviewed receipt to every installed zLD member. For an existing public edition, the authoritative edition source can remain in its independent repository, with exact archive digests and provenance retained centrally. The publication path does not rewrite the native module.
+
+None of these paths authorizes a textual correction by itself. See [editorial policy](../policies/EDITORIAL_RULES.md), [rights](../policies/RIGHTS.md), and [production contract](../PRODUCTION_PIPELINE.md).
 
 ## 2. Prepare one release identity
 

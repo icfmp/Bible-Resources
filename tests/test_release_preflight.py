@@ -1,4 +1,4 @@
-"""End-to-end tests of one production release preflight across three editions."""
+"""End-to-end tests of one production release preflight across four editions."""
 from __future__ import annotations
 
 import json
@@ -16,7 +16,7 @@ class CrossEditionReleasePreflightTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.ids = ("lsg-1910", "darby-jnd-2024", "mhcc-crosswire")
+        cls.ids = ("lsg-1910", "darby-jnd-2024", "mhcc-crosswire", "isbe-1915")
         cls.report = inspect_approved_releases(ROOT, cls.ids)
 
     def test_actual_new_ztext_and_older_zcom_publication_drivers_share_the_same_interface(self):
@@ -37,6 +37,8 @@ class CrossEditionReleasePreflightTests(unittest.TestCase):
         self.assertEqual(by_id["lsg-1910"]["package_size_bytes"], lsg_plan["package_size_bytes"])
         self.assertEqual(by_id["darby-jnd-2024"]["driver"], "zText")
         self.assertEqual(by_id["mhcc-crosswire"]["driver"], "zCom")
+        self.assertEqual(by_id["isbe-1915"]["driver"], "zLD")
+        self.assertEqual(by_id["isbe-1915"]["category"], "dictionary")
         legacy_ids = {entry["module_id"] for entry in json.loads(
             (ROOT / "config/release-legacy-bindings.json").read_text())["entries"]}
         for record in by_id.values():
@@ -60,7 +62,7 @@ class CrossEditionReleasePreflightTests(unittest.TestCase):
         self.assertFalse(report["public_release_created"])
         self.assertFalse(report["catalogue_changed"])
 
-    def test_real_preflight_matches_approved_three_distinct_release_plans(self):
+    def test_real_preflight_matches_approved_distinct_release_plans(self):
         by_id = {r["resource_id"]: r for r in self.report["modules"]}
         legacy = json.loads((ROOT/"config/release-legacy-bindings.json")
                             .read_text(encoding="utf-8"))

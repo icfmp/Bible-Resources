@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "expected_tei_sha256": "bdac245cad329fdff8039d0374815ff7086b8a5f8055118f1250461b9d5f17ec",
+  "native_imp_sha256": "5d39f597757745875cba20cc603488dc115f173e7f75d416a81a3e8cad4546d0",
+  "expected_keys": 9380,
+  "native_keys": 9380,
+  "missing_keys": [],
+  "missing_key_count": 0,
+  "unexpected_keys": [],
+  "unexpected_key_count": 0,
+  "malformed_readback": [],
+  "malformed_count": 0,
+  "unicode_text_mismatches": [],
+  "unicode_text_mismatch_count": 0,
+  "xml_structure_mismatches": [],
+  "xml_structure_mismatch_count": 0,
+  "native_roundtrip_verified": true,
+  "reader_ui_verified": false,
+  "rights_cleared": false,
+  "publication_permitted": false
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "standard": "TEI P5",
+  "version": "4.12.0",
+  "rng_sha256": "b0f115095ead2ccc6933aa3365c6f4a82cba3b2ec7eee7f76bb616d7a63b7e48",
+  "schematron_sha256": "500f231ac32d12827bdbdd4168e88743848656bc46cc83286d39bd1f396113d5",
+  "reviewed_schema_source": "https://www.tei-c.org/Vault/P5/4.12.0/",
+  "scope": "Independently validated historical master; adapter/native readback is a separate gate."
+}

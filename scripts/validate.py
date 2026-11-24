@@ -14,6 +14,7 @@ from compiled_stock_commentary_proof import compiled_stock_commentary_errors
 from reviewed_compiled_commentary_rebuild import reviewed_rebuilt_commentary_errors
 from reviewed_osis_commentary_rebuild import reviewed_osis_commentary_errors
 from reviewed_modern_commentary_rebuild import reviewed_modern_commentary_errors
+from reviewed_tei_dictionary import dictionary_proof_errors
 
 ROOT = Path(__file__).resolve().parents[1]
 DRIVERS = {"RawText","zText","RawCom","RawCom4","zCom","zCom4","RawLD","RawLD4","zLD","RawGenBook"}
@@ -231,7 +232,12 @@ def validate(root=ROOT):
         if driver not in DRIVERS or driver not in ALLOWED.get(m["category"],set()):
             errors.append(f"{d.name}: unsupported or mismatched driver")
         if conf.get("Encoding")!="UTF-8": errors.append(f"{d.name}: UTF-8 required")
-        if (m["category"] == "commentary" and
+        verified_dictionary = False
+        if m["category"] == "dictionary" and conf.get("SourceType") == "TEI":
+            dictionary_errors = dictionary_proof_errors(d, root, m, conf)
+            errors.extend(dictionary_errors)
+            verified_dictionary = not dictionary_errors
+        elif (m["category"] == "commentary" and
                 m.get("index_audit", {}).get("mode") == "stock_reader_keys"):
             # Existing compiled stock is not a newly converted OSIS source.
             # Require the complete original archived SWORD/native proof,
@@ -272,7 +278,10 @@ def validate(root=ROOT):
         if m["category"] in ("bible","commentary") and conf.get("Versification")!=m.get("versification"):
             errors.append(f"{d.name}: versification mismatch")
         for field in ("SourceType","DistributionLicense","TextSource","Version","Description","DataPath"):
-            if not conf.get(field):errors.append(f"{d.name}: missing {field}")
+            # Preserve exact published dictionary conf bytes; a verified external
+            # release and manifest origin supply provenance if TextSource is absent.
+            if not conf.get(field) and not (field == "TextSource" and verified_dictionary):
+                errors.append(f"{d.name}: missing {field}")
         if conf.get("Version") != m["version"]:
             errors.append(
                 f"{d.name}: SWORD .conf Version {conf.get('Version')!r} "

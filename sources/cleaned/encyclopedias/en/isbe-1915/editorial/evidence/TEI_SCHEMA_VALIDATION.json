@@ -1,0 +1,26 @@
+{
+  "historical_print_collation_certified": false,
+  "relax_ng_negative_control_rejected": true,
+  "relax_ng_passed": true,
+  "rng_sha256": "b0f115095ead2ccc6933aa3365c6f4a82cba3b2ec7eee7f76bb616d7a63b7e48",
+  "schema_version": 1,
+  "schematron_negative_control_rejected": true,
+  "schematron_negative_counts": {
+    "active_patterns": 120,
+    "failed_assertions": 0,
+    "fired_rules": 5,
+    "successful_reports": 1
+  },
+  "schematron_passed": true,
+  "schematron_positive_counts": {
+    "active_patterns": 120,
+    "failed_assertions": 0,
+    "fired_rules": 175092,
+    "successful_reports": 0
+  },
+  "schematron_sha256": "500f231ac32d12827bdbdd4168e88743848656bc46cc83286d39bd1f396113d5",
+  "source_sha256": "5df8a6d1311e3f5a83a6d961c6e09c27e042b0c68b4a9da54cb98821cb878d2c",
+  "standard": "TEI P5",
+  "version": "4.12.0",
+  "workflow_run": "45487623774"
+}
