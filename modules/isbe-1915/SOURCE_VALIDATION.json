@@ -1,0 +1,118 @@
+{
+  "adapter_sha256": "bdac245cad329fdff8039d0374815ff7086b8a5f8055118f1250461b9d5f17ec",
+  "canonical_edition_id": "isbe-orr-1915-crosswire-corrected",
+  "entry_count": 9380,
+  "evidence_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45486706493",
+  "native_roundtrip": {
+    "expected_keys": 9380,
+    "expected_tei_sha256": "bdac245cad329fdff8039d0374815ff7086b8a5f8055118f1250461b9d5f17ec",
+    "malformed_count": 0,
+    "malformed_readback": [],
+    "missing_key_count": 0,
+    "missing_keys": [],
+    "native_imp_sha256": "5d39f597757745875cba20cc603488dc115f173e7f75d416a81a3e8cad4546d0",
+    "native_keys": 9380,
+    "native_roundtrip_verified": true,
+    "publication_permitted": false,
+    "reader_ui_verified": false,
+    "rights_cleared": false,
+    "schema_version": 1,
+    "unexpected_key_count": 0,
+    "unexpected_keys": [],
+    "unicode_text_mismatch_count": 0,
+    "unicode_text_mismatches": [],
+    "xml_structure_mismatch_count": 0,
+    "xml_structure_mismatches": []
+  },
+  "original_archive_sha256": "4de747545d9c349ab724bc1708b01df5481e3b93e5e51077f859dd8a32023a32",
+  "payload_members": {
+    "mods.d/brisbe1915.conf": {
+      "sha256": "1ad616360dac90d7a2842de6079b479924fefae37d1c3e21efa5a2adca222f65",
+      "size_bytes": 385
+    },
+    "modules/lexdict/zld/brisbe1915/dict.dat": {
+      "sha256": "25fb739067c21447299bb6be94b49d5c181bef2dca52c3d9a22d99eaba5b09a2",
+      "size_bytes": 200952
+    },
+    "modules/lexdict/zld/brisbe1915/dict.idx": {
+      "sha256": "5806b07781998578972df1fa6b8870798abdae2ac11d763b83b91fe794f92ddf",
+      "size_bytes": 75040
+    },
+    "modules/lexdict/zld/brisbe1915/dict.zdt": {
+      "sha256": "d93324666352f80c9a389db88a0053b8b4118a0562d4025d2a366b0dcc99a80d",
+      "size_bytes": 11940748
+    },
+    "modules/lexdict/zld/brisbe1915/dict.zdx": {
+      "sha256": "55cf0941615a4f73f79ed582b35f5d7db05d595b372708f41622b3eb8bf70ccf",
+      "size_bytes": 2504
+    }
+  },
+  "reader_evidence_url": "https://github.com/icfmp/Bible-Resources-ISBE/actions/runs/45344977265",
+  "reader_samples": {
+    "AARON": {
+      "bytes": 12382,
+      "sha256": "1bdc42aa05e447874265592dd0ad8a820df085a523855e31961e9d0029cccabe"
+    },
+    "ABIDE": {
+      "bytes": 2063,
+      "sha256": "dc7f7349fc82dea72d391c24aef36f3bb96836bfaac8d83f5db911b1f2f10a16"
+    },
+    "ARK": {
+      "bytes": 464,
+      "sha256": "e308c3c0136b471dbedb9080f8d7cf72e11a9a44c7d292387118ca9e6ceb9269"
+    },
+    "ARK OF BULRUSHES": {
+      "bytes": 2943,
+      "sha256": "588d19cb425c47d7da61215c7660eda2961d54ab8423f943c19a586f0e77dc5c"
+    },
+    "GAINSAY": {
+      "bytes": 2075,
+      "sha256": "183120a550161ffc103925df23a85139ca808f4160b450de132220161e1ea056"
+    },
+    "ZEBIDAH": {
+      "bytes": 1597,
+      "sha256": "feba5aff3c858e75891cf003acc31c1c1d7c3c7e1b83b1aca5a1107fcc428215"
+    }
+  },
+  "schema_validation": {
+    "historical_print_collation_certified": false,
+    "relax_ng_negative_control_rejected": true,
+    "relax_ng_passed": true,
+    "rng_sha256": "b0f115095ead2ccc6933aa3365c6f4a82cba3b2ec7eee7f76bb616d7a63b7e48",
+    "schema_version": 1,
+    "schematron_negative_control_rejected": true,
+    "schematron_negative_counts": {
+      "active_patterns": 120,
+      "failed_assertions": 0,
+      "fired_rules": 5,
+      "successful_reports": 1
+    },
+    "schematron_passed": true,
+    "schematron_positive_counts": {
+      "active_patterns": 120,
+      "failed_assertions": 0,
+      "fired_rules": 175092,
+      "successful_reports": 0
+    },
+    "schematron_sha256": "500f231ac32d12827bdbdd4168e88743848656bc46cc83286d39bd1f396113d5",
+    "source_sha256": "5df8a6d1311e3f5a83a6d961c6e09c27e042b0c68b4a9da54cb98821cb878d2c",
+    "standard": "TEI P5",
+    "version": "4.12.0",
+    "workflow_run": "45487623774"
+  },
+  "schema_version": 1,
+  "source_kind": "dictionary",
+  "source_sha256": "5df8a6d1311e3f5a83a6d961c6e09c27e042b0c68b4a9da54cb98821cb878d2c",
+  "status": "validated",
+  "sword_id": "BRISBE1915",
+  "upstream_release": {
+    "draft": false,
+    "package_sha256": "9d41edc06c3ebd916f3aaa5b3b12f2a495b069b36f2cb26b8e0dab4bdac15df7",
+    "package_size_bytes": 11734786,
+    "prerelease": false,
+    "source_archive_sha256": "52ac2b3db91b49adab94db2fd6d6d009bf836efe11e993516c33434bb5c56365",
+    "url": "https://github.com/icfmp/Bible-Resources-ISBE/releases/tag/isbe-1915-v0.1.0",
+    "verified_public": true
+  },
+  "version": "0.1.0"
+}

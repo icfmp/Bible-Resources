@@ -39,6 +39,25 @@
       "version": "1.0.0"
     },
     {
+      "canonical_edition_id": "isbe-orr-1915-crosswire-corrected",
+      "category": "dictionary",
+      "download": {
+        "sha256": "9d41edc06c3ebd916f3aaa5b3b12f2a495b069b36f2cb26b8e0dab4bdac15df7",
+        "size_bytes": 11734786,
+        "url": "https://icfmp.github.io/Bible-Resources/sword/packages/BRISBE1915.zip"
+      },
+      "edition": "faithful",
+      "id": "isbe-1915",
+      "language": "en",
+      "sword_id": "BRISBE1915",
+      "title": {
+        "en": "International Standard Bible Encyclopedia (1915)",
+        "fr": "International Standard Bible Encyclopedia (1915)"
+      },
+      "versification": null,
+      "version": "0.1.0"
+    },
+    {
       "canonical_edition_id": "louis-segond-1910-ebible",
       "category": "bible",
       "download": {

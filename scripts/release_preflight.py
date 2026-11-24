@@ -97,7 +97,7 @@ def inspect_approved_releases(root: Path, module_ids: tuple[str, ...]) -> dict:
                 raise PreflightError(resource_id + ": SWORD header identity mismatch")
             driver = conf.get("ModDrv")
             if driver not in ("RawText", "zText", "RawCom", "RawCom4",
-                              "zCom", "zCom4"):
+                              "zCom", "zCom4", "zLD"):
                 raise PreflightError(resource_id + ": unsupported driver for this pilot")
             fingerprint = sha256(archive.read_bytes()).hexdigest()
             reference = plan or historic

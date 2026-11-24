@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "Prepare redistribution of the exact existing approved public package following the owner's central integration request in #2; final merge/public delivery remains subject to central validation and owner instruction.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/2#issuecomment-7144363584",
+    "reviewed_by": "Bible Resources project owner — prior exact ISBE 0.1.0 public distribution approval",
+    "source_rights": "Existing owner-approved CrossWire Public Domain ISBE 1915 distribution; no new editorial change or derivative authorization."
+  },
+  "editorial_path": "modules/isbe-1915/EDITORIAL.md",
+  "evidence_path": "modules/isbe-1915/SOURCE_VALIDATION.json",
+  "module_id": "isbe-1915",
+  "notes_path": "sources/cleaned/encyclopedias/en/isbe-1915/editorial/releases/ISBE-1915-0.1.0.md",
+  "package_sha256": "9d41edc06c3ebd916f3aaa5b3b12f2a495b069b36f2cb26b8e0dab4bdac15df7",
+  "package_size_bytes": 11734786,
+  "schema_version": 1,
+  "sword_id": "BRISBE1915",
+  "tag": "isbe-1915-0.1.0",
+  "title": "International Standard Bible Encyclopedia (1915) — 0.1.0",
+  "version": "0.1.0",
+  "zip_name": "BRISBE1915-0.1.0.zip"
+}

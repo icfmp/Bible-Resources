@@ -1,0 +1,38 @@
+{
+  "canonical_edition_id": "isbe-orr-1915-crosswire-corrected",
+  "category": "dictionary",
+  "id": "isbe-1915",
+  "language": "en",
+  "origin": {
+    "publisher": "James Orr (ed.); CrossWire ISBE 2.2; Bible Resources ISBE",
+    "source_revision": "1915 corrected historical English edition; exact published 0.1.0 TEI master SHA-256 5df8a6d1311e3f5a83a6d961c6e09c27e042b0c68b4a9da54cb98821cb878d2c",
+    "url": "https://github.com/icfmp/Bible-Resources-ISBE/releases/tag/isbe-1915-v0.1.0"
+  },
+  "quality": {
+    "edition": "faithful",
+    "reviewed_by": "Bible Resources project owner — previously published 0.1.0; unchanged distribution candidate",
+    "smoke_key": "AARON",
+    "status": "approved"
+  },
+  "rights": {
+    "derivatives_allowed": false,
+    "evidence_url": "https://github.com/icfmp/Bible-Resources-ISBE/issues/1",
+    "license": "Public Domain",
+    "redistribution_allowed": true,
+    "reviewed_by": "Bible Resources project owner — existing ISBE publication decision (2026-11-24); no further derivatives authorized here"
+  },
+  "schema_version": 1,
+  "sword_id": "BRISBE1915",
+  "title": {
+    "en": "International Standard Bible Encyclopedia (1915)",
+    "fr": "International Standard Bible Encyclopedia (1915)"
+  },
+  "upstreams": [
+    {
+      "last_integrated_version": "2.2",
+      "module_id": "ISBE",
+      "provider": "crosswire"
+    }
+  ],
+  "version": "0.1.0"
+}

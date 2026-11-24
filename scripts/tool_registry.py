@@ -33,6 +33,7 @@ CORE = {
     "commentary_native_inventory.py", "commentary_native_raw_inventory.py",
     "reviewed_compiled_commentary_rebuild.py",
     "compiled_stock_commentary_proof.py", "guard_commentary.py",
+    "reviewed_tei_dictionary.py",
     "sword_native_raw_corpus_inventory.py", "sword_native_inventory.py",
     "sword_native_commentary_index.cpp",
     "sword_native_commentary_raw_corpus.cpp",
@@ -74,7 +75,7 @@ EDITION_PREFIXES = (
 READER_NAMES = ("xiphos", "andbible", "android", "jsword", "webview")
 PIN = re.compile(r"[a-f0-9]{64}")
 FORMATS = ("RawText", "zText", "RawCom", "RawCom4", "zCom", "zCom4",
-           "OSIS", "USFM", "USFX", "ThML")
+           "OSIS", "USFM", "USFX", "ThML", "TEI", "zLD")
 FILE_BOUND = 500_000
 
 
