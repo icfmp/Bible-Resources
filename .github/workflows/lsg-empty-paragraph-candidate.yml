@@ -1,0 +1,101 @@
+name: Prepare and validate reviewed LSG paragraph cleanup candidate
+on:
+  push:
+    branches: [fix/lsg-empty-paragraphs]
+    paths:
+      - '.github/workflows/lsg-empty-paragraph-candidate.yml'
+      - 'scripts/remove_reviewed_empty_osis_paragraphs.py'
+      - 'tests/test_remove_reviewed_empty_osis_paragraphs.py'
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          python -m pip install -r requirements.txt
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libsword-dev libsword-utils diatheke
+      - name: Prepare isolated candidate and prove reversibility
+        run: |
+          python -m unittest discover -s tests -p test_remove_reviewed_empty_osis_paragraphs.py -v
+          mkdir /tmp/empty-paragraph-review
+          python scripts/remove_reviewed_empty_osis_paragraphs.py \
+            --input sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml \
+            --expected-input-sha256 2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd \
+            --reviewed-ref Luke.6.20 --reviewed-ref Rev.2.1 --reviewed-ref Rev.2.8 \
+            --reviewed-ref Rev.2.12 --reviewed-ref Rev.2.18 --reviewed-ref Rev.3.1 \
+            --reviewed-ref Rev.3.7 --reviewed-ref Rev.3.14 \
+            --output /tmp/lsg-1.0.3-candidate.osis.xml \
+            --report /tmp/empty-paragraph-review/overlay.json
+          python scripts/fetch_reviewed_schema.py --directory /tmp/lsg-paragraph-schema
+          set +e
+          python scripts/check_brnp.py /tmp/lsg-1.0.3-candidate.osis.xml --kind bible \
+            --schema /tmp/lsg-paragraph-schema/osisCore.2.1.1-cw-latest.xsd \
+            --report /tmp/empty-paragraph-review/schema.json
+          status=$?
+          set -e
+          test "$status" -le 1
+          python -c 'import json; assert json.load(open("/tmp/empty-paragraph-review/schema.json"))["official_osis"]["status"]=="validated"'
+      - name: Recompile isolated SWORD and prove complete generic source-native parity
+        run: |
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o /tmp/paragraph-index -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o /tmp/paragraph-raw -lsword
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          import json, shutil
+          from approved_osis_sword_candidate import (_create_candidate_layout,_compile_osis,_candidate_result,
+              original_osis_verses_and_notes,project_reviewed_merge_slots,authorial_structures,
+              authorial_body_opening_sequences,authorial_book_streams,authorial_outside_book_titles)
+          from stable_sword_refs import load_approved_merge_policy, inspect_references, parse_keys, parse_registry
+          from sword_native_inventory import collect_native_inventory
+          module=Path("modules/lsg-1910")
+          source=Path("/tmp/lsg-1.0.3-candidate.osis.xml")
+          old=Path("sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml").read_bytes()
+          new=source.read_bytes()
+          verses,notes,_=original_osis_verses_and_notes(new)
+          old_verses,old_notes,_=original_osis_verses_and_notes(old)
+          assert (verses,notes)==(old_verses,old_notes)
+          meta=json.loads((module/"metadata.json").read_text())
+          compat=json.loads((module/"SWORD_COMPATIBILITY.json").read_text())
+          merges,_=load_approved_merge_policy(module/"SOURCE_REFERENCE_MERGES.json",publisher_digest=compat["original_publisher_document_sha256"],versification=meta["versification"])
+          work=Path("/tmp/paragraph-native")
+          work.mkdir()
+          payload,out=_create_candidate_layout(work,meta["sword_id"],meta["versification"],meta["language"])
+          conf=payload/"mods.d/brlsg1910.conf"
+          shutil.copyfile(module/"payload/mods.d/brlsg1910.conf",conf)
+          compilation=_compile_osis(Path(shutil.which("osis2mod")),source,out,meta["versification"],Path("/tmp/paragraph-compiler.log"))
+          keys,registry,_=collect_native_inventory(Path("/tmp/paragraph-index"),work,meta["sword_id"])
+          index=inspect_references(parse_keys("\n".join(verses)),parse_keys(keys),parse_registry(registry,meta["versification"]),merges)
+          assert index["status"]==compat["status"] and index["reviewed_merges"]==compat["reviewed_merges"]
+          projected,projected_notes=project_reviewed_merge_slots(verses,notes,merges)
+          body,counts=authorial_body_opening_sequences(new)
+          result=_candidate_result(Path("/tmp/paragraph-index"),Path("/tmp/paragraph-raw"),work,meta["sword_id"],meta["versification"],projected,projected_notes,authorial_structures(new),body,counts,authorial_book_streams(new),authorial_outside_book_titles(new))
+          assert result["numbered_slot_text_and_note_parity_verified"]
+          assert result["source_native_body_boundary_positions"]["all_book_body_nonspace_and_boundary_events_equal"]
+          assert result["original_to_compiled_body_opening_order"]["same_order_and_kind_in_every_mapped_book"]
+          assert result["explicit_note_target_index_addressability"]["all_original_explicit_targets_index_addressable"]
+          before={p.relative_to(module/"payload").as_posix():sha256(p.read_bytes()).hexdigest() for p in (module/"payload").rglob("*") if p.is_file()}
+          after={p.relative_to(payload).as_posix():sha256(p.read_bytes()).hexdigest() for p in payload.rglob("*") if p.is_file()}
+          assert set(before)==set(after)
+          result["previous_payload_member_sha256"]=before
+          result["candidate_payload_member_sha256"]=after
+          result["changed_payload_members"]=[k for k in before if before[k]!=after[k]]
+          result["source_osis_sha256"]=sha256(new).hexdigest()
+          result["original_authorial_verse_count"]=len(verses)
+          result["index"]=index
+          result["compilation"]=compilation
+          Path("/tmp/empty-paragraph-review/native.json").write_text(json.dumps(result,indent=2,sort_keys=True))
+          print("CANDIDATE",json.dumps({"source_sha256":result["source_osis_sha256"],"changed_payload_members":result["changed_payload_members"],"counts":result["source_to_compiled_counts"],"structure":result["source_native_body_boundary_positions"]},sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-empty-paragraph-metadata
+          path: /tmp/empty-paragraph-review/
+          if-no-files-found: error
