@@ -77,7 +77,8 @@ jobs:
               require(bool(books),'No USFM books')
               return books,markers
           def usfx(archive):
-              members=[m for m in archive.infolist() if not m.is_dir() and m.filename.lower().endswith('.xml')]
+              # eBible uses *_usfx.xml for Scripture; other XML members are metadata.
+              members=[m for m in archive.infolist() if not m.is_dir() and Path(m.filename).name.casefold().endswith('_usfx.xml')]
               require(len(members)==1,'Expected one explicit USFX XML member')
               raw=archive.read(members[0])
               require(not re.search(rb'<!DOCTYPE\b',raw,re.I),'Unexpected USFX DTD')
