@@ -212,7 +212,8 @@ jobs:
           set -euo pipefail
           # Leave workflow deletion to authorized connector; do not publish or touch main here.
           git restore --source=HEAD --staged --worktree .github/workflows/mhcc-classic-maintenance-audit.yml
-          git add -A -- ':!dist'
+          git add -A
+          test -z "$(git ls-files dist)"
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git diff --cached --stat
