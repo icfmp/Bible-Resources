@@ -233,9 +233,7 @@ def main():
             newimp["provenance"]["empty_paragraph_receipt_sha256"]=sha(receipt)
             newimp["provenance"]["full_native_paragraph_audit_sha256"]=sha(native_report)
             newimp["editorial_approval"]["scope"]=(
-                "Reported and source-verified missing chapter-first headings; "
-                "803 existing title types corrected for source-faithful SWORD "
-                "rendering. Final public release remains a separate approval.")
+                "Eight source-attested redundant empty paragraphs removed; full native parity and actual Xiphos checks. Final public release remains a separate approval.")
             save(ROOT/"config/catalogue-import-lsg-1.0.3.json",newimp)
             newplan=deepcopy(plan)
             newplan.update({
@@ -246,9 +244,7 @@ def main():
             newplan["authorization"]["evidence_url"]="https://github.com/icfmp/Bible-Resources/issues/565"
             newplan["authorization"]["reviewed_by"]="Bible Resources owner — requested redundant paragraph correction #565; publication approval still distinct"
             newplan["authorization"]["decision"]=(
-                "Source-attested OSIS section-heading markup repair, "
-                "803 unchanged titles re-associated to verse one; all Scripture "
-                "and notes preserved in independent native SWORD testing")
+                "Source-attested redundant empty paragraph removal; full native content and structure parity and actual Xiphos comparison")
             save(ROOT/"config/release-plans/lsg-1.0.3.json",newplan)
             catalogue.write_bytes((dist/"catalog/v1/catalog.json").read_bytes())
             result=coverage(ROOT,built=dist)
