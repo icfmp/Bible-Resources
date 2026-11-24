@@ -1,0 +1,113 @@
+name: Verify already published dictionary intake
+on:
+  push:
+    branches: [integration/published-isbe-1915]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: icfmp/Bible-Resources-ISBE
+          ref: b99f32dd45b408ed4be3b1ac6f4f28ee6a1eb333
+          path: .intake-upstream
+          sparse-checkout: scripts
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install real native reader
+        run: |
+          sudo apt-get -o Acquire::Retries=2 update -qq
+          sudo apt-get -o Acquire::Retries=2 install -y -qq libsword-utils diatheke
+      - name: Download and authenticate both public packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/intake"
+          gh release download isbe-1915-v0.1.0 --repo icfmp/Bible-Resources-ISBE --pattern 'BRISBE1915-0.1.0-SWORD.zip' --pattern 'BRISBE1915-0.1.0-source.zip' --dir "$RUNNER_TEMP/intake"
+          python - <<'PY'
+          import hashlib,json,os,stat,zipfile
+          from pathlib import Path, PurePosixPath
+          root=Path(os.environ["RUNNER_TEMP"])/"intake"
+          proof=json.loads(Path("sources/cleaned/encyclopedias/en/isbe-1915/editorial/evidence/UPSTREAM_PUBLICATION.json").read_text())
+          assert proof["verified_public"] and not proof["release"]["draft"] and not proof["release"]["prerelease"]
+          sha=lambda b:hashlib.sha256(b).hexdigest()
+          reports={}
+          for kind in ("SWORD","source"):
+              name=f"BRISBE1915-0.1.0-{kind}.zip"
+              pkg=root/name
+              expected=proof["release"]["assets"][name]
+              assert pkg.stat().st_size==expected["size_bytes"] and sha(pkg.read_bytes())==expected["sha256"]
+              with zipfile.ZipFile(pkg) as z:
+                  infos=z.infolist()
+                  assert len(infos)==len({i.filename.casefold() for i in infos})
+                  assert sum(i.file_size for i in infos)<100_000_000
+                  assert len(infos)<=100
+                  assert z.testzip() is None
+                  members={}
+                  for i in infos:
+                      name=i.filename
+                      p=PurePosixPath(name)
+                      assert not p.is_absolute() and ".." not in p.parts and "\\" not in name
+                      assert str(p)==name and not i.is_dir() and stat.S_ISREG(i.external_attr>>16)
+                      if kind=="SWORD":
+                          assert name=="mods.d/brisbe1915.conf" or name.startswith("modules/lexdict/zld/brisbe1915/")
+                      else:
+                          assert name.startswith("source/") and len(p.parts)==2
+                      data=z.read(i)
+                      dest=root/kind/name
+                      dest.parent.mkdir(parents=True,exist_ok=True)
+                      dest.write_bytes(data)
+                      members[name]={"sha256":sha(data),"size_bytes":len(data)}
+                  reports[kind]={"archive_sha256":expected["sha256"],"archive_size_bytes":expected["size_bytes"],"members":members}
+          source=root/"source/source/ISBE.xml"
+          assert sha(source.read_bytes())==proof["source"]["corrected_historical_tei_sha256"]
+          conf=(root/"SWORD/mods.d/brisbe1915.conf").read_text()
+          for line in ("[BRISBE1915]","Version=0.1.0","SourceType=TEI","ModDrv=zLD","Encoding=UTF-8","DistributionLicense=Public Domain","Lang=en"):
+              assert line in conf.splitlines(),line
+          (root/"acquisition.json").write_text(json.dumps(reports,indent=2,sort_keys=True)+"\n")
+          print("Authenticated public release ZIPs; exact TEI master; native configuration verified.")
+          print("ACQUISITION_RECEIPT",json.dumps(reports,sort_keys=True))
+          PY
+      - name: Independently read every dictionary article against the pinned master
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/intake"
+          export SWORD_PATH="$root/SWORD"
+          python .intake-upstream/scripts/export_tei_dictionary_for_sword.py --source "$root/source/source/ISBE.xml" --expected-sha256 5df8a6d1311e3f5a83a6d961c6e09c27e042b0c68b4a9da54cb98821cb878d2c --expected-count 9380 --module-id BRISBE1915 --output "$root/import.xml" --report "$root/adapter.json"
+          echo "bdac245cad329fdff8039d0374815ff7086b8a5f8055118f1250461b9d5f17ec  $root/import.xml" | sha256sum --check --strict
+          mod2imp BRISBE1915 > "$root/readback.imp"
+          python .intake-upstream/scripts/validate_sword_dictionary_roundtrip.py --input-tei "$root/import.xml" --native-imp "$root/readback.imp" --report "$root/roundtrip.json"
+          python - <<'PY'
+          import json,os,subprocess,hashlib
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"intake"
+          proof=json.loads((root/"roundtrip.json").read_text())
+          assert proof["native_roundtrip_verified"] and proof["native_keys"]==proof["expected_keys"]==9380
+          results={}
+          for key in ("AARON","ABIDE","GAINSAY","ZEBIDAH","ARK","ARK OF BULRUSHES"):
+              data=subprocess.check_output(["diatheke","-b","BRISBE1915","-f","HTMLHREF","-k",key],timeout=30)
+              assert len(data)>100 and b"<entryFree" not in data
+              results[key]={"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest()}
+          (root/"reader.json").write_text(json.dumps(results,indent=2)+"\n")
+          print("Native dictionary: all 9380 entries match, six representative diatheke requests succeeded.")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-published-isbe-intake
+          path: |
+            ${{ runner.temp }}/intake/BRISBE1915-0.1.0-SWORD.zip
+            ${{ runner.temp }}/intake/BRISBE1915-0.1.0-source.zip
+            ${{ runner.temp }}/intake/acquisition.json
+            ${{ runner.temp }}/intake/roundtrip.json
+            ${{ runner.temp }}/intake/reader.json
+          retention-days: 30
+          if-no-files-found: error

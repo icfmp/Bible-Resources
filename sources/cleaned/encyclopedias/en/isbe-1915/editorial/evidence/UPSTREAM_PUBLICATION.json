@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "release": {
+    "id": 456444484,
+    "tag": "isbe-1915-v0.1.0",
+    "url": "https://github.com/icfmp/Bible-Resources-ISBE/releases/tag/isbe-1915-v0.1.0",
+    "draft": false,
+    "prerelease": false,
+    "published_at": "2026-11-24T07:47:40Z",
+    "assets": {
+      "BRISBE1915-0.1.0-SHA256SUMS.txt": {
+        "sha256": "f911097ecde8826b312c9db29e1ac78fbd478490bae88f0bd39d0141cac2a0f7",
+        "size_bytes": 283,
+        "download_url": "https://github.com/icfmp/Bible-Resources-ISBE/releases/download/isbe-1915-v0.1.0/BRISBE1915-0.1.0-SHA256SUMS.txt"
+      },
+      "BRISBE1915-0.1.0-source.zip": {
+        "sha256": "52ac2b3db91b49adab94db2fd6d6d009bf836efe11e993516c33434bb5c56365",
+        "size_bytes": 10901183,
+        "download_url": "https://github.com/icfmp/Bible-Resources-ISBE/releases/download/isbe-1915-v0.1.0/BRISBE1915-0.1.0-source.zip"
+      },
+      "BRISBE1915-0.1.0-SWORD.tar.gz": {
+        "sha256": "6b7edccc0f27fbcf71595597ddd8794a5db72acd3952fb03e1e4e569e7acf3a5",
+        "size_bytes": 11731030,
+        "download_url": "https://github.com/icfmp/Bible-Resources-ISBE/releases/download/isbe-1915-v0.1.0/BRISBE1915-0.1.0-SWORD.tar.gz"
+      },
+      "BRISBE1915-0.1.0-SWORD.zip": {
+        "sha256": "9d41edc06c3ebd916f3aaa5b3b12f2a495b069b36f2cb26b8e0dab4bdac15df7",
+        "size_bytes": 11734786,
+        "download_url": "https://github.com/icfmp/Bible-Resources-ISBE/releases/download/isbe-1915-v0.1.0/BRISBE1915-0.1.0-SWORD.zip"
+      }
+    }
+  },
+  "verified_public": true,
+  "publisher_run": "https://github.com/icfmp/Bible-Resources-ISBE/actions/runs/45350683511",
+  "source": {
+    "original_crosswire_archive_sha256": "4de747545d9c349ab724bc1708b01df5481e3b93e5e51077f859dd8a32023a32",
+    "corrected_historical_tei_sha256": "5df8a6d1311e3f5a83a6d961c6e09c27e042b0c68b4a9da54cb98821cb878d2c",
+    "native_sword_adapter_import_sha256": "bdac245cad329fdff8039d0374815ff7086b8a5f8055118f1250461b9d5f17ec"
+  },
+  "verified_native_entries": 9380,
+  "verified_native_unicode_mismatches": 0,
+  "verified_native_structure_mismatches": 0,
+  "documented_readers_xiphos_book_view_limit": true,
+  "original_print_full_collation_certified": false,
+  "central_catalogue_integrated": false
+}
