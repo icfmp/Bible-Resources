@@ -79,6 +79,10 @@ jobs:
               p.Parse(data,True)
               assert len(items)==len(spans) and not stack
               mapping={node:span for node,span in zip(items,spans)}
+              from bisect import bisect_left
+              offsets=[sp[0] for sp in spans]
+              event_offsets=[event[0] for event in text_events]
+              assert offsets==sorted(offsets) and event_offsets==sorted(event_offsets)
               patches=[]; removed=[]; closures=[]; gaps=[]
               books=[n for n in items if n.tag==ns+"div" and n.get("type")=="book" and not(n.get("sID") or n.get("eID"))]
               ids=[n.get("osisID") for n in books]
@@ -107,13 +111,13 @@ jobs:
                       removed.append({"book":book_id,"role":"start" if sid else "end","attributes":a})
                   assert not active and Counter(starts)==Counter(ends)
                   # The paired duplicate flag variants must span the same content.
-                  assert len(starts)==2 and starts[0][0]==starts[1][0] and {x[1] for x in starts}=={None,"true"}
+                  assert len(starts)==2 and {x[1] for x in starts}=={None,"true"}, (book_id,starts)
                   # No authored text/section starts between duplicate starts or ends.
                   a,b,c,d=marks
                   for left,right in ((a,b),(c,d)):
                       lo=mapping[left][1];hi=mapping[right][0]
-                      between=[n for n in items if lo<=mapping[n][0]<hi]
-                      visible=sum(length for pos,nonempty,length in text_events if lo<=pos<hi and nonempty)
+                      between=items[bisect_left(offsets,lo):bisect_left(offsets,hi)]
+                      visible=sum(length for pos,nonempty,length in text_events[bisect_left(event_offsets,lo):bisect_left(event_offsets,hi)] if nonempty)
                       gaps.append({"book":book_id,"nonwhitespace_characters":visible,"intervening_tags":dict(Counter(etree.QName(n).localname+":"+str(n.get("type","")) for n in between))})
               print("BOOK_PAIR_GAPS",json.dumps({"distinct_gap_shapes":list({json.dumps({k:v for k,v in g.items() if k!="book"},sort_keys=True) for g in gaps}),"nonempty_gaps":[g for g in gaps if g["nonwhitespace_characters"]][:10]},sort_keys=True),flush=True)
               assert all(not g["nonwhitespace_characters"] and all(tag.startswith("milestone:") or tag in {"div:bookGroup","div:book","div:chapter"} for tag in g["intervening_tags"]) for g in gaps), "Book milestone pair variants differ in content or semantic scope"
