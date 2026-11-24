@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "base_commit": "3e25693e647ae2581ac7d8118bd9b838d0e96942",
+  "prior_zip_sha256": "009af5d19795797337cfa25b68ce96d593fe60f93770d01c44942455d6827e5d",
+  "prior_zip_size_bytes": 1960800,
+  "candidate_zip_sha256": "81acdfdfbbb18135a49609c045b293ce495a200b37f667f55c190925544b9553",
+  "candidate_zip_size_bytes": 1960800,
+  "candidate_payload_sha256": "948afc84a5818565efb155643e05f5d67c815c04a60f04771cd1919d007c9f43",
+  "only_changed_member": "mods.d/brjnd2024.conf",
+  "six_native_members_unchanged": true,
+  "source_osis_sha256": "35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d",
+  "sword_id": "BRJND2024",
+  "abbreviation": "DARBY2024",
+  "version": "1.0.0",
+  "workflow_run": 45483177053,
+  "workflow_job": 138761466351,
+  "candidate_member_sha256": {
+    "mods.d/brjnd2024.conf": "8c8e0cf409224ffa32aafb8005ebc5c54c36b7e36afdde0f6dddc1399236dfec",
+    "modules/texts/ztext/brjnd2024/nt.bzs": "640a405f27dab6313ccca94b962b98057363f8967d01e4d98b982329eeb1f14c",
+    "modules/texts/ztext/brjnd2024/nt.bzv": "4e52999400ad2410a32a91f2e7fe3ea7a7c138b02f3c805870271d203279e17d",
+    "modules/texts/ztext/brjnd2024/nt.bzz": "6965613636374f2b4dfe07f6a17895c4060062c0605f3939edac3e987057c67b",
+    "modules/texts/ztext/brjnd2024/ot.bzs": "14f1b4697d81c9f0b5f9a6c5a4ee41cc36ebb334c253a1c646baff432dd7500d",
+    "modules/texts/ztext/brjnd2024/ot.bzv": "8e722b8eb1be520a28d4f882a0781680d8637383da26ed39f69a4d5a3995bd00",
+    "modules/texts/ztext/brjnd2024/ot.bzz": "0423cd0aef6a21d7d395782e1c49e4945da2e812e7394f326a2bbc40a0a812e8"
+  }
+}
