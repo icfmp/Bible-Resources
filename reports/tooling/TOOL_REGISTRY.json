@@ -1120,11 +1120,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_intake.py",
         "scripts/tool_registry.py",
-        ".github/workflows/hmcc-modern-reader.yml",
         ".github/workflows/validate.yml",
         "tests/test_bounded_sword_reader.py"
       ]
@@ -1929,11 +1928,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/tool_registry.py",
-        ".github/workflows/commentary-native-raw-corpus.yml",
-        ".github/workflows/hmcc-modern-reader.yml"
+        ".github/workflows/commentary-native-raw-corpus.yml"
       ]
     },
     {
@@ -2080,11 +2078,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 7,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/commentary_native_raw_inventory.py",
         "scripts/tool_registry.py",
-        ".github/workflows/hmcc-modern-reader.yml",
         ".github/workflows/validate.yml",
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
         "tests/test_commentary_native_raw_inventory.py",
