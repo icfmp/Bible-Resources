@@ -13,8 +13,46 @@ from approved_osis_sword_candidate import (
     ApprovedOSISNativeError, _create_candidate_layout, _native_notes,
     _read_native_frames, _compile_osis, safe_failure_code,
     compiler_output_metrics,
-    approved_source_for,
+    approved_source_for, project_reviewed_merge_slots,
 )
+
+
+class ReviewedMergeProjectionTests(unittest.TestCase):
+    def test_exact_private_projection_preserves_notes_targets_and_anchors(self):
+        verses = {"Gen.1.1": "First word.", "Gen.1.2": "Second!",
+                  "Gen.2.1": "Next."}
+        notes = {ref: [] for ref in verses}
+        notes["Gen.1.2"] = [{"body": "A note", "caller": "a", "type": "study",
+                             "targets": ("Gen.1.2",), "point": 3}]
+        result, projected = project_reviewed_merge_slots(
+            verses, notes, [("Gen.1.2", "Gen.1.1")])
+        self.assertEqual(result, {"Gen.1.1": "First word. Second!", "Gen.2.1": "Next."})
+        self.assertEqual(projected["Gen.1.1"][0]["point"], 13)
+        self.assertEqual(projected["Gen.1.1"][0]["targets"], ("Gen.1.2",))
+        self.assertEqual(notes["Gen.1.2"][0]["point"], 3)
+        self.assertIn("Gen.1.2", verses)
+
+    def test_reject_missing_nonadjacent_cross_chapter_nonfinal_and_duplicate_merges(self):
+        verses = {"Gen.1.1": "a", "Gen.1.2": "b", "Gen.1.3": "c", "Gen.2.1": "d"}
+        notes = {ref: [] for ref in verses}
+        for merges in (
+            [("Gen.1.2", "Gen.1.1")],
+            [("Gen.1.3", "Gen.1.1")],
+            [("Gen.2.1", "Gen.1.3")],
+            [("Gen.1.4", "Gen.1.3")],
+            [("Gen.1.3", "Gen.1.2"), ("Gen.1.3", "Gen.1.2")],
+        ):
+            with self.subTest(merges=merges):
+                with self.assertRaises(ApprovedOSISNativeError):
+                    project_reviewed_merge_slots(verses, notes, merges)
+
+    def test_reject_invalid_note_anchor_and_missing_note_scope(self):
+        verses = {"Gen.1.1": "a", "Gen.1.2": "b"}
+        with self.assertRaises(ApprovedOSISNativeError):
+            project_reviewed_merge_slots(verses, {}, [])
+        notes = {"Gen.1.1": [], "Gen.1.2": [{"point": 2}]}
+        with self.assertRaises(ApprovedOSISNativeError):
+            project_reviewed_merge_slots(verses, notes, [("Gen.1.2", "Gen.1.1")])
 
 
 class ApprovedSourceNativeAuditTests(unittest.TestCase):

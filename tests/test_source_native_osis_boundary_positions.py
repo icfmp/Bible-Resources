@@ -41,6 +41,11 @@ class OriginalNativeBoundaryPositionTests(unittest.TestCase):
         self.assertFalse(proof["literal_whitespace_or_exact_typography_verified"])
         self.assertNotIn("PRIVATE",str(proof))
 
+    def test_comments_and_processing_instructions_are_not_body_text(self):
+        authored = OSIS.replace(b'alpha<note>', b'al<!--private comment-->pha<?audit ignored?><note>')
+        proof = compare_book_boundary_positions(authorial_book_streams(authored), native(), [])
+        self.assertTrue(proof["all_book_body_nonspace_and_boundary_events_equal"])
+
     def test_original_and_native_title_text_difference_is_blocked(self):
         compiled=NativeBookStreams()
         compiled.observe("I","Gen",
@@ -57,6 +62,24 @@ class OriginalNativeBoundaryPositionTests(unittest.TestCase):
         self.assertEqual(proof["counts"]["books_with_identical_full_nonspace_body_stream"],1)
         self.assertEqual(proof["counts"]["books_with_title_position_or_text_differences"],1)
         self.assertNotIn("PRIVATE",str(proof))
+
+    def test_zero_length_paragraph_difference_is_located_not_waived(self):
+        authored = OSIS.replace(b'<p><verse', b'<p/><p><verse')
+        proof = compare_book_boundary_positions(authorial_book_streams(authored), native(), [])
+        diagnostic = proof["paragraph_span_diagnostic"]
+        self.assertEqual(diagnostic["counts"]["source_only_zero_nonspace_paragraph_spans"], 1)
+        self.assertEqual(diagnostic["bounded_reference_only_findings"][0]["preceding_or_coincident_source_verse"], "Gen.1.1")
+        self.assertFalse(proof["all_book_body_nonspace_and_boundary_events_equal"])
+        self.assertTrue(diagnostic["zero_nonspace_spans_not_automatically_waived"])
+
+    def test_nonempty_missing_paragraph_is_distinct_from_empty_span(self):
+        compiled = native(first=b"", second=b'alpha<note>PRIVATE NOTE</note> beta'
+                          b'<lg sID="g"/><l sID="l"/>poetry'
+                          b'<l eID="l"/><lg eID="g"/>')
+        proof = compare_book_boundary_positions(authorial_book_streams(OSIS), compiled, [])
+        diagnostic = proof["paragraph_span_diagnostic"]
+        self.assertEqual(diagnostic["counts"]["source_only_nonempty_paragraph_spans"], 1)
+        self.assertFalse(proof["all_book_body_nonspace_and_boundary_events_equal"])
 
     def test_moved_heading_to_middle_of_body_is_blocked(self):
         compiled=NativeBookStreams()

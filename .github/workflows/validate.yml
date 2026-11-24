@@ -49,6 +49,7 @@ jobs:
           from pathlib import Path
           from approved_osis_sword_candidate import (
               approved_source_for, _candidate_result, original_osis_verses_and_notes,
+              project_reviewed_merge_slots,
               authorial_structures, authorial_body_opening_sequences,
               authorial_book_streams, authorial_outside_book_titles,
           )
@@ -157,8 +158,34 @@ jobs:
                       assert parity["reviewed_merges"] == compat["reviewed_merges"]
                       assert parity["resolved_reader_reference_count"] == compat["resolved_reader_reference_count"]
                       print("REVIEWED_MERGED_INDEX_AUDIT", m["id"], json.dumps(parity, sort_keys=True), flush=True)
-                      # Full merged-source body fidelity remains the separate
-                      # source-pinned readback contract required by proof_errors.
+                      # Keep the existing mandatory source-pinned proof. Run the
+                      # same independent exact-slot comparator on a private
+                      # projected reader view, not a rewritten source or target.
+                      projected, projected_notes = project_reviewed_merge_slots(
+                          verses, notes, merges)
+                      body, body_counts = authorial_body_opening_sequences(source)
+                      merged_result = _candidate_result(
+                          tmp / "candidate-index", tmp / "candidate-raw", folder,
+                          m["sword_id"], m["versification"], projected, projected_notes,
+                          authorial_structures(source), body, body_counts,
+                          authorial_book_streams(source), authorial_outside_book_titles(source))
+                      # The target addressability checker saw projected slot keys,
+                      # not the full authorial index. Keep that scope explicit.
+                      target_report = merged_result["explicit_note_target_index_addressability"]
+                      target_report["source_and_native_verse_indices_equal"] = False
+                      target_report["scope"] = "reviewed_projected_reader_slots_original_target_literals_unchanged"
+                      merged_result["source_scope"] = {
+                          "original_source_verse_count": len(verses),
+                          "projected_reader_slot_count": len(projected),
+                          "reviewed_merge_count": len(merges),
+                          "source_osis_sha256": source_sha,
+                          "source_not_modified": True,
+                      }
+                      print("REVIEWED_MERGE_NATIVE_DIAGNOSTIC", json.dumps(merged_result, sort_keys=True), flush=True)
+                      # Actual full numbered-slot parity passed on the first real
+                      # run. Make that proof mandatory independently of the still
+                      # diagnostic whole-book layout comparison.
+                      assert merged_result["numbered_slot_text_and_note_parity_verified"], m["id"]
                   else:
                       body, body_counts = authorial_body_opening_sequences(source)
                       result = _candidate_result(
