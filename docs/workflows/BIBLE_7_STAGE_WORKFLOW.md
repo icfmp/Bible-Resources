@@ -38,3 +38,7 @@ For every stage:
 - Important editorial changes, licensing judgments and publication need owner approval; routine audits and technical fixes do not.
 
 Edition-specific test results, release decisions and historical experiments belong next to the resource under `sources/cleaned/**/editorial/`, not in this checklist. See [technical verification](../technical/README.md), [rights](../policies/RIGHTS.md) and [publishing](PUBLISHING.md).
+
+## Historical LSG release replay
+
+The immutable 1.0.2 heading correction can be replayed from commit `5ea881265ba9cd525cd03fccc7925c1d5e5530c6` using `modules/lsg-1910/tools/stage_chapter_heading_hotfix.py` with its original source/native receipts and previous-version inputs. Do not run this staging command against the current approved module. For 1.0.3, `modules/lsg-1910/tools/stage_empty_paragraph_hotfix.py` consumes exact source-bound overlay, native and real reader evidence, produced by the one-shot workflow in commit history; `modules/lsg-1910/tools/review_empty_paragraph_xiphos.py` is the corresponding isolated prior/candidate GUI witness. These are historical replay tools, not independent publication authorization. The generic empty-paragraph detector remains active in Validate.

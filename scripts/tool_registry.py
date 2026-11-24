@@ -46,6 +46,7 @@ REVIEWED_ACTIVE = frozenset({
     "normalize_bible_references.py", "segment_osis_reference_destinations.py",
     "apply_reviewed_osis_editorial_corrections.py",
     "mark_osis_preverse_section_titles.py", "sword_option_filters.py",
+    "remove_reviewed_empty_osis_paragraphs.py",
     "catalogue_profiles.py", "check_provider_parity.py", "check_updates.py",
     "fetch_reviewed_schema.py", "osis_semantic_fidelity.py",
     "pilot_subprocess.py", "published_reference_audit.py",

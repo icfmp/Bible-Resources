@@ -162,8 +162,8 @@ def main():
     profile_source.write_text(card,encoding="utf-8")
     profile=load(module/"profiles/fr.json")
     profile["module_version"]=VERSION
-    profile["revision"]="2026-11-24.1"
-    profile["approval_url"]="https://github.com/icfmp/Bible-Resources/issues/565"
+    profile["revision"]=profile["approved_at"]+".4"
+    # Profile prose approval remains the original approval; only version labels changed.
     profile["evidence_urls"]["curated_release"]="https://github.com/icfmp/Bible-Resources/releases/tag/"+TAG
     buf=profile_source.read_bytes()
     profile["source_git_blob_sha1"]=sha1(b"blob "+str(len(buf)).encode()+b"\0"+buf).hexdigest()
@@ -232,6 +232,8 @@ def main():
             newimp["provenance"]["historical_1_0_2_zip_sha256"]=OLD_ZIP
             newimp["provenance"]["empty_paragraph_receipt_sha256"]=sha(receipt)
             newimp["provenance"]["full_native_paragraph_audit_sha256"]=sha(native_report)
+            newimp["release_audit_sha256"]=sha(native_report)
+            newimp["provenance"]["new_full_native_readback_sha256"]=sha(native_report)
             newimp["editorial_approval"]["scope"]=(
                 "Eight source-attested redundant empty paragraphs removed; full native parity and actual Xiphos checks. Final public release remains a separate approval.")
             save(ROOT/"config/catalogue-import-lsg-1.0.3.json",newimp)
