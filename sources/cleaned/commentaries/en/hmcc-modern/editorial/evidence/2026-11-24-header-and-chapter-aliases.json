@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45473365105",
+  "tested_commit": "5227cd2671082bc4c67c20d52ec6f6e9fe3dfadc",
+  "results": {
+    "MODERN_BRNP": {
+      "element_counts": {
+        "cell": 8746,
+        "chapter": 1189,
+        "description": 1,
+        "div": 5358,
+        "header": 1,
+        "hi": 15599,
+        "identifier": 1,
+        "language": 1,
+        "note": 27,
+        "osis": 1,
+        "osisText": 1,
+        "p": 40435,
+        "reference": 1209,
+        "row": 4373,
+        "seg": 11,
+        "table": 1035,
+        "title": 5295,
+        "work": 1
+      },
+      "entries": 4049,
+      "examples": {
+        "UNREVIEWED_ELEMENT": {
+          "code": "UNREVIEWED_ELEMENT",
+          "element": "language",
+          "line": 2
+        }
+      },
+      "findings": {
+        "UNREVIEWED_ELEMENT": 1
+      },
+      "schema_error_count": 1,
+      "schema_first_errors": [
+        {
+          "line": 2,
+          "message": "Element '{http://www.bibletechnologies.net/2003/OSIS/namespace}description': This element is not expected. Expected is one of ( {http://www.bibletechnologies.net/2003/OSIS/namespace}language, {http://www.bibletechnologies.net/2003/OSIS/namespace}relation, {http://www.bibletechnologies.net/2003/OSIS/namespace}coverage, {http://www.bibletechnologies.net/2003/OSIS/namespace}rights, {http://www.bibletechnologies.net/2003/OSIS/namespace}scope, {http://www.bibletechnologies.net/2003/OSIS/namespace}castList, {http://www.bibletechnologies.net/2003/OSIS/namespace}teiHeader, {http://www.bibletechnologies.net/2003/OSIS/namespace}refSystem ).",
+          "type": "SCHEMAV_ELEMENT_CONTENT"
+        }
+      ],
+      "schema_validated": false,
+      "sha256": "23f0872a67086d9f659bd96936ab63db63c8c7b8c10eb92e59537c3e6cf16189"
+    },
+    "MODERN_HEADER": {
+      "header": "<header xmlns=\"http://www.bibletechnologies.net/2003/OSIS/namespace\"><work osisWork=\"MHCCMODAP\"><title>Henry's Modern Concise Commentary (editorial approval preview)</title><identifier type=\"OSIS\">MHCCMODAP</identifier><language type=\"IETF\">en</language><description>Private unpublished editorial review candidate; 15 source-linked corrections and two secondary-witness expositions; reader and distribution rights pending.</description></work></header>",
+      "schema_work_children": "Element '{http://www.bibletechnologies.net/2003/OSIS/namespace}description': This element is not expected. Expected is one of ( {http://www.bibletechnologies.net/2003/OSIS/namespace}language, {http://www.bibletechnologies.net/2003/OSIS/namespace}relation, {http://www.bibletechnologies.net/2003/OSIS/namespace}coverage, {http://www.bibletechnologies.net/2003/OSIS/namespace}rights, {http://www.bibletechnologies.net/2003/OSIS/namespace}scope, {http://www.bibletechnologies.net/2003/OSIS/namespace}castList, {http://www.bibletechnologies.net/2003/OSIS/namespace}teiHeader, {http://www.bibletechnologies.net/2003/OSIS/namespace}refSystem )."
+    },
+    "MODERN_CHAPTER_ONLY": {
+      "chapter_links": {
+        "Lev.19": {
+          "link_probes": [
+            "L\tLev.19.1\tLev.19.2\t1",
+            "L\tLev.19.1\tLev.19.3\t1",
+            "L\tLev.19.1\tLev.19.4\t1",
+            "L\tLev.19.1\tLev.19.5\t1",
+            "L\tLev.19.1\tLev.19.6\t1",
+            "L\tLev.19.1\tLev.19.7\t1",
+            "L\tLev.19.1\tLev.19.8\t1",
+            "L\tLev.19.1\tLev.19.9\t1",
+            "L\tLev.19.1\tLev.19.10\t1",
+            "L\tLev.19.1\tLev.19.11\t1",
+            "L\tLev.19.1\tLev.19.12\t1",
+            "L\tLev.19.1\tLev.19.13\t1",
+            "L\tLev.19.1\tLev.19.14\t1",
+            "L\tLev.19.1\tLev.19.15\t1",
+            "L\tLev.19.1\tLev.19.16\t1",
+            "L\tLev.19.1\tLev.19.17\t1",
+            "L\tLev.19.1\tLev.19.18\t1",
+            "L\tLev.19.1\tLev.19.19\t1",
+            "L\tLev.19.1\tLev.19.20\t1",
+            "L\tLev.19.1\tLev.19.21\t1",
+            "L\tLev.19.1\tLev.19.22\t1",
+            "L\tLev.19.1\tLev.19.23\t1",
+            "L\tLev.19.1\tLev.19.24\t1",
+            "L\tLev.19.1\tLev.19.25\t1",
+            "L\tLev.19.1\tLev.19.26\t1",
+            "L\tLev.19.1\tLev.19.27\t1",
+            "L\tLev.19.1\tLev.19.28\t1",
+            "L\tLev.19.1\tLev.19.29\t1",
+            "L\tLev.19.1\tLev.19.30\t1",
+            "L\tLev.19.1\tLev.19.31\t1",
+            "L\tLev.19.1\tLev.19.32\t1",
+            "L\tLev.19.1\tLev.19.33\t1",
+            "L\tLev.19.1\tLev.19.34\t1",
+            "L\tLev.19.1\tLev.19.35\t1",
+            "L\tLev.19.1\tLev.19.36\t1",
+            "L\tLev.19.1\tLev.19.37\t1"
+          ],
+          "same_raw": true
+        },
+        "Ps.108": {
+          "link_probes": [
+            "L\tPs.108.1\tPs.108.2\t1",
+            "L\tPs.108.1\tPs.108.3\t1",
+            "L\tPs.108.1\tPs.108.4\t1",
+            "L\tPs.108.1\tPs.108.5\t1",
+            "L\tPs.108.1\tPs.108.6\t1",
+            "L\tPs.108.1\tPs.108.7\t1",
+            "L\tPs.108.1\tPs.108.8\t1",
+            "L\tPs.108.1\tPs.108.9\t1",
+            "L\tPs.108.1\tPs.108.10\t1",
+            "L\tPs.108.1\tPs.108.11\t1",
+            "L\tPs.108.1\tPs.108.12\t1",
+            "L\tPs.108.1\tPs.108.13\t1"
+          ],
+          "same_raw": true
+        }
+      },
+      "extra_exact_expected": true,
+      "extra_keys": [
+        "Lev.19.1",
+        "Lev.19.10",
+        "Lev.19.11",
+        "Lev.19.12",
+        "Lev.19.13",
+        "Lev.19.14",
+        "Lev.19.15",
+        "Lev.19.16",
+        "Lev.19.17",
+        "Lev.19.18",
+        "Lev.19.19",
+        "Lev.19.2",
+        "Lev.19.20",
+        "Lev.19.21",
+        "Lev.19.22",
+        "Lev.19.23",
+        "Lev.19.24",
+        "Lev.19.25",
+        "Lev.19.26",
+        "Lev.19.27",
+        "Lev.19.28",
+        "Lev.19.29",
+        "Lev.19.3",
+        "Lev.19.30",
+        "Lev.19.31",
+        "Lev.19.32",
+        "Lev.19.33",
+        "Lev.19.34",
+        "Lev.19.35",
+        "Lev.19.36",
+        "Lev.19.37",
+        "Lev.19.4",
+        "Lev.19.5",
+        "Lev.19.6",
+        "Lev.19.7",
+        "Lev.19.8",
+        "Lev.19.9",
+        "Ps.108.1",
+        "Ps.108.10",
+        "Ps.108.11",
+        "Ps.108.12",
+        "Ps.108.13",
+        "Ps.108.2",
+        "Ps.108.3",
+        "Ps.108.4",
+        "Ps.108.5",
+        "Ps.108.6",
+        "Ps.108.7",
+        "Ps.108.8",
+        "Ps.108.9"
+      ]
+    }
+  }
+}
