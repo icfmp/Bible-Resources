@@ -1,0 +1,122 @@
+name: MHCC classic maintenance evidence (read-only)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/mhcc-classic-maintenance-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PYTHONPATH: scripts
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install stock native readers
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_index.cpp -o "$RUNNER_TEMP/mhcc-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_TEMP/mhcc-raw" -lsword
+      - name: Check immutable history, actual upstream drift and exact erratum scope
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,io,json,os,subprocess
+          from collections import Counter
+          from pathlib import Path
+          from lxml import etree
+          from pilot_fetch import fetch
+          from pilot_preflight import inspect_archive
+          from commentary_native_raw_inventory import _safe_stock_install,private_crosscheck,NativeCommentaryMarkupCensus
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          tmp=Path(os.environ["RUNNER_TEMP"])
+          module=Path("modules/mhcc-crosswire")
+          source_dir=Path("sources/cleaned/commentaries/en/mhcc-crosswire")
+          intake=json.loads(Path("config/commentary-intake/mhcc-crosswire.json").read_text())
+          plan=json.loads(Path("config/release-plans/mhcc-0.1.1.json").read_text())
+          rebuild=json.loads(Path("config/commentary-rebuilds/mhcc-crosswire.json").read_text())
+          cleanup=json.loads((source_dir/"CLEANUP_MANIFEST.json").read_text())
+          sha=lambda data: hashlib.sha256(data).hexdigest()
+          def download_release(tag,name,digest,expected_size,ident):
+              subprocess.run(["gh","release","download",tag,"--pattern",name,"--dir",str(tmp)],check=True,timeout=120)
+              archive=tmp/name
+              assert sha(archive.read_bytes())==digest and archive.stat().st_size==expected_size
+              manifest=inspect_archive(archive,source_kind="sword",expected_module_id=ident,expected_category="commentary")
+              root=tmp/tag
+              _safe_stock_install(archive,manifest["members"],root)
+              return archive,root,manifest
+          prev,stock,prev_meta=download_release("mhcc-0.1.0","BRMHCC-0.1.0.zip","0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0",1772960,"BRMHCC")
+          current,published,cur_meta=download_release(plan["tag"],plan["zip_name"],plan["package_sha256"],plan["package_size_bytes"],"MHCC")
+          def members(root):
+              return {p.relative_to(root).as_posix():sha(p.read_bytes()) for p in root.rglob("*") if p.is_file()}
+          assert members(published)==members(module/"payload")==rebuild["payload_sha256"]
+          print("PUBLISHED_PAYLOAD",json.dumps({"archive_sha256":plan["package_sha256"],"members":members(published),"all_git_payload_members_match":True}),flush=True)
+          def scan(root,ident):
+              env=dict(os.environ,SWORD_PATH=str(root.resolve()))
+              data=subprocess.run([str(tmp/"mhcc-raw"),ident],env=env,capture_output=True,check=True,timeout=90).stdout
+              entries={}
+              census=NativeCommentaryMarkupCensus()
+              def observe(kind,ref,raw):
+                  entries[(kind,ref)]=raw
+                  census.observe(kind,ref,raw)
+              report,*_=parse_native_raw_corpus(io.BytesIO(data),on_entry=observe)
+              index=subprocess.run([str(tmp/"mhcc-index"),ident],env=env,capture_output=True,check=True,timeout=90).stdout
+              parity=private_crosscheck(index,ident,list(entries),report)
+              return entries,{"native_sha256":report["all_native_raw_entries_ordered_sha256"],"counts":dict(Counter(k for k,r in entries)),"index":parity,"markup":census.report(len(entries))}
+          old,old_report=scan(stock,"BRMHCC")
+          new,new_report=scan(published,"MHCC")
+          assert old_report["native_sha256"]==intake["native_raw_corpus_sha256"]
+          assert new_report["native_sha256"]==rebuild["candidate_native_corpus_sha256"]
+          added=set(new)-set(old)
+          removed=set(old)-set(new)
+          changed={k for k in old.keys()&new.keys() if old[k]!=new[k]}
+          expected_added={("K",row["new_key"]) for row in rebuild["added_links"]}
+          expected_changed={("K",key) for row in rebuild["source_edits"] for key in row["affected_original_keys"]}
+          assert added==expected_added and not removed and changed==expected_changed
+          for row in rebuild["added_links"]:
+              assert new["K",row["new_key"]]==new["K",row["master_key"]]
+          for row in rebuild["source_edits"]:
+              for key in row["affected_original_keys"]:
+                  assert sha(old["K",key])==row["original_sha256"]
+                  assert sha(new["K",key])==row["revised_sha256"]
+          print("NATIVE_HISTORY",json.dumps({"original":old_report,"current":new_report,"added_keys":len(added),"changed_keys":len(changed),"removed_keys":len(removed),"exact_approved_delta":True},sort_keys=True),flush=True)
+          source=(source_dir/"mhcc.osis.xml").read_bytes()
+          assert sha(source)==cleanup["reconstructed_source_sha256"]
+          parser=etree.XMLParser(resolve_entities=False,no_network=True,huge_tree=False)
+          document=etree.fromstring(source,parser)
+          broken=b"hard livelihood out comfort us."
+          restored=b'hard livelihood out of it. Lamech hoped for relief by the birth of this son, "This same shall comfort us.'
+          hosts=[key for key,raw in new.items() if broken in raw]
+          assert hosts and set(hosts)=={key for key,raw in old.items() if broken in raw}
+          assert all(key[0]=="K" and key[1].startswith("Gen.5.") and new[key]==old[key] and new[key].count(broken)==1 for key in hosts)
+          assert source.count(broken)==1
+          candidate=source.replace(broken,restored,1)
+          assert candidate.replace(restored,broken,1)==source
+          edited=etree.fromstring(candidate,parser)
+          sig=lambda root:[(node.tag,sorted(node.attrib.items())) for node in root.iter() if isinstance(node.tag,str)]
+          assert sig(document)==sig(edited)
+          target=[(str(node.tag),[(str(p.tag),dict(p.attrib)) for p in list(node.iterancestors())[:3]]) for node in document.iter() if isinstance(node.tag,str) and ((node.text and broken.decode() in node.text) or (node.tail and broken.decode() in node.tail))]
+          print("GENESIS_ERRATUM",json.dumps({"source_sha256":sha(source),"candidate_source_sha256":sha(candidate),"affected_keys":[key[1] for key in hosts],"before_native_entry_sha256":sha(new[hosts[0]]),"proposed_after_native_entry_sha256":sha(new[hosts[0]].replace(broken,restored,1)),"identical_old_native_body":all(new[key]==new[hosts[0]] for key in hosts),"source_occurrences":source.count(broken),"bytes_inserted":len(restored)-len(broken),"exact_reverse_roundtrip":True,"xml_structure_and_attributes_identical":True,"source_location":target,"candidate_compiled":False,"published":False},sort_keys=True),flush=True)
+          # New upstream bytes are research only: never repin the source.
+          upstream=tmp/"upstream-observed.zip"
+          try:
+              observation=fetch(intake["sword_zip_url"],upstream,intake["provider"])
+              meta=inspect_archive(upstream,source_kind="sword",expected_module_id="MHCC",expected_category="commentary")
+              root=tmp/"upstream-observed"
+              _safe_stock_install(upstream,meta["members"],root)
+              live,live_report=scan(root,"MHCC")
+              data=lambda m:{Path(k).name:v for k,v in m.items() if k.startswith("modules/comments/")}
+              live_data,archived_data=data(members(root)),data(members(stock))
+              print("UPSTREAM_DRIFT",json.dumps({"observed":observation,"pinned_archive_sha256":intake["archive_sha256"],"observed_conf_sha256":meta["sword_conf"]["conf_sha256"],"pinned_conf_sha256":intake["stock_conf_sha256"],"observed_version":meta["sword_conf"]["version"],"observed_native":live_report,"same_native_corpus_as_original":live==old,"same_native_data_members_as_immutable_original":live_data==archived_data,"data_members_changed":sorted(k for k in set(live_data)|set(archived_data) if live_data.get(k)!=archived_data.get(k)),"added_native_keys":len(live.keys()-old.keys()),"removed_native_keys":len(old.keys()-live.keys()),"changed_existing_native_keys":sum(live[k]!=old[k] for k in live.keys()&old.keys()),"source_pin_unchanged":True},sort_keys=True),flush=True)
+          except Exception as exc:
+              print("UPSTREAM_DRIFT_BLOCKED",type(exc).__name__,str(exc)[:400],flush=True)
+          PY
