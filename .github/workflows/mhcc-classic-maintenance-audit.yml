@@ -23,7 +23,7 @@ jobs:
           set -euo pipefail
           python -m pip install -r requirements.txt
           timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
-          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke xiphos xvfb dbus-x11 xdotool xclip
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_index.cpp -o "$RUNNER_TEMP/mhcc-index" -lsword
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_TEMP/mhcc-raw" -lsword
       - name: Check immutable history, actual upstream drift and exact erratum scope
@@ -182,6 +182,55 @@ jobs:
           assert not baseline_missing and not baseline_extra and not baseline_semantic and not baseline_parse
           assert set(baseline)==set(revised) and exact_candidate_edits and not revised_parse
           assert old_topology==baseline_topology==revised_topology and aliases_preserved
+          # Exact private versioned ZIP; no public catalogue/release changes.
+          assert revised_report["native_sha256"]=="ec00e36c0d0cdaefccddd1db164731c49087f43b68676a6a5cd0c6bd699ab263"
+          assert sha(candidate)=="690184e2cdac0e6160bddb256149f2111d51b946caf29622e3b7f2ea358835e0"
+          import zipfile,re,shutil
+          from pilot_subprocess import query,present_key
+          conf=candidate_root/"mods.d/mhcc.conf"
+          config=conf.read_text()
+          assert config.count("\nVersion=0.1.1\n")==1 and config.count("\nSwordVersionDate=2026-11-16\n")==1
+          config=config.replace("\nVersion=0.1.1\n","\nVersion=0.1.2\n").replace("Bible Resources edited module MHCC version 0.1.1.","Bible Resources edited module MHCC version 0.1.2. Restored one attested textual lacuna in Genesis 5:25-32; all previously reviewed navigation and two historical corrections retained.")
+          # Keep the previous date until actual publication date is known.
+          config=re.sub(r"(?m)^InstallSize=\d+$","InstallSize="+str(sum(p.stat().st_size for p in (candidate_root/"modules").rglob("*") if p.is_file())),config)
+          config=config.rstrip()+"\nHistory_0.1.2=Restored the attested omitted words in Genesis 5:25-32; all prior sections and aliases preserved.\n"
+          conf.write_text(config)
+          bundle=tmp/"mhcc-candidate-evidence"
+          bundle.mkdir()
+          source_target=bundle/"mhcc.osis.xml"
+          source_target.write_bytes(candidate)
+          package=bundle/"MHCC-0.1.2-private.zip"
+          with zipfile.ZipFile(package,"w",compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+              for rel in sorted(members(candidate_root)):
+                  if rel=="source.osis.xml":continue
+                  info=zipfile.ZipInfo(rel,(1980,1,1,0,0,0))
+                  info.compress_type=zipfile.ZIP_DEFLATED
+                  info.external_attr=0o100644<<16
+                  z.writestr(info,(candidate_root/rel).read_bytes())
+          meta=inspect_archive(package,source_kind="sword",expected_module_id="MHCC",expected_category="commentary")
+          assert len(meta["members"])==7 and meta["sword_conf"]["version"]=="0.1.2"
+          qa_root=tmp/"reader-candidate"/"sword"
+          qa_root.parent.mkdir()
+          _safe_stock_install(package,meta["members"],qa_root)
+          qa_entries,qa_scan=scan(qa_root,"MHCC")
+          assert qa_entries==revised
+          diatheke=[]
+          for key in ["Gen.5.24","Gen.5.25","Gen.5.26","Gen.5.32","Gen.6.1","Eccl.4.8","Ezek.3.1","1Chr.7.1","Lev.19.37","Ps.108.13"]:
+              if ("K",key) not in revised:
+                  diatheke.append({"reference":key,"native_key_absent":True})
+                  continue
+              book,ch,v=key.split(".")
+              ref=f"{book} {ch}:{v}"
+              code,data=query("MHCC",ref,fmt="plain",root=qa_root)
+              assert present_key(ref,data,code)
+              is_edit=key in {k[1] for k in hosts}
+              if is_edit:
+                  assert b"Lamech hoped for relief by the birth of this son" in data
+                  assert broken not in data
+              diatheke.append({"reference":key,"nonempty_readback":True,"restored_phrase_verified":is_edit,"sha256":sha(data)})
+          receipt={"schema_version":1,"candidate_source_sha256":sha(candidate),"candidate_native_corpus_sha256":qa_scan["native_sha256"],"candidate_package_sha256":sha(package.read_bytes()),"candidate_package_size_bytes":package.stat().st_size,"payload_member_sha256":members(qa_root),"actual_candidate_installed_readback_equal":True,"diatheke":diatheke,"source_correction":compile_result,"version":"0.1.2","publication_date_pending":True,"publication_authorized":False,"published":False}
+          (bundle/"candidate-receipt.json").write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n")
+          print("PRIVATE_CANDIDATE",json.dumps(receipt,sort_keys=True),flush=True)
           # New upstream bytes are research only: never repin the source.
           upstream=tmp/"upstream-observed.zip"
           try:
@@ -206,3 +255,60 @@ jobs:
           test "$(git hash-object "$p")" = 17ae1990423f5bdee7096ea76e9b5fc6927af1b6
           sha256sum "$p"
           python -m unittest discover -s tests -p test_reviewed_modern_commentary_rebuild.py -v
+      - name: Real Xiphos selected-passage proof using prior reviewed harness
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin refs/pull/275/head
+          test "$(git rev-parse FETCH_HEAD)" = 30d6cd7a26de8cf8982877eee06a19b8b163d937
+          git worktree add --detach "$RUNNER_TEMP/historical-reader" FETCH_HEAD
+          PYTHONPATH="$RUNNER_TEMP/historical-reader/scripts" python - <<'PY'
+          import hashlib,io,json,os,subprocess
+          from pathlib import Path
+          from commentary_xiphos_dual_reader import _run_real_gui,verify_and_install_reviewed_bible
+          from pilot_subprocess import query,present_key
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          tmp=Path(os.environ["RUNNER_TEMP"])
+          root=tmp/"reader-candidate/sword"
+          receipt=tmp/"mhcc-candidate-evidence/candidate-receipt.json"
+          data=json.loads(receipt.read_text())
+          raw=subprocess.run([str(tmp/"mhcc-raw"),"MHCC"],env=dict(os.environ,SWORD_PATH=str(root)),capture_output=True,check=True,timeout=90).stdout
+          entries={}
+          report,*_=parse_native_raw_corpus(io.BytesIO(raw),on_entry=lambda kind,key,body:entries.__setitem__((kind,key),body))
+          assert report["all_native_raw_entries_ordered_sha256"]==data["candidate_native_corpus_sha256"]
+          bible=verify_and_install_reviewed_bible(root)
+          samples=["Gen.5.25","Gen.5.32","Gen.5.24","Eccl.4.8","Ezek.3.1","1Chr.7.1"]
+          comparisons={}
+          for key in samples:
+              book,ch,v=key.split(".")
+              ref=f"{book} {ch}:{v}"
+              code,commentary=query("MHCC",ref,fmt="plain",root=root)
+              bc,bible_text=query("BRLSG1910",ref,fmt="plain",root=root)
+              assert present_key(ref,commentary,code) and present_key(ref,bible_text,bc)
+              comparisons[ref]={"commentary":commentary,"bible":bible_text,"commentary_internal":entries["K",key]}
+          # Require the restored sentence itself in the GUI selection, not only
+          # any unrelated long excerpt from the same chapter.
+          import commentary_xiphos_dual_reader as reader
+          original_match=reader._long_commentary_excerpt_is_on_gui_clipboard
+          restored=b"Lamech hoped for relief by the birth of this son"
+          def strict_match(original,bible,selected):
+              if not original_match(original,bible,selected):return False
+              if restored in original:
+                  expected=reader._normalized_words(restored)
+                  words=reader._normalized_words(selected)
+                  return any(words[i:i+len(expected)]==expected for i in range(len(words)-len(expected)+1))
+              return True
+          reader._long_commentary_excerpt_is_on_gui_clipboard=strict_match
+          result=_run_real_gui(root,comparisons,seconds=12,commentary_module_id="MHCC")
+          data["xiphos"]={"result":result,"restored_phrase_required_in_gui":True,"candidate_package_sha256":data["candidate_package_sha256"],"historical_harness_commit":"30d6cd7a26de8cf8982877eee06a19b8b163d937","historical_bible":bible}
+          receipt.write_text(json.dumps(data,sort_keys=True,indent=2)+"\n")
+          print("XIPHOS_CANDIDATE",json.dumps(data["xiphos"],sort_keys=True),flush=True)
+          assert result["independent_gui_commentary_excerpt_match_count"]==len(samples)
+          PY
+      - name: Retain exact unpublished candidate and receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mhcc-0.1.2-private-candidate
+          path: ${{ runner.temp }}/mhcc-candidate-evidence/
+          retention-days: 90
+          if-no-files-found: warn
