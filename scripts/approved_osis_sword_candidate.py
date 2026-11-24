@@ -250,6 +250,56 @@ def _native_notes(raw: bytes):
     ]
 
 
+def project_reviewed_merge_slots(verses, notes, approved_merges):
+    """Private expected reader-slot view, never an edit to the source OSIS.
+
+    Only already reviewed adjacent final-verse merges are eligible. The caller
+    must independently validate the original key/registry/native index and
+    source-bound merge manifest before using this view. Preserve source order,
+    punctuation, note labels/types/targets and nonspace anchors; shift anchors
+    only by the exact preceding verse's nonspace length. Never infer a merge.
+    """
+    if set(verses) != set(notes) or not isinstance(approved_merges, list):
+        raise ApprovedOSISNativeError("Inconsistent source verse/note scope")
+    projected = dict(verses)
+    projected_notes = {ref: [dict(note) for note in rows]
+                       for ref, rows in notes.items()}
+    seen_sources, seen_destinations = set(), set()
+    for source, dest in approved_merges:
+        if (not KEY.fullmatch(source) or not KEY.fullmatch(dest)
+                or source not in verses or dest not in verses
+                or source in seen_sources or dest in seen_destinations
+                or source in seen_destinations or dest in seen_sources):
+            raise ApprovedOSISNativeError("Invalid or overlapping reviewed merge")
+        sb, sc, sv = source.split(".")
+        db, dc, dv = dest.split(".")
+        if (sb != db or sc != dc or int(sv) != int(dv) + 1
+                or any(ref.startswith(sb + "." + sc + ".")
+                       and int(ref.rsplit(".", 1)[-1]) > int(sv)
+                       for ref in verses)):
+            raise ApprovedOSISNativeError("Reviewed merge must be adjacent final verse")
+        # Whitespace at the reader slot join is compiler presentation; use a
+        # separator only in the private view. Nonspace comparison retains
+        # every authored character. Original note targets are never retargeted.
+        offset = len(_nonspace(verses[dest]))
+        projected[dest] = verses[dest] + " " + verses[source]
+        for note in notes[source]:
+            item = dict(note)
+            point = item.get("point")
+            if type(point) is not int or not 0 <= point <= len(_nonspace(verses[source])):
+                raise ApprovedOSISNativeError("Unverified original note anchor")
+            item["point"] = offset + point
+            projected_notes[dest].append(item)
+        del projected[source]
+        del projected_notes[source]
+        seen_sources.add(source)
+        seen_destinations.add(dest)
+    if (len(projected) != len(verses) - len(approved_merges)
+            or sum(map(len, projected_notes.values())) != sum(map(len, notes.values()))):
+        raise ApprovedOSISNativeError("Reviewed merge lost source keys or notes")
+    return projected, projected_notes
+
+
 def _candidate_result(index_binary: Path,raw_binary: Path,
                       candidate_dir: Path,module_id: str,system: str,
                       source: dict,notes: dict,original_structures: dict,
