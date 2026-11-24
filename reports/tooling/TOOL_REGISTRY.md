@@ -17,7 +17,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 
 - GENERALIZE: 1
 - HISTORICAL/ARCHIVE: 0
-- KEEP_GENERIC: 55
+- KEEP_GENERIC: 56
 - MERGE: 0
 - MODULE_LOCAL: 3
 - UNDECIDED: 0
@@ -69,6 +69,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 7 | publication/release |
 | [`scripts/reviewed_modern_commentary_rebuild.py`](../../scripts/reviewed_modern_commentary_rebuild.py) | GENERALIZE | named test | 3 | publication/release |
 | [`scripts/reviewed_osis_commentary_rebuild.py`](../../scripts/reviewed_osis_commentary_rebuild.py) | KEEP_GENERIC | not established | 2 | publication/release |
+| [`scripts/reviewed_tei_dictionary.py`](../../scripts/reviewed_tei_dictionary.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/segment_osis_reference_destinations.py`](../../scripts/segment_osis_reference_destinations.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/smoke.py`](../../scripts/smoke.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/source_osis_inventory.py`](../../scripts/source_osis_inventory.py) | KEEP_GENERIC | named test | 10 | source/native audit |
