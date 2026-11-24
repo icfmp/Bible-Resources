@@ -20,3 +20,12 @@ The historical 0.1.1 source/native audits and bounded Xiphos/AndBible review rem
 Required before publication: actual archive and member hashes, renewed source-to-native index/structure/note audit, catalogue and release coverage, default and explicit cross-reference mode tests, reader acceptance or documented limitations, all required CI checks, and explicit owner publication authorization. Issue #549 remains open independently; do not claim that correcting the filter resolves optional-mode plain-text XML leakage.
 
 The immutable 0.1.1 release remains available for rollback. No application repository change.
+
+## Verified candidate result
+
+- Canonical diagnostic ZIP SHA-256: `009af5d19795797337cfa25b68ce96d593fe60f93770d01c44942455d6827e5d` (1960800 bytes); production builder must independently match it.
+- Candidate installed payload SHA-256: `37672ac52e881cf8343412eae65090c2eb745be7027896f10872140f248bb429`.
+- Independently downloaded immutable 0.1.1 asset matched its pinned checksum. Only `mods.d/brjnd2024.conf` differed; all six compiled data files were identical.
+- Complete native audit: 31,166 numbered verses, 6,340 note bodies/callers/types/anchors/target sequences, 1,257 titles (including two outside-book titles), 5,197 paragraphs, 3,895 poetry lines, 708 poetry groups; all 1,041 explicit target attributes addressable. No numbered reference or note discrepancy.
+- Diatheke: 13 sampled references, default and cross-references enabled, no literal OSIS tags in either result. This is a bounded test, not full graphical-reader or upstream #549 resolution.
+- [Machine-readable evidence](../evidence/darby-2024-0.1.2-native-audit.json) from [CI](https://github.com/icfmp/Bible-Resources/actions/runs/45376786567). That run was superseded after emitting the Darby results; no overall green CI claim.

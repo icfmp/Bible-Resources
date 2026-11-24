@@ -4,7 +4,7 @@
       "canonical_edition_id": "bpc-jnd-2024-revision-2.0",
       "category": "bible",
       "download": {
-        "sha256": "2b48c3c9a8897e58805a7cb3be731bb895363e51bc854df502ce7e7a45f0c2c4",
+        "sha256": "009af5d19795797337cfa25b68ce96d593fe60f93770d01c44942455d6827e5d",
         "size_bytes": 1960800,
         "url": "https://icfmp.github.io/Bible-Resources/sword/packages/BRJND2024.zip"
       },
@@ -13,11 +13,11 @@
       "language": "fr",
       "sword_id": "BRJND2024",
       "title": {
-        "en": "J. N. Darby Bible — BPC 2024",
-        "fr": "Bible J. N. Darby — BPC 2024"
+        "en": "J. N. Darby Bible (2024)",
+        "fr": "Bible J. N. Darby (2024)"
       },
       "versification": "Luther",
-      "version": "0.1.1"
+      "version": "0.1.2"
     },
     {
       "canonical_edition_id": "matthew-henry-concise-modern-english-2026",

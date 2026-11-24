@@ -37,11 +37,13 @@ class CrossEditionReleasePreflightTests(unittest.TestCase):
         self.assertEqual(by_id["lsg-1910"]["package_size_bytes"], lsg_plan["package_size_bytes"])
         self.assertEqual(by_id["darby-jnd-2024"]["driver"], "zText")
         self.assertEqual(by_id["mhcc-crosswire"]["driver"], "zCom")
+        legacy_ids = {entry["module_id"] for entry in json.loads(
+            (ROOT / "config/release-legacy-bindings.json").read_text())["entries"]}
         for record in by_id.values():
             self.assertRegex(record["package_sha256"], r"^[a-f0-9]{64}$")
             self.assertGreater(record["package_size_bytes"], 0)
             self.assertTrue(record["native_payload_member_identity_verified"])
-            if record["resource_id"] == "darby-jnd-2024":
+            if record["resource_id"] in legacy_ids:
                 self.assertEqual(record["release_route"], "frozen_historical_binding")
                 self.assertFalse(record["release_authorization_verified_in_current_plan"])
                 self.assertTrue(record["frozen_historical_evidence_verified"])

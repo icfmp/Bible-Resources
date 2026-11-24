@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "Prepare configuration-only 0.1.2 candidate: registered OSIS filter and owner-requested display metadata; source and six zText members unchanged. Explicit owner publication authorization is still required before merging or publishing.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/pull/554",
+    "reviewed_by": "Bible Resources project owner — previously approved BPC 2024 revision 2.0 source and editorial overlays (#241); maintenance candidate requested, publication not yet authorized",
+    "source_rights": "Exact BPC 2024 rev. 2.0 Public Domain source; unchanged from reviewed 0.1.1."
+  },
+  "editorial_path": "modules/darby-jnd-2024/EDITORIAL.md",
+  "evidence_path": "modules/darby-jnd-2024/SOURCE_VALIDATION.json",
+  "module_id": "darby-jnd-2024",
+  "notes_path": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/releases/DARBY-JND-2024-0.1.2.md",
+  "package_sha256": "009af5d19795797337cfa25b68ce96d593fe60f93770d01c44942455d6827e5d",
+  "package_size_bytes": 1960800,
+  "schema_version": 1,
+  "sword_id": "BRJND2024",
+  "tag": "darby-jnd-2024-0.1.2",
+  "title": "Bible J. N. Darby (2024) — 0.1.2",
+  "version": "0.1.2",
+  "zip_name": "BRJND2024-0.1.2.zip"
+}
