@@ -368,7 +368,8 @@
     "previous_zip_sha256": "2b48c3c9a8897e58805a7cb3be731bb895363e51bc854df502ce7e7a45f0c2c4",
     "resource_id": "darby-jnd-2024"
   },
-  "publication_authorized": false,
+  "publication_authorized": true,
+  "publication_scope": "configuration-only release; required final protected-branch CI and publication verification remain distinct",
   "schema_version": 1,
   "status": "exact_candidate_native_fidelity_verified_not_publication_approved",
   "workflow_head_sha": "0f0f7629977398aff1d0773c9d366ff7a8923866",
@@ -376,9 +377,130 @@
   "workflow_overall_conclusion": "cancelled after Darby evidence was emitted",
   "workflow_run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45376786567",
   "xiphos_replay": {
+    "actual_reader_reading_pane_text_verified": true,
+    "all_seven_prior_candidate_clipboard_sha256_equal": true,
+    "conclusion": "success",
+    "fresh_manual_screenshot_review": false,
     "job_id": 138395069652,
-    "not_a_visual_acceptance_claim": true,
-    "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45379658739",
-    "status": "in_progress_at_recording"
+    "note_popup_acceptance": "inconclusive_in_both_versions_not_a_detected_regression",
+    "result": {
+      "all_source_prose_witnesses": true,
+      "candidate": [
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "58c98f07085bbf1896c4c957bc478a36b7f05c732ba4805031d87d55506a22ab",
+          "reference": "Gen.2.4",
+          "screenshot_sha256": "6d7b3e595b1163b53b6b3851c45cca3a97809f2b954cf2fa011e454255545d7a",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "d277e963f31efe7afd65f76b8315651868c19f2afba774f70adc59cfea9d51f5",
+          "reference": "Gen.6.9",
+          "screenshot_sha256": "91f22d43df1143e24a818192e6c0c290b176edefae768fc23f17143bc6ee551a",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "0734472776988929d1b4c28f1bfe8b80959a15a0c7b7979cd5dabdeba8508024",
+          "reference": "Ps.3.1",
+          "screenshot_sha256": "225899a79a21ace5027a93355c0655d445ca567764ef14e9f16a99b79ba7b059",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "712c669d4778c7e731a448db549f80fd6d70effb7ba5529b1c7f7f4a55e368be",
+          "reference": "Ezek.4.11",
+          "screenshot_sha256": "058765204d8f77c389a9b90a4863d001ea2202f53c572effe57c9492cc9ba76d",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "ca8b3701b8dd4a7114f7a8b6044a14b16dc549e0019ec67164487da8b391b776",
+          "reference": "Acts.8.36",
+          "screenshot_sha256": "285ea08d2ef2772d51ace4470321dd82b7570b34034c58d1a754f9e386b9bfb1",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "a71041f295cc2ebbf3d354d9bb00f3a00acdf6a308dfde2b72f9ac55c711bd8b",
+          "reference": "Rom.16.25",
+          "screenshot_sha256": "336732a21f2f7a853cc1e5846e7e2f4c16076ea1291f6c7e4dd1c8709e8fa694",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "a8a6c16fd7f88412b204fa2636a1c63b59461ca97d351b27f695dae0f07fa23b",
+          "reference": "Rev.20.4",
+          "screenshot_sha256": "956be5903ab9a057f42e141093398c003b729013af375a68e60191612c10907e",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "note_preview_text_witness": false,
+          "reference": "Gen.2.4"
+        }
+      ],
+      "candidate_reading_markup_free": true,
+      "candidate_sha256": "009af5d19795797337cfa25b68ce96d593fe60f93770d01c44942455d6827e5d",
+      "new_visible_markup": false,
+      "note_preview_verified": false,
+      "prior": [
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "58c98f07085bbf1896c4c957bc478a36b7f05c732ba4805031d87d55506a22ab",
+          "reference": "Gen.2.4",
+          "screenshot_sha256": "93474374ce3081a1f741bd11b9cff0dcfa69f07fd5b9b070385492023b5d4a68",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "d277e963f31efe7afd65f76b8315651868c19f2afba774f70adc59cfea9d51f5",
+          "reference": "Gen.6.9",
+          "screenshot_sha256": "4bd73d95e364de7ad7ce0f3b112d8f2b84905f2d9d2025590dd88cede0af7fad",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "0734472776988929d1b4c28f1bfe8b80959a15a0c7b7979cd5dabdeba8508024",
+          "reference": "Ps.3.1",
+          "screenshot_sha256": "bc1279e9565c13b908b364f2bee9f8eec2352efa677d004c27d2ae3b65faebb6",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "712c669d4778c7e731a448db549f80fd6d70effb7ba5529b1c7f7f4a55e368be",
+          "reference": "Ezek.4.11",
+          "screenshot_sha256": "93dad746691561fe25a94568179aeb56f145380b52535d0d129c86a225d0612d",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "ca8b3701b8dd4a7114f7a8b6044a14b16dc549e0019ec67164487da8b391b776",
+          "reference": "Acts.8.36",
+          "screenshot_sha256": "a3b9d59039c215c1c8d529606bcaf36a8db31eb9af2e1402c361ec5ab1d37415",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "a71041f295cc2ebbf3d354d9bb00f3a00acdf6a308dfde2b72f9ac55c711bd8b",
+          "reference": "Rom.16.25",
+          "screenshot_sha256": "e12fa264e2057ad93530adf7bacb48637839a7323cc20d7b051cca2be35b1ac2",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "actual_clipboard_source_prose_witness": true,
+          "clipboard_sha256": "a8a6c16fd7f88412b204fa2636a1c63b59461ca97d351b27f695dae0f07fa23b",
+          "reference": "Rev.20.4",
+          "screenshot_sha256": "3a7e994715fa011bf4291ff4d4044b0d8b973956adee7b29716666bb71fe4c18",
+          "visible_literal_osis_marker": false
+        },
+        {
+          "note_preview_text_witness": false,
+          "reference": "Gen.2.4"
+        }
+      ],
+      "published": false
+    },
+    "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45379658739/job/138395069652"
   }
 }
