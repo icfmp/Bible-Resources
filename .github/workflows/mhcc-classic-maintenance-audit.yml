@@ -135,6 +135,53 @@ jobs:
           assert sig(document)==sig(edited)
           target=[(str(node.tag),[(str(p.tag),dict(p.attrib)) for p in list(node.iterancestors())[:3]]) for node in document.iter() if isinstance(node.tag,str) and ((node.text and broken.decode() in node.text) or (node.tail and broken.decode() in node.tail))]
           print("GENESIS_ERRATUM",json.dumps({"source_sha256":sha(source),"candidate_source_sha256":sha(candidate),"affected_keys":[key[1] for key in hosts],"before_native_entry_sha256":sha(new[hosts[0]]),"proposed_after_native_entry_sha256":sha(new[hosts[0]].replace(broken,restored,1)),"identical_old_native_body":all(new[key]==new[hosts[0]] for key in hosts),"source_occurrences":source.count(broken),"bytes_inserted":len(restored)-len(broken),"exact_reverse_roundtrip":True,"xml_structure_and_attributes_identical":True,"source_location":target,"candidate_compiled":False,"published":False},sort_keys=True),flush=True)
+          # Compile the pinned clean master and exact reversible edited master
+          # with identical compiler settings; compare every actual entry.
+          def compile_source(label,data):
+              root=tmp/label
+              payload=root/"modules/comments/zcom/mhcc"
+              payload.mkdir(parents=True)
+              (root/"mods.d").mkdir()
+              (root/"mods.d/mhcc.conf").write_bytes((published/"mods.d/mhcc.conf").read_bytes())
+              xml=root/"source.osis.xml"
+              xml.write_bytes(data)
+              p=subprocess.run(["osis2mod",str(payload),str(xml),"-z","z","-b","3","-v","KJV"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=240)
+              if p.returncode:
+                  raise RuntimeError("Standard compiler failed; private source not logged")
+              return root
+          baseline_root=compile_source("recompile-baseline",source)
+          candidate_root=compile_source("recompile-erratum",candidate)
+          baseline,baseline_report=scan(baseline_root,"MHCC")
+          revised,revised_report=scan(candidate_root,"MHCC")
+          baseline_missing=set(new)-set(baseline)
+          baseline_extra=set(baseline)-set(new)
+          def content_differences(a,b):
+              differences=[]; failures=[]
+              for key in sorted(a.keys()&b.keys()):
+                  if a[key]==b[key]:continue
+                  if key[0]=="U":
+                      differences.append(key);continue
+                  try:
+                      if semantics(a[key])!=semantics(b[key]):differences.append(key)
+                  except (etree.XMLSyntaxError,ValueError):failures.append(key)
+              return differences,failures
+          baseline_semantic,baseline_parse=content_differences(new,baseline)
+          revised_semantic,revised_parse=content_differences(baseline,revised)
+          actual_changed={key for key in baseline.keys()&revised.keys() if baseline[key]!=revised[key]}
+          exact_candidate_edits=set(hosts)==actual_changed and all(revised[key]==baseline[key].replace(broken,restored,1) for key in hosts if key in baseline and key in revised)
+          def topology(root):
+              return subprocess.run([str(tmp/"mhcc-index"),"MHCC","--adjacent-links"],env=dict(os.environ,SWORD_PATH=str(root.resolve())),capture_output=True,check=True,timeout=90).stdout
+          old_topology=topology(published); baseline_topology=topology(baseline_root); revised_topology=topology(candidate_root)
+          aliases_preserved=True
+          for row in rebuild["added_links"]:
+              link=subprocess.run([str(tmp/"mhcc-index"),"MHCC","--is-linked",row["master_key"],row["new_key"]],env=dict(os.environ,SWORD_PATH=str(candidate_root.resolve())),capture_output=True,check=True,timeout=10).stdout
+              previous_link=subprocess.run([str(tmp/"mhcc-index"),"MHCC","--is-linked",row["master_key"],row["new_key"]],env=dict(os.environ,SWORD_PATH=str(published.resolve())),capture_output=True,check=True,timeout=10).stdout
+              if link!=previous_link: aliases_preserved=False
+          compile_result={"published_to_baseline_missing":sorted(baseline_missing)[:30],"published_to_baseline_extra":sorted(baseline_extra)[:30],"published_to_baseline_semantic_differences_count":len(baseline_semantic),"published_to_baseline_semantic_differences_sample":baseline_semantic[:20],"published_to_baseline_parse_failures":len(baseline_parse),"baseline_to_candidate_key_parity":set(baseline)==set(revised),"baseline_to_candidate_raw_changed_keys":sorted(actual_changed)[:30],"baseline_to_candidate_raw_changed_count":len(actual_changed),"baseline_to_candidate_semantic_changed_count":len(revised_semantic),"baseline_to_candidate_parse_failures":len(revised_parse),"exact_reversible_native_erratum":exact_candidate_edits,"published_to_baseline_adjacent_link_topology_equal":old_topology==baseline_topology,"baseline_to_candidate_adjacent_link_topology_equal":baseline_topology==revised_topology,"historical_alias_link_state_equal":aliases_preserved,"baseline_native_corpus_sha256":baseline_report["native_sha256"],"candidate_native_corpus_sha256":revised_report["native_sha256"],"candidate_native_counts":revised_report["counts"],"native_candidate_compiled":True,"published":False}
+          print("COMPILED_ERRATUM",json.dumps(compile_result,sort_keys=True),flush=True)
+          assert not baseline_missing and not baseline_extra and not baseline_semantic and not baseline_parse
+          assert set(baseline)==set(revised) and exact_candidate_edits and not revised_parse
+          assert old_topology==baseline_topology==revised_topology and aliases_preserved
           # New upstream bytes are research only: never repin the source.
           upstream=tmp/"upstream-observed.zip"
           try:
