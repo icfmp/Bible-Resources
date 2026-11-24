@@ -99,8 +99,8 @@
   ],
   "authorization": {
     "approved_by": "Bible Resources project owner",
-    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/291",
-    "scope": "Owner explicitly authorized publication after satisfactory checks in issue #291; one attested Genesis 5:25-32 correction and reviewed reversible BRNP normalization; prior 0.1.1 source and historical aliases unchanged in scope."
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/557",
+    "scope": "Owner requested metadata-only promotion to Matthew Henry's Concise Commentary (MHCC) 1.0.0, retaining all validated 0.1.2 content."
   },
   "block_type": "CHAPTER",
   "candidate_native_corpus_sha256": "957ef1f956f804ae67d0563969a2e2a4a9e567fe0153550c45015cb14310a5d6",
@@ -131,6 +131,14 @@
     "source_name": "mhcc.osis.xml"
   },
   "index_only_rebuild_native_corpus_sha256": "badb234e2c36543d8d5cb536ef8b722c31ccb02944177bc043a14e7b1eb0e045",
+  "metadata_promotion": {
+    "new_display_name": "Matthew Henry's Concise Commentary",
+    "old_display_name": "Matthew Henry's Concise Commentary on the Whole Bible",
+    "previous_metadata_sha256": "b1e8b530078eb192b3c82ac08e13ab98b7130b5de8f813eff310dfdd731ff5b1",
+    "previous_proof_sha256": "8a21d62e014922b73c9601085ce15df90e078fa4de81109593c05c82c9b6d824",
+    "previous_review_sha256": "e696e2b840c4d610b1c300b23d3e16a65acb63688ab03bcebd67df6cc31b3407",
+    "previous_version": "0.1.2"
+  },
   "module_id": "mhcc-crosswire",
   "original_archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
   "original_manifest": "config/commentary-intake/mhcc-crosswire.json",
@@ -143,7 +151,7 @@
     "TOP": 2
   },
   "payload_sha256": {
-    "mods.d/mhcc.conf": "eb9d684ecdad407d945fd9f5e139c5f5a92e0809b647e0370c548af0b45e2fa7",
+    "mods.d/mhcc.conf": "3feb409841dcbe58228f9469f77d8a59f1be2bb563a646fd9a338cb5aacd936d",
     "modules/comments/zcom/mhcc/nt.czs": "82a0532db2a93523bfc1e1da3d86bc723b7ef068f3a8e6638eeaf34b30b91cb3",
     "modules/comments/zcom/mhcc/nt.czv": "bc8556ee39c53a777a094dabfaeaec8633fc05bb236a844851e32305c072a7a1",
     "modules/comments/zcom/mhcc/nt.czz": "82a7728f22547669946fc723659723f4c1c7099bebc7dc5ed3b230348e2e5307",
@@ -184,5 +192,5 @@
   "status": "owner_authorized_for_release",
   "sword_id": "MHCC",
   "versification": "KJV",
-  "version": "0.1.2"
+  "version": "1.0.0"
 }

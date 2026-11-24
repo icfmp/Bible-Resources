@@ -28,7 +28,7 @@
   "schema_version": 1,
   "sword_id": "MHCC",
   "title": {
-    "en": "Matthew Henry's Concise Commentary on the Whole Bible",
+    "en": "Matthew Henry's Concise Commentary",
     "fr": "Commentaire concis de Matthew Henry sur toute la Bible"
   },
   "upstreams": [
@@ -40,5 +40,5 @@
     }
   ],
   "versification": "KJV",
-  "version": "0.1.2"
+  "version": "1.0.0"
 }
