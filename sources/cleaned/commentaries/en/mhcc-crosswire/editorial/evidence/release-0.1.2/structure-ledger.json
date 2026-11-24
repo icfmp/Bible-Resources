@@ -1,0 +1,1632 @@
+{
+  "byte_edits": [
+    {
+      "input_offset": 462,
+      "inserted": "",
+      "output_offset": 462,
+      "removed": "<div osisID=\"Gen\" sID=\"gen2\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 504,
+      "inserted": "",
+      "output_offset": 462,
+      "removed": "<div canonical=\"true\" osisID=\"Gen\" sID=\"gen2\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 403851,
+      "inserted": "",
+      "output_offset": 403750,
+      "removed": "<div canonical=\"true\" eID=\"gen2\" osisID=\"Gen\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 404054,
+      "inserted": "",
+      "output_offset": 403894,
+      "removed": "<div eID=\"gen2\" osisID=\"Gen\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 404145,
+      "inserted": "",
+      "output_offset": 403943,
+      "removed": "<div osisID=\"Exod\" sID=\"gen248\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 404190,
+      "inserted": "",
+      "output_offset": 403943,
+      "removed": "<div canonical=\"true\" osisID=\"Exod\" sID=\"gen845\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 666254,
+      "inserted": "",
+      "output_offset": 665945,
+      "removed": "<div canonical=\"true\" eID=\"gen845\" osisID=\"Exod\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 666463,
+      "inserted": "",
+      "output_offset": 666092,
+      "removed": "<div eID=\"gen248\" osisID=\"Exod\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 666556,
+      "inserted": "",
+      "output_offset": 666140,
+      "removed": "<div osisID=\"Lev\" sID=\"gen419\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 666600,
+      "inserted": "",
+      "output_offset": 666140,
+      "removed": "<div canonical=\"true\" osisID=\"Lev\" sID=\"gen1418\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 795932,
+      "inserted": "",
+      "output_offset": 795410,
+      "removed": "<div canonical=\"true\" eID=\"gen1418\" osisID=\"Lev\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 796128,
+      "inserted": "",
+      "output_offset": 795544,
+      "removed": "<div eID=\"gen419\" osisID=\"Lev\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 796220,
+      "inserted": "",
+      "output_offset": 795592,
+      "removed": "<div osisID=\"Num\" sID=\"gen515\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 796264,
+      "inserted": "",
+      "output_offset": 795592,
+      "removed": "<div canonical=\"true\" osisID=\"Num\" sID=\"gen1726\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1005996,
+      "inserted": "",
+      "output_offset": 1005262,
+      "removed": "<div canonical=\"true\" eID=\"gen1726\" osisID=\"Num\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1006192,
+      "inserted": "",
+      "output_offset": 1005396,
+      "removed": "<div eID=\"gen515\" osisID=\"Num\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1006285,
+      "inserted": "",
+      "output_offset": 1005445,
+      "removed": "<div osisID=\"Deut\" sID=\"gen663\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1006330,
+      "inserted": "",
+      "output_offset": 1005445,
+      "removed": "<div canonical=\"true\" osisID=\"Deut\" sID=\"gen2221\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1203707,
+      "inserted": "",
+      "output_offset": 1202759,
+      "removed": "<div canonical=\"true\" eID=\"gen2221\" osisID=\"Deut\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1203916,
+      "inserted": "",
+      "output_offset": 1202905,
+      "removed": "<div eID=\"gen663\" osisID=\"Deut\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1204010,
+      "inserted": "",
+      "output_offset": 1202954,
+      "removed": "<div osisID=\"Josh\" sID=\"gen806\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1204055,
+      "inserted": "",
+      "output_offset": 1202954,
+      "removed": "<div canonical=\"true\" osisID=\"Josh\" sID=\"gen2700\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1328381,
+      "inserted": "",
+      "output_offset": 1327217,
+      "removed": "<div canonical=\"true\" eID=\"gen2700\" osisID=\"Josh\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1328591,
+      "inserted": "",
+      "output_offset": 1327364,
+      "removed": "<div eID=\"gen806\" osisID=\"Josh\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1328685,
+      "inserted": "",
+      "output_offset": 1327413,
+      "removed": "<div osisID=\"Judg\" sID=\"gen902\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1328730,
+      "inserted": "",
+      "output_offset": 1327413,
+      "removed": "<div canonical=\"true\" osisID=\"Judg\" sID=\"gen3016\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1442193,
+      "inserted": "",
+      "output_offset": 1440813,
+      "removed": "<div canonical=\"true\" eID=\"gen3016\" osisID=\"Judg\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1442391,
+      "inserted": "",
+      "output_offset": 1440948,
+      "removed": "<div eID=\"gen902\" osisID=\"Judg\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1442485,
+      "inserted": "",
+      "output_offset": 1440997,
+      "removed": "<div osisID=\"Ruth\" sID=\"gen990\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1442530,
+      "inserted": "",
+      "output_offset": 1440997,
+      "removed": "<div canonical=\"true\" osisID=\"Ruth\" sID=\"gen3295\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1467545,
+      "inserted": "",
+      "output_offset": 1465949,
+      "removed": "<div canonical=\"true\" eID=\"gen3295\" osisID=\"Ruth\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1467754,
+      "inserted": "",
+      "output_offset": 1466095,
+      "removed": "<div eID=\"gen990\" osisID=\"Ruth\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1467848,
+      "inserted": "",
+      "output_offset": 1466144,
+      "removed": "<div osisID=\"1Sam\" sID=\"gen1008\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1467894,
+      "inserted": "",
+      "output_offset": 1466144,
+      "removed": "<div canonical=\"true\" osisID=\"1Sam\" sID=\"gen3358\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1609877,
+      "inserted": "<chapter eID=\"1Sam.25\"/>",
+      "output_offset": 1608064,
+      "removed": ""
+    },
+    {
+      "input_offset": 1635618,
+      "inserted": "",
+      "output_offset": 1633829,
+      "removed": "<div canonical=\"true\" eID=\"gen3358\" osisID=\"1Sam\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1635829,
+      "inserted": "",
+      "output_offset": 1633977,
+      "removed": "<div eID=\"gen1008\" osisID=\"1Sam\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1635924,
+      "inserted": "",
+      "output_offset": 1634026,
+      "removed": "<div osisID=\"2Sam\" sID=\"gen1138\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1635970,
+      "inserted": "",
+      "output_offset": 1634026,
+      "removed": "<div canonical=\"true\" osisID=\"2Sam\" sID=\"gen3796\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1758381,
+      "inserted": "",
+      "output_offset": 1756374,
+      "removed": "<div canonical=\"true\" eID=\"gen3796\" osisID=\"2Sam\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1758593,
+      "inserted": "",
+      "output_offset": 1756523,
+      "removed": "<div eID=\"gen1138\" osisID=\"2Sam\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1758688,
+      "inserted": "",
+      "output_offset": 1756572,
+      "removed": "<div osisID=\"1Kgs\" sID=\"gen1240\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1758734,
+      "inserted": "",
+      "output_offset": 1756572,
+      "removed": "<div canonical=\"true\" osisID=\"1Kgs\" sID=\"gen4136\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1891345,
+      "inserted": "",
+      "output_offset": 1889120,
+      "removed": "<div canonical=\"true\" eID=\"gen4136\" osisID=\"1Kgs\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1891557,
+      "inserted": "",
+      "output_offset": 1889269,
+      "removed": "<div eID=\"gen1240\" osisID=\"1Kgs\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1891652,
+      "inserted": "",
+      "output_offset": 1889318,
+      "removed": "<div osisID=\"2Kgs\" sID=\"gen1339\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 1891698,
+      "inserted": "",
+      "output_offset": 1889318,
+      "removed": "<div canonical=\"true\" osisID=\"2Kgs\" sID=\"gen4468\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2032317,
+      "inserted": "",
+      "output_offset": 2029874,
+      "removed": "<div canonical=\"true\" eID=\"gen4468\" osisID=\"2Kgs\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2032529,
+      "inserted": "",
+      "output_offset": 2030023,
+      "removed": "<div eID=\"gen1339\" osisID=\"2Kgs\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2032624,
+      "inserted": "",
+      "output_offset": 2030072,
+      "removed": "<div osisID=\"1Chr\" sID=\"gen1445\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2032670,
+      "inserted": "",
+      "output_offset": 2030072,
+      "removed": "<div canonical=\"true\" osisID=\"1Chr\" sID=\"gen4829\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2101234,
+      "inserted": "",
+      "output_offset": 2098573,
+      "removed": "<div canonical=\"true\" eID=\"gen4829\" osisID=\"1Chr\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2101446,
+      "inserted": "",
+      "output_offset": 2098722,
+      "removed": "<div eID=\"gen1445\" osisID=\"1Chr\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2101541,
+      "inserted": "",
+      "output_offset": 2098771,
+      "removed": "<div osisID=\"2Chr\" sID=\"gen1519\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2101587,
+      "inserted": "",
+      "output_offset": 2098771,
+      "removed": "<div canonical=\"true\" osisID=\"2Chr\" sID=\"gen5000\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2199250,
+      "inserted": "",
+      "output_offset": 2196371,
+      "removed": "<div canonical=\"true\" eID=\"gen5000\" osisID=\"2Chr\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2199462,
+      "inserted": "",
+      "output_offset": 2196520,
+      "removed": "<div eID=\"gen1519\" osisID=\"2Chr\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2199557,
+      "inserted": "",
+      "output_offset": 2196569,
+      "removed": "<div osisID=\"Ezra\" sID=\"gen1610\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2199603,
+      "inserted": "",
+      "output_offset": 2196569,
+      "removed": "<div canonical=\"true\" osisID=\"Ezra\" sID=\"gen5209\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2240446,
+      "inserted": "",
+      "output_offset": 2237349,
+      "removed": "<div canonical=\"true\" eID=\"gen5209\" osisID=\"Ezra\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2240658,
+      "inserted": "",
+      "output_offset": 2237498,
+      "removed": "<div eID=\"gen1610\" osisID=\"Ezra\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2240752,
+      "inserted": "",
+      "output_offset": 2237546,
+      "removed": "<div osisID=\"Neh\" sID=\"gen1646\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2240797,
+      "inserted": "",
+      "output_offset": 2237546,
+      "removed": "<div canonical=\"true\" osisID=\"Neh\" sID=\"gen5326\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2294887,
+      "inserted": "",
+      "output_offset": 2291574,
+      "removed": "<div canonical=\"true\" eID=\"gen5326\" osisID=\"Neh\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2295095,
+      "inserted": "",
+      "output_offset": 2291720,
+      "removed": "<div eID=\"gen1646\" osisID=\"Neh\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2295189,
+      "inserted": "",
+      "output_offset": 2291769,
+      "removed": "<div osisID=\"Esth\" sID=\"gen1691\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2295235,
+      "inserted": "",
+      "output_offset": 2291769,
+      "removed": "<div canonical=\"true\" osisID=\"Esth\" sID=\"gen5462\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2334974,
+      "inserted": "",
+      "output_offset": 2331445,
+      "removed": "<div canonical=\"true\" eID=\"gen5462\" osisID=\"Esth\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2335174,
+      "inserted": "",
+      "output_offset": 2331582,
+      "removed": "<div eID=\"gen1691\" osisID=\"Esth\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2335268,
+      "inserted": "",
+      "output_offset": 2331630,
+      "removed": "<div osisID=\"Job\" sID=\"gen1723\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2335313,
+      "inserted": "",
+      "output_offset": 2331630,
+      "removed": "<div canonical=\"true\" osisID=\"Job\" sID=\"gen5559\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2564522,
+      "inserted": "",
+      "output_offset": 2560777,
+      "removed": "<div canonical=\"true\" eID=\"gen5559\" osisID=\"Job\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2564730,
+      "inserted": "",
+      "output_offset": 2560923,
+      "removed": "<div eID=\"gen1723\" osisID=\"Job\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2564822,
+      "inserted": "",
+      "output_offset": 2560970,
+      "removed": "<div osisID=\"Ps\" sID=\"gen1893\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 2564866,
+      "inserted": "",
+      "output_offset": 2560970,
+      "removed": "<div canonical=\"true\" osisID=\"Ps\" sID=\"gen6111\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3000786,
+      "inserted": "<chapter eID=\"Ps.95\"/>",
+      "output_offset": 2996829,
+      "removed": ""
+    },
+    {
+      "input_offset": 3230126,
+      "inserted": "",
+      "output_offset": 3226191,
+      "removed": "<div canonical=\"true\" eID=\"gen6111\" osisID=\"Ps\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3230322,
+      "inserted": "",
+      "output_offset": 3226326,
+      "removed": "<div eID=\"gen1893\" osisID=\"Ps\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3230415,
+      "inserted": "",
+      "output_offset": 3226375,
+      "removed": "<div osisID=\"Prov\" sID=\"gen2379\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3230461,
+      "inserted": "",
+      "output_offset": 3226375,
+      "removed": "<div canonical=\"true\" osisID=\"Prov\" sID=\"gen7528\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3656252,
+      "inserted": "",
+      "output_offset": 3652103,
+      "removed": "<div canonical=\"true\" eID=\"gen7528\" osisID=\"Prov\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3656464,
+      "inserted": "",
+      "output_offset": 3652252,
+      "removed": "<div eID=\"gen2379\" osisID=\"Prov\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3656559,
+      "inserted": "",
+      "output_offset": 3652301,
+      "removed": "<div osisID=\"Eccl\" sID=\"gen2945\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3656605,
+      "inserted": "",
+      "output_offset": 3652301,
+      "removed": "<div canonical=\"true\" osisID=\"Eccl\" sID=\"gen9012\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3718565,
+      "inserted": "",
+      "output_offset": 3714198,
+      "removed": "<div canonical=\"true\" eID=\"gen9012\" osisID=\"Eccl\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3718776,
+      "inserted": "",
+      "output_offset": 3714346,
+      "removed": "<div eID=\"gen2945\" osisID=\"Eccl\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3718871,
+      "inserted": "",
+      "output_offset": 3714395,
+      "removed": "<div osisID=\"Song\" sID=\"gen2999\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3718917,
+      "inserted": "",
+      "output_offset": 3714395,
+      "removed": "<div canonical=\"true\" osisID=\"Song\" sID=\"gen9068\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3768128,
+      "inserted": "",
+      "output_offset": 3763543,
+      "removed": "<div canonical=\"true\" eID=\"gen9068\" osisID=\"Song\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3768337,
+      "inserted": "",
+      "output_offset": 3763689,
+      "removed": "<div eID=\"gen2999\" osisID=\"Song\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3768431,
+      "inserted": "",
+      "output_offset": 3763737,
+      "removed": "<div osisID=\"Isa\" sID=\"gen3033\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 3768476,
+      "inserted": "",
+      "output_offset": 3763737,
+      "removed": "<div canonical=\"true\" osisID=\"Isa\" sID=\"gen9104\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4084475,
+      "inserted": "",
+      "output_offset": 4079674,
+      "removed": "<div canonical=\"true\" eID=\"gen9104\" osisID=\"Isa\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4084683,
+      "inserted": "",
+      "output_offset": 4079820,
+      "removed": "<div eID=\"gen3033\" osisID=\"Isa\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4084776,
+      "inserted": "",
+      "output_offset": 4079868,
+      "removed": "<div osisID=\"Jer\" sID=\"gen3275\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4084821,
+      "inserted": "",
+      "output_offset": 4079868,
+      "removed": "<div canonical=\"true\" osisID=\"Jer\" sID=\"gen9349\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4304491,
+      "inserted": "",
+      "output_offset": 4299476,
+      "removed": "<div canonical=\"true\" eID=\"gen9349\" osisID=\"Jer\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4304699,
+      "inserted": "",
+      "output_offset": 4299622,
+      "removed": "<div eID=\"gen3275\" osisID=\"Jer\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4304792,
+      "inserted": "",
+      "output_offset": 4299670,
+      "removed": "<div osisID=\"Lam\" sID=\"gen3476\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4304837,
+      "inserted": "",
+      "output_offset": 4299670,
+      "removed": "<div canonical=\"true\" osisID=\"Lam\" sID=\"gen9555\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4324885,
+      "inserted": "",
+      "output_offset": 4319656,
+      "removed": "<div canonical=\"true\" eID=\"gen9555\" osisID=\"Lam\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4325090,
+      "inserted": "",
+      "output_offset": 4319799,
+      "removed": "<div eID=\"gen3476\" osisID=\"Lam\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4325184,
+      "inserted": "",
+      "output_offset": 4319848,
+      "removed": "<div osisID=\"Ezek\" sID=\"gen3496\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4325230,
+      "inserted": "",
+      "output_offset": 4319848,
+      "removed": "<div canonical=\"true\" osisID=\"Ezek\" sID=\"gen9577\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4477549,
+      "inserted": "",
+      "output_offset": 4472104,
+      "removed": "<div canonical=\"true\" eID=\"gen9577\" osisID=\"Ezek\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4477749,
+      "inserted": "",
+      "output_offset": 4472241,
+      "removed": "<div eID=\"gen3496\" osisID=\"Ezek\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4477843,
+      "inserted": "",
+      "output_offset": 4472289,
+      "removed": "<div osisID=\"Dan\" sID=\"gen3650\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4477888,
+      "inserted": "",
+      "output_offset": 4472289,
+      "removed": "<div canonical=\"true\" osisID=\"Dan\" sID=\"gen9728\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4543111,
+      "inserted": "",
+      "output_offset": 4537450,
+      "removed": "<div canonical=\"true\" eID=\"gen9728\" osisID=\"Dan\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4543318,
+      "inserted": "",
+      "output_offset": 4537595,
+      "removed": "<div eID=\"gen3650\" osisID=\"Dan\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4543411,
+      "inserted": "",
+      "output_offset": 4537643,
+      "removed": "<div osisID=\"Hos\" sID=\"gen3700\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4543456,
+      "inserted": "",
+      "output_offset": 4537643,
+      "removed": "<div canonical=\"true\" osisID=\"Hos\" sID=\"gen9780\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4601201,
+      "inserted": "",
+      "output_offset": 4595326,
+      "removed": "<div canonical=\"true\" eID=\"gen9780\" osisID=\"Hos\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4601398,
+      "inserted": "",
+      "output_offset": 4595461,
+      "removed": "<div eID=\"gen3700\" osisID=\"Hos\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4601492,
+      "inserted": "",
+      "output_offset": 4595510,
+      "removed": "<div osisID=\"Joel\" sID=\"gen3748\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4601538,
+      "inserted": "",
+      "output_offset": 4595510,
+      "removed": "<div canonical=\"true\" osisID=\"Joel\" sID=\"gen9830\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4614874,
+      "inserted": "",
+      "output_offset": 4608783,
+      "removed": "<div canonical=\"true\" eID=\"gen9830\" osisID=\"Joel\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4615083,
+      "inserted": "",
+      "output_offset": 4608929,
+      "removed": "<div eID=\"gen3748\" osisID=\"Joel\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4615178,
+      "inserted": "",
+      "output_offset": 4608978,
+      "removed": "<div osisID=\"Amos\" sID=\"gen3761\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4615224,
+      "inserted": "",
+      "output_offset": 4608978,
+      "removed": "<div canonical=\"true\" osisID=\"Amos\" sID=\"gen9845\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4650643,
+      "inserted": "",
+      "output_offset": 4644334,
+      "removed": "<div canonical=\"true\" eID=\"gen9845\" osisID=\"Amos\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4650852,
+      "inserted": "",
+      "output_offset": 4644480,
+      "removed": "<div eID=\"gen3761\" osisID=\"Amos\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4650947,
+      "inserted": "",
+      "output_offset": 4644529,
+      "removed": "<div osisID=\"Obad\" sID=\"gen3790\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4650993,
+      "inserted": "",
+      "output_offset": 4644529,
+      "removed": "<div canonical=\"true\" osisID=\"Obad\" sID=\"gen9933\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4656350,
+      "inserted": "",
+      "output_offset": 4649823,
+      "removed": "<div canonical=\"true\" eID=\"gen9933\" osisID=\"Obad\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4656559,
+      "inserted": "",
+      "output_offset": 4649969,
+      "removed": "<div eID=\"gen3790\" osisID=\"Obad\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4656655,
+      "inserted": "",
+      "output_offset": 4650019,
+      "removed": "<div osisID=\"Jonah\" sID=\"gen3794\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4656702,
+      "inserted": "",
+      "output_offset": 4650019,
+      "removed": "<div canonical=\"true\" osisID=\"Jonah\" sID=\"gen9946\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4680415,
+      "inserted": "",
+      "output_offset": 4673668,
+      "removed": "<div canonical=\"true\" eID=\"gen9946\" osisID=\"Jonah\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4680627,
+      "inserted": "",
+      "output_offset": 4673816,
+      "removed": "<div eID=\"gen3794\" osisID=\"Jonah\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4680722,
+      "inserted": "",
+      "output_offset": 4673864,
+      "removed": "<div osisID=\"Mic\" sID=\"gen3809\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4680767,
+      "inserted": "",
+      "output_offset": 4673864,
+      "removed": "<div canonical=\"true\" osisID=\"Mic\" sID=\"gen9994\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4713437,
+      "inserted": "",
+      "output_offset": 4706472,
+      "removed": "<div canonical=\"true\" eID=\"gen9994\" osisID=\"Mic\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4713642,
+      "inserted": "",
+      "output_offset": 4706615,
+      "removed": "<div eID=\"gen3809\" osisID=\"Mic\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4713735,
+      "inserted": "",
+      "output_offset": 4706663,
+      "removed": "<div osisID=\"Nah\" sID=\"gen3834\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4713780,
+      "inserted": "",
+      "output_offset": 4706663,
+      "removed": "<div canonical=\"true\" osisID=\"Nah\" sID=\"gen10073\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4724971,
+      "inserted": "",
+      "output_offset": 4717791,
+      "removed": "<div canonical=\"true\" eID=\"gen10073\" osisID=\"Nah\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4725176,
+      "inserted": "",
+      "output_offset": 4717933,
+      "removed": "<div eID=\"gen3834\" osisID=\"Nah\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4725269,
+      "inserted": "",
+      "output_offset": 4717981,
+      "removed": "<div osisID=\"Hab\" sID=\"gen3844\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4725314,
+      "inserted": "",
+      "output_offset": 4717981,
+      "removed": "<div canonical=\"true\" osisID=\"Hab\" sID=\"gen10104\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4743227,
+      "inserted": "",
+      "output_offset": 4735831,
+      "removed": "<div canonical=\"true\" eID=\"gen10104\" osisID=\"Hab\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4743433,
+      "inserted": "",
+      "output_offset": 4735974,
+      "removed": "<div eID=\"gen3844\" osisID=\"Hab\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4743527,
+      "inserted": "",
+      "output_offset": 4736023,
+      "removed": "<div osisID=\"Zeph\" sID=\"gen3856\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4743573,
+      "inserted": "",
+      "output_offset": 4736023,
+      "removed": "<div canonical=\"true\" osisID=\"Zeph\" sID=\"gen10142\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4758137,
+      "inserted": "",
+      "output_offset": 4750523,
+      "removed": "<div canonical=\"true\" eID=\"gen10142\" osisID=\"Zeph\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4758347,
+      "inserted": "",
+      "output_offset": 4750669,
+      "removed": "<div eID=\"gen3856\" osisID=\"Zeph\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4758441,
+      "inserted": "",
+      "output_offset": 4750717,
+      "removed": "<div osisID=\"Hag\" sID=\"gen3868\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4758486,
+      "inserted": "",
+      "output_offset": 4750717,
+      "removed": "<div canonical=\"true\" osisID=\"Hag\" sID=\"gen10180\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4770868,
+      "inserted": "",
+      "output_offset": 4763036,
+      "removed": "<div canonical=\"true\" eID=\"gen10180\" osisID=\"Hag\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4771074,
+      "inserted": "",
+      "output_offset": 4763179,
+      "removed": "<div eID=\"gen3868\" osisID=\"Hag\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4771168,
+      "inserted": "",
+      "output_offset": 4763228,
+      "removed": "<div osisID=\"Zech\" sID=\"gen3876\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4771214,
+      "inserted": "",
+      "output_offset": 4763228,
+      "removed": "<div canonical=\"true\" osisID=\"Zech\" sID=\"gen10204\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4846734,
+      "inserted": "",
+      "output_offset": 4838684,
+      "removed": "<div canonical=\"true\" eID=\"gen10204\" osisID=\"Zech\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4846947,
+      "inserted": "",
+      "output_offset": 4838833,
+      "removed": "<div eID=\"gen3876\" osisID=\"Zech\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4847041,
+      "inserted": "",
+      "output_offset": 4838881,
+      "removed": "<div osisID=\"Mal\" sID=\"gen3925\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4847086,
+      "inserted": "",
+      "output_offset": 4838881,
+      "removed": "<div canonical=\"true\" osisID=\"Mal\" sID=\"gen10361\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4869606,
+      "inserted": "",
+      "output_offset": 4861338,
+      "removed": "<div canonical=\"true\" eID=\"gen10361\" osisID=\"Mal\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4869810,
+      "inserted": "",
+      "output_offset": 4861479,
+      "removed": "<div eID=\"gen3925\" osisID=\"Mal\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4869904,
+      "inserted": "",
+      "output_offset": 4861528,
+      "removed": "<div osisID=\"Matt\" sID=\"gen3939\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 4869950,
+      "inserted": "",
+      "output_offset": 4861528,
+      "removed": "<div canonical=\"true\" osisID=\"Matt\" sID=\"gen10409\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5186366,
+      "inserted": "",
+      "output_offset": 5177880,
+      "removed": "<div canonical=\"true\" eID=\"gen10409\" osisID=\"Matt\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5186579,
+      "inserted": "",
+      "output_offset": 5178029,
+      "removed": "<div eID=\"gen3939\" osisID=\"Matt\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5186674,
+      "inserted": "",
+      "output_offset": 5178078,
+      "removed": "<div osisID=\"Mark\" sID=\"gen4112\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5186720,
+      "inserted": "",
+      "output_offset": 5178078,
+      "removed": "<div canonical=\"true\" osisID=\"Mark\" sID=\"gen11017\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5319709,
+      "inserted": "",
+      "output_offset": 5311003,
+      "removed": "<div canonical=\"true\" eID=\"gen11017\" osisID=\"Mark\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5319922,
+      "inserted": "",
+      "output_offset": 5311152,
+      "removed": "<div eID=\"gen4112\" osisID=\"Mark\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5320017,
+      "inserted": "",
+      "output_offset": 5311201,
+      "removed": "<div osisID=\"Luke\" sID=\"gen4205\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5320063,
+      "inserted": "",
+      "output_offset": 5311201,
+      "removed": "<div canonical=\"true\" osisID=\"Luke\" sID=\"gen11338\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5543644,
+      "inserted": "",
+      "output_offset": 5534718,
+      "removed": "<div canonical=\"true\" eID=\"gen11338\" osisID=\"Luke\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5543857,
+      "inserted": "",
+      "output_offset": 5534867,
+      "removed": "<div eID=\"gen4205\" osisID=\"Luke\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5543952,
+      "inserted": "",
+      "output_offset": 5534916,
+      "removed": "<div osisID=\"John\" sID=\"gen4348\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5543998,
+      "inserted": "",
+      "output_offset": 5534916,
+      "removed": "<div canonical=\"true\" osisID=\"John\" sID=\"gen11844\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5770215,
+      "inserted": "",
+      "output_offset": 5761069,
+      "removed": "<div canonical=\"true\" eID=\"gen11844\" osisID=\"John\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5770417,
+      "inserted": "",
+      "output_offset": 5761207,
+      "removed": "<div eID=\"gen4348\" osisID=\"John\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5770512,
+      "inserted": "",
+      "output_offset": 5761256,
+      "removed": "<div osisID=\"Acts\" sID=\"gen4486\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 5770558,
+      "inserted": "",
+      "output_offset": 5761256,
+      "removed": "<div canonical=\"true\" osisID=\"Acts\" sID=\"gen12299\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6016993,
+      "inserted": "",
+      "output_offset": 6007627,
+      "removed": "<div canonical=\"true\" eID=\"gen12299\" osisID=\"Acts\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6017206,
+      "inserted": "",
+      "output_offset": 6007776,
+      "removed": "<div eID=\"gen4486\" osisID=\"Acts\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6017300,
+      "inserted": "",
+      "output_offset": 6007824,
+      "removed": "<div osisID=\"Rom\" sID=\"gen4634\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6017345,
+      "inserted": "",
+      "output_offset": 6007824,
+      "removed": "<div canonical=\"true\" osisID=\"Rom\" sID=\"gen12795\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6172731,
+      "inserted": "",
+      "output_offset": 6163147,
+      "removed": "<div canonical=\"true\" eID=\"gen12795\" osisID=\"Rom\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6172940,
+      "inserted": "",
+      "output_offset": 6163293,
+      "removed": "<div eID=\"gen4634\" osisID=\"Rom\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6173034,
+      "inserted": "",
+      "output_offset": 6163342,
+      "removed": "<div osisID=\"1Cor\" sID=\"gen4721\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6173080,
+      "inserted": "",
+      "output_offset": 6163342,
+      "removed": "<div canonical=\"true\" osisID=\"1Cor\" sID=\"gen13099\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6299525,
+      "inserted": "",
+      "output_offset": 6289723,
+      "removed": "<div canonical=\"true\" eID=\"gen13099\" osisID=\"1Cor\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6299738,
+      "inserted": "",
+      "output_offset": 6289872,
+      "removed": "<div eID=\"gen4721\" osisID=\"1Cor\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6299833,
+      "inserted": "",
+      "output_offset": 6289921,
+      "removed": "<div osisID=\"2Cor\" sID=\"gen4796\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6299879,
+      "inserted": "",
+      "output_offset": 6289921,
+      "removed": "<div canonical=\"true\" osisID=\"2Cor\" sID=\"gen13392\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6377160,
+      "inserted": "",
+      "output_offset": 6367138,
+      "removed": "<div canonical=\"true\" eID=\"gen13392\" osisID=\"2Cor\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6377373,
+      "inserted": "",
+      "output_offset": 6367287,
+      "removed": "<div eID=\"gen4796\" osisID=\"2Cor\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6377467,
+      "inserted": "",
+      "output_offset": 6367335,
+      "removed": "<div osisID=\"Gal\" sID=\"gen4848\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6377512,
+      "inserted": "",
+      "output_offset": 6367335,
+      "removed": "<div canonical=\"true\" osisID=\"Gal\" sID=\"gen13568\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6439235,
+      "inserted": "",
+      "output_offset": 6428995,
+      "removed": "<div canonical=\"true\" eID=\"gen13568\" osisID=\"Gal\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6439441,
+      "inserted": "",
+      "output_offset": 6429138,
+      "removed": "<div eID=\"gen4848\" osisID=\"Gal\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6439534,
+      "inserted": "",
+      "output_offset": 6429186,
+      "removed": "<div osisID=\"Eph\" sID=\"gen4883\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6439579,
+      "inserted": "",
+      "output_offset": 6429186,
+      "removed": "<div canonical=\"true\" osisID=\"Eph\" sID=\"gen13691\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6493679,
+      "inserted": "",
+      "output_offset": 6483223,
+      "removed": "<div canonical=\"true\" eID=\"gen13691\" osisID=\"Eph\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6493885,
+      "inserted": "",
+      "output_offset": 6483366,
+      "removed": "<div eID=\"gen4883\" osisID=\"Eph\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6493979,
+      "inserted": "",
+      "output_offset": 6483415,
+      "removed": "<div osisID=\"Phil\" sID=\"gen4915\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6494025,
+      "inserted": "",
+      "output_offset": 6483415,
+      "removed": "<div canonical=\"true\" osisID=\"Phil\" sID=\"gen13801\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6528495,
+      "inserted": "",
+      "output_offset": 6517821,
+      "removed": "<div canonical=\"true\" eID=\"gen13801\" osisID=\"Phil\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6528705,
+      "inserted": "",
+      "output_offset": 6517967,
+      "removed": "<div eID=\"gen4915\" osisID=\"Phil\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6528799,
+      "inserted": "",
+      "output_offset": 6518015,
+      "removed": "<div osisID=\"Col\" sID=\"gen4935\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6528844,
+      "inserted": "",
+      "output_offset": 6518015,
+      "removed": "<div canonical=\"true\" osisID=\"Col\" sID=\"gen13874\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6561315,
+      "inserted": "",
+      "output_offset": 6550423,
+      "removed": "<div canonical=\"true\" eID=\"gen13874\" osisID=\"Col\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6561521,
+      "inserted": "",
+      "output_offset": 6550566,
+      "removed": "<div eID=\"gen4935\" osisID=\"Col\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6561617,
+      "inserted": "",
+      "output_offset": 6550617,
+      "removed": "<div osisID=\"1Thess\" sID=\"gen4955\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6561665,
+      "inserted": "",
+      "output_offset": 6550617,
+      "removed": "<div canonical=\"true\" osisID=\"1Thess\" sID=\"gen13945\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6594529,
+      "inserted": "",
+      "output_offset": 6583415,
+      "removed": "<div canonical=\"true\" eID=\"gen13945\" osisID=\"1Thess\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6594747,
+      "inserted": "",
+      "output_offset": 6583567,
+      "removed": "<div eID=\"gen4955\" osisID=\"1Thess\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6594846,
+      "inserted": "",
+      "output_offset": 6583618,
+      "removed": "<div osisID=\"2Thess\" sID=\"gen4978\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6594894,
+      "inserted": "",
+      "output_offset": 6583618,
+      "removed": "<div canonical=\"true\" osisID=\"2Thess\" sID=\"gen14017\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6618620,
+      "inserted": "",
+      "output_offset": 6607278,
+      "removed": "<div canonical=\"true\" eID=\"gen14017\" osisID=\"2Thess\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6618838,
+      "inserted": "",
+      "output_offset": 6607430,
+      "removed": "<div eID=\"gen4978\" osisID=\"2Thess\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6618935,
+      "inserted": "",
+      "output_offset": 6607479,
+      "removed": "<div osisID=\"1Tim\" sID=\"gen4992\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6618981,
+      "inserted": "",
+      "output_offset": 6607479,
+      "removed": "<div canonical=\"true\" osisID=\"1Tim\" sID=\"gen14066\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6656315,
+      "inserted": "",
+      "output_offset": 6644749,
+      "removed": "<div canonical=\"true\" eID=\"gen14066\" osisID=\"1Tim\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6656525,
+      "inserted": "",
+      "output_offset": 6644895,
+      "removed": "<div eID=\"gen4992\" osisID=\"1Tim\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6656620,
+      "inserted": "",
+      "output_offset": 6644944,
+      "removed": "<div osisID=\"2Tim\" sID=\"gen5019\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6656666,
+      "inserted": "",
+      "output_offset": 6644944,
+      "removed": "<div canonical=\"true\" osisID=\"2Tim\" sID=\"gen14154\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6685935,
+      "inserted": "",
+      "output_offset": 6674149,
+      "removed": "<div canonical=\"true\" eID=\"gen14154\" osisID=\"2Tim\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6686145,
+      "inserted": "",
+      "output_offset": 6674295,
+      "removed": "<div eID=\"gen5019\" osisID=\"2Tim\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6686241,
+      "inserted": "",
+      "output_offset": 6674345,
+      "removed": "<div osisID=\"Titus\" sID=\"gen5039\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6686288,
+      "inserted": "",
+      "output_offset": 6674345,
+      "removed": "<div canonical=\"true\" osisID=\"Titus\" sID=\"gen14220\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6706586,
+      "inserted": "",
+      "output_offset": 6694578,
+      "removed": "<div canonical=\"true\" eID=\"gen14220\" osisID=\"Titus\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6706800,
+      "inserted": "",
+      "output_offset": 6694727,
+      "removed": "<div eID=\"gen5039\" osisID=\"Titus\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6706896,
+      "inserted": "",
+      "output_offset": 6694776,
+      "removed": "<div osisID=\"Phlm\" sID=\"gen5052\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6706942,
+      "inserted": "",
+      "output_offset": 6694776,
+      "removed": "<div canonical=\"true\" osisID=\"Phlm\" sID=\"gen14262\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6716100,
+      "inserted": "",
+      "output_offset": 6703870,
+      "removed": "<div canonical=\"true\" eID=\"gen14262\" osisID=\"Phlm\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6716310,
+      "inserted": "",
+      "output_offset": 6704016,
+      "removed": "<div eID=\"gen5052\" osisID=\"Phlm\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6716404,
+      "inserted": "",
+      "output_offset": 6704064,
+      "removed": "<div osisID=\"Heb\" sID=\"gen5058\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6716449,
+      "inserted": "",
+      "output_offset": 6704064,
+      "removed": "<div canonical=\"true\" osisID=\"Heb\" sID=\"gen14281\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6825912,
+      "inserted": "",
+      "output_offset": 6813464,
+      "removed": "<div canonical=\"true\" eID=\"gen14281\" osisID=\"Heb\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6826121,
+      "inserted": "",
+      "output_offset": 6813610,
+      "removed": "<div eID=\"gen5058\" osisID=\"Heb\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6826214,
+      "inserted": "",
+      "output_offset": 6813658,
+      "removed": "<div osisID=\"Jas\" sID=\"gen5117\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6826259,
+      "inserted": "",
+      "output_offset": 6813658,
+      "removed": "<div canonical=\"true\" osisID=\"Jas\" sID=\"gen14492\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6868068,
+      "inserted": "",
+      "output_offset": 6855404,
+      "removed": "<div canonical=\"true\" eID=\"gen14492\" osisID=\"Jas\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6868274,
+      "inserted": "",
+      "output_offset": 6855547,
+      "removed": "<div eID=\"gen5117\" osisID=\"Jas\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6868368,
+      "inserted": "",
+      "output_offset": 6855596,
+      "removed": "<div osisID=\"1Pet\" sID=\"gen5138\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6868414,
+      "inserted": "",
+      "output_offset": 6855596,
+      "removed": "<div canonical=\"true\" osisID=\"1Pet\" sID=\"gen14574\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6911427,
+      "inserted": "",
+      "output_offset": 6898545,
+      "removed": "<div canonical=\"true\" eID=\"gen14574\" osisID=\"1Pet\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6911637,
+      "inserted": "",
+      "output_offset": 6898691,
+      "removed": "<div eID=\"gen5138\" osisID=\"1Pet\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6911732,
+      "inserted": "",
+      "output_offset": 6898740,
+      "removed": "<div osisID=\"2Pet\" sID=\"gen5161\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6911778,
+      "inserted": "",
+      "output_offset": 6898740,
+      "removed": "<div canonical=\"true\" osisID=\"2Pet\" sID=\"gen14656\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6936193,
+      "inserted": "",
+      "output_offset": 6923091,
+      "removed": "<div canonical=\"true\" eID=\"gen14656\" osisID=\"2Pet\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6936403,
+      "inserted": "",
+      "output_offset": 6923237,
+      "removed": "<div eID=\"gen5161\" osisID=\"2Pet\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6936499,
+      "inserted": "",
+      "output_offset": 6923287,
+      "removed": "<div osisID=\"1John\" sID=\"gen5174\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6936546,
+      "inserted": "",
+      "output_offset": 6923287,
+      "removed": "<div canonical=\"true\" osisID=\"1John\" sID=\"gen14703\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6987990,
+      "inserted": "",
+      "output_offset": 6974666,
+      "removed": "<div canonical=\"true\" eID=\"gen14703\" osisID=\"1John\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6988204,
+      "inserted": "",
+      "output_offset": 6974815,
+      "removed": "<div eID=\"gen5174\" osisID=\"1John\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6988301,
+      "inserted": "",
+      "output_offset": 6974865,
+      "removed": "<div osisID=\"2John\" sID=\"gen5201\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6988348,
+      "inserted": "",
+      "output_offset": 6974865,
+      "removed": "<div canonical=\"true\" osisID=\"2John\" sID=\"gen14813\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6996099,
+      "inserted": "",
+      "output_offset": 6982551,
+      "removed": "<div canonical=\"true\" eID=\"gen14813\" osisID=\"2John\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6996313,
+      "inserted": "",
+      "output_offset": 6982700,
+      "removed": "<div eID=\"gen5201\" osisID=\"2John\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6996410,
+      "inserted": "",
+      "output_offset": 6982750,
+      "removed": "<div osisID=\"3John\" sID=\"gen5207\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 6996457,
+      "inserted": "",
+      "output_offset": 6982750,
+      "removed": "<div canonical=\"true\" osisID=\"3John\" sID=\"gen14833\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 7003123,
+      "inserted": "",
+      "output_offset": 6989351,
+      "removed": "<div canonical=\"true\" eID=\"gen14833\" osisID=\"3John\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 7003337,
+      "inserted": "",
+      "output_offset": 6989500,
+      "removed": "<div eID=\"gen5207\" osisID=\"3John\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 7003433,
+      "inserted": "",
+      "output_offset": 6989549,
+      "removed": "<div osisID=\"Jude\" sID=\"gen5212\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 7003479,
+      "inserted": "",
+      "output_offset": 6989549,
+      "removed": "<div canonical=\"true\" osisID=\"Jude\" sID=\"gen14849\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 7018060,
+      "inserted": "",
+      "output_offset": 7004066,
+      "removed": "<div canonical=\"true\" eID=\"gen14849\" osisID=\"Jude\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 7018270,
+      "inserted": "",
+      "output_offset": 7004212,
+      "removed": "<div eID=\"gen5212\" osisID=\"Jude\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 7018364,
+      "inserted": "",
+      "output_offset": 7004260,
+      "removed": "<div osisID=\"Rev\" sID=\"gen5219\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 7018409,
+      "inserted": "",
+      "output_offset": 7004260,
+      "removed": "<div canonical=\"true\" osisID=\"Rev\" sID=\"gen14873\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 7171443,
+      "inserted": "",
+      "output_offset": 7157231,
+      "removed": "<div canonical=\"true\" eID=\"gen14873\" osisID=\"Rev\" type=\"book\"/>"
+    },
+    {
+      "input_offset": 7171652,
+      "inserted": "",
+      "output_offset": 7157377,
+      "removed": "<div eID=\"gen5219\" osisID=\"Rev\" type=\"book\"/>"
+    }
+  ],
+  "structure": {
+    "after_findings": {},
+    "annotation_count_after": 12141,
+    "annotation_count_before": 12141,
+    "base_sha256": "690184e2cdac0e6160bddb256149f2111d51b946caf29622e3b7f2ea358835e0",
+    "before_findings": {
+      "BOOK_MILESTONE_WITHIN_CONTAINER": 132,
+      "DUPLICATE_BOOK_MILESTONE_KEY": 1,
+      "UNCLOSED_CHAPTER_MILESTONE": 1
+    },
+    "closed_chapters": [
+      {
+        "chapter": "1Sam.25",
+        "pair_id": "1Sam.25"
+      },
+      {
+        "chapter": "Ps.95",
+        "pair_id": "Ps.95"
+      }
+    ],
+    "exact_visible_character_stream_equal": true,
+    "idempotent": true,
+    "normalized_sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e",
+    "official_schema": {
+      "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
+      "source_sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e",
+      "status": "validated"
+    },
+    "other_element_hierarchy_and_attributes_equal": true,
+    "removed_book_milestones": 264,
+    "reversible": true
+  }
+}

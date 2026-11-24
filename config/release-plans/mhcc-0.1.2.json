@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "Owner explicitly authorized publication after satisfactory checks in issue #291; one attested Genesis 5:25-32 correction and reviewed reversible BRNP normalization; prior 0.1.1 source and historical aliases unchanged in scope.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/291#issuecomment-7131921663",
+    "reviewed_by": "Bible Resources project owner",
+    "source_rights": "CrossWire Public Domain — Copy Freely; Genesis phrase independently witnessed in Bible Truth Forum public-domain concise text; no separate CCEL edition or project relicensing."
+  },
+  "editorial_path": "modules/mhcc-crosswire/EDITORIAL.md",
+  "evidence_path": "modules/mhcc-crosswire/SOURCE_VALIDATION.json",
+  "module_id": "mhcc-crosswire",
+  "notes_path": "sources/cleaned/commentaries/en/mhcc-crosswire/editorial/releases/MHCC-0.1.2.md",
+  "package_sha256": "ae6c9006bfd889446122426ae2d29e1b80c8cb7ba1b1d4aeaf6eecd1157ac6b3",
+  "package_size_bytes": 2474085,
+  "schema_version": 1,
+  "sword_id": "MHCC",
+  "tag": "mhcc-0.1.2",
+  "title": "Matthew Henry Concise Commentary — Bible Resources MHCC 0.1.2",
+  "version": "0.1.2",
+  "zip_name": "MHCC-0.1.2.zip"
+}

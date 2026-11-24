@@ -1,0 +1,19 @@
+{
+  "adjacent_link_topology_equal": true,
+  "baseline_native_sha256": "ec00e36c0d0cdaefccddd1db164731c49087f43b68676a6a5cd0c6bd699ab263",
+  "changed_reviewed_alias_links": [],
+  "counts": {
+    "I": 1255,
+    "K": 28742,
+    "U": 2
+  },
+  "extra": [],
+  "missing": [],
+  "normalized_native_sha256": "957ef1f956f804ae67d0563969a2e2a4a9e567fe0153550c45015cb14310a5d6",
+  "opaque_top_equal": true,
+  "publication": false,
+  "raw_changed": 442,
+  "semantic_changed_count": 0,
+  "semantic_changed_sample": [],
+  "xml_parse_errors": 0
+}

@@ -1,11 +1,13 @@
 {
-  "candidate_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "candidate_native_corpus_sha256": "957ef1f956f804ae67d0563969a2e2a4a9e567fe0153550c45015cb14310a5d6",
+  "candidate_source_sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e",
   "curated_module_id": "MHCC",
-  "curated_version": "0.1.1",
+  "curated_version": "0.1.2",
+  "incremental_evidence_sha256": "ccedc69d7a2d6bfffc56a2aa2c4fcd5b45a5109826d57e5f70e01c955d2866a9",
   "original_archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
   "review_manifest": "config/commentary-rebuilds/mhcc-crosswire.json",
-  "schema_version": 1,
-  "source_audit_sha256": "e51358a9b10185f2a45bbb63a38d6ccf063e8f492905f8519bf4ed9d54aaa7e4",
+  "schema_version": 2,
+  "source_audit_sha256": "caab3e72f633d3b381766d705544c84bcd730b26de4f2c1527929d8eab9094d6",
   "source_kind": "reviewed_compiled_commentary_rebuild",
   "status": "validated"
 }

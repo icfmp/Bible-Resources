@@ -99,11 +99,9 @@
   ],
   "all_added_K_keys_link_to_reviewed_original_master": true,
   "all_edited_source_structure_and_unedited_content_preserved": true,
-  "all_original_I_bytes_identical": true,
   "all_original_TOP_bytes_identical": true,
   "all_original_linked_section_boundaries_preserved": true,
-  "all_other_original_K_bytes_identical": true,
-  "candidate_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "candidate_native_corpus_sha256": "957ef1f956f804ae67d0563969a2e2a4a9e567fe0153550c45015cb14310a5d6",
   "candidate_native_counts": {
     "I": 1255,
     "K": 28742,
@@ -111,6 +109,27 @@
   },
   "compiler": "osis2mod",
   "full_original_and_rebuilt_native_inventory_compared": true,
+  "incremental_revision": {
+    "candidate_source_sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e",
+    "evidence_sha256": "ccedc69d7a2d6bfffc56a2aa2c4fcd5b45a5109826d57e5f70e01c955d2866a9",
+    "previous_cleanup_sha256": "eaa8458231106dbe5bf07809b9566132a4494f9649cc22d0b9d99fafc403606f",
+    "previous_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+    "previous_review_sha256": "b7fd321d03b46a4752e68dfca9de2fe7bb22eb874c5b11dd931b924702e1179d",
+    "previous_source_sha256": "6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39",
+    "previous_version": "0.1.1",
+    "reference_changed_keys": [],
+    "semantic_changed_keys": [
+      "Gen.5.25",
+      "Gen.5.26",
+      "Gen.5.27",
+      "Gen.5.28",
+      "Gen.5.29",
+      "Gen.5.30",
+      "Gen.5.31",
+      "Gen.5.32"
+    ],
+    "source_name": "mhcc.osis.xml"
+  },
   "index_only_rebuild_native_corpus_sha256": "badb234e2c36543d8d5cb536ef8b722c31ccb02944177bc043a14e7b1eb0e045",
   "no_source_prose_exported": true,
   "no_unreviewed_original_native_keys_changed": true,
@@ -122,7 +141,7 @@
     "TOP": 2
   },
   "reader": "libSWORD",
-  "schema_version": 1,
+  "schema_version": 2,
   "source_edits": [
     {
       "affected_original_keys": [
@@ -152,6 +171,6 @@
     }
   ],
   "source_kind": "reviewed_compiled_commentary_rebuild",
-  "status": "complete_native_rebuild_comparison",
+  "status": "complete_native_semantic_rebuild_comparison",
   "versification": "KJV"
 }

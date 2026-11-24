@@ -1,0 +1,469 @@
+{
+  "bible_verse_member_count": 0,
+  "book_identifier_count": 66,
+  "book_milestone_pair_identifier_count": 131,
+  "brnp_conformance_certified": false,
+  "chapter_identifier_count": 1189,
+  "chapter_pair_identifier_count": 1189,
+  "commentary_entry_count": 12141,
+  "element_counts": {
+    "cell": 5062,
+    "chapter": 2376,
+    "div": 54891,
+    "header": 1,
+    "hi": 3928,
+    "identifier": 1,
+    "milestone": 198,
+    "osis": 1,
+    "osisText": 1,
+    "refSystem": 1,
+    "reference": 1204,
+    "row": 2531,
+    "table": 2531,
+    "title": 2054,
+    "work": 1
+  },
+  "finding_codes": {
+    "BOOK_MILESTONE_WITHIN_CONTAINER": 132,
+    "DUPLICATE_BOOK_MILESTONE_KEY": 1,
+    "UNCLOSED_CHAPTER_MILESTONE": 1
+  },
+  "finding_count": 134,
+  "finding_examples_by_code": {
+    "BOOK_MILESTONE_WITHIN_CONTAINER": {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    "DUPLICATE_BOOK_MILESTONE_KEY": {
+      "code": "DUPLICATE_BOOK_MILESTONE_KEY",
+      "line": 1
+    },
+    "UNCLOSED_CHAPTER_MILESTONE": {
+      "code": "UNCLOSED_CHAPTER_MILESTONE",
+      "count": 2,
+      "line": 1
+    }
+  },
+  "findings": [
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "DUPLICATE_BOOK_MILESTONE_KEY",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    },
+    {
+      "code": "BOOK_MILESTONE_WITHIN_CONTAINER",
+      "line": 1
+    }
+  ],
+  "kind": "commentary",
+  "limitations": [
+    "Official OSIS XSD is checked only when --schema is supplied; neither route proves historical/authorial fidelity",
+    "NOT a complete verse hierarchy, reference target, annotation or reader validation",
+    "NOT a production or publication approval gate"
+  ],
+  "official_osis": {
+    "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
+    "source_sha256": "690184e2cdac0e6160bddb256149f2111d51b946caf29622e3b7f2ea358835e0",
+    "status": "validated"
+  },
+  "profile": "BRNP",
+  "profile_version": "0.2-draft",
+  "publication_approved": false,
+  "sha256": "690184e2cdac0e6160bddb256149f2111d51b946caf29622e3b7f2ea358835e0",
+  "status": "findings_need_review",
+  "unreviewed_elements": {},
+  "verse_identifier_count": 0,
+  "verse_pair_identifier_count": 0,
+  "verse_start_reasons": {}
+}
