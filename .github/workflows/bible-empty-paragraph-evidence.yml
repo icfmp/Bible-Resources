@@ -1,0 +1,68 @@
+name: Inspect exact source zero-body paragraph semantics (read only)
+on:
+  push:
+    branches: [research/bible-empty-paragraph-evidence]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          PYTHONPATH=scripts python - <<'PY'
+          import hashlib, json
+          from collections import Counter
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          ns="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
+          for folder in sorted(Path("modules").iterdir()):
+              if not (folder/"metadata.json").is_file():
+                  continue
+              m=json.loads((folder/"metadata.json").read_text())
+              if m["category"]!="bible" or m["quality"]["status"]!="approved":
+                  continue
+              pin=json.loads((folder/"SOURCE_VALIDATION.json").read_text())["source_sha256"]
+              files=list((Path("sources/cleaned/bibles")/m["language"]/m["id"]).glob("*.osis.xml"))
+              assert len(files)==1
+              data=files[0].read_bytes()
+              assert hashlib.sha256(data).hexdigest()==pin
+              root=ET.fromstring(data)
+              findings=[]
+              for book in root.iter(ns+"div"):
+                  if book.get("type")!="book":
+                      continue
+                  pos=0
+                  ref=None
+                  def count(s):
+                      return sum(not c.isspace() for c in (s or ""))
+                  def walk(n):
+                      nonlocal_dummy=None
+                      global pos,ref
+                      if n.tag in {ns+"title",ns+"note",ns+"header"}:
+                          return
+                      if n.tag==ns+"verse" and n.get("osisID"):
+                          ref=n.get("osisID")
+                      start=pos
+                      before=ref
+                      pos+=count(n.text)
+                      for c in n:
+                          walk(c)
+                          pos+=count(c.tail)
+                      if n.tag==ns+"p" and start==pos:
+                          findings.append({
+                              "book":book.get("osisID"),
+                              "preceding_reference":before,
+                              "position":start,
+                              "descendant_tags":dict(Counter(x.tag.removeprefix(ns) for x in n.iter() if x is not n)),
+                              "attribute_names":sorted(n.attrib),
+                              "all_descendant_nonspace_chars":count("".join(n.itertext())),
+                              "contains_title":any(x.tag==ns+"title" for x in n.iter()),
+                              "contains_note":any(x.tag==ns+"note" for x in n.iter()),
+                          })
+                  walk(book)
+              print("ZERO_BODY_PARAGRAPHS",json.dumps({"resource":m["id"],"source_sha256":pin,"count":len(findings),"findings":findings},sort_keys=True))
+          PY
