@@ -113,6 +113,26 @@ jobs:
               return [(tuple(sorted(n.attrib.items())), "".join(n.itertext())) for n in root.iter() if isinstance(n.tag,str) and etree.QName(n).localname=="w"]
           def bare(root):
               return [n for n in root.iter() if isinstance(n.tag,str) and etree.QName(n).localname=="p" and not n.attrib and not len(n) and not (n.text or "").strip()]
+          def normalize_whitespace_tree(root):
+              # Compare text runs separated by identical elements. Retain a
+              # whitespace marker even when the run is entirely whitespace.
+              import re
+              for node in root.iter():
+                  if isinstance(node.tag,str):
+                      if node.text is not None: node.text=re.sub(r"\s+", " ", node.text)
+                  if node.tail is not None: node.tail=re.sub(r"\s+", " ", node.tail)
+              return etree.tostring(root,method="c14n",with_comments=True)
+          def events(root):
+              rows=[]
+              def visit(n):
+                  rows.append(("open",str(n.tag),tuple(sorted(n.attrib.items()))))
+                  if n.text and n.text.strip(): rows.append(("text","".join(n.text.split())))
+                  for c in n:
+                      visit(c)
+                      if c.tail and c.tail.strip(): rows.append(("tail","".join(c.tail.split())))
+                  rows.append(("close",str(n.tag)))
+              visit(root)
+              return rows
           changes=[]
           counts=Counter()
           for key,raw in previous.items():
@@ -133,7 +153,16 @@ jobs:
                   else: prev.tail=(prev.tail or "")+tail
                   n.getparent().remove(n)
               exact=etree.tostring(a,method="c14n",with_comments=True)==etree.tostring(b,method="c14n",with_comments=True)
-              changes.append({"entry_kind":key[0],"entry_ref":key[1],"old_bare_p":len(empties),"new_bare_p":len(bare(b)),"xml_equal_after_removing_only_bare_p":exact,"old_raw_sha256":sha256(raw).hexdigest(),"new_raw_sha256":sha256(current[key]).hexdigest()})
+              folded=normalize_whitespace_tree(a)==normalize_whitespace_tree(b)
+              ea,eb=events(a),events(b)
+              exact_event_match=ea==eb
+              # Text-free structural/attribute classifications only.
+              from difflib import SequenceMatcher
+              edits=[]
+              for tag,i,j,k,l in SequenceMatcher(a=ea,b=eb,autojunk=False).get_opcodes():
+                  if tag=="equal": continue
+                  edits.append({"operation":tag,"before_event_types":[v[0] for v in ea[i:j]],"after_event_types":[v[0] for v in eb[k:l]],"before_element_names":[v[1] for v in ea[i:j] if v[0] in ("open","close")],"after_element_names":[v[1] for v in eb[k:l] if v[0] in ("open","close")]})
+              changes.append({"folded_xml_equal":folded,"nonspace_event_sequence_equal":exact_event_match,"event_edits":edits,"entry_kind":key[0],"entry_ref":key[1],"old_bare_p":len(empties),"new_bare_p":len(bare(b)),"xml_equal_after_removing_only_bare_p":exact,"old_raw_sha256":sha256(raw).hexdigest(),"new_raw_sha256":sha256(current[key]).hexdigest()})
           report={"counts":dict(counts),"changed_entries":len(changes),"first_changed_entries":changes[:30],"all_changed_entries_equal_after_removing_only_bare_p":all(x["xml_equal_after_removing_only_bare_p"] for x in changes),"published":False,"scope":"previous versus candidate native data, not publisher-to-source lexical certification"}
           print("NATIVE_PARAGRAPH_DELTA",json.dumps(report,sort_keys=True))
           assert counts["word_association_mismatch_entries"]==0
