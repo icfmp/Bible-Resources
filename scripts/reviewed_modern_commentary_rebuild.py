@@ -163,8 +163,6 @@ def reviewed_modern_commentary_errors(directory: Path, root: Path,
         plan = load(root / "config/commentary-rebuilds" / (ident + ".json"))
         proof = load(directory / "SOURCE_VALIDATION.json")
         artifact = load(directory / "RELEASE_ARTIFACT_PROOF.json")
-        if "header_revision" in plan:
-            verify_header_only_revision(directory,root,metadata,plan,proof,artifact)
         decisions = load(root / "sources/cleaned/commentaries/en/hmcc-modern/"
                          "editorial/evidence/OWNER_EDITORIAL_DECISIONS_2026-11-19.json")
         if (plan.get("schema_version") != 1
@@ -259,6 +257,8 @@ def reviewed_modern_commentary_errors(directory: Path, root: Path,
         for name in members - {"mods.d/" + folder + ".conf"}:
             if source_members.get(name) != expected_members[name]:
                 raise ValueError("Modern approved source binary not preserved")
+        if "header_revision" in plan:
+            verify_header_only_revision(directory,root,metadata,plan,proof,artifact)
     except (KeyError, ValueError, TypeError, OSError, AttributeError) as exc:
         return [prefix + str(exc)]
     return []
