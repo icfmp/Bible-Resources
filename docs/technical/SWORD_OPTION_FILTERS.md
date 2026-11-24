@@ -38,3 +38,5 @@ when repairing a rendering filter. A corrected Darby binary distribution
 requires an independently verified new version and publication approval.
 
 The presence of an invalid option in any already approved module is a blocking defect, not an exception to this rule. A repair must be staged with a new version before the check can be merged to the publication branch.
+
+The gate deliberately fails the current Darby candidate until a new, immutable-versioned package and independent filter-mode QA are reviewed; a successful metadata test alone is not release authorization.
