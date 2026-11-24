@@ -152,6 +152,101 @@ def _review_deltas(edits: object, links: object, original: dict,
         raise ValueError("Too many changed original native addresses")
 
 
+
+def _check_incremental_revision(module_dir: Path, root: Path, metadata: dict,
+                                review: dict, audit: dict) -> dict:
+    """Bind a source-attested semantic rebuild to its prior immutable review.
+
+    The legacy raw-byte comparison still applies to v1 reviews. A subsequent
+    serialization-changing rebuild needs a separate, versioned proof, not
+    false byte-identity claims or a resource-specific exemption.
+    """
+    revision = review.get("incremental_revision")
+    if not isinstance(revision, dict):
+        raise ValueError("Missing incremental source/reader evidence")
+    if not re.fullmatch(r"[a-z0-9-]+", module_dir.name):
+        raise ValueError("Unsafe edition identity")
+    language = metadata.get("language")
+    if not isinstance(language, str) or not re.fullmatch(r"[a-z]{2,3}", language):
+        raise ValueError("Unsafe edition language")
+    edition = root / "sources/cleaned/commentaries" / language / module_dir.name
+    previous_version = revision.get("previous_version")
+    version = metadata["version"]
+    if not all(isinstance(v, str) and re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", v)
+               for v in (previous_version, version)) or (
+                   tuple(map(int, previous_version.split("."))) >= tuple(map(int, version.split(".")))):
+        raise ValueError("Previous review must precede the candidate")
+    archive = edition / "editorial/evidence" / ("release-" + previous_version)
+    previous, previous_sha = _object(archive / "review-manifest.json", 1_000_000)
+    previous_audit, previous_audit_sha = _object(archive / "SOURCE_AUDIT.json", 1_000_000)
+    if (previous.get("schema_version") != 1 or previous.get("status") != "owner_authorized_for_release"
+            or previous.get("version") != previous_version
+            or previous.get("module_id") != metadata["id"]
+            or previous.get("sword_id") != metadata["sword_id"]
+            or previous.get("versification") != metadata["versification"]
+            or previous_sha != revision.get("previous_review_sha256")
+            or previous_audit_sha != previous.get("source_audit_sha256")
+            or previous_audit.get("candidate_native_corpus_sha256") != previous.get("candidate_native_corpus_sha256")
+            or previous.get("candidate_native_corpus_sha256") != revision.get("previous_native_corpus_sha256")
+            or previous.get("candidate_native_counts") != review["candidate_native_counts"]
+            or any(previous.get(key) != review.get(key) for key in (
+                "original_manifest", "original_manifest_sha256", "original_archive_sha256",
+                "original_native_corpus_sha256", "original_native_counts",
+                "index_only_rebuild_native_corpus_sha256", "added_links", "source_edits"))):
+        raise ValueError("Prior immutable review does not match revision ancestry")
+    previous_cleanup, cleanup_sha = _object(archive / "CLEANUP_MANIFEST.json", 1_000_000)
+    if (cleanup_sha != revision.get("previous_cleanup_sha256")
+            or previous_cleanup.get("reconstructed_source_sha256") != revision.get("previous_source_sha256")
+            or previous_cleanup.get("source_native_corpus_sha256") != revision["previous_native_corpus_sha256"]):
+        raise ValueError("Previous cleaned master provenance differs")
+    source_name = revision.get("source_name")
+    if not isinstance(source_name, str) or not re.fullmatch(r"[a-z0-9-]+\.osis\.xml", source_name):
+        raise ValueError("Unsafe canonical OSIS source filename")
+    source = edition / source_name
+    if (source.is_symlink() or not source.is_file() or source.stat().st_size > 128 * 1024 * 1024
+            or sha256(source.read_bytes()).hexdigest() != revision.get("candidate_source_sha256")):
+        raise ValueError("Canonical OSIS source checksum mismatch")
+    if (not _digest(revision.get("previous_source_sha256"))
+            or not _digest(revision.get("candidate_source_sha256"))
+            or revision["previous_source_sha256"] == revision["candidate_source_sha256"]):
+        raise ValueError("Missing distinct source revision fingerprints")
+    evidence, evidence_sha = _object(
+        edition / "editorial/evidence" / ("release-" + version) / "incremental-native-reader.json", 1_000_000)
+    if (evidence_sha != revision.get("evidence_sha256")
+            or evidence.get("schema_version") != 1
+            or evidence.get("previous_source_sha256") != revision["previous_source_sha256"]
+            or evidence.get("candidate_source_sha256") != revision["candidate_source_sha256"]
+            or evidence.get("previous_native_corpus_sha256") != revision["previous_native_corpus_sha256"]
+            or evidence.get("candidate_native_corpus_sha256") != review["candidate_native_corpus_sha256"]
+            or evidence.get("candidate_native_counts") != review["candidate_native_counts"]
+            or evidence.get("payload_sha256") != review["payload_sha256"]
+            or evidence.get("semantic_changed_keys") != revision.get("semantic_changed_keys")
+            or evidence.get("reference_changed_keys") != revision.get("reference_changed_keys")
+            or evidence.get("missing_keys") != [] or evidence.get("extra_keys") != []
+            or evidence.get("changed_alias_links") != []
+            or evidence.get("parse_failures") != 0 or evidence.get("brnp_findings") != 0
+            or evidence.get("official_osis_schema_validated") is not True
+            or evidence.get("native_link_topology_equal") is not True
+            or evidence.get("opaque_top_bytes_equal") is not True
+            or evidence.get("source_reversible") is not True
+            or evidence.get("source_idempotent_normalization") is not True
+            or evidence.get("remaining_source_text_and_markup_equal") is not True
+            or evidence.get("all_native_entries_compared") is not True
+            or evidence.get("reader_checks_passed") is not True):
+        raise ValueError("Incremental native/source/reader proof differs")
+    changes = revision.get("semantic_changed_keys")
+    ref_changes = revision.get("reference_changed_keys")
+    if (not isinstance(changes, list) or changes != sorted(set(changes))
+            or not all(isinstance(key, str) and KEY.fullmatch(key) for key in changes)
+            or not isinstance(ref_changes, list) or ref_changes != sorted(set(ref_changes))
+            or not set(ref_changes).issubset(changes)):
+        raise ValueError("Unbounded or invalid incremental source correction scope")
+    if audit.get("incremental_revision") != revision:
+        raise ValueError("Native audit does not bind the exact incremental review")
+    return {"candidate_source_sha256": revision["candidate_source_sha256"],
+            "incremental_evidence_sha256": evidence_sha}
+
+
 def reviewed_rebuilt_commentary_errors(
         module_dir: Path, root: Path, metadata: dict,
         conf: dict) -> list[str]:
@@ -178,7 +273,7 @@ def reviewed_rebuilt_commentary_errors(
         original, original_manifest_sha = _object(root / original_name, 256_000)
         proof, _ = _object(module_dir / "SOURCE_VALIDATION.json", 256_000)
         audit, audit_sha = _object(module_dir / "SOURCE_AUDIT.json", 1_000_000)
-        if (review.get("schema_version") != 1
+        if (review.get("schema_version") not in (1, 2)
                 or review.get("status") != "owner_authorized_for_release"
                 or review.get("module_id") != metadata["id"]
                 or review.get("sword_id") != metadata["sword_id"]
@@ -218,8 +313,12 @@ def reviewed_rebuilt_commentary_errors(
                 or not isinstance(authorization.get("evidence_url"), str)
                 or not GITHUB_ISSUE.fullmatch(authorization["evidence_url"])):
             raise ValueError("Explicit per-edition owner review unavailable")
+        incremental = review["schema_version"] == 2
+        extra_proof = (_check_incremental_revision(module_dir, root, metadata, review, audit)
+                       if incremental else {})
         expected_proof = {
-            "schema_version": 1,
+            "schema_version": review["schema_version"],
+            **extra_proof,
             "status": "validated",
             "source_kind": "reviewed_compiled_commentary_rebuild",
             "review_manifest": review_name,
@@ -269,6 +368,13 @@ def reviewed_rebuilt_commentary_errors(
             "no_unreviewed_original_native_keys_changed": True,
             "no_source_prose_exported": True,
         }
+        if incremental:
+            expected_audit.update(schema_version=2, status="complete_native_semantic_rebuild_comparison")
+            # v1 raw identity holds only for its named historical transport baseline.
+            for field in ("all_other_original_K_bytes_identical", "all_original_I_bytes_identical"):
+                expected_audit.pop(field)
+                if field in audit:
+                    raise ValueError("Incremental semantic proof must not claim historical raw-byte identity")
         if any(audit.get(field) != value for field, value in expected_audit.items()):
             raise ValueError("Native comparison lacks a required verified invariant")
         if (conf.get("ModDrv") != "zCom"
