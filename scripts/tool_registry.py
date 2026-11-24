@@ -44,7 +44,7 @@ REVIEWED_ACTIVE = frozenset({
     "approved_osis_sword_candidate.py", "audit_osis.py", "check_brnp.py",
     "normalize_bible_references.py", "segment_osis_reference_destinations.py",
     "apply_reviewed_osis_editorial_corrections.py",
-    "mark_osis_preverse_section_titles.py",
+    "mark_osis_preverse_section_titles.py", "sword_option_filters.py",
     "catalogue_profiles.py", "check_provider_parity.py", "check_updates.py",
     "fetch_reviewed_schema.py", "osis_semantic_fidelity.py",
     "pilot_subprocess.py", "published_reference_audit.py",
@@ -56,7 +56,7 @@ REVIEWED_ACTIVE = frozenset({
     "source_native_osis_target_addressability.py",
     "source_osis_verse_notes.py", "reviewed_osis_commentary_rebuild.py",
     "smoke.py", "source_osis_inventory.py", "stable_sword_refs.py",
-    "sword_native_raw_corpus.cpp", "sword_native_raw_entry.cpp",
+    "sword_native_raw_corpus.cpp", "sword_native_raw_entry.cpp", "sword_native_render.cpp",
 })
 # The HMCC Modern release gate is currently required but embeds
 # one-edition editorial decisions; it must not be represented as generic.

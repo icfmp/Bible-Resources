@@ -115,8 +115,8 @@ jobs:
           set -euo pipefail
           python -m pip install -r requirements.txt
           python modules/lsg-1910/tools/stage_filter_hotfix.py
-          g++ -std=c++17 -O2 -I/usr/include/sword modules/lsg-1910/tools/check_native_render.cpp -o /tmp/lsg-native-render-check -lsword
-          SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg-native-render-check BRLSG1910
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_render.cpp -o /tmp/lsg-native-render-check -lsword
+          SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg-native-render-check BRLSG1910 31169
           python scripts/tool_registry.py --write
           # Track the superseding plan and the deleted prior active plan
           # BEFORE topology tests inspect git ls-files; do not relax checks.
@@ -136,8 +136,8 @@ jobs:
       - name: Fail-closed complete SWORD plain display check for all 31,169 native verses
         if: github.event_name != 'push'
         run: |
-          g++ -std=c++17 -O2 -I/usr/include/sword modules/lsg-1910/tools/check_native_render.cpp -o /tmp/lsg-native-render-check -lsword
-          SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg-native-render-check BRLSG1910
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_render.cpp -o /tmp/lsg-native-render-check -lsword
+          SWORD_PATH="$GITHUB_WORKSPACE/modules/lsg-1910/payload" /tmp/lsg-native-render-check BRLSG1910 31169
       - name: Store diagnostic report without publication
         uses: actions/upload-artifact@v4
         with:

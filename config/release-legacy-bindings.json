@@ -1,20 +1,5 @@
 {
-  "entries": [
-    {
-      "asset_name": "BRJND2024-0.1.1.zip",
-      "catalogue_sha256": "2b48c3c9a8897e58805a7cb3be731bb895363e51bc854df502ce7e7a45f0c2c4",
-      "catalogue_size_bytes": 1960800,
-      "evidence_url": "https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.1",
-      "legacy_package_differs": false,
-      "module_id": "darby-jnd-2024",
-      "notes": "Previously published immutable Darby 0.1.1 release; verified source and catalogued version are identical.",
-      "release_sha256": "2b48c3c9a8897e58805a7cb3be731bb895363e51bc854df502ce7e7a45f0c2c4",
-      "release_size_bytes": 1960800,
-      "sword_id": "BRJND2024",
-      "tag": "darby-jnd-2024-0.1.1",
-      "version": "0.1.1"
-    }
-  ],
+  "entries": [],
   "purpose": "Historical releases preceding unified publication. This closed, owner-reviewed list does not authorize adding new exemptions.",
   "reviewed_by": "Bible Resources project owner — unified-publication remediation 2026-11-14",
   "schema_version": 1

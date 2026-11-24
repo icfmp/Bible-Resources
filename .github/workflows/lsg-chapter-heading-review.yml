@@ -106,7 +106,7 @@ jobs:
         run: |
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp \
             -o /tmp/lsg-heading-native-raw -lsword
-          g++ -std=c++17 -O2 -I/usr/include/sword modules/lsg-1910/tools/check_native_render.cpp \
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_render.cpp \
             -o /tmp/lsg-heading-native-display -lsword
           python - <<'PY'
           from pathlib import Path
@@ -212,7 +212,7 @@ jobs:
           print('All 803 original chapter-opening headings present in native first verse, all 31,169 Scripture verse bodies and 9,751 notes preserved')
           PY
           SWORD_PATH=/tmp/lsg-chapter-heading-sword/payload \
-            /tmp/lsg-heading-native-display BRLSG1910
+            /tmp/lsg-heading-native-display BRLSG1910 31169
       - name: Verify checked-in 1.0.2 module matches independently compiled native payload (read-only)
         run: |
           python - <<'PY'

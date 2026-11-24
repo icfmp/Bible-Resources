@@ -34,6 +34,181 @@ jobs:
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
             install -y diatheke libsword-dev
+      - name: Audit exact stock-reader-key Bible payloads (read-only candidate evidence)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o "$RUNNER_TEMP/candidate-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o "$RUNNER_TEMP/candidate-raw" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_render.cpp -o "$RUNNER_TEMP/candidate-render" -lsword
+          "$RUNNER_TEMP/candidate-render" --self-test
+          PYTHONPATH=scripts python - <<'PY'
+          import hashlib, io, json, os, re, subprocess, zipfile
+          from pathlib import Path
+          from approved_osis_sword_candidate import (
+              approved_source_for, _candidate_result, original_osis_verses_and_notes,
+              authorial_structures, authorial_body_opening_sequences,
+              authorial_book_streams, authorial_outside_book_titles,
+          )
+          from pilot_subprocess import query
+          from smoke import reader_failure_class
+          from stable_sword_refs import (module_payload_digest, proof_errors, load_approved_merge_policy,
+                                         inspect_references, parse_keys, parse_registry)
+          from sword_native_inventory import collect_native_inventory
+          tmp = Path(os.environ["RUNNER_TEMP"])
+          legacy = json.loads(Path("config/release-legacy-bindings.json").read_text())["entries"]
+          legacy = {row["module_id"]: row for row in legacy}
+          for folder in sorted(Path("modules").iterdir()):
+              if not (folder / "metadata.json").is_file():
+                  continue
+              m = json.loads((folder / "metadata.json").read_text())
+              if m["quality"]["status"] != "approved" or m["category"] != "bible":
+                  continue
+              payload = folder / "payload"
+              # Diagnostic fingerprint only. The production builder and snapshot gate
+              # independently verify the canonical archive later in this workflow.
+              stream = io.BytesIO()
+              members = {}
+              with zipfile.ZipFile(stream, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+                  for p in sorted(p for p in payload.rglob("*") if p.is_file()):
+                      rel = p.relative_to(payload).as_posix()
+                      data = p.read_bytes()
+                      members[rel] = hashlib.sha256(data).hexdigest()
+                      info = zipfile.ZipInfo(rel, (1980, 1, 1, 0, 0, 0))
+                      info.compress_type = zipfile.ZIP_DEFLATED
+                      info.external_attr = 0o100644 << 16
+                      z.writestr(info, data)
+              receipt = {
+                  "resource_id": m["id"], "version": m["version"],
+                  "package_sha256": hashlib.sha256(stream.getvalue()).hexdigest(),
+                  "package_size_bytes": len(stream.getvalue()),
+                  "module_payload_sha256": module_payload_digest(folder),
+                  "member_sha256": members,
+              }
+              print("CANDIDATE_FINGERPRINT", json.dumps(receipt, sort_keys=True), flush=True)
+              previous_root = None
+              old = legacy.get(m["id"])
+              release_proof = folder / "RELEASE_PROVENANCE.json"
+              config_only = False
+              if release_proof.is_file():
+                  proof = json.loads(release_proof.read_text())
+                  config_only = proof.get("candidate_scope") == "configuration_only"
+                  if config_only:
+                      old = proof["prior_release_binding"]
+                      assert old["module_id"] == m["id"] and old["sword_id"] == m["sword_id"]
+              if old and old["version"] != m["version"]:
+                  previous = tmp / old["asset_name"]
+                  subprocess.run(["gh", "release", "download", old["tag"],
+                                  "--pattern", old["asset_name"], "--dir", str(tmp)],
+                                 check=True, timeout=120)
+                  prior_bytes = previous.read_bytes()
+                  assert hashlib.sha256(prior_bytes).hexdigest() == old["release_sha256"]
+                  assert len(prior_bytes) == old["release_size_bytes"]
+                  with zipfile.ZipFile(previous) as z:
+                      assert z.testzip() is None
+                      assert len(z.namelist()) == len(members)
+                      assert set(z.namelist()) == set(members)
+                      changed = sorted(name for name in members
+                                       if hashlib.sha256(z.read(name)).hexdigest() != members[name])
+                  if config_only:
+                      assert changed == ["mods.d/" + m["sword_id"].lower() + ".conf"], (m["id"], changed)
+                      previous_root = tmp / (m["id"] + "-previous-payload")
+                      previous_root.mkdir()
+                      # Names exactly match the validated current regular-file layout.
+                      with zipfile.ZipFile(previous) as z:
+                          for name in members:
+                              target = previous_root / name
+                              target.parent.mkdir(parents=True, exist_ok=True)
+                              target.write_bytes(z.read(name))
+                  print("PREVIOUS_RELEASE_COMPARISON", json.dumps({
+                      "resource_id": m["id"], "previous_tag": old["tag"],
+                      "previous_zip_sha256": old["release_sha256"], "changed_members": changed,
+                  }), flush=True)
+              provenance = Path("sources/original/bibles") / m["language"] / m["id"] / "PROVENANCE.json"
+              if provenance.is_file():
+                  p = json.loads(provenance.read_text())
+                  if p.get("original_file") and p.get("original_sha256"):
+                      source_path = provenance.parent / p["original_file"]
+                      assert source_path.is_file() and not source_path.is_symlink()
+                      original_hash = hashlib.sha256(source_path.read_bytes()).hexdigest()
+                      assert original_hash == p["original_sha256"]
+                      print("ORIGINAL_SOURCE_SHA256", m["id"], original_hash, flush=True)
+              refs = [m["quality"]["smoke_key"]]
+              if m.get("index_audit", {}).get("mode") == "stock_reader_keys":
+                  cfg, source = approved_source_for(m["id"])
+                  verses, notes, _ = original_osis_verses_and_notes(source)
+                  source_sha = hashlib.sha256(source).hexdigest()
+                  proof_failures = proof_errors(folder, m["versification"], source_sha)
+                  assert not proof_failures, proof_failures
+                  compat = json.loads((folder / "SWORD_COMPATIBILITY.json").read_text())
+                  if compat["status"] == "stable_reference_index_verified_with_reviewed_merges":
+                      merges, _ = load_approved_merge_policy(
+                          folder / "SOURCE_REFERENCE_MERGES.json",
+                          publisher_digest=compat["original_publisher_document_sha256"],
+                          versification=m["versification"])
+                      keys, registry, inventory = collect_native_inventory(
+                          tmp / "candidate-index", folder, m["sword_id"])
+                      parity = inspect_references(
+                          parse_keys("\n".join(verses)), parse_keys(keys),
+                          parse_registry(registry, m["versification"]), merges)
+                      assert parity["status"] == compat["status"]
+                      assert parity["reviewed_merges"] == compat["reviewed_merges"]
+                      assert parity["resolved_reader_reference_count"] == compat["resolved_reader_reference_count"]
+                      print("REVIEWED_MERGED_INDEX_AUDIT", m["id"], json.dumps(parity, sort_keys=True), flush=True)
+                      # Full merged-source body fidelity remains the separate
+                      # source-pinned readback contract required by proof_errors.
+                  else:
+                      body, body_counts = authorial_body_opening_sequences(source)
+                      result = _candidate_result(
+                          tmp / "candidate-index", tmp / "candidate-raw", folder,
+                          m["sword_id"], m["versification"], verses, notes,
+                          authorial_structures(source), body, body_counts,
+                          authorial_book_streams(source), authorial_outside_book_titles(source))
+                      print("EXACT_NATIVE_AUDIT", json.dumps(result, sort_keys=True), flush=True)
+                      assert result["candidate_status"] == "full_numbered_text_and_note_preflight_equal_not_approved"
+                      assert result["source_native_body_boundary_positions"]["all_title_text_and_nonspace_placement_equal"]
+                      assert result["explicit_note_target_index_addressability"]["all_original_explicit_targets_index_addressable"]
+                  linked = [ref for ref, rows in notes.items() if any(row["targets"] for row in rows)]
+                  xref_hosts = [ref for ref, rows in notes.items()
+                                if any(row["type"] == "crossReference" and row["targets"] for row in rows)]
+                  refs += linked[:6] + linked[-6:] + xref_hosts[:6]
+                  expected_native = compat["resolved_reader_reference_count"]
+              else:
+                  _, _, inventory = collect_native_inventory(tmp / "candidate-index", folder, m["sword_id"])
+                  expected_native = inventory["native_occupied_numbered_verse_count"]
+              print("NATIVE_RENDER_MODULE", m["id"], flush=True)
+              render_command = [str(tmp / "candidate-render"), m["sword_id"], str(expected_native)]
+              if previous_root:
+                  render_command.append(str(previous_root))
+              subprocess.run(render_command,
+                             env=dict(os.environ, SWORD_PATH=str(payload.resolve())),
+                             check=True, timeout=180)
+              tag = re.compile(rb"</?(?:reference|note|verse|div|title|seg|milestone|hi)\b", re.I)
+              modes = {"default": "", "cross_references": "x",
+                       "footnotes": "n", "footnotes_and_cross_references": "nx"}
+              leaks = {mode: [] for mode in modes}
+              changed_from_default = {mode: 0 for mode in modes}
+              for ref in dict.fromkeys(refs):
+                  default_data = None
+                  for mode, opt in modes.items():
+                      code, data = query(m["sword_id"], ref, fmt="plain", root=payload.resolve(), options=opt)
+                      assert reader_failure_class(code, data.decode("utf-8")) is None, (m["id"], ref, mode)
+                      if default_data is None:
+                          default_data = data
+                      elif data != default_data:
+                          changed_from_default[mode] += 1
+                      if tag.search(data):
+                          leaks[mode].append(ref)
+              print("DIATHEKE_REFERENCE_MODES", json.dumps({
+                  "resource_id": m["id"], "checked_references": list(dict.fromkeys(refs)),
+                  "literal_markup_leaks_by_mode": leaks,
+                  "output_changed_from_default_count": changed_from_default,
+                  "visual_reader_verified": False,
+              }), flush=True)
+              assert not leaks["default"], (m["id"], "default plain-text markup leak", leaks["default"])
+          PY
       # Main's active ruleset requires this job. Include the source-bound
       # registry here so a stale inventory cannot slip through on any PR.
       - name: Check source-bound tracked tool inventory

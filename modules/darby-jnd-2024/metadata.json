@@ -27,8 +27,8 @@
   "schema_version": 1,
   "sword_id": "BRJND2024",
   "title": {
-    "en": "J. N. Darby Bible — BPC 2024",
-    "fr": "Bible J. N. Darby — BPC 2024"
+    "en": "J. N. Darby Bible (2024)",
+    "fr": "Bible J. N. Darby (2024)"
   },
   "upstreams": [
     {
@@ -38,5 +38,5 @@
     }
   ],
   "versification": "Luther",
-  "version": "0.1.1"
+  "version": "0.1.2"
 }
