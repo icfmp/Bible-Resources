@@ -132,23 +132,57 @@ jobs:
               all_titles[chapter] = title
           if len(all_titles) != 803:
               raise SystemExit("Changed source-authored chapter-first title inventory")
-          preferred_books = (
-              "Gen", "Exod", "Ps", "Prov", "Isa", "Jer", "Dan", "Hag",
-              "Matt", "Mark", "Luke", "John", "Acts", "Rom", "1Cor", "Rev")
           first_per_book = {}
           for chapter, heading in all_titles.items():
               book, number = chapter.rsplit(".", 1)
               first_per_book.setdefault(book, (chapter + ".1", book + " " + number + ":1", heading))
-          missing = sorted(set(preferred_books) - set(first_per_book))
-          if missing:
-              raise SystemExit("Missing source-attested heading in planned book: " + ",".join(missing))
-          samples = tuple(first_per_book[book] for book in preferred_books)
-          report["stratification"] = {
-              "authored_chapter_opening_titles": len(all_titles),
-              "sample_count": len(samples),
-              "source_books": list(preferred_books),
-              "old_testament_books": 8, "new_testament_books": 8,
-              "source_attested_selection": True,
+          # Groups are structural/canonical sampling strata, NOT edition
+          # exceptions. Books without one of the 803 modified title sites are
+          # naturally absent. Never invent a missing title to meet a quota.
+          ot_groups = (
+              ("Gen", "Exod"), ("Exod", "Lev", "Num", "Deut"),
+              ("Josh", "Judg", "Ruth", "1Sam", "2Sam"),
+              ("Ps", "Job", "Prov", "Eccl", "Song"),
+              ("Isa", "Jer", "Lam"), ("Ezek", "Dan"),
+              ("Hos", "Joel", "Amos", "Mic", "Nah"),
+              ("Hag", "Zech", "Mal", "Hab", "Zeph"))
+          nt_groups = (
+              ("Matt",), ("Mark",), ("Luke",), ("John",),
+              ("Acts",), ("Rom",), ("1Cor", "2Cor", "Gal", "Eph"),
+              ("Rev", "1John", "1Pet", "Heb", "Jas"))
+          ot_order = ("Gen Exod Lev Num Deut Josh Judg Ruth 1Sam 2Sam 1Kgs 2Kgs "
+                      "1Chr 2Chr Ezra Neh Esth Job Ps Prov Eccl Song Isa Jer Lam "
+                      "Ezek Dan Hos Joel Amos Obad Jonah Mic Nah Hab Zeph Hag Zech Mal").split()
+          nt_order = ("Matt Mark Luke John Acts Rom 1Cor 2Cor Gal Eph Phil Col "
+                      "1Thess 2Thess 1Tim 2Tim Titus Phlm Heb Jas 1Pet 2Pet "
+                      "1John 2John 3John Jude Rev").split()
+          def select_source_attested(groups, order, count=8):
+              chosen=[]
+              for group in groups:
+                  found=next((book for book in group if book in first_per_book
+                              and book not in chosen),None)
+                  if found is not None:
+                      chosen.append(found)
+              for book in order:
+                  if len(chosen)>=count:break
+                  if book in first_per_book and book not in chosen:
+                      chosen.append(book)
+              if len(chosen)<count:
+                  raise SystemExit("Insufficient independently titled books for stratified test")
+              return tuple(chosen[:count])
+          ot_books=select_source_attested(ot_groups,ot_order)
+          nt_books=select_source_attested(nt_groups,nt_order)
+          preferred_books=ot_books+nt_books
+          if len(set(preferred_books))!=16:
+              raise SystemExit("Stratified books must be unique")
+          samples=tuple(first_per_book[book] for book in preferred_books)
+          report["stratification"]={
+              "authored_chapter_opening_titles":len(all_titles),
+              "sample_count":len(samples),
+              "source_books":list(preferred_books),
+              "old_testament_books":len(ot_books),
+              "new_testament_books":len(nt_books),
+              "source_attested_selection":True,
           }
           disp=app=None
           with tempfile.TemporaryDirectory(prefix="isolated-lsg-xiphos-") as home:
