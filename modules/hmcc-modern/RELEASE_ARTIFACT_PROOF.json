@@ -1,4 +1,17 @@
 {
+  "header_revision": {
+    "candidate_source_sha256": "784dadcb4800c7e8d0fede02aa6116ee55d4f835b25168c4b3ba3ff530e1fb38",
+    "new_display_name": "Matthew Henry's Modern Concise Commentary",
+    "old_text_source": "https://github.com/icfmp/Bible-Resources/tree/main/work/mhcc-modern/production/accepted",
+    "previous_artifact_sha256": "f24019af1cdfe8b04dd8769bb0652ef60003b3e27a859db61c87b0af9673cbca",
+    "previous_conf_sha256": "6140453b6b8eea4c7bcb594cf5f0d9f7cfe4d65e1342ee785a157229811e2ec2",
+    "previous_metadata_sha256": "2165e89c07423ff1c8915805f22104b5adf763a2bca366ccbc43b3025f696ae8",
+    "previous_proof_sha256": "017400e90ee24c8c1241c0b046aeb349583fb3909b7b62ec7bda4f9d6a1b441d",
+    "previous_review_sha256": "3b88ab329beaf0d32b972fd400c18c247312566d5d5e363c4c29438e61b71026",
+    "previous_version": "0.1.0",
+    "receipt_name": "2026-11-24-header-revision-trial.json",
+    "receipt_sha256": "100e266983ad6582a97acdef2ed20e96d08d07636817939d2e6a65fa1f9c691b"
+  },
   "metadata_only_conf_delta": {
     "added_fields": [
       "Encoding=UTF-8",
@@ -16,7 +29,7 @@
     "modules/comments/zcom/hmccmodern/ot.czz": "1582dc5d52879183e87f42da895cef732a607de209fa6787e05d373f62bb9ac3"
   },
   "payload_sha256": {
-    "mods.d/hmccmodern.conf": "6140453b6b8eea4c7bcb594cf5f0d9f7cfe4d65e1342ee785a157229811e2ec2",
+    "mods.d/hmccmodern.conf": "d76a68c39cb3137b0334bebbde358b3089078a5349b269f7bce5097847d61e6d",
     "modules/comments/zcom/hmccmodern/nt.czs": "91ddf7185f0897f6c4b33e5015a92c96ab89e217d0be4e9e28786a5d7dc1442f",
     "modules/comments/zcom/hmccmodern/nt.czv": "820f8d6a68cd48b4cf1f0ad242dd122720eade6cb9e4434102587b82c70dca2f",
     "modules/comments/zcom/hmccmodern/nt.czz": "b22800b76ea3c3ede4e1c5ca4c3f6ea5acaad356ac39c92c07667027dbccf4fd",

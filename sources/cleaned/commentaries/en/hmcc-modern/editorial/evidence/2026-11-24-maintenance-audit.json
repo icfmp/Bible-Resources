@@ -1,0 +1,398 @@
+{
+  "schema_version": 1,
+  "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45472804838",
+  "tested_commit": "d196a5d71fe63964bd7936a53154df3fa3cbc97d",
+  "public_archives_verified": true,
+  "source_sha256_verified": true,
+  "results": {
+    "MODERN_BRNP": {
+      "element_counts": {
+        "cell": 8746,
+        "chapter": 1189,
+        "description": 1,
+        "div": 5358,
+        "header": 1,
+        "hi": 15599,
+        "identifier": 1,
+        "language": 1,
+        "note": 27,
+        "osis": 1,
+        "osisText": 1,
+        "p": 40435,
+        "reference": 1209,
+        "row": 4373,
+        "seg": 11,
+        "table": 1035,
+        "title": 5295,
+        "work": 1
+      },
+      "entries": 4049,
+      "examples": {
+        "UNREVIEWED_ELEMENT": {
+          "code": "UNREVIEWED_ELEMENT",
+          "element": "language",
+          "line": 2
+        }
+      },
+      "findings": {
+        "UNREVIEWED_ELEMENT": 1
+      },
+      "schema_error_count": 1,
+      "schema_first_errors": [
+        {
+          "line": 2,
+          "type": "SCHEMAV_ELEMENT_CONTENT"
+        }
+      ],
+      "schema_validated": false,
+      "sha256": "23f0872a67086d9f659bd96936ab63db63c8c7b8c10eb92e59537c3e6cf16189"
+    },
+    "MODERN_SCOPES": {
+      "classic_annotated_chapters": 1187,
+      "classic_annotations": 12141,
+      "classic_chapters_without_modern_annotateRef": [],
+      "gen5_classic": [
+        {
+          "ref": "Gen.5.1-Gen.5.5",
+          "text": "Chapter 5 Chapter Outline Adam and Seth. (1-5) The patriarchs from Seth to Enoch. (6-20) Enoch. (21-24) Methuselah to Noah. (25-32) Verses 1-5 Adam was made in the image of God; but when fallen he begat a son in his own image, sinful and defiled, frail, wretched, and mortal, like himself. Not only a man like himself, consisting of body and soul, but a sinner like himself. This was the reverse of that Divine likeness in which Adam was made; having lost it, he could not convey it to his seed. Adam lived, in all, 930 years; and then died, according to the sentence passed upon him, \"To dust thou shalt return.\" Though he did not die in the day he ate forbidden fruit, yet in that very day he became mortal. Then he began to die; his whole life after was but a reprieve, a forfeited, condemned life; it was a wasting, dying life. Man's life is but dying by degrees.",
+          "words": 162
+        },
+        {
+          "ref": "Gen.5.1-Gen.5.5",
+          "text": "",
+          "words": 0
+        },
+        {
+          "ref": "Gen.5.1-Gen.5.5",
+          "text": "",
+          "words": 0
+        },
+        {
+          "ref": "Gen.5.6-Gen.5.20",
+          "text": "Verses 6-20 Concerning each of these, except Enoch, it is said, \"and he died.\" It is well to observe the deaths of others. They all lived very long; not one of them died till he had seen almost eight hundred years, and some of them lived much longer; a great while for an immortal soul to be prisoned in a house of clay. The present life surely was not to them such a burden as it commonly is now, else they would have been weary of it. Nor was the future life so clearly revealed then, as it now under the gospel, else they would have been urgent to remove to it. All the patriarchs that lived before the flood, except Noah, were born before Adam died. From him they might receive a full account of the creation, the fall, the promise, and the Divine precepts about religious worship and a religious life. Thus God kept up in his church the knowledge of his will.",
+          "words": 165
+        },
+        {
+          "ref": "Gen.5.6-Gen.5.20",
+          "text": "",
+          "words": 0
+        },
+        {
+          "ref": "Gen.5.6-Gen.5.20",
+          "text": "",
+          "words": 0
+        },
+        {
+          "ref": "Gen.5.21-Gen.5.24",
+          "text": "Verses 21-24 Enoch was the seventh from Adam. Godliness is walking with God: which shows reconciliation to God, for two cannot walk together except they be agreed, Am 3:3 . It includes all the parts of a godly, righteous, and sober life. To walk with God, is to set God always before us, to act as always under his eye. It is constantly to care, in all things to please God, and in nothing to offend him. It is to be followers of him as dear children. The Holy Spirit, instead of saying, Enoch lived, says, Enoch walked with God. This was his constant care and work; while others lived to themselves and the world, he lived to God. It was the joy of his life. Enoch was removed to a better world. As he did not live like the rest of mankind, so he did not leave the world by death as they did. He was not found, because God had translated him, He 11:5 . He had lived but 365 years, which, as men's ages were then, was but the midst of a man's days. God often takes those soonest whom he loves best; the time they lose on earth, is gained in heaven, to their unspeakable advantage. See how Enoch's removal is expressed: he was not, for God took him. He was not any longer in this world; he was changed, as the saints shall be, who are alive at Christ's second coming. Those who begin to walk with God when young, may expect to walk with him long, comfortably, and usefully. The true christian's steady walk in holiness, through many a year, till God takes him, will best recommend that religion which many oppose and many abuse. And walking with God well agrees with the cares, comforts, and duties of life.",
+          "words": 305
+        },
+        {
+          "ref": "Gen.5.21-Gen.5.24",
+          "text": "",
+          "words": 0
+        },
+        {
+          "ref": "Gen.5.21-Gen.5.24",
+          "text": "",
+          "words": 0
+        },
+        {
+          "ref": "Gen.5.25-Gen.5.32",
+          "text": "Verses 25-32 Methuselah signifies, he dies, there is a dart,' a sending forth,' namely, of the deluge, which came the year that Methuselah died. He lived 969 years, the longest that any man ever lived on earth; but the longest liver must die at last. Noah signifies rest; his parents gave him that name, with a prospect of his being a great blessing to his generation. Observe his father's complaint of the calamitous state of human life, by the entrance of sin, and the curse of sin. Our whole life is spent in labour, and our time filled up with continual toil. God having cursed the ground, it is as much as some can do, with the utmost care and pains, to get a hard livelihood out of it. Lamech hoped for relief by the birth of this son, \"This same shall comfort us.\" It signifies not only that desire and expectation which parents generally have about their children, that they will be comforts to them and helpers, though they often prove otherwise; but it signifies also a prospect of something more. Is Christ ours? Is heaven ours? We need better comforters under our toil and sorrow, than the dearest relations and the most promising offspring; may we seek and find comforts in Christ.",
+          "words": 214
+        },
+        {
+          "ref": "Gen.5.25-Gen.5.32",
+          "text": "",
+          "words": 0
+        },
+        {
+          "ref": "Gen.5.25-Gen.5.32",
+          "text": "",
+          "words": 0
+        }
+      ],
+      "gen5_modern": [
+        {
+          "ref": "Gen.5.1-Gen.5.5",
+          "text": "Adam and Seth (verses 1–5) Adam was made in God's image. But after he fell, he fathered a son in his own likeness—sinful and defiled, weak, miserable, and mortal like himself. His son was like him not only as a human being with body and soul, but also as a sinner. This was the opposite of the divine likeness in which Adam had been created. Having lost that likeness, he could not pass it on to his descendants. Adam lived for 930 years. Then he died, just as God had sentenced him: “You shall return to dust.” He did not die on the very day he ate the forbidden fruit. But on that day he became mortal, and from then on he began to die. The rest of his life was a reprieve—a life already forfeited and under sentence of death, slowly wasting away. Human life is a gradual dying.",
+          "words": 150
+        },
+        {
+          "ref": "Gen.5.6-Gen.5.20",
+          "text": "The patriarchs from Seth to Enoch (verses 6–20) Of every one of these patriarchs except Enoch, we read the words, “And he died.” It is good for us to pay attention to the deaths of others. These men lived extraordinarily long lives. None died before reaching nearly eight hundred years, and some lived much longer. That is a very long time for an immortal soul to remain confined within a house of clay. Life in this world surely did not feel as burdensome to them as it often does now; otherwise they would have grown weary of it. Nor was the future life revealed to them as clearly as it is to us under the gospel. Otherwise they would have been eager to depart for it. Every patriarch who lived before the flood, except Noah, was born while Adam was still alive. They could therefore have learned directly from him about creation, the fall, the promise, and God's commands concerning worship and godly living. In this way, God preserved the knowledge of his will in his church.",
+          "words": 177
+        },
+        {
+          "ref": "Gen.5.21-Gen.5.24",
+          "text": "Enoch walks with God (verses 21–24) Enoch was the seventh generation from Adam. To be godly is to walk with God. That means being reconciled to him, for two cannot walk together unless they are in agreement ( Amos 3:3 ). Walking with God includes every part of a godly, righteous, and self-controlled life. It means keeping God continually before us and acting as people who always live under his gaze. In everything, we seek to please him and avoid offending him. We follow him as dearly loved children. Instead of simply saying that Enoch lived , the Holy Spirit says that he walked with God . This was his constant concern and work. While other people lived for themselves and for the world, Enoch lived for God. That was the joy of his life. God took Enoch to a better world. Because he had not lived like other people, he did not leave the world through death as they did. He was no longer found, because God had taken him away ( Hebrews 11:5 ). Enoch had lived only 365 years—little more than half a lifetime compared with the ages of people then. God often takes earliest those he loves best. The time they lose on earth is more than made up to them in heaven, to their unspeakable benefit. Notice the way his departure is described: he was no more, because God took him. He was no longer in this world. He had been changed, as believers still alive at Christ's return will be changed. Those who begin walking with God when they are young may hope to walk with him for many years, finding comfort and doing good. A Christian's steady walk in holiness over many years, until God takes that person home, is one of the best recommendations for a faith that many oppose or misuse. And walking with God fits perfectly well with the responsibilities, comforts, and duties of ordinary life.",
+          "words": 326
+        },
+        {
+          "ref": "Gen.5.25-Gen.5.32",
+          "text": "Methuselah, Lamech, and Noah (verses 25–32) Matthew Henry explains Methuselah as meaning something like “when he dies, there is a dart” or “a sending out,” which he connects with the flood that came in the year of Methuselah's death. Methuselah lived 969 years, longer than any other person on earth. Yet even the person who lives longest must die at last. Noah means “rest.” His parents gave him that name in the hope that he would be a great blessing to his generation. Notice the complaint of Noah's father about the misery of human life since sin entered the world and brought its curse. Our lives are filled with work, and our time with continual toil. Because God cursed the ground, even those who work with the greatest care and effort may struggle to earn a bare living from it. Lamech hoped that Noah's birth would bring relief: “This one will comfort us.” That expresses the hope parents naturally place in their children—that they will bring them comfort and help. Yet children often turn out differently. The name also points to a greater expectation. Do we belong to Christ? Do we have heaven ahead of us? We need greater comfort in our toil and sorrow than even our closest family or our most promising children can provide. May we seek and find that comfort in Christ.",
+          "words": 226
+        }
+      ],
+      "modern_annotated_chapters": 1189,
+      "modern_annotations": 4049,
+      "modern_chapters_without_classic_annotateRef": [
+        "Lev.19",
+        "Ps.108"
+      ]
+    },
+    "MODERN_NATIVE": {
+      "changed_native_raw_count": 0,
+      "classic": {
+        "counts": {
+          "I": 1255,
+          "K": 28742,
+          "U": 2
+        },
+        "index_verified": true,
+        "link_sha256": "e87e83f9f3e2e07c1a59dc3b51965e7ac023311e9b068c38a6493bad7d87ae84",
+        "markup": {
+          "all_original_native_entries_accounted_for": true,
+          "empty_numbered_or_intro_entries": 0,
+          "entries_with_note_markup": 0,
+          "entries_with_paragraph_markup": 0,
+          "entries_with_reference_markup": 5784,
+          "entries_with_table_markup": 6542,
+          "entries_with_title_markup": 8937,
+          "no_original_source_bytes_rewritten": true,
+          "no_original_words_keys_or_reference_values_reported": true,
+          "no_osisref_value_normalization_or_verse_existence_claim": true,
+          "opaque_top_entries_not_assumed_to_be_xml": 2,
+          "original_element_counts_by_fixed_category": {
+            "br": 0,
+            "cell": 40002,
+            "chapter": 9925,
+            "div": 407334,
+            "hi": 28609,
+            "item": 0,
+            "lb": 0,
+            "list": 0,
+            "milestone": 198,
+            "note": 0,
+            "other": 0,
+            "p": 0,
+            "q": 0,
+            "quote": 0,
+            "reference": 10571,
+            "row": 20001,
+            "seg": 0,
+            "table": 20001,
+            "title": 15989,
+            "verse": 0
+          },
+          "original_osisref_form_count_by_fixed_category": {
+            "book_or_chapter_like": 0,
+            "compound_target": 0,
+            "other_unclassified": 0,
+            "single_osis_verse": 5896,
+            "verse_range_like": 4675
+          },
+          "original_reference_elements_with_literal_Bible_work_prefix": 0,
+          "original_reference_labels_with_visible_text": 10571,
+          "original_reference_labels_without_visible_text": 0,
+          "original_title_elements_with_visible_text": 15989,
+          "original_title_elements_without_visible_text": 0,
+          "oversized_or_binary_numbered_or_intro_entries": 0,
+          "raw_entries_observed": 29999,
+          "real_reader_layout_or_click_navigation_proven": false,
+          "reference_elements_with_osisref_attribute": 10571,
+          "reference_elements_without_osisref_attribute": 0,
+          "source_to_other_digital_edition_parity_proven": false,
+          "strict_xml_parseable_numbered_or_intro_entries": 29997,
+          "unparseable_numbered_or_intro_entries": 0
+        },
+        "sha256": "957ef1f956f804ae67d0563969a2e2a4a9e567fe0153550c45015cb14310a5d6"
+      },
+      "classic_only_numbered_key_count": 0,
+      "classic_only_numbered_keys": [],
+      "link_stream_equal": true,
+      "modern_only_numbered_key_count": 50,
+      "published": {
+        "counts": {
+          "I": 1255,
+          "K": 28792,
+          "U": 2
+        },
+        "index_verified": true,
+        "link_sha256": "d4a499b1ba70d58e6b52f0354df095710fe5f4bb53d462e34a73b9b51be66d58",
+        "markup": {
+          "all_original_native_entries_accounted_for": true,
+          "empty_numbered_or_intro_entries": 0,
+          "entries_with_note_markup": 111,
+          "entries_with_paragraph_markup": 0,
+          "entries_with_reference_markup": 4369,
+          "entries_with_table_markup": 1035,
+          "entries_with_title_markup": 29960,
+          "no_original_source_bytes_rewritten": true,
+          "no_original_words_keys_or_reference_values_reported": true,
+          "no_osisref_value_normalization_or_verse_existence_claim": true,
+          "opaque_top_entries_not_assumed_to_be_xml": 2,
+          "original_element_counts_by_fixed_category": {
+            "br": 0,
+            "cell": 8746,
+            "chapter": 9973,
+            "div": 726147,
+            "hi": 118868,
+            "item": 0,
+            "lb": 0,
+            "list": 0,
+            "milestone": 0,
+            "note": 206,
+            "other": 0,
+            "p": 0,
+            "q": 0,
+            "quote": 0,
+            "reference": 6793,
+            "row": 4373,
+            "seg": 76,
+            "table": 1035,
+            "title": 30142,
+            "verse": 0
+          },
+          "original_osisref_form_count_by_fixed_category": {
+            "book_or_chapter_like": 0,
+            "compound_target": 0,
+            "other_unclassified": 0,
+            "single_osis_verse": 5722,
+            "verse_range_like": 1071
+          },
+          "original_reference_elements_with_literal_Bible_work_prefix": 0,
+          "original_reference_labels_with_visible_text": 6793,
+          "original_reference_labels_without_visible_text": 0,
+          "original_title_elements_with_visible_text": 30142,
+          "original_title_elements_without_visible_text": 0,
+          "oversized_or_binary_numbered_or_intro_entries": 0,
+          "raw_entries_observed": 30049,
+          "real_reader_layout_or_click_navigation_proven": false,
+          "reference_elements_with_osisref_attribute": 6793,
+          "reference_elements_without_osisref_attribute": 0,
+          "source_to_other_digital_edition_parity_proven": false,
+          "strict_xml_parseable_numbered_or_intro_entries": 30047,
+          "unparseable_numbered_or_intro_entries": 0
+        },
+        "sha256": "7810173dfad96c3284925187b08eb283a9ea5f4cfb9ad445d00cae7d4bf71f27"
+      },
+      "rebuild": {
+        "counts": {
+          "I": 1255,
+          "K": 28792,
+          "U": 2
+        },
+        "index_verified": true,
+        "link_sha256": "d4a499b1ba70d58e6b52f0354df095710fe5f4bb53d462e34a73b9b51be66d58",
+        "markup": {
+          "all_original_native_entries_accounted_for": true,
+          "empty_numbered_or_intro_entries": 0,
+          "entries_with_note_markup": 111,
+          "entries_with_paragraph_markup": 0,
+          "entries_with_reference_markup": 4369,
+          "entries_with_table_markup": 1035,
+          "entries_with_title_markup": 29960,
+          "no_original_source_bytes_rewritten": true,
+          "no_original_words_keys_or_reference_values_reported": true,
+          "no_osisref_value_normalization_or_verse_existence_claim": true,
+          "opaque_top_entries_not_assumed_to_be_xml": 2,
+          "original_element_counts_by_fixed_category": {
+            "br": 0,
+            "cell": 8746,
+            "chapter": 9973,
+            "div": 726147,
+            "hi": 118868,
+            "item": 0,
+            "lb": 0,
+            "list": 0,
+            "milestone": 0,
+            "note": 206,
+            "other": 0,
+            "p": 0,
+            "q": 0,
+            "quote": 0,
+            "reference": 6793,
+            "row": 4373,
+            "seg": 76,
+            "table": 1035,
+            "title": 30142,
+            "verse": 0
+          },
+          "original_osisref_form_count_by_fixed_category": {
+            "book_or_chapter_like": 0,
+            "compound_target": 0,
+            "other_unclassified": 0,
+            "single_osis_verse": 5722,
+            "verse_range_like": 1071
+          },
+          "original_reference_elements_with_literal_Bible_work_prefix": 0,
+          "original_reference_labels_with_visible_text": 6793,
+          "original_reference_labels_without_visible_text": 0,
+          "original_title_elements_with_visible_text": 30142,
+          "original_title_elements_without_visible_text": 0,
+          "oversized_or_binary_numbered_or_intro_entries": 0,
+          "raw_entries_observed": 30049,
+          "real_reader_layout_or_click_navigation_proven": false,
+          "reference_elements_with_osisref_attribute": 6793,
+          "reference_elements_without_osisref_attribute": 0,
+          "source_to_other_digital_edition_parity_proven": false,
+          "strict_xml_parseable_numbered_or_intro_entries": 30047,
+          "unparseable_numbered_or_intro_entries": 0
+        },
+        "sha256": "7810173dfad96c3284925187b08eb283a9ea5f4cfb9ad445d00cae7d4bf71f27"
+      },
+      "rebuild_extra_keys": [],
+      "rebuild_missing_keys": [],
+      "scope_samples": {
+        "Gen.5.25": {
+          "classic_present": true,
+          "modern_note_targets": [],
+          "modern_present": true,
+          "modern_words": 226
+        },
+        "Lev.19.1": {
+          "classic_present": false,
+          "modern_note_targets": [],
+          "modern_present": true,
+          "modern_words": 590
+        },
+        "Lev.19.37": {
+          "classic_present": false,
+          "modern_note_targets": [],
+          "modern_present": true,
+          "modern_words": 590
+        },
+        "Num.29.1": {
+          "classic_present": true,
+          "modern_note_targets": [
+            "Lev.23.24"
+          ],
+          "modern_present": true,
+          "modern_words": 144
+        },
+        "Ps.108.1": {
+          "classic_present": false,
+          "modern_note_targets": [],
+          "modern_present": true,
+          "modern_words": 153
+        },
+        "Ps.108.13": {
+          "classic_present": false,
+          "modern_note_targets": [],
+          "modern_present": true,
+          "modern_words": 153
+        }
+      }
+    },
+    "genesis_native": {
+      "classic": "       Verses 25-32        Methuselah signifies, he dies, there is a dart,' a sending forth,' namely, of the deluge, which came the year that Methuselah died. He lived 969 years, the longest that any man ever lived on earth; but the longest liver must die at last. Noah signifies rest; his parents gave him that name, with a prospect of his being a great blessing to his generation. Observe his father's complaint of the calamitous state of human life, by the entrance of sin, and the curse of sin. Our whole life is spent in labour, and our time filled up with continual toil. God having cursed the ground, it is as much as some can do, with the utmost care and pains, to get a hard livelihood out of it. Lamech hoped for relief by the birth of this son, \"This same shall comfort us.\" It signifies not only that desire and expectation which parents generally have about their children, that they will be comforts to them and helpers, though they often prove otherwise; but it signifies also a prospect of something more. Is Christ ours? Is heaven ours? We need better comforters under our toil and sorrow, than the dearest relations and the most promising offspring; may we seek and find comforts in Christ.      ",
+      "published": "  Methuselah, Lamech, and Noah (verses 25–32)  Matthew Henry explains  Methuselah  as meaning something like “when he dies, there is a dart” or “a sending out,” which he connects with the flood that came in the year of Methuselah's death.  Methuselah lived 969 years, longer than any other person on earth.  Yet even the person who lives longest must die at last.   Noah  means “rest.” His parents gave him that name in the hope that he would be a great blessing to his generation.  Notice the complaint of Noah's father about the misery of human life since sin entered the world and brought its curse.  Our lives are filled with work, and our time with continual toil.  Because God cursed the ground, even those who work with the greatest care and effort may struggle to earn a bare living from it.  Lamech hoped that Noah's birth would bring relief: “This one will comfort us.”  That expresses the hope parents naturally place in their children—that they will bring them comfort and help. Yet children often turn out differently.  The name also points to a greater expectation.  Do we belong to Christ? Do we have heaven ahead of us?  We need greater comfort in our toil and sorrow than even our closest family or our most promising children can provide.  May we seek and find that comfort in Christ.   "
+    }
+  },
+  "limitations": [
+    "Native identity and chapter coverage do not certify all modernization semantics or source-reference parity.",
+    "Official schema and BRNP each have one finding; actual GUI note click not tested."
+  ]
+}

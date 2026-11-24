@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45474164267",
+  "tested_commit": "5fcc2ff825f6ae0810b5fa5b729b9fe2932e100c",
+  "results": {
+    "regression": {
+      "lsg-1910": {
+        "UNRESOLVED_REFERENCE_TARGET": 311
+      },
+      "darby-jnd-2024": {},
+      "mhcc-crosswire": {},
+      "mhc-crosswire": {}
+    },
+    "MODERN_HEADER_TRIAL": {
+      "source_sha256": "23f0872a67086d9f659bd96936ab63db63c8c7b8c10eb92e59537c3e6cf16189",
+      "candidate_sha256": "784dadcb4800c7e8d0fede02aa6116ee55d4f835b25168c4b3ba3ff530e1fb38",
+      "offset": 303,
+      "before": "<identifier type=\"OSIS\">MHCCMODAP</identifier><language type=\"IETF\">en</language><description>Private unpublished editorial review candidate; 15 source-linked corrections and two secondary-witness expositions; reader and distribution rights pending.</description>",
+      "after": "<description>Private unpublished editorial review candidate; 15 source-linked corrections and two secondary-witness expositions; reader and distribution rights pending.</description><identifier type=\"OSIS\">MHCCMODAP</identifier><language type=\"IETF\">en</language>",
+      "source_reversible": true,
+      "body_byte_identical": true,
+      "official_schema_validated": true,
+      "brnp": {
+        "profile": "BRNP",
+        "profile_version": "0.3-draft",
+        "official_osis": {
+          "status": "validated",
+          "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
+          "source_sha256": "784dadcb4800c7e8d0fede02aa6116ee55d4f835b25168c4b3ba3ff530e1fb38"
+        },
+        "publication_approved": false,
+        "kind": "commentary",
+        "sha256": "784dadcb4800c7e8d0fede02aa6116ee55d4f835b25168c4b3ba3ff530e1fb38",
+        "status": "draft_subset_no_findings",
+        "brnp_conformance_certified": false,
+        "element_counts": {
+          "cell": 8746,
+          "chapter": 1189,
+          "description": 1,
+          "div": 5358,
+          "header": 1,
+          "hi": 15599,
+          "identifier": 1,
+          "language": 1,
+          "note": 27,
+          "osis": 1,
+          "osisText": 1,
+          "p": 40435,
+          "reference": 1209,
+          "row": 4373,
+          "seg": 11,
+          "table": 1035,
+          "title": 5295,
+          "work": 1
+        },
+        "commentary_entry_count": 4049,
+        "commentary_representation": "annotated_divisions",
+        "annotated_commentary_entry_count": 4049,
+        "paired_commentary_entry_count": 0,
+        "paired_commentary_member_count": 0,
+        "verse_identifier_count": 0,
+        "verse_pair_identifier_count": 0,
+        "book_identifier_count": 66,
+        "book_milestone_pair_identifier_count": 0,
+        "chapter_identifier_count": 1189,
+        "chapter_pair_identifier_count": 0,
+        "bible_verse_member_count": 0,
+        "findings": [],
+        "finding_count": 0,
+        "finding_examples_by_code": {},
+        "finding_codes": {},
+        "unreviewed_elements": {},
+        "verse_start_reasons": {},
+        "limitations": [
+          "Official OSIS XSD is checked only when --schema is supplied; neither route proves historical/authorial fidelity",
+          "NOT a complete verse hierarchy, reference target, annotation or reader validation",
+          "NOT a production or publication approval gate"
+        ]
+      }
+    },
+    "MODERN_HEADER_NATIVE_TRIAL": {
+      "all_raw_equal": true,
+      "changed_keys": [],
+      "extra_keys": [],
+      "links_equal": true,
+      "missing_keys": [],
+      "native": {
+        "counts": {
+          "I": 1255,
+          "K": 28792,
+          "U": 2
+        },
+        "index_verified": true,
+        "link_sha256": "d4a499b1ba70d58e6b52f0354df095710fe5f4bb53d462e34a73b9b51be66d58",
+        "markup": {
+          "all_original_native_entries_accounted_for": true,
+          "empty_numbered_or_intro_entries": 0,
+          "entries_with_note_markup": 111,
+          "entries_with_paragraph_markup": 0,
+          "entries_with_reference_markup": 4369,
+          "entries_with_table_markup": 1035,
+          "entries_with_title_markup": 29960,
+          "no_original_source_bytes_rewritten": true,
+          "no_original_words_keys_or_reference_values_reported": true,
+          "no_osisref_value_normalization_or_verse_existence_claim": true,
+          "opaque_top_entries_not_assumed_to_be_xml": 2,
+          "original_element_counts_by_fixed_category": {
+            "br": 0,
+            "cell": 8746,
+            "chapter": 9973,
+            "div": 726147,
+            "hi": 118868,
+            "item": 0,
+            "lb": 0,
+            "list": 0,
+            "milestone": 0,
+            "note": 206,
+            "other": 0,
+            "p": 0,
+            "q": 0,
+            "quote": 0,
+            "reference": 6793,
+            "row": 4373,
+            "seg": 76,
+            "table": 1035,
+            "title": 30142,
+            "verse": 0
+          },
+          "original_osisref_form_count_by_fixed_category": {
+            "book_or_chapter_like": 0,
+            "compound_target": 0,
+            "other_unclassified": 0,
+            "single_osis_verse": 5722,
+            "verse_range_like": 1071
+          },
+          "original_reference_elements_with_literal_Bible_work_prefix": 0,
+          "original_reference_labels_with_visible_text": 6793,
+          "original_reference_labels_without_visible_text": 0,
+          "original_title_elements_with_visible_text": 30142,
+          "original_title_elements_without_visible_text": 0,
+          "oversized_or_binary_numbered_or_intro_entries": 0,
+          "raw_entries_observed": 30049,
+          "real_reader_layout_or_click_navigation_proven": false,
+          "reference_elements_with_osisref_attribute": 6793,
+          "reference_elements_without_osisref_attribute": 0,
+          "source_to_other_digital_edition_parity_proven": false,
+          "strict_xml_parseable_numbered_or_intro_entries": 30047,
+          "unparseable_numbered_or_intro_entries": 0
+        },
+        "sha256": "7810173dfad96c3284925187b08eb283a9ea5f4cfb9ad445d00cae7d4bf71f27"
+      }
+    }
+  }
+}

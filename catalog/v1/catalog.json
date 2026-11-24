@@ -23,8 +23,8 @@
       "canonical_edition_id": "matthew-henry-concise-modern-english-2026",
       "category": "commentary",
       "download": {
-        "sha256": "dd1940b3bf85cc09659b634dc74c9a9d8810816bc2f8316a8293f893c3eb94ee",
-        "size_bytes": 2771760,
+        "sha256": "3cf8833115fe38825ec4cb3db6d231ac30493af0f0f6249bc143a7eb0c4ff0cc",
+        "size_bytes": 2771776,
         "url": "https://icfmp.github.io/Bible-Resources/sword/packages/HMCCModern.zip"
       },
       "edition": "reader_optimized",
@@ -32,11 +32,11 @@
       "language": "en",
       "sword_id": "HMCCModern",
       "title": {
-        "en": "Henry's Modern Concise Commentary",
+        "en": "Matthew Henry's Modern Concise Commentary",
         "fr": "Commentaire concis de Matthew Henry en anglais moderne"
       },
       "versification": "KJV",
-      "version": "0.1.0"
+      "version": "1.0.0"
     },
     {
       "canonical_edition_id": "louis-segond-1910-ebible",

@@ -51,6 +51,8 @@ class RecoveredSourceIntegrity(unittest.TestCase):
                 proof = json.loads((ROOT / approval_path).read_text())
                 approved = (MHC_ACCEPTED_SHA if approval_key == "candidate_source_sha256"
                             and proof.get("schema_version") == 1 else proof[approval_key])
+                if "header_revision" in proof:
+                    approved = proof["header_revision"]["candidate_source_sha256"]
                 self.assertEqual(report[manifest_key], approved)
                 digest = hashlib.sha256()
                 with path.open("rb") as stream:

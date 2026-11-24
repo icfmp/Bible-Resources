@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "candidate_commit": "aa22974cfde62fb271c0dbac10e700987a11f2df",
+  "source_sha256": "784dadcb4800c7e8d0fede02aa6116ee55d4f835b25168c4b3ba3ff530e1fb38",
+  "native_ordered_raw_sha256": "7810173dfad96c3284925187b08eb283a9ea5f4cfb9ad445d00cae7d4bf71f27",
+  "evidence": {
+    "run_id": 45476053874,
+    "job_id": 138736478365,
+    "artifact_id": 14959950827,
+    "artifact_digest": "sha256:5d0180c58ed33abb31c43fb072484f894d8238b5e1d9ff19dc80513139072059",
+    "source_native_screen": {
+      "annotations_checked": 4049,
+      "exact_contiguous_word_matches": 4049,
+      "unresolved_scope_count": 0,
+      "missing_reference_occurrences_count": 0,
+      "approved_cases": 15,
+      "approved_targets": 28,
+      "missing_approved_targets": 0,
+      "limitation": "Normalized word-stream containment and first-address reference containment, not full punctuation, markup, or semantic modernization review."
+    },
+    "readers": {
+      "diatheke_passages": 9,
+      "xiphos_gui_excerpt_matches": 9,
+      "keys": [
+        "Gen.5.25",
+        "Lev.19.1",
+        "Lev.19.37",
+        "Ps.108.1",
+        "Ps.108.13",
+        "1Sam.25.39",
+        "Ps.95.11",
+        "Gen.12.6",
+        "Num.29.1"
+      ],
+      "actual_note_click_verified": false,
+      "android_gui_verified": false
+    }
+  },
+  "remaining": [
+    {
+      "runs": [
+        45476053662,
+        45476053602
+      ],
+      "finding": "One-shot pre-integration workflows now fail on already archived historical files and old source pin; retire after preserving receipts."
+    },
+    {
+      "runs": [
+        45476053426,
+        45476053665,
+        45476053585
+      ],
+      "finding": "Generated tool registry stale after reader workflow change; regenerate using the canonical tool and rerun full validation."
+    },
+    {
+      "finding": "Actual note-click navigation, Android GUI and independent semantic review not proven by this run; owner final release authorization remains pending."
+    }
+  ],
+  "disposition": "Technical evidence only; draft PR must not be merged or published on this receipt alone."
+}

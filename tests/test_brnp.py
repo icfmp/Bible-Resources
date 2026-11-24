@@ -59,6 +59,16 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         self.assertEqual(report["commentary_entry_count"], 1)
         self.assertEqual(report["finding_count"], 0)
 
+    def test_standard_work_language_metadata(self):
+        xml = document('<div annotateType="commentary" annotateRef="Gen.1.1" type="section"><p>Note</p></div>')
+        xml = xml.replace("<header/>", '<header><work osisWork="Demo"><title>Demo</title><description>Test</description><language type="IETF">en</language></work></header>')
+        self.assertEqual(self.inspect(xml, "commentary")["finding_count"], 0)
+
+    def test_language_metadata_outside_work_header_rejected(self):
+        xml = document('<div annotateType="commentary" annotateRef="Gen.1.1" type="section"><p><language>en</language>Note</p></div>')
+        report = self.inspect(xml, "commentary")
+        self.assertIn("INVALID_STRUCTURAL_PARENT", report["finding_codes"])
+
     def test_unmatched_verse_is_blocked(self):
         report = self.inspect(document(
             '<verse osisID="Gen.1.1" sID="Gen.1.1"/>Text'

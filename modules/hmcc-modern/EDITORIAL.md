@@ -8,3 +8,7 @@ Source and native GUI evidence: https://github.com/icfmp/Bible-Resources/actions
 Source decisions: https://github.com/icfmp/Bible-Resources/pull/272.
 QA artifact: https://github.com/icfmp/Bible-Resources/actions/runs/44695710957/artifacts/14610990289.
 The original primary historical text remains public domain. This derivative is distributed with the owner's permission; it is not a claim of new proprietary rights in the original Matthew Henry text.
+
+## 1.0.0 technical maintenance
+
+Header-only schema repair with zero BRNP findings and exact all-entry native comparison. No modern prose, notes, references, or six binary members altered. Corrected the obsolete SWORD TextSource link and proposed harmonized display name; existing HMCCModern module ID retained. The historical 0.1.0 proof remains archived. Modern-English semantic review and actual note-click verification are distinct from this technical correction. Publication instruction recorded on 2026-11-24: https://github.com/icfmp/Bible-Resources/issues/559#issuecomment-7143486405. Reader evidence and remaining limitations are preserved in the edition-local release notes and receipts; public deployment must be separately verified.
