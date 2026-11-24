@@ -1,0 +1,499 @@
+{
+  "schema_version": 1,
+  "status": "historical_and_upstream_audit_completed_erratum_preview_only",
+  "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45384038277",
+  "job_id": 138410190131,
+  "base_commit": "2180d453fe1487479346f86e195cdb27eb9ef77c",
+  "tested_head": "9d2e2f3118c85d40735a1283e16af28b3c42a3d5",
+  "publication_changed": false,
+  "source_pins_changed": false,
+  "published_package": {
+    "archive_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
+    "members": {
+      "mods.d/mhcc.conf": "04859f158d75ad2fd44fda4a0420095ab3172e3b96a5ed2b2d43b30538bad5d6",
+      "modules/comments/zcom/mhcc/ot.czv": "1a31afe2a132c5b1988eac15a6dfd07cbd718797db450b69ad4b2637c1d806ce",
+      "modules/comments/zcom/mhcc/nt.czs": "0d7f1347c8a570330d6ef82048281018f30e30a0ce5d40df00f1dafac332f550",
+      "modules/comments/zcom/mhcc/nt.czz": "ca87b997b510711012180991ab7230549b3a03b588bf58961fe28e9d5b3cca87",
+      "modules/comments/zcom/mhcc/nt.czv": "f39b155c597dad8ad37fae98fc14b94e5c3a44ded6abfd3dc58e4c24b8e3b582",
+      "modules/comments/zcom/mhcc/ot.czs": "fd4ae8c4558dfc8e0a5b31e0d0dc48954ad183da40c87f5f63b8321fd7f2e17b",
+      "modules/comments/zcom/mhcc/ot.czz": "c58f099b763687151ed9725031dce59a68193cc296c8998bfb9431f0b0bfe086"
+    },
+    "all_git_payload_members_match": true
+  },
+  "historical_raw_deltas": {
+    "added": [
+      [
+        "K",
+        "Eccl.4.8"
+      ],
+      [
+        "K",
+        "Eccl.9.12"
+      ],
+      [
+        "K",
+        "Isa.21.12"
+      ],
+      [
+        "K",
+        "Isa.26.21"
+      ],
+      [
+        "K",
+        "Isa.50.11"
+      ],
+      [
+        "K",
+        "Isa.56.2"
+      ],
+      [
+        "K",
+        "Isa.57.2"
+      ],
+      [
+        "K",
+        "Isa.58.14"
+      ],
+      [
+        "K",
+        "Isa.58.2"
+      ],
+      [
+        "K",
+        "Isa.61.11"
+      ],
+      [
+        "K",
+        "Jer.4.2"
+      ],
+      [
+        "K",
+        "Jer.4.4"
+      ],
+      [
+        "K",
+        "Lam.4.22"
+      ],
+      [
+        "K",
+        "Matt.13.36"
+      ],
+      [
+        "K",
+        "Matt.13.37"
+      ],
+      [
+        "K",
+        "Matt.13.38"
+      ],
+      [
+        "K",
+        "Matt.13.39"
+      ],
+      [
+        "K",
+        "Matt.13.40"
+      ],
+      [
+        "K",
+        "Matt.13.41"
+      ],
+      [
+        "K",
+        "Matt.13.42"
+      ],
+      [
+        "K",
+        "Matt.13.43"
+      ],
+      [
+        "K",
+        "Song.1.8"
+      ],
+      [
+        "K",
+        "Song.6.3"
+      ],
+      [
+        "K",
+        "Song.8.14"
+      ]
+    ],
+    "changed_count": 29973,
+    "expected_added_absent": [],
+    "expected_changed_absent": [],
+    "history_matches": false,
+    "new_native_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+    "old_native_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6",
+    "removed": [],
+    "unexpected_added": [],
+    "unexpected_changed_count": 29961,
+    "unexpected_changed_sample": [
+      [
+        "I",
+        "1Chr"
+      ],
+      [
+        "I",
+        "1Chr.1"
+      ],
+      [
+        "I",
+        "1Chr.10"
+      ],
+      [
+        "I",
+        "1Chr.11"
+      ],
+      [
+        "I",
+        "1Chr.12"
+      ],
+      [
+        "I",
+        "1Chr.13"
+      ],
+      [
+        "I",
+        "1Chr.14"
+      ],
+      [
+        "I",
+        "1Chr.15"
+      ],
+      [
+        "I",
+        "1Chr.16"
+      ],
+      [
+        "I",
+        "1Chr.17"
+      ],
+      [
+        "I",
+        "1Chr.18"
+      ],
+      [
+        "I",
+        "1Chr.19"
+      ]
+    ]
+  },
+  "semantic_comparison": {
+    "nondiv_markup_changed_count": 11,
+    "nondiv_markup_changed_sample": [
+      [
+        "K",
+        "Ezek.3.1"
+      ],
+      [
+        "K",
+        "Ezek.3.10"
+      ],
+      [
+        "K",
+        "Ezek.3.11"
+      ],
+      [
+        "K",
+        "Ezek.3.2"
+      ],
+      [
+        "K",
+        "Ezek.3.3"
+      ],
+      [
+        "K",
+        "Ezek.3.4"
+      ],
+      [
+        "K",
+        "Ezek.3.5"
+      ],
+      [
+        "K",
+        "Ezek.3.6"
+      ],
+      [
+        "K",
+        "Ezek.3.7"
+      ],
+      [
+        "K",
+        "Ezek.3.8"
+      ],
+      [
+        "K",
+        "Ezek.3.9"
+      ]
+    ],
+    "opaque_top_bytes_equal": true,
+    "parse_failures": 0,
+    "reference_changed_count": 11,
+    "reference_changed_sample": [
+      [
+        "K",
+        "Ezek.3.1"
+      ],
+      [
+        "K",
+        "Ezek.3.10"
+      ],
+      [
+        "K",
+        "Ezek.3.11"
+      ],
+      [
+        "K",
+        "Ezek.3.2"
+      ],
+      [
+        "K",
+        "Ezek.3.3"
+      ],
+      [
+        "K",
+        "Ezek.3.4"
+      ],
+      [
+        "K",
+        "Ezek.3.5"
+      ],
+      [
+        "K",
+        "Ezek.3.6"
+      ],
+      [
+        "K",
+        "Ezek.3.7"
+      ],
+      [
+        "K",
+        "Ezek.3.8"
+      ],
+      [
+        "K",
+        "Ezek.3.9"
+      ]
+    ],
+    "text_changed_count": 12,
+    "text_changed_sample": [
+      [
+        "K",
+        "1Chr.7.1"
+      ],
+      [
+        "K",
+        "Ezek.3.1"
+      ],
+      [
+        "K",
+        "Ezek.3.10"
+      ],
+      [
+        "K",
+        "Ezek.3.11"
+      ],
+      [
+        "K",
+        "Ezek.3.2"
+      ],
+      [
+        "K",
+        "Ezek.3.3"
+      ],
+      [
+        "K",
+        "Ezek.3.4"
+      ],
+      [
+        "K",
+        "Ezek.3.5"
+      ],
+      [
+        "K",
+        "Ezek.3.6"
+      ],
+      [
+        "K",
+        "Ezek.3.7"
+      ],
+      [
+        "K",
+        "Ezek.3.8"
+      ],
+      [
+        "K",
+        "Ezek.3.9"
+      ]
+    ],
+    "unique_changed_body_pairs": 5302
+  },
+  "interpretation": "Direct stock-vs-recompiled raw bytes differ; independently observed normalized visible text differences are exactly the 12 historically approved occupied keys, and reference/non-div attributes differ only at the 11 approved Ezekiel addresses. Opaque TOP bytes and exact added/removed key coverage confirmed. Raw per-entry original/revised historical digests require the original intermediate compiler transport baseline; do not claim stock-to-curated raw equality.",
+  "current_upstream": {
+    "added_native_keys": 0,
+    "changed_existing_native_keys": 0,
+    "data_members_changed": [],
+    "observed": {
+      "bytes": 1773039,
+      "sha256": "36fc8aa1b136a7ed86c0ff3f460509c8eb3cdcac988f884b2a033786b2f04af3",
+      "url": "https://crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHCC.zip"
+    },
+    "observed_conf_sha256": "11ba831f6f59da3ddd90cb3149692298d3708802babe9d3d95fbab5cfef9a892",
+    "observed_native": {
+      "counts": {
+        "I": 1255,
+        "K": 28718,
+        "U": 2
+      },
+      "index": {
+        "all_stock_occupied_keys_count": 29975,
+        "exact_all_occupied_stock_keys_read_and_crosschecked": true,
+        "native_driver": "zCom",
+        "native_engine_version": "1.9.0",
+        "native_key_order_sha256": "fd8f02258e08d1ed4934dbbd7229d533234c1050bbcaab4cc7c9ef38abe7fb09",
+        "native_versification": "KJV"
+      },
+      "markup": {
+        "all_original_native_entries_accounted_for": true,
+        "empty_numbered_or_intro_entries": 0,
+        "entries_with_note_markup": 0,
+        "entries_with_paragraph_markup": 0,
+        "entries_with_reference_markup": 5780,
+        "entries_with_table_markup": 6542,
+        "entries_with_title_markup": 8933,
+        "no_original_source_bytes_rewritten": true,
+        "no_original_words_keys_or_reference_values_reported": true,
+        "no_osisref_value_normalization_or_verse_existence_claim": true,
+        "opaque_top_entries_not_assumed_to_be_xml": 2,
+        "original_element_counts_by_fixed_category": {
+          "br": 0,
+          "cell": 40002,
+          "chapter": 9895,
+          "div": 272362,
+          "hi": 28585,
+          "item": 0,
+          "lb": 0,
+          "list": 0,
+          "milestone": 198,
+          "note": 0,
+          "other": 0,
+          "p": 0,
+          "q": 0,
+          "quote": 0,
+          "reference": 10557,
+          "row": 20001,
+          "seg": 0,
+          "table": 20001,
+          "title": 15985,
+          "verse": 0
+        },
+        "original_osisref_form_count_by_fixed_category": {
+          "book_or_chapter_like": 0,
+          "compound_target": 0,
+          "other_unclassified": 0,
+          "single_osis_verse": 5891,
+          "verse_range_like": 4666
+        },
+        "original_reference_elements_with_literal_Bible_work_prefix": 0,
+        "original_reference_labels_with_visible_text": 10557,
+        "original_reference_labels_without_visible_text": 0,
+        "original_title_elements_with_visible_text": 15985,
+        "original_title_elements_without_visible_text": 0,
+        "oversized_or_binary_numbered_or_intro_entries": 0,
+        "raw_entries_observed": 29975,
+        "real_reader_layout_or_click_navigation_proven": false,
+        "reference_elements_with_osisref_attribute": 10557,
+        "reference_elements_without_osisref_attribute": 0,
+        "source_to_other_digital_edition_parity_proven": false,
+        "strict_xml_parseable_numbered_or_intro_entries": 29973,
+        "unparseable_numbered_or_intro_entries": 0
+      },
+      "native_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+    },
+    "observed_version": "2.0",
+    "pinned_archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "pinned_conf_sha256": "2762a04757ec3ee14bcf5d442fedcd47d2b938d573de4e9100a31aa073bc5863",
+    "removed_native_keys": 0,
+    "same_native_corpus_as_original": true,
+    "same_native_data_members_as_immutable_original": true,
+    "source_pin_unchanged": true
+  },
+  "genesis_proposed_erratum": {
+    "affected_keys": [
+      "Gen.5.25",
+      "Gen.5.26",
+      "Gen.5.27",
+      "Gen.5.28",
+      "Gen.5.29",
+      "Gen.5.30",
+      "Gen.5.31",
+      "Gen.5.32"
+    ],
+    "before_native_entry_sha256": "34ef1165d982265ba46f78bf6364979f4e4faf41d7604e1683232ea68f7adf5f",
+    "bytes_inserted": 74,
+    "candidate_compiled": false,
+    "candidate_source_sha256": "690184e2cdac0e6160bddb256149f2111d51b946caf29622e3b7f2ea358835e0",
+    "exact_reverse_roundtrip": true,
+    "identical_old_native_body": true,
+    "proposed_after_native_entry_sha256": "dba35108cf631ba96bdb2a7f8691bb391518fbc54b4507536479999b71e8d18e",
+    "published": false,
+    "source_location": [
+      [
+        "{http://www.bibletechnologies.net/2003/OSIS/namespace}div",
+        [
+          [
+            "{http://www.bibletechnologies.net/2003/OSIS/namespace}div",
+            {
+              "annotateRef": "Gen.5.25-Gen.5.32",
+              "annotateType": "commentary",
+              "type": "section"
+            }
+          ],
+          [
+            "{http://www.bibletechnologies.net/2003/OSIS/namespace}div",
+            {
+              "osisID": "Gen.5",
+              "type": "chapter"
+            }
+          ],
+          [
+            "{http://www.bibletechnologies.net/2003/OSIS/namespace}div",
+            {
+              "osisID": "Gen",
+              "type": "book"
+            }
+          ]
+        ]
+      ]
+    ],
+    "source_occurrences": 1,
+    "source_sha256": "6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39",
+    "xml_structure_and_attributes_identical": true
+  },
+  "genesis_prior_semantics": {
+    "text_and_nondiv_attributes_equal": true,
+    "prior_body_sha256": "041f77c0e300ec7f0c9038b342c00fd48c224072437d786cc74211c23a2a0764",
+    "current_body_sha256": "34ef1165d982265ba46f78bf6364979f4e4faf41d7604e1683232ea68f7adf5f"
+  },
+  "witnesses": [
+    {
+      "url": "https://dir.sermon-online.com/english/MatthewHenry/Matthew_Henrys_Concise_Commentary_On_The_Bible.pdf",
+      "pdf_page": 26,
+      "kind": "Bible Truth Forum digital text, specific historical phrase visually verified; not a whole edition substitute"
+    },
+    {
+      "url": "https://truthaccordingtoscripture.com/commentaries/mhn/genesis-5.php",
+      "kind": "corroborating concise commentary text; not proven independent digitization"
+    }
+  ],
+  "modern_decision_relocation": {
+    "issue": 517,
+    "git_blob_sha": "17ae1990423f5bdee7096ea76e9b5fc6927af1b6",
+    "actual_checkout_file_sha256": "b828124fcfb9825bdcb581e79d9edf9579fdac27f441199c12a309fda21a3101",
+    "actual_checkout_path": "sources/cleaned/commentaries/en/hmcc-modern/editorial/evidence/OWNER_EDITORIAL_DECISIONS_2026-11-19.json",
+    "git_index_verified": true,
+    "seven_modern_contract_tests_passed": true,
+    "historical_provider_discrepancy_cause_not_established": true
+  }
+}
