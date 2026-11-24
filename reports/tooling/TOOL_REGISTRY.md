@@ -33,7 +33,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/approved_osis_sword_candidate.py`](../../scripts/approved_osis_sword_candidate.py) | KEEP_GENERIC | named test | 10 | not determined |
 | [`scripts/audit_osis.py`](../../scripts/audit_osis.py) | KEEP_GENERIC | not established | 5 | source/native audit |
 | [`scripts/bible_intake.py`](../../scripts/bible_intake.py) | KEEP_GENERIC | named test | 4 | intake |
-| [`scripts/build.py`](../../scripts/build.py) | KEEP_GENERIC | not established | 15 | publication/release |
+| [`scripts/build.py`](../../scripts/build.py) | KEEP_GENERIC | not established | 14 | publication/release |
 | [`scripts/catalogue_profiles.py`](../../scripts/catalogue_profiles.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/catalogue_release_coverage.py`](../../scripts/catalogue_release_coverage.py) | KEEP_GENERIC | named test | 11 | publication/release |
 | [`scripts/check_brnp.py`](../../scripts/check_brnp.py) | KEEP_GENERIC | not established | 8 | not determined |
@@ -55,7 +55,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/pilot_subprocess.py`](../../scripts/pilot_subprocess.py) | KEEP_GENERIC | not established | 4 | not determined |
 | [`scripts/publish_reviewed_release.py`](../../scripts/publish_reviewed_release.py) | KEEP_GENERIC | not established | 12 | publication/release |
 | [`scripts/published_reference_audit.py`](../../scripts/published_reference_audit.py) | KEEP_GENERIC | named test | 4 | publication/release |
-| [`scripts/release_preflight.py`](../../scripts/release_preflight.py) | KEEP_GENERIC | named test | 10 | publication/release |
+| [`scripts/release_preflight.py`](../../scripts/release_preflight.py) | KEEP_GENERIC | named test | 9 | publication/release |
 | [`scripts/research/bible/__init__.py`](../../scripts/research/bible/__init__.py) | KEEP_GENERIC | not established | 2 | not determined |
 | [`scripts/research/bible/native_milestone_pair_audit.py`](../../scripts/research/bible/native_milestone_pair_audit.py) | KEEP_GENERIC | named test | 6 | source/native audit |
 | [`scripts/research/bible/native_raw_main_text.py`](../../scripts/research/bible/native_raw_main_text.py) | KEEP_GENERIC | named test | 9 | not determined |
@@ -66,7 +66,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/bible/source_native_osis_structure_screen.py`](../../scripts/research/bible/source_native_osis_structure_screen.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_osis_target_addressability.py`](../../scripts/research/bible/source_native_osis_target_addressability.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/research/bible/source_osis_verse_notes.py`](../../scripts/research/bible/source_osis_verse_notes.py) | KEEP_GENERIC | named test | 8 | not determined |
-| [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 8 | publication/release |
+| [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 7 | publication/release |
 | [`scripts/reviewed_modern_commentary_rebuild.py`](../../scripts/reviewed_modern_commentary_rebuild.py) | GENERALIZE | named test | 3 | publication/release |
 | [`scripts/reviewed_osis_commentary_rebuild.py`](../../scripts/reviewed_osis_commentary_rebuild.py) | KEEP_GENERIC | not established | 2 | publication/release |
 | [`scripts/segment_osis_reference_destinations.py`](../../scripts/segment_osis_reference_destinations.py) | KEEP_GENERIC | named test | 4 | not determined |
@@ -82,8 +82,8 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/sword_native_raw_entry.cpp`](../../scripts/sword_native_raw_entry.cpp) | KEEP_GENERIC | not established | 4 | not determined |
 | [`scripts/sword_native_render.cpp`](../../scripts/sword_native_render.cpp) | KEEP_GENERIC | not established | 5 | not determined |
 | [`scripts/sword_option_filters.py`](../../scripts/sword_option_filters.py) | KEEP_GENERIC | named test | 4 | not determined |
-| [`scripts/tool_registry.py`](../../scripts/tool_registry.py) | KEEP_GENERIC | named test | 5 | not determined |
-| [`scripts/validate.py`](../../scripts/validate.py) | KEEP_GENERIC | not established | 23 | not determined |
+| [`scripts/tool_registry.py`](../../scripts/tool_registry.py) | KEEP_GENERIC | named test | 4 | not determined |
+| [`scripts/validate.py`](../../scripts/validate.py) | KEEP_GENERIC | not established | 22 | not determined |
 | [`scripts/verify_public_catalogue.py`](../../scripts/verify_public_catalogue.py) | KEEP_GENERIC | named test | 5 | not determined |
 
 ## Safeguards and next steps
