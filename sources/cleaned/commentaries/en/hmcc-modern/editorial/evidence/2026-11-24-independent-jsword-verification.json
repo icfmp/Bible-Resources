@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "source_sha256": "784dadcb4800c7e8d0fede02aa6116ee55d4f835b25168c4b3ba3ff530e1fb38",
+  "conf_sha256": "d76a68c39cb3137b0334bebbde358b3089078a5349b269f7bce5097847d61e6d",
+  "native_ordered_raw_sha256": "7810173dfad96c3284925187b08eb283a9ea5f4cfb9ad445d00cae7d4bf71f27",
+  "candidate_commit": "32b560926f5726c2c445c1f8c646dd4a28a9bdb1",
+  "jsword": {
+    "run_id": 45478655325,
+    "job_id": 138745545112,
+    "artifact_id": 14960032549,
+    "artifact_digest": "sha256:ca33362ce7768b203c74e2a4ed5c2c8f89847d6ceb5e4f6b997a07629c625581",
+    "engine_commit": "6ebd10a005fa7761e611c048ececea1430e22546",
+    "probe_commit": "7fdb347e073a96464a70290ef87d90c43dcf02c2",
+    "payload_members_authenticated": 7,
+    "samples": [
+      "Genesis 5:25",
+      "Leviticus 19:1",
+      "Leviticus 19:37",
+      "Psalms 108:1",
+      "Psalms 108:13",
+      "1Sam 25:39",
+      "Psalms 95:11",
+      "Genesis 12:6",
+      "Numbers 29:1"
+    ],
+    "junit": {
+      "tests": 3,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "gradle_exit_code": 0,
+    "limitation": "Substantive raw and structured entries and distinct book keys; not full cross-engine text parity or actual Android GUI."
+  },
+  "xiphos": {
+    "successful_runs": [
+      45476053874,
+      45477247317,
+      45477578247,
+      45478039133
+    ],
+    "successful_sample_count": 9,
+    "latest_run": 45478655325,
+    "latest_job": 138745545555,
+    "latest_gui_excerpt_matches": 0,
+    "latest_failure": "Focus/main-window automation failed for eight passages; first clipboard contained only 49 bytes. Source-native screen and diatheke retrieval completed before GUI; no demonstrated content regression. Prior successful runs against the unchanged source/native data remain evidence, not a claim of a green latest GUI run.",
+    "actual_note_click_verified": false
+  },
+  "global_validation": {
+    "run_id": 45478038997,
+    "tests": 534,
+    "failures": 0,
+    "repeat_run_id": 45478655386,
+    "repeat_conclusion": "success"
+  },
+  "manual_followup": "Prior 0.1.0 release record documents owner-approved manual post-release Numbers 29:1 to Leviticus 23:24 note click. Android GUI and new independent semantic collation are not certified.",
+  "publication": "Not approved or performed in this audit."
+}
