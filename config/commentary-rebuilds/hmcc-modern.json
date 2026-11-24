@@ -7,6 +7,19 @@
     "decision": "Publish the source-attested modern-English derivative as HMCC Modern 0.1.0, with owner-approved 15 link corrections and two historical restorations. Manual note-click navigation in Xiphos remains a post-publication test."
   },
   "derivative_rights_status": "owner_authorized_distribution_no_relicensing_of_underlying_source",
+  "header_revision": {
+    "candidate_source_sha256": "784dadcb4800c7e8d0fede02aa6116ee55d4f835b25168c4b3ba3ff530e1fb38",
+    "new_display_name": "Matthew Henry's Modern Concise Commentary",
+    "old_text_source": "https://github.com/icfmp/Bible-Resources/tree/main/work/mhcc-modern/production/accepted",
+    "previous_artifact_sha256": "f24019af1cdfe8b04dd8769bb0652ef60003b3e27a859db61c87b0af9673cbca",
+    "previous_conf_sha256": "6140453b6b8eea4c7bcb594cf5f0d9f7cfe4d65e1342ee785a157229811e2ec2",
+    "previous_metadata_sha256": "2165e89c07423ff1c8915805f22104b5adf763a2bca366ccbc43b3025f696ae8",
+    "previous_proof_sha256": "017400e90ee24c8c1241c0b046aeb349583fb3909b7b62ec7bda4f9d6a1b441d",
+    "previous_review_sha256": "3b88ab329beaf0d32b972fd400c18c247312566d5d5e363c4c29438e61b71026",
+    "previous_version": "0.1.0",
+    "receipt_name": "2026-11-24-header-revision-trial.json",
+    "receipt_sha256": "100e266983ad6582a97acdef2ed20e96d08d07636817939d2e6a65fa1f9c691b"
+  },
   "historical_authorial_restorations": 2,
   "module_id": "hmcc-modern",
   "original_native_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
@@ -23,5 +36,5 @@
   "status": "owner_authorized_for_release",
   "sword_id": "HMCCModern",
   "underlying_public_domain_source": "CrossWire MHCC 2.0 — Public Domain / Copy Freely",
-  "version": "0.1.0"
+  "version": "1.0.0"
 }

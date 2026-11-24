@@ -28,9 +28,9 @@
   "schema_version": 1,
   "sword_id": "HMCCModern",
   "title": {
-    "en": "Henry's Modern Concise Commentary",
+    "en": "Matthew Henry's Modern Concise Commentary",
     "fr": "Commentaire concis de Matthew Henry en anglais moderne"
   },
   "versification": "KJV",
-  "version": "0.1.0"
+  "version": "1.0.0"
 }

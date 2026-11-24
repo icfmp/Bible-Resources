@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "Technical maintenance requested by owner; candidate pending separate final publication approval.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/559",
+    "reviewed_by": "Bible Resources project owner — 2026-11-20",
+    "source_rights": "Original Matthew Henry via CrossWire Public Domain; separate modern derivative authorized by project owner; no imported CCEL formatting"
+  },
+  "editorial_path": "modules/hmcc-modern/EDITORIAL.md",
+  "evidence_path": "modules/hmcc-modern/SOURCE_VALIDATION.json",
+  "module_id": "hmcc-modern",
+  "notes_path": "sources/cleaned/commentaries/en/hmcc-modern/editorial/releases/HMCC-Modern-1.0.0.md",
+  "package_sha256": "3cf8833115fe38825ec4cb3db6d231ac30493af0f0f6249bc143a7eb0c4ff0cc",
+  "package_size_bytes": 2771776,
+  "schema_version": 1,
+  "sword_id": "HMCCModern",
+  "tag": "hmcc-modern-1.0.0",
+  "title": "Matthew Henry's Modern Concise Commentary — 1.0.0",
+  "version": "1.0.0",
+  "zip_name": "HMCCModern-1.0.0.zip"
+}
