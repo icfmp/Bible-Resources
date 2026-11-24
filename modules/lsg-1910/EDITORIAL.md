@@ -1,12 +1,12 @@
-# Louis Segond 1910 — Bible Resources 1.0.2 (unpublished candidate)
+# Louis Segond 1910 — Bible Resources 1.0.2 (published 2026-11-24)
 
 Existing original section headings now carry the OSIS-valid x-section type where they immediately follow a chapter opening. Exactly 803 unchanged titles are now part of native verse 1 entries. All original Scripture, publisher notes and citations are identical. The known Segond index exception for Mark 10:53 is retained.
 
-## Reader QA and publication gate
+## Reader QA and publication evidence
 
 The native SWORD readback verifies all **803 original section headings** are inside the appropriate first numbered verse. Independent real Xiphos GTK reader QA now passes for **16/16 source-attested title lines**, selected across **eight Old Testament books and eight New Testament books**. Each title appears as exactly one standalone copied heading line, and each matching GUI chapter contains at least sixteen consecutive words matching the native SWORD chapter. The earlier Romans 1 and Romans 2 regression also passed independently. The focused GUI sample does **not** establish pixel-perfect display for all 803 headings or other readers. Source text, notes, versification and historic releases are unchanged.
 
-Evidence: [source-stratified actual Xiphos run #45334886553](https://github.com/icfmp/Bible-Resources/actions/runs/45334886553) on candidate commit `d5852193058db6678994e9d1ea388e81171787f5`, alongside all seven other CI workflows passing on that exact commit. Final owner editorial/publication approval, PR merge and public release/catalogue/download checks are **still outstanding**; do not describe 1.0.2 as released.
+Evidence: [source-stratified actual Xiphos run #45334886553](https://github.com/icfmp/Bible-Resources/actions/runs/45334886553) on candidate commit `d5852193058db6678994e9d1ea388e81171787f5`, alongside all seven other CI workflows passing on that exact commit. The reviewed PR #551 was merged as `7092d6e9318eeff46081feb831c207efa5859af2`, and [release `lsg-1.0.2`](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-1.0.2) is **public**. [Official publisher run #45339868788](https://github.com/icfmp/Bible-Resources/actions/runs/45339868788) completed successfully: immutable versioned GitHub asset and release-plan hashes verified, GitHub Pages deployed, and all five publicly advertised SWORD ZIP files independently downloaded and SHA-256 verified over HTTPS. The [versioned BRLSG1910 ZIP](https://github.com/icfmp/Bible-Resources/releases/download/lsg-1.0.2/BRLSG1910-1.0.2.zip) is 4,268,030 bytes with SHA-256 `547d5b953c3a3720bf21bed0e48d515e1d9c581dc419bd4b0af5593286180f01`; cleaned OSIS SHA-256 is `2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd`. See the versioned release receipt under `sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-1.0.2.md`.
 
 ## Earlier approved 1.0.1 editorial record
 
