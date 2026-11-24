@@ -8,6 +8,7 @@ typography, title contents, independent reader rendering or publication.
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from bisect import bisect_right
 from hashlib import sha256
 import re
 
@@ -37,6 +38,7 @@ class _Stream:
         self.chars = 0
         self.events = defaultdict(list)
         self.num_events = 0
+        self.refs = []  # private source verse anchors (nonspace position, ID)
         self.titles = []  # private (nonspace position, title digest, character count)
 
     def append(self, string):
@@ -70,6 +72,11 @@ def _walk(node,stream,mode):
     if not isinstance(node.tag, str):
         return
     name=_local(node)
+    if mode == "source" and node.tag == OSIS+"verse" and node.get("osisID"):
+        ref = node.get("osisID")
+        if not KEY.fullmatch(ref):
+            raise BoundaryScreenError("Invalid source verse anchor")
+        stream.refs.append((stream.chars, ref))
     if name == "title":
         prose="".join(node.itertext())
         chars="".join(x for x in prose if not x.isspace())
@@ -188,18 +195,53 @@ class NativeBookStreams:
         _walk(root,stream,"native")
 
 
+def _paragraph_spans(stream):
+    """Compare complete non-nested paragraph spans, not shifted ordinal pairs."""
+    starts, ends = stream.events["p_open"], stream.events["p_close"]
+    if (len(starts) != len(ends)
+            or any(a > b for a, b in zip(starts, ends))
+            or any(b > a for b, a in zip(ends, starts[1:]))):
+        raise BoundaryScreenError("Paragraph spans are unpaired or overlapping")
+    return Counter(zip(starts, ends))
+
+
+def _paragraph_differences(book, src, nat, counts, findings):
+    """When full book text agrees, locate missing/extra spans by source anchors."""
+    expected, actual = _paragraph_spans(src), _paragraph_spans(nat)
+    offsets = [position for position, _ in src.refs]
+    for category, spans in (("source_only", expected-actual),
+                            ("native_only", actual-expected)):
+        for (start, end), multiplicity in sorted(spans.items()):
+            counts[category+"_paragraph_spans"] += multiplicity
+            if start == end:
+                counts[category+"_zero_nonspace_paragraph_spans"] += multiplicity
+            else:
+                counts[category+"_nonempty_paragraph_spans"] += multiplicity
+            if len(findings) < MAX_EXAMPLES:
+                index = bisect_right(offsets, start)-1
+                findings.append({"book": book, "kind": category,
+                                 "preceding_or_coincident_source_verse": src.refs[index][1] if index >= 0 else None,
+                                 "next_source_verse": src.refs[index+1][1] if index+1 < len(src.refs) else None,
+                                 "start_nonspace": start, "end_nonspace": end,
+                                 "multiplicity": multiplicity})
+    counts["identical_paragraph_spans"] += sum((expected & actual).values())
+
+
 def compare_book_boundary_positions(original: dict, compiled: NativeBookStreams,
                                     original_outside_titles=None):
     if not original or set(original)!=set(compiled.books):
         raise BoundaryScreenError("Full source/native book scope not verified")
     counts=Counter()
     samples=[]
+    paragraph_counts=Counter()
+    paragraph_findings=[]
     for book in sorted(original):
         src,nat=original[book],compiled.books[book]
         counts["books_compared"]+=1
         same_text=(src.chars==nat.chars and src.digest()==nat.digest())
         if same_text:
             counts["books_with_identical_full_nonspace_body_stream"]+=1
+            _paragraph_differences(book,src,nat,paragraph_counts,paragraph_findings)
         else:
             counts["books_with_unmatched_full_body_stream"]+=1
             if len(samples)<MAX_EXAMPLES:
@@ -265,6 +307,12 @@ def compare_book_boundary_positions(original: dict, compiled: NativeBookStreams,
         "native_anonymous_top_nonspace_body_characters":compiled.top_nonspace,
         "native_frame_counts":dict(sorted(compiled.frames.items())),
         "bounded_reference_only_findings":samples,
+        "paragraph_span_diagnostic": {
+            "counts": dict(sorted(paragraph_counts.items())),
+            "bounded_reference_only_findings": paragraph_findings,
+            "scope": "books_with_identical_full_nonspace_body_stream",
+            "zero_nonspace_spans_not_automatically_waived": True,
+        },
         "all_book_body_nonspace_and_boundary_events_equal":verified,
         "literal_whitespace_or_exact_typography_verified":False,
         "all_title_text_and_nonspace_placement_equal": (
