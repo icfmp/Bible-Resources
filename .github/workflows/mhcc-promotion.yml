@@ -85,6 +85,7 @@ jobs:
           save(root/"config/release-plans/mhcc-1.0.0.json",newplan);plan.unlink()
           print("MHCC_PROMOTION",json.dumps(newplan,sort_keys=True),flush=True)
           PY
+          git add -A -- modules/mhcc-crosswire sources/cleaned/commentaries/en/mhcc-crosswire/editorial config/release-plans config/commentary-rebuilds/mhcc-crosswire.json catalog/v1/catalog.json
           python scripts/tool_registry.py --write
           python scripts/release_preflight.py --module-id mhcc-crosswire --report "$RUNNER_TEMP/preflight.json"
           python -m unittest discover -s tests -v
