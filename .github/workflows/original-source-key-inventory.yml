@@ -1,0 +1,138 @@
+name: Inventory original authorial USFM and USFX keys without expanding verse bridges
+on:
+  push:
+    branches: [research/original-source-key-inventory]
+    paths: ['.github/workflows/original-source-key-inventory.yml']
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Inspect pinned original archives independently from cleaned OSIS
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from collections import Counter
+          from hashlib import sha256
+          import json,re,zipfile
+          from lxml import etree
+          from pilot_preflight import inspect_archive
+          from source_osis_inventory import source_inventory
+          from approved_osis_sword_candidate import approved_source_for
+          BOOK=re.compile(r'[A-Z0-9]{3}\Z')
+          LABEL=re.compile(r'[0-9]+[a-z]?(?:-[0-9]+[a-z]?)?\Z')
+          MARKER=re.compile(r'\\(\+?[a-z][a-z0-9-]*)(\*)?(?=\s|\\|$)|\\\*')
+          NOTE={'f','fe','ef','x','ex'}
+          def require(condition,reason):
+              if not condition: raise ValueError(reason)
+          def label(value):
+              require(bool(value and LABEL.fullmatch(value)), 'Unsupported original verse label')
+              return value
+          def word_after(text,pos):
+              match=re.match(r'[ \t]+([^ \t\r\n\\]+)',text[pos:])
+              require(match is not None,'Missing marker label')
+              return match[1]
+          def usfm(archive):
+              books={}
+              markers=Counter()
+              for member in archive.infolist():
+                  if member.is_dir() or not member.filename.lower().endswith(('.sfm','.usfm')):continue
+                  text=archive.read(member).decode('utf-8-sig')
+                  book=None; chapter=None; keys=[]; chapters=[]; notes=[]
+                  for m in MARKER.finditer(text):
+                      kind=m[1]
+                      if kind is None: continue
+                      markers[kind+('*' if m[2] else '')]+=1
+                      if kind in NOTE:
+                          if m[2]:
+                              require(notes and notes[-1]==kind,'Unpaired USFM note marker')
+                              notes.pop()
+                          else: notes.append(kind)
+                      if kind not in {'id','c','v'} or m[2]:continue
+                      require(not notes,'Key marker nested inside note')
+                      value=word_after(text,m.end())
+                      if kind=='id':
+                          require(book is None and BOOK.fullmatch(value),'Invalid or duplicate USFM book marker')
+                          book=value
+                      elif kind=='c':
+                          require(book and re.fullmatch(r'[1-9][0-9]*',value),'Invalid USFM chapter')
+                          require(value not in chapters,'Duplicate USFM chapter')
+                          chapter=value;chapters.append(value)
+                      else:
+                          require(book and chapter,'USFM verse outside book/chapter')
+                          keys.append((chapter,label(value)))
+                  require(book and book not in books and not notes,'Missing/duplicate book or unclosed note')
+                  require(len(keys)==len(set(keys)),'Duplicate exact USFM verse label')
+                  books[book]=keys
+              require(bool(books),'No USFM books')
+              return books,markers
+          def usfx(archive):
+              members=[m for m in archive.infolist() if not m.is_dir() and m.filename.lower().endswith('.xml')]
+              require(len(members)==1,'Expected one explicit USFX XML member')
+              raw=archive.read(members[0])
+              require(not re.search(rb'<!DOCTYPE\b',raw,re.I),'Unexpected USFX DTD')
+              root=etree.fromstring(raw,etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True,recover=False))
+              require(etree.QName(root).localname=='usfx','Wrong source root')
+              require(not any(isinstance(x,etree._Entity) for x in root.iter()),'Unresolved USFX entity')
+              books={};markers=Counter()
+              for book in root.iter('book'):
+                  ident=book.get('id')
+                  require(ident and BOOK.fullmatch(ident) and ident not in books,'Invalid or duplicate USFX book')
+                  chapter=None;keys=[];chapters=[]
+                  for n in book.iter():
+                      if not isinstance(n.tag,str):continue
+                      kind=etree.QName(n).localname
+                      markers[kind]+=1
+                      if kind not in {'c','v'}:continue
+                      require(not any(etree.QName(a).localname in NOTE for a in n.iterancestors()),'USFX numbering inside note')
+                      value=n.get('id')
+                      if kind=='c':
+                          require(value and re.fullmatch(r'[1-9][0-9]*',value),'Invalid USFX chapter')
+                          require(value not in chapters,'Duplicate USFX chapter')
+                          chapter=value;chapters.append(value)
+                      else:
+                          require(chapter,'USFX verse before chapter')
+                          keys.append((chapter,label(value)))
+                  require(len(keys)==len(set(keys)),'Duplicate exact USFX verse label')
+                  books[ident]=keys
+              require(bool(books),'No USFX books')
+              return books,markers
+          def compare(a,b):
+              diffs=[]
+              for book in sorted(set(a)|set(b)):
+                  if a.get(book)==b.get(book):continue
+                  x,y=a.get(book,[]),b.get(book,[])
+                  diffs.append({'book':book,'left_count':len(x),'right_count':len(y),'left_only':sorted(set(x)-set(y))[:8],'right_only':sorted(set(y)-set(x))[:8]})
+              return {'book_sets_equal':set(a)==set(b),'ordered_labels_within_every_book_equal':not diffs,'different_books':len(diffs),'findings':diffs[:20]}
+          def summary(books):
+              return {'books':len(books),'raw_verse_labels':sum(map(len,books.values())),'bridges':sum('-' in v for rows in books.values() for _,v in rows),'suffixes':sum(bool(re.search('[a-z]',v)) for rows in books.values() for _,v in rows)}
+          crosswalk=json.loads(Path('config/standard_usfm_osis_66.json').read_text())
+          mapping={x['usfm']:x['osis'] for x in crosswalk['books']}
+          for manifest in sorted(Path('sources/original/bibles').glob('*/*/PROVENANCE.json')):
+              p=json.loads(manifest.read_text())
+              if p['format']!='USFM':continue
+              a=manifest.parent/p['original_file']; witness=p.get('additional_original_witness',{})
+              require(witness.get('format')=='USFX','Missing independent USFX witness')
+              b=manifest.parent/witness['filename']
+              for path,expected,size in [(a,p['original_sha256'],p['original_size_bytes']),(b,witness['sha256'],witness['size_bytes'])]:
+                  receipt=inspect_archive(path,source_kind='authored')
+                  require(receipt['archive_sha256']==expected and receipt['archive_bytes']==size,'Original archive pin mismatch')
+              with zipfile.ZipFile(a) as z: fm,fm_markers=usfm(z)
+              with zipfile.ZipFile(b) as z: fx,fx_markers=usfx(z)
+              require(set(fm)<=set(mapping) and set(fx)<=set(mapping),'Original book ID missing reviewed crosswalk')
+              _,xml=approved_source_for(p['resource_id'])
+              keys,_=source_inventory(xml)
+              osis={}
+              for key in keys.splitlines():
+                  book,c,v=key.split('.')
+                  osis.setdefault(book,[]).append((c,v))
+              report={'resource':p['resource_id'],'usfm':summary(fm),'usfx':summary(fx),'osis':summary(osis),'original_formats':compare(fm,fx),'usfm_vs_approved_osis':compare({mapping[k]:v for k,v in fm.items()},osis),'usfx_vs_approved_osis':compare({mapping[k]:v for k,v in fx.items()},osis),'verse_bridges_expanded':False,'text_or_note_parity_certified':False,'archive_pins_verified':True,'usfm_marker_counts':dict(fm_markers),'usfx_element_counts':dict(fx_markers)}
+              print('ORIGINAL_SOURCE_KEY_INVENTORY',json.dumps(report,sort_keys=True),flush=True)
+          PY
