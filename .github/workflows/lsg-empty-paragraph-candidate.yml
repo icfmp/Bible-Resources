@@ -11,7 +11,7 @@ permissions:
 jobs:
   candidate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -94,7 +94,12 @@ jobs:
           Path("/tmp/empty-paragraph-review/native.json").write_text(json.dumps(result,indent=2,sort_keys=True))
           print("CANDIDATE",json.dumps({"source_sha256":result["source_osis_sha256"],"changed_payload_members":result["changed_payload_members"],"counts":result["source_to_compiled_counts"],"structure":result["source_native_body_boundary_positions"]},sort_keys=True))
           PY
+      - name: Compare actual Xiphos reading panes at all eight reviewed sites
+        run: |
+          sudo apt-get install -y -qq xiphos xvfb dbus-x11 xdotool xclip
+          python modules/lsg-1910/tools/review_empty_paragraph_xiphos.py
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: reviewed-empty-paragraph-metadata
           path: /tmp/empty-paragraph-review/
