@@ -2138,6 +2138,38 @@
       ]
     },
     {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "OSIS",
+        "ThML"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/sword_option_filters.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Reject unregistered SWORD option filters in every repeated .conf declaration.",
+      "python_imports": [
+        "__future__",
+        "pathlib",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "14f5430e9a0530ba870757ea53421e67a5ecff169828f683e9d8029855ee11c2",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 4,
+      "static_references": [
+        "scripts/validate.py",
+        ".github/workflows/temporary-rebuild-filter-tool-registry.yml",
+        "docs/technical/SWORD_OPTION_FILTERS.md",
+        "tests/test_sword_option_filters.py"
+      ]
+    },
+    {
       "classification": "KEEP_GENERIC",
       "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
@@ -2180,10 +2212,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
+        ".github/workflows/temporary-rebuild-filter-tool-registry.yml",
         ".github/workflows/tool-registry-maintenance.yml",
         "tests/test_tool_registry.py"
       ]
@@ -2219,15 +2252,16 @@
         "reviewed_modern_commentary_rebuild",
         "reviewed_osis_commentary_rebuild",
         "stable_sword_refs",
+        "sword_option_filters",
         "sys"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "e19d8cde710851c430c1ef08c500df7acf67f5935db79886cac8d03914c1ea22",
+      "sha256_at_inventory": "f0b8c272ac083e62abadf167a8b82a51cf7f5bef00eb4525d5437b6bc609a1d9",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 22,
+      "static_reference_count": 23,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
@@ -2240,6 +2274,7 @@
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         ".github/workflows/pages.yml",
+        ".github/workflows/temporary-rebuild-filter-tool-registry.yml",
         ".github/workflows/validate.yml",
         "docs/policies/COMMENTARY_POLICY.md",
         "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
