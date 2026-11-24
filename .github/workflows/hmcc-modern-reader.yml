@@ -193,16 +193,33 @@ jobs:
           export JAVA_TOOL_OPTIONS="-Duser.home=$HOME"
           export LC_ALL=C.UTF-8
           cd "$RUNNER_TEMP/andbible-pinned-jsword"
-          set +e
-          timeout 900 bash ./gradlew --no-daemon --console=plain test --tests org.icfmp.research.CommentaryAndBibleJSwordProbeTest > "$RUNNER_TEMP/modern-jsword-private.log" 2>&1
-          rc=$?
-          set -e
-          export PROBE_RC="$rc"
+          # Retry only a missing-result infrastructure failure, never a failed assertion.
+          result=build/test-results/test/TEST-org.icfmp.research.CommentaryAndBibleJSwordProbeTest.xml
+          for attempt in 1 2; do
+            set +e
+            timeout 540 bash ./gradlew --no-daemon --console=plain test --tests org.icfmp.research.CommentaryAndBibleJSwordProbeTest > "$RUNNER_TEMP/modern-jsword-private-$attempt.log" 2>&1
+            rc=$?
+            set -e
+            export PROBE_RC="$rc"
+            export PROBE_ATTEMPT="$attempt"
+            test ! -f "$result" || break
+            test "$rc" != 0 || break
+            echo "No JUnit result on attempt $attempt (exit $rc)"
+          done
           python - <<'PY'
           import json,os,xml.etree.ElementTree as ET
           from pathlib import Path
           p=Path("build/test-results/test/TEST-org.icfmp.research.CommentaryAndBibleJSwordProbeTest.xml")
-          assert p.is_file() and 0<p.stat().st_size<=500000,"No bounded Java test evidence"
+          if not p.is_file() or not 0<p.stat().st_size<=500000:
+              log=Path(os.environ["RUNNER_TEMP"])/("modern-jsword-private-"+os.environ["PROBE_ATTEMPT"]+".log")
+              assert log.is_file() and log.stat().st_size<=4000000,"Missing or unbounded private Gradle log"
+              data=log.read_text(errors="replace")
+              patterns={"dependency_resolution":["Could not resolve","Could not download","Could not GET","Could not HEAD","Could not find"],"network":["Connection timed out","Read timed out","UnknownHostException","Connection reset","SSLHandshakeException","429 Too Many Requests","502 Bad Gateway","503 Service Unavailable"],"compile":["Compilation failed","compileTestJava FAILED","compileJava FAILED","cannot find symbol"],"gradle_daemon":["Gradle build daemon disappeared","Could not start Gradle daemon"],"test_task":["No tests found","Execution failed for task ':test'"],"java_runtime":["Unsupported class file major version","UnsupportedClassVersionError","OutOfMemoryError"]}
+              flags={kind:any(token in data for token in tokens) for kind,tokens in patterns.items()}
+              receipt={"schema_version":1,"module_id":"HMCCModern","version":"1.0.0","gradle_exit_code":int(os.environ["PROBE_RC"]),"attempt":int(os.environ["PROBE_ATTEMPT"]),"junit_available":False,"diagnostic_categories":flags,"android_gui_verified":False,"actual_note_click_verified":False}
+              (Path(os.environ["RUNNER_TEMP"])/"modern-jsword-receipt.json").write_text(json.dumps(receipt,indent=2)+"\n")
+              print("JSWORD_INFRASTRUCTURE_DIAGNOSTICS",json.dumps(receipt))
+              raise SystemExit("No bounded Java test evidence; see metadata diagnostic categories")
           t=ET.parse(p).getroot()
           counts={k:int(t.attrib.get(k,"0")) for k in ("tests","errors","failures","skipped")}
           assert t.tag=="testsuite"
