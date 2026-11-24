@@ -27,7 +27,7 @@ jobs:
           python scripts/fetch_reviewed_schema.py --directory "$RUNNER_TEMP/schema"
       - name: Authenticate actual public bytes and recompile exact modern OSIS
         env:
-          GH_${{ github.token }}: TOKEN
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           gh release download hmcc-modern-0.1.0 -p HMCCModern-0.1.0.zip -D "$RUNNER_TEMP"
@@ -53,7 +53,8 @@ jobs:
           (rebuild/"modules/comments/zcom/hmccmodern").mkdir(parents=True)
           shutil.copytree(t/"published/mods.d",rebuild/"mods.d")
           PY
-          osis2mod "$RUNNER_TEMP/rebuild/modules/comments/zcom/hmccmodern" sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml -z z -b 3 > "$RUNNER_TEMP/compile.log" 2>&1
+          echo 'Both public ZIPs and exact modern source verified'
+          osis2mod "$RUNNER_TEMP/rebuild/modules/comments/zcom/hmccmodern" sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml -z z -b 3 > "$RUNNER_TEMP/compile.log" 2>&1 || { tail -15 "$RUNNER_TEMP/compile.log"; exit 1; }
       - name: Full native corpus, linked addresses, chapter scopes, and BRNP diagnostic
         run: |
           set -euo pipefail
