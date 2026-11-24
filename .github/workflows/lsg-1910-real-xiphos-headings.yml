@@ -193,8 +193,21 @@ jobs:
                        SWORD_PATH=str(payload),GDK_BACKEND="x11",DISPLAY=":91",
                        NO_AT_BRIDGE="1",LC_ALL="C.UTF-8")
               try:
-                  native={key:run(["diatheke","-b","BRLSG1910","-f","plain","-k",ref],env)
-                          .decode("utf-8","replace") for key,ref,title in samples}
+                  # Keep the exact first-verse witness and independently
+                  # sample the whole native chapter for short initial verses.
+                  # Genesis 1:1, Isaiah 2:1, Matthew 1:1 and Mark 1:1
+                  # are legitimately too short for a generic >=8-word
+                  # first-verse match after SWORD/diatheke navigation labels.
+                  native={
+                      key:{
+                          "first":run(["diatheke","-b","BRLSG1910","-f","plain",
+                                       "-k",ref],env).decode("utf-8","replace"),
+                          "chapter":run(["diatheke","-b","BRLSG1910","-f","plain",
+                                         "-k",ref.split(":")[0]],env)
+                                    .decode("utf-8","replace"),
+                      }
+                      for key,ref,title in samples
+                  }
                   disp=subprocess.Popen(["Xvfb",":91","-screen","0","1280x800x24","-nolisten","tcp"],
                                         env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
                                         start_new_session=True)
@@ -220,6 +233,8 @@ jobs:
                               "actual_copy_attempts":0,"heading_occurrences":0,
                               "exact_standalone_heading_lines":0,
                               "longest_contiguous_native_word_run":0,
+                              "native_first_verse_word_run":0,
+                              "native_chapter_word_run":0,
                               "successful_navigation_form":None,
                               "attempted_navigation_forms":[]}
                       for navigate in (reference,reference.split(":")[0]):
@@ -239,12 +254,18 @@ jobs:
                                         for i in range(len(text_words)-len(title_words)+1))
                               standalone=sum(tokenize(line)==title_words
                                              for line in selected_text.splitlines())
-                              overlap=longest_native_prose_run(selected_text,native[key])
+                              first_overlap=longest_native_prose_run(
+                                  selected_text,native[key]["first"])
+                              chapter_overlap=longest_native_prose_run(
+                                  selected_text,native[key]["chapter"])
+                              overlap=max(first_overlap,chapter_overlap)
                               record["actual_copy_attempts"]+=1
                               record["clipboard_bytes"]=len(selected)
                               record["heading_occurrences"]=count
                               record["exact_standalone_heading_lines"]=standalone
                               record["longest_contiguous_native_word_run"]=overlap
+                              record["native_first_verse_word_run"]=first_overlap
+                              record["native_chapter_word_run"]=chapter_overlap
                               # A title line must be unique. A repeated phrase
                               # elsewhere in Romans 2 prose is not a duplicate title.
                               record["heading_once"]=(standalone==1)
