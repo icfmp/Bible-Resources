@@ -75,7 +75,7 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         self.assertEqual(report["finding_codes"]["UNREVIEWED_ELEMENT"], 1)
         self.assertEqual(report["unreviewed_elements"]["invented"], 1)
         self.assertEqual(report["finding_examples_by_code"]["UNREVIEWED_ELEMENT"]["element"], "invented")
-        self.assertEqual(report["profile_version"], "0.2-draft")
+        self.assertEqual(report["profile_version"], "0.3-draft")
         self.assertIn("<invented>word</invented>", self.path.read_text(encoding="utf-8"))
 
     def test_commentary_missing_reference_is_blocked(self):
@@ -354,6 +354,85 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         before = self.path.read_bytes()
         check(self.path, "bible")
         self.assertEqual(before, self.path.read_bytes())
+
+
+
+    def test_paired_commentary_crosses_paragraphs_and_poetry(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1" sID="ch"/>'
+            '<p>Original heading<verse osisID="Gen.1.1 Gen.1.2" sID="a"/>'
+            'First paragraph.</p><lg><l>Original poetry<verse eID="a"/></l></lg>'
+            '<chapter eID="ch"/>'), "commentary")
+        self.assertEqual(report["finding_count"], 0)
+        self.assertEqual(report["commentary_representation"], "paired_verse_milestones")
+        self.assertEqual(report["paired_commentary_entry_count"], 1)
+        self.assertEqual(report["paired_commentary_member_count"], 2)
+
+    def test_paired_commentary_under_chapter_container(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1"><p><verse osisID="Gen.1.1" sID="v"/>'
+            'One<verse eID="v"/></p></chapter>'), "commentary")
+        self.assertEqual(report["finding_count"], 0)
+
+    def test_paired_commentary_strict_negative_cases(self):
+        cases = [
+            ('<verse osisID="Gen.1.1 Gen.1.2" sID="a"/>A<verse eID="a"/>'
+             '<verse osisID="Gen.1.2 Gen.1.3" sID="b"/>B<verse eID="b"/>',
+             "COMMENTARY_MILESTONE_MEMBER_ID"),
+            ('<verse osisID="Gen.1.1" sID="a"/>A<verse eID="a"/>'
+             '<verse osisID="Gen.1.2" sID="a"/>B<verse eID="a"/>',
+             "COMMENTARY_MILESTONE_PAIR_ID"),
+            ('<verse osisID="Gen.1.1" sID="a"/>A'
+             '<verse osisID="Gen.1.2" sID="b"/>B<verse eID="b"/><verse eID="a"/>',
+             "COMMENTARY_MILESTONE_OVERLAP"),
+            ('<verse osisID="Gen.1.1" sID="a"/>A<verse eID="b"/>',
+             "COMMENTARY_MILESTONE_PAIR"),
+            ('<verse osisID="Gen.1.1" sID="a"/>A',
+             "COMMENTARY_MILESTONE_UNCLOSED"),
+            ('<verse osisID="Exod.1.1" sID="a"/>A<verse eID="a"/>',
+             "COMMENTARY_MILESTONE_SCOPE"),
+            ('<verse osisID="Gen.2.1" sID="a"/>A<verse eID="a"/>',
+             "COMMENTARY_MILESTONE_SCOPE"),
+            ('<verse osisID="Gen.1.0" sID="a"/>A<verse eID="a"/>',
+             "COMMENTARY_MILESTONE_MEMBER_ID"),
+            ('<verse osisID="Gen.1.3 Gen.1.2" sID="a"/>A<verse eID="a"/>',
+             "COMMENTARY_MILESTONE_MEMBER_ORDER"),
+            ('<verse osisID="Gen.1.1">A</verse>',
+             "COMMENTARY_MILESTONE_FORM"),
+            ('<verse osisID="Gen.1.1" sID="a"/>A<verse eID="a"/>'
+             '<div annotateType="commentary" annotateRef="Gen.1.2">B</div>',
+             "COMMENTARY_MIXED_REPRESENTATIONS"),
+            ('<verse osisID="Gen.1.1" sID="a">A</verse><verse eID="a"/>',
+             "COMMENTARY_MILESTONE_NONEMPTY_MARKER"),
+        ]
+        for body, expected in cases:
+            with self.subTest(expected=expected):
+                report = self.inspect(document(
+                    '<chapter osisID="Gen.1" sID="ch"/><p>'+body+
+                    '</p><chapter eID="ch"/>'), "commentary")
+                self.assertIn(expected, report["finding_codes"])
+
+    def test_paired_commentary_cannot_cross_chapter_boundary(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1" sID="a"/><p>'
+            '<verse osisID="Gen.1.1" sID="v"/>One</p><chapter eID="a"/>'
+            '<chapter osisID="Gen.2" sID="b"/><p>Two<verse eID="v"/></p>'
+            '<chapter eID="b"/>'), "commentary")
+        self.assertIn("COMMENTARY_MILESTONE_CHAPTER_BOUNDARY", report["finding_codes"])
+
+    def test_paired_commentary_requires_chapter_scope(self):
+        report = self.inspect(document(
+            '<p><verse osisID="Gen.1.1" sID="v"/>One<verse eID="v"/></p>'),
+            "commentary")
+        self.assertIn("COMMENTARY_MILESTONE_SCOPE", report["finding_codes"])
+
+    def test_paired_commentary_does_not_waive_other_diagnostics(self):
+        report = self.inspect(document(
+            '<chapter osisID="Gen.1" sID="ch"/><p>'
+            '<verse osisID="Gen.1.1" sID="v"/>'
+            '<reference osisRef=" Gen.1.2">Link</reference>'
+            '<verse eID="v"/></p><chapter eID="ch"/>'), "commentary")
+        self.assertEqual(report["finding_codes"], {"REFERENCE_TARGET_WHITESPACE": 1})
 
 
 if __name__ == "__main__":
