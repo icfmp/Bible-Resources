@@ -28,7 +28,10 @@ jobs:
           from approved_osis_sword_candidate import approved_source_for
           BOOK=re.compile(r'[A-Z0-9]{3}\Z')
           LABEL=re.compile(r'[0-9]+[a-z]?(?:-[0-9]+[a-z]?)?\Z')
-          MARKER=re.compile(r'\\(\+?[a-z][a-z0-9-]*)(\*)?(?=\s|\\|$)|\\\*')
+          MARKER=re.compile(r'\\(\+?[a-z][a-z0-9-]*)(\*|(?=\s|\\|$))|\\\*')
+          # Closing markers may be immediately followed by punctuation or text.
+          # This is valid USFM, not an unclosed note or a new verse in a note.
+          assert [(m[1],m[2]) for m in MARKER.finditer(r'\f + \ft note\f*, text \v 2')] == [('f',''),('ft',''),('f','*'),('v','')]
           NOTE={'f','fe','ef','x','ex'}
           def require(condition,reason):
               if not condition: raise ValueError(reason)
@@ -56,7 +59,7 @@ jobs:
                               notes.pop()
                           else: notes.append(kind)
                       if kind not in {'id','c','v'} or m[2]:continue
-                      require(not notes,'Key marker nested inside note')
+                      require(not notes,'Key marker nested inside note: '+str(book)+' chapter '+str(chapter)+' marker '+kind+' open note types '+','.join(notes))
                       value=word_after(text,m.end())
                       if kind=='id':
                           require(book is None and BOOK.fullmatch(value),'Invalid or duplicate USFM book marker')
