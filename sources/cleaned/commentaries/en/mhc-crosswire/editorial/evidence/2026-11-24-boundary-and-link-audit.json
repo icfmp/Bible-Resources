@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45442479885",
+  "tested_commit": "b91e1fd027fa263815f7265b4b30accc411f1a37",
+  "results": {
+    "MHC_EXACT_TRIM": {
+      "all_other_native_markup_and_text_exact": true,
+      "candidate_native_sha256": "2d8663f64ef554c5805a2bfb364b24a887c98d08aaac3812c6b9b5fd0f562e68",
+      "distinct_changed_body_pairs": 10,
+      "distinct_reviewed_reference_mappings": 10,
+      "key_sets_equal": true,
+      "link_topology_equal": true,
+      "native_changed_entries": 88,
+      "opaque_top_equal": true,
+      "previous_native_sha256": "ea20737b3612cb183921c48beca96a728317dcbb5b4e5ff142308b6d974169b4",
+      "published": false
+    },
+    "MHC_BOOK_BOUNDARIES": [
+      {
+        "classification": {
+          "class": "native_suffix_matches_authored_closing_without_whitespace",
+          "compiled_trailing_nonspace_codepoints": 14,
+          "matched_source_word_run_starts_at_native_word": 1,
+          "native_trailing_sha256": "37f34ee73b2f5565c91dad40124cfb84c72d7fdf6f3ca65f661fdeca7e3f1237",
+          "original_book_closing_sha256": "dbb3d76b7c25a9e6e7427d73791ad2a439c6debebc56f4b86c5d2f28fd61734f",
+          "original_closing_visible_codepoints": 14,
+          "original_group_trailing_nonspace_codepoints": 4,
+          "source_word_or_commentary_prose_exposed": false
+        },
+        "full_source_group_plus_closing_contiguous_in_native_ignoring_whitespace": true,
+        "full_source_group_plus_closing_nonwhitespace_equals_native": true,
+        "original_and_cleaned_closing_text_exact": true,
+        "original_and_cleaned_group_text_exact": true,
+        "scope": "Deut.34.9-12"
+      },
+      {
+        "classification": {
+          "class": "native_suffix_matches_authored_closing_without_whitespace",
+          "compiled_trailing_nonspace_codepoints": 5,
+          "matched_source_word_run_starts_at_native_word": 1,
+          "native_trailing_sha256": "125498eb83ff8a4673d23f78bd5e7b8c805ab104ffe45c2f6014903b85c262ed",
+          "original_book_closing_sha256": "6a3cf5192354f71615ac51034b3e97c20eda99643fcaf5bbe6d41ad59bd12167",
+          "original_closing_visible_codepoints": 3,
+          "original_group_trailing_nonspace_codepoints": 5,
+          "source_word_or_commentary_prose_exposed": false
+        },
+        "full_source_group_plus_closing_contiguous_in_native_ignoring_whitespace": true,
+        "full_source_group_plus_closing_nonwhitespace_equals_native": true,
+        "original_and_cleaned_closing_text_exact": true,
+        "original_and_cleaned_group_text_exact": true,
+        "scope": "Esth.10.1-3"
+      },
+      {
+        "classification": {
+          "class": "native_suffix_matches_authored_closing_without_whitespace",
+          "compiled_trailing_nonspace_codepoints": 11,
+          "matched_source_word_run_starts_at_native_word": 1,
+          "native_trailing_sha256": "124d14ecca701c1febe4cb3af26e9b0fc29f3fa359d9b96b17c03a7bc2a773e0",
+          "original_book_closing_sha256": "d31a928152f573fe9de4ce452e5b73fb47be2f9bb868061de8f71cd31cbf77ad",
+          "original_closing_visible_codepoints": 11,
+          "original_group_trailing_nonspace_codepoints": 4,
+          "source_word_or_commentary_prose_exposed": false
+        },
+        "full_source_group_plus_closing_contiguous_in_native_ignoring_whitespace": true,
+        "full_source_group_plus_closing_nonwhitespace_equals_native": true,
+        "original_and_cleaned_closing_text_exact": true,
+        "original_and_cleaned_group_text_exact": true,
+        "scope": "Song.8.13-14"
+      },
+      {
+        "classification": {
+          "class": "native_suffix_matches_authored_closing_without_whitespace",
+          "compiled_trailing_nonspace_codepoints": 12,
+          "matched_source_word_run_starts_at_native_word": 1,
+          "native_trailing_sha256": "9e7914ec4af9179c2bbc810d26878139e557717a65b25b74f91c207ca7da64ec",
+          "original_book_closing_sha256": "d31a928152f573fe9de4ce452e5b73fb47be2f9bb868061de8f71cd31cbf77ad",
+          "original_closing_visible_codepoints": 11,
+          "original_group_trailing_nonspace_codepoints": 5,
+          "source_word_or_commentary_prose_exposed": false
+        },
+        "full_source_group_plus_closing_contiguous_in_native_ignoring_whitespace": true,
+        "full_source_group_plus_closing_nonwhitespace_equals_native": true,
+        "original_and_cleaned_closing_text_exact": true,
+        "original_and_cleaned_group_text_exact": true,
+        "scope": "Mal.4.4-6"
+      },
+      {
+        "classification": {
+          "class": "native_suffix_matches_authored_closing_without_whitespace",
+          "compiled_trailing_nonspace_codepoints": 14,
+          "matched_source_word_run_starts_at_native_word": 1,
+          "native_trailing_sha256": "effbac20cbc15d38bc6bfd03fb41e75eeb689f01abea18974326ae05597c7da0",
+          "original_book_closing_sha256": "dbb3d76b7c25a9e6e7427d73791ad2a439c6debebc56f4b86c5d2f28fd61734f",
+          "original_closing_visible_codepoints": 14,
+          "original_group_trailing_nonspace_codepoints": 4,
+          "source_word_or_commentary_prose_exposed": false
+        },
+        "full_source_group_plus_closing_contiguous_in_native_ignoring_whitespace": true,
+        "full_source_group_plus_closing_nonwhitespace_equals_native": true,
+        "original_and_cleaned_closing_text_exact": true,
+        "original_and_cleaned_group_text_exact": true,
+        "scope": "John.21.20-25"
+      },
+      {
+        "classification": {
+          "class": "native_suffix_matches_authored_closing_without_whitespace",
+          "compiled_trailing_nonspace_codepoints": 4,
+          "matched_source_word_run_starts_at_native_word": 1,
+          "native_trailing_sha256": "64bd6333a1819c3642cdf93a22dbc982bb5d25d54289d47a940dc3a13d6e022e",
+          "original_book_closing_sha256": "6a3cf5192354f71615ac51034b3e97c20eda99643fcaf5bbe6d41ad59bd12167",
+          "original_closing_visible_codepoints": 3,
+          "original_group_trailing_nonspace_codepoints": 4,
+          "source_word_or_commentary_prose_exposed": false
+        },
+        "full_source_group_plus_closing_contiguous_in_native_ignoring_whitespace": true,
+        "full_source_group_plus_closing_nonwhitespace_equals_native": true,
+        "original_and_cleaned_closing_text_exact": true,
+        "original_and_cleaned_group_text_exact": true,
+        "scope": "Rev.22.20-21"
+      }
+    ],
+    "MHC_ANCHOR_INTRO": [
+      {
+        "first_numbered_section": "Josh.18.2",
+        "intro_text_present_exact_whitespace_fold": true,
+        "native_first_verse_occupied": false,
+        "original_intro_text_equal": true,
+        "reference": "Josh.18.1",
+        "source_intro_sha256": "5756e2bc84816204979341a045260e46260dfaac24fb871df7373c6623886850",
+        "source_intro_words": 122
+      },
+      {
+        "first_numbered_section": "1Sam.25.2",
+        "intro_text_present_exact_whitespace_fold": true,
+        "native_first_verse_occupied": false,
+        "original_intro_text_equal": true,
+        "reference": "1Sam.25.1",
+        "source_intro_sha256": "67c0cc61be3332de3f69077a8b7eb23b4dd9c4b3b4d37bf8d5eda361755af3e5",
+        "source_intro_words": 177
+      },
+      {
+        "first_numbered_section": "2Sam.22.2",
+        "intro_text_present_exact_whitespace_fold": true,
+        "native_first_verse_occupied": false,
+        "original_intro_text_equal": true,
+        "reference": "2Sam.22.1",
+        "source_intro_sha256": "ca4056e8862139187ac3fb9a0ad9bc15a5c44286fb8ecc51aa185d8643b81ceb",
+        "source_intro_words": 362
+      }
+    ],
+    "MHC_CCEL_ANCHORS": [
+      {
+        "ccel_20word_blocks_total": 40,
+        "ccel_full_word_stream_in_cleaned_intro": false,
+        "ccel_full_word_stream_in_original_intro": false,
+        "ccel_intro_20word_blocks_present": 0,
+        "ccel_nonwhitespace_chars_in_cleaned_intro": false,
+        "matching_numbered_source_sections": [],
+        "reference": "Josh.18.1",
+        "source_witness_line": 9074,
+        "source_witness_sha256": "b26a66b634d34d368ce1f737244cac4ba583f3786afabfde47be1a45f1aa8b0a",
+        "source_witness_words": 781
+      },
+      {
+        "ccel_20word_blocks_total": 33,
+        "ccel_full_word_stream_in_cleaned_intro": false,
+        "ccel_full_word_stream_in_original_intro": false,
+        "ccel_intro_20word_blocks_present": 0,
+        "ccel_nonwhitespace_chars_in_cleaned_intro": false,
+        "matching_numbered_source_sections": [],
+        "reference": "1Sam.25.1",
+        "source_witness_line": 40795,
+        "source_witness_sha256": "21d50ea6a813d3c4bcbc65fcc1360722eff41a1f45400aec9cae97b02f26cd33",
+        "source_witness_words": 642
+      },
+      {
+        "ccel_20word_blocks_total": 24,
+        "ccel_full_word_stream_in_cleaned_intro": false,
+        "ccel_full_word_stream_in_original_intro": false,
+        "ccel_intro_20word_blocks_present": 0,
+        "ccel_nonwhitespace_chars_in_cleaned_intro": false,
+        "matching_numbered_source_sections": [],
+        "reference": "2Sam.22.1",
+        "source_witness_line": 55281,
+        "source_witness_sha256": "fc1be3588f82069128ca4448587d46d198fe71ccaa4f45c54da508021f9903d9",
+        "source_witness_words": 469
+      }
+    ],
+    "MHC_SCOPE_GEOMETRY": {
+      "attributes": {
+        "end:eID": 4255,
+        "start:n": 4255,
+        "start:osisID": 4255,
+        "start:sID": 4255
+      },
+      "groups": 4255,
+      "shapes": [
+        {
+          "count": 4067,
+          "end_last_child": false,
+          "end_parent": "p",
+          "end_tail_blank": true,
+          "example": "Gen.1.1-2",
+          "same_parent": false,
+          "start_first_child": false,
+          "start_parent": "p",
+          "start_parent_text_blank": false
+        },
+        {
+          "count": 50,
+          "end_last_child": false,
+          "end_parent": "p",
+          "end_tail_blank": true,
+          "example": "Gen.19.24-25",
+          "same_parent": false,
+          "start_first_child": false,
+          "start_parent": "p",
+          "start_parent_text_blank": true
+        },
+        {
+          "count": 49,
+          "end_last_child": true,
+          "end_parent": "p",
+          "end_tail_blank": true,
+          "example": "Exod.14.15-20",
+          "same_parent": false,
+          "start_first_child": false,
+          "start_parent": "p",
+          "start_parent_text_blank": false
+        },
+        {
+          "count": 60,
+          "end_last_child": false,
+          "end_parent": "p",
+          "end_tail_blank": true,
+          "example": "Exod.14.21-31",
+          "same_parent": false,
+          "start_first_child": false,
+          "start_parent": "div",
+          "start_parent_text_blank": true
+        },
+        {
+          "count": 7,
+          "end_last_child": false,
+          "end_parent": "l",
+          "end_tail_blank": true,
+          "example": "Job.3.11-19",
+          "same_parent": false,
+          "start_first_child": false,
+          "start_parent": "p",
+          "start_parent_text_blank": false
+        },
+        {
+          "count": 8,
+          "end_last_child": false,
+          "end_parent": "p",
+          "end_tail_blank": true,
+          "example": "Job.3.20-26",
+          "same_parent": false,
+          "start_first_child": false,
+          "start_parent": "l",
+          "start_parent_text_blank": false
+        },
+        {
+          "count": 2,
+          "end_last_child": true,
+          "end_parent": "l",
+          "end_tail_blank": true,
+          "example": "Ps.98.4-9",
+          "same_parent": false,
+          "start_first_child": false,
+          "start_parent": "p",
+          "start_parent_text_blank": false
+        },
+        {
+          "count": 5,
+          "end_last_child": false,
+          "end_parent": "p",
+          "end_tail_blank": true,
+          "example": "Prov.10.1",
+          "same_parent": false,
+          "start_first_child": true,
+          "start_parent": "p",
+          "start_parent_text_blank": false
+        },
+        {
+          "count": 5,
+          "end_last_child": true,
+          "end_parent": "p",
+          "end_tail_blank": true,
+          "example": "Prov.22.17-21",
+          "same_parent": false,
+          "start_first_child": false,
+          "start_parent": "div",
+          "start_parent_text_blank": true
+        },
+        {
+          "count": 1,
+          "end_last_child": false,
+          "end_parent": "l",
+          "end_tail_blank": true,
+          "example": "Prov.28.1",
+          "same_parent": false,
+          "start_first_child": false,
+          "start_parent": "div",
+          "start_parent_text_blank": true
+        },
+        {
+          "count": 1,
+          "end_last_child": false,
+          "end_parent": "l",
+          "end_tail_blank": true,
+          "example": "Prov.28.2",
+          "same_parent": false,
+          "start_first_child": false,
+          "start_parent": "l",
+          "start_parent_text_blank": false
+        }
+      ]
+    },
+    "MHC_ANNOTATION_TRIAL": {
+      "candidate_sha256": "3a23be098ba40bea1f75513fc002a5b9e4d6237f3c71e00040da6bc4ce371716",
+      "guard_code": "OSIS_SCHEMA_INVALID",
+      "guard_line": 149,
+      "official_schema_blocked": true,
+      "published": false,
+      "reversible": true,
+      "visible_text_exact": true
+    }
+  },
+  "published_changes": false
+}

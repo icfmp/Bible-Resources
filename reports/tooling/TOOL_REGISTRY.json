@@ -425,7 +425,7 @@
       "owner": "Bible Resources maintainers",
       "path": "scripts/check_brnp.py",
       "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
-      "purpose_first_line": "Read-only structural BRNP v0.1 pilot; not an OSIS XSD or release gate.",
+      "purpose_first_line": "Read-only structural BRNP draft pilot; not an OSIS XSD or release gate.",
       "python_imports": [
         "__future__",
         "argparse",
@@ -436,11 +436,12 @@
         "json",
         "lxml",
         "pathlib",
+        "re",
         "sys"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "cc88907343be180603ebf51f7df6231bb419fc88dc3d7c4f8680908ca1966e60",
+      "sha256_at_inventory": "5ba7a08fedea05d5c86aa716118f92a11bfd5ef2eb59c3c4f6f2a66b8c3ce608",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -1686,13 +1687,14 @@
       "python_imports": [
         "hashlib",
         "json",
+        "lxml",
         "pathlib",
         "re",
         "reviewed_compiled_commentary_rebuild"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "4bddd0e3d5040b9aa2d01aa038f1d4cf7ca83613c499cb106f319972c2bf06f6",
+      "sha256_at_inventory": "d5fd44e03656f22b055b5f3a4656856a77276719320580f2efa7135b54793a4d",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",

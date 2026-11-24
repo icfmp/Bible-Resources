@@ -1,0 +1,814 @@
+{
+  "schema_version": 1,
+  "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45444013587",
+  "tested_commit": "41c29cce1cd6ad803d8e7c2466f5f29704ff3565",
+  "anchor_alignment": [
+    {
+      "ccel_marker_line": 9074,
+      "ccel_vs_entire_chapter": {
+        "book_12word_windows_matched": 770,
+        "longest_exact_word_run": 6,
+        "missing_or_replaced_word_runs": [
+          {
+            "count": 50,
+            "start_word": 1
+          },
+          {
+            "count": 2,
+            "start_word": 53
+          },
+          {
+            "count": 7,
+            "start_word": 63
+          },
+          {
+            "count": 1,
+            "start_word": 71
+          },
+          {
+            "count": 5,
+            "start_word": 73
+          },
+          {
+            "count": 1,
+            "start_word": 79
+          },
+          {
+            "count": 6,
+            "start_word": 81
+          },
+          {
+            "count": 64,
+            "start_word": 88
+          },
+          {
+            "count": 1,
+            "start_word": 155
+          },
+          {
+            "count": 4,
+            "start_word": 158
+          },
+          {
+            "count": 1,
+            "start_word": 163
+          },
+          {
+            "count": 1,
+            "start_word": 169
+          },
+          {
+            "count": 2,
+            "start_word": 172
+          },
+          {
+            "count": 2,
+            "start_word": 176
+          },
+          {
+            "count": 6,
+            "start_word": 179
+          },
+          {
+            "count": 8,
+            "start_word": 187
+          },
+          {
+            "count": 8,
+            "start_word": 196
+          },
+          {
+            "count": 19,
+            "start_word": 205
+          },
+          {
+            "count": 6,
+            "start_word": 228
+          },
+          {
+            "count": 3,
+            "start_word": 235
+          },
+          {
+            "count": 9,
+            "start_word": 240
+          },
+          {
+            "count": 15,
+            "start_word": 250
+          },
+          {
+            "count": 3,
+            "start_word": 266
+          },
+          {
+            "count": 2,
+            "start_word": 271
+          },
+          {
+            "count": 1,
+            "start_word": 274
+          }
+        ],
+        "ordered_words_matched": 70,
+        "sliding_12word_windows_matched": 0,
+        "sliding_12word_windows_total": 770,
+        "source_tokens": 781,
+        "target_tokens": 2541
+      },
+      "ccel_vs_first_native": {
+        "book_12word_windows_matched": 770,
+        "longest_exact_word_run": 781,
+        "missing_or_replaced_word_runs": [],
+        "ordered_words_matched": 781,
+        "sliding_12word_windows_matched": 770,
+        "sliding_12word_windows_total": 770,
+        "source_tokens": 781,
+        "target_tokens": 2239
+      },
+      "ccel_vs_first_source": {
+        "book_12word_windows_matched": 770,
+        "longest_exact_word_run": 4,
+        "missing_or_replaced_word_runs": [
+          {
+            "count": 3,
+            "start_word": 2
+          },
+          {
+            "count": 1,
+            "start_word": 8
+          },
+          {
+            "count": 4,
+            "start_word": 10
+          },
+          {
+            "count": 2,
+            "start_word": 18
+          },
+          {
+            "count": 2,
+            "start_word": 23
+          },
+          {
+            "count": 1,
+            "start_word": 26
+          },
+          {
+            "count": 2,
+            "start_word": 29
+          },
+          {
+            "count": 1,
+            "start_word": 33
+          },
+          {
+            "count": 2,
+            "start_word": 35
+          },
+          {
+            "count": 1,
+            "start_word": 40
+          },
+          {
+            "count": 1,
+            "start_word": 43
+          },
+          {
+            "count": 1,
+            "start_word": 46
+          },
+          {
+            "count": 1,
+            "start_word": 50
+          },
+          {
+            "count": 1,
+            "start_word": 52
+          },
+          {
+            "count": 2,
+            "start_word": 56
+          },
+          {
+            "count": 2,
+            "start_word": 63
+          },
+          {
+            "count": 3,
+            "start_word": 66
+          },
+          {
+            "count": 8,
+            "start_word": 71
+          },
+          {
+            "count": 7,
+            "start_word": 81
+          },
+          {
+            "count": 3,
+            "start_word": 90
+          },
+          {
+            "count": 2,
+            "start_word": 94
+          },
+          {
+            "count": 2,
+            "start_word": 97
+          },
+          {
+            "count": 1,
+            "start_word": 100
+          },
+          {
+            "count": 1,
+            "start_word": 103
+          },
+          {
+            "count": 2,
+            "start_word": 105
+          }
+        ],
+        "ordered_words_matched": 78,
+        "sliding_12word_windows_matched": 0,
+        "sliding_12word_windows_total": 770,
+        "source_tokens": 781,
+        "target_tokens": 1458
+      },
+      "ccel_witness_sha256": "b26a66b634d34d368ce1f737244cac4ba583f3786afabfde47be1a45f1aa8b0a",
+      "key": "Josh.18.1",
+      "master": "Josh.18.2",
+      "native_contains_complete_first_source": true,
+      "native_intro_matches_source": true,
+      "original_scope_ids": [
+        "Josh.18.2",
+        "Josh.18.3",
+        "Josh.18.4",
+        "Josh.18.5",
+        "Josh.18.6",
+        "Josh.18.7",
+        "Josh.18.8",
+        "Josh.18.9",
+        "Josh.18.10"
+      ],
+      "original_scope_label": "2-10",
+      "source_first_text_unchanged_from_original": true,
+      "source_first_verse_occupied": false
+    },
+    {
+      "ccel_marker_line": 40795,
+      "ccel_vs_entire_chapter": {
+        "book_12word_windows_matched": 631,
+        "longest_exact_word_run": 4,
+        "missing_or_replaced_word_runs": [
+          {
+            "count": 1,
+            "start_word": 8
+          },
+          {
+            "count": 2,
+            "start_word": 10
+          },
+          {
+            "count": 1,
+            "start_word": 15
+          },
+          {
+            "count": 2,
+            "start_word": 17
+          },
+          {
+            "count": 2,
+            "start_word": 20
+          },
+          {
+            "count": 2,
+            "start_word": 23
+          },
+          {
+            "count": 3,
+            "start_word": 27
+          },
+          {
+            "count": 2,
+            "start_word": 31
+          },
+          {
+            "count": 3,
+            "start_word": 34
+          },
+          {
+            "count": 1,
+            "start_word": 38
+          },
+          {
+            "count": 4,
+            "start_word": 40
+          },
+          {
+            "count": 1,
+            "start_word": 48
+          },
+          {
+            "count": 1,
+            "start_word": 50
+          },
+          {
+            "count": 3,
+            "start_word": 52
+          },
+          {
+            "count": 2,
+            "start_word": 59
+          },
+          {
+            "count": 7,
+            "start_word": 63
+          },
+          {
+            "count": 1,
+            "start_word": 72
+          },
+          {
+            "count": 2,
+            "start_word": 74
+          },
+          {
+            "count": 5,
+            "start_word": 78
+          },
+          {
+            "count": 1,
+            "start_word": 84
+          },
+          {
+            "count": 1,
+            "start_word": 87
+          },
+          {
+            "count": 2,
+            "start_word": 90
+          },
+          {
+            "count": 15,
+            "start_word": 93
+          },
+          {
+            "count": 17,
+            "start_word": 110
+          },
+          {
+            "count": 1,
+            "start_word": 133
+          }
+        ],
+        "ordered_words_matched": 178,
+        "sliding_12word_windows_matched": 0,
+        "sliding_12word_windows_total": 631,
+        "source_tokens": 642,
+        "target_tokens": 9107
+      },
+      "ccel_vs_first_native": {
+        "book_12word_windows_matched": 631,
+        "longest_exact_word_run": 642,
+        "missing_or_replaced_word_runs": [],
+        "ordered_words_matched": 642,
+        "sliding_12word_windows_matched": 631,
+        "sliding_12word_windows_total": 631,
+        "source_tokens": 642,
+        "target_tokens": 3079
+      },
+      "ccel_vs_first_source": {
+        "book_12word_windows_matched": 631,
+        "longest_exact_word_run": 4,
+        "missing_or_replaced_word_runs": [
+          {
+            "count": 4,
+            "start_word": 1
+          },
+          {
+            "count": 1,
+            "start_word": 8
+          },
+          {
+            "count": 2,
+            "start_word": 10
+          },
+          {
+            "count": 1,
+            "start_word": 15
+          },
+          {
+            "count": 2,
+            "start_word": 17
+          },
+          {
+            "count": 2,
+            "start_word": 20
+          },
+          {
+            "count": 2,
+            "start_word": 23
+          },
+          {
+            "count": 3,
+            "start_word": 27
+          },
+          {
+            "count": 2,
+            "start_word": 31
+          },
+          {
+            "count": 3,
+            "start_word": 34
+          },
+          {
+            "count": 1,
+            "start_word": 38
+          },
+          {
+            "count": 4,
+            "start_word": 40
+          },
+          {
+            "count": 1,
+            "start_word": 48
+          },
+          {
+            "count": 1,
+            "start_word": 50
+          },
+          {
+            "count": 3,
+            "start_word": 52
+          },
+          {
+            "count": 2,
+            "start_word": 59
+          },
+          {
+            "count": 7,
+            "start_word": 63
+          },
+          {
+            "count": 1,
+            "start_word": 72
+          },
+          {
+            "count": 2,
+            "start_word": 74
+          },
+          {
+            "count": 5,
+            "start_word": 78
+          },
+          {
+            "count": 1,
+            "start_word": 84
+          },
+          {
+            "count": 1,
+            "start_word": 87
+          },
+          {
+            "count": 2,
+            "start_word": 90
+          },
+          {
+            "count": 15,
+            "start_word": 93
+          },
+          {
+            "count": 17,
+            "start_word": 110
+          }
+        ],
+        "ordered_words_matched": 90,
+        "sliding_12word_windows_matched": 0,
+        "sliding_12word_windows_total": 631,
+        "source_tokens": 642,
+        "target_tokens": 2437
+      },
+      "ccel_witness_sha256": "21d50ea6a813d3c4bcbc65fcc1360722eff41a1f45400aec9cae97b02f26cd33",
+      "key": "1Sam.25.1",
+      "master": "1Sam.25.2",
+      "native_contains_complete_first_source": true,
+      "native_intro_matches_source": true,
+      "original_scope_ids": [
+        "1Sam.25.2",
+        "1Sam.25.3",
+        "1Sam.25.4",
+        "1Sam.25.5",
+        "1Sam.25.6",
+        "1Sam.25.7",
+        "1Sam.25.8",
+        "1Sam.25.9",
+        "1Sam.25.10",
+        "1Sam.25.11"
+      ],
+      "original_scope_label": "2-11",
+      "source_first_text_unchanged_from_original": true,
+      "source_first_verse_occupied": false
+    },
+    {
+      "ccel_marker_line": 55281,
+      "ccel_vs_entire_chapter": {
+        "book_12word_windows_matched": 458,
+        "longest_exact_word_run": 5,
+        "missing_or_replaced_word_runs": [
+          {
+            "count": 4,
+            "start_word": 6
+          },
+          {
+            "count": 3,
+            "start_word": 11
+          },
+          {
+            "count": 4,
+            "start_word": 17
+          },
+          {
+            "count": 1,
+            "start_word": 23
+          },
+          {
+            "count": 3,
+            "start_word": 26
+          },
+          {
+            "count": 1,
+            "start_word": 38
+          },
+          {
+            "count": 1,
+            "start_word": 42
+          },
+          {
+            "count": 1,
+            "start_word": 45
+          },
+          {
+            "count": 4,
+            "start_word": 49
+          },
+          {
+            "count": 1,
+            "start_word": 54
+          },
+          {
+            "count": 5,
+            "start_word": 58
+          },
+          {
+            "count": 43,
+            "start_word": 66
+          },
+          {
+            "count": 8,
+            "start_word": 113
+          },
+          {
+            "count": 2,
+            "start_word": 123
+          },
+          {
+            "count": 1,
+            "start_word": 126
+          },
+          {
+            "count": 1,
+            "start_word": 128
+          },
+          {
+            "count": 37,
+            "start_word": 130
+          },
+          {
+            "count": 2,
+            "start_word": 172
+          },
+          {
+            "count": 12,
+            "start_word": 175
+          },
+          {
+            "count": 1,
+            "start_word": 188
+          },
+          {
+            "count": 2,
+            "start_word": 190
+          },
+          {
+            "count": 1,
+            "start_word": 195
+          },
+          {
+            "count": 3,
+            "start_word": 197
+          },
+          {
+            "count": 9,
+            "start_word": 201
+          },
+          {
+            "count": 3,
+            "start_word": 211
+          }
+        ],
+        "ordered_words_matched": 103,
+        "sliding_12word_windows_matched": 0,
+        "sliding_12word_windows_total": 458,
+        "source_tokens": 469,
+        "target_tokens": 4398
+      },
+      "ccel_vs_first_native": {
+        "book_12word_windows_matched": 458,
+        "longest_exact_word_run": 469,
+        "missing_or_replaced_word_runs": [],
+        "ordered_words_matched": 469,
+        "sliding_12word_windows_matched": 458,
+        "sliding_12word_windows_total": 458,
+        "source_tokens": 469,
+        "target_tokens": 4505
+      },
+      "ccel_vs_first_source": {
+        "book_12word_windows_matched": 458,
+        "longest_exact_word_run": 5,
+        "missing_or_replaced_word_runs": [
+          {
+            "count": 4,
+            "start_word": 6
+          },
+          {
+            "count": 3,
+            "start_word": 11
+          },
+          {
+            "count": 4,
+            "start_word": 17
+          },
+          {
+            "count": 1,
+            "start_word": 23
+          },
+          {
+            "count": 3,
+            "start_word": 26
+          },
+          {
+            "count": 1,
+            "start_word": 38
+          },
+          {
+            "count": 1,
+            "start_word": 42
+          },
+          {
+            "count": 1,
+            "start_word": 45
+          },
+          {
+            "count": 4,
+            "start_word": 49
+          },
+          {
+            "count": 1,
+            "start_word": 54
+          },
+          {
+            "count": 5,
+            "start_word": 58
+          },
+          {
+            "count": 43,
+            "start_word": 66
+          },
+          {
+            "count": 8,
+            "start_word": 113
+          },
+          {
+            "count": 2,
+            "start_word": 123
+          },
+          {
+            "count": 1,
+            "start_word": 126
+          },
+          {
+            "count": 1,
+            "start_word": 128
+          },
+          {
+            "count": 37,
+            "start_word": 130
+          },
+          {
+            "count": 2,
+            "start_word": 172
+          },
+          {
+            "count": 12,
+            "start_word": 175
+          },
+          {
+            "count": 1,
+            "start_word": 188
+          },
+          {
+            "count": 2,
+            "start_word": 190
+          },
+          {
+            "count": 1,
+            "start_word": 195
+          },
+          {
+            "count": 3,
+            "start_word": 197
+          },
+          {
+            "count": 9,
+            "start_word": 201
+          },
+          {
+            "count": 3,
+            "start_word": 211
+          }
+        ],
+        "ordered_words_matched": 103,
+        "sliding_12word_windows_matched": 0,
+        "sliding_12word_windows_total": 458,
+        "source_tokens": 469,
+        "target_tokens": 4036
+      },
+      "ccel_witness_sha256": "fc1be3588f82069128ca4448587d46d198fe71ccaa4f45c54da508021f9903d9",
+      "key": "2Sam.22.1",
+      "master": "2Sam.22.2",
+      "native_contains_complete_first_source": true,
+      "native_intro_matches_source": true,
+      "original_scope_ids": [
+        "2Sam.22.2",
+        "2Sam.22.3",
+        "2Sam.22.4",
+        "2Sam.22.5",
+        "2Sam.22.6",
+        "2Sam.22.7",
+        "2Sam.22.8",
+        "2Sam.22.9",
+        "2Sam.22.10",
+        "2Sam.22.11",
+        "2Sam.22.12",
+        "2Sam.22.13",
+        "2Sam.22.14",
+        "2Sam.22.15",
+        "2Sam.22.16",
+        "2Sam.22.17",
+        "2Sam.22.18",
+        "2Sam.22.19",
+        "2Sam.22.20",
+        "2Sam.22.21",
+        "2Sam.22.22",
+        "2Sam.22.23",
+        "2Sam.22.24",
+        "2Sam.22.25",
+        "2Sam.22.26",
+        "2Sam.22.27",
+        "2Sam.22.28",
+        "2Sam.22.29",
+        "2Sam.22.30",
+        "2Sam.22.31",
+        "2Sam.22.32",
+        "2Sam.22.33",
+        "2Sam.22.34",
+        "2Sam.22.35",
+        "2Sam.22.36",
+        "2Sam.22.37",
+        "2Sam.22.38",
+        "2Sam.22.39",
+        "2Sam.22.40",
+        "2Sam.22.41",
+        "2Sam.22.42",
+        "2Sam.22.43",
+        "2Sam.22.44",
+        "2Sam.22.45",
+        "2Sam.22.46",
+        "2Sam.22.47",
+        "2Sam.22.48",
+        "2Sam.22.49",
+        "2Sam.22.50",
+        "2Sam.22.51"
+      ],
+      "original_scope_label": "2-51",
+      "source_first_text_unchanged_from_original": true,
+      "source_first_verse_occupied": false
+    }
+  ],
+  "limitations": "All three source-witness alignments completed and receipt uploaded. Subsequent unrelated paragraph census failed on an XML comment node, not on any witness comparison. No source or module change.",
+  "artifact_id": 14945466874,
+  "artifact_sha256": "7c8ea54e5e740246f84b1e1e36d753865cd6ff3238809f3d52523b7a232f6ea1"
+}

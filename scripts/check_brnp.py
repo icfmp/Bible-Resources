@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only structural BRNP v0.1 pilot; not an OSIS XSD or release gate.
+"""Read-only structural BRNP draft pilot; not an OSIS XSD or release gate.
 
 No source rewriting, guessed reference mappings or published content output.
 Official schema and guard_osis/guard_commentary checks remain mandatory.
@@ -10,6 +10,7 @@ import argparse
 from collections import Counter
 from hashlib import sha256
 import json
+import re
 from pathlib import Path
 import sys
 
@@ -22,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 POLICY = ROOT / "config" / "osis-policy.json"
 NS = "{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 MAX_BYTES = 128 * 1024 * 1024
-VERSION = "0.2-draft"
+VERSION = "0.3-draft"
 # OSIS 2.1.1 constructs already encountered in independently XSD-valid
 # resources. Preserve structured tables/lists and historical source metadata.
 # This is not a supplier-specific allowlist or permission to drop content.
@@ -30,6 +31,106 @@ STANDARD_STRUCTURAL = frozenset({
     "cell", "date", "description", "identifier", "item", "list",
     "refSystem", "revisionDesc", "rights", "row", "table", "type",
 })
+
+
+
+def paired_commentary_scopes(root) -> tuple[int, int, list[dict]]:
+    """Check standard verse-delimited commentary without flattening prose.
+
+    Called only for a commentary containing verse elements. No supplier ID
+    or expected resource count participates. Actual XML scope, not the
+    printed label or arbitrary pairing ID, determines canonical ownership.
+    Separate native versification/reader proof is still required.
+    """
+    member_pattern = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*\Z")
+    chapter_pattern = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\Z")
+    errors = []
+    books = []
+    chapters = []
+    seen_members = set()
+    seen_pairs = set()
+    active = None
+    completed = 0
+
+    def fail(code, node):
+        errors.append({"code": code, "line": node.sourceline or 1})
+
+    for event, node in etree.iterwalk(root, events=("start", "end")):
+        if not isinstance(node.tag, str):
+            continue
+        tag = node.tag
+        if tag == NS + "div" and node.get("type") == "book":
+            if event == "start":
+                if node.get("sID") or node.get("eID") or books or active:
+                    fail("COMMENTARY_MILESTONE_BOOK_BOUNDARY", node)
+                books.append((node, node.get("osisID")))
+            else:
+                if active or chapters:
+                    fail("COMMENTARY_MILESTONE_BOOK_BOUNDARY", node)
+                if books:
+                    books.pop()
+        elif tag == NS + "chapter":
+            sid, eid, ident = node.get("sID"), node.get("eID"), node.get("osisID")
+            if event == "start":
+                if active:
+                    fail("COMMENTARY_MILESTONE_CHAPTER_BOUNDARY", node)
+                if eid:
+                    if not chapters or chapters[-1][0] != eid:
+                        fail("COMMENTARY_MILESTONE_CHAPTER_PAIR", node)
+                    else:
+                        chapters.pop()
+                else:
+                    if (chapters or len(books) != 1 or not ident
+                            or not chapter_pattern.fullmatch(ident)
+                            or ident.rsplit(".", 1)[0] != books[-1][1]):
+                        fail("COMMENTARY_MILESTONE_CHAPTER_SCOPE", node)
+                    chapters.append((sid, ident, node))
+            elif not sid and not eid:
+                if active:
+                    fail("COMMENTARY_MILESTONE_CHAPTER_BOUNDARY", node)
+                if not chapters or chapters[-1][2] is not node:
+                    fail("COMMENTARY_MILESTONE_CHAPTER_PAIR", node)
+                else:
+                    chapters.pop()
+        elif event == "start" and tag == NS + "verse":
+            sid, eid, ident = node.get("sID"), node.get("eID"), node.get("osisID")
+            if sid and not eid:
+                members = (ident or "").split()
+                valid = bool(members) and all(member_pattern.fullmatch(k) for k in members)
+                if (not valid or len(set(members)) != len(members)
+                        or seen_members.intersection(members)):
+                    fail("COMMENTARY_MILESTONE_MEMBER_ID", node)
+                if sid in seen_pairs:
+                    fail("COMMENTARY_MILESTONE_PAIR_ID", node)
+                if active is not None:
+                    fail("COMMENTARY_MILESTONE_OVERLAP", node)
+                if (len(books) != 1 or len(chapters) != 1 or not valid
+                        or any(k.rsplit(".", 1)[0] != chapters[-1][1]
+                               or k.split(".")[0] != books[-1][1] for k in members)):
+                    fail("COMMENTARY_MILESTONE_SCOPE", node)
+                if valid and [int(k.rsplit(".", 1)[1]) for k in members] != sorted(
+                        int(k.rsplit(".", 1)[1]) for k in members):
+                    fail("COMMENTARY_MILESTONE_MEMBER_ORDER", node)
+                if len(node) or (node.text or "").strip():
+                    fail("COMMENTARY_MILESTONE_NONEMPTY_MARKER", node)
+                seen_pairs.add(sid)
+                seen_members.update(members)
+                active = (sid, tuple(books), tuple(chapters))
+            elif eid and not sid and not ident:
+                if len(node) or (node.text or "").strip():
+                    fail("COMMENTARY_MILESTONE_NONEMPTY_MARKER", node)
+                if active is None or active[0] != eid:
+                    fail("COMMENTARY_MILESTONE_PAIR", node)
+                else:
+                    if active[1:] != (tuple(books), tuple(chapters)):
+                        fail("COMMENTARY_MILESTONE_SCOPE", node)
+                    completed += 1
+                    active = None
+            else:
+                fail("COMMENTARY_MILESTONE_FORM", node)
+    if active is not None:
+        errors.append({"code": "COMMENTARY_MILESTONE_UNCLOSED", "line": 1})
+    return completed, len(seen_members), errors
 
 
 def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
@@ -270,7 +371,16 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
                        "line": chapters_active[-1][1]})
     if kind == "bible" and not books_seen:
         errors.append({"code": "NO_BOOK_DIVISIONS"})
-    if kind == "commentary" and not annotations:
+    paired_entries = 0
+    paired_members = 0
+    representation = "annotated_divisions" if kind == "commentary" else "bible"
+    if kind == "commentary" and next(root.iter(NS + "verse"), None) is not None:
+        representation = "paired_verse_milestones"
+        paired_entries, paired_members, scope_errors = paired_commentary_scopes(root)
+        errors.extend(scope_errors)
+        if annotations:
+            errors.append({"code": "COMMENTARY_MIXED_REPRESENTATIONS"})
+    if kind == "commentary" and not annotations and not paired_entries:
         errors.append({"code": "NO_COMMENTARY_ENTRIES"})
     if kind == "bible" and not verse_ids:
         errors.append({"code": "NO_NUMBERED_VERSES"})
@@ -288,7 +398,12 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
                    "diagnostic_only_schema_not_checked"),
         "brnp_conformance_certified": False,
         "element_counts": dict(sorted(counts.items())),
-        "commentary_entry_count": annotations, "verse_identifier_count": len(verse_ids),
+        "commentary_entry_count": annotations + paired_entries,
+        "commentary_representation": representation,
+        "annotated_commentary_entry_count": annotations,
+        "paired_commentary_entry_count": paired_entries,
+        "paired_commentary_member_count": paired_members,
+        "verse_identifier_count": len(verse_ids),
         "verse_pair_identifier_count": len(verse_pair_ids),
         "book_identifier_count": len(books_seen),
         "book_milestone_pair_identifier_count": len(book_pair_ids), "chapter_identifier_count": len(chapters_seen),

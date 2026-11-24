@@ -34,7 +34,7 @@ jobs:
             "commentary|sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml|mhcc"
             "commentary|sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml|mhc"
           )
-          echo '## BRNP v0.2-draft inventory (not a certification)' >> "$GITHUB_STEP_SUMMARY"
+          echo '## BRNP v0.3-draft inventory (not a certification)' >> "$GITHUB_STEP_SUMMARY"
           echo '| Edition | Diagnostic exit |' >> "$GITHUB_STEP_SUMMARY"
           echo '| --- | --- |' >> "$GITHUB_STEP_SUMMARY"
           for entry in "${paths[@]}"; do

@@ -1,0 +1,62 @@
+{
+  "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45451189667",
+  "tested_commit": "bb32b2e7821eadde4d330bfbded877bef4c7846d",
+  "results": {
+    "darby": {
+      "after": {},
+      "before": {},
+      "entries": 0,
+      "official_schema": "validated",
+      "paired_members": 0,
+      "representation": "bible",
+      "source_sha256": "35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d"
+    },
+    "lsg": {
+      "after": {
+        "UNRESOLVED_REFERENCE_TARGET": 311
+      },
+      "before": {
+        "UNRESOLVED_REFERENCE_TARGET": 311
+      },
+      "entries": 0,
+      "official_schema": "validated",
+      "paired_members": 0,
+      "representation": "bible",
+      "source_sha256": "2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd"
+    },
+    "mhc-candidate": {
+      "after": {},
+      "before": {
+        "NO_COMMENTARY_ENTRIES": 1
+      },
+      "entries": 4255,
+      "official_schema": "validated",
+      "paired_members": 31101,
+      "representation": "paired_verse_milestones",
+      "source_sha256": "069d18e5be5839e3082fbdd33280802c5287b0d5be2703cb0494f4c29f1f4749"
+    },
+    "mhc-old": {
+      "after": {
+        "REFERENCE_TARGET_WHITESPACE": 10
+      },
+      "before": {
+        "NO_COMMENTARY_ENTRIES": 1,
+        "REFERENCE_TARGET_WHITESPACE": 10
+      },
+      "entries": 4255,
+      "official_schema": "validated",
+      "paired_members": 31098,
+      "representation": "paired_verse_milestones",
+      "source_sha256": "c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4"
+    },
+    "mhcc": {
+      "after": {},
+      "before": {},
+      "entries": 12141,
+      "official_schema": "validated",
+      "paired_members": 0,
+      "representation": "annotated_divisions",
+      "source_sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e"
+    }
+  }
+}
