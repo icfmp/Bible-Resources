@@ -36,5 +36,19 @@
   "xiphos_note_popup_fresh_verification": false,
   "xiphos_reading_pane_clipboard_parity": true,
   "xiphos_reading_pane_sample_count": 7,
-  "version_promotion_receipt": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/evidence/darby-2024-1.0.0-version-receipt.json"
+  "version_promotion_receipt": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/evidence/darby-2024-1.0.0-version-receipt.json",
+  "prior_release_binding": {
+    "asset_name": "BRJND2024-0.1.2.zip",
+    "catalogue_sha256": "009af5d19795797337cfa25b68ce96d593fe60f93770d01c44942455d6827e5d",
+    "catalogue_size_bytes": 1960800,
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.2",
+    "legacy_package_differs": false,
+    "module_id": "darby-jnd-2024",
+    "notes": "Exact public 0.1.2 package verified against all seven prior repository members by run 45483177053.",
+    "release_sha256": "009af5d19795797337cfa25b68ce96d593fe60f93770d01c44942455d6827e5d",
+    "release_size_bytes": 1960800,
+    "sword_id": "BRJND2024",
+    "tag": "darby-jnd-2024-0.1.2",
+    "version": "0.1.2"
+  }
 }
