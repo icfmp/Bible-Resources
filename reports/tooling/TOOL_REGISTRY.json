@@ -2130,7 +2130,7 @@
       "python_imports": [],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "8850cd4c0bed7f0da7f98042a32cee7620611184c2ec11d588882eacba1359fa",
+      "sha256_at_inventory": "fb05bfcc8bc8f0948ee058820a0ed4c637530fc2668fc659a712c9b61b773478",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",

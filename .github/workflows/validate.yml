@@ -88,6 +88,7 @@ jobs:
                   "member_sha256": members,
               }
               print("CANDIDATE_FINGERPRINT", json.dumps(receipt, sort_keys=True), flush=True)
+              previous_root = None
               old = legacy.get(m["id"])
               release_proof = folder / "RELEASE_PROVENANCE.json"
               config_only = False
@@ -113,6 +114,14 @@ jobs:
                                        if hashlib.sha256(z.read(name)).hexdigest() != members[name])
                   if config_only:
                       assert changed == ["mods.d/" + m["sword_id"].lower() + ".conf"], (m["id"], changed)
+                      previous_root = tmp / (m["id"] + "-previous-payload")
+                      previous_root.mkdir()
+                      # Names exactly match the validated current regular-file layout.
+                      with zipfile.ZipFile(previous) as z:
+                          for name in members:
+                              target = previous_root / name
+                              target.parent.mkdir(parents=True, exist_ok=True)
+                              target.write_bytes(z.read(name))
                   print("PREVIOUS_RELEASE_COMPARISON", json.dumps({
                       "resource_id": m["id"], "previous_tag": old["tag"],
                       "previous_zip_sha256": old["release_sha256"], "changed_members": changed,
@@ -170,7 +179,10 @@ jobs:
                   _, _, inventory = collect_native_inventory(tmp / "candidate-index", folder, m["sword_id"])
                   expected_native = inventory["native_occupied_numbered_verse_count"]
               print("NATIVE_RENDER_MODULE", m["id"], flush=True)
-              subprocess.run([str(tmp / "candidate-render"), m["sword_id"], str(expected_native)],
+              render_command = [str(tmp / "candidate-render"), m["sword_id"], str(expected_native)]
+              if previous_root:
+                  render_command.append(str(previous_root))
+              subprocess.run(render_command,
                              env=dict(os.environ, SWORD_PATH=str(payload.resolve())),
                              check=True, timeout=180)
               tag = re.compile(rb"</?(?:reference|note|verse|div|title|seg|milestone|hi)\b", re.I)
