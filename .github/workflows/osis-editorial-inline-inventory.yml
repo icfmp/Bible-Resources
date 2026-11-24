@@ -69,3 +69,132 @@ jobs:
               report={"resource":m["id"],"source_sha256":sha256(xml).hexdigest(),"native_frame_counts":dict(frames),"source_markup_signatures":dict(sorted(source.items())),"native_markup_signatures":dict(sorted(native.items())),"native_entry_scope_counts":dict(sorted(native_scope.items())),"scope":"inventory only, not quotation or introduction fidelity approval"}
               print("EDITORIAL_SCOPE_INVENTORY",json.dumps(report,sort_keys=True),flush=True)
           PY
+      - name: Check exact inline associations and introduction spans across real corpus
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from collections import Counter,defaultdict
+          from hashlib import sha256
+          import json
+          from lxml import etree
+          from approved_osis_sword_candidate import approved_source_for,_read_native_frames
+          from source_osis_inventory import _source_tree, OSIS
+          from research.bible.native_milestone_pair_audit import _strict_root
+          # These explicit OSIS constructs have matching source/native representations
+          # in the real-edition census. Unsupported milestone shapes fail visibly.
+          INLINE={"w","q","hi","lb","reference","seg","foreign","name","divineName","transChange"}
+          def local(node):
+              return etree.QName(node).localname if isinstance(node.tag,str) else ""
+          def digest(value):
+              return sha256(json.dumps(value,ensure_ascii=False,separators=(",",":")).encode()).hexdigest()
+          class Stream:
+              def __init__(self):
+                  self.pos=0
+                  self.text=sha256()
+                  self.events=defaultdict(list)
+                  self.intros=[]
+                  self.open_intros={}
+                  self.scopes=defaultdict(list)
+                  self.scope_word_count=Counter()
+              def append(self,value):
+                  v="".join(c for c in (value or "") if not c.isspace())
+                  self.pos+=len(v)
+                  self.text.update(v.encode())
+              def signature(self):
+                  assert not self.open_intros
+                  return (self.pos,self.text.hexdigest(),[(tag,len(rows),digest(rows)) for tag,rows in sorted(self.events.items())],self.intros)
+              def visit(self,node,mode,allow_scopes=True):
+                  tag=local(node)
+                  if not tag or tag=="header": return
+                  if tag in {"note","title"} and allow_scopes:
+                      nested=Stream()
+                      nested.visit(node,mode,False)
+                      # Body anchor + ordered scoped text digest and word/markup spans.
+                      self.scopes[tag].append((self.pos,nested.signature()))
+                      self.scope_word_count[tag]+=len(nested.events["w"])
+                      return
+                  start=self.pos
+                  attrs=tuple(sorted(node.attrib.items()))
+                  is_intro=tag=="div" and node.get("type")=="introduction"
+                  if is_intro:
+                      sid,eid=node.get("sID"),node.get("eID")
+                      assert not(sid and eid)
+                      stable=tuple((k,v) for k,v in attrs if k not in {"sID","eID"})
+                      if sid:
+                          assert mode=="native" and sid not in self.open_intros
+                          self.open_intros[sid]=len(self.intros)
+                          self.intros.append([start,None,stable])
+                      elif eid:
+                          assert mode=="native" and eid in self.open_intros
+                          idx=self.open_intros.pop(eid)
+                          assert self.intros[idx][2]==stable
+                          self.intros[idx][1]=start
+                      else:
+                          idx=len(self.intros)
+                          self.intros.append([start,None,stable])
+                  if tag in INLINE:
+                      assert node.get("sID") is None and node.get("eID") is None
+                      # Reserve event order before recursion to handle nested formatting.
+                      ordinal=len(self.events[tag])
+                      self.events[tag].append(None)
+                  self.append(node.text)
+                  for child in node:
+                      self.visit(child,mode,allow_scopes)
+                      self.append(child.tail)
+                  if tag in INLINE:
+                      self.events[tag][ordinal]=(start,self.pos,attrs)
+                  if is_intro and not(sid or eid):
+                      self.intros[idx][1]=self.pos
+          def compare(src,nat):
+              counts=Counter()
+              findings=[]
+              for book in sorted(set(src)|set(nat)):
+                  if book not in src or book not in nat:
+                      findings.append({"book":book,"kind":"missing_book_scope"})
+                      continue
+                  a,b=src[book],nat[book]
+                  assert not a.open_intros and not b.open_intros
+                  text_equal=(a.pos,a.text.digest())==(b.pos,b.text.digest())
+                  counts["books"]+=1
+                  counts["body_text_equal"]+=text_equal
+                  for tag in sorted(INLINE):
+                      x,y=a.events[tag],b.events[tag]
+                      counts["source_body_"+tag]+=len(x)
+                      counts["native_body_"+tag]+=len(y)
+                      if text_equal and x==y: counts["matched_body_"+tag]+=len(x)
+                      else: findings.append({"book":book,"kind":"body_"+tag,"source_count":len(x),"native_count":len(y)})
+                  counts["source_intro_spans"]+=len(a.intros)
+                  counts["native_intro_spans"]+=len(b.intros)
+                  if text_equal and a.intros==b.intros: counts["matched_intro_spans"]+=len(a.intros)
+                  else: findings.append({"book":book,"kind":"intro_spans","source_count":len(a.intros),"native_count":len(b.intros)})
+                  for tag in ("note","title"):
+                      x,y=a.scopes[tag],b.scopes[tag]
+                      counts["source_"+tag+"_word_elements"]+=a.scope_word_count[tag]
+                      counts["native_"+tag+"_word_elements"]+=b.scope_word_count[tag]
+                      counts["source_"+tag+"_scopes"]+=len(x)
+                      counts["native_"+tag+"_scopes"]+=len(y)
+                      if text_equal and x==y: counts["matched_"+tag+"_scopes"]+=len(x)
+                      else: findings.append({"book":book,"kind":tag+"_scopes","source_count":len(x),"native_count":len(y)})
+              return {"counts":dict(sorted(counts.items())),"finding_count":len(findings),"bounded_findings":findings[:30],"all_compared_scopes_equal":not findings}
+          for folder in sorted(Path("modules").iterdir()):
+              meta=folder/"metadata.json"
+              if not meta.is_file(): continue
+              m=json.loads(meta.read_text())
+              if m.get("category")!="bible" or m.get("quality",{}).get("status")!="approved" or m.get("index_audit",{}).get("mode")!="stock_reader_keys": continue
+              _,xml=approved_source_for(m["id"])
+              source={}
+              for book in _source_tree(xml).iter(OSIS+"div"):
+                  if book.get("type")!="book":continue
+                  ident=book.get("osisID")
+                  assert ident not in source
+                  source[ident]=Stream()
+                  source[ident].visit(book,"source")
+              native={}
+              top=Stream()
+              for kind,ref,raw in _read_native_frames(Path("/tmp/native-raw"),m["sword_id"],(folder/"payload").resolve()):
+                  stream=top if kind=="U" else native.setdefault(ref.split(".",1)[0],Stream())
+                  stream.visit(_strict_root(raw),"native")
+              report=compare(source,native)
+              report.update({"resource":m["id"],"source_sha256":sha256(xml).hexdigest(),"excluded_native_TOP_scope_count":sum(map(len,top.scopes.values())),"scope":"exact inline attributes and nonspace spans, book body and anchored note/title substreams; not exact typography or TOP parity"})
+              print("EDITORIAL_INLINE_SPAN_DIAGNOSTIC",json.dumps(report,sort_keys=True),flush=True)
+          PY
