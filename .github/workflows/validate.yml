@@ -36,12 +36,14 @@ jobs:
             install -y diatheke libsword-dev
       - name: Audit exact stock-reader-key Bible payloads (read-only candidate evidence)
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o "$RUNNER_TEMP/candidate-index" -lsword
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o "$RUNNER_TEMP/candidate-raw" -lsword
           PYTHONPATH=scripts python - <<'PY'
-          import hashlib, io, json, os, re, zipfile
+          import hashlib, io, json, os, re, subprocess, zipfile
           from pathlib import Path
           from approved_osis_sword_candidate import (
               approved_source_for, _candidate_result, original_osis_verses_and_notes,
@@ -52,6 +54,8 @@ jobs:
           from smoke import reader_failure_class
           from stable_sword_refs import module_payload_digest
           tmp = Path(os.environ["RUNNER_TEMP"])
+          legacy = json.loads(Path("config/release-legacy-bindings.json").read_text())["entries"]
+          legacy = {row["module_id"]: row for row in legacy}
           for folder in sorted(Path("modules").iterdir()):
               if not (folder / "metadata.json").is_file():
                   continue
@@ -80,6 +84,34 @@ jobs:
                   "member_sha256": members,
               }
               print("CANDIDATE_FINGERPRINT", json.dumps(receipt, sort_keys=True), flush=True)
+              old = legacy.get(m["id"])
+              if old and old["version"] != m["version"]:
+                  previous = tmp / old["asset_name"]
+                  subprocess.run(["gh", "release", "download", old["tag"],
+                                  "--pattern", old["asset_name"], "--dir", str(tmp)],
+                                 check=True, timeout=120)
+                  prior_bytes = previous.read_bytes()
+                  assert hashlib.sha256(prior_bytes).hexdigest() == old["release_sha256"]
+                  assert len(prior_bytes) == old["release_size_bytes"]
+                  with zipfile.ZipFile(previous) as z:
+                      assert z.testzip() is None
+                      assert len(z.namelist()) == len(members)
+                      assert set(z.namelist()) == set(members)
+                      changed = sorted(name for name in members
+                                       if hashlib.sha256(z.read(name)).hexdigest() != members[name])
+                  print("PREVIOUS_RELEASE_COMPARISON", json.dumps({
+                      "resource_id": m["id"], "previous_tag": old["tag"],
+                      "previous_zip_sha256": old["release_sha256"], "changed_members": changed,
+                  }), flush=True)
+              provenance = Path("sources/original/bibles") / m["language"] / m["id"] / "PROVENANCE.json"
+              if provenance.is_file():
+                  p = json.loads(provenance.read_text())
+                  if p.get("original_file") and p.get("original_sha256"):
+                      source_path = provenance.parent / p["original_file"]
+                      assert source_path.is_file() and not source_path.is_symlink()
+                      original_hash = hashlib.sha256(source_path.read_bytes()).hexdigest()
+                      assert original_hash == p["original_sha256"]
+                      print("ORIGINAL_SOURCE_SHA256", m["id"], original_hash, flush=True)
               refs = [m["quality"]["smoke_key"]]
               if m.get("index_audit", {}).get("mode") == "stock_reader_keys":
                   cfg, source = approved_source_for(m["id"])
