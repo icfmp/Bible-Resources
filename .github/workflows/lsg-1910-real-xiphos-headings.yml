@@ -1,0 +1,298 @@
+name: LSG 1.0.2 actual Xiphos opening-title GUI QA (no release)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/lsg-1910-real-xiphos-headings.yml'
+      - 'modules/lsg-1910/payload/**'
+      - 'sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  gui:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install real Xiphos GTK and independent SWORD command-line reader
+        run: |
+          set -euo pipefail
+          # Ubuntu hosted runners may default to a slow EC2 regional mirror.
+          # Real Xiphos acceptance previously succeeded using the canonical archive.
+          if test -f /etc/apt/apt-mirrors.txt; then
+            sudo sed -i -E 's#https?://[A-Za-z0-9.-]*ec2.archive.ubuntu.com/ubuntu#http://archive.ubuntu.com/ubuntu#g' /etc/apt/apt-mirrors.txt
+          fi
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y xiphos xvfb dbus-x11 xdotool xclip diatheke
+      - name: Source-stratified real Xiphos first-chapter heading audit across both Testaments
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from hashlib import sha256
+          from pathlib import Path
+          from collections import Counter
+          import json, os, re, shutil, signal, subprocess, tempfile, time, unicodedata
+          source=Path("sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml")
+          expected_source="2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd"
+          expected_zip="547d5b953c3a3720bf21bed0e48d515e1d9c581dc419bd4b0af5593286180f01"
+          payload=Path("modules/lsg-1910/payload").resolve()
+          out=Path(os.environ["RUNNER_TEMP"])/"lsg-real-xiphos"
+          out.mkdir(mode=0o700)
+          report={"source_sha256":expected_source,"planned_zip_sha256":expected_zip,
+                  "real_xiphos_window":False,"observations":{},
+                  "published":False,"status":"INCONCLUSIVE_NOT_READER_APPROVAL"}
+          if sha256(source.read_bytes()).hexdigest()!=expected_source:
+              raise SystemExit("Wrong original reviewed edition")
+          manifest=json.loads(Path("config/catalogue-import-lsg-1.0.2.json").read_text())
+          plan=json.loads(Path("config/release-plans/lsg-1.0.2.json").read_text())
+          if manifest["release_zip_sha256"]!=plan["package_sha256"] or plan["package_sha256"]!=expected_zip:
+              raise SystemExit("Unreviewed package digest")
+          for name in ("nt.bzs","nt.bzv","nt.bzz","ot.bzs","ot.bzv","ot.bzz"):
+              rel="modules/texts/ztext/brlsg1910/"+name
+              file=payload/rel
+              if not file.is_file() or sha256(file.read_bytes()).hexdigest()!=manifest["files"][rel]:
+                  raise SystemExit("Native SWORD file not attested: "+name)
+          conf=(payload/"mods.d/brlsg1910.conf").read_text()
+          if "Version=1.0.2" not in conf or "GlobalOptionFilter=OSISHeadings" not in conf:
+              raise SystemExit("Incorrect native SWORD configuration")
+          for cmd in ("Xvfb","dbus-run-session","xiphos","xdotool","xclip","diatheke"):
+              if shutil.which(cmd) is None: raise SystemExit("Missing real-reader dependency "+cmd)
+          def run(args,env,timeout=12,check=True):
+              done=subprocess.run(args,env=env,stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE,timeout=timeout)
+              if check and done.returncode:
+                  raise RuntimeError("Reader command unsuccessful: "+args[0]+" "+args[1])
+              if len(done.stdout)>350000: raise RuntimeError("Unbounded reader clipboard")
+              return done.stdout
+          def tokenize(value):
+              value=unicodedata.normalize("NFKD",value.casefold())
+              return re.findall(r"[a-z0-9]+","".join(x for x in value if not unicodedata.combining(x)))
+          def stop(p):
+              if p is not None and p.poll() is None:
+                  os.killpg(p.pid,signal.SIGTERM)
+                  try: p.wait(timeout=5)
+                  except subprocess.TimeoutExpired:
+                      os.killpg(p.pid,signal.SIGKILL); p.wait(timeout=5)
+          def main_window(env):
+              z=run(["xdotool","search","--onlyvisible","--class","[Xx]iphos"],env,check=False)
+              for wid in z.decode("ascii","ignore").splitlines()[::-1]:
+                  if not wid.isdigit():continue
+                  g=run(["xdotool","getwindowgeometry","--shell",wid],env,check=False).decode("ascii","ignore")
+                  d=dict(re.findall(r"^(WIDTH|HEIGHT)=([0-9]+)$",g,re.M))
+                  if int(d.get("WIDTH","0"))>=650 and int(d.get("HEIGHT","0"))>=400:
+                      return wid
+              return None
+          def copy_reader(env,window,x,y):
+              run(["xdotool","windowfocus","--sync",window],env)
+              run(["xdotool","mousemove",str(x),str(y),"click","1"],env)
+              subprocess.run(["xclip","-selection","clipboard","-i"],
+                             input=b"LSG_QA_UNRELATED_CLIPBOARD_SENTINEL",env=env,
+                             stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                             check=True,timeout=8)
+              run(["xdotool","key","--clearmodifiers","ctrl+a"],env)
+              run(["xdotool","key","--clearmodifiers","ctrl+c"],env)
+              time.sleep(0.8)
+              return run(["xclip","-selection","clipboard","-o"],env)
+          def longest_native_prose_run(copied,native):
+              # Require a distinctive eight-word native body witness plus one exact standalone title line.
+              copied_words=tokenize(copied)
+              native_words=tokenize(native)
+              if len(copied_words)<30 or len(native_words)<15:return 0
+              for span in (16,14,12,10,8,6):
+                  copied_set={tuple(copied_words[j:j+span])
+                              for j in range(len(copied_words)-span+1)}
+                  if any(tuple(native_words[i:i+span]) in copied_set
+                         for i in range(4,len(native_words)-span+1)):
+                      return span
+              return 0
+          # Select original chapter-first titles from the exact pinned candidate,
+          # not a manually invented list of expected title words.
+          # Each selected source book is independently represented once.
+          chapter_title = re.compile(
+              rb'(?P<prefix><chapter\b(?=[^<>]*\bsID="[^"]+")'
+              rb'(?=[^<>]*\bosisID="[^"]+")[^<>]*/>'
+              rb'(?:\s*<!--[^>]*-->\s*)*)'
+              rb'(?P<opening><title type="x-section">)')
+          chapter_id = re.compile(rb'\bsID="([^"]+)"')
+          all_titles = {}
+          source_bytes = source.read_bytes()
+          for found in chapter_title.finditer(source_bytes):
+              chapter = chapter_id.search(found.group("prefix"))
+              if chapter is None:
+                  raise SystemExit("Ambiguous source-attested first heading")
+              chapter = chapter.group(1).decode("ascii")
+              end = source_bytes.find(b"</title>", found.end("opening"))
+              if end < 0 or b"<" in source_bytes[found.end("opening"):end]:
+                  raise SystemExit("Unexpected mixed heading")
+              title = source.read_bytes()[found.end("opening"):end].decode("utf-8")
+              if chapter in all_titles or not title.strip():
+                  raise SystemExit("Repeated or empty original chapter-first heading")
+              all_titles[chapter] = title
+          if len(all_titles) != 803:
+              raise SystemExit("Changed source-authored chapter-first title inventory")
+          first_per_book = {}
+          for chapter, heading in all_titles.items():
+              book, number = chapter.rsplit(".", 1)
+              first_per_book.setdefault(book, (chapter + ".1", book + " " + number + ":1", heading))
+          # Groups are structural/canonical sampling strata, NOT edition
+          # exceptions. Books without one of the 803 modified title sites are
+          # naturally absent. Never invent a missing title to meet a quota.
+          ot_groups = (
+              ("Gen", "Exod"), ("Exod", "Lev", "Num", "Deut"),
+              ("Josh", "Judg", "Ruth", "1Sam", "2Sam"),
+              ("Ps", "Job", "Prov", "Eccl", "Song"),
+              ("Isa", "Jer", "Lam"), ("Ezek", "Dan"),
+              ("Hos", "Joel", "Amos", "Mic", "Nah"),
+              ("Hag", "Zech", "Mal", "Hab", "Zeph"))
+          nt_groups = (
+              ("Matt",), ("Mark",), ("Luke",), ("John",),
+              ("Acts",), ("Rom",), ("1Cor", "2Cor", "Gal", "Eph"),
+              ("Rev", "1John", "1Pet", "Heb", "Jas"))
+          ot_order = ("Gen Exod Lev Num Deut Josh Judg Ruth 1Sam 2Sam 1Kgs 2Kgs "
+                      "1Chr 2Chr Ezra Neh Esth Job Ps Prov Eccl Song Isa Jer Lam "
+                      "Ezek Dan Hos Joel Amos Obad Jonah Mic Nah Hab Zeph Hag Zech Mal").split()
+          nt_order = ("Matt Mark Luke John Acts Rom 1Cor 2Cor Gal Eph Phil Col "
+                      "1Thess 2Thess 1Tim 2Tim Titus Phlm Heb Jas 1Pet 2Pet "
+                      "1John 2John 3John Jude Rev").split()
+          def select_source_attested(groups, order, count=8):
+              chosen=[]
+              for group in groups:
+                  found=next((book for book in group if book in first_per_book
+                              and book not in chosen),None)
+                  if found is not None:
+                      chosen.append(found)
+              for book in order:
+                  if len(chosen)>=count:break
+                  if book in first_per_book and book not in chosen:
+                      chosen.append(book)
+              if len(chosen)<count:
+                  raise SystemExit("Insufficient independently titled books for stratified test")
+              return tuple(chosen[:count])
+          ot_books=select_source_attested(ot_groups,ot_order)
+          nt_books=select_source_attested(nt_groups,nt_order)
+          preferred_books=ot_books+nt_books
+          if len(set(preferred_books))!=16:
+              raise SystemExit("Stratified books must be unique")
+          samples=tuple(first_per_book[book] for book in preferred_books)
+          report["stratification"]={
+              "authored_chapter_opening_titles":len(all_titles),
+              "sample_count":len(samples),
+              "source_books":list(preferred_books),
+              "old_testament_books":len(ot_books),
+              "new_testament_books":len(nt_books),
+              "source_attested_selection":True,
+          }
+          disp=app=None
+          with tempfile.TemporaryDirectory(prefix="isolated-lsg-xiphos-") as home:
+              home=Path(home)
+              for part in ("config","cache","data"):(home/part).mkdir()
+              env=dict(os.environ,HOME=str(home),XDG_CONFIG_HOME=str(home/"config"),
+                       XDG_CACHE_HOME=str(home/"cache"),XDG_DATA_HOME=str(home/"data"),
+                       SWORD_PATH=str(payload),GDK_BACKEND="x11",DISPLAY=":91",
+                       NO_AT_BRIDGE="1",LC_ALL="C.UTF-8")
+              try:
+                  # Keep the exact first-verse witness and independently
+                  # sample the whole native chapter for short initial verses.
+                  # Genesis 1:1, Isaiah 2:1, Matthew 1:1 and Mark 1:1
+                  # are legitimately too short for a generic >=8-word
+                  # first-verse match after SWORD/diatheke navigation labels.
+                  native={
+                      key:{
+                          "first":run(["diatheke","-b","BRLSG1910","-f","plain",
+                                       "-k",ref],env).decode("utf-8","replace"),
+                          "chapter":run(["diatheke","-b","BRLSG1910","-f","plain",
+                                         "-k",ref.split(":")[0]],env)
+                                    .decode("utf-8","replace"),
+                      }
+                      for key,ref,title in samples
+                  }
+                  disp=subprocess.Popen(["Xvfb",":91","-screen","0","1280x800x24","-nolisten","tcp"],
+                                        env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                                        start_new_session=True)
+                  time.sleep(1.5)
+                  if disp.poll() is not None:raise RuntimeError("No virtual X display")
+                  app=subprocess.Popen(["dbus-run-session","--","xiphos"],env=env,
+                                       stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                                       start_new_session=True)
+                  window=None
+                  for _ in range(90):
+                      if app.poll() is not None:raise RuntimeError("Real Xiphos exited")
+                      window=main_window(env)
+                      if window:break
+                      time.sleep(0.5)
+                  if not window:raise RuntimeError("Real Xiphos main reading window not visible")
+                  report["real_xiphos_window"]=True
+                  run(["xdotool","windowsize",window,"1216","736"],env)
+                  run(["xdotool","windowmove",window,"16","16"],env)
+                  time.sleep(1.2)
+                  for key,reference,title in samples:
+                      record={"navigation_accepted":False,"heading_once":False,
+                              "native_verse_prose_match":False,"clipboard_bytes":0,
+                              "actual_copy_attempts":0,"heading_occurrences":0,
+                              "exact_standalone_heading_lines":0,
+                              "longest_contiguous_native_word_run":0,
+                              "native_first_verse_word_run":0,
+                              "native_chapter_word_run":0,
+                              "successful_navigation_form":None,
+                              "attempted_navigation_forms":[]}
+                      for navigate in (reference,reference.split(":")[0]):
+                          record["attempted_navigation_forms"].append(navigate)
+                          run(["xdotool","windowfocus","--sync",window],env)
+                          run(["xdotool","key","--clearmodifiers","ctrl+l"],env)
+                          run(["xdotool","type","--clearmodifiers","--delay","25",navigate],env)
+                          run(["xdotool","key","Return"],env)
+                          record["navigation_accepted"]=True
+                          time.sleep(2.5)
+                          for x,y in ((535,290),(680,460),(390,550)):
+                              selected=copy_reader(env,window,x,y)
+                              selected_text=selected.decode("utf-8","replace")
+                              text_words=tokenize(selected_text)
+                              title_words=tokenize(title)
+                              count=sum(text_words[i:i+len(title_words)]==title_words
+                                        for i in range(len(text_words)-len(title_words)+1))
+                              standalone=sum(tokenize(line)==title_words
+                                             for line in selected_text.splitlines())
+                              first_overlap=longest_native_prose_run(
+                                  selected_text,native[key]["first"])
+                              chapter_overlap=longest_native_prose_run(
+                                  selected_text,native[key]["chapter"])
+                              overlap=max(first_overlap,chapter_overlap)
+                              record["actual_copy_attempts"]+=1
+                              record["clipboard_bytes"]=len(selected)
+                              record["heading_occurrences"]=count
+                              record["exact_standalone_heading_lines"]=standalone
+                              record["longest_contiguous_native_word_run"]=overlap
+                              record["native_first_verse_word_run"]=first_overlap
+                              record["native_chapter_word_run"]=chapter_overlap
+                              # A title line must be unique. A repeated phrase
+                              # elsewhere in Romans 2 prose is not a duplicate title.
+                              record["heading_once"]=(standalone==1)
+                              # Clipboard plain text can interleave Xiphos footnotes.
+                              # The full native 31,169-verse parity is checked separately.
+                              record["native_verse_prose_match"]=(overlap>=8)
+                              if record["heading_once"] and record["native_verse_prose_match"]:
+                                  record["successful_navigation_form"]=navigate
+                                  break
+                          if record["successful_navigation_form"] is not None:
+                              break
+                      report["observations"][key]=record
+                      print("Actual GUI title/prose diagnostic:",key,json.dumps(record,sort_keys=True))
+                  if not all(v["heading_once"] and v["native_verse_prose_match"]
+                             for v in report["observations"].values()):
+                      raise RuntimeError("Real GUI did not confirm all 16 source-attested chapter headings and verse prose")
+                  report["status"]="SIXTEEN_STRATIFIED_SOURCE_HEADING_AND_NATIVE_GUI_MATCHES"
+              finally:
+                  (out/"evidence.json").write_text(json.dumps(report,sort_keys=True,indent=2)+"\n")
+                  stop(app); stop(disp)
+          print("Actual isolated Xiphos result:",report["status"])
+          PY
+      - name: Retain only bounded metadata; no SWORD module or source text
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lsg-1.0.2-stratified-real-xiphos-heading-evidence
+          path: ${{ runner.temp }}/lsg-real-xiphos/evidence.json
+          retention-days: 14
+          if-no-files-found: warn

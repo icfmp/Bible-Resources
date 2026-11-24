@@ -1,3 +1,15 @@
+# Louis Segond 1910 — Bible Resources 1.0.2 (unpublished candidate)
+
+Existing original section headings now carry the OSIS-valid x-section type where they immediately follow a chapter opening. Exactly 803 unchanged titles are now part of native verse 1 entries. All original Scripture, publisher notes and citations are identical. The known Segond index exception for Mark 10:53 is retained.
+
+## Reader QA and publication gate
+
+The native SWORD readback verifies all **803 original section headings** are inside the appropriate first numbered verse. Independent real Xiphos GTK reader QA now passes for **16/16 source-attested title lines**, selected across **eight Old Testament books and eight New Testament books**. Each title appears as exactly one standalone copied heading line, and each matching GUI chapter contains at least sixteen consecutive words matching the native SWORD chapter. The earlier Romans 1 and Romans 2 regression also passed independently. The focused GUI sample does **not** establish pixel-perfect display for all 803 headings or other readers. Source text, notes, versification and historic releases are unchanged.
+
+Evidence: [source-stratified actual Xiphos run #45334886553](https://github.com/icfmp/Bible-Resources/actions/runs/45334886553) on candidate commit `d5852193058db6678994e9d1ea388e81171787f5`, alongside all seven other CI workflows passing on that exact commit. Final owner editorial/publication approval, PR merge and public release/catalogue/download checks are **still outstanding**; do not describe 1.0.2 as released.
+
+## Earlier approved 1.0.1 editorial record
+
 # Louis Segond 1910 — Bible Resources 1.0.1
 
 Module configuration-only hotfix: replace OSISXRefs with the registered OSISScripref filter. Native binary data and reviewed Bible source are byte-identical to v1.0.0. Plain-text cross-reference On rendering remains a known upstream limitation. Old tagged releases are not rewritten.

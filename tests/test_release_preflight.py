@@ -26,8 +26,15 @@ class CrossEditionReleasePreflightTests(unittest.TestCase):
         by_id = {r["resource_id"]: r for r in report["modules"]}
         self.assertEqual(set(by_id), set(self.ids))
         self.assertEqual(by_id["lsg-1910"]["driver"], "zText")
-        self.assertEqual(by_id["lsg-1910"]["version"], "1.0.1")
-        self.assertEqual(by_id["lsg-1910"]["release_tag"], "lsg-1.0.1")
+        lsg_metadata = json.loads((ROOT / "modules/lsg-1910/metadata.json").read_text())
+        lsg_version = lsg_metadata["version"]
+        lsg_plan = json.loads((
+            ROOT / f"config/release-plans/lsg-{lsg_version}.json"
+        ).read_text())
+        self.assertEqual(by_id["lsg-1910"]["version"], lsg_version)
+        self.assertEqual(by_id["lsg-1910"]["release_tag"], lsg_plan["tag"])
+        self.assertEqual(by_id["lsg-1910"]["package_sha256"], lsg_plan["package_sha256"])
+        self.assertEqual(by_id["lsg-1910"]["package_size_bytes"], lsg_plan["package_size_bytes"])
         self.assertEqual(by_id["darby-jnd-2024"]["driver"], "zText")
         self.assertEqual(by_id["mhcc-crosswire"]["driver"], "zCom")
         for record in by_id.values():
