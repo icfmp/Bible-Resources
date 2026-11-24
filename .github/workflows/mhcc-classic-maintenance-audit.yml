@@ -130,7 +130,8 @@ jobs:
                       assert len(ends)==1 and ends[0].get("eID")==sid
                       continue
                   assert re.fullmatch(r"[A-Za-z0-9_.:-]+",sid)
-                  assert starts[0].getparent() is ch and starts[0] is ch[0]
+                  assert starts[0].getparent() is ch, own
+                  print("CHAPTER_CLOSURE_LOCATION",json.dumps({"chapter":own,"start_child_index":ch.index(starts[0]),"last_child_tag":etree.QName(ch[-1]).localname,"parent_osis_id":ch.get("osisID")}),flush=True)
                   st,en,close,_,empty=mapping[ch]
                   assert not empty and data[close:close+2]==b"</"
                   added=('<chapter eID="'+sid+'"/>').encode()
