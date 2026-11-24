@@ -1,23 +1,26 @@
 {
-  "approved_cleaned_sha256": "c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4",
+  "approved_cleaned_sha256": "069d18e5be5839e3082fbdd33280802c5287b0d5be2703cb0494f4c29f1f4749",
   "cleaned_path": "sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml",
   "language": "en",
   "no_authorial_prose_changed": true,
-  "published_release": "https://github.com/icfmp/Bible-Resources/releases/tag/mhc-0.1.0",
+  "previous_approved_cleaned_sha256": "c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4",
+  "published_release": "https://github.com/icfmp/Bible-Resources/releases/tag/mhc-1.0.0",
   "reconstruction_method": "Existing generic scripts and source-SHA-pinned plans; byte-for-byte validated against all historical checkpoint digests; original untouched.",
   "resource_id": "mhc-crosswire",
   "reviewed_patches": {
     "chapter_intro_reclassification": 1,
     "cross_reference_destinations": 25,
     "empty_inert_hi": 11,
+    "first_verse_navigation_aliases": 3,
     "invalid_range_endpoints": 3,
-    "overlap_reindex_groups": 6
+    "overlap_reindex_groups": 6,
+    "reference_whitespace": 10
   },
   "schema_version": 1,
-  "source_attestation_run": "https://github.com/icfmp/Bible-Resources/actions/runs/44554276085",
+  "source_attestation_run": "https://github.com/icfmp/Bible-Resources/actions/runs/45447586839",
   "source_original_path": "sources/original/commentaries/en/mhc-crosswire/mhc.osis.xml",
   "source_original_sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
-  "status": "recovered_exact_approved_source_input",
+  "status": "reviewed_attribute_only_revision",
   "transformation_steps": [
     {
       "sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
@@ -38,6 +41,14 @@
     {
       "sha256": "c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4",
       "stage": "chapter_intro"
+    },
+    {
+      "sha256": "46e1c04206b274b1dd58d2d043bedc121089f74bb0c78250339e5991a1999982",
+      "stage": "reference_whitespace"
+    },
+    {
+      "sha256": "069d18e5be5839e3082fbdd33280802c5287b0d5be2703cb0494f4c29f1f4749",
+      "stage": "first_verse_navigation_aliases"
     }
   ],
   "type": "commentary"

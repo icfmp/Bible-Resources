@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "Owner selected MHC 1.0.0 and requested continuation of verified maintenance and release; exact source/native/reader tests required.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/290",
+    "reviewed_by": "Bible Resources project owner",
+    "source_rights": "CrossWire 2.2 Public Domain \u2014 Copy Freely, prior owner acceptance 2026-11-19. No relicensing or CCEL substitution."
+  },
+  "editorial_path": "modules/mhc-crosswire/EDITORIAL.md",
+  "evidence_path": "modules/mhc-crosswire/SOURCE_VALIDATION.json",
+  "module_id": "mhc-crosswire",
+  "notes_path": "sources/cleaned/commentaries/en/mhc-crosswire/editorial/releases/MHC-1.0.0.md",
+  "package_sha256": "f501403e520b8e35b8fc14438950561ec2e7f266b165e4b151a0606cf38dda7e",
+  "package_size_bytes": 16409097,
+  "schema_version": 1,
+  "sword_id": "MHC",
+  "tag": "mhc-1.0.0",
+  "title": "Matthew Henry's Complete Commentary \u2014 MHC 1.0.0",
+  "version": "1.0.0",
+  "zip_name": "MHC-1.0.0.zip"
+}

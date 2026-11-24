@@ -324,7 +324,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 14,
+      "static_reference_count": 15,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
@@ -332,6 +332,7 @@
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
         "scripts/tool_registry.py",
+        ".github/workflows/mhc-complete-maintenance-audit.yml",
         ".github/workflows/pages.yml",
         ".github/workflows/validate.yml",
         "docs/architecture/RESOURCE_PROFILES.md",
@@ -425,7 +426,7 @@
       "owner": "Bible Resources maintainers",
       "path": "scripts/check_brnp.py",
       "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
-      "purpose_first_line": "Read-only structural BRNP v0.1 pilot; not an OSIS XSD or release gate.",
+      "purpose_first_line": "Read-only structural BRNP draft pilot; not an OSIS XSD or release gate.",
       "python_imports": [
         "__future__",
         "argparse",
@@ -436,11 +437,12 @@
         "json",
         "lxml",
         "pathlib",
+        "re",
         "sys"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "cc88907343be180603ebf51f7df6231bb419fc88dc3d7c4f8680908ca1966e60",
+      "sha256_at_inventory": "5ba7a08fedea05d5c86aa716118f92a11bfd5ef2eb59c3c4f6f2a66b8c3ce608",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -1245,7 +1247,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
@@ -1254,6 +1256,7 @@
         ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
+        ".github/workflows/mhc-complete-maintenance-audit.yml",
         "tests/test_release_preflight.py",
         "tests/test_tool_registry.py"
       ]
@@ -1624,12 +1627,13 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 7,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/reviewed_modern_commentary_rebuild.py",
         "scripts/reviewed_osis_commentary_rebuild.py",
         "scripts/tool_registry.py",
         "scripts/validate.py",
+        ".github/workflows/mhc-complete-maintenance-audit.yml",
         "docs/workflows/PUBLISHING.md",
         "tests/test_reviewed_compiled_commentary_rebuild.py",
         "tests/test_tool_registry.py"
@@ -1686,20 +1690,22 @@
       "python_imports": [
         "hashlib",
         "json",
+        "lxml",
         "pathlib",
         "re",
         "reviewed_compiled_commentary_rebuild"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "4bddd0e3d5040b9aa2d01aa038f1d4cf7ca83613c499cb106f319972c2bf06f6",
+      "sha256_at_inventory": "d5fd44e03656f22b055b5f3a4656856a77276719320580f2efa7135b54793a4d",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 2,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/tool_registry.py",
-        "scripts/validate.py"
+        "scripts/validate.py",
+        ".github/workflows/mhc-complete-maintenance-audit.yml"
       ]
     },
     {
@@ -2218,10 +2224,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
+        ".github/workflows/mhc-complete-maintenance-audit.yml",
         ".github/workflows/tool-registry-maintenance.yml",
         "tests/test_tool_registry.py"
       ]
@@ -2266,7 +2273,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 22,
+      "static_reference_count": 23,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
@@ -2278,6 +2285,7 @@
         ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
+        ".github/workflows/mhc-complete-maintenance-audit.yml",
         ".github/workflows/pages.yml",
         ".github/workflows/validate.yml",
         "docs/policies/COMMENTARY_POLICY.md",

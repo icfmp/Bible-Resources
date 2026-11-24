@@ -1,26 +1,31 @@
 {
-  "schema_version": 1,
-  "source_workflow_run": 44554276085,
-  "artifact_id": 14544781469,
-  "review_zip_sha256": "c8d70166dd569674e936874cd9a94809bceb9642a76af7220ef86f2b71af93b2",
-  "review_zip_bytes": 16404517,
-  "original_authoring_osis_sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
-  "source_binary_payload_byte_identical": false,
+  "artifact_id": 14944829878,
   "full_native_corpus_readback_equal": true,
   "member_sha256": {
-    "mods.d/mhc.conf": "6737bcd8ddc5853fa6e86f15d434d5a74dce5346a4a493f0433c15fd1a4d9ed8",
-    "modules/comments/zcom4/mhc/nt.czs": "278ac96013c020926907e671fdc166a1ccaad736f4fe2b610de2efb027c5b6f1",
-    "modules/comments/zcom4/mhc/nt.czv": "61d77340158a9a898c5935c2b03c47711999fdc5ddc49414adcb5f5b5e9d7eec",
-    "modules/comments/zcom4/mhc/nt.czz": "ab71e7654621df3e87fffe82617ea869b15d3bdc58b37cfe015ad5c4f046bddd",
-    "modules/comments/zcom4/mhc/ot.czs": "fa16b59eec100851cc6a09a289097c04ef2bbb87ff6c4b7f2c1f85a6d597d0fb",
-    "modules/comments/zcom4/mhc/ot.czv": "f77abdfcebc081d2226706609ac0783385d0b53ce6699a2e747f36ce7b310aa2",
-    "modules/comments/zcom4/mhc/ot.czz": "8c35118f08df4f605857f3183f186fbf67300345e9ec5ffcc34eeb29cd818c5d"
+    "mods.d/mhc.conf": "31359473a5fd5d3b2ffeca51c0fe35eb06019cb324e148360f847c7189cc7b75",
+    "modules/comments/zcom4/mhc/nt.czs": "3f69c4972eae45f5c2cdcef49f1bb7b1cded651b04e05065125769aac1edf3d1",
+    "modules/comments/zcom4/mhc/nt.czv": "e19c2d84028df8be4708357ffa6082e0b47aa57ebea83b8430ab1e0e0137d0b8",
+    "modules/comments/zcom4/mhc/nt.czz": "981ce11f8ebb0cb9d4e1c23ee3cce9227908a633e87b107a02b837ce70927054",
+    "modules/comments/zcom4/mhc/ot.czs": "9283e2ef61467157c3c708b290956b51093ed0225610d073f52e567a626aa945",
+    "modules/comments/zcom4/mhc/ot.czv": "09c6af8ac0bf4abc0598e68a24506120c8e9b71a9885d54945735903591a018c",
+    "modules/comments/zcom4/mhc/ot.czz": "2c763597e336ea3738585b24b51c67bba6fbcb4d620c3729994c9907e52818c1"
   },
-  "original_review_member_conf_sha256": "da631c6cf905871e5ad79ebc64e8f5d09be2bc54f12a6502e64c78e81490ce00",
-  "metadata_only_conf_delta": {
-    "operation": "add TextSource entry following SourceType=OSIS",
-    "original_conf_sha256": "da631c6cf905871e5ad79ebc64e8f5d09be2bc54f12a6502e64c78e81490ce00",
-    "record": "https://github.com/icfmp/Bible-Resources/issues/285"
+  "original_authoring_osis_sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
+  "review_zip_bytes": 31226284,
+  "review_zip_sha256": "db179a533e43f0ba90682ad1786fb4c674cbd5a9db8d2a98b2d34acc89b7efe2",
+  "revision": {
+    "candidate_native_sha256": "4e6efd6b9374bbac5185b51abf0bced8791ea59fa87f098504f71dce8ce36928",
+    "candidate_source_sha256": "069d18e5be5839e3082fbdd33280802c5287b0d5be2703cb0494f4c29f1f4749",
+    "evidence_sha256": "dfa6fc3df84bddbbad3e6a0392e95fc28a143e2ab67a4ff80853d893b461a4a9",
+    "previous_cleanup_sha256": "326bd0b180a7b2ee837be0e66dec03a25d5f5839db65e3048520eabc7f230960",
+    "previous_native_sha256": "ea20737b3612cb183921c48beca96a728317dcbb5b4e5ff142308b6d974169b4",
+    "previous_review_sha256": "0af925318b300b07b866e2a9a015a644f55c46b2a745ae3a4cb8c98cd4cea929",
+    "previous_source_sha256": "c64891f4fb2c3bd3a7e5e6cca992d80675849e7b3615f80ee95121461ef385f4",
+    "previous_version": "0.1.0",
+    "source_name": "mhc.osis.xml"
   },
-  "six_compiled_data_members_byte_identical_to_review_artifact": true
+  "schema_version": 2,
+  "six_compiled_data_members_byte_identical_to_review_artifact": true,
+  "source_binary_payload_byte_identical": false,
+  "source_workflow_run": 45447586839
 }

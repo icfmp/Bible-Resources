@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "status": "owner_authorized_for_release",
+  "module_id": "mhc-crosswire",
+  "sword_id": "MHC",
+  "version": "0.1.0",
+  "versification": "KJV",
+  "driver": "zCom4",
+  "block_type": "CHAPTER",
+  "original_manifest": "config/commentary-intake/mhc-crosswire.json",
+  "original_module_id": "MHC",
+  "original_version": "2.2",
+  "original_archive_sha256": "6bcb936873ca144e317805e5c1677940fd86e2403f7c14517752e44f25c8882b",
+  "original_authoring_commit": "537591a94c991941877b47a06666b6a7812e05d8",
+  "original_authoring_osis_sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
+  "candidate_artifact_sha256": "c8d70166dd569674e936874cd9a94809bceb9642a76af7220ef86f2b71af93b2",
+  "candidate_artifact_bytes": 16404517,
+  "candidate_artifact_source_run": 44554276085,
+  "candidate_artifact_id": 14544781469,
+  "source_commentary_bodies": 4256,
+  "source_commentary_word_tokens": 7073234,
+  "numbered_native_entries": 31098,
+  "introduction_native_entries": 1255,
+  "opaque_top_native_entries": 2,
+  "reviewed_reference_target_repairs": 25,
+  "authorization": {
+    "approved_by": "Bible Resources project owner",
+    "scope": "Release the full source-attested corrected MHC 0.1.0 with preserved CrossWire/CCEL/Logos attribution and reviewed standard whole-verse and introduction semantics.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/285",
+    "rights_basis": "CrossWire 2.2 Public Domain--Copy Freely accepted 2026-11-19"
+  },
+  "native_evidence_url": "https://github.com/icfmp/Bible-Resources/actions/runs/44554276085"
+}
