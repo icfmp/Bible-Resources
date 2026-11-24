@@ -20,20 +20,20 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/14920876777/zip" > "$RUNNER_${{ runner.temp }}/mhcc-structural.zip"
-          echo "e27b710c907275e6dd842b685caa95a552e84a2f73efce5faef0391bccd2d360  $RUNNER_${{ runner.temp }}/mhcc-structural.zip" | sha256sum -c
-          unzip -q "$RUNNER_${{ runner.temp }}/mhcc-structural.zip" -d "$RUNNER_${{ runner.temp }}/verified"
-          echo "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e  $RUNNER_${{ runner.temp }}/verified/mhcc.osis.xml" | sha256sum -c
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/14920876777/zip" > "$RUNNER_TEMP/mhcc-structural.zip"
+          echo "e27b710c907275e6dd842b685caa95a552e84a2f73efce5faef0391bccd2d360  $RUNNER_TEMP/mhcc-structural.zip" | sha256sum -c
+          unzip -q "$RUNNER_TEMP/mhcc-structural.zip" -d "$RUNNER_TEMP/verified"
+          echo "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e  $RUNNER_TEMP/verified/mhcc.osis.xml" | sha256sum -c
           git fetch --no-tags --depth=1 origin refs/pull/275/head
           test "$(git rev-parse FETCH_HEAD)" = 30d6cd7a26de8cf8982877eee06a19b8b163d937
-          git worktree add --detach "$RUNNER_${{ runner.temp }}/historical-reader" FETCH_HEAD
+          git worktree add --detach "$RUNNER_TEMP/historical-reader" FETCH_HEAD
           python -m pip install -r requirements.txt
           if test -f /etc/apt/apt-mirrors.txt; then
             sudo sed -i -E 's#https?://[A-Za-z0-9.-]*ec2.archive.ubuntu.com/ubuntu#http://archive.ubuntu.com/ubuntu#g' /etc/apt/apt-mirrors.txt
           fi
           timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
           timeout 180s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke xiphos xvfb dbus-x11 xdotool xclip openbox
-          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_${{ runner.temp }}/native" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_TEMP/native" -lsword
       - name: Compare actual diatheke and Xiphos passage text, including repaired chapters
         env:
           PYTHONPATH: ${{ runner.temp }}/historical-reader/scripts
