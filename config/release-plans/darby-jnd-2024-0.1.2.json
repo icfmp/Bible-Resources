@@ -1,8 +1,8 @@
 {
   "authorization": {
-    "decision": "Prepare configuration-only 0.1.2 candidate: registered OSIS filter and owner-requested display metadata; source and six zText members unchanged. Explicit owner publication authorization is still required before merging or publishing.",
-    "evidence_url": "https://github.com/icfmp/Bible-Resources/pull/554",
-    "reviewed_by": "Bible Resources project owner — previously approved BPC 2024 revision 2.0 source and editorial overlays (#241); maintenance candidate requested, publication not yet authorized",
+    "decision": "Owner explicitly authorized publication if all technical and reader checks are satisfactory, as recorded in PR #554. Configuration-only 0.1.2; registered OSIS filter and requested display metadata; source and six zText members unchanged. Protected merge only after reader evidence and required CI are verified.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/pull/554#issuecomment-7129478812",
+    "reviewed_by": "Bible Resources project owner — previously approved BPC 2024 revision 2.0 source and editorial overlays (#241); conditional 0.1.2 publication authorization recorded on PR #554",
     "source_rights": "Exact BPC 2024 rev. 2.0 Public Domain source; unchanged from reviewed 0.1.1."
   },
   "editorial_path": "modules/darby-jnd-2024/EDITORIAL.md",

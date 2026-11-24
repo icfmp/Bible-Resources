@@ -15,11 +15,11 @@ when adding a newly supported filter; do not add translation-specific bypasses.
 
 - **Configuration:** `OSISXRefs` is not registered by stable libSWORD;
   `OSISScripref` is the valid filter for OSIS cross-references. LSG was
-  fixed in 1.0.1, but the currently published Darby 0.1.1 still has the
-  invalid setting. See [#553](https://github.com/icfmp/Bible-Resources/issues/553).
+  fixed in 1.0.1; Darby 0.1.2 repairs the invalid setting in the prior
+  immutable 0.1.1 configuration. See [#553](https://github.com/icfmp/Bible-Resources/issues/553).
 - **Reader rendering:** with Cross-references explicitly On, the
-  `SWModule::stripText()` path may still expose nested literal OSIS
-  reference tags even with `OSISScripref` configured correctly. This
+  `SWModule::stripText()` path with an unconfigured markup manager may expose
+  nested literal OSIS reference tags even with `OSISScripref` configured correctly. This
   is a separate unresolved [#549](https://github.com/icfmp/Bible-Resources/issues/549).
   Do not flatten original cross-reference notes or delete their machine
   destinations to make a plain-text reader look cleaner.
@@ -39,4 +39,16 @@ requires an independently verified new version and publication approval.
 
 The presence of an invalid option in any already approved module is a blocking defect, not an exception to this rule. A repair must be staged with a new version before the check can be merged to the publication branch.
 
-The gate deliberately fails the current Darby candidate until a new, immutable-versioned package and independent filter-mode QA are reviewed; a successful metadata test alone is not release authorization.
+The gate rejects an invalid filter before publication; a successful metadata test alone is not release authorization.
+
+### Actual rendering versus internal markup
+
+The shared `sword_native_render.cpp` probe explicitly constructs a standard
+`MarkupFilterMgr(FMT_HTMLHREF)` before calling `renderText()`. A bare `SWMgr`
+can return internal OSIS and must not be described as HTML output. The audit
+checks every populated numbered verse in four separately verified option
+combinations, distinguishes literal OSIS elements from valid HTML attributes,
+and can compare the prior immutable package under the same render settings.
+The Darby 0.1.2 and LSG 1.0.2 audits had zero residual OSIS marker detections
+under HTMLHREF. Earlier unconfigured-manager limitations remain tracked in
+#549; engine output is not proof of every graphical client's behavior.

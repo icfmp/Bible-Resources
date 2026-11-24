@@ -1,4 +1,32 @@
 {
+  "andbible_jsword_validation": {
+    "conclusion": "success",
+    "job_id": 138395070138,
+    "result": {
+      "actual_module_used_was_native_fidelity_audited": true,
+      "actual_package_sha256": "009af5d19795797337cfa25b68ce96d593fe60f93770d01c44942455d6827e5d",
+      "actual_private_module_identity": "BRJND2024",
+      "all_31166_authored_keys_queried_via_jsword_contains": true,
+      "andbible_jsword_submodule_commit": "6ebd10a005fa7761e611c048ececea1430e22546",
+      "andbible_release_tag": "production-1117",
+      "android_gui_installed_or_tested": false,
+      "compiled_module_or_source_uploaded": false,
+      "editorial_approval": false,
+      "full_jsword_note_inventory_checked": false,
+      "historical_test_revision": "8c6f2b821048114550c046b44bf9cb3e0e9677cd",
+      "java_test_count": 5,
+      "java_test_failures": 0,
+      "java_test_skipped": 0,
+      "released": false,
+      "scope_semantics_diagnostics": {
+        "cardinality": 32424,
+        "empty_nominal_slots": 0,
+        "extra_populated": 0
+      },
+      "status": "exact_andbible_5_1_jsword_engine_samples_pass"
+    },
+    "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45379658739"
+  },
   "approved_cleaned_osis_sha256": "35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d",
   "diatheke_modes": {
     "checked_references": [
@@ -20,6 +48,95 @@
     "explicit_on_markup_leaks": [],
     "resource_id": "darby-jnd-2024",
     "visual_reader_verified": false
+  },
+  "final_native_htmlhref_validation": {
+    "all_unit_tests_passed": 523,
+    "commit": "ee08fce69c1559e82330e4f423ee71aa94d1227b",
+    "conclusion": "success",
+    "job_id": 138394270372,
+    "native_render": [
+      {
+        "checked": 31166,
+        "mode": "default_off",
+        "option_state_verified": true,
+        "plain_changed_from_default": 0,
+        "plain_leaks": 0,
+        "render_format": "HTMLHREF",
+        "rendered_osis_leaks": 0
+      },
+      {
+        "checked": 31166,
+        "mode": "xref_on",
+        "option_state_verified": true,
+        "plain_changed_from_default": 0,
+        "plain_leaks": 0,
+        "render_format": "HTMLHREF",
+        "rendered_osis_leaks": 0
+      },
+      {
+        "checked": 31166,
+        "mode": "notes_on",
+        "option_state_verified": true,
+        "plain_changed_from_default": 5506,
+        "plain_leaks": 0,
+        "render_format": "HTMLHREF",
+        "rendered_osis_leaks": 0
+      },
+      {
+        "checked": 31166,
+        "mode": "both_on",
+        "option_state_verified": true,
+        "plain_changed_from_default": 5506,
+        "plain_leaks": 0,
+        "render_format": "HTMLHREF",
+        "rendered_osis_leaks": 0
+      }
+    ],
+    "optional_mode_issue_still_open": 549,
+    "previous_version_comparison": [
+      {
+        "checked": 31166,
+        "html_different": 0,
+        "mode": "default_off",
+        "new_html_leaks": 0,
+        "new_plain_leaks": 0,
+        "plain_different": 0,
+        "previous_plain_leaks": 0,
+        "previous_rendered_osis_leaks": 0
+      },
+      {
+        "checked": 31166,
+        "html_different": 0,
+        "mode": "xref_on",
+        "new_html_leaks": 0,
+        "new_plain_leaks": 0,
+        "plain_different": 0,
+        "previous_plain_leaks": 0,
+        "previous_rendered_osis_leaks": 0
+      },
+      {
+        "checked": 31166,
+        "html_different": 0,
+        "mode": "notes_on",
+        "new_html_leaks": 0,
+        "new_plain_leaks": 0,
+        "plain_different": 0,
+        "previous_plain_leaks": 0,
+        "previous_rendered_osis_leaks": 0
+      },
+      {
+        "checked": 31166,
+        "html_different": 0,
+        "mode": "both_on",
+        "new_html_leaks": 0,
+        "new_plain_leaks": 0,
+        "plain_different": 0,
+        "previous_plain_leaks": 0,
+        "previous_rendered_osis_leaks": 0
+      }
+    ],
+    "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45379429851",
+    "unconfigured_manager_diagnostics_not_html_render": true
   },
   "fingerprint": {
     "member_sha256": {
@@ -242,6 +359,7 @@
     "visual_reader_or_parallel_reader_verified": false
   },
   "original_publisher_osis_sha256": "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
+  "owner_conditional_publication_authorization_record_url": "https://github.com/icfmp/Bible-Resources/pull/554#issuecomment-7129478812",
   "previous_release_comparison": {
     "changed_members": [
       "mods.d/brjnd2024.conf"
@@ -256,5 +374,11 @@
   "workflow_head_sha": "0f0f7629977398aff1d0773c9d366ff7a8923866",
   "workflow_job_id": 138385119127,
   "workflow_overall_conclusion": "cancelled after Darby evidence was emitted",
-  "workflow_run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45376786567"
+  "workflow_run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45376786567",
+  "xiphos_replay": {
+    "job_id": 138395069652,
+    "not_a_visual_acceptance_claim": true,
+    "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45379658739",
+    "status": "in_progress_at_recording"
+  }
 }

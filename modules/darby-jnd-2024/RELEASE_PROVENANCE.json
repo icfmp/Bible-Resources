@@ -1,6 +1,6 @@
 {
   "candidate_native_audit_path": "sources/cleaned/bibles/fr/darby-jnd-2024/editorial/evidence/darby-2024-0.1.2-native-audit.json",
-  "candidate_native_audit_workflow_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45376786567",
+  "candidate_native_audit_workflow_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45379429851",
   "candidate_scope": "configuration_only",
   "complete_release_member_sha256": {
     "mods.d/brjnd2024.conf": "39fbe397d91ff766146207f5725fd4eb9ac5632d4f8aaea82286fb5387ed4bde",
@@ -17,6 +17,7 @@
   "full_source_verse_count": 31166,
   "original_editorial_division_metadata_count": 521,
   "original_publisher_osis_sha256": "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
+  "owner_conditional_publication_authorization_url": "https://github.com/icfmp/Bible-Resources/pull/554#issuecomment-7129478812",
   "prior_immutable_release_tag": "darby-jnd-2024-0.1.1",
   "prior_immutable_release_zip_sha256": "2b48c3c9a8897e58805a7cb3be731bb895363e51bc854df502ce7e7a45f0c2c4",
   "prior_immutable_release_zip_size_bytes": 1960800,
@@ -40,9 +41,10 @@
   "public_zip_format": "canonical_Bible_Resources_catalogue_build",
   "publication_authorized": false,
   "published": false,
+  "reader_replay_workflow_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45379658739",
   "release_tag": "darby-jnd-2024-0.1.2",
   "release_zip_bytes": 1960800,
   "release_zip_sha256": "009af5d19795797337cfa25b68ce96d593fe60f93770d01c44942455d6827e5d",
   "six_ztext_payload_files_byte_identical_to_full_native_audit": true,
-  "status": "configuration_only_native_attested_candidate_pending_publication_authorization"
+  "status": "configuration_only_native_attested_candidate_owner_conditionally_authorized_pending_final_reader_result"
 }
