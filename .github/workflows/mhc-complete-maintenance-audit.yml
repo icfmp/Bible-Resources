@@ -1,4 +1,4 @@
-name: MHC 0.1.1 candidate final independent reader verification
+name: BRNP v0.3 paired commentary regression and corrected candidate
 on:
   pull_request:
     paths:
@@ -7,122 +7,71 @@ permissions:
   contents: read
   actions: read
 jobs:
-  reader:
+  audit:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: scripts
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Obtain exact previously validated structural candidate
+      - name: Verify exact source, official schema and synthetic regression
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/14944829878/zip" > "$RUNNER_TEMP/mhc-alias.zip"
-          echo "db179a533e43f0ba90682ad1786fb4c674cbd5a9db8d2a98b2d34acc89b7efe2  $RUNNER_TEMP/mhc-alias.zip" | sha256sum -c
-          unzip -q "$RUNNER_TEMP/mhc-alias.zip" -d "$RUNNER_TEMP/verified"
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/14944829878/zip" > "$RUNNER_TEMP/verified.zip"
+          echo "db179a533e43f0ba90682ad1786fb4c674cbd5a9db8d2a98b2d34acc89b7efe2  $RUNNER_TEMP/verified.zip" | sha256sum -c
+          unzip -q "$RUNNER_TEMP/verified.zip" -d "$RUNNER_TEMP/verified"
           echo "069d18e5be5839e3082fbdd33280802c5287b0d5be2703cb0494f4c29f1f4749  $RUNNER_TEMP/verified/mhc.osis.xml" | sha256sum -c
-          git fetch --no-tags --depth=1 origin refs/pull/275/head
-          test "$(git rev-parse FETCH_HEAD)" = 30d6cd7a26de8cf8982877eee06a19b8b163d937
-          git worktree add --detach "$RUNNER_TEMP/historical-reader" FETCH_HEAD
           python -m pip install -r requirements.txt
-          if test -f /etc/apt/apt-mirrors.txt; then
-            sudo sed -i -E 's#https?://[A-Za-z0-9.-]*ec2.archive.ubuntu.com/ubuntu#http://archive.ubuntu.com/ubuntu#g' /etc/apt/apt-mirrors.txt
-          fi
-          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
-          timeout 180s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke xiphos xvfb dbus-x11 xdotool xclip openbox
-          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_TEMP/native" -lsword
-      - name: Compare actual diatheke and Xiphos passage text, including repaired chapters
-        env:
-          PYTHONPATH: ${{ runner.temp }}/historical-reader/scripts
+          python -m unittest discover -s tests -p test_brnp.py -v
+          python scripts/fetch_reviewed_schema.py --directory "$RUNNER_TEMP/schema"
+      - name: Compare v0.2 and v0.3 on all real masters and exact corrected candidate
         run: |
           set -euo pipefail
+          git fetch --no-tags --depth=1 origin 643a3e1ba5735a8e9fff1de2bd186e06beb925c8
+          test "$(git rev-parse FETCH_HEAD)" = 643a3e1ba5735a8e9fff1de2bd186e06beb925c8
+          git show FETCH_HEAD:scripts/check_brnp.py > "$RUNNER_TEMP/check_brnp_v02.py"
           python - <<'PY'
-          import hashlib,io,json,os,re,shutil,signal,subprocess,time
+          import importlib.util,json,os
           from pathlib import Path
-          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
-          from commentary_xiphos_dual_reader import verify_and_install_reviewed_bible,attempt_real_xiphos_passage_copy
-          import commentary_xiphos_dual_reader as reader
-          from pilot_subprocess import query
-          from reader_xiphos_headless_smoke import _dismiss_transient_xiphos_notice
-          tmp=Path(os.environ["RUNNER_TEMP"])
-          source=tmp/"verified"
-          root=tmp/"qa/sword";root.parent.mkdir()
-          shutil.copytree(source/"payload",root)
-          raw=subprocess.run([str(tmp/"native"),"MHC"],env=dict(os.environ,SWORD_PATH=str(root)),capture_output=True,check=True,timeout=90).stdout
-          entries={}
-          report,*_=parse_native_raw_corpus(io.BytesIO(raw),on_entry=lambda kind,key,body:entries.__setitem__((kind,key),body))
-          assert report["all_native_raw_entries_ordered_sha256"]=="4e6efd6b9374bbac5185b51abf0bced8791ea59fa87f098504f71dce8ce36928"
-          bible=verify_and_install_reviewed_bible(root)
-          keys=["Josh.18.1","Josh.18.2","1Sam.25.1","1Sam.25.2","2Sam.22.1","2Sam.22.2","Rom.4.17","Rev.4.1","Ps.95.1"]
-          comparisons={}
-          for key in keys:
-              assert ("K",key) in entries,key
-              book,ch,v=key.split(".");ref=f"{book} {ch}:{v}"
-              code,commentary=query("MHC",ref,fmt="plain",root=root)
-              bc,bible_text=query("BRLSG1910",ref,fmt="plain",root=root)
-              assert code==bc==0 and len(commentary)>64 and len(bible_text)>16,key
-              # Check a distinctive real source body excerpt, not merely a successful command.
-              words=reader._normalized_words(entries["K",key])
-              rendered=reader._normalized_words(commentary)
-              # The historical GUI helper will independently compare against native prose.
-              assert len(rendered)>12
-              comparisons[ref]={"commentary":commentary,"bible":bible_text,"commentary_internal":entries["K",key]}
-          home=tmp/"qa-home";home.mkdir()
-          for d in ("config","cache","data"):(home/d).mkdir()
-          env=dict(os.environ,HOME=str(home),XDG_CONFIG_HOME=str(home/"config"),XDG_CACHE_HOME=str(home/"cache"),XDG_DATA_HOME=str(home/"data"),SWORD_PATH=str(root),DISPLAY=":91",GDK_BACKEND="x11",LC_ALL="C.UTF-8",NO_AT_BRIDGE="1",WEBKIT_DISABLE_COMPOSITING_MODE="1")
-          procs=[]
-          log=tmp/"xiphos-startup.log"
-          def launch(args,output):
-              p=subprocess.Popen(args,env=env,stdout=output,stderr=output,start_new_session=True)
-              procs.append(p);return p
-          try:
-              with log.open("wb") as stream:
-                  xv=launch(["Xvfb",":91","-screen","0","1280x800x24","-nolisten","tcp"],stream)
-                  time.sleep(1.5)
-                  wm=launch(["openbox"],stream)
-                  time.sleep(1)
-                  app=launch(["dbus-run-session","--","xiphos"],stream)
-                  win=None
-                  for _ in range(110):
-                      if app.poll() is not None:raise RuntimeError("Xiphos exited")
-                      win=reader._main_xiphos_window(env)
-                      if win:break
-                      # Resize any actual visible Xiphos window that is too
-                      # small for the historical main-window threshold.
-                      ids=subprocess.run(["xdotool","search","--onlyvisible","--class","[Xx]iphos"],env=env,capture_output=True).stdout.decode().split()
-                      for wid in ids:
-                          g=subprocess.run(["xdotool","getwindowgeometry","--shell",wid],env=env,capture_output=True).stdout.decode()
-                          dims=dict(re.findall(r"^(WIDTH|HEIGHT)=(\d+)$",g,re.M))
-                          if int(dims.get("WIDTH",0))>=420 and int(dims.get("HEIGHT",0))>=300:
-                              subprocess.run(["xdotool","windowsize",wid,"1216","736"],env=env,capture_output=True)
-                      time.sleep(.5)
-                  assert win,"Xiphos main window did not become visible"
-                  subprocess.run(["xdotool","windowsize",win,"1216","736"],env=env,check=True)
-                  subprocess.run(["xdotool","windowmove",win,"16","16"],env=env,check=True)
-                  time.sleep(2)
-                  _dismiss_transient_xiphos_notice(env)
-                  result=attempt_real_xiphos_passage_copy(env,comparisons)
-                  receipt={"schema_version":1,"native_corpus_sha256":report["all_native_raw_entries_ordered_sha256"],"source_sha256":hashlib.sha256((source/"mhc.osis.xml").read_bytes()).hexdigest(),"source_structure_run":45447586839,"diatheke_samples":keys,"xiphos":result,"xiphos_window_visible":True,"published":False}
-                  (source/"reader-receipt.json").write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n")
-                  print("FINAL_READER",json.dumps(receipt,sort_keys=True),flush=True)
-                  assert result["actual_passage_commands_accepted"] and result["independent_gui_commentary_excerpt_match_count"]==len(keys)
-          finally:
-              for p in reversed(procs):
-                  if p.poll() is None:
-                      os.killpg(p.pid,signal.SIGTERM)
-                      try:p.wait(timeout=5)
-                      except subprocess.TimeoutExpired:os.killpg(p.pid,signal.SIGKILL);p.wait()
-              if not (source/"reader-receipt.json").exists():
-                  print("XIPHOS_STARTUP_DIAGNOSTIC",log.read_text(errors="replace")[-3000:])
+          import check_brnp
+          tmp=Path(os.environ["RUNNER_TEMP"]);schema=tmp/"schema/osisCore.2.1.1-cw-latest.xsd"
+          spec=importlib.util.spec_from_file_location("check_brnp_v02",tmp/"check_brnp_v02.py")
+          old=importlib.util.module_from_spec(spec);spec.loader.exec_module(old)
+          # The old checker normally resolves its policy relative to its own script.
+          old.POLICY=check_brnp.POLICY
+          entries=[
+              ("lsg","bible",Path("sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml")),
+              ("darby","bible",Path("sources/cleaned/bibles/fr/darby-jnd-2024/bible_jnd_2_0.osis.xml")),
+              ("mhcc","commentary",Path("sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml")),
+              ("mhc-old","commentary",Path("sources/cleaned/commentaries/en/mhc-crosswire/mhc.osis.xml")),
+              ("mhc-candidate","commentary",tmp/"verified/mhc.osis.xml")]
+          out=tmp/"brnp-regression";out.mkdir()
+          summary={}
+          for label,kind,path in entries:
+              a=old.check(path,kind,schema_path=schema);b=check_brnp.check(path,kind,schema_path=schema)
+              (out/(label+".json")).write_text(json.dumps(b,indent=2,sort_keys=True)+"\n")
+              summary[label]={"before":a["finding_codes"],"after":b["finding_codes"],"representation":b["commentary_representation"],"entries":b["commentary_entry_count"],"paired_members":b["paired_commentary_member_count"],"source_sha256":b["sha256"],"official_schema":b["official_osis"]["status"]}
+              print("BRNP_REAL",label,json.dumps(summary[label],sort_keys=True),flush=True)
+              if label in {"lsg","darby","mhcc"}:
+                  assert a["finding_codes"]==b["finding_codes"]
+              else:
+                  expected=dict(a["finding_codes"]);assert expected.pop("NO_COMMENTARY_ENTRIES")==1
+                  assert b["finding_codes"]==expected
+                  assert b["paired_commentary_entry_count"]==4255
+                  assert b["paired_commentary_member_count"]==(31101 if label=="mhc-candidate" else 31098)
+          assert summary["mhc-candidate"]["after"]=={}
+          (out/"summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
+          print("BRNP_REGRESSION",json.dumps(summary,sort_keys=True),flush=True)
           PY
-      - name: Retain final independent reader receipt
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
-          name: mhc-final-reader-proof
-          path: ${{ runner.temp }}/verified/reader-receipt.json
+          name: brnp-v03-regression
+          path: ${{ runner.temp }}/brnp-regression/
           if-no-files-found: warn
           retention-days: 90
