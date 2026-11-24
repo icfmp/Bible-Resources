@@ -28,7 +28,7 @@ VERSION = "0.3-draft"
 # resources. Preserve structured tables/lists and historical source metadata.
 # This is not a supplier-specific allowlist or permission to drop content.
 STANDARD_STRUCTURAL = frozenset({
-    "cell", "date", "description", "identifier", "item", "list",
+    "cell", "date", "description", "identifier", "item", "language", "list",
     "refSystem", "revisionDesc", "rights", "row", "table", "type",
 })
 
@@ -190,6 +190,13 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         counts[tag] += 1
         if tag not in allowed:
             errors.append({"code": "UNREVIEWED_ELEMENT", "line": line, "element": tag})
+        if tag == "language":
+            parent = element.getparent()
+            if (parent is None or parent.tag != NS + "work"
+                    or parent.getparent() is None
+                    or parent.getparent().tag != NS + "header"):
+                errors.append({"code": "INVALID_STRUCTURAL_PARENT",
+                               "line": line, "element": tag})
         if tag == "div" and element.get("type") == "book":
             book_id = element.get("osisID")
             start_id, end_id = element.get("sID"), element.get("eID")
