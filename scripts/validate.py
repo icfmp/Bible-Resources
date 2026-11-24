@@ -9,6 +9,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 from stable_sword_refs import proof_errors as stable_sword_proof_errors
 from published_reference_audit import archived_release_errors
 from catalogue_profiles import approved_profiles, ProfileError
+from sword_option_filters import option_filter_errors
 from compiled_stock_commentary_proof import compiled_stock_commentary_errors
 from reviewed_compiled_commentary_rebuild import reviewed_rebuilt_commentary_errors
 from reviewed_osis_commentary_rebuild import reviewed_osis_commentary_errors
@@ -223,6 +224,9 @@ def validate(root=ROOT):
             errors.append(f"{d.name}: bad configuration: {e}");continue
         if section != m["sword_id"]: errors.append(f"{d.name}: module name mismatch")
         if confs[0].name != section.lower()+".conf": errors.append(f"{d.name}: .conf filename mismatch")
+        # parse_conf retains the first duplicate key; all GlobalOptionFilter
+        # declarations must be checked against registered libSWORD filters.
+        errors.extend(option_filter_errors(confs[0], conf.get("SourceType")))
         driver=conf.get("ModDrv")
         if driver not in DRIVERS or driver not in ALLOWED.get(m["category"],set()):
             errors.append(f"{d.name}: unsupported or mismatched driver")
