@@ -324,7 +324,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 15,
+      "static_reference_count": 14,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
@@ -332,7 +332,6 @@
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
         "scripts/tool_registry.py",
-        ".github/workflows/hmcc-modern-integrate.yml",
         ".github/workflows/pages.yml",
         ".github/workflows/validate.yml",
         "docs/architecture/RESOURCE_PROFILES.md",
@@ -446,12 +445,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 8,
       "static_references": [
         "scripts/normalize_osis.py",
         "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
-        ".github/workflows/hmcc-modern-maintenance.yml",
         ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-reference-review.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
@@ -681,11 +679,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/commentary-native-raw-corpus.yml",
-        ".github/workflows/hmcc-modern-maintenance.yml",
         "tests/test_commentary_native_raw_inventory.py"
       ]
     },
@@ -752,11 +749,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 10,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/brnp-review.yml",
-        ".github/workflows/hmcc-modern-maintenance.yml",
         ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-reference-review.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
@@ -838,7 +834,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 15,
+      "static_reference_count": 14,
       "static_references": [
         "scripts/audit_osis.py",
         "scripts/check_brnp.py",
@@ -846,7 +842,6 @@
         "scripts/guard_commentary.py",
         "scripts/normalize_osis.py",
         "scripts/tool_registry.py",
-        ".github/workflows/hmcc-modern-maintenance.yml",
         ".github/workflows/osis-schema-review.yml",
         "docs/policies/NORMALIZATION_POLICY.md",
         "docs/technical/SOURCE_NATIVE_INDEX_AUDIT.md",
@@ -1125,10 +1120,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/commentary_intake.py",
         "scripts/tool_registry.py",
+        ".github/workflows/hmcc-modern-reader.yml",
         ".github/workflows/validate.yml",
         "tests/test_bounded_sword_reader.py"
       ]
@@ -1251,13 +1247,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 10,
+      "static_reference_count": 9,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
         "modules/lsg-1910/tools/stage_reviewed_release.py",
         "scripts/tool_registry.py",
-        ".github/workflows/hmcc-modern-integrate.yml",
         ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
@@ -1631,13 +1626,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 8,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/reviewed_modern_commentary_rebuild.py",
         "scripts/reviewed_osis_commentary_rebuild.py",
         "scripts/tool_registry.py",
         "scripts/validate.py",
-        ".github/workflows/hmcc-modern-maintenance.yml",
         "docs/workflows/PUBLISHING.md",
         "tests/test_reviewed_compiled_commentary_rebuild.py",
         "tests/test_tool_registry.py"
@@ -1671,11 +1665,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/tool_registry.py",
         "scripts/validate.py",
-        ".github/workflows/hmcc-modern-integrate.yml",
         "tests/test_reviewed_modern_commentary_rebuild.py"
       ]
     },
@@ -1907,12 +1900,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/commentary-intake.yml",
-        ".github/workflows/commentary-native-raw-corpus.yml",
-        ".github/workflows/hmcc-modern-maintenance.yml"
+        ".github/workflows/commentary-native-raw-corpus.yml"
       ]
     },
     {
@@ -1941,7 +1933,7 @@
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/commentary-native-raw-corpus.yml",
-        ".github/workflows/hmcc-modern-maintenance.yml"
+        ".github/workflows/hmcc-modern-reader.yml"
       ]
     },
     {
@@ -2092,7 +2084,7 @@
       "static_references": [
         "scripts/commentary_native_raw_inventory.py",
         "scripts/tool_registry.py",
-        ".github/workflows/hmcc-modern-maintenance.yml",
+        ".github/workflows/hmcc-modern-reader.yml",
         ".github/workflows/validate.yml",
         "docs/technical/NATIVE_SWORD_WHOLE_CORPUS.md",
         "tests/test_commentary_native_raw_inventory.py",
@@ -2232,9 +2224,8 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
-        ".github/workflows/hmcc-modern-integrate.yml",
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         ".github/workflows/tool-registry-maintenance.yml",
@@ -2281,7 +2272,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 23,
+      "static_reference_count": 22,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
@@ -2290,7 +2281,6 @@
         "scripts/release_preflight.py",
         "scripts/smoke.py",
         "scripts/tool_registry.py",
-        ".github/workflows/hmcc-modern-integrate.yml",
         ".github/workflows/lsg-chapter-heading-review.yml",
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
