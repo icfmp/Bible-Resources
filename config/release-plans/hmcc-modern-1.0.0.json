@@ -1,8 +1,8 @@
 {
   "authorization": {
-    "decision": "Technical maintenance requested by owner; candidate pending separate final publication approval.",
-    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/559",
-    "reviewed_by": "Bible Resources project owner — 2026-11-20",
+    "decision": "Owner instructed continuation in direct response to explicit merge and publication request on 2026-11-24; release of the exact audited 1.0.0 candidate authorized with documented reader limitations.",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/559#issuecomment-7143486405",
+    "reviewed_by": "Bible Resources project owner — 2026-11-24",
     "source_rights": "Original Matthew Henry via CrossWire Public Domain; separate modern derivative authorized by project owner; no imported CCEL formatting"
   },
   "editorial_path": "modules/hmcc-modern/EDITORIAL.md",
