@@ -2161,10 +2161,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/validate.py",
-        ".github/workflows/temporary-rebuild-filter-tool-registry.yml",
         "docs/technical/SWORD_OPTION_FILTERS.md",
         "tests/test_sword_option_filters.py"
       ]
@@ -2212,11 +2211,10 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
-        ".github/workflows/temporary-rebuild-filter-tool-registry.yml",
         ".github/workflows/tool-registry-maintenance.yml",
         "tests/test_tool_registry.py"
       ]
@@ -2261,7 +2259,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 23,
+      "static_reference_count": 22,
       "static_references": [
         "modules/lsg-1910/tools/stage_chapter_heading_hotfix.py",
         "modules/lsg-1910/tools/stage_filter_hotfix.py",
@@ -2274,7 +2272,6 @@
         ".github/workflows/lsg-rendering-regression.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         ".github/workflows/pages.yml",
-        ".github/workflows/temporary-rebuild-filter-tool-registry.yml",
         ".github/workflows/validate.yml",
         "docs/policies/COMMENTARY_POLICY.md",
         "docs/technical/STABLE_SWORD_REFERENCE_AUDIT.md",
