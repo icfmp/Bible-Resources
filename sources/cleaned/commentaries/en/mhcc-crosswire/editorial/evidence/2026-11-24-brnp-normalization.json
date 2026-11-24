@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "status": "verified_unpublished_structural_candidate",
+  "profile": "BRNP v0.2-draft",
+  "run_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45394900192",
+  "job_id": 138447943764,
+  "trial_commit": "7a0507db94cf7eb95d8103849968b07c22041677",
+  "previous_erratum_native_audit_run": 45384410255,
+  "fixture_tests_passed": 38,
+  "source_structure": {
+    "after_findings": {},
+    "annotation_count_after": 12141,
+    "annotation_count_before": 12141,
+    "base_sha256": "690184e2cdac0e6160bddb256149f2111d51b946caf29622e3b7f2ea358835e0",
+    "before_findings": {
+      "BOOK_MILESTONE_WITHIN_CONTAINER": 132,
+      "DUPLICATE_BOOK_MILESTONE_KEY": 1,
+      "UNCLOSED_CHAPTER_MILESTONE": 1
+    },
+    "closed_chapters": [
+      {
+        "chapter": "1Sam.25",
+        "pair_id": "1Sam.25"
+      },
+      {
+        "chapter": "Ps.95",
+        "pair_id": "Ps.95"
+      }
+    ],
+    "exact_visible_character_stream_equal": true,
+    "idempotent": true,
+    "normalized_sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e",
+    "official_schema": {
+      "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
+      "source_sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e",
+      "status": "validated"
+    },
+    "other_element_hierarchy_and_attributes_equal": true,
+    "removed_book_milestones": 264,
+    "reversible": true
+  },
+  "native_comparison": {
+    "adjacent_link_topology_equal": true,
+    "baseline_native_sha256": "ec00e36c0d0cdaefccddd1db164731c49087f43b68676a6a5cd0c6bd699ab263",
+    "changed_reviewed_alias_links": [],
+    "counts": {
+      "I": 1255,
+      "K": 28742,
+      "U": 2
+    },
+    "extra": [],
+    "missing": [],
+    "normalized_native_sha256": "957ef1f956f804ae67d0563969a2e2a4a9e567fe0153550c45015cb14310a5d6",
+    "opaque_top_equal": true,
+    "publication": false,
+    "raw_changed": 442,
+    "semantic_changed_count": 0,
+    "semantic_changed_sample": [],
+    "xml_parse_errors": 0
+  },
+  "artifact": {
+    "id": 14920876777,
+    "name": "mhcc-brnp-structural-trial",
+    "digest": "sha256:e27b710c907275e6dd842b685caa95a552e84a2f73efce5faef0391bccd2d360",
+    "size_in_bytes": 4290270,
+    "retention_days": 90
+  },
+  "limits": [
+    "The canonical BRNP draft subset and pinned official XSD passed; this is not complete BRNP certification.",
+    "Native comparison preserves normalized visible text and ordered non-div markup except the two explicitly added chapter end markers; all source hierarchy and attributes outside the reviewed transport changes were checked separately.",
+    "Independent reader QA and release integration still pending; no source or module published."
+  ],
+  "published": false
+}
