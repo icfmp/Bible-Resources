@@ -68,7 +68,7 @@ class OriginalNativeBoundaryPositionTests(unittest.TestCase):
         proof = compare_book_boundary_positions(authorial_book_streams(authored), native(), [])
         diagnostic = proof["paragraph_span_diagnostic"]
         self.assertEqual(diagnostic["counts"]["source_only_zero_nonspace_paragraph_spans"], 1)
-        self.assertEqual(diagnostic["bounded_reference_only_findings"][0]["next_source_verse"], "Gen.1.1")
+        self.assertEqual(diagnostic["bounded_reference_only_findings"][0]["preceding_or_coincident_source_verse"], "Gen.1.1")
         self.assertFalse(proof["all_book_body_nonspace_and_boundary_events_equal"])
         self.assertTrue(diagnostic["zero_nonspace_spans_not_automatically_waived"])
 
