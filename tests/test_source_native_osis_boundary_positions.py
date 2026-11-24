@@ -158,6 +158,47 @@ class OriginalNativeBoundaryPositionTests(unittest.TestCase):
         self.assertEqual(proof["counts"]["outside_book_title_text_or_order_requires_review"],1)
         self.assertNotIn("PRIVATE",str(proof))
 
+    def lexical_proof(self, authored, compiled):
+        return compare_book_boundary_positions(
+            authorial_book_streams(authored), compiled, []
+        )["body_lexical_association_diagnostic"]
+
+    def test_lexical_values_bound_to_word_positions_not_just_order(self):
+        authored=OSIS.replace(b'alpha',b'<w lemma="strong:H1" morph="x-test">alpha</w>')
+        original_native=native(second=b'<w morph="x-test" lemma="strong:H1">alpha</w><note>PRIVATE NOTE</note> beta'
+                               b'<div type="x-p" eID="p"/><lg sID="g"/><l sID="l"/>poetry<l eID="l"/><lg eID="g"/>')
+        proof=self.lexical_proof(authored,original_native)
+        self.assertTrue(proof["all_book_body_word_spans_and_attributes_equal"])
+        self.assertEqual(proof["counts"]["source_body_word_elements"],1)
+        for bad in (
+            b'<w lemma="strong:H2" morph="x-test">alpha</w><note>PRIVATE NOTE</note> beta',
+            b'<w lemma="strong:H1">alpha</w><note>PRIVATE NOTE</note> beta',
+            b'alpha<note>PRIVATE NOTE</note> <w lemma="strong:H1" morph="x-test">beta</w>',
+            b'<w lemma="strong:H1" morph="x-test">alph</w>a<note>PRIVATE NOTE</note> beta',
+            b'alpha<note>PRIVATE NOTE</note> beta',
+        ):
+            compiled=native(second=bad+b'<div type="x-p" eID="p"/><lg sID="g"/><l sID="l"/>poetry<l eID="l"/><lg eID="g"/>')
+            proof=self.lexical_proof(authored,compiled)
+            self.assertFalse(proof["all_book_body_word_spans_and_attributes_equal"])
+            self.assertNotIn("strong:H1",str(proof))
+            self.assertNotIn("PRIVATE",str(proof))
+
+    def test_lexical_annotation_in_note_is_not_claimed_as_body_verified(self):
+        authored=OSIS.replace(b'PRIVATE NOTE',b'<w lemma="strong:H1">PRIVATE NOTE</w>')
+        proof=self.lexical_proof(authored,native())
+        self.assertEqual(proof["counts"]["source_excluded_note_title_header_word_elements"],1)
+        self.assertFalse(proof["excluded_scopes_certified"])
+
+    def test_lexical_word_in_addressable_intro_is_compared(self):
+        authored=OSIS.replace(b'<p><verse',b'<w lemma="strong:H1">intro</w><p><verse')
+        compiled=native(first=b'<w lemma="strong:H2">intro</w><div type="x-p" sID="p"/>')
+        self.assertFalse(self.lexical_proof(authored,compiled)["all_book_body_word_spans_and_attributes_equal"])
+
+    def test_lexical_empty_or_nested_word_is_rejected(self):
+        for word in (b'<w lemma="strong:H1"/>', b'<w><w>alpha</w></w>'):
+            with self.subTest(word=word), self.assertRaises(BoundaryScreenError):
+                authorial_book_streams(OSIS.replace(b'alpha',word))
+
     def test_native_unbalanced_xml_fails_closed(self):
         with self.assertRaises(ValueError):
             native(second=b'<l sID="x">BROKEN')

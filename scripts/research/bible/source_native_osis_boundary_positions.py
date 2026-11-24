@@ -11,6 +11,7 @@ from collections import Counter, defaultdict
 from bisect import bisect_right
 from hashlib import sha256
 import re
+import json
 
 from lxml import etree
 
@@ -40,6 +41,30 @@ class _Stream:
         self.num_events = 0
         self.refs = []  # private source verse anchors (nonspace position, ID)
         self.titles = []  # private (nonspace position, title digest, character count)
+        self.word_hash = sha256()
+        self.word_count = 0
+        self.annotated_word_count = 0
+        self.excluded_word_count = 0
+
+    def mark_word(self, node, start):
+        # Attribute order is XML serialization, not lexical meaning. Do not
+        # normalize values, sort lemma tokens or discard unfamiliar attributes.
+        attributes = sorted(node.attrib.items())
+        if any(_local(c) == 'w' for c in node.iterdescendants()):
+            raise BoundaryScreenError('Nested lexical word element')
+        if node.get('sID') is not None or node.get('eID') is not None:
+            raise BoundaryScreenError('Unsupported lexical word milestone')
+        if self.chars <= start:
+            raise BoundaryScreenError('Empty lexical word span')
+        data = json.dumps([start, self.chars, attributes], ensure_ascii=False,
+                          separators=(',', ':')).encode('utf-8')
+        self.word_hash.update(len(data).to_bytes(8, 'big'))
+        self.word_hash.update(data)
+        self.word_count += 1
+        self.annotated_word_count += bool(attributes)
+
+    def exclude_words(self, node):
+        self.excluded_word_count += sum(_local(n) == 'w' for n in node.iterdescendants())
 
     def append(self, string):
         if string:
@@ -78,6 +103,7 @@ def _walk(node,stream,mode):
             raise BoundaryScreenError("Invalid source verse anchor")
         stream.refs.append((stream.chars, ref))
     if name == "title":
+        stream.exclude_words(node)
         prose="".join(node.itertext())
         chars="".join(x for x in prose if not x.isspace())
         if len(chars)>MAX_TEXT or len(stream.titles)>=MAX_EVENTS:
@@ -85,6 +111,7 @@ def _walk(node,stream,mode):
         stream.titles.append((stream.chars,sha256(chars.encode("utf-8")).hexdigest(),len(chars)))
         return  # Title is editorial metadata, not part of the main-body stream.
     if name in SKIP:
+        stream.exclude_words(node)
         return  # Parent still processes node.tail, as authored.
     event = None
     container = False
@@ -116,10 +143,13 @@ def _walk(node,stream,mode):
                 container=True
     if container:
         stream.mark(event,"open")
+    word_start = stream.chars if name == "w" else None
     stream.append(node.text)
     for child in node:
         _walk(child,stream,mode)
         stream.append(child.tail)
+    if word_start is not None:
+        stream.mark_word(node, word_start)
     if container:
         stream.mark(event,"close")
 
@@ -171,6 +201,8 @@ class NativeBookStreams:
         self.books={}
         self.top_nonspace=0
         self.top_titles=[]  # original order, private content digests only
+        self.top_word_count=0
+        self.top_excluded_word_count=0
         self.frames=Counter()
 
     def observe(self,kind,ref,raw):
@@ -186,6 +218,8 @@ class NativeBookStreams:
             top=_Stream()
             _walk(root,top,"native")
             self.top_nonspace+=top.chars
+            self.top_word_count+=top.word_count
+            self.top_excluded_word_count+=top.excluded_word_count
             self.top_titles.extend((digest,length) for _position,digest,length in top.titles)
             return
         book=ref.split(".",1)[0]
@@ -235,6 +269,8 @@ def compare_book_boundary_positions(original: dict, compiled: NativeBookStreams,
     samples=[]
     paragraph_counts=Counter()
     paragraph_findings=[]
+    lexical=Counter()
+    lexical_findings=[]
     for book in sorted(original):
         src,nat=original[book],compiled.books[book]
         counts["books_compared"]+=1
@@ -248,6 +284,21 @@ def compare_book_boundary_positions(original: dict, compiled: NativeBookStreams,
                 samples.append({"book":book,"kind":"body_nonspace_stream_differs",
                                 "source_nonspace_length":src.chars,
                                 "compiled_nonspace_length":nat.chars})
+        lexical["source_body_word_elements"] += src.word_count
+        lexical["native_body_word_elements"] += nat.word_count
+        lexical["source_body_word_elements_with_attributes"] += src.annotated_word_count
+        lexical["native_body_word_elements_with_attributes"] += nat.annotated_word_count
+        lexical["source_excluded_note_title_header_word_elements"] += src.excluded_word_count
+        lexical["native_excluded_note_title_header_word_elements"] += nat.excluded_word_count
+        if same_text and src.word_count == nat.word_count and src.word_hash.digest() == nat.word_hash.digest():
+            lexical["books_with_identical_word_spans_and_attributes"] += 1
+        else:
+            lexical["books_with_unverified_or_different_word_associations"] += 1
+            if len(lexical_findings) < MAX_EXAMPLES:
+                lexical_findings.append({"book": book, "source_word_elements": src.word_count,
+                    "native_word_elements": nat.word_count,
+                    "full_body_nonspace_equal": same_text,
+                    "ordered_span_attribute_digest_equal": src.word_hash.digest() == nat.word_hash.digest()})
         counts["source_title_events"]+=len(src.titles)
         counts["native_title_events"]+=len(nat.titles)
         if src.titles==nat.titles:
@@ -307,6 +358,20 @@ def compare_book_boundary_positions(original: dict, compiled: NativeBookStreams,
         "native_anonymous_top_nonspace_body_characters":compiled.top_nonspace,
         "native_frame_counts":dict(sorted(compiled.frames.items())),
         "bounded_reference_only_findings":samples,
+        "body_lexical_association_diagnostic": {
+            "counts": dict(sorted(lexical.items())),
+            "bounded_book_only_findings": lexical_findings,
+            "all_book_body_word_spans_and_attributes_equal": (
+                lexical["books_with_identical_word_spans_and_attributes"] == len(original)
+                and compiled.top_word_count == 0),
+            "native_TOP_body_word_elements": compiled.top_word_count,
+            "native_TOP_excluded_word_elements": compiled.top_excluded_word_count,
+            "scope": "book body including addressable introductions; excludes title, note, header, outside-book source",
+            "exact_attribute_values_compared": True,
+            "original_publisher_to_cleaned_source_lexical_parity_verified": False,
+            "excluded_scopes_certified": False,
+            "mandatory_release_gate": False,
+        },
         "paragraph_span_diagnostic": {
             "counts": dict(sorted(paragraph_counts.items())),
             "bounded_reference_only_findings": paragraph_findings,
