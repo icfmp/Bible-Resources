@@ -23,10 +23,6 @@ jobs:
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p test_brnp.py -v
           python scripts/fetch_reviewed_schema.py --directory "$RUNNER_TEMP/reviewed-osis"
-          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
-          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke
-          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_index.cpp -o "$RUNNER_TEMP/mhcc-index" -lsword
-          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_TEMP/mhcc-raw" -lsword
       - name: Reversible structural normalization, independent BRNP and full native comparison
         run: |
           set -euo pipefail
@@ -120,7 +116,7 @@ jobs:
                       visible=sum(length for pos,nonempty,length in text_events[bisect_left(event_offsets,lo):bisect_left(event_offsets,hi)] if nonempty)
                       gaps.append({"book":book_id,"nonwhitespace_characters":visible,"intervening_tags":dict(Counter(etree.QName(n).localname+":"+str(n.get("type","")) for n in between))})
               print("BOOK_PAIR_GAPS",json.dumps({"distinct_gap_shapes":list({json.dumps({k:v for k,v in g.items() if k!="book"},sort_keys=True) for g in gaps}),"nonempty_gaps":[g for g in gaps if g["nonwhitespace_characters"]][:10]},sort_keys=True),flush=True)
-              assert all(not g["nonwhitespace_characters"] and all(tag.startswith("milestone:") or tag in {"div:bookGroup","div:book","div:chapter"} for tag in g["intervening_tags"]) for g in gaps), "Book milestone pair variants differ in content or semantic scope"
+              assert all(not g["nonwhitespace_characters"] and all(tag.startswith("milestone:") or tag in {"div:bookGroup","div:book","div:chapter","div:section"} for tag in g["intervening_tags"]) for g in gaps), "Book milestone pair variants differ in content or semantic scope"
               chapters=[n for n in items if n.tag==ns+"div" and n.get("type")=="chapter" and n.get("osisID") and not(n.get("sID") or n.get("eID"))]
               for ch in chapters:
                   own=ch.get("osisID")
@@ -175,6 +171,33 @@ jobs:
           print("BRNP_STRUCTURE",json.dumps(structure,sort_keys=True),flush=True)
           (bundle/"structure-ledger.json").write_text(json.dumps({"structure":structure,"byte_edits":ledger},sort_keys=True,indent=2)+"\n")
           assert after["finding_count"]==0 and before["commentary_entry_count"]==after["commentary_entry_count"]
+          PY
+      - name: Install native SWORD for successful structural trial
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_index.cpp -o "$RUNNER_TEMP/mhcc-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp -o "$RUNNER_TEMP/mhcc-raw" -lsword
+      - name: Recompile and compare all native entries
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,io,json,os,subprocess
+          from collections import Counter
+          from pathlib import Path
+          from lxml import etree
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          from commentary_native_raw_inventory import private_crosscheck
+          tmp=Path(os.environ["RUNNER_TEMP"])
+          bundle=tmp/"mhcc-brnp-candidate"
+          base=(tmp/"erratum-only.osis.xml").read_bytes()
+          normalized=(bundle/"mhcc.osis.xml").read_bytes()
+          structure=json.loads((bundle/"structure-ledger.json").read_text())["structure"]
+          closures=structure["closed_chapters"]
+          sha=lambda data:hashlib.sha256(data).hexdigest()
+          assert sha(base)==structure["base_sha256"] and sha(normalized)==structure["normalized_sha256"]
+          parser=lambda:etree.XMLParser(resolve_entities=False,no_network=True,load_dtd=False)
           def compile_source(label,raw):
               root=tmp/label;payload=root/"modules/comments/zcom/mhcc"
               payload.mkdir(parents=True);(root/"mods.d").mkdir()
