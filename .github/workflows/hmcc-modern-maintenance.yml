@@ -1,0 +1,112 @@
+name: Audit published modern commentary and current classical witness
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/hmcc-modern-maintenance.yml'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: scripts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned validation and stable SWORD tools
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          sudo apt-get update
+          sudo apt-get install -y libsword-dev libsword-utils diatheke pkg-config
+          g++ -O2 -std=c++17 scripts/sword_native_commentary_index.cpp $(pkg-config --cflags --libs sword) -o "$RUNNER_TEMP/index"
+          g++ -O2 -std=c++17 scripts/sword_native_commentary_raw_corpus.cpp $(pkg-config --cflags --libs sword) -o "$RUNNER_TEMP/raw"
+          python scripts/fetch_reviewed_schema.py --directory "$RUNNER_TEMP/schema"
+      - name: Authenticate actual public bytes and recompile exact modern OSIS
+        env:
+          GH_${{ github.token }}: TOKEN
+        run: |
+          set -euo pipefail
+          gh release download hmcc-modern-0.1.0 -p HMCCModern-0.1.0.zip -D "$RUNNER_TEMP"
+          echo "dd1940b3bf85cc09659b634dc74c9a9d8810816bc2f8316a8293f893c3eb94ee  $RUNNER_TEMP/HMCCModern-0.1.0.zip" | sha256sum -c
+          gh release download mhcc-1.0.0 -p MHCC-1.0.0.zip -D "$RUNNER_TEMP"
+          echo "04bdbeb103e3b766b723c0aa627e4ceab29adaacc657f3070bb5c99fb5df08b3  $RUNNER_TEMP/MHCC-1.0.0.zip" | sha256sum -c
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import hashlib,json,os,shutil
+          from reviewed_compiled_commentary_rebuild import checked_zcom_payload_files
+          t=Path(os.environ["RUNNER_TEMP"])
+          for module,slug,archive,name in [("HMCCModern","hmcc-modern","HMCCModern-0.1.0.zip","published"),("MHCC","mhcc-crosswire","MHCC-1.0.0.zip","classic")]:
+              p=Path("modules")/slug/"payload"
+              files=checked_zcom_payload_files(p,module,"CHAPTER")
+              with ZipFile(t/archive) as z:
+                  assert len(z.namelist())==len(files) and set(z.namelist())==set(files)
+                  assert all(z.read(k)==v.read_bytes() for k,v in files.items())
+              shutil.copytree(p,t/name)
+          source=Path("sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml")
+          assert hashlib.sha256(source.read_bytes()).hexdigest()=="23f0872a67086d9f659bd96936ab63db63c8c7b8c10eb92e59537c3e6cf16189"
+          rebuild=t/"rebuild"
+          (rebuild/"modules/comments/zcom/hmccmodern").mkdir(parents=True)
+          shutil.copytree(t/"published/mods.d",rebuild/"mods.d")
+          PY
+          osis2mod "$RUNNER_TEMP/rebuild/modules/comments/zcom/hmccmodern" sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml -z z -b 3 > "$RUNNER_TEMP/compile.log" 2>&1
+      - name: Full native corpus, linked addresses, chapter scopes, and BRNP diagnostic
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import collections,hashlib,json,os,re,subprocess
+          from pathlib import Path
+          from lxml import etree
+          from check_brnp import check
+          from commentary_native_raw_inventory import private_crosscheck,NativeCommentaryMarkupCensus
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          t=Path(os.environ["RUNNER_TEMP"]);ns="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
+          source=Path("sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml")
+          emit=lambda label,data:print(label,json.dumps(data,ensure_ascii=False,sort_keys=True),flush=True)
+          root=etree.parse(str(source));schema=t/"schema/osisCore.2.1.1-cw-latest.xsd"
+          xsd=etree.XMLSchema(etree.parse(str(schema)))
+          valid=xsd.validate(root)
+          diag=check(source,"commentary",schema_path=schema if valid else None)
+          emit("MODERN_BRNP",{"schema_validated":valid,"schema_error_count":len(xsd.error_log),"schema_first_errors":[{"line":e.line,"type":e.type_name} for e in list(xsd.error_log)[:10]],"sha256":diag["sha256"],"findings":diag["finding_codes"],"examples":diag["finding_examples_by_code"],"entries":diag["commentary_entry_count"],"element_counts":diag["element_counts"]})
+          def census(path):
+              tree=etree.parse(str(path))
+              result=collections.Counter()
+              chapters=set()
+              sample=[]
+              for e in tree.iter(ns+"div"):
+                  a=e.get("annotateRef")
+                  if a:
+                      result["annotations"]+=1
+                      for k in a.split():
+                          m=re.search(r"(?:Bible:)?([1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*)",k)
+                          if m:chapters.add(m[1])
+                      if re.search(r"(?:^|[\s:])Gen\.5(?:\.|$)",a):
+                          sample.append({"ref":a,"words":len(" ".join(e.itertext()).split()),"text":" ".join(" ".join(e.itertext()).split())[:3000]})
+              return {"annotation_count":result["annotations"],"annotated_chapter_count":len(chapters),"annotated_chapters":chapters,"gen5":sample}
+          c=census(Path("sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml"));m=census(source)
+          emit("MODERN_SCOPES",{"classic_annotations":c["annotation_count"],"modern_annotations":m["annotation_count"],"classic_annotated_chapters":c["annotated_chapter_count"],"modern_annotated_chapters":m["annotated_chapter_count"],"classic_chapters_without_modern_annotateRef":sorted(c["annotated_chapters"]-m["annotated_chapters"]),"modern_chapters_without_classic_annotateRef":sorted(m["annotated_chapters"]-c["annotated_chapters"]),"gen5_classic":c["gen5"],"gen5_modern":m["gen5"]})
+          def native(folder,module):
+              env=dict(os.environ,SWORD_PATH=str(t/folder))
+              index=subprocess.check_output([str(t/"index"),module],env=env,timeout=60)
+              raw=t/(folder+".raw")
+              with raw.open("wb") as f:subprocess.run([str(t/"raw"),module],stdout=f,env=env,check=True,timeout=120)
+              rows={};observed=[];markup=NativeCommentaryMarkupCensus()
+              def capture(kind,key,body):
+                  rows[(kind,key)]=body
+                  observed.append((kind,key))
+                  markup.observe(kind,key,body)
+              with raw.open("rb") as f:stats,*_=parse_native_raw_corpus(f,on_entry=capture)
+              independent=private_crosscheck(index,module,observed,stats)
+              links=subprocess.check_output([str(t/"index"),module,"--adjacent-links"],env=env,timeout=60)
+              summary={"sha256":stats["all_native_raw_entries_ordered_sha256"],"counts":dict(collections.Counter(k[0] for k in rows)),"markup":markup.report(len(rows)),"link_sha256":hashlib.sha256(links).hexdigest(),"index_verified":True}
+              return rows,links,summary
+          p,pl,ps=native("published","HMCCModern");r,rl,rs=native("rebuild","HMCCModern");c,cl,cs=native("classic","MHCC")
+          emit("MODERN_NATIVE",{"published":ps,"rebuild":rs,"classic":cs,"rebuild_missing_keys":sorted(p.keys()-r.keys()),"rebuild_extra_keys":sorted(r.keys()-p.keys()),"changed_native_raw_count":sum(p[k]!=r[k] for k in p.keys()&r.keys()),"link_stream_equal":pl==rl,"classic_only_numbered_keys":sorted(k[1] for k in c.keys()-p.keys() if k[0]=="K")[:100],"modern_only_numbered_key_count":sum(k[0]=="K" for k in p.keys()-c.keys()),"classic_only_numbered_key_count":sum(k[0]=="K" for k in c.keys()-p.keys()),"scope_samples":{key:{"classic_present":("K",key) in c,"modern_present":("K",key) in p,"modern_words":len(re.sub(r"<[^>]+>"," ",p.get(("K",key),b"").decode()).split()),"modern_note_targets":re.findall(r'osisRef="([^"]+)"',p.get(("K",key),b"").decode())[:20]} for key in ["Gen.5.25","Num.29.1","Lev.19.1","Lev.19.37","Ps.108.1","Ps.108.13"]}})
+          for folder,rows in [("classic",c),("published",p)]:
+              raw=rows.get(("K","Gen.5.25"),b"").decode()
+              emit("MODERN_GEN5_NATIVE",{"edition":folder,"body":re.sub(r"<[^>]+>"," ",raw)[:6000]})
+          PY
