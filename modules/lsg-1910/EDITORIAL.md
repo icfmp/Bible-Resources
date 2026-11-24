@@ -1,3 +1,9 @@
+# Louis Segond 1910 — Bible Resources 1.0.3 (unpublished candidate)
+
+Eight redundant, bare empty paragraphs removed after source USFM review. All source words, notes, titles, inline annotations and remaining paragraph and poetry positions preserved. Original publisher files remain immutable.
+
+## Earlier approved 1.0.2 editorial record
+
 # Louis Segond 1910 — Bible Resources 1.0.2 (published 2026-11-24)
 
 Existing original section headings now carry the OSIS-valid x-section type where they immediately follow a chapter opening. Exactly 803 unchanged titles are now part of native verse 1 entries. All original Scripture, publisher notes and citations are identical. The known Segond index exception for Mark 10:53 is retained.

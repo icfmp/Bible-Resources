@@ -1,5 +1,5 @@
 {
-  "diff_sha256": "2551fbfae3a3479125f8aa986562b3d4f2290082a0656a7bd3c8562ae7b43cb5",
+  "diff_sha256": "fa5d4858ef5fccb4377b3694d8da4a1f155b6179ef006abc0df59d556207bd59",
   "edition": "reader_optimized",
   "full_text_exactly_preserved": true,
   "inline_semantic_tags_preserved": true,
@@ -28,12 +28,19 @@
       "old_sha256": "1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d",
       "only_title_type_attributes_added": true,
       "operation": "annotate_untyped_first_section_headings"
+    },
+    {
+      "count": 8,
+      "exact_inverse_verified": true,
+      "new_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
+      "old_sha256": "2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd",
+      "operation": "remove_reviewed_redundant_empty_paragraphs"
     }
   ],
   "original_source_unchanged": true,
-  "output_sha256": "2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd",
-  "plan_sha256": "c3b9a2a9dc215f07ce1d0eefbdbf3e238d3b57c6e1af41780a9b292187a5e607",
-  "review_asserted_by_plan": "Owner-reported missing chapter-first headings; independently validated source/native candidate PR #551",
+  "output_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
+  "plan_sha256": "5fe06cabd8bd517d28abfa7bf147d9bb51fcf700828740faf13f02f22afef300",
+  "review_asserted_by_plan": "Owner-requested empty paragraph cleanup #565; independent native and GUI checks",
   "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
   "source_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
   "status": "structural_edit_verified_not_published"

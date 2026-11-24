@@ -1,0 +1,37 @@
+{
+  "editorial_approval": {
+    "approved_by": "Bible Resources project owner",
+    "date": "2026-11-23",
+    "scope": "Eight source-attested redundant empty paragraphs removed; full native parity and actual Xiphos checks. Final public release remains a separate approval."
+  },
+  "files": {
+    "mods.d/brlsg1910.conf": "e9c07f3ffd05a69edb7929f90090cbe4f548a99a1c148954d2ad9a1127d0c2f2",
+    "modules/texts/ztext/brlsg1910/nt.bzs": "a3698a28dbe4bd938eb49a205d1a841ce2cb65c9ea76de5f1c089aacc456eb43",
+    "modules/texts/ztext/brlsg1910/nt.bzv": "5c3990e7838962ef4f58f921edbf3c523c2ae87025478d9e9ba1af75082aa374",
+    "modules/texts/ztext/brlsg1910/nt.bzz": "3b1e8b178256bac4f2df6f70df82a8deceddbab5f8a94a80f8270ae8d5bde58f",
+    "modules/texts/ztext/brlsg1910/ot.bzs": "425faad2f45629697ffc20b3bfeee1e908df2d2eaf057a338522b57eaccd8379",
+    "modules/texts/ztext/brlsg1910/ot.bzv": "fa18229cf203609bc6c43a4e3a488be0c2f49165c678951dd390d6f974cdce48",
+    "modules/texts/ztext/brlsg1910/ot.bzz": "28b9bb8e3bb5bb8fbbfb7606a83c1b20c7182462a6e724c8a4c4ad6d4c84b4da"
+  },
+  "metadata_path": "modules/lsg-1910/metadata.json",
+  "module_id": "BRLSG1910",
+  "provenance": {
+    "empty_paragraph_receipt_sha256": "5fe06cabd8bd517d28abfa7bf147d9bb51fcf700828740faf13f02f22afef300",
+    "first_heading_receipt_sha256": "c3b9a2a9dc215f07ce1d0eefbdbf3e238d3b57c6e1af41780a9b292187a5e607",
+    "full_native_heading_audit_sha256": "2551fbfae3a3479125f8aa986562b3d4f2290082a0656a7bd3c8562ae7b43cb5",
+    "full_native_paragraph_audit_sha256": "fa5d4858ef5fccb4377b3694d8da4a1f155b6179ef006abc0df59d556207bd59",
+    "historical_1_0_0_zip_sha256": "cc3b57ab0b61476a77b42fa19004956085d7608a974724c770cc2211adc67499",
+    "historical_1_0_1_zip_sha256": "c7b7471cba433abf99c84c1a6968a7a07a1d1cb5d021ca3bf6fdb86f6f6adf63",
+    "historical_1_0_2_zip_sha256": "547d5b953c3a3720bf21bed0e48d515e1d9c581dc419bd4b0af5593286180f01",
+    "new_full_native_readback_sha256": "fa5d4858ef5fccb4377b3694d8da4a1f155b6179ef006abc0df59d556207bd59",
+    "original_usfx_zip_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+    "previous_approved_osis_sha256": "2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd",
+    "reviewed_candidate_osis_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0"
+  },
+  "release_audit_sha256": "fa5d4858ef5fccb4377b3694d8da4a1f155b6179ef006abc0df59d556207bd59",
+  "release_tag": "lsg-1.0.3",
+  "release_zip_sha256": "aac34652d06ab83087a1f7aebad1ba8c21a3c5716aaad63927d08a290ae08df2",
+  "schema_version": 1,
+  "source_usfm_zip_sha256": "64c4fe2a84d92f958deb0d1add4247d126a21c8a51e5b3058338f661a42d4900",
+  "source_usfx_zip_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e"
+}

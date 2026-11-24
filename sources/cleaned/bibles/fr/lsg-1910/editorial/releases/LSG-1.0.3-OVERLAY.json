@@ -1,0 +1,66 @@
+{
+  "candidate_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
+  "changes": [
+    {
+      "candidate_byte_offset": 24230792,
+      "next_source_verse": "Luke.6.20",
+      "original_byte_offset": 24230792,
+      "removed_markup_utf8": "<p/>",
+      "retained_inner_whitespace_utf8": ""
+    },
+    {
+      "candidate_byte_offset": 30040955,
+      "next_source_verse": "Rev.2.1",
+      "original_byte_offset": 30040959,
+      "removed_markup_utf8": "<p/>",
+      "retained_inner_whitespace_utf8": ""
+    },
+    {
+      "candidate_byte_offset": 30049033,
+      "next_source_verse": "Rev.2.8",
+      "original_byte_offset": 30049041,
+      "removed_markup_utf8": "<p/>",
+      "retained_inner_whitespace_utf8": ""
+    },
+    {
+      "candidate_byte_offset": 30054900,
+      "next_source_verse": "Rev.2.12",
+      "original_byte_offset": 30054912,
+      "removed_markup_utf8": "<p/>",
+      "retained_inner_whitespace_utf8": ""
+    },
+    {
+      "candidate_byte_offset": 30063999,
+      "next_source_verse": "Rev.2.18",
+      "original_byte_offset": 30064015,
+      "removed_markup_utf8": "<p/>",
+      "retained_inner_whitespace_utf8": ""
+    },
+    {
+      "candidate_byte_offset": 30078188,
+      "next_source_verse": "Rev.3.1",
+      "original_byte_offset": 30078208,
+      "removed_markup_utf8": "<p/>",
+      "retained_inner_whitespace_utf8": ""
+    },
+    {
+      "candidate_byte_offset": 30086944,
+      "next_source_verse": "Rev.3.7",
+      "original_byte_offset": 30086968,
+      "removed_markup_utf8": "<p/>",
+      "retained_inner_whitespace_utf8": ""
+    },
+    {
+      "candidate_byte_offset": 30097858,
+      "next_source_verse": "Rev.3.14",
+      "original_byte_offset": 30097886,
+      "removed_markup_utf8": "<p/>",
+      "retained_inner_whitespace_utf8": ""
+    }
+  ],
+  "exact_inverse_verified": true,
+  "no_other_xml_changes": true,
+  "published": false,
+  "removed_redundant_empty_paragraphs": 8,
+  "source_sha256": "2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd"
+}

@@ -26,7 +26,7 @@ Cette édition, préparée par Bible Resources à partir de la source eBible, es
 - L'édition de 1910 est une révision de la traduction originale de Louis Segond.
 - Certains choix de variantes du Nouveau Testament retiennent des formulations moins explicites concernant la divinité de Jésus-Christ que d'autres lectures manuscrites, notamment en 1 Timothée 3.16 et Actes 20.28 (voir les références et précautions de méthode ci-dessous).
 
-**Source :** eBible · **Version Bible Resources :** 1.0.2
+**Source :** eBible · **Version Bible Resources :** 1.0.3
 
 ## Présentation longue — détails de la ressource (texte soumis à validation éditoriale)
 
@@ -117,7 +117,7 @@ Ces particularités sont documentées et ne constituent pas une modification des
 | Format | SWORD / OSIS |
 | Versification | Segond |
 | Module | BRLSG1910 |
-| Version | 1.0.2 |
+| Version | 1.0.3 |
 | Licence du texte | Domaine public |
 | Distribution | Bible Resources |
 
@@ -133,7 +133,7 @@ Ces particularités sont documentées et ne constituent pas une modification des
 - [Déclaration de domaine public](https://ebible.org/fraLSG/copyright.htm).
 - [Publication Bible Resources 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0).
 
-**Édition numérique :** Bible Resources 1.0.2, novembre 2026.
+**Édition numérique :** Bible Resources 1.0.3, novembre 2026.
 
 ## Three distinct provenance layers
 

@@ -1,0 +1,175 @@
+{
+  "actual_xiphos": true,
+  "all_eight_title_and_verse_witnesses": true,
+  "comparisons": {
+    "Luke.6.20": {
+      "exact_clipboard_equal": true,
+      "nonspace_clipboard_equal": true
+    },
+    "Rev.2.1": {
+      "exact_clipboard_equal": true,
+      "nonspace_clipboard_equal": true
+    },
+    "Rev.2.12": {
+      "exact_clipboard_equal": true,
+      "nonspace_clipboard_equal": true
+    },
+    "Rev.2.18": {
+      "exact_clipboard_equal": true,
+      "nonspace_clipboard_equal": true
+    },
+    "Rev.2.8": {
+      "exact_clipboard_equal": true,
+      "nonspace_clipboard_equal": true
+    },
+    "Rev.3.1": {
+      "exact_clipboard_equal": true,
+      "nonspace_clipboard_equal": true
+    },
+    "Rev.3.14": {
+      "exact_clipboard_equal": true,
+      "nonspace_clipboard_equal": true
+    },
+    "Rev.3.7": {
+      "exact_clipboard_equal": true,
+      "nonspace_clipboard_equal": true
+    }
+  },
+  "observations": {
+    "candidate": {
+      "Luke.6.20": {
+        "clipboard_bytes": 7864,
+        "clipboard_nonspace_sha256": "80b6c1444d161b04285f080cf458c2b699e4e77039a98123e213b67f0e7c31e3",
+        "clipboard_sha256": "e48ce994925f77e384bcdba3487e0309fbe167e0423b7a6d52e79d5d4f648f1c",
+        "navigation": "Luke 6:20",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      },
+      "Rev.2.1": {
+        "clipboard_bytes": 5667,
+        "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+        "clipboard_sha256": "575902204cbbae6bb2caa47932780b1b0ac72330e9ad371d9d2dab02cbdd0153",
+        "navigation": "Rev 2:1",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      },
+      "Rev.2.12": {
+        "clipboard_bytes": 5667,
+        "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+        "clipboard_sha256": "575902204cbbae6bb2caa47932780b1b0ac72330e9ad371d9d2dab02cbdd0153",
+        "navigation": "Rev 2:12",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      },
+      "Rev.2.18": {
+        "clipboard_bytes": 5667,
+        "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+        "clipboard_sha256": "575902204cbbae6bb2caa47932780b1b0ac72330e9ad371d9d2dab02cbdd0153",
+        "navigation": "Rev 2:18",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      },
+      "Rev.2.8": {
+        "clipboard_bytes": 5667,
+        "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+        "clipboard_sha256": "575902204cbbae6bb2caa47932780b1b0ac72330e9ad371d9d2dab02cbdd0153",
+        "navigation": "Rev 2:8",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      },
+      "Rev.3.1": {
+        "clipboard_bytes": 4189,
+        "clipboard_nonspace_sha256": "d7c2f9f34cb9d2704e915da0e516d3a75e247056727f7d7460b20f2e732f64f7",
+        "clipboard_sha256": "6cae7042fde310aa9a88c11592321bf3b109138d4eabc515bb9eded19b07e415",
+        "navigation": "Rev 3:1",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      },
+      "Rev.3.14": {
+        "clipboard_bytes": 4189,
+        "clipboard_nonspace_sha256": "d7c2f9f34cb9d2704e915da0e516d3a75e247056727f7d7460b20f2e732f64f7",
+        "clipboard_sha256": "6cae7042fde310aa9a88c11592321bf3b109138d4eabc515bb9eded19b07e415",
+        "navigation": "Rev 3:14",
+        "parallel_title_once": true,
+        "verse_witness_words": 14
+      },
+      "Rev.3.7": {
+        "clipboard_bytes": 4189,
+        "clipboard_nonspace_sha256": "d7c2f9f34cb9d2704e915da0e516d3a75e247056727f7d7460b20f2e732f64f7",
+        "clipboard_sha256": "6cae7042fde310aa9a88c11592321bf3b109138d4eabc515bb9eded19b07e415",
+        "navigation": "Rev 3:7",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      }
+    },
+    "published": {
+      "Luke.6.20": {
+        "clipboard_bytes": 7864,
+        "clipboard_nonspace_sha256": "80b6c1444d161b04285f080cf458c2b699e4e77039a98123e213b67f0e7c31e3",
+        "clipboard_sha256": "e48ce994925f77e384bcdba3487e0309fbe167e0423b7a6d52e79d5d4f648f1c",
+        "navigation": "Luke 6:20",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      },
+      "Rev.2.1": {
+        "clipboard_bytes": 5667,
+        "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+        "clipboard_sha256": "575902204cbbae6bb2caa47932780b1b0ac72330e9ad371d9d2dab02cbdd0153",
+        "navigation": "Rev 2:1",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      },
+      "Rev.2.12": {
+        "clipboard_bytes": 5667,
+        "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+        "clipboard_sha256": "575902204cbbae6bb2caa47932780b1b0ac72330e9ad371d9d2dab02cbdd0153",
+        "navigation": "Rev 2:12",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      },
+      "Rev.2.18": {
+        "clipboard_bytes": 5667,
+        "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+        "clipboard_sha256": "575902204cbbae6bb2caa47932780b1b0ac72330e9ad371d9d2dab02cbdd0153",
+        "navigation": "Rev 2:18",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      },
+      "Rev.2.8": {
+        "clipboard_bytes": 5667,
+        "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+        "clipboard_sha256": "575902204cbbae6bb2caa47932780b1b0ac72330e9ad371d9d2dab02cbdd0153",
+        "navigation": "Rev 2:8",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      },
+      "Rev.3.1": {
+        "clipboard_bytes": 4189,
+        "clipboard_nonspace_sha256": "d7c2f9f34cb9d2704e915da0e516d3a75e247056727f7d7460b20f2e732f64f7",
+        "clipboard_sha256": "6cae7042fde310aa9a88c11592321bf3b109138d4eabc515bb9eded19b07e415",
+        "navigation": "Rev 3:1",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      },
+      "Rev.3.14": {
+        "clipboard_bytes": 4189,
+        "clipboard_nonspace_sha256": "d7c2f9f34cb9d2704e915da0e516d3a75e247056727f7d7460b20f2e732f64f7",
+        "clipboard_sha256": "6cae7042fde310aa9a88c11592321bf3b109138d4eabc515bb9eded19b07e415",
+        "navigation": "Rev 3:14",
+        "parallel_title_once": true,
+        "verse_witness_words": 14
+      },
+      "Rev.3.7": {
+        "clipboard_bytes": 4189,
+        "clipboard_nonspace_sha256": "d7c2f9f34cb9d2704e915da0e516d3a75e247056727f7d7460b20f2e732f64f7",
+        "clipboard_sha256": "6cae7042fde310aa9a88c11592321bf3b109138d4eabc515bb9eded19b07e415",
+        "navigation": "Rev 3:7",
+        "parallel_title_once": true,
+        "verse_witness_words": 16
+      }
+    }
+  },
+  "published": false,
+  "source_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
+  "visual_spacing_pixel_verified": false
+}

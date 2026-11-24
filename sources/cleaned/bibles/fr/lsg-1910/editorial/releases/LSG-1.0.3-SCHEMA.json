@@ -1,0 +1,477 @@
+{
+  "annotated_commentary_entry_count": 0,
+  "bible_verse_member_count": 31170,
+  "book_identifier_count": 66,
+  "book_milestone_pair_identifier_count": 0,
+  "brnp_conformance_certified": false,
+  "chapter_identifier_count": 1189,
+  "chapter_pair_identifier_count": 1189,
+  "commentary_entry_count": 0,
+  "commentary_representation": "bible",
+  "element_counts": {
+    "cell": 329,
+    "chapter": 2378,
+    "date": 1,
+    "description": 66,
+    "div": 132,
+    "header": 1,
+    "hi": 170,
+    "identifier": 1,
+    "item": 181,
+    "l": 23991,
+    "lb": 29,
+    "lg": 1014,
+    "list": 28,
+    "milestone": 198,
+    "note": 9751,
+    "osis": 1,
+    "osisText": 1,
+    "p": 3229,
+    "q": 2644,
+    "refSystem": 2,
+    "reference": 29998,
+    "revisionDesc": 1,
+    "row": 162,
+    "seg": 2811,
+    "table": 12,
+    "title": 4543,
+    "type": 1,
+    "verse": 62340,
+    "w": 705728,
+    "work": 2
+  },
+  "finding_codes": {
+    "UNRESOLVED_REFERENCE_TARGET": 311
+  },
+  "finding_count": 311,
+  "finding_examples_by_code": {
+    "UNRESOLVED_REFERENCE_TARGET": {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 185
+    }
+  },
+  "findings": [
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 185
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 204
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 282
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 335
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 422
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 670
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 714
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 781
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 859
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 912
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 957
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 962
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 1023
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 1614
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 1810
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 1880
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2073
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2092
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2106
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2166
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2187
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2240
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2259
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2456
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2466
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2485
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2543
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2553
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2569
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 2661
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3171
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3171
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3264
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3287
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3342
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3407
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3484
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3552
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3580
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3603
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3691
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3712
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 3864
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 4604
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 4604
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 4656
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 4656
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 4702
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 4730
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5014
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5114
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5148
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5231
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5327
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5370
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5871
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5878
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5895
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5916
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5916
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5923
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5932
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5932
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5946
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5960
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5967
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5976
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5985
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5994
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 5994
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6015
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6145
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6166
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6175
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6193
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6352
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6395
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6482
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6482
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6602
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6609
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6616
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6689
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6743
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6761
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6834
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6888
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 6888
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 7146
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 7151
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 7216
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 7216
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 7225
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 7513
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 7513
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 7518
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 7525
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 7528
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 7533
+    },
+    {
+      "code": "UNRESOLVED_REFERENCE_TARGET",
+      "line": 7561
+    }
+  ],
+  "kind": "bible",
+  "limitations": [
+    "Official OSIS XSD is checked only when --schema is supplied; neither route proves historical/authorial fidelity",
+    "NOT a complete verse hierarchy, reference target, annotation or reader validation",
+    "NOT a production or publication approval gate"
+  ],
+  "official_osis": {
+    "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
+    "source_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
+    "status": "validated"
+  },
+  "paired_commentary_entry_count": 0,
+  "paired_commentary_member_count": 0,
+  "profile": "BRNP",
+  "profile_version": "0.3-draft",
+  "publication_approved": false,
+  "sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
+  "status": "findings_need_review",
+  "unreviewed_elements": {},
+  "verse_identifier_count": 31170,
+  "verse_pair_identifier_count": 31170,
+  "verse_start_reasons": {}
+}

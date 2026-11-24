@@ -1,10 +1,10 @@
 {
   "no_transformation_performed": true,
-  "note": "Official OSIS validated: 803 existing heading metadata types specified; all 31,169 native verse texts and 9,751 notes preserved",
+  "note": "Official OSIS validated; eight redundant empty paragraphs removed; all 31,169 native texts, 9,751 notes, 4,542 titles and 3,228 remaining paragraph spans verified",
   "policy_sha256": "15f875c19b94fc84ae123afad312164ca8631a302c2e03d980b934adf221a34f",
-  "provenance_audit_sha256": "2551fbfae3a3479125f8aa986562b3d4f2290082a0656a7bd3c8562ae7b43cb5",
+  "provenance_audit_sha256": "fa5d4858ef5fccb4377b3694d8da4a1f155b6179ef006abc0df59d556207bd59",
   "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
   "source_kind": "bible",
-  "source_sha256": "2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd",
+  "source_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
   "status": "validated"
 }

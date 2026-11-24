@@ -1,0 +1,261 @@
+{
+  "authorial_osis_structural_census": {
+    "source_l_elements": 23991,
+    "source_lb_elements": 29,
+    "source_lg_elements": 1014,
+    "source_p_elements": 3228,
+    "source_title_elements": 4542
+  },
+  "candidate_module_id": "BRLSG1910",
+  "candidate_payload_member_sha256": {
+    "mods.d/brlsg1910.conf": "3197ad444f9cb987a759b572d313a79b2fddaf1995de746eef371b1aade89efa",
+    "modules/texts/ztext/brlsg1910/nt.bzs": "a3698a28dbe4bd938eb49a205d1a841ce2cb65c9ea76de5f1c089aacc456eb43",
+    "modules/texts/ztext/brlsg1910/nt.bzv": "5c3990e7838962ef4f58f921edbf3c523c2ae87025478d9e9ba1af75082aa374",
+    "modules/texts/ztext/brlsg1910/nt.bzz": "3b1e8b178256bac4f2df6f70df82a8deceddbab5f8a94a80f8270ae8d5bde58f",
+    "modules/texts/ztext/brlsg1910/ot.bzs": "425faad2f45629697ffc20b3bfeee1e908df2d2eaf057a338522b57eaccd8379",
+    "modules/texts/ztext/brlsg1910/ot.bzv": "fa18229cf203609bc6c43a4e3a488be0c2f49165c678951dd390d6f974cdce48",
+    "modules/texts/ztext/brlsg1910/ot.bzz": "28b9bb8e3bb5bb8fbbfb7606a83c1b20c7182462a6e724c8a4c4ad6d4c84b4da"
+  },
+  "candidate_status": "full_numbered_text_and_note_preflight_equal_not_approved",
+  "candidate_versification": "Segond",
+  "changed_payload_members": [
+    "modules/texts/ztext/brlsg1910/nt.bzz",
+    "modules/texts/ztext/brlsg1910/nt.bzv",
+    "modules/texts/ztext/brlsg1910/nt.bzs"
+  ],
+  "compilation": {
+    "compiler_log_is_private_and_discarded": true,
+    "compiler_tool": "osis2mod",
+    "diagnostic_categories": {
+      "INFO": 2,
+      "unclassified": 2
+    },
+    "first_diagnostic_locations_no_source_text": [],
+    "returncode": 0,
+    "tool_sha256": "8ceed9fe597fd7948da02170144578522acd7e07ff60a42ba9ee11ddd81b820e"
+  },
+  "compiled_engine_version": "1.9.0",
+  "compiled_native_driver": "zText",
+  "compiled_native_milestone_closure_metadata_only": {
+    "cross_book_pair_reference_samples_no_ids": [],
+    "different_tag_interleavings_are_diagnostic_not_nesting_defects": true,
+    "first_issue_reference_ids_no_scripture": {},
+    "native_milestone_pair_categories": {
+      "different_tag_interleaving_diagnostic": 8070,
+      "globally_non_lifo_milestone_pairs": 10712,
+      "intro_to_intro_pairs": 588,
+      "intro_to_numbered_verse_pairs": 176,
+      "numbered_to_numbered_verse_pairs": 38313,
+      "pairs_spanning_multiple_entries": 3659,
+      "pairs_with_both_ends_in_one_entry": 35418,
+      "same_tag_different_type_interleaving_review": 2642
+    },
+    "native_milestone_pairing_findings": {},
+    "native_milestone_tag_counts": {
+      "div:close": 14072,
+      "div:open": 14072,
+      "div:paired": 14072,
+      "l:close": 23991,
+      "l:open": 23991,
+      "l:paired": 23991,
+      "lg:close": 1014,
+      "lg:open": 1014,
+      "lg:paired": 1014
+    },
+    "native_numbered_intro_scan_counts": {
+      "close_events": 39077,
+      "observed_I_entries": 1255,
+      "observed_K_entries": 31169,
+      "observed_U_entries": 2,
+      "open_events": 39077,
+      "paired_matching_sID_eID": 39077,
+      "parseable_anonymous_TOP_entries": 2,
+      "parseable_numbered_or_intro_entries": 32424,
+      "unaddressable_TOP_entries_unverified": 2,
+      "unaddressable_TOP_milestone_events_unverified": 0
+    },
+    "ordered_native_event_reference_fingerprint_sha256": "26ccc54334072edb3375b9e82372488009f81398be27255bf29108e8d865742b",
+    "paired_div_types_allowlisted": {
+      "book": 66,
+      "other_unreviewed_type": 66,
+      "x-milestone": 10712,
+      "x-p": 3228
+    },
+    "remaining_unclosed_milestones_by_tag": {},
+    "schema_version": 1,
+    "source_editorial_or_publication_approved": false,
+    "source_generated_identifier_values_exposed": false,
+    "source_relative_word_position_coverage_verified": false,
+    "source_to_compiled_same_type_event_order_verified": false,
+    "status": "compiled_milestone_pairs_verified_only",
+    "verse_zero_and_numbered_milestones_inspected": true
+  },
+  "compiled_payload_sha256": "c50b65e578de0419951186b7313847a0aad40eda2cf2efc1cf088f62c7cf1e8a",
+  "explicit_note_target_index_addressability": {
+    "actual_reader_link_click_navigation_verified": false,
+    "all_original_explicit_targets_index_addressable": true,
+    "bounded_note_host_reference_samples": [],
+    "counts": {
+      "addressable_endpoint_components": 29513,
+      "all_target_components_index_addressable": 29509,
+      "explicit_target_attributes_checked": 29509,
+      "notes_checked": 9751,
+      "range_components_checked": 4,
+      "target_component_indexed_chapter": 16,
+      "target_component_indexed_ordered_full_range": 4,
+      "target_component_indexed_verse": 29489
+    },
+    "original_target_literals_or_note_text_exposed": false,
+    "publication_approved": false,
+    "source_and_native_verse_indices_equal": true,
+    "status": "all_explicit_targets_index_addressable_including_full_ranges"
+  },
+  "explicit_p_q_and_layout_structure_fidelity_verified": false,
+  "first_safe_reference_note_index_findings": [],
+  "index": {
+    "exact_reference_key_parity": false,
+    "first_outside_refs": [
+      "Mark.10.53"
+    ],
+    "first_unexpected_reader_refs": [],
+    "first_unreachable_refs": [
+      "Mark.10.53"
+    ],
+    "outside_registered_versification_count": 1,
+    "resolved_reader_reference_count": 31169,
+    "reviewed_index_compromise_verified": true,
+    "reviewed_merge_count": 1,
+    "reviewed_merges": [
+      {
+        "original_osis_ref": "Mark.10.53",
+        "stock_reader_osis_ref": "Mark.10.52"
+      }
+    ],
+    "source_reference_count": 31170,
+    "source_references_unreachable_count": 1,
+    "status": "stable_reference_index_verified_with_reviewed_merges",
+    "text_notes_markup_and_visuals_verified": false,
+    "unexpected_populated_reader_references_count": 0,
+    "unoccupied_registered_slots_count": 1
+  },
+  "native_compiled_structure_screen": {
+    "actual_compiled_raw_entries_scanned": 32426,
+    "editorial_layout_and_visual_signoff_deferred_to_stage_5": true,
+    "original_to_native_editorial_structure_counts": {
+      "native_l_close_elements": 23991,
+      "native_l_open_elements": 23991,
+      "native_lb_container_elements": 29,
+      "native_lg_close_elements": 1014,
+      "native_lg_open_elements": 1014,
+      "native_paragraph_close_elements": 3228,
+      "native_paragraph_open_elements": 3228,
+      "native_title_container_elements": 4542
+    },
+    "semantic_source_native_event_position_or_scope_verified": false,
+    "source_native_structural_count_equality_not_inferred": true
+  },
+  "numbered_slot_text_and_note_parity_verified": true,
+  "original_authorial_verse_count": 31170,
+  "original_to_compiled_body_opening_order": {
+    "explicit_prechapter_book_title_styles_separately_accounted_for": false,
+    "first_mismatch_book_references_no_scripture": [],
+    "native_event_kind_order_sha256": "165d502414cc6fbbb6ba4f135b1d0cc3a6a80e322fec0c9b0f046c0f0dd488d9",
+    "no_scripture_or_native_milestone_identifiers_in_report": true,
+    "original_to_native_book_title_match_not_verified_by_this_screen": true,
+    "originals_rewritten_or_published": false,
+    "same_order_and_kind_in_every_mapped_book": true,
+    "schema_version": 1,
+    "source_event_kind_order_sha256": "165d502414cc6fbbb6ba4f135b1d0cc3a6a80e322fec0c9b0f046c0f0dd488d9",
+    "source_native_body_opening_kind_counts": {
+      "authorial_body_start_events": 27219,
+      "books_checked": 66,
+      "books_with_body_opening_count_difference": 0,
+      "books_with_body_opening_kind_difference": 0,
+      "books_with_equal_count_but_reordered_kinds": 0,
+      "books_with_exact_body_opening_kind_order": 66,
+      "native_body_start_events": 27219,
+      "native_paragraph_starts": 3228,
+      "native_poetry_line_starts": 23991,
+      "source_body_p_openings": 3228,
+      "source_body_q_openings": 23991
+    },
+    "source_native_exact_word_positions_or_boundary_spans_verified": false,
+    "source_native_whitespace_or_full_editorial_layout_verified": false
+  },
+  "previous_payload_member_sha256": {
+    "mods.d/brlsg1910.conf": "3197ad444f9cb987a759b572d313a79b2fddaf1995de746eef371b1aade89efa",
+    "modules/texts/ztext/brlsg1910/nt.bzs": "236d60cc3c6033b36cd82e31ec09fb97a53d96d43bbae4cf0821d81721caa832",
+    "modules/texts/ztext/brlsg1910/nt.bzv": "24205eae8a835a6afbadeaecd7567316f9ef1b9db222b10a5cda602327a46a5c",
+    "modules/texts/ztext/brlsg1910/nt.bzz": "93636f507abb441e47b0711fc4b31c5fee38d946e3e592dee5af5fbfe359e922",
+    "modules/texts/ztext/brlsg1910/ot.bzs": "425faad2f45629697ffc20b3bfeee1e908df2d2eaf057a338522b57eaccd8379",
+    "modules/texts/ztext/brlsg1910/ot.bzv": "fa18229cf203609bc6c43a4e3a488be0c2f49165c678951dd390d6f974cdce48",
+    "modules/texts/ztext/brlsg1910/ot.bzz": "28b9bb8e3bb5bb8fbbfb7606a83c1b20c7182462a6e724c8a4c4ad6d4c84b4da"
+  },
+  "publisher_original_note_target_navigation_verified": false,
+  "source_native_body_boundary_positions": {
+    "all_book_body_nonspace_and_boundary_events_equal": true,
+    "all_title_text_and_nonspace_placement_equal": true,
+    "bounded_reference_only_findings": [],
+    "counts": {
+      "books_compared": 66,
+      "books_with_identical_full_nonspace_body_stream": 66,
+      "boundary_event_positions_equal": 56466,
+      "native_TOP_title_events": 0,
+      "native_l_close_events": 23991,
+      "native_l_open_events": 23991,
+      "native_lg_close_events": 1014,
+      "native_lg_open_events": 1014,
+      "native_p_close_events": 3228,
+      "native_p_open_events": 3228,
+      "native_title_events": 4542,
+      "outside_book_title_text_and_order_equal": 0,
+      "source_l_close_events": 23991,
+      "source_l_open_events": 23991,
+      "source_lg_close_events": 1014,
+      "source_lg_open_events": 1014,
+      "source_outside_book_title_events": 0,
+      "source_p_close_events": 3228,
+      "source_p_open_events": 3228,
+      "source_title_events": 4542,
+      "title_prose_and_nonspace_positions_equal": 4542
+    },
+    "independent_reader_visual_signoff": false,
+    "literal_whitespace_or_exact_typography_verified": false,
+    "native_anonymous_top_nonspace_body_characters": 0,
+    "native_frame_counts": {
+      "I": 1255,
+      "K": 31169,
+      "U": 2
+    },
+    "paragraph_span_diagnostic": {
+      "bounded_reference_only_findings": [],
+      "counts": {
+        "identical_paragraph_spans": 3228
+      },
+      "scope": "books_with_identical_full_nonspace_body_stream",
+      "zero_nonspace_spans_not_automatically_waived": true
+    },
+    "published": false,
+    "source_title_prose_and_verse_zero_semantics_verified": false,
+    "status": "source_native_body_boundary_nonspace_positions_equal"
+  },
+  "source_osis_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
+  "source_to_compiled_counts": {
+    "native_only_references": 0,
+    "native_other_I_entries": 1255,
+    "native_other_U_entries": 2,
+    "note_body_equal_after_whitespace_folding": 9751,
+    "note_explicit_target_sequence_equal": 9751,
+    "note_nonspace_anchor_equal": 9751,
+    "note_original_caller_label_equal": 9751,
+    "note_original_type_equal": 9751,
+    "note_pairs_compared": 9751,
+    "numbered_verse_nonspace_main_text_equal": 31169,
+    "numbered_verse_note_count_matches": 31169,
+    "official_source_verse_count": 31169,
+    "populated_native_verse_count": 31169,
+    "source_only_references": 0
+  },
+  "usable_for_publication": false,
+  "visual_reader_or_parallel_reader_verified": false
+}

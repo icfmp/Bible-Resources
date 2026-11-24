@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "Source-attested redundant empty paragraph removal; full native content and structure parity and actual Xiphos comparison",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/565",
+    "reviewed_by": "Bible Resources owner — requested redundant paragraph correction #565; publication approval still distinct",
+    "source_rights": "eBible fraLSG public-domain source; independently reviewed original electronic reference citations and historical printed evidence"
+  },
+  "editorial_path": "modules/lsg-1910/EDITORIAL.md",
+  "evidence_path": "modules/lsg-1910/SOURCE_VALIDATION.json",
+  "module_id": "lsg-1910",
+  "notes_path": "sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-1.0.3.md",
+  "package_sha256": "aac34652d06ab83087a1f7aebad1ba8c21a3c5716aaad63927d08a290ae08df2",
+  "package_size_bytes": 4268022,
+  "schema_version": 1,
+  "sword_id": "BRLSG1910",
+  "tag": "lsg-1.0.3",
+  "title": "Louis Segond 1910 — 1.0.3",
+  "version": "1.0.3",
+  "zip_name": "BRLSG1910-1.0.3.zip"
+}
