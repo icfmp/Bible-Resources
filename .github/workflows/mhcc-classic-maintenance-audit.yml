@@ -81,14 +81,12 @@ jobs:
           changed={k for k in old.keys()&new.keys() if old[k]!=new[k]}
           expected_added={("K",row["new_key"]) for row in rebuild["added_links"]}
           expected_changed={("K",key) for row in rebuild["source_edits"] for key in row["affected_original_keys"]}
-          assert added==expected_added and not removed and changed==expected_changed
-          for row in rebuild["added_links"]:
-              assert new["K",row["new_key"]]==new["K",row["master_key"]]
-          for row in rebuild["source_edits"]:
-              for key in row["affected_original_keys"]:
-                  assert sha(old["K",key])==row["original_sha256"]
-                  assert sha(new["K",key])==row["revised_sha256"]
-          print("NATIVE_HISTORY",json.dumps({"original":old_report,"current":new_report,"added_keys":len(added),"changed_keys":len(changed),"removed_keys":len(removed),"exact_approved_delta":True},sort_keys=True),flush=True)
+          history_matches = added==expected_added and not removed and changed==expected_changed
+          print("HISTORICAL_DELTA",json.dumps({"added":sorted(added),"removed":sorted(removed),"changed_count":len(changed),"unexpected_added":sorted(added-expected_added),"expected_added_absent":sorted(expected_added-added),"unexpected_changed":sorted(changed-expected_changed),"expected_changed_absent":sorted(expected_changed-changed),"old_native_sha256":old_report["native_sha256"],"new_native_sha256":new_report["native_sha256"],"history_matches":history_matches},sort_keys=True),flush=True)
+          wrong_links=[row["new_key"] for row in rebuild["added_links"] if new.get(("K",row["new_key"]))!=new.get(("K",row["master_key"])) or ("K",row["new_key"]) not in new]
+          wrong_edits=[key for row in rebuild["source_edits"] for key in row["affected_original_keys"] if ("K",key) not in old or ("K",key) not in new or sha(old["K",key])!=row["original_sha256"] or sha(new["K",key])!=row["revised_sha256"]]
+          print("HISTORICAL_DELTA_WITNESSES",json.dumps({"wrong_links":wrong_links,"wrong_edits":wrong_edits}),flush=True)
+          print("NATIVE_HISTORY",json.dumps({"original":old_report,"current":new_report,"added_keys":len(added),"changed_keys":len(changed),"removed_keys":len(removed),"exact_approved_delta":history_matches and not wrong_links and not wrong_edits},sort_keys=True),flush=True)
           source=(source_dir/"mhcc.osis.xml").read_bytes()
           assert sha(source)==cleanup["reconstructed_source_sha256"]
           parser=etree.XMLParser(resolve_entities=False,no_network=True,huge_tree=False)
@@ -98,6 +96,7 @@ jobs:
           hosts=[key for key,raw in new.items() if broken in raw]
           assert hosts and set(hosts)=={key for key,raw in old.items() if broken in raw}
           assert all(key[0]=="K" and key[1].startswith("Gen.5.") and new[key]==old[key] and new[key].count(broken)==1 for key in hosts)
+          print("ERRATUM_LOCATORS",json.dumps({"source_matches":source.count(broken),"native_hosts":[key[1] for key in hosts],"source_hash":sha(source)},sort_keys=True),flush=True)
           assert source.count(broken)==1
           candidate=source.replace(broken,restored,1)
           assert candidate.replace(restored,broken,1)==source
@@ -120,3 +119,12 @@ jobs:
           except Exception as exc:
               print("UPSTREAM_DRIFT_BLOCKED",type(exc).__name__,str(exc)[:400],flush=True)
           PY
+      - name: Verify relocated historical Modern owner decision witness in clean checkout
+        run: |
+          set -euo pipefail
+          p="sources/cleaned/commentaries/en/hmcc-modern/editorial/evidence/OWNER_EDITORIAL_DECISIONS_2026-11-19.json"
+          test -f "$p"
+          git ls-files --error-unmatch "$p"
+          test "$(git hash-object "$p")" = 17ae1990423f5bdee7096ea76e9b5fc6927af1b6
+          sha256sum "$p"
+          python -m unittest discover -s tests -p test_reviewed_modern_commentary_rebuild.py -v
