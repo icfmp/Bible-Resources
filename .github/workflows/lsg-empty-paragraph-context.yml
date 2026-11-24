@@ -1,0 +1,68 @@
+name: Review source-attested empty paragraph context before correction
+on:
+  push:
+    branches: [fix/lsg-empty-paragraphs]
+    paths: ['.github/workflows/lsg-empty-paragraph-context.yml']
+permissions:
+  contents: read
+jobs:
+  context:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          python -m pip install -r requirements.txt
+          python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          from zipfile import ZipFile
+          from lxml import etree
+          import json,re
+          base=Path("sources/original/bibles/fr/lsg-1910")
+          prov=json.loads((base/"PROVENANCE.json").read_text())
+          archive=base/prov["original_file"]
+          assert sha256(archive.read_bytes()).hexdigest()==prov["original_sha256"]
+          assert archive.stat().st_size==prov["original_size_bytes"]
+          source=Path("sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml")
+          raw=source.read_bytes()
+          assert sha256(raw).hexdigest()=="2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd"
+          ns="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
+          root=etree.fromstring(raw,etree.XMLParser(resolve_entities=False,no_network=True,load_dtd=False))
+          targets={"LUK":{(6,20)},"REV":{(2,1),(2,8),(2,12),(2,18),(3,1),(3,7),(3,14)}}
+          def summarize(n):
+              if n is None: return None
+              if not isinstance(n.tag,str): return {"tag":"comment_or_pi"}
+              return {"tag":etree.QName(n).localname,"attributes":dict(n.attrib),
+                      "direct_children":[etree.QName(x).localname for x in n if isinstance(x.tag,str)][:12],
+                      "nonspace_text_count":sum(not c.isspace() for c in "".join(n.itertext()))}
+          for p in root.iter(ns+"p"):
+              if len(p) or p.attrib or (p.text or "").strip(): continue
+              prev=next(p.itersiblings(preceding=True),None)
+              nxt=p.getnext()
+              anc=next(a for a in p.iterancestors() if a.tag==ns+"div" and a.get("type")=="book")
+              print("OSIS_CONTEXT",json.dumps({"book":anc.get("osisID"),"line":p.sourceline,
+                   "parent":summarize(p.getparent())["tag"],"previous":summarize(prev),
+                   "next":summarize(nxt),"tail_nonspace":bool((p.tail or "").strip()),
+                   "previous_verse":next((v.get("osisID") for v in p.xpath("preceding::o:verse[@osisID]",namespaces={"o":ns[1:-1]})[::-1]),None),
+                   "next_verse":next((v.get("osisID") for v in p.xpath("following::o:verse[@osisID]",namespaces={"o":ns[1:-1]})),None)},sort_keys=True))
+          with ZipFile(archive) as z:
+              for name in z.namelist():
+                  if not name.lower().endswith((".usfm",".sfm")): continue
+                  lines=z.read(name).decode("utf-8-sig").splitlines()
+                  ident=next((re.match(r"\\id\s+(\w+)",s).group(1) for s in lines if re.match(r"\\id\s+(\w+)",s)),None)
+                  if ident not in targets: continue
+                  chapter=0
+                  for i,line in enumerate(lines):
+                      c=re.match(r"\\c\s+(\d+)",line)
+                      if c: chapter=int(c.group(1))
+                      v=re.match(r"\\v\s+(\d+)\b",line)
+                      if v and (chapter,int(v.group(1))) in targets[ident]:
+                          markers=[]
+                          for j in range(max(0,i-6),min(len(lines),i+5)):
+                              m=re.match(r"\\([A-Za-z0-9]+)\b(?:\s+(.*))?",lines[j])
+                              markers.append({"relative_line":j-i,"marker":m.group(1) if m else None,"empty_after_marker":not bool((m.group(2) or "").strip()) if m else None})
+                          print("USFM_CONTEXT",json.dumps({"book":ident,"chapter":chapter,"verse":int(v.group(1)),"markers":markers},sort_keys=True))
+          PY
