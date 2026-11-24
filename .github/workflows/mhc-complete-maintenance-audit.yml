@@ -70,10 +70,11 @@ jobs:
           intros=source_commentary_introductions(cleaned)
           issue_keys={"Josh.18.1","1Sam.25.1","2Sam.22.1"}
           chapters={"Deut.34","Ps.95","Song.8","Mal.4","John.21","Rom.4","Rom.7","2Thess.2","2Pet.2","Rev.4"}
-          bodies={};intro_bodies={};body_hash={};needed=targets|issue_keys
+          bodies={};intro_bodies={};body_hash={};ordered_rows=[];needed=targets|issue_keys
           env=dict(os.environ,SWORD_PATH=str(payload))
           proc=subprocess.Popen([str(tmp/"raw"),"MHC"],env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
           def capture(kind,key,raw):
+              ordered_rows.append((kind,key))
               if kind=="K":
                   body_hash[key]=sha(raw)
                   if key in needed:bodies[key]=raw
@@ -86,7 +87,7 @@ jobs:
               if proc.poll() is None:proc.kill();proc.wait()
           idx=subprocess.run([str(tmp/"index"),"MHC"],env=env,capture_output=True,check=True,timeout=90).stdout
           # Independent index and stream agree on every occupied K/I/TOP address.
-          private_crosscheck(idx,"MHC",[("K",k) for k in keys]+[("I",k) for k in intro_keys]+[("U","TOP:1"),("U","TOP:2")],native)
+          private_crosscheck(idx,"MHC",ordered_rows,native)
           assert len(keys)==31098 and len(intro_keys)==1255
           missing=sorted(targets-set(bodies));missing_all=sorted({k for g in groups for k in g["keys"]}-set(keys))
           print("MHC_KEY_CENSUS",json.dumps({"original_groups":len(original_groups),"cleaned_groups":len(groups),"missing_first_keys":missing,"missing_source_scope_keys":missing_all[:100],"overlap_keys":sorted(overlap),"native_sha":native["all_native_raw_entries_ordered_sha256"]},sort_keys=True),flush=True)
