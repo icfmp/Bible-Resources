@@ -25,8 +25,8 @@ SOURCES = (
     (
         "commentaries/en/mhc-crosswire/mhc.osis.xml",
         "commentaries/en/mhc-crosswire/CLEANUP_MANIFEST.json",
-        None,
-        None,
+        "modules/mhc-crosswire/SOURCE_VALIDATION.json",
+        "candidate_source_sha256",
         "approved_cleaned_sha256",
     ),
     (
@@ -48,10 +48,9 @@ class RecoveredSourceIntegrity(unittest.TestCase):
                 self.assertTrue(path.is_file(), f"Missing curated source: {rel}")
                 self.assertFalse(path.is_symlink())
                 report = json.loads((ROOT / "sources/cleaned" / manifest_rel).read_text())
-                approved = (
-                    json.loads((ROOT / approval_path).read_text())[approval_key]
-                    if approval_path is not None else MHC_ACCEPTED_SHA
-                )
+                proof = json.loads((ROOT / approval_path).read_text())
+                approved = (MHC_ACCEPTED_SHA if approval_key == "candidate_source_sha256"
+                            and proof.get("schema_version") == 1 else proof[approval_key])
                 self.assertEqual(report[manifest_key], approved)
                 digest = hashlib.sha256()
                 with path.open("rb") as stream:
