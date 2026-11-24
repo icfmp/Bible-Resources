@@ -374,7 +374,7 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
     paired_entries = 0
     paired_members = 0
     representation = "annotated_divisions" if kind == "commentary" else "bible"
-    if kind == "commentary" and any(root.iter(NS + "verse")):
+    if kind == "commentary" and next(root.iter(NS + "verse"), None) is not None:
         representation = "paired_verse_milestones"
         paired_entries, paired_members, scope_errors = paired_commentary_scopes(root)
         errors.extend(scope_errors)
