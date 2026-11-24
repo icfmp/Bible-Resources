@@ -3,32 +3,6 @@
     {
       "classification": "MODULE_LOCAL",
       "confidence": "high",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [
-        "zText",
-        "OSIS"
-      ],
-      "has_direct_tests_by_filename": false,
-      "owner": "Bible Resources maintainers",
-      "path": "modules/lsg-1910/tools/check_native_render.cpp",
-      "proposed_action": "Keep with the owning module only while its pinned maintenance/replay workflow and regression checks remain necessary.",
-      "purpose_first_line": "Module-owned complete stable-SWORD text-rendering regression gate.",
-      "python_imports": [],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "bf301ce6c5eef067566d1c625e8f5373ec8dd5fc2bdc4887b71b0f1002e90e08",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 2,
-      "static_references": [
-        ".github/workflows/lsg-chapter-heading-review.yml",
-        ".github/workflows/lsg-rendering-regression.yml"
-      ]
-    },
-    {
-      "classification": "MODULE_LOCAL",
-      "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS",
@@ -2144,6 +2118,35 @@
       "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
+        "RawText",
+        "zText",
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/sword_native_render.cpp",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
+      "purpose_first_line": "Generic complete stable-SWORD Bible rendering audit; metadata only.",
+      "python_imports": [],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "8850cd4c0bed7f0da7f98042a32cee7620611184c2ec11d588882eacba1359fa",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 4,
+      "static_references": [
+        "scripts/tool_registry.py",
+        ".github/workflows/lsg-chapter-heading-review.yml",
+        ".github/workflows/lsg-rendering-regression.yml",
+        ".github/workflows/validate.yml"
+      ]
+    },
+    {
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
         "OSIS",
         "ThML"
       ],
@@ -2210,7 +2213,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "5306ef886c3e1cfe9c9dc1997edc0b9560383958d83c02b3d5ee6b285e57ea9f",
+      "sha256_at_inventory": "184635f62fb3d6a95a8b368e042f55e1821059f16c94da23a2ebaf4f520e3b11",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",

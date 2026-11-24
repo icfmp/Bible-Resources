@@ -42,6 +42,8 @@ jobs:
           set -euo pipefail
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o "$RUNNER_TEMP/candidate-index" -lsword
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o "$RUNNER_TEMP/candidate-raw" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_render.cpp -o "$RUNNER_TEMP/candidate-render" -lsword
+          "$RUNNER_TEMP/candidate-render" --self-test
           PYTHONPATH=scripts python - <<'PY'
           import hashlib, io, json, os, re, subprocess, zipfile
           from pathlib import Path
@@ -52,7 +54,9 @@ jobs:
           )
           from pilot_subprocess import query
           from smoke import reader_failure_class
-          from stable_sword_refs import module_payload_digest
+          from stable_sword_refs import (module_payload_digest, proof_errors, load_approved_merge_policy,
+                                         inspect_references, parse_keys, parse_registry)
+          from sword_native_inventory import collect_native_inventory
           tmp = Path(os.environ["RUNNER_TEMP"])
           legacy = json.loads(Path("config/release-legacy-bindings.json").read_text())["entries"]
           legacy = {row["module_id"]: row for row in legacy}
@@ -126,20 +130,49 @@ jobs:
               if m.get("index_audit", {}).get("mode") == "stock_reader_keys":
                   cfg, source = approved_source_for(m["id"])
                   verses, notes, _ = original_osis_verses_and_notes(source)
-                  body, body_counts = authorial_body_opening_sequences(source)
-                  result = _candidate_result(
-                      tmp / "candidate-index", tmp / "candidate-raw", folder,
-                      m["sword_id"], m["versification"], verses, notes,
-                      authorial_structures(source), body, body_counts,
-                      authorial_book_streams(source), authorial_outside_book_titles(source))
-                  print("EXACT_NATIVE_AUDIT", json.dumps(result, sort_keys=True), flush=True)
+                  source_sha = hashlib.sha256(source).hexdigest()
+                  proof_failures = proof_errors(folder, m["versification"], source_sha)
+                  assert not proof_failures, proof_failures
+                  compat = json.loads((folder / "SWORD_COMPATIBILITY.json").read_text())
+                  if compat["status"] == "stable_reference_index_verified_with_reviewed_merges":
+                      merges, _ = load_approved_merge_policy(
+                          folder / "SOURCE_REFERENCE_MERGES.json",
+                          publisher_digest=compat["original_publisher_document_sha256"],
+                          versification=m["versification"])
+                      keys, registry, inventory = collect_native_inventory(
+                          tmp / "candidate-index", folder, m["sword_id"])
+                      parity = inspect_references(
+                          parse_keys("\n".join(verses)), parse_keys(keys),
+                          parse_registry(registry, m["versification"]), merges)
+                      assert parity["status"] == compat["status"]
+                      assert parity["reviewed_merges"] == compat["reviewed_merges"]
+                      assert parity["resolved_reader_reference_count"] == compat["resolved_reader_reference_count"]
+                      print("REVIEWED_MERGED_INDEX_AUDIT", m["id"], json.dumps(parity, sort_keys=True), flush=True)
+                      # Full merged-source body fidelity remains the separate
+                      # source-pinned readback contract required by proof_errors.
+                  else:
+                      body, body_counts = authorial_body_opening_sequences(source)
+                      result = _candidate_result(
+                          tmp / "candidate-index", tmp / "candidate-raw", folder,
+                          m["sword_id"], m["versification"], verses, notes,
+                          authorial_structures(source), body, body_counts,
+                          authorial_book_streams(source), authorial_outside_book_titles(source))
+                      print("EXACT_NATIVE_AUDIT", json.dumps(result, sort_keys=True), flush=True)
+                      assert result["candidate_status"] == "full_numbered_text_and_note_preflight_equal_not_approved"
+                      assert result["source_native_body_boundary_positions"]["all_title_text_and_nonspace_placement_equal"]
+                      assert result["explicit_note_target_index_addressability"]["all_original_explicit_targets_index_addressable"]
                   linked = [ref for ref, rows in notes.items() if any(row["targets"] for row in rows)]
                   xref_hosts = [ref for ref, rows in notes.items()
                                 if any(row["type"] == "crossReference" and row["targets"] for row in rows)]
                   refs += linked[:6] + linked[-6:] + xref_hosts[:6]
-                  assert result["candidate_status"] == "full_numbered_text_and_note_preflight_equal_not_approved"
-                  assert result["source_native_body_boundary_positions"]["all_title_text_and_nonspace_placement_equal"]
-                  assert result["explicit_note_target_index_addressability"]["all_original_explicit_targets_index_addressable"]
+                  expected_native = compat["resolved_reader_reference_count"]
+              else:
+                  _, _, inventory = collect_native_inventory(tmp / "candidate-index", folder, m["sword_id"])
+                  expected_native = inventory["native_occupied_numbered_verse_count"]
+              print("NATIVE_RENDER_MODULE", m["id"], flush=True)
+              subprocess.run([str(tmp / "candidate-render"), m["sword_id"], str(expected_native)],
+                             env=dict(os.environ, SWORD_PATH=str(payload.resolve())),
+                             check=True, timeout=180)
               tag = re.compile(rb"</?(?:reference|note|verse|div|title|seg|milestone|hi)\b", re.I)
               modes = {"default": "", "cross_references": "x",
                        "footnotes": "n", "footnotes_and_cross_references": "nx"}

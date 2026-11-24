@@ -17,16 +17,15 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 
 - GENERALIZE: 1
 - HISTORICAL/ARCHIVE: 0
-- KEEP_GENERIC: 54
+- KEEP_GENERIC: 55
 - MERGE: 0
-- MODULE_LOCAL: 4
+- MODULE_LOCAL: 3
 - UNDECIDED: 0
 
 ## All tracked tools
 
 | Script | Classification | Tests | Static callers | Stage hint |
 | --- | --- | --- | ---: | --- |
-| [`modules/lsg-1910/tools/check_native_render.cpp`](../../modules/lsg-1910/tools/check_native_render.cpp) | MODULE_LOCAL | not established | 2 | not determined |
 | [`modules/lsg-1910/tools/stage_chapter_heading_hotfix.py`](../../modules/lsg-1910/tools/stage_chapter_heading_hotfix.py) | MODULE_LOCAL | not established | 1 | not determined |
 | [`modules/lsg-1910/tools/stage_filter_hotfix.py`](../../modules/lsg-1910/tools/stage_filter_hotfix.py) | MODULE_LOCAL | not established | 1 | not determined |
 | [`modules/lsg-1910/tools/stage_reviewed_release.py`](../../modules/lsg-1910/tools/stage_reviewed_release.py) | MODULE_LOCAL | not established | 1 | publication/release |
@@ -81,6 +80,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/sword_native_raw_corpus.cpp`](../../scripts/sword_native_raw_corpus.cpp) | KEEP_GENERIC | not established | 8 | not determined |
 | [`scripts/sword_native_raw_corpus_inventory.py`](../../scripts/sword_native_raw_corpus_inventory.py) | KEEP_GENERIC | named test | 6 | source/native audit |
 | [`scripts/sword_native_raw_entry.cpp`](../../scripts/sword_native_raw_entry.cpp) | KEEP_GENERIC | not established | 4 | not determined |
+| [`scripts/sword_native_render.cpp`](../../scripts/sword_native_render.cpp) | KEEP_GENERIC | not established | 4 | not determined |
 | [`scripts/sword_option_filters.py`](../../scripts/sword_option_filters.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/tool_registry.py`](../../scripts/tool_registry.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/validate.py`](../../scripts/validate.py) | KEEP_GENERIC | not established | 22 | not determined |
