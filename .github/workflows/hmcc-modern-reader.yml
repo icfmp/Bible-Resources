@@ -135,3 +135,85 @@ jobs:
             ${{ runner.temp }}/modern-source-native.json
             ${{ runner.temp }}/modern-reader.json
           retention-days: 90
+
+  independent-jsword:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+      - name: Authenticate candidate and acquire the previously reviewed independent Java probe
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin refs/pull/216/head
+          test "$(git rev-parse FETCH_HEAD)" = 7fdb347e073a96464a70290ef87d90c43dcf02c2
+          git show FETCH_HEAD:tests/java/org/icfmp/research/CommentaryAndBibleJSwordProbeTest.java > "$RUNNER_TEMP/CommentaryAndBibleJSwordProbeTest.java"
+          git clone --quiet --filter=blob:none --no-checkout https://github.com/AndBible/jsword.git "$RUNNER_TEMP/andbible-pinned-jsword"
+          git -C "$RUNNER_TEMP/andbible-pinned-jsword" fetch --quiet --depth=1 origin 6ebd10a005fa7761e611c048ececea1430e22546
+          git -C "$RUNNER_TEMP/andbible-pinned-jsword" checkout --quiet --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/andbible-pinned-jsword" rev-parse HEAD)" = 6ebd10a005fa7761e611c048ececea1430e22546
+          python - <<'PY'
+          import hashlib,json,os,shutil
+          from pathlib import Path
+          t=Path(os.environ["RUNNER_TEMP"])
+          m=Path("modules/hmcc-modern")
+          p=m/"payload"
+          expected=json.loads((m/"RELEASE_ARTIFACT_PROOF.json").read_text())["payload_sha256"]
+          sha=lambda b:hashlib.sha256(b).hexdigest()
+          assert len(expected)==7
+          assert expected["mods.d/hmccmodern.conf"]=="d76a68c39cb3137b0334bebbde358b3089078a5349b269f7bce5097847d61e6d"
+          assert sha(Path("sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml").read_bytes())=="784dadcb4800c7e8d0fede02aa6116ee55d4f835b25168c4b3ba3ff530e1fb38"
+          assert {x.relative_to(p).as_posix() for x in p.rglob("*") if x.is_file()}==set(expected)
+          assert all(not (p/n).is_symlink() and sha((p/n).read_bytes())==v for n,v in expected.items())
+          root=t/"commentary-andbible-jsword-private-modern"
+          shutil.copytree(p,root)
+          target=t/"andbible-pinned-jsword/src/test/java/org/icfmp/research/CommentaryAndBibleJSwordProbeTest.java"
+          assert not target.exists()
+          target.parent.mkdir(parents=True,exist_ok=True)
+          shutil.copyfile(t/"CommentaryAndBibleJSwordProbeTest.java",target)
+          PY
+      - name: Read nine independently confirmed candidate passages in pinned JSword
+        run: |
+          set -euo pipefail
+          export COMMENTARY_JSWORD_MODULE_ROOT="$RUNNER_TEMP/commentary-andbible-jsword-private-modern"
+          export COMMENTARY_JSWORD_MODULE_ID=HMCCModern
+          export COMMENTARY_JSWORD_SAMPLES='Genesis 5:25;Leviticus 19:1;Leviticus 19:37;Psalms 108:1;Psalms 108:13;1 Samuel 25:39;Psalms 95:11;Genesis 12:6;Numbers 29:1'
+          export SWORD_PATH="$COMMENTARY_JSWORD_MODULE_ROOT"
+          export HOME="$RUNNER_TEMP/modern-java-home"
+          export GRADLE_USER_HOME="$RUNNER_TEMP/modern-gradle-home"
+          mkdir -m 700 "$HOME" "$GRADLE_USER_HOME"
+          export JAVA_TOOL_OPTIONS="-Duser.home=$HOME"
+          export LC_ALL=C.UTF-8
+          cd "$RUNNER_TEMP/andbible-pinned-jsword"
+          set +e
+          timeout 900 bash ./gradlew --no-daemon --console=plain test --tests org.icfmp.research.CommentaryAndBibleJSwordProbeTest > "$RUNNER_TEMP/modern-jsword-private.log" 2>&1
+          rc=$?
+          set -e
+          export PROBE_RC="$rc"
+          python - <<'PY'
+          import json,os,xml.etree.ElementTree as ET
+          from pathlib import Path
+          p=Path("build/test-results/test/TEST-org.icfmp.research.CommentaryAndBibleJSwordProbeTest.xml")
+          assert p.is_file() and 0<p.stat().st_size<=500000,"No bounded Java test evidence"
+          t=ET.parse(p).getroot()
+          counts={k:int(t.attrib.get(k,"0")) for k in ("tests","errors","failures","skipped")}
+          assert t.tag=="testsuite"
+          receipt={"schema_version":1,"module_id":"HMCCModern","version":"1.0.0","candidate_conf_sha256":"d76a68c39cb3137b0334bebbde358b3089078a5349b269f7bce5097847d61e6d","candidate_source_sha256":"784dadcb4800c7e8d0fede02aa6116ee55d4f835b25168c4b3ba3ff530e1fb38","jsword_commit":"6ebd10a005fa7761e611c048ececea1430e22546","probe_revision":"7fdb347e073a96464a70290ef87d90c43dcf02c2","samples":os.environ["COMMENTARY_JSWORD_SAMPLES"].split(";"),"junit":counts,"gradle_exit_code":int(os.environ["PROBE_RC"]),"android_gui_verified":False,"actual_note_click_verified":False,"limitation":"Substantive raw and structured entries and distinct book keys; not full cross-engine text parity."}
+          (Path(os.environ["RUNNER_TEMP"])/"modern-jsword-receipt.json").write_text(json.dumps(receipt,indent=2)+"\n")
+          print(json.dumps(receipt))
+          assert receipt["gradle_exit_code"]==0 and counts=={"tests":3,"errors":0,"failures":0,"skipped":0}
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: modern-candidate-jsword-engine-evidence
+          path: ${{ runner.temp }}/modern-jsword-receipt.json
+          retention-days: 90
