@@ -34,7 +34,7 @@ Previously published editions include:
 
 - [Louis Segond 1910 — BRLSG1910 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0)
 - [Darby — BRJND2024 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.1)
-- [Matthew Henry Concise Commentary — MHCC 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1)
+- [Matthew Henry Concise Commentary — MHCC 0.1.2](https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.2)
 - [Matthew Henry Complete Commentary — MHC 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/mhc-0.1.0)
 - [Henry's Modern Concise Commentary — HMCCModern 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/hmcc-modern-0.1.0)
 

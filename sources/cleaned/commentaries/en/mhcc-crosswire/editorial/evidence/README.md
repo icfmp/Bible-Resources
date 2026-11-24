@@ -2,11 +2,17 @@
 
 **Begin with [the editorial summary](../README.md)** and the exact [reconstructed-source manifest](../../CLEANUP_MANIFEST.json). Most material here documents *why* a specific rule was accepted, not a procedure to repeat for a new translation.
 
-## Version 0.1.1 — what needs a proof?
+## Version 0.1.2 — current evidence
+
+- [Incremental native and reader proof](release-0.1.2/incremental-native-reader.json): direct 0.1.1→0.1.2 comparison and exact payload hashes.
+- [Reversible structural ledger](release-0.1.2/structure-ledger.json), [BRNP after report](release-0.1.2/brnp-after.json), [native parity](release-0.1.2/native-receipt.json), [real reader receipt](release-0.1.2/reader-receipt.json).
+- [Release notes](../releases/MHCC-0.1.2.md).
+
+## Version 0.1.1 — historical evidence
 
 | Question | Useful document |
 | --- | --- |
-| Which editorial changes were actually accepted? | [Decision summary](release-0.1.1/0.1.1-editorial-disposition.md) and [approved rebuild manifest](../../../../../../../config/commentary-rebuilds/mhcc-crosswire.json) |
+| Which editorial changes were actually accepted? | [Decision summary](release-0.1.1/0.1.1-editorial-disposition.md) and [archived approved rebuild manifest](release-0.1.1/review-manifest.json) |
 | Why are there 24 aliases to 17 sections? | [Passage-indexing decision](release-0.1.1/reader-oriented-indexing-decision.md) |
 | Who owns the original chapter-only commentary? | [Introduction ownership](release-0.1.1/native-intro-text-ownership.md) |
 | Why is the OSIS master a reconstruction, not original authoring XML? | [OSIS transport boundary](release-0.1.1/original-osis-transport-preflight.md) |
