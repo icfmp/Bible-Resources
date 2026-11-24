@@ -1,0 +1,157 @@
+{
+  "added_links": [
+    {
+      "master_key": "Eccl.4.7",
+      "new_key": "Eccl.4.8"
+    },
+    {
+      "master_key": "Eccl.9.11",
+      "new_key": "Eccl.9.12"
+    },
+    {
+      "master_key": "Isa.21.11",
+      "new_key": "Isa.21.12"
+    },
+    {
+      "master_key": "Isa.26.20",
+      "new_key": "Isa.26.21"
+    },
+    {
+      "master_key": "Isa.50.10",
+      "new_key": "Isa.50.11"
+    },
+    {
+      "master_key": "Isa.56.1",
+      "new_key": "Isa.56.2"
+    },
+    {
+      "master_key": "Isa.57.1",
+      "new_key": "Isa.57.2"
+    },
+    {
+      "master_key": "Isa.58.13",
+      "new_key": "Isa.58.14"
+    },
+    {
+      "master_key": "Isa.58.1",
+      "new_key": "Isa.58.2"
+    },
+    {
+      "master_key": "Isa.61.10",
+      "new_key": "Isa.61.11"
+    },
+    {
+      "master_key": "Jer.4.1",
+      "new_key": "Jer.4.2"
+    },
+    {
+      "master_key": "Jer.4.3",
+      "new_key": "Jer.4.4"
+    },
+    {
+      "master_key": "Lam.4.21",
+      "new_key": "Lam.4.22"
+    },
+    {
+      "master_key": "Matt.13.24",
+      "new_key": "Matt.13.36"
+    },
+    {
+      "master_key": "Matt.13.24",
+      "new_key": "Matt.13.37"
+    },
+    {
+      "master_key": "Matt.13.24",
+      "new_key": "Matt.13.38"
+    },
+    {
+      "master_key": "Matt.13.24",
+      "new_key": "Matt.13.39"
+    },
+    {
+      "master_key": "Matt.13.24",
+      "new_key": "Matt.13.40"
+    },
+    {
+      "master_key": "Matt.13.24",
+      "new_key": "Matt.13.41"
+    },
+    {
+      "master_key": "Matt.13.24",
+      "new_key": "Matt.13.42"
+    },
+    {
+      "master_key": "Matt.13.24",
+      "new_key": "Matt.13.43"
+    },
+    {
+      "master_key": "Song.1.7",
+      "new_key": "Song.1.8"
+    },
+    {
+      "master_key": "Song.6.2",
+      "new_key": "Song.6.3"
+    },
+    {
+      "master_key": "Song.8.13",
+      "new_key": "Song.8.14"
+    }
+  ],
+  "all_added_K_keys_link_to_reviewed_original_master": true,
+  "all_edited_source_structure_and_unedited_content_preserved": true,
+  "all_original_I_bytes_identical": true,
+  "all_original_TOP_bytes_identical": true,
+  "all_original_linked_section_boundaries_preserved": true,
+  "all_other_original_K_bytes_identical": true,
+  "candidate_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "candidate_native_counts": {
+    "I": 1255,
+    "K": 28742,
+    "TOP": 2
+  },
+  "compiler": "osis2mod",
+  "full_original_and_rebuilt_native_inventory_compared": true,
+  "index_only_rebuild_native_corpus_sha256": "badb234e2c36543d8d5cb536ef8b722c31ccb02944177bc043a14e7b1eb0e045",
+  "no_source_prose_exported": true,
+  "no_unreviewed_original_native_keys_changed": true,
+  "original_archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+  "original_native_corpus_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6",
+  "original_native_counts": {
+    "I": 1255,
+    "K": 28718,
+    "TOP": 2
+  },
+  "reader": "libSWORD",
+  "schema_version": 1,
+  "source_edits": [
+    {
+      "affected_original_keys": [
+        "Ezek.3.1",
+        "Ezek.3.10",
+        "Ezek.3.11",
+        "Ezek.3.2",
+        "Ezek.3.3",
+        "Ezek.3.4",
+        "Ezek.3.5",
+        "Ezek.3.6",
+        "Ezek.3.7",
+        "Ezek.3.8",
+        "Ezek.3.9"
+      ],
+      "master_key": "Ezek.3.1",
+      "original_sha256": "c69f6b1580c2ea555083f78bfa05c92f82150a1afcca0c0672b8e69333ac99ae",
+      "revised_sha256": "d307cf2e00790bde22a0e9e89be4ae02c47d6e7b1b3baa734e29ccc546ad8d7a"
+    },
+    {
+      "affected_original_keys": [
+        "1Chr.7.1"
+      ],
+      "master_key": "1Chr.7.1",
+      "original_sha256": "9c6d1cddec83f9b5ebf8a0c146e3d4176408ab2bff4a8b0a7e9dcec2ee7e6c7e",
+      "revised_sha256": "0a4de262b8e7340db7e5f78928e3b3e36095780f87b9b60272bc9f28f8ca08e7"
+    }
+  ],
+  "source_kind": "reviewed_compiled_commentary_rebuild",
+  "status": "complete_native_rebuild_comparison",
+  "versification": "KJV"
+}

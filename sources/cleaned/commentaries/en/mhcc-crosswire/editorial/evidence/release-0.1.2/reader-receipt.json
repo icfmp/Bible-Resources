@@ -1,0 +1,169 @@
+{
+  "diatheke_samples": [
+    "Gen.5.25",
+    "Gen.5.32",
+    "1Sam.25.1",
+    "1Sam.26.1",
+    "Ps.95.1",
+    "Ps.96.1",
+    "Eccl.4.8",
+    "Matt.13.36",
+    "Rev.22.21"
+  ],
+  "native_corpus_sha256": "957ef1f956f804ae67d0563969a2e2a4a9e567fe0153550c45015cb14310a5d6",
+  "published": false,
+  "restored_phrase_required_in_gui": true,
+  "schema_version": 1,
+  "source_sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e",
+  "source_structure_run": 45394900192,
+  "xiphos": {
+    "actual_passage_commands_accepted": true,
+    "bounded_right_commentary_pane_focus_attempts_by_passage": {
+      "1Sam 25:1": 1,
+      "1Sam 26:1": 1,
+      "Eccl 4:8": 1,
+      "Gen 5:25": 1,
+      "Gen 5:32": 1,
+      "Matt 13:36": 1,
+      "Ps 95:1": 1,
+      "Ps 96:1": 1,
+      "Rev 22:21": 1
+    },
+    "bounded_xiphos_ui_failed_action_by_passage": {},
+    "commentary_clipboard_match_by_passage": {
+      "1Sam 25:1": true,
+      "1Sam 26:1": true,
+      "Eccl 4:8": true,
+      "Gen 5:25": true,
+      "Gen 5:32": true,
+      "Matt 13:36": true,
+      "Ps 95:1": true,
+      "Ps 96:1": true,
+      "Rev 22:21": true
+    },
+    "copied_gui_clipboard_byte_count_by_passage": {
+      "1Sam 25:1": 262,
+      "1Sam 26:1": 621,
+      "Eccl 4:8": 1117,
+      "Gen 5:25": 1204,
+      "Gen 5:32": 1204,
+      "Matt 13:36": 1457,
+      "Ps 95:1": 721,
+      "Ps 96:1": 511,
+      "Rev 22:21": 1353
+    },
+    "independent_gui_commentary_excerpt_match_count": 9,
+    "real_main_reader_window_found": true,
+    "real_markup_rendering_observation_by_passage": {
+      "1Sam 25:1": {
+        "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations": 0,
+        "exact_original_titles_in_copied_gui_rich_html": 0,
+        "exact_original_titles_in_copied_gui_text": 0,
+        "original_internal_reference_elements_found": 0,
+        "original_internal_title_elements_found": 2,
+        "original_stock_nontrivial_reference_labels_found": 0,
+        "real_gui_rich_html_anchor_elements_found": 1,
+        "real_gui_rich_html_selection_available": true,
+        "source_reference_labels_observed_as_real_gui_HTML_anchors": 0,
+        "xiphos_link_click_target_and_navigation_verified": false
+      },
+      "1Sam 26:1": {
+        "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations": 0,
+        "exact_original_titles_in_copied_gui_rich_html": 0,
+        "exact_original_titles_in_copied_gui_text": 0,
+        "original_internal_reference_elements_found": 0,
+        "original_internal_title_elements_found": 2,
+        "original_stock_nontrivial_reference_labels_found": 0,
+        "real_gui_rich_html_anchor_elements_found": 1,
+        "real_gui_rich_html_selection_available": true,
+        "source_reference_labels_observed_as_real_gui_HTML_anchors": 0,
+        "xiphos_link_click_target_and_navigation_verified": false
+      },
+      "Eccl 4:8": {
+        "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations": 0,
+        "exact_original_titles_in_copied_gui_rich_html": 0,
+        "exact_original_titles_in_copied_gui_text": 0,
+        "original_internal_reference_elements_found": 0,
+        "original_internal_title_elements_found": 0,
+        "original_stock_nontrivial_reference_labels_found": 0,
+        "real_gui_rich_html_anchor_elements_found": 1,
+        "real_gui_rich_html_selection_available": true,
+        "source_reference_labels_observed_as_real_gui_HTML_anchors": 0,
+        "xiphos_link_click_target_and_navigation_verified": false
+      },
+      "Gen 5:25": {
+        "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations": 0,
+        "exact_original_titles_in_copied_gui_rich_html": 0,
+        "exact_original_titles_in_copied_gui_text": 0,
+        "original_internal_reference_elements_found": 0,
+        "original_internal_title_elements_found": 0,
+        "original_stock_nontrivial_reference_labels_found": 0,
+        "real_gui_rich_html_anchor_elements_found": 1,
+        "real_gui_rich_html_selection_available": true,
+        "source_reference_labels_observed_as_real_gui_HTML_anchors": 0,
+        "xiphos_link_click_target_and_navigation_verified": false
+      },
+      "Gen 5:32": {
+        "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations": 0,
+        "exact_original_titles_in_copied_gui_rich_html": 0,
+        "exact_original_titles_in_copied_gui_text": 0,
+        "original_internal_reference_elements_found": 0,
+        "original_internal_title_elements_found": 0,
+        "original_stock_nontrivial_reference_labels_found": 0,
+        "real_gui_rich_html_anchor_elements_found": 1,
+        "real_gui_rich_html_selection_available": true,
+        "source_reference_labels_observed_as_real_gui_HTML_anchors": 0,
+        "xiphos_link_click_target_and_navigation_verified": false
+      },
+      "Matt 13:36": {
+        "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations": 0,
+        "exact_original_titles_in_copied_gui_rich_html": 0,
+        "exact_original_titles_in_copied_gui_text": 0,
+        "original_internal_reference_elements_found": 0,
+        "original_internal_title_elements_found": 0,
+        "original_stock_nontrivial_reference_labels_found": 0,
+        "real_gui_rich_html_anchor_elements_found": 1,
+        "real_gui_rich_html_selection_available": true,
+        "source_reference_labels_observed_as_real_gui_HTML_anchors": 0,
+        "xiphos_link_click_target_and_navigation_verified": false
+      },
+      "Ps 95:1": {
+        "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations": 0,
+        "exact_original_titles_in_copied_gui_rich_html": 0,
+        "exact_original_titles_in_copied_gui_text": 0,
+        "original_internal_reference_elements_found": 0,
+        "original_internal_title_elements_found": 2,
+        "original_stock_nontrivial_reference_labels_found": 0,
+        "real_gui_rich_html_anchor_elements_found": 1,
+        "real_gui_rich_html_selection_available": true,
+        "source_reference_labels_observed_as_real_gui_HTML_anchors": 0,
+        "xiphos_link_click_target_and_navigation_verified": false
+      },
+      "Ps 96:1": {
+        "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations": 0,
+        "exact_original_titles_in_copied_gui_rich_html": 0,
+        "exact_original_titles_in_copied_gui_text": 0,
+        "original_internal_reference_elements_found": 0,
+        "original_internal_title_elements_found": 2,
+        "original_stock_nontrivial_reference_labels_found": 0,
+        "real_gui_rich_html_anchor_elements_found": 1,
+        "real_gui_rich_html_selection_available": true,
+        "source_reference_labels_observed_as_real_gui_HTML_anchors": 0,
+        "xiphos_link_click_target_and_navigation_verified": false
+      },
+      "Rev 22:21": {
+        "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations": 0,
+        "exact_original_titles_in_copied_gui_rich_html": 0,
+        "exact_original_titles_in_copied_gui_text": 0,
+        "original_internal_reference_elements_found": 0,
+        "original_internal_title_elements_found": 0,
+        "original_stock_nontrivial_reference_labels_found": 0,
+        "real_gui_rich_html_anchor_elements_found": 1,
+        "real_gui_rich_html_selection_available": true,
+        "source_reference_labels_observed_as_real_gui_HTML_anchors": 0,
+        "xiphos_link_click_target_and_navigation_verified": false
+      }
+    }
+  },
+  "xiphos_window_visible": true
+}

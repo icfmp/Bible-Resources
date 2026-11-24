@@ -99,15 +99,36 @@
   ],
   "authorization": {
     "approved_by": "Bible Resources project owner",
-    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/276",
-    "scope": "Publish exact CrossWire MHCC 0.1.1 source-attested edition with 24 existing-section navigation aliases and the two reversible source corrections, renamed MHCC SWORD identifier, after all final tests and rights checks."
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/291",
+    "scope": "Owner explicitly authorized publication after satisfactory checks in issue #291; one attested Genesis 5:25-32 correction and reviewed reversible BRNP normalization; prior 0.1.1 source and historical aliases unchanged in scope."
   },
   "block_type": "CHAPTER",
-  "candidate_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "candidate_native_corpus_sha256": "957ef1f956f804ae67d0563969a2e2a4a9e567fe0153550c45015cb14310a5d6",
   "candidate_native_counts": {
     "I": 1255,
     "K": 28742,
     "TOP": 2
+  },
+  "incremental_revision": {
+    "candidate_source_sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e",
+    "evidence_sha256": "ccedc69d7a2d6bfffc56a2aa2c4fcd5b45a5109826d57e5f70e01c955d2866a9",
+    "previous_cleanup_sha256": "eaa8458231106dbe5bf07809b9566132a4494f9649cc22d0b9d99fafc403606f",
+    "previous_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+    "previous_review_sha256": "b7fd321d03b46a4752e68dfca9de2fe7bb22eb874c5b11dd931b924702e1179d",
+    "previous_source_sha256": "6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39",
+    "previous_version": "0.1.1",
+    "reference_changed_keys": [],
+    "semantic_changed_keys": [
+      "Gen.5.25",
+      "Gen.5.26",
+      "Gen.5.27",
+      "Gen.5.28",
+      "Gen.5.29",
+      "Gen.5.30",
+      "Gen.5.31",
+      "Gen.5.32"
+    ],
+    "source_name": "mhcc.osis.xml"
   },
   "index_only_rebuild_native_corpus_sha256": "badb234e2c36543d8d5cb536ef8b722c31ccb02944177bc043a14e7b1eb0e045",
   "module_id": "mhcc-crosswire",
@@ -122,16 +143,16 @@
     "TOP": 2
   },
   "payload_sha256": {
-    "mods.d/mhcc.conf": "04859f158d75ad2fd44fda4a0420095ab3172e3b96a5ed2b2d43b30538bad5d6",
-    "modules/comments/zcom/mhcc/nt.czs": "0d7f1347c8a570330d6ef82048281018f30e30a0ce5d40df00f1dafac332f550",
-    "modules/comments/zcom/mhcc/nt.czv": "f39b155c597dad8ad37fae98fc14b94e5c3a44ded6abfd3dc58e4c24b8e3b582",
-    "modules/comments/zcom/mhcc/nt.czz": "ca87b997b510711012180991ab7230549b3a03b588bf58961fe28e9d5b3cca87",
-    "modules/comments/zcom/mhcc/ot.czs": "fd4ae8c4558dfc8e0a5b31e0d0dc48954ad183da40c87f5f63b8321fd7f2e17b",
-    "modules/comments/zcom/mhcc/ot.czv": "1a31afe2a132c5b1988eac15a6dfd07cbd718797db450b69ad4b2637c1d806ce",
-    "modules/comments/zcom/mhcc/ot.czz": "c58f099b763687151ed9725031dce59a68193cc296c8998bfb9431f0b0bfe086"
+    "mods.d/mhcc.conf": "eb9d684ecdad407d945fd9f5e139c5f5a92e0809b647e0370c548af0b45e2fa7",
+    "modules/comments/zcom/mhcc/nt.czs": "82a0532db2a93523bfc1e1da3d86bc723b7ef068f3a8e6638eeaf34b30b91cb3",
+    "modules/comments/zcom/mhcc/nt.czv": "bc8556ee39c53a777a094dabfaeaec8633fc05bb236a844851e32305c072a7a1",
+    "modules/comments/zcom/mhcc/nt.czz": "82a7728f22547669946fc723659723f4c1c7099bebc7dc5ed3b230348e2e5307",
+    "modules/comments/zcom/mhcc/ot.czs": "82fda362c28d7e983d89bbf3cbc8574f9ff791c6a6ba8758f491e2d1b5d12a92",
+    "modules/comments/zcom/mhcc/ot.czv": "b49873deec402f09e4c9ab00b034200d76a585d34f766973ef7d98da7b268c37",
+    "modules/comments/zcom/mhcc/ot.czz": "cc2a799245c454f92746f755e1fcb5941521a6eac761bcfe7c30d7c8a416d187"
   },
-  "schema_version": 1,
-  "source_audit_sha256": "e51358a9b10185f2a45bbb63a38d6ccf063e8f492905f8519bf4ed9d54aaa7e4",
+  "schema_version": 2,
+  "source_audit_sha256": "caab3e72f633d3b381766d705544c84bcd730b26de4f2c1527929d8eab9094d6",
   "source_edits": [
     {
       "affected_original_keys": [
@@ -163,5 +184,5 @@
   "status": "owner_authorized_for_release",
   "sword_id": "MHCC",
   "versification": "KJV",
-  "version": "0.1.1"
+  "version": "0.1.2"
 }

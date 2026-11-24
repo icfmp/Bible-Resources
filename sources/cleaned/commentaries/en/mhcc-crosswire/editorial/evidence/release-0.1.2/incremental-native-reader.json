@@ -1,0 +1,66 @@
+{
+  "all_native_entries_compared": true,
+  "brnp_findings": 0,
+  "candidate_native_corpus_sha256": "957ef1f956f804ae67d0563969a2e2a4a9e567fe0153550c45015cb14310a5d6",
+  "candidate_native_counts": {
+    "I": 1255,
+    "K": 28742,
+    "TOP": 2
+  },
+  "candidate_source_sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e",
+  "changed_alias_links": [],
+  "comparison_evidence_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45397885031",
+  "extra_keys": [],
+  "limitations": "Independent real Xiphos passage-prose and restored phrase readback passed; titles, all hyperlink clicks and Android GUI are not certified. BRNP v0.2-draft has zero findings, not complete future-profile certification.",
+  "missing_keys": [],
+  "native_link_topology_equal": true,
+  "official_osis_schema_validated": true,
+  "opaque_top_bytes_equal": true,
+  "parse_failures": 0,
+  "payload_sha256": {
+    "mods.d/mhcc.conf": "eb9d684ecdad407d945fd9f5e139c5f5a92e0809b647e0370c548af0b45e2fa7",
+    "modules/comments/zcom/mhcc/nt.czs": "82a0532db2a93523bfc1e1da3d86bc723b7ef068f3a8e6638eeaf34b30b91cb3",
+    "modules/comments/zcom/mhcc/nt.czv": "bc8556ee39c53a777a094dabfaeaec8633fc05bb236a844851e32305c072a7a1",
+    "modules/comments/zcom/mhcc/nt.czz": "82a7728f22547669946fc723659723f4c1c7099bebc7dc5ed3b230348e2e5307",
+    "modules/comments/zcom/mhcc/ot.czs": "82fda362c28d7e983d89bbf3cbc8574f9ff791c6a6ba8758f491e2d1b5d12a92",
+    "modules/comments/zcom/mhcc/ot.czv": "b49873deec402f09e4c9ab00b034200d76a585d34f766973ef7d98da7b268c37",
+    "modules/comments/zcom/mhcc/ot.czz": "cc2a799245c454f92746f755e1fcb5941521a6eac761bcfe7c30d7c8a416d187"
+  },
+  "previous_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "previous_source_sha256": "6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39",
+  "reader_checks_passed": true,
+  "reader_evidence_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45397093858",
+  "reference_changed_keys": [],
+  "remaining_source_text_and_markup_equal": true,
+  "schema_version": 1,
+  "semantic_changed_keys": [
+    "Gen.5.25",
+    "Gen.5.26",
+    "Gen.5.27",
+    "Gen.5.28",
+    "Gen.5.29",
+    "Gen.5.30",
+    "Gen.5.31",
+    "Gen.5.32"
+  ],
+  "source_erratum": {
+    "affected_keys": [
+      "Gen.5.25",
+      "Gen.5.26",
+      "Gen.5.27",
+      "Gen.5.28",
+      "Gen.5.29",
+      "Gen.5.30",
+      "Gen.5.31",
+      "Gen.5.32"
+    ],
+    "historical_witness": "https://dir.sermon-online.com/english/MatthewHenry/Matthew_Henrys_Concise_Commentary_On_The_Bible.pdf",
+    "master_key": "Gen.5.25",
+    "pdf_page": 26,
+    "previous_raw_body_sha256": "34ef1165d982265ba46f78bf6364979f4e4faf41d7604e1683232ea68f7adf5f",
+    "revised_raw_body_sha256": "0307fb3c019cb68cc817d26c3097fa69f3a662a17337d79c75f0b92d8eb4f7d1"
+  },
+  "source_idempotent_normalization": true,
+  "source_reversible": true,
+  "source_structure_evidence_url": "https://github.com/icfmp/Bible-Resources/actions/runs/45394900192"
+}

@@ -103,8 +103,8 @@
       "canonical_edition_id": "matthew-henry-concise-crosswire-2.0",
       "category": "commentary",
       "download": {
-        "sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
-        "size_bytes": 2449819,
+        "sha256": "ae6c9006bfd889446122426ae2d29e1b80c8cb7ba1b1d4aeaf6eecd1157ac6b3",
+        "size_bytes": 2474085,
         "url": "https://icfmp.github.io/Bible-Resources/sword/packages/MHCC.zip"
       },
       "edition": "faithful",
@@ -116,7 +116,7 @@
         "fr": "Commentaire concis de Matthew Henry sur toute la Bible"
       },
       "versification": "KJV",
-      "version": "0.1.1"
+      "version": "0.1.2"
     }
   ],
   "repository": "Bible Resources",

@@ -1,0 +1,50 @@
+{
+  "bible_verse_member_count": 0,
+  "book_identifier_count": 66,
+  "book_milestone_pair_identifier_count": 0,
+  "brnp_conformance_certified": false,
+  "chapter_identifier_count": 1189,
+  "chapter_pair_identifier_count": 1189,
+  "commentary_entry_count": 12141,
+  "element_counts": {
+    "cell": 5062,
+    "chapter": 2378,
+    "div": 54627,
+    "header": 1,
+    "hi": 3928,
+    "identifier": 1,
+    "milestone": 198,
+    "osis": 1,
+    "osisText": 1,
+    "refSystem": 1,
+    "reference": 1204,
+    "row": 2531,
+    "table": 2531,
+    "title": 2054,
+    "work": 1
+  },
+  "finding_codes": {},
+  "finding_count": 0,
+  "finding_examples_by_code": {},
+  "findings": [],
+  "kind": "commentary",
+  "limitations": [
+    "Official OSIS XSD is checked only when --schema is supplied; neither route proves historical/authorial fidelity",
+    "NOT a complete verse hierarchy, reference target, annotation or reader validation",
+    "NOT a production or publication approval gate"
+  ],
+  "official_osis": {
+    "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
+    "source_sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e",
+    "status": "validated"
+  },
+  "profile": "BRNP",
+  "profile_version": "0.2-draft",
+  "publication_approved": false,
+  "sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e",
+  "status": "draft_subset_no_findings",
+  "unreviewed_elements": {},
+  "verse_identifier_count": 0,
+  "verse_pair_identifier_count": 0,
+  "verse_start_reasons": {}
+}

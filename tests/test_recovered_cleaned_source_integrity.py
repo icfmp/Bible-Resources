@@ -71,7 +71,10 @@ class RecoveredSourceIntegrity(unittest.TestCase):
         with path.open("rb") as stream:
             for chunk in iter(lambda: stream.read(1024*1024), b""):
                 digest.update(chunk)
-        self.assertEqual(digest.hexdigest(), "6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39")
+        self.assertEqual(digest.hexdigest(), "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e")
+        previous = json.loads((path.parent / "editorial/evidence/release-0.1.1/CLEANUP_MANIFEST.json").read_text())
+        self.assertEqual(previous["reconstructed_source_sha256"], "6aca55c36789f6f7d081b7cba2a167a8006cad9447ae8b50d619ad0de32dfb39")
+        self.assertEqual(manifest["previous_reconstructed_source_sha256"], previous["reconstructed_source_sha256"])
         self.assertEqual(manifest["reconstructed_source_sha256"], digest.hexdigest())
         self.assertEqual(manifest["reconstructed_source_size"], path.stat().st_size)
         self.assertEqual(manifest["source_kind"], "native_source_attested_reconstructed_osis_not_original_authoring_osis")
