@@ -41,6 +41,11 @@ class OriginalNativeBoundaryPositionTests(unittest.TestCase):
         self.assertFalse(proof["literal_whitespace_or_exact_typography_verified"])
         self.assertNotIn("PRIVATE",str(proof))
 
+    def test_comments_and_processing_instructions_are_not_body_text(self):
+        authored = OSIS.replace(b'alpha<note>', b'al<!--private comment-->pha<?audit ignored?><note>')
+        proof = compare_book_boundary_positions(authorial_book_streams(authored), native(), [])
+        self.assertTrue(proof["all_book_body_nonspace_and_boundary_events_equal"])
+
     def test_original_and_native_title_text_difference_is_blocked(self):
         compiled=NativeBookStreams()
         compiled.observe("I","Gen",

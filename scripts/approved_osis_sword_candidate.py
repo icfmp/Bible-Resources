@@ -408,7 +408,7 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
         authored_boundaries,native_boundaries,authored_outside_titles)
 
     approved_candidate=False
-    all_ok=(
+    numbered_content_ok=(
         not counts["source_only_references"] and
         not counts["native_only_references"] and
         not counts["numbered_verse_nonspace_main_text_differs_or_unparseable"] and
@@ -421,12 +421,17 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
         not counts["note_nonspace_anchor_moved"] and
         not counts["numbered_verse_note_positions_unverified"] and
         counts["note_pairs_compared"]==sum(map(len,notes.values())) and
+        counts["numbered_verse_nonspace_main_text_equal"]==len(source) and
+        counts["numbered_verse_note_count_matches"]==len(source)
+    )
+    all_ok=(numbered_content_ok and
         ordered_body["same_order_and_kind_in_every_mapped_book"] and
         positions["all_book_body_nonspace_and_boundary_events_equal"]
     )
     return {
         "candidate_status":("full_numbered_text_and_note_preflight_equal_not_approved"
                             if all_ok else "candidate_source_native_differences_require_review"),
+        "numbered_slot_text_and_note_parity_verified":numbered_content_ok,
         "candidate_versification":system,
         "candidate_module_id":module_id,
         "compiled_payload_sha256":inventory["module_payload_sha256"],

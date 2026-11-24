@@ -182,8 +182,10 @@ jobs:
                           "source_not_modified": True,
                       }
                       print("REVIEWED_MERGE_NATIVE_DIAGNOSTIC", json.dumps(merged_result, sort_keys=True), flush=True)
-                      # Report-only until real-corpus findings are reviewed.
-                      # No new gate is inferred from the pre-existing approval.
+                      # Actual full numbered-slot parity passed on the first real
+                      # run. Make that proof mandatory independently of the still
+                      # diagnostic whole-book layout comparison.
+                      assert merged_result["numbered_slot_text_and_note_parity_verified"], m["id"]
                   else:
                       body, body_counts = authorial_body_opening_sequences(source)
                       result = _candidate_result(

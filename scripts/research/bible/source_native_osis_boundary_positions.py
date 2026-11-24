@@ -65,6 +65,10 @@ def _local(node):
 
 
 def _walk(node,stream,mode):
+    # XML comments and processing instructions are not authored body text.
+    # The caller still includes their tails in the surrounding body stream.
+    if not isinstance(node.tag, str):
+        return
     name=_local(node)
     if name == "title":
         prose="".join(node.itertext())
