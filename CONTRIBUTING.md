@@ -47,3 +47,5 @@ Never silently rewrite Scripture, fill intentional omissions, merge commentary s
 Offer clear source/metadata corrections to upstream maintainers with reproducible evidence. CrossWire or eBible accepting a patch does not automatically mean that the fix is in their current compiled module. See [upstream contribution workflow](docs/workflows/UPSTREAM.md).
 
 The proposed [BRNP profile](docs/architecture/BRNP.md) is experimental and its full implementation is deferred to [issue #451](https://github.com/icfmp/Bible-Resources/issues/451). It is not currently mandatory for publication.
+
+For the two approved Bible examples, see the [published-pair acceptance record](docs/technical/PUBLISHED_BIBLE_PAIR_ACCEPTANCE.md) and the [registered USFM conversion command](docs/workflows/REGISTERED_USFM_CONVERSION.md). Keep conversion, native and real reader receipts distinct.
