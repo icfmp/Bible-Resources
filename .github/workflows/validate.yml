@@ -702,6 +702,135 @@ jobs:
               return {"books":len(old),"counts":dict(counts),"differences":findings,
                       "supported_table_and_numbered_paragraph_parity":not findings,
                       "scope":"ordered table rows/cell text/header roles/selected inline spans; paragraph starts and style at positive numbered offsets; not initial or intro paragraph boundaries or exact typography"}
+          def editorial_signature(book,source):
+              # Compare source-authored title text at numbered coordinates,
+              # and selected body inline spans. Retain nonnumbered text and
+              # introduction paragraph offsets as a separate diagnostic.
+              pos=0; fullpos=0; current=None; chapter=None
+              titles=[]; spans=defaultdict(list); intro=[]; outside=[]
+              title_styles={"s","s1","s2","s3","s4","r","sr","mr","ms","ms1","ms2","ms3",
+                            "mt","mt1","mt2","mt3","imt","imt1","imt2","imt3","is","is1","is2"}
+              def append(value):
+                  nonlocal pos,fullpos
+                  value=_no_space(value or "")
+                  fullpos+=len(value)
+                  if current is not None:pos+=len(value)
+                  elif value:outside.append(value)
+              def walk(n):
+                  nonlocal current,chapter
+                  k=_name(n)
+                  if not k:return
+                  style=n.get("sfm") or n.get("style") or k
+                  if source and k in {"x","f","fe","ef","ex","id","h","toc"}:return
+                  if not source and k in {"note","header"}:return
+                  if source and (k in title_styles or k=="p" and style in title_styles) or not source and k=="title":
+                      value=_no_space("".join(n.itertext()))
+                      titles.append((pos,len(value),_hash(value)))
+                      return
+                  container=False
+                  if source and k=="c":assert current is None;chapter=n.get("id")
+                  elif source and k=="v":assert current is None and chapter;current=n.get("id")
+                  elif source and k=="ve":assert current is not None;current=None
+                  elif not source and k=="verse":
+                      if n.get("eID"):
+                          assert current==n.get("eID");current=None
+                          return
+                      assert current is None and n.get("osisID")
+                      current=n.get("osisID");container=not bool(n.get("sID"))
+                  start=pos; fullstart=fullpos
+                  kind=None
+                  if source and k=="wj" or not source and k=="q":kind="quotation"
+                  elif source and k=="it" or not source and k=="hi" and n.get("type")=="italic":kind="italic"
+                  elif source and k=="ord" or not source and k=="hi" and n.get("type")=="super":kind="superscript"
+                  is_intro=(source and k=="p" and style in {"ip","ipi"} or not source and k=="p" and
+                            any(_name(a)=="div" and a.get("type")=="introduction" for a in n.iterancestors()))
+                  append(n.text)
+                  for c in n:
+                      walk(c);append(c.tail)
+                  if kind:spans[kind].append((start,pos))
+                  if is_intro:intro.append((fullstart,fullpos))
+                  if container:current=None
+              walk(book)
+              assert current is None
+              return titles,dict(spans),intro,"".join(outside)
+          def project_reviewed_intro_text(source,mapping,edits):
+              # Modify a private in-memory comparison tree only, never the
+              # original archive. Require the exact authored introduction
+              # reference, its book and a unique match in intro scope.
+              from copy import deepcopy
+              projected=deepcopy(source)
+              books={mapping[b.get("id")]:b for b in projected.iter("book")}
+              used=set()
+              for edit in edits:
+                  if edit["type"]!="introduction_text_correction":continue
+                  case=edit["case_id"]
+                  assert case not in used and edit["book"] in books
+                  old,new=edit["original_label"],edit["new_label"]
+                  assert old and new and old!=new
+                  matches=[n for n in books[edit["book"]].iter("ior")
+                           if len(n)==0 and (n.text or "").strip()==old
+                           and any(_name(a)=="p" and (a.get("sfm") or a.get("style")) in {"ip","ipi","io","io1","io2","io3","io4"} for a in n.iterancestors())]
+                  assert len(matches)==1,(case,"approved intro label not uniquely found")
+                  node=matches[0]
+                  node.text=node.text.replace(old,new,1)
+                  used.add(case)
+              return projected,len(used)
+          def editorial_diagnostic(source,target,mapping):
+              old={mapping[b.get("id")]:b for b in source.iter("book")}
+              new={b.get("osisID"):b for b in target.iter(OSIS+"div") if b.get("type")=="book"}
+              assert old and list(old)==list(new)
+              counts=Counter();findings=defaultdict(list)
+              from difflib import SequenceMatcher
+              for ident in old:
+                  t,s,i,o=editorial_signature(old[ident],True)
+                  tt,ss,ii,oo=editorial_signature(new[ident],False)
+                  for label,a,b in (("titles",t,tt),("intro_paragraphs",i,ii)):
+                      counts[label+"_source"]+=len(a);counts[label+"_target"]+=len(b)
+                      if a!=b:findings[label].append(ident)
+                  for label in sorted(set(s)|set(ss)):
+                      a,b=s.get(label,[]),ss.get(label,[])
+                      counts[label+"_source"]+=len(a);counts[label+"_target"]+=len(b)
+                      if a!=b:findings[label].append(ident)
+                  if o!=oo:
+                      # Retain only positions and hashes; do not leak text.
+                      diffs=[]
+                      for op,a,b,c,d in SequenceMatcher(None,o,oo,autojunk=False).get_opcodes():
+                          if op!="equal":
+                              diffs.append({"kind":op,"source_offset":a,"target_offset":c,
+                                  "source_length":b-a,"target_length":d-c,
+                                  "source_sha256":_hash(o[a:b]),"target_sha256":_hash(oo[c:d])})
+                      findings["unnumbered_text"].append({"book":ident,"differences":diffs[:20]})
+              return {"counts":dict(counts),"findings":dict(findings),
+                      "scope":"title text and numbered positions, selected inline numbered spans, intro paragraph offsets and nonnumbered nonspace text; approved text corrections projected separately; not exact typography or complete structure"}
+          sample_editorial_source=parse_usfx(b'<usfx><book id="GEN"><imt>Heading</imt>'
+              b'<p sfm="ip">Intro <ior>1:1-40</ior></p><c id="1"/>'
+              b'<p><v id="1"/><wj>alpha</wj> <it>beta</it> gamma<ve/></p></book></usfx>')
+          sample_editorial_target=(b'<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">'
+              b'<div type="book" osisID="Gen"><title>Heading</title>'
+              b'<div type="introduction"><p>Intro <reference>1:1-4</reference></p></div>'
+              b'<chapter osisID="Gen.1"><p><verse osisID="Gen.1.1" sID="Gen.1.1"/>'
+              b'<q>alpha</q> <hi type="italic">beta</hi> gamma<verse eID="Gen.1.1"/>'
+              b'</p></chapter></div></osis>')
+          sample_intro_edits=[{"type":"introduction_text_correction","case_id":"example",
+              "book":"Gen","original_label":"1:1-40","new_label":"1:1-4"}]
+          projected,n=project_reviewed_intro_text(sample_editorial_source,{"GEN":"Gen"},sample_intro_edits)
+          assert n==1 and sample_editorial_source.find(".//ior").text=="1:1-40"
+          def editorial_sample(raw):
+              return editorial_diagnostic(projected,etree.fromstring(raw),{"GEN":"Gen"})["findings"]
+          assert not editorial_sample(sample_editorial_target)
+          for before,after,kind in (
+              (b'<title>Heading</title>',b'',"titles"),
+              (b'>Heading</title>',b'>Changed</title>',"titles"),
+              (b'>1:1-4</reference>',b'>1:1-5</reference>',"unnumbered_text"),
+              (b'<p>Intro ',b'<p/>Intro ',"intro_paragraphs"),
+              (b'<q>alpha</q>',b'alpha',"quotation"),
+              (b'<hi type="italic">beta</hi> gamma',b'beta <hi type="italic">gamma</hi>',"italic"),
+          ):
+              # Keep the altered introduction XML well formed.
+              changed=sample_editorial_target.replace(before,after)
+              if before==b'<p>Intro ':changed=changed.replace(b'</reference></p>',b'</reference>')
+              assert changed!=sample_editorial_target and kind in editorial_sample(changed),kind
+          print("Original editorial comparator: approved intro repair and six corruption cases passed")
           # Positive fixture with a mid-verse paragraph and two distinct tables.
           sample_layout_source=parse_usfx(b'<usfx><book id="GEN">'
               b'<table><tr><th>A</th><tc><it>B</it>C</tc></tr></table>'
@@ -770,6 +899,23 @@ jobs:
               layout=compare_original_tables_and_paragraphs(root,_source_tree(xml),mapping)
               print("ORIGINAL_USFX_TABLE_PARAGRAPH_PROOF",resource,json.dumps(layout,sort_keys=True),flush=True)
               assert layout["supported_table_and_numbered_paragraph_parity"],(resource,layout["differences"])
+              edits=[]
+              if a.get("note_repair_ledger"):
+                  ledger_path=Path(a["note_repair_ledger"])
+                  assert hashlib.sha256(ledger_path.read_bytes()).hexdigest()==a["note_repair_ledger_sha256"]
+                  ledger=json.loads(ledger_path.read_text())
+                  approved_bytes=Path(a["approval_manifest"]).read_bytes()
+                  assert hashlib.sha1(b"blob "+str(len(approved_bytes)).encode()+b"\0"+approved_bytes).hexdigest()==a["approval_manifest_git_blob_sha1"]
+                  approval=json.loads(approved_bytes)
+                  assert approval["editorial_approval"]["approved_by"]=="Bible Resources project owner"
+                  assert ledger["original_usfx_zip_sha256"]==witness["sha256"]==approval["source_usfx_zip_sha256"]
+                  edits=ledger["edits"]
+              projected,reviewed=project_reviewed_intro_text(root,mapping,edits)
+              editorial=editorial_diagnostic(projected,_source_tree(xml),mapping)
+              editorial["reviewed_intro_text_corrections"]=reviewed
+              editorial["supported_editorial_parity"]=not editorial["findings"]
+              print("ORIGINAL_USFX_EDITORIAL_PROOF",resource,json.dumps(editorial,sort_keys=True),flush=True)
+              assert editorial["supported_editorial_parity"],(resource,editorial["findings"])
           PY
       - name: Audit exact stock-reader-key Bible payloads (read-only candidate evidence)
         shell: bash
