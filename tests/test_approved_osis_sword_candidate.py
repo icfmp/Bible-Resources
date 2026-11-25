@@ -156,7 +156,7 @@ class ApprovedSourceNativeAuditTests(unittest.TestCase):
                 raw = (b'alpha<note type="x-footnote"' + marker +
                        b'>PRIVATE NOTE</note> beta')
                 with patch("approved_osis_sword_candidate.collect_native_inventory",
-                           return_value=("Gen.1.1\\n", {}, inventory)), \
+                           return_value=("Gen.1.1\n", {}, inventory)), \
                      patch("approved_osis_sword_candidate._read_native_frames",
                            return_value=iter([("K", "Gen.1.1", raw)])), \
                      patch("approved_osis_sword_candidate.compare_book_boundary_positions",
