@@ -1,0 +1,182 @@
+name: Inspect published Bible pair in real Xiphos
+on:
+  push:
+    branches: [research/published-bible-parallel]
+    paths: ['.github/workflows/published-bible-xiphos-research.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  xiphos:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent reader
+        run: |
+          if test -f /etc/apt/apt-mirrors.txt; then
+            sudo sed -Ei 's#https?://[A-Za-z0-9.-]*ec2.archive.ubuntu.com/ubuntu#https://archive.ubuntu.com/ubuntu#g' /etc/apt/apt-mirrors.txt
+          fi
+          sudo apt-get -o Acquire::Retries=2 update -qq
+          sudo apt-get install -y --no-install-recommends xiphos diatheke python3-sword xvfb dbus-x11 xdotool xclip
+      - name: Download exact public archives
+        run: |
+          mkdir "$RUNNER_TEMP/archives"
+          cd "$RUNNER_TEMP/archives"
+          curl -fLsS --retry 2 --max-time 90 https://github.com/icfmp/Bible-Resources/releases/download/lsg-1.0.4/BRLSG1910-1.0.4.zip -o BRLSG1910.zip
+          curl -fLsS --retry 2 --max-time 90 https://github.com/icfmp/Bible-Resources/releases/download/darby-jnd-2024-1.0.0/BRJND2024-1.0.0.zip -o BRJND2024.zip
+          echo '643b33b6f8130c46ec381394169c4ff3b60575b8e7d999ba550fbaeb36f65d05  BRLSG1910.zip' | sha256sum -c -
+          echo '81acdfdfbbb18135a49609c045b293ce495a200b37f667f55c190925544b9553  BRJND2024.zip' | sha256sum -c -
+      - name: Inspect independent native and actual parallel GUI
+        run: |
+          cat > "$RUNNER_TEMP/xiphos-audit.py" <<'PY'
+          import os,subprocess,time,signal,zipfile,stat,re,json,hashlib,unicodedata
+          from pathlib import Path,PurePosixPath
+          from xml.etree import ElementTree as ET
+          from html.parser import HTMLParser
+          import Sword
+          root=Path(os.environ["RUNNER_TEMP"])/"xiphos-pair-home";root.mkdir()
+          for part in ("config","cache","data",".sword"):(root/part).mkdir()
+          payload=root/".sword"
+          os.environ.update(HOME=str(root),XDG_CONFIG_HOME=str(root/"config"),XDG_CACHE_HOME=str(root/"cache"),XDG_DATA_HOME=str(root/"data"),SWORD_PATH=str(payload),GDK_BACKEND="x11",NO_AT_BRIDGE="1",LC_ALL="C.UTF-8")
+          names=("BRLSG1910","BRJND2024")
+          systems=dict(zip(names,("Segond","Luther")))
+          report={"reader":"Xiphos","standalone":[],"parallel":[],"diatheke":[],"findings":[],"status":"INCOMPLETE"}
+          def sha(data):return hashlib.sha256(data).hexdigest()
+          files={}
+          for name in names:
+              with zipfile.ZipFile(Path(os.environ["RUNNER_TEMP"])/"archives"/(name+".zip")) as z:
+                  for entry in z.infolist():
+                      if entry.is_dir():continue
+                      path=PurePosixPath(entry.filename)
+                      assert path.parts[0] in {"mods.d","modules"} and ".." not in path.parts and not stat.S_ISLNK(entry.external_attr>>16)
+                      target=payload/path;target.parent.mkdir(parents=True,exist_ok=True)
+                      data=z.read(entry)
+                      with target.open("xb") as out:out.write(data)
+                      files[str(target)]=sha(data)
+          def run(args,check=True,timeout=12):
+              p=subprocess.run(args,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=timeout,check=check)
+              assert len(p.stdout)<2_000_000
+              return p.stdout
+          report["version"]=run(["dpkg-query","-W","-f=${Version}","xiphos"]).decode().strip()
+          def words(s):
+              s=unicodedata.normalize("NFC",s.casefold())
+              return re.findall(r"[^\W\d_]+",s)
+          def contains(whole,part):
+              return bool(part) and any(whole[i:i+len(part)]==part for i in range(len(whole)-len(part)+1))
+          manager=Sword.SWMgr(str(payload))
+          def native(name,ref):
+              key=Sword.VerseKey();key.setVersificationSystem(systems[name]);key.setAutoNormalize(False);key.setText(ref)
+              assert key.popError()=="\x00"
+              module=manager.getModule(name);assert module.hasEntry(key)
+              module.setKey(key);return str(module.stripText())
+          def reference(ref):
+              book,c,v=ref.split(".");return f"{book} {c}:{v}"
+          def witness(name,ref):
+              # Compare distinctive contiguous native prose, not a module label.
+              target=words(native(name,ref));assert len(target)>=6
+              return target[:6]
+          cases=[("John.3.16","John.3.16"),("Eccl.12.1","Eccl.11.9"),("Eccl.12.3","Eccl.12.1")]
+          for a,b in cases:
+              for name,ref in zip(names,(a,b)):
+                  data=run(["diatheke","-b",name,"-f","plain","-k",reference(ref)])
+                  expected=witness(name,ref)
+                  ok=contains(words(data.decode("utf-8","replace")),expected)
+                  report["diatheke"].append({"module":name,"reference":ref,"prose_witness":ok,"sha256":sha(data)})
+                  assert ok
+          app=None
+          def windows():
+              result=[]
+              for wid in run(["xdotool","search","--onlyvisible","--class","[Xx]iphos"],False).decode().splitlines():
+                  title=run(["xdotool","getwindowname",wid],False).decode("utf-8","replace")
+                  dims=run(["xdotool","getwindowgeometry","--shell",wid],False).decode()
+                  if "WIDTH=" in dims:
+                      values=dict(re.findall(r"^(WIDTH|HEIGHT)=([0-9]+)$",dims,re.M))
+                      if int(values.get("WIDTH",0))>=550 and int(values.get("HEIGHT",0))>=300:result.append((wid,title))
+              return result
+          def start(parallel=False):
+              global app
+              app=subprocess.Popen(["xiphos"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+              for _ in range(70):
+                  assert app.poll() is None
+                  for wid,title in windows():
+                      if ("Parallel" in title)==parallel:
+                          run(["xdotool","windowsize",wid,"1200","760"]);run(["xdotool","windowmove",wid,"25","25"]);time.sleep(1.5)
+                          return wid
+                  time.sleep(.3)
+              raise RuntimeError("Expected real reader window unavailable")
+          def stop():
+              global app
+              if app and app.poll() is None:
+                  os.killpg(app.pid,signal.SIGTERM)
+                  try:app.wait(timeout=5)
+                  except subprocess.TimeoutExpired:os.killpg(app.pid,signal.SIGKILL);app.wait(timeout=5)
+              app=None
+          def copy(wid,x,y):
+              run(["xdotool","windowfocus","--sync",wid]);run(["xdotool","mousemove","--window",wid,str(x),str(y),"click","1"])
+              subprocess.run(["xclip","-selection","clipboard","-i"],input=b"UNRELATED_SENTINEL",stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,timeout=8)
+              run(["xdotool","key","--clearmodifiers","ctrl+a","ctrl+c"]);time.sleep(.6)
+              data=run(["xclip","-selection","clipboard","-o"],False)
+              html=run(["xclip","-selection","clipboard","-t","text/html","-o"],False)
+              return data,html
+          class Rows(HTMLParser):
+              def __init__(self):super().__init__();self.rows=[];self.current=None
+              def handle_starttag(self,tag,attrs):
+                  if tag=="tr":self.current=[]
+              def handle_endtag(self,tag):
+                  if tag=="tr" and self.current is not None:self.rows.append(" ".join(self.current));self.current=None
+              def handle_data(self,data):
+                  if self.current is not None:self.current.append(data)
+          try:
+              start();stop()
+              configs=list(root.rglob("settings.xml"));assert len(configs)==1
+              config=configs[0]
+              initial=config.read_bytes()
+              def settings(primary,comparison,ref,parallel):
+                  tree=ET.fromstring(initial)
+                  def put(section,key,value):
+                      parent=tree.find(section)
+                      assert parent is not None
+                      node=parent.find(key)
+                      if node is None:node=ET.SubElement(parent,key)
+                      node.text=value
+                  put("modules","bible",primary);put("modules","parallels",primary+","+comparison)
+                  put("modules","parallel_set_current","")
+                  put("keys","verse",reference(ref))
+                  put("layout","parallelopen","1" if parallel else "0")
+                  put("layout","parallel_width","1200");put("layout","parallel_height","760")
+                  ET.ElementTree(tree).write(config,encoding="utf-8",xml_declaration=True)
+              for primary,comparison in (names,names[::-1]):
+                  ref="John.3.16";settings(primary,comparison,ref,False)
+                  try:
+                      wid=start();run(["xdotool","windowfocus","--sync",wid]);run(["xdotool","key","--clearmodifiers","ctrl+l"]);run(["xdotool","type",reference(ref)]);run(["xdotool","key","Return"]);time.sleep(2)
+                      found=False
+                      for x,y in ((535,290),(680,460),(390,550)):
+                          data,html=copy(wid,x,y)
+                          if contains(words(data.decode("utf-8","replace")),witness(primary,ref)):found=True;break
+                      report["standalone"].append({"module":primary,"reference":ref,"prose_witness":found})
+                  finally:stop()
+                  for a,b in cases:
+                      ref,target=(a,b) if primary==names[0] else (b,a)
+                      settings(primary,comparison,ref,True)
+                      try:
+                          wid=start(True)
+                          first,second=witness(primary,ref),witness(comparison,target)
+                          record={"source":primary,"target":comparison,"reference":ref,"expected_target":target,"both_prose_witnesses":False,"same_html_row":False,"html_rows":0}
+                          for x,y in ((300,300),(600,420),(900,350)):
+                              data,html=copy(wid,x,y);visible=words(data.decode("utf-8","replace"))
+                              if not (contains(visible,first) and contains(visible,second)):continue
+                              record["both_prose_witnesses"]=True
+                              parser=Rows();parser.feed(html.decode("utf-8","replace"));record["html_rows"]=len(parser.rows)
+                              record["same_html_row"]=any(contains(words(row),first) and contains(words(row),second) for row in parser.rows)
+                              if record["same_html_row"]:break
+                          report["parallel"].append(record)
+                      except Exception as exc:report["findings"].append({"scope":"parallel","module":primary,"reference":ref,"error":type(exc).__name__})
+                      finally:stop()
+              report["payload_unchanged"]=all(sha(Path(path).read_bytes())==digest for path,digest in files.items())
+              report["status"]="PASS" if report["payload_unchanged"] and len(report["standalone"])==2 and all(x["prose_witness"] for x in report["standalone"]) and len(report["parallel"])==6 and all(x["same_html_row"] for x in report["parallel"]) and not report["findings"] else "INCONCLUSIVE_OR_FINDINGS"
+          finally:
+              stop();print("XIPHOS_PAIR_PROOF",json.dumps(report,sort_keys=True),flush=True)
+          assert report["status"]=="PASS"
+          PY
+          dbus-run-session -- xvfb-run -a -s '-screen 0 1400x1000x24' /usr/bin/python3 "$RUNNER_TEMP/xiphos-audit.py"
