@@ -402,6 +402,7 @@ jobs:
           NOTE={'x','f','fe','ex','ef'}
           def audit_book(book,source):
               pos=0; active=None; chapter=None; rows=defaultdict(list); body=sha256(); full=sha256(); fullpos=0
+              unnumbered=[]; para_context=[]; verse_starts={}; context=None
               styles=Counter(); markers=Counter(); counts=Counter()
               def append(v):
                   nonlocal pos,fullpos
@@ -410,8 +411,9 @@ jobs:
                       full.update(value.encode());fullpos+=len(value)
                       if active:
                           body.update(value.encode());pos+=len(value)
+                      else:unnumbered.append(value)
               def walk(n):
-                  nonlocal active,chapter
+                  nonlocal active,chapter,context
                   k=local(n)
                   if not k:return
                   style=safe_style(n) if source else ''
@@ -428,7 +430,7 @@ jobs:
                           assert active is None;chapter=n.get('id')
                       elif k=='v':
                           assert active is None and chapter
-                          active=chapter+'.'+n.get('id')
+                          active=chapter+'.'+n.get('id');context=active;verse_starts[active]=pos
                       elif k=='ve':
                           assert active is not None;active=None
                   elif k=='verse':
@@ -437,9 +439,9 @@ jobs:
                           active=None
                           return
                       assert active is None and n.get('osisID')
-                      active=n.get('osisID').split('.',1)[1]
+                      active=n.get('osisID').split('.',1)[1];context=active;verse_starts[active]=pos
                       container=n.get('sID') is None
-                  start=pos; fullstart=fullpos
+                  start=pos; fullstart=fullpos; before_ref=context
                   group=None
                   if source and k=='p' and style in {'p','m','pi1'} or not source and k=='p' and not any(local(a)=='div' and a.get('type')=='introduction' for a in n.iterancestors()):
                       group='body_paragraphs'
@@ -462,10 +464,11 @@ jobs:
                       # Numbered content is an unambiguous common coordinate system.
                       # Intro elements are compared in the full-body coordinate separately.
                       rows[group].append((start,pos,fullstart,fullpos))
+                      if group=='body_paragraphs':para_context.append({'start':start,'end':pos,'before_ref':before_ref,'after_ref':context,'style':style if source else n.get('type'),'full_length':fullpos-fullstart})
                   if container:active=None
               walk(book)
               assert active is None
-              return {"numbered_digest":body.hexdigest(),"numbered_length":pos,"full_body_digest":full.hexdigest(),"full_body_length":fullpos,"rows":rows,"styles":styles,"markers":markers}
+              return {"numbered_digest":body.hexdigest(),"numbered_length":pos,"full_body_digest":full.hexdigest(),"full_body_length":fullpos,"rows":rows,"styles":styles,"markers":markers,"unnumbered":"".join(unnumbered),"para_context":para_context,"verse_starts":verse_starts}
           mapping={x['usfm']:x['osis'] for x in json.loads(Path('config/standard_usfm_osis_66.json').read_text())['books']}
           for manifest in sorted(Path('sources/original/bibles').glob('*/*/PROVENANCE.json')):
               p=json.loads(manifest.read_text()); witness=p.get('additional_original_witness',{})
@@ -509,5 +512,21 @@ jobs:
                           same=[r[2:] for r in x]==[r[2:] for r in y]
                       counts[kind+'_books_equal']+=same
                       if not same:findings[kind].append(book)
+              from difflib import SequenceMatcher
+              details={}
+              for book in old:
+                  a,b=old[book],new[book]
+                  changes=[]
+                  aa,bb=a['para_context'],b['para_context']
+                  matcher=SequenceMatcher(None,[(x['start'],x['end']) for x in aa],[(x['start'],x['end']) for x in bb],autojunk=False)
+                  for op,i,j,k,l in matcher.get_opcodes():
+                      if op!='equal':changes.append({'op':op,'source':aa[i:j][:8],'target':bb[k:l][:8],'source_count':j-i,'target_count':l-k})
+                  u,v=a['unnumbered'],b['unnumbered']
+                  diff=[]
+                  if u!=v:
+                      for op,i,j,k,l in SequenceMatcher(None,u,v,autojunk=False).get_opcodes():
+                          if op!='equal':diff.append({'op':op,'source_length':j-i,'target_length':l-k,'source_sha256':sha256(u[i:j].encode()).hexdigest(),'target_sha256':sha256(v[k:l].encode()).hexdigest(),'source_offset':i,'target_offset':k})
+                  if changes or diff:details[book]={'paragraph_deltas':changes[:20],'unnumbered_deltas':diff[:20],'unnumbered_source_length':len(u),'unnumbered_target_length':len(v)}
+              print('ORIGINAL_USFX_LAYOUT_DETAILS',json.dumps(details,sort_keys=True),flush=True)
               print('ORIGINAL_USFX_LAYOUT_DIAGNOSTIC',json.dumps({'resource':p['resource_id'],'books':len(old),'counts':dict(counts),'bounded_book_findings':{k:v[:30] for k,v in findings.items()},'source_style_counts':dict(styles_old),'target_style_counts':dict(styles_new),'source_marker_census':dict(markers_old),'target_marker_census':dict(markers_new),'empty_paragraph_book_offsets':empty_paragraphs[:20],'scope':'cross-format numbered positions, title symbol hashes and full body stream; classification diagnostic, not complete editorial or reader approval'},sort_keys=True),flush=True)
           PY
