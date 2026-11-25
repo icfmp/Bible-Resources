@@ -384,41 +384,46 @@ jobs:
           assert len(parse_registry((Path(os.environ["RUNNER_TEMP"]) / "sword-registry.tsv").read_text(), "Segond")) == trial["expected_chapters"]
           print("Independent stock SWORD native source-index readback agrees with original published LSG audit.")
           PY
-      - name: Privately hash the complete actual approved LSG SWORD raw corpus
+      - name: Privately hash every approved Bible's complete native SWORD corpus
         shell: bash
         run: |
           set -euo pipefail
-          # Raw Bible text moves only through the private captured pipe from
-          # stock libsword into the Python hasher; never log stdout directly.
+          # Independently verify each native index, full raw stream and exact-key
+          # reader without exposing Bible text or changing the approved payload.
           g++ -std=c++17 -O2 -I/usr/include/sword \
             scripts/sword_native_raw_corpus.cpp \
             -o "${RUNNER_TEMP}/sword-native-raw-corpus" -lsword
           g++ -std=c++17 -O2 -I/usr/include/sword \
             scripts/sword_native_raw_entry.cpp \
             -o "${RUNNER_TEMP}/sword-native-raw-entry" -lsword
-          python scripts/sword_native_raw_corpus_inventory.py \
-            --module-directory modules/lsg-1910 \
-            --module-id BRLSG1910 \
-            --native-raw-binary "${RUNNER_TEMP}/sword-native-raw-corpus" \
-            --native-index-binary "${RUNNER_TEMP}/sword-native-index" \
-            --native-entry-binary "${RUNNER_TEMP}/sword-native-raw-entry" \
-            --report "${RUNNER_TEMP}/lsg-entire-native-raw-corpus.json"
-          python - <<'PY'
+          PYTHONPATH=scripts python - <<'PY'
           import json, os
           from pathlib import Path
+          from sword_native_raw_corpus_inventory import inspect_native_raw_corpus
           root = Path(os.environ["RUNNER_TEMP"])
-          corpus = json.loads((root / "lsg-entire-native-raw-corpus.json").read_text())
-          index = json.loads((root / "sword-native-index-proof.json").read_text())
-          assert corpus["exact_all_occupied_native_keys_matched_independent_index"]
-          assert corpus["independent_native_exact_key_raw_spotcheck_verified"]
-          assert len(corpus["independent_native_exact_key_raw_spotcheck_refs"]) >= 2
-          assert corpus["actual_occupied_numbered_entry_count"] == index["native_occupied_numbered_verse_count"]
-          assert corpus["actual_occupied_intro_entry_count"] == index["native_occupied_verse_zero_intro_count"]
-          assert corpus["actual_occupied_anonymous_top_entry_count"] == index["native_nonaddressable_populated_top_count"]
-          assert len(corpus["all_native_raw_entries_ordered_sha256"]) == 64
-          assert corpus["source_original_authorial_text_compared"] is False
-          assert corpus["rights_and_editorial_approval"] is False
-          print("Actual LSG full-corpus unfiltered stock-SWORD raw-entry SHA inventory passed without text disclosure")
+          audited = []
+          for folder in sorted(Path("modules").iterdir()):
+              metadata = folder / "metadata.json"
+              if not metadata.is_file():
+                  continue
+              m = json.loads(metadata.read_text(encoding="utf-8"))
+              if m["category"] != "bible" or m["quality"]["status"] != "approved":
+                  continue
+              corpus = inspect_native_raw_corpus(
+                  folder, m["sword_id"], root / "sword-native-raw-corpus",
+                  root / "sword-native-index",
+                  native_entry_binary=root / "sword-native-raw-entry")
+              assert corpus["exact_all_occupied_native_keys_matched_independent_index"], m["id"]
+              assert corpus["independent_native_exact_key_raw_spotcheck_verified"], m["id"]
+              assert len(corpus["independent_native_exact_key_raw_spotcheck_refs"]) >= 2, m["id"]
+              assert len(corpus["all_native_raw_entries_ordered_sha256"]) == 64, m["id"]
+              assert corpus["source_original_authorial_text_compared"] is False
+              assert corpus["rights_and_editorial_approval"] is False
+              audited.append(m["id"])
+              print("INDEPENDENT_NATIVE_RAW_CORPUS", m["id"],
+                    json.dumps(corpus, sort_keys=True), flush=True)
+          assert audited, "No approved Bible was audited"
+          print("Independent raw corpus and exact-key spotchecks passed:", ", ".join(audited))
           PY
       - run: python scripts/validate.py
       - run: python scripts/build.py --output dist
