@@ -54,3 +54,7 @@ Research run 45502660046 found exact selected inline attribute/span parity in bo
 ### Original-format numbering inventory
 
 `original_authorial_key_inventory.py` independently preserves literal chapter/verse labels from preflighted, pinned USFM and explicitly selected USFX Scripture members. The parser does not expand bridges or suffixes, assume a canon, or choose a provider member implicitly. Compare ordered labels per book with an explicit reviewed identifier crosswalk before OSIS compilation. LSG original USFM/USFX and cleaned OSIS matched 31,170 labels in run 45504471359. Unsupported formats/labels require review. This is not full text, note, lexical or conversion fidelity, and is not yet a required publication gate.
+
+### Original-format numbered content proof
+
+The generic `original_authorial_content_parity.py` compares independently decoded USFM/USFX verse prose, note bodies, callers, anchors and numbered Strong spans against OSIS. Exact previously approved note repairs are supplied as source-bound input, not hard-coded exemptions; unmatched or partial repairs fail. Original LSG trials 45562090720, 45562348920 and 45566140719 confirm all 31,170 verses, 9,751 notes (12 exact approved repairs), 705,605 numbered word spans and 705,728 global ordered word/Strong associations. This does not certify all editorial structures, external target semantics, whitespace bytes, other source formats, or reader rendering. The comparator rejects unreviewed syntax/attributes rather than claiming a complete USFM grammar.

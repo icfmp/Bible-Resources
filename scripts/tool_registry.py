@@ -56,7 +56,7 @@ REVIEWED_ACTIVE = frozenset({
     "source_native_ordered_body.py", "source_native_osis_boundary_positions.py",
     "source_native_osis_structure_screen.py",
     "source_native_osis_target_addressability.py",
-    "original_authorial_key_inventory.py", "source_osis_verse_notes.py", "reviewed_osis_commentary_rebuild.py",
+    "original_authorial_key_inventory.py", "original_authorial_content_parity.py", "source_osis_verse_notes.py", "reviewed_osis_commentary_rebuild.py",
     "smoke.py", "source_osis_inventory.py", "stable_sword_refs.py",
     "sword_native_raw_corpus.cpp", "sword_native_raw_entry.cpp", "sword_native_render.cpp",
 })
