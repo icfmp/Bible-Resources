@@ -1,0 +1,48 @@
+{
+  "status": "editorial_work_in_progress",
+  "tracking_issue": 587,
+  "target_language": "fr",
+  "provisional_edition_id": "hmcc-french",
+  "baseline_commit": "c157b1db2b2b1457c76aa6fdfab0c0df80eca9fa",
+  "translation_source": {
+    "edition": "HMCC Modern 1.0.0",
+    "path": "sources/cleaned/commentaries/en/hmcc-modern/hmcc-modern.osis.xml",
+    "git_blob": "5a060fe516d9715e868f27e315be3981ac6eb215",
+    "sha256": "784dadcb4800c7e8d0fede02aa6116ee55d4f835b25168c4b3ba3ff530e1fb38",
+    "bytes": 5596387
+  },
+  "editorial_witness": {
+    "edition": "MHCC classic 1.0.0",
+    "path": "sources/cleaned/commentaries/en/mhcc-crosswire/mhcc.osis.xml",
+    "git_blob": "7ee8dc3fc0bb52dce4853e70170954a4fc4c8354",
+    "sha256": "6e692fe887b0952bda540599b99c2c39d4b71a9f3d8e32a443db405bf53da52e",
+    "bytes": 7157453
+  },
+  "verification": "Both complete UTF-8 blob contents hashed and matched declared SHA-256 and byte lengths. Modern internal OSIS header retains historical preview wording; published identity follows manifest and metadata. Do not edit source header in translation work.",
+  "rights": "Modern metadata allows derivatives; project owner requested French translation. French distribution rights and attribution must be separately recorded before release.",
+  "policy": "Natural contemporary French, complete semantic transfer, direct comparison against classic witness; preserve modern editorial structure and exact reference destinations. No silent source correction. No release approval.",
+  "versification": "KJV",
+  "source_unit_inventory": "pending full corpus inventory; chapter-local source structure read directly",
+  "manuscript_format": "OSIS chapter fragments; introductions and outline retained at their source placement",
+  "first_checkpoint": {
+    "chapter": "Gen.1",
+    "translation": "complete",
+    "editorial_audit": "complete (same editor, separate comparison against classic, not independent human review)",
+    "manuscript_commit": "788a292d34b06df89508f789186897e7d5702f04",
+    "paragraphs": 62,
+    "commentary_sections": 8,
+    "outline_rows": 9,
+    "inline_reference_destinations": [
+      "1John.5.20",
+      "Eccl.7.29"
+    ],
+    "book_introduction": "translated and reviewed",
+    "audit_notes": [
+      "Preserved classical empty/confused creation and evil works rather than strengthening the statement to metaphysical nothingness.",
+      "Preserved grace, temporal mercies, the power of providence, the ordering of affections, and the Trinitarian purpose of creation.",
+      "Maintained quoted Scripture and both exact reference destinations at their source semantic anchors."
+    ],
+    "technical_validation": "not performed; simple chapter structure counts only",
+    "next": "Gen.2"
+  }
+}
