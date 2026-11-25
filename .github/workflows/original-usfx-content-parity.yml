@@ -43,7 +43,7 @@ jobs:
               else: parts=[x for x in re.split(r'[\s,]+',value) if x]
               return tuple(parts) if all(re.fullmatch(r'[HG]\d+[a-z]?',x) for x in parts) else None
           def source_verses(root,mapping):
-              verses={}; notes=defaultdict(list); outside=0; books=set()
+              verses={}; notes=defaultdict(list); words=defaultdict(list); outside=0; books=set()
               for book in root.iter():
                   if local(book)!='book': continue
                   code=book.get('id')
@@ -76,12 +76,54 @@ jobs:
                           return
                       if kind in EXCLUDED or (kind=='p' and (n.get('sfm') or n.get('style')) in EXCLUDED_PARAGRAPH):
                           return
+                      word_key=key if kind=='w' else None
+                      start=position
+                      if word_key:
+                          require(not any(local(x) in NOTE|{'w','v','ve','c'} for x in n.iterdescendants()),'Unsupported nested USFX word')
                       append(n.text)
                       for c in n:
                           walk(c);append(c.tail)
+                      if word_key:
+                          require(key==word_key and position>start,'Invalid USFX word scope')
+                          words[word_key].append((start,position,ns(''.join(n.itertext())),strong(n.get('s'))))
                   walk(book)
                   require(key is None,'Unclosed verse at book boundary')
-              return {k:''.join(v) for k,v in verses.items()},notes,outside
+              return {k:''.join(v) for k,v in verses.items()},notes,outside,words
+          def osis_numbered_words(root):
+              rows=defaultdict(list); keys=set()
+              for book in root.iter(OSIS+'div'):
+                  if book.get('type')!='book':continue
+                  key=None; pos=0
+                  def append(value):
+                      nonlocal pos
+                      if key is not None:pos+=len(ns(value))
+                  def visit(n):
+                      nonlocal key,pos
+                      kind=local(n)
+                      if not kind or kind in {'note','title','header'}:return
+                      container=False
+                      if kind=='verse':
+                          if n.get('eID'):
+                              require(key==n.get('eID'),'OSIS closing mismatch')
+                              key=None
+                              return
+                          require(key is None and n.get('osisID') and n.get('osisID') not in keys,'Invalid OSIS opening')
+                          key=n.get('osisID');keys.add(key);pos=0
+                          container=not bool(n.get('sID'))
+                      word_key=key if kind=='w' else None
+                      start=pos
+                      if word_key:
+                          require(not any(local(x) in {'w','verse','note','title'} for x in n.iterdescendants()),'Unsupported nested OSIS word')
+                      append(n.text)
+                      for child in n:
+                          visit(child);append(child.tail)
+                      if word_key:
+                          require(key==word_key and pos>start,'Invalid OSIS word scope')
+                          rows[word_key].append((start,pos,ns(''.join(n.itertext())),strong(n.get('lemma'),True)))
+                      if container:key=None
+                  visit(book)
+                  require(key is None,'Unclosed OSIS verse')
+              return rows,keys
           def scope(n,osis):
               for a in n.iterancestors():
                   t=local(a)
@@ -115,9 +157,11 @@ jobs:
               root=etree.fromstring(raw,etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True,recover=False))
               require(local(root)=='usfx' and not any(isinstance(x,etree._Entity) for x in root.iter()),'Invalid USFX root or entity')
               _,xml=approved_source_for(p['resource_id'])
-              original,notes,outside=source_verses(root,mapping)
+              original,notes,outside,source_word_spans=source_verses(root,mapping)
               target,target_notes,meta=original_osis_verses_and_notes(xml)
               require(set(original)==set(target),'Numbered source and OSIS key mismatch')
+              target_word_spans,word_keys=osis_numbered_words(_source_tree(xml))
+              require(word_keys==set(target),'Independent OSIS word walker key mismatch')
               counts=Counter(); findings=defaultdict(list)
               # Reconcile only exact previously authorized source-bound repairs.
               # A reference match alone is not permission to ignore a text change.
@@ -144,6 +188,11 @@ jobs:
                   a,b=original[ref],target[ref]
                   check('verse_nonspace',ns(a)==ns(b),ref)
                   check('verse_folded_whitespace',' '.join(a.split())==' '.join(b.split()),ref)
+                  sw,tw=source_word_spans[ref],target_word_spans[ref]
+                  check('verse_word_span_count',len(sw)==len(tw),ref)
+                  check('verse_ordered_word_spans',sw==tw and all(x[3] is not None for x in sw),ref)
+                  for wi,(sl,tl) in enumerate(zip(sw,tw),1):
+                      check('numbered_word_span_and_strong',sl==tl and sl[3] is not None,ref+'#'+str(wi))
                   x,y=notes[ref],target_notes[ref]
                   check('verse_note_count',len(x)==len(y),ref)
                   for i,(old,new) in enumerate(zip(x,y),1):
@@ -166,6 +215,6 @@ jobs:
                   check('global_word_nonspace',left[0]==right[0],i)
                   check('global_word_strong_association',left[0]==right[0] and left[1] is not None and right[1] is not None and left[1]==right[1],i)
               require(matched_repairs==set(approved_repairs),'Unaccounted authorized repair')
-              report={'reviewed_note_repairs_verified':len(matched_repairs),'unexplained_note_body_differences':counts['note_body_equal_or_exact_reviewed_repair_compared']-counts['note_body_equal_or_exact_reviewed_repair_equal'],'repair_ledger_sha256':sha256(ledger_path.read_bytes()).hexdigest() if ledger_path.is_file() else None,'resource':p['resource_id'],'original_xml_sha256':sha256(raw).hexdigest(),'osis_sha256':sha256(xml).hexdigest(),'counts':dict(counts),'bounded_findings':dict(findings),'source_word_elements':len(a),'osis_word_elements':len(b),'source_word_attributes':dict(af),'osis_word_attributes':dict(bf),'source_unparsed_strong':dict(au),'osis_unparsed_strong':dict(bu),'source_notes_outside_verses':outside,'osis_notes_outside_verses':meta['publisher_notes_outside_numbered_verses'],'explicit_note_target_conversion_verified':False,'morphology_or_non_strong_lemma_parity_verified':False,'global_word_order_not_per_verse_position_proof':True,'scope':'USFX original vs cleaned OSIS; not independent USFM prose or complete conversion certification'}
+              report={'reviewed_note_repairs_verified':len(matched_repairs),'unexplained_note_body_differences':counts['note_body_equal_or_exact_reviewed_repair_compared']-counts['note_body_equal_or_exact_reviewed_repair_equal'],'repair_ledger_sha256':sha256(ledger_path.read_bytes()).hexdigest() if ledger_path.is_file() else None,'resource':p['resource_id'],'original_xml_sha256':sha256(raw).hexdigest(),'osis_sha256':sha256(xml).hexdigest(),'counts':dict(counts),'bounded_findings':dict(findings),'source_word_elements':len(a),'osis_word_elements':len(b),'source_word_attributes':dict(af),'osis_word_attributes':dict(bf),'source_unparsed_strong':dict(au),'osis_unparsed_strong':dict(bu),'source_notes_outside_verses':outside,'osis_notes_outside_verses':meta['publisher_notes_outside_numbered_verses'],'explicit_note_target_conversion_verified':False,'morphology_or_non_strong_lemma_parity_verified':False,'source_numbered_word_elements':sum(map(len,source_word_spans.values())),'osis_numbered_word_elements':sum(map(len,target_word_spans.values())),'global_word_order_not_per_verse_position_proof':True,'scope':'USFX original vs cleaned OSIS; not independent USFM prose or complete conversion certification'}
               print('ORIGINAL_USFX_CONTENT_DIAGNOSTIC',json.dumps(report,sort_keys=True),flush=True)
           PY
