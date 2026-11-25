@@ -217,4 +217,59 @@ jobs:
               require(matched_repairs==set(approved_repairs),'Unaccounted authorized repair')
               report={'reviewed_note_repairs_verified':len(matched_repairs),'unexplained_note_body_differences':counts['note_body_equal_or_exact_reviewed_repair_compared']-counts['note_body_equal_or_exact_reviewed_repair_equal'],'repair_ledger_sha256':sha256(ledger_path.read_bytes()).hexdigest() if ledger_path.is_file() else None,'resource':p['resource_id'],'original_xml_sha256':sha256(raw).hexdigest(),'osis_sha256':sha256(xml).hexdigest(),'counts':dict(counts),'bounded_findings':dict(findings),'source_word_elements':len(a),'osis_word_elements':len(b),'source_word_attributes':dict(af),'osis_word_attributes':dict(bf),'source_unparsed_strong':dict(au),'osis_unparsed_strong':dict(bu),'source_notes_outside_verses':outside,'osis_notes_outside_verses':meta['publisher_notes_outside_numbered_verses'],'explicit_note_target_conversion_verified':False,'morphology_or_non_strong_lemma_parity_verified':False,'source_numbered_word_elements':sum(map(len,source_word_spans.values())),'osis_numbered_word_elements':sum(map(len,target_word_spans.values())),'global_word_order_not_per_verse_position_proof':True,'scope':'USFX original vs cleaned OSIS; not independent USFM prose or complete conversion certification'}
               print('ORIGINAL_USFX_CONTENT_DIAGNOSTIC',json.dumps(report,sort_keys=True),flush=True)
+              # Audit the already published link representation; do not rewrite it.
+              from normalize_bible_references import (_printed_book_aliases,
+                  _complete_printed_destinations, _explicit_source_local_reference,
+                  _origin_target, _one_child, _label)
+              alias_path=Path('config')/(p['resource_id']+'-printed-book-aliases.json')
+              if alias_path.is_file():
+                  aliases,alias_sha=_printed_book_aliases(alias_path,mapping,witness['sha256'],root)
+                  target_root=_source_tree(xml)
+                  target_books={n.get('osisID'):n for n in target_root.iter(OSIS+'div') if n.get('type')=='book'}
+                  verse_ids=set(target)
+                  link_counts=Counter(); link_findings=defaultdict(list)
+                  def link_check(kind,ok,ref):
+                      link_counts[kind+'_compared']+=1
+                      link_counts[kind+'_equal']+=bool(ok)
+                      if not ok and len(link_findings[kind])<30: link_findings[kind].append(ref)
+                  for book in root.iter('book'):
+                      bid=mapping[book.get('id')]
+                      src_notes=list(book.iter('x'))
+                      dst_notes=[n for n in target_books[bid].iter(OSIS+'note') if n.get('type')=='crossReference']
+                      require(len(src_notes)==len(dst_notes),'Cross-reference note count differs')
+                      for old,new in zip(src_notes,dst_notes,strict=True):
+                          xo,xt=_one_child(old,'xo'),_one_child(old,'xt')
+                          origin=_label(xo); ref=_origin_target(origin,bid,verse_ids)
+                          label=_label(xt)
+                          repair=approved_repairs.get((ref,old.get('caller')))
+                          if repair:
+                              # The prior whole-note proof covers the repair.
+                              edits=[e for e in ledger['edits'] if e.get('case_id')==repair[2]]
+                              require(len(edits)==1 and ns(label)==repair[0],'Source destination repair mismatch')
+                              label=' '.join(edits[0]['new_label'].split())
+                          origins=[n for n in new if n.tag==OSIS+'reference' and n.get('type')=='annotateRef' and n.get('subType')=='x-origin']
+                          destinations=[n for n in new if n.tag==OSIS+'reference' and n.get('type') is None and n.get('subType') is None]
+                          link_check('origin_text_and_target',len(origins)==1 and _label(origins[0])==origin and origins[0].get('osisRef')==ref,ref)
+                          link_check('caller',old.get('caller')==new.get('n'),ref)
+                          link_check('destination_visible_symbols',ns(label)==ns(''.join(''.join(n.itertext())+(n.tail or '') for n in destinations)),ref)
+                          expected,reason,_=_complete_printed_destinations(label,aliases,verse_ids,disambiguated_chapter_commas=True,named_single_chapter_refs=True)
+                          if expected is None and reason=='compound_or_implicit_reference':
+                              expected,reason=_explicit_source_local_reference(label,aliases,origin,bid,verse_ids)
+                          actual=[token for n in destinations for token in (n.get('osisRef') or '').split()]
+                          if xt.get('link-ref'):
+                              link_counts['original_explicit_machine_targets']+=1
+                              # Explicit source target literals need a separate format mapping.
+                          if expected is not None:
+                              link_counts['fully_parsed_notes']+=1
+                              link_counts['expected_target_tokens']+=len(expected.split())
+                              link_check('fully_parsed_ordered_targets',actual==expected.split(),ref)
+                          else:
+                              link_counts['unresolved_by_full_label_parser']+=1
+                              if actual:
+                                  link_counts['unresolved_but_linked']+=1
+                                  if len(link_findings['unresolved_but_linked'])<30:link_findings['unresolved_but_linked'].append(ref)
+                              else:link_counts['unresolved_and_unlinked']+=1
+                          link_counts['actual_linked_notes']+=bool(actual)
+                          link_counts['actual_target_tokens']+=len(actual)
+                  print('ORIGINAL_USFX_REFERENCE_DIAGNOSTIC',json.dumps({'resource':p['resource_id'],'counts':dict(link_counts),'bounded_findings':dict(link_findings),'alias_sha256':alias_sha,'scope':'replay of reviewed full-label citation grammar against actual linked OSIS; separate explicit source machine targets and partial grammar review'},sort_keys=True),flush=True)
           PY
