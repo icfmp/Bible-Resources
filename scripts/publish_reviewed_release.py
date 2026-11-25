@@ -18,8 +18,6 @@ import tempfile
 from zipfile import ZipFile
 
 from catalogue_release_coverage import coverage
-from check_brnp import inspect_approved_osis
-from guard_osis import StructureFailure
 
 ROOT = Path(__file__).resolve().parents[1]
 SHA = re.compile(r"[a-f0-9]{64}\Z")
@@ -256,6 +254,8 @@ def main() -> int:
         raise ReleaseError("Unsafe destination or unreviewed release commit")
     # Fail closed BEFORE any release creation on a missing catalogue mapping,
     # malformed legacy exception, or uncatalogued/newly approved module.
+    from check_brnp import inspect_approved_osis
+    from guard_osis import StructureFailure
     # Owner-approved BRNP v0.4 subset is mandatory before any public write.
     # Validate existing immutable masters read-only; no resource is rebuilt.
     try:

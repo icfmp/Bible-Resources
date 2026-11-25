@@ -588,12 +588,19 @@ class BRNPPublicationGateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "BRNP_MASTER_MISSING_OR_AMBIGUOUS"):
             inspect_approved_osis(self.root,self.schema)
 
+    def test_unverified_header_revision_cannot_override_approval_hash(self):
+        data = json.loads(self.proof.read_text())
+        data["header_revision"] = {"candidate_source_sha256": sha256(self.source.read_bytes()).hexdigest()}
+        self.proof.write_text(json.dumps(data))
+        with self.assertRaisesRegex(ValueError, "BRNP_HEADER_REVISION_UNSUPPORTED"):
+            inspect_approved_osis(self.root,self.schema)
+
     def test_publisher_requires_gate_before_coverage_or_public_write(self):
         from unittest.mock import patch
         import publish_reviewed_release as publisher
         argv=["publisher","--root",str(self.root),"--built",str(self.root),
               "--repository","owner/repo","--target-sha","a"*40,"--brnp-schema",str(self.schema)]
-        with patch.object(sys,"argv",argv), patch.object(publisher,"inspect_approved_osis",side_effect=ValueError("blocked")), patch.object(publisher,"coverage") as coverage, patch.object(publisher,"publish_one") as publish:
+        with patch.object(sys,"argv",argv), patch("check_brnp.inspect_approved_osis",side_effect=ValueError("blocked")), patch.object(publisher,"coverage") as coverage, patch.object(publisher,"publish_one") as publish:
             with self.assertRaisesRegex(publisher.ReleaseError,"BRNP structural"):
                 publisher.main()
             coverage.assert_not_called()

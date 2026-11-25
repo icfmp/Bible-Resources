@@ -589,9 +589,28 @@ def inspect_approved_osis(root: Path, schema_path: Path, *, enforce: bool = True
         proof = json.loads((metadata.parent / "SOURCE_VALIDATION.json").read_text())
         hashes = [proof[k] for k in ("source_sha256", "candidate_source_sha256",
                                     "source_approved_osis_sha256") if k in proof]
+        if proof.get("header_revision") is not None:
+            # A historical approval hash is not the current master hash.
+            # Reuse the existing strict reversible header-only validator;
+            # do not trust an arbitrary newer hash or exempt a resource ID.
+            from reviewed_modern_commentary_rebuild import verify_header_only_revision
+            audit = m.get("index_audit", {})
+            manifest = f"config/commentary-rebuilds/{m['id']}.json"
+            if (audit.get("mode") != "reviewed_modern_commentary_rebuild" or
+                    audit.get("manifest") != manifest or
+                    proof.get("source_kind") != audit.get("mode")):
+                raise ValueError("BRNP_HEADER_REVISION_UNSUPPORTED")
+            plan = json.loads((root / manifest).read_text())
+            artifact = json.loads((metadata.parent / "RELEASE_ARTIFACT_PROOF.json").read_text())
+            if (proof.get("source_approved_osis_sha256") != plan.get("source_approved_osis_sha256")
+                    or proof["header_revision"] != plan.get("header_revision")
+                    or not isinstance(proof["header_revision"], dict)):
+                raise ValueError("BRNP_HEADER_REVISION_MISMATCH")
+            verify_header_only_revision(metadata.parent, root, m, plan, proof, artifact)
+            hashes = [proof["header_revision"]["candidate_source_sha256"]]
         if (proof.get("status") != "validated" or not hashes
                 or any(h != report["sha256"] for h in hashes)):
-            raise ValueError("BRNP_APPROVED_SOURCE_MISMATCH")
+            raise ValueError("BRNP_APPROVED_SOURCE_MISMATCH:" + m["id"])
         result = {"resource": m["id"], "version": m["version"], **report}
         results.append(result)
         print("BRNP_REAL_EDITION", json.dumps({
