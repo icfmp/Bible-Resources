@@ -269,7 +269,8 @@ jobs:
                               from xml.parsers import expat
                               raw=table_revised
                               root=_source_tree(raw)
-                              local=namespace["_name"];ns=namespace["_no_space"]
+                              def local(node):return namespace["_name"](node) if node is not None else ""
+                              def ns(value):return namespace["_no_space"](value or "")
                               NOTE={"x","f","fe","ef","ex"}
                               TITLE={"s","s1","s2","s3","s4","r","sr","mr","ms","ms1","ms2","ms3","mt","mt1","mt2","mt3","imt","imt1","imt2","imt3","is","is1","is2"}
                               SRC_STYLE={"p":None,"m":"x-noindent","pi":"x-indented-1","pi1":"x-indented-1"}
@@ -416,10 +417,16 @@ jobs:
                                   "editorial":namespace["editorial_diagnostic"](source_root,final_root,mapping),
                                   "poetry_unchanged":namespace["audit_segments"](source_root,final_root,mapping,refs)==report["poetry_diagnostic"],
                                   "candidate_sha256":sha256(final).hexdigest()}
-                      except (ValueError,RuntimeError,AssertionError) as exc:
-                          report["audit_blocked_by"]=type(exc).__name__
                       except Exception as exc:
+                          import traceback
                           report["audit_blocked_by"]=type(exc).__name__
+                          # Report locations only, never exception text or
+                          # locals, which might include original Scripture.
+                          report["audit_blocked_frames"]=[
+                              {"function":frame.name,"line":frame.lineno}
+                              for frame in traceback.extract_tb(exc.__traceback__)[-8:]]
                   print("GENERIC_USFM_CONVERSION_RESEARCH",json.dumps(report,sort_keys=True),flush=True)
                   assert proc.returncode==0 and candidate.is_file(),"Converter failed; see metadata-only report"
+                  assert not report.get("audit_blocked_by"),"Audit interrupted; see metadata-only report"
+                  assert report.get("paragraph_projection",{}).get("layout",{}).get("supported_table_and_numbered_paragraph_parity"),"Paragraph layout remains unresolved"
           PY
