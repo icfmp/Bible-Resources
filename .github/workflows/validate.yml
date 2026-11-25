@@ -702,6 +702,36 @@ jobs:
               return {"books":len(old),"counts":dict(counts),"differences":findings,
                       "supported_table_and_numbered_paragraph_parity":not findings,
                       "scope":"ordered table rows/cell text/header roles/selected inline spans; paragraph starts and style at positive numbered offsets; not initial or intro paragraph boundaries or exact typography"}
+          # Positive fixture with a mid-verse paragraph and two distinct tables.
+          sample_layout_source=parse_usfx(b'<usfx><book id="GEN">'
+              b'<table><tr><th>A</th><tc><it>B</it>C</tc></tr></table>'
+              b'<table><tr><tc>D</tc></tr></table><c id="1"/>'
+              b'<p><v id="1"/>alpha</p><p sfm="m">beta<ve/></p>'
+              b'</book></usfx>')
+          sample_layout_target=(b'<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">'
+              b'<div type="book" osisID="Gen"><table><row><cell role="label">A</cell>'
+              b'<cell><hi type="italic">B</hi>C</cell></row></table>'
+              b'<table><row><cell>D</cell></row></table><chapter osisID="Gen.1">'
+              b'<p><verse osisID="Gen.1.1" sID="Gen.1.1"/>alpha</p>'
+              b'<p type="x-noindent">beta<verse eID="Gen.1.1"/></p>'
+              b'</chapter></div></osis>')
+          def layout_sample(raw):
+              return compare_original_tables_and_paragraphs(
+                  sample_layout_source,etree.fromstring(raw),{"GEN":"Gen"})
+          assert layout_sample(sample_layout_target)["supported_table_and_numbered_paragraph_parity"]
+          for before,after,kind in (
+              (b'role="label"',b'role="data"',"tables"),
+              (b'>A</cell>',b'>X</cell>',"tables"),
+              (b'<hi type="italic">B</hi>C',b'B<hi type="italic">C</hi>',"tables"),
+              (b'</row></table><table><row>',b'</row><row>',"tables"),
+              (b'</p><p type="x-noindent">beta',b'b</p><p type="x-noindent">eta',"numbered_paragraph_starts"),
+              (b'<p type="x-noindent">',b'<p type="x-indented-1">',"numbered_paragraph_starts"),
+              (b'</p><p type="x-noindent">',b'',"numbered_paragraph_starts"),
+          ):
+              assert sample_layout_target.count(before)==1
+              proof=layout_sample(sample_layout_target.replace(before,after))
+              assert ("Gen",kind) in proof["differences"],kind
+          print("Original layout comparator: positive fixture and seven corruption cases passed")
           # Use the same explicit, hash-pinned original member and reviewed
           # crosswalk as the preceding original numbered-content gate.
           adapters=json.loads(Path("config/original-bible-content-adapters.json").read_text())["resources"]
