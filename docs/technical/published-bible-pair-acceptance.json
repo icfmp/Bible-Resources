@@ -1,0 +1,485 @@
+{
+  "schema_version": 1,
+  "issue": 28,
+  "workflow_run": 45660060897,
+  "research_commit": "018ccd5ea5c756b64e4f02597d43d297b82e19d4",
+  "app_commit": "3d794a2bba48c30022b64bb4faabc8be9a10f1e8",
+  "findings": [],
+  "gtk": [
+    {
+      "comparison_fidelity": {
+        "byte_identical": 12,
+        "direct_sword_sha256": "e4030f9f0fb49856569fefe448962508f8e837968026ecc45b18da176f549265",
+        "verified_decorations": [],
+        "verses": 31
+      },
+      "primary_fidelity": {
+        "byte_identical": 23,
+        "direct_sword_sha256": "dbae61afcbf4640ea5561785dd31f9a18f3b62d7be7839dd3b2d1bcb500ed7c4",
+        "verified_decorations": [],
+        "verses": 31
+      },
+      "reference": "Gen.1.1",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Gen.1.1"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 23,
+        "direct_sword_sha256": "dbae61afcbf4640ea5561785dd31f9a18f3b62d7be7839dd3b2d1bcb500ed7c4",
+        "verified_decorations": [],
+        "verses": 31
+      },
+      "primary_fidelity": {
+        "byte_identical": 12,
+        "direct_sword_sha256": "e4030f9f0fb49856569fefe448962508f8e837968026ecc45b18da176f549265",
+        "verified_decorations": [],
+        "verses": 31
+      },
+      "reference": "Gen.1.1",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Gen.1.1"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 33,
+        "direct_sword_sha256": "9b6730a3aaa7b616fb10d188aedff3d837433d80066b61d20ca8f10782d6d79a",
+        "verified_decorations": [],
+        "verses": 36
+      },
+      "primary_fidelity": {
+        "byte_identical": 23,
+        "direct_sword_sha256": "d1333ca2eec8eba7b0dbb31b4d96f6530a7e85a633979062dce575c6c24f5b08",
+        "verified_decorations": [],
+        "verses": 36
+      },
+      "reference": "John.3.16",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "John.3.16"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 23,
+        "direct_sword_sha256": "d1333ca2eec8eba7b0dbb31b4d96f6530a7e85a633979062dce575c6c24f5b08",
+        "verified_decorations": [],
+        "verses": 36
+      },
+      "primary_fidelity": {
+        "byte_identical": 33,
+        "direct_sword_sha256": "9b6730a3aaa7b616fb10d188aedff3d837433d80066b61d20ca8f10782d6d79a",
+        "verified_decorations": [],
+        "verses": 36
+      },
+      "reference": "John.3.16",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "John.3.16"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 3,
+        "direct_sword_sha256": "ab09060bf3e132c982ffdde88a2c1f820c796c3032f8372798d8cdfda4ef6b7e",
+        "verified_decorations": [],
+        "verses": 8
+      },
+      "primary_fidelity": {
+        "byte_identical": 6,
+        "direct_sword_sha256": "5607becf817208f3a830fe91c812167ec2b363dae9858fc672092c5cebfdc024",
+        "verified_decorations": [],
+        "verses": 8
+      },
+      "reference": "Eccl.11.8",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Eccl.11.8"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 8,
+        "direct_sword_sha256": "878dcda441a8ba1b251196bc8c7ed28af798949e858c0c623532893167df6724",
+        "verified_decorations": [],
+        "verses": 10
+      },
+      "primary_fidelity": {
+        "byte_identical": 4,
+        "direct_sword_sha256": "a1a0db8673c34744d63709ee8b2849ee1e1a1ea32a13fc0e50dc0e339f53095c",
+        "verified_decorations": [],
+        "verses": 10
+      },
+      "reference": "Eccl.11.8",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Eccl.11.8"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 7,
+        "direct_sword_sha256": "24c9e33c51c44f0325807c42bcb94cfbdc1dd03a80abf07f978b82546d52c0b6",
+        "verified_decorations": [],
+        "verses": 16
+      },
+      "primary_fidelity": {
+        "byte_identical": 14,
+        "direct_sword_sha256": "ae6733cc7d49b639edbd25ed3fd24bd20b46e73dcf6b436f0c5ffd0da986060e",
+        "verified_decorations": [],
+        "verses": 16
+      },
+      "reference": "Eccl.12.1",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Eccl.11.9"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 8,
+        "direct_sword_sha256": "878dcda441a8ba1b251196bc8c7ed28af798949e858c0c623532893167df6724",
+        "verified_decorations": [],
+        "verses": 10
+      },
+      "primary_fidelity": {
+        "byte_identical": 4,
+        "direct_sword_sha256": "a1a0db8673c34744d63709ee8b2849ee1e1a1ea32a13fc0e50dc0e339f53095c",
+        "verified_decorations": [],
+        "verses": 10
+      },
+      "reference": "Eccl.11.9",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Eccl.12.1"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 7,
+        "direct_sword_sha256": "24c9e33c51c44f0325807c42bcb94cfbdc1dd03a80abf07f978b82546d52c0b6",
+        "verified_decorations": [],
+        "verses": 16
+      },
+      "primary_fidelity": {
+        "byte_identical": 14,
+        "direct_sword_sha256": "ae6733cc7d49b639edbd25ed3fd24bd20b46e73dcf6b436f0c5ffd0da986060e",
+        "verified_decorations": [],
+        "verses": 16
+      },
+      "reference": "Eccl.12.2",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Eccl.11.10"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 8,
+        "direct_sword_sha256": "878dcda441a8ba1b251196bc8c7ed28af798949e858c0c623532893167df6724",
+        "verified_decorations": [],
+        "verses": 10
+      },
+      "primary_fidelity": {
+        "byte_identical": 4,
+        "direct_sword_sha256": "a1a0db8673c34744d63709ee8b2849ee1e1a1ea32a13fc0e50dc0e339f53095c",
+        "verified_decorations": [],
+        "verses": 10
+      },
+      "reference": "Eccl.11.10",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Eccl.12.2"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 7,
+        "direct_sword_sha256": "24c9e33c51c44f0325807c42bcb94cfbdc1dd03a80abf07f978b82546d52c0b6",
+        "verified_decorations": [],
+        "verses": 16
+      },
+      "primary_fidelity": {
+        "byte_identical": 14,
+        "direct_sword_sha256": "ae6733cc7d49b639edbd25ed3fd24bd20b46e73dcf6b436f0c5ffd0da986060e",
+        "verified_decorations": [],
+        "verses": 16
+      },
+      "reference": "Eccl.12.3",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Eccl.12.1"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 12,
+        "direct_sword_sha256": "0779c46e1a7df196e5f0c12711f0ada956e3f1bc2f5606609055cd5fa38ff761",
+        "verified_decorations": [],
+        "verses": 14
+      },
+      "primary_fidelity": {
+        "byte_identical": 6,
+        "direct_sword_sha256": "b0b6ad110e05883591075e01a6d4a119ce0e55438b5bedfe6008112d9ab0a8cb",
+        "verified_decorations": [],
+        "verses": 14
+      },
+      "reference": "Eccl.12.1",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Eccl.12.3"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 7,
+        "direct_sword_sha256": "24c9e33c51c44f0325807c42bcb94cfbdc1dd03a80abf07f978b82546d52c0b6",
+        "verified_decorations": [],
+        "verses": 16
+      },
+      "primary_fidelity": {
+        "byte_identical": 14,
+        "direct_sword_sha256": "ae6733cc7d49b639edbd25ed3fd24bd20b46e73dcf6b436f0c5ffd0da986060e",
+        "verified_decorations": [],
+        "verses": 16
+      },
+      "reference": "Eccl.12.16",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Eccl.12.14"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 12,
+        "direct_sword_sha256": "0779c46e1a7df196e5f0c12711f0ada956e3f1bc2f5606609055cd5fa38ff761",
+        "verified_decorations": [],
+        "verses": 14
+      },
+      "primary_fidelity": {
+        "byte_identical": 6,
+        "direct_sword_sha256": "b0b6ad110e05883591075e01a6d4a119ce0e55438b5bedfe6008112d9ab0a8cb",
+        "verified_decorations": [],
+        "verses": 14
+      },
+      "reference": "Eccl.12.14",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Eccl.12.16"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 35,
+        "direct_sword_sha256": "185e1c43f1475367ad2c6d365ac559ca00ec9fb513f336576cbfcd4edbb8a9c3",
+        "verified_decorations": [],
+        "verses": 40
+      },
+      "primary_fidelity": {
+        "byte_identical": 35,
+        "direct_sword_sha256": "24eb2773b842bcf9d770794d3542f3047e979c1cf7d6498267f1611f4ab79235",
+        "verified_decorations": [],
+        "verses": 40
+      },
+      "reference": "Acts.19.40",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Acts.19.40"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 35,
+        "direct_sword_sha256": "24eb2773b842bcf9d770794d3542f3047e979c1cf7d6498267f1611f4ab79235",
+        "verified_decorations": [],
+        "verses": 40
+      },
+      "primary_fidelity": {
+        "byte_identical": 35,
+        "direct_sword_sha256": "185e1c43f1475367ad2c6d365ac559ca00ec9fb513f336576cbfcd4edbb8a9c3",
+        "verified_decorations": [],
+        "verses": 40
+      },
+      "reference": "Acts.19.40",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Acts.19.40"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 0,
+        "direct_sword_sha256": "3d0cd736b7c36dc02294212695c191aa086677224a9e7717794c0933188855d4",
+        "verified_decorations": [
+          {
+            "reference": "Ps.3.1",
+            "verified_native_stars": 2
+          }
+        ],
+        "verses": 9
+      },
+      "primary_fidelity": {
+        "byte_identical": 2,
+        "direct_sword_sha256": "e2347b32a25f42453ed05e2455fc1f9f0575fe3dbef7c587d45656e32fbafb79",
+        "verified_decorations": [],
+        "verses": 9
+      },
+      "reference": "Ps.3.2",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Ps.3.2"
+    },
+    {
+      "comparison_fidelity": {
+        "byte_identical": 2,
+        "direct_sword_sha256": "e2347b32a25f42453ed05e2455fc1f9f0575fe3dbef7c587d45656e32fbafb79",
+        "verified_decorations": [],
+        "verses": 9
+      },
+      "primary_fidelity": {
+        "byte_identical": 0,
+        "direct_sword_sha256": "3d0cd736b7c36dc02294212695c191aa086677224a9e7717794c0933188855d4",
+        "verified_decorations": [
+          {
+            "reference": "Ps.3.1",
+            "verified_native_stars": 2
+          }
+        ],
+        "verses": 9
+      },
+      "reference": "Ps.3.2",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Ps.3.2"
+    }
+  ],
+  "native": [
+    {
+      "reference": "Gen.1.1",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Gen.1.1"
+    },
+    {
+      "reference": "Gen.1.1",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Gen.1.1"
+    },
+    {
+      "reference": "John.3.16",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "John.3.16"
+    },
+    {
+      "reference": "John.3.16",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "John.3.16"
+    },
+    {
+      "reference": "Eccl.11.8",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Eccl.11.8"
+    },
+    {
+      "reference": "Eccl.11.8",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Eccl.11.8"
+    },
+    {
+      "reference": "Eccl.12.1",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Eccl.11.9"
+    },
+    {
+      "reference": "Eccl.11.9",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Eccl.12.1"
+    },
+    {
+      "reference": "Eccl.12.2",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Eccl.11.10"
+    },
+    {
+      "reference": "Eccl.11.10",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Eccl.12.2"
+    },
+    {
+      "reference": "Eccl.12.3",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Eccl.12.1"
+    },
+    {
+      "reference": "Eccl.12.1",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Eccl.12.3"
+    },
+    {
+      "reference": "Eccl.12.16",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Eccl.12.14"
+    },
+    {
+      "reference": "Eccl.12.14",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Eccl.12.16"
+    },
+    {
+      "reference": "Acts.19.40",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Acts.19.40"
+    },
+    {
+      "reference": "Acts.19.40",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Acts.19.40"
+    },
+    {
+      "reference": "Ps.3.2",
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024",
+      "target_reference": "Ps.3.2"
+    },
+    {
+      "reference": "Ps.3.2",
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910",
+      "target_reference": "Ps.3.2"
+    }
+  ],
+  "resources": {
+    "BRJND2024": {
+      "archive_sha256": "81acdfdfbbb18135a49609c045b293ce495a200b37f667f55c190925544b9553",
+      "id": "bible-resources~BRJND2024",
+      "payload_members_verified": 7,
+      "versification": "Luther",
+      "version": "1.0.0"
+    },
+    "BRLSG1910": {
+      "archive_sha256": "643b33b6f8130c46ec381394169c4ff3b60575b8e7d999ba550fbaeb36f65d05",
+      "id": "bible-resources~BRLSG1910",
+      "payload_members_verified": 7,
+      "versification": "Segond",
+      "version": "1.0.4"
+    }
+  },
+  "scroll": [
+    {
+      "bidirectional_native_wheel": true,
+      "history_unchanged": true,
+      "source": "bible-resources~BRLSG1910",
+      "target": "bible-resources~BRJND2024"
+    },
+    {
+      "bidirectional_native_wheel": true,
+      "history_unchanged": true,
+      "source": "bible-resources~BRJND2024",
+      "target": "bible-resources~BRLSG1910"
+    }
+  ],
+  "status": "PASS"
+}
