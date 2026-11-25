@@ -204,6 +204,12 @@ class PublicationCoverageTests(unittest.TestCase):
         self.assertLess(workflow.index("scripts/publish_reviewed_release.py"),
                         workflow.index("actions/deploy-pages@v4"))
         self.assertIn("contents: write",workflow)
+        self.assertIn("actions: read",workflow)
+        self.assertIn("name: github-pages-${{ github.run_attempt }}",workflow)
+        self.assertIn("artifact_name: github-pages-${{ github.run_attempt }}",workflow)
+        self.assertIn("steps.pages-artifact.outputs.artifact_id",workflow)
+        self.assertLess(workflow.index("Require the exact attempt artifact"),
+                        workflow.index("actions/deploy-pages@v4"))
         self.assertIn("github.ref == 'refs/heads/main'",workflow)
         self.assertFalse((ROOT/".github/workflows/publish-reviewed-sword-releases.yml").exists())
         self.assertTrue((ROOT/"config/release-legacy-bindings.json").is_file())

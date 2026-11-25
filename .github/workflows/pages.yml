@@ -4,6 +4,7 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
+  actions: read
   contents: write
   pages: write
   id-token: write
@@ -44,9 +45,33 @@ jobs:
             --target-sha "${{ github.sha }}"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
+        id: pages-artifact
         with:
           path: dist
+          name: github-pages-${{ github.run_attempt }}
+      - name: Require the exact attempt artifact to be visible before deploying
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_NAME: github-pages-${{ github.run_attempt }}
+          ARTIFACT_ID: ${{ steps.pages-artifact.outputs.artifact_id }}
+        run: |
+          set -euo pipefail
+          test -n "$ARTIFACT_ID"
+          for attempt in $(seq 1 12); do
+            if response=$(gh api --method GET "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts" -f name="$ARTIFACT_NAME" -f per_page=100) &&
+              jq -e --arg id "$ARTIFACT_ID" --arg name "$ARTIFACT_NAME" \
+                '.total_count == 1 and (.artifacts | length == 1 and (.[0].id | tostring) == $id and .[0].name == $name and .[0].expired == false)' \
+                >/dev/null <<< "$response"; then
+              echo "Verified exact Pages attempt artifact $ARTIFACT_NAME ($ARTIFACT_ID)"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::Exact Pages attempt artifact did not become uniquely visible"
+          exit 1
       - uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
       - name: Verify live public HTTPS catalogue and all actual ZIP checksums
         run: |
           set -euo pipefail
