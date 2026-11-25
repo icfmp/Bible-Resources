@@ -1522,6 +1522,41 @@
       "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
+        "OSIS",
+        "USFM",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/bible/original_authorial_content_parity.py",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
+      "purpose_first_line": "Independent original USFM/USFX and approved OSIS numbered-content diagnostics.",
+      "python_imports": [
+        "collections",
+        "hashlib",
+        "lxml",
+        "re",
+        "research",
+        "source_osis_inventory"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "b918ee9d120ba73e55a322fc53a2ff29ad1283337b818c09d8f7ad3125a87132",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/tool_registry.py",
+        "docs/workflows/BIBLE_7_STAGE_WORKFLOW.md",
+        "tests/test_original_authorial_content_parity.py"
+      ]
+    },
+    {
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
         "USFM",
         "USFX"
       ],
@@ -1743,9 +1778,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/approved_osis_sword_candidate.py",
+        "scripts/research/bible/original_authorial_content_parity.py",
         "scripts/tool_registry.py",
         ".github/workflows/approved-osis-native-audit.yml",
         ".github/workflows/lsg-chapter-heading-review.yml",
@@ -1998,11 +2034,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 12,
+      "static_reference_count": 13,
       "static_references": [
         "scripts/approved_osis_sword_candidate.py",
         "scripts/osis_semantic_fidelity.py",
         "scripts/remove_reviewed_empty_osis_paragraphs.py",
+        "scripts/research/bible/original_authorial_content_parity.py",
         "scripts/research/bible/source_native_osis_boundary_positions.py",
         "scripts/research/bible/source_native_osis_structure_screen.py",
         "scripts/research/bible/source_osis_verse_notes.py",
@@ -2412,7 +2449,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "7bc7a8c5f906520a966f21ec3c350741188acc5025b394bea7a6f5c520b1f8d5",
+      "sha256_at_inventory": "683685ae7a5f23f8f00811d5c9f095222a97c072ede48667af9bd6da5d96f2fb",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",

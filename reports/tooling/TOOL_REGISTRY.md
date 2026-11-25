@@ -17,7 +17,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 
 - GENERALIZE: 1
 - HISTORICAL/ARCHIVE: 0
-- KEEP_GENERIC: 58
+- KEEP_GENERIC: 59
 - MERGE: 0
 - MODULE_LOCAL: 5
 - UNDECIDED: 0
@@ -63,20 +63,21 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/bible/native_milestone_pair_audit.py`](../../scripts/research/bible/native_milestone_pair_audit.py) | KEEP_GENERIC | named test | 6 | source/native audit |
 | [`scripts/research/bible/native_raw_main_text.py`](../../scripts/research/bible/native_raw_main_text.py) | KEEP_GENERIC | named test | 9 | not determined |
 | [`scripts/research/bible/native_sword_markup_census.py`](../../scripts/research/bible/native_sword_markup_census.py) | KEEP_GENERIC | named test | 3 | not determined |
+| [`scripts/research/bible/original_authorial_content_parity.py`](../../scripts/research/bible/original_authorial_content_parity.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/research/bible/original_authorial_key_inventory.py`](../../scripts/research/bible/original_authorial_key_inventory.py) | KEEP_GENERIC | named test | 3 | source/native audit |
 | [`scripts/research/bible/source_native_note_positions.py`](../../scripts/research/bible/source_native_note_positions.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_ordered_body.py`](../../scripts/research/bible/source_native_ordered_body.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/research/bible/source_native_osis_boundary_positions.py`](../../scripts/research/bible/source_native_osis_boundary_positions.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_osis_structure_screen.py`](../../scripts/research/bible/source_native_osis_structure_screen.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_osis_target_addressability.py`](../../scripts/research/bible/source_native_osis_target_addressability.py) | KEEP_GENERIC | named test | 5 | not determined |
-| [`scripts/research/bible/source_osis_verse_notes.py`](../../scripts/research/bible/source_osis_verse_notes.py) | KEEP_GENERIC | named test | 8 | not determined |
+| [`scripts/research/bible/source_osis_verse_notes.py`](../../scripts/research/bible/source_osis_verse_notes.py) | KEEP_GENERIC | named test | 9 | not determined |
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 7 | publication/release |
 | [`scripts/reviewed_modern_commentary_rebuild.py`](../../scripts/reviewed_modern_commentary_rebuild.py) | GENERALIZE | named test | 3 | publication/release |
 | [`scripts/reviewed_osis_commentary_rebuild.py`](../../scripts/reviewed_osis_commentary_rebuild.py) | KEEP_GENERIC | not established | 2 | publication/release |
 | [`scripts/reviewed_tei_dictionary.py`](../../scripts/reviewed_tei_dictionary.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/segment_osis_reference_destinations.py`](../../scripts/segment_osis_reference_destinations.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/smoke.py`](../../scripts/smoke.py) | KEEP_GENERIC | named test | 5 | not determined |
-| [`scripts/source_osis_inventory.py`](../../scripts/source_osis_inventory.py) | KEEP_GENERIC | named test | 12 | source/native audit |
+| [`scripts/source_osis_inventory.py`](../../scripts/source_osis_inventory.py) | KEEP_GENERIC | named test | 13 | source/native audit |
 | [`scripts/stable_sword_refs.py`](../../scripts/stable_sword_refs.py) | KEEP_GENERIC | named test | 24 | not determined |
 | [`scripts/sword_native_commentary_index.cpp`](../../scripts/sword_native_commentary_index.cpp) | KEEP_GENERIC | not established | 3 | not determined |
 | [`scripts/sword_native_commentary_raw_corpus.cpp`](../../scripts/sword_native_commentary_raw_corpus.cpp) | KEEP_GENERIC | not established | 2 | not determined |
