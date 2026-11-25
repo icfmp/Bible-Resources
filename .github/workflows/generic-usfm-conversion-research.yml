@@ -76,9 +76,60 @@ jobs:
                       report["candidate_sha256"]=sha256(xml).hexdigest()
                       try:
                           keys,_=source_inventory(xml)
-                          report["candidate_numbered_keys"]=len(keys)
+                          report["candidate_numbered_keys"]=len(keys.splitlines())
                           proof=verify_numbered_content(zfx.read(a["usfx_member"]),xml,mapping,{},zfm)
                           report["numbered_content_diagnostic"]=proof
+                          from research.bible.original_authorial_content_parity import parse_usfx,source_verses
+                          from research.bible.source_osis_verse_notes import original_osis_verses_and_notes
+                          from source_osis_inventory import _source_tree,OSIS
+                          from collections import Counter
+                          source_root=parse_usfx(zfx.read(a["usfx_member"]))
+                          original,_,_,_=source_verses(source_root,mapping)
+                          converted,_,_=original_osis_verses_and_notes(xml)
+                          target=_source_tree(xml)
+                          selah_hosts=Counter()
+                          for book in target.iter(OSIS+"div"):
+                              if book.get("type")!="book":continue
+                              current=None
+                              for node in book.iter():
+                                  if node.tag==OSIS+"verse":
+                                      if node.get("eID"):current=None
+                                      elif node.get("sID"):current=node.get("sID")
+                                  if node.tag==OSIS+"l" and node.get("type")=="selah":
+                                      assert current is not None
+                                      selah_hosts[current]+=1
+                          mismatch={k for k in original if " ".join(original[k].split())!=" ".join(converted[k].split())}
+                          report["selah_spacing_diagnostic"]={
+                              "mismatch_count":len(mismatch),"selah_count":sum(selah_hosts.values()),
+                              "selah_host_count":len(selah_hosts),"mismatches_exactly_selah_hosts":mismatch==set(selah_hosts),
+                              "non_selah_mismatches":sorted(mismatch-set(selah_hosts))[:20],
+                              "unchanged_selah_hosts":sorted(set(selah_hosts)-mismatch)[:20]}
+                          # Compare the actual converter product through the
+                          # independent structural checks already in Validate.
+                          # Recover only function definitions, never run a
+                          # second workflow or substitute the approved master.
+                          workflow=Path(".github/workflows/validate.yml").read_text()
+                          start=workflow.index("          def _name(node):")
+                          end=workflow.index("          # Exercise the actual comparator",start)
+                          import textwrap,re,hashlib
+                          from collections import defaultdict
+                          from lxml import etree
+                          from pilot_preflight import PilotError
+                          namespace=dict(globals())
+                          namespace.update(NON_VERSE_TEXT_ELEMENTS={"x","f","fig","s","r","toc","h","id"},
+                              NON_VERSE_PARAGRAPH_STYLES={"r","s","s1","s2","s3","s4","sr","h","toc1","toc2","toc3"},
+                              SKIP_TARGET=frozenset(("title","header","note","revisionDesc","description")),
+                              SKIP_SOURCE=frozenset(("x","f","fig","s","r","toc","h","id","fe","ef","ex")),
+                              OSIS=OSIS,PilotError=PilotError,re=re,hashlib=hashlib,etree=etree,
+                              Counter=Counter,defaultdict=defaultdict)
+                          exec(compile(textwrap.dedent(workflow[start:end]),"<reviewed poetry comparator>","exec"),namespace)
+                          refs=[]
+                          for book in source_root.iter("book"):
+                              chapter=None
+                              for node in book.iter():
+                                  if node.tag=="c":chapter=int(node.get("id"))
+                                  if node.tag=="v":refs.append((book.get("id"),chapter,int(node.get("id"))))
+                          report["poetry_diagnostic"]=namespace["audit_segments"](source_root,target,mapping,refs)
                       except (ValueError,RuntimeError,AssertionError) as exc:
                           report["audit_blocked_by"]=type(exc).__name__
                       except Exception as exc:
