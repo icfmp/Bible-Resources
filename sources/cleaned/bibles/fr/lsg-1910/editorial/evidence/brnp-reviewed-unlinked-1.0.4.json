@@ -1,0 +1,18 @@
+{
+  "all_unlinked_reference_indices_reconciled": true,
+  "current_master_sha256": "25479903513b66c5dbb0f8eb1d9025da023a6b63df38492c35940ef65425e965",
+  "current_release_review": "https://github.com/icfmp/Bible-Resources/pull/574",
+  "destination_semantics_certified": false,
+  "entries_sha256": "117338297af084c716f4082ff3821632d5113508a57eaf18ca42fee382c1f692",
+  "historical_approval_manifest_sha256": "672467cff77474163c7e746194b70744e012b21878ecdc9424fa890f28729ab4",
+  "historical_review": "https://github.com/icfmp/Bible-Resources/pull/546",
+  "historically_reviewed_master_sha256": "1eb474496bef0388da403528ea080da489d8b4d980d4b11397ffd8cfe2398a4d",
+  "mandatory_gate_approved": false,
+  "original_usfx_archive_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+  "preserved_unlinked_groups": 311,
+  "schema_version": 1,
+  "source_notes_reconciled": 9751,
+  "status": "exact_reviewed_unlinked_preservation_evidence",
+  "workflow_run": 45665274938,
+  "research_commit": "d96c0a0adc4c52dd166869f59f473a5ce56f9d09"
+}
