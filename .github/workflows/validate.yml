@@ -52,6 +52,8 @@ jobs:
           assert adapters["schema_version"]==1
           reviewed=adapters["resources"]
           seen=set()
+          osis_reviewed=adapters.get("osis_resources",{})
+          osis_seen=set()
           for folder in sorted(Path("modules").iterdir()):
               if not (folder/"metadata.json").is_file():continue
               m=read(folder/"metadata.json")
@@ -64,7 +66,7 @@ jobs:
                   # Compare the actual pinned original and approved cleaned OSIS,
                   # using the same independent verse/note parser as native QA.
                   # Editorial repairs may legitimately differ: inventory them
-                  # rather than requiring byte equality or silently waiving them.
+                  # and account for each exact reviewed edit before accepting parity.
                   from approved_osis_sword_candidate import original_osis_verses_and_notes
                   from collections import Counter
                   original=original_dir/provenance["original_file"]
@@ -76,8 +78,50 @@ jobs:
                   _,cleaned=approved_source_for(resource)
                   old,old_notes,old_meta=original_osis_verses_and_notes(raw)
                   new,new_notes,new_meta=original_osis_verses_and_notes(cleaned)
+                  # All intentional differences are source-hash-bound data.
+                  # Unlisted editions must preserve numbered semantics exactly.
+                  review=osis_reviewed.get(resource)
+                  marks={}
+                  edits={}
+                  if review is not None:
+                      osis_seen.add(resource)
+                      from hashlib import sha1
+                      from source_osis_inventory import _source_tree, OSIS
+                      assert sha256(raw).hexdigest()==review["original_sha256"]
+                      assert sha256(cleaned).hexdigest()==review["cleaned_sha256"]
+                      approval_path=Path(review["approval_manifest"])
+                      approval=read(approval_path)
+                      approval_bytes=approval_path.read_bytes()
+                      assert sha1(b"blob "+str(len(approval_bytes)).encode()+b"\0"+approval_bytes).hexdigest()==review["approval_manifest_git_blob_sha1"]
+                      assert approval["source_osis_sha256"]==review["original_sha256"]
+                      assert approval["compiler_input_osis_sha256"]==review["cleaned_sha256"]
+                      assert approval["owner_approval_url"]
+                      marker_policy=review.get("division_markers")
+                      if marker_policy:
+                          tree=_source_tree(cleaned)
+                          for verse in tree.iter(OSIS+"verse"):
+                              ref=verse.get("sID")
+                              if not ref:continue
+                              node=verse.getnext()
+                              if node is None or node.tag!=OSIS+"milestone" or node.get("type") not in marker_policy["types"]:continue
+                              assert not (verse.tail or "").strip()
+                              assert node.get("marker") is None and ref not in marks
+                              mark=marker_policy["subtypes"][node.get("subType")]
+                              assert mark and set(mark)=={"*"}
+                              marks[ref]=mark
+                          assert len(marks)==marker_policy["expected_count"]
+                          all_markers=[n for n in tree.iter(OSIS+"milestone") if n.get("type") in marker_policy["types"]]
+                          assert len(all_markers)==len(marks)
+                      for ref,index,original_target,new_target in review.get("note_target_edits",[]):
+                          assert ref in old_notes and 1<=index<=len(old_notes[ref])
+                          key=(ref,index)
+                          mapping=edits.setdefault(key,{})
+                          assert original_target not in mapping
+                          mapping[original_target]=new_target
                   counts=Counter()
                   samples={}
+                  used_edits=set()
+                  used_marks=set()
                   def delta(kind,ref,index=None):
                       counts[kind]+=1
                       rows=samples.setdefault(kind,[])
@@ -92,17 +136,39 @@ jobs:
                   for ref in old:
                       if ref not in new:continue
                       counts["verse_pairs"]+=1
-                      if nonspace(old[ref])!=nonspace(new[ref]):
+                      mark=marks.get(ref,"")
+                      original_text=old[ref]
+                      if mark:
+                          original_text=original_text.lstrip()
+                          assert original_text.startswith(mark)
+                          original_text=original_text[len(mark):]
+                          used_marks.add(ref)
+                          counts["reviewed_division_markers_preserved"]+=1
+                      if nonspace(original_text)!=nonspace(new[ref]):
                           delta("verse_nonspace_difference",ref)
-                      if folded(old[ref])!=folded(new[ref]):
+                      if folded(original_text)!=folded(new[ref]):
                           delta("verse_folded_whitespace_difference",ref)
                       if len(old_notes[ref])!=len(new_notes[ref]):
                           delta("note_count_difference",ref)
                           continue
                       for i,(a_note,b_note) in enumerate(zip(old_notes[ref],new_notes[ref]),1):
                           counts["note_pairs"]+=1
-                          for field in ("caller","type","point","targets"):
+                          for field in ("caller","type"):
                               if a_note[field]!=b_note[field]:delta("note_"+field+"_difference",ref,i)
+                          if a_note["point"]-len(mark)!=b_note["point"]:
+                              delta("note_point_difference",ref,i)
+                          elif mark:
+                              counts["reviewed_marker_note_anchor_shifts"]+=1
+                          expected_targets=list(a_note["targets"])
+                          for target,replacement in edits.get((ref,i),{}).items():
+                              assert expected_targets.count(target)==1
+                              idx=expected_targets.index(target)
+                              if replacement is None:expected_targets.pop(idx)
+                              else:expected_targets[idx]=replacement
+                              used_edits.add((ref,i,target))
+                              counts["reviewed_note_target_edits"]+=1
+                          if tuple(expected_targets)!=b_note["targets"]:
+                              delta("note_targets_difference",ref,i)
                           if nonspace(a_note["body"])!=nonspace(b_note["body"]):
                               delta("note_body_nonspace_difference",ref,i)
                           if folded(a_note["body"])!=folded(b_note["body"]):
@@ -119,7 +185,7 @@ jobs:
                       "cleaned_outside_numbered_notes":new_meta["publisher_notes_outside_numbered_verses"],
                       "ordered_numbered_keys_equal":list(old)==list(new),
                       "counts":dict(counts),"bounded_reference_only_differences":samples,
-                      "all_editorial_differences_approved_by_this_diagnostic":False,
+                      "all_numbered_differences_reconciled_with_reviewed_edits":not samples,
                       "full_layout_or_typography_certified":False,
                   },sort_keys=True),flush=True)
                   # These are required invariants for the currently supported
@@ -127,7 +193,9 @@ jobs:
                   # authorized change needs an explicit reviewed transformation
                   # policy; never a translation-specific bypass.
                   assert list(old)==list(new),(resource,"original numbered keys differ")
-                  assert not counts["note_count_difference"] and not counts["note_caller_difference"],resource
+                  assert used_marks==set(marks),resource
+                  assert used_edits=={(ref,i,t) for (ref,i),mapping in edits.items() for t in mapping},resource
+                  assert not samples,(resource,dict(counts))
                   assert old_meta["publisher_notes_outside_numbered_verses"]==new_meta["publisher_notes_outside_numbered_verses"],resource
                   continue
               assert provenance["format"]=="USFM" and resource in reviewed,("No reviewed original-format adapter",resource)
@@ -168,6 +236,7 @@ jobs:
               print("MANDATORY_ORIGINAL_NUMBERED_CONTENT",resource,json.dumps(proof,sort_keys=True),flush=True)
               assert proof["all_supported_content_checks_equal"],(resource,proof["mismatch_counts"])
           assert seen==set(reviewed),"Unused/stale original-format adapter"
+          assert osis_seen==set(osis_reviewed),"Unused/stale original OSIS review"
           PY
       - name: Audit exact stock-reader-key Bible payloads (read-only candidate evidence)
         shell: bash
