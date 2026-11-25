@@ -530,3 +530,85 @@ jobs:
               print('ORIGINAL_USFX_LAYOUT_DETAILS',json.dumps(details,sort_keys=True),flush=True)
               print('ORIGINAL_USFX_LAYOUT_DIAGNOSTIC',json.dumps({'resource':p['resource_id'],'books':len(old),'counts':dict(counts),'bounded_book_findings':{k:v[:30] for k,v in findings.items()},'source_style_counts':dict(styles_old),'target_style_counts':dict(styles_new),'source_marker_census':dict(markers_old),'target_marker_census':dict(markers_new),'empty_paragraph_book_offsets':empty_paragraphs[:20],'scope':'cross-format numbered positions, title symbol hashes and full body stream; classification diagnostic, not complete editorial or reader approval'},sort_keys=True),flush=True)
           PY
+      - name: Verify effective paragraph starts against OSIS line breaks and explicit empty-paragraph overlay
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          import json,re,zipfile
+          from pathlib import Path
+          from hashlib import sha256
+          from collections import Counter,defaultdict
+          from lxml import etree
+          from pilot_preflight import inspect_archive
+          from approved_osis_sword_candidate import approved_source_for
+          from source_osis_inventory import _source_tree,OSIS
+          def local(n): return etree.QName(n).localname if isinstance(n.tag,str) else ''
+          def compact(v): return ''.join((v or '').split())
+          NOTE={'x','f','fe','ex','ef'}
+          TITLE={'s','s1','s2','s3','s4','r','sr','mr','ms','ms1','ms2','ms3','mt','mt1','mt2','mt3','imt','imt1','imt2','imt3','is','is1','is2'}
+          def inventory(book,src):
+              pos=0; current=None; chapter=None; last=None
+              starts=[]; breaks=[]; tables=[]; cell_rows=[]; before=[]; unnumbered=[]
+              intro=False
+              def append(v):
+                  nonlocal pos
+                  s=compact(v)
+                  if current:pos+=len(s)
+                  elif s:unnumbered.append(s)
+              def walk(n):
+                  nonlocal current,chapter,last,intro
+                  k=local(n)
+                  if not k:return
+                  style=n.get('sfm') or n.get('style') or k
+                  if src and (k in NOTE|{'id','h','toc'}|TITLE or k=='p' and style in TITLE) or not src and k in {'note','title','header'}:return
+                  container=False
+                  if src and k=='c':chapter=n.get('id')
+                  if src and k=='v':current=chapter+'.'+n.get('id');last=current
+                  if src and k=='ve':current=None
+                  if not src and k=='verse':
+                      if n.get('eID'):current=None;return
+                      current=n.get('osisID').split('.',1)[1];last=current;container=n.get('sID') is None
+                  if src and k=='p' and style in {'p','m','pi1'} or not src and k=='p' and not any(local(a)=='div' and a.get('type')=='introduction' for a in n.iterancestors()):
+                      starts.append((pos,last,style if src else n.get('type')))
+                  if not src and k=='lb' and n.get('type')=='x-p':breaks.append((pos,last,n.get('type')))
+                  if k=='table':tables.append((pos,last,len(list(n.iter('tr' if src else OSIS+'row')))))
+                  if src and k in {'tr','tc','th'} or not src and k in {'row','cell'}:
+                      cell_rows.append(('row' if k in {'tr','row'} else 'cell',pos,compact(''.join(n.itertext())),n.get('level'),n.get('role')))
+                  append(n.text)
+                  for child in n:walk(child);append(child.tail)
+                  if container:current=None
+              walk(book)
+              return starts,breaks,tables,cell_rows,''.join(unnumbered)
+          mapping={x['usfm']:x['osis'] for x in json.loads(Path('config/standard_usfm_osis_66.json').read_text())['books']}
+          for manifest in sorted(Path('sources/original/bibles').glob('*/*/PROVENANCE.json')):
+              p=json.loads(manifest.read_text());w=p.get('additional_original_witness',{})
+              if w.get('format')!='USFX':continue
+              path=manifest.parent/w['filename']; proof=inspect_archive(path,source_kind='authored')
+              assert proof['archive_sha256']==w['sha256'] and proof['archive_bytes']==w['size_bytes']
+              with zipfile.ZipFile(path) as z:
+                  names=[n for n in z.namelist() if n.endswith('_usfx.xml')];assert len(names)==1;raw=z.read(names[0])
+              assert not re.search(rb'<!DOCTYPE\b',raw,re.I)
+              src=etree.fromstring(raw,etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True,recover=False))
+              _,xml=approved_source_for(p['resource_id']);dst=_source_tree(xml)
+              # Classify only exact symbols, do not normalize or write resource.
+              from difflib import SequenceMatcher
+              counts=Counter(); details={}
+              for a,b in zip(src.iter('book'),(n for n in dst.iter(OSIS+'div') if n.get('type')=='book'),strict=True):
+                  book=mapping[a.get('id')];assert book==b.get('osisID')
+                  x,_,xt,xc,u=inventory(a,True); y,lb,yt,yc,v=inventory(b,False)
+                  sx=Counter(q[0] for q in x); sy=Counter(q[0] for q in y+lb)
+                  missing=sx-sy;extra=sy-sx
+                  counts['source_paragraph_starts']+=len(x);counts['osis_paragraph_starts']+=len(y);counts['osis_paragraph_linebreaks']+=len(lb)
+                  counts['missing_effective_starts']+=sum(missing.values());counts['extra_effective_starts']+=sum(extra.values())
+                  cells_equal=[q[:3] for q in xc]==[q[:3] for q in yc]
+                  counts['table_cell_row_stream_books_equal']+=cells_equal
+                  counts['source_tables']+=len(xt);counts['osis_tables']+=len(yt)
+                  diffs=[]
+                  if u!=v:
+                      for op,i,j,k,l in SequenceMatcher(None,u,v,autojunk=False).get_opcodes():
+                          if op!='equal':
+                              # Only tiny exact characters; never surrounding prose.
+                              diffs.append({'op':op,'source_offset':i,'target_offset':k,'source_codepoints':[ord(c) for c in u[i:j]] if j-i<=4 else None,'target_codepoints':[ord(c) for c in v[k:l]] if l-k<=4 else None,'source_length':j-i,'target_length':l-k})
+                  if missing or extra or xt!=yt or not cells_equal or diffs:
+                      details[book]={'missing_starts':[q for q in x if q[0] in missing][:25],'extra_starts':[q for q in y+lb if q[0] in extra][:25],'source_tables':xt,'target_tables':yt,'row_cell_stream_equal':cells_equal,'unnumbered_deltas':diffs[:20]}
+              print('EFFECTIVE_LAYOUT',json.dumps({'resource':p['resource_id'],'counts':dict(counts),'details':details,'scope':'diagnostic paragraph starts including OSIS lb type x-p, and table row/cell content/order; no editorial decision'},sort_keys=True),flush=True)
+          PY
