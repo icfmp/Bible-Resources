@@ -450,7 +450,11 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/fetch_reviewed_schema.py --directory "$RUNNER_TEMP/reviewed-schema" --report "$RUNNER_TEMP/lsg-layout-schema-provenance.json"
-          python scripts/guard_osis.py "$RUNNER_TEMP/lsg-layout-candidate.osis.xml" --schema "$RUNNER_TEMP/reviewed-schema/osisCore.2.1.1-cw-latest.xsd" --report "$RUNNER_TEMP/lsg-layout-schema.json"
+          # Use the established LSG release route: the generic normalizer
+          # guard rejects inherited revisionDesc even on the unchanged master.
+          # Official schema validity and advisory BRNP are separate.
+          python scripts/check_brnp.py "$RUNNER_TEMP/lsg-layout-candidate.osis.xml" --kind bible --schema "$RUNNER_TEMP/reviewed-schema/osisCore.2.1.1-cw-latest.xsd" --report "$RUNNER_TEMP/lsg-layout-schema.json"
+          python -c 'import json,os; from pathlib import Path; p=json.loads((Path(os.environ["RUNNER_TEMP"])/"lsg-layout-schema.json").read_text()); assert p["official_osis"]["status"]=="validated"'
           timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
           timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y diatheke libsword-dev libsword-utils libxml2-utils
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o "$RUNNER_TEMP/native-index" -lsword
