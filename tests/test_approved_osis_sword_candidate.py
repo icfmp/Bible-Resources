@@ -138,6 +138,43 @@ class ApprovedSourceNativeAuditTests(unittest.TestCase):
             "targets":("Gen.1.2",),
         }])
 
+    def test_missing_original_note_labels_block_numbered_fidelity(self):
+        # Regression for #95: unchanged prose, note body, type and anchor
+        # cannot compensate for lost authorial note-call labels.
+        from unittest.mock import patch
+        from approved_osis_sword_candidate import _candidate_result
+        expected = {"Gen.1.1": [{"caller": "a", "type": "x-footnote",
+                    "body": "PRIVATE NOTE", "targets": (), "point": 5}]}
+        inventory = {"module_payload_sha256": "0" * 64,
+                     "reader_version": "fixture", "module_driver": "zText"}
+        source = {"Gen.1.1": "alpha beta"}
+        boundary_proof = {"all_book_body_nonspace_and_boundary_events_equal": True}
+        ordered_proof = {"same_order_and_kind_in_every_mapped_book": True}
+        for marker, equal in ((b' n="a"', True), (b'', False),
+                              (b' n="b"', False), (b' n=""', False)):
+            with self.subTest(marker=marker):
+                raw = (b'alpha<note type="x-footnote"' + marker +
+                       b'>PRIVATE NOTE</note> beta')
+                with patch("approved_osis_sword_candidate.collect_native_inventory",
+                           return_value=("Gen.1.1\\n", {}, inventory)), \
+                     patch("approved_osis_sword_candidate._read_native_frames",
+                           return_value=iter([("K", "Gen.1.1", raw)])), \
+                     patch("approved_osis_sword_candidate.compare_book_boundary_positions",
+                           return_value=boundary_proof), \
+                     patch("approved_osis_sword_candidate.compare_ordered_body_openings",
+                           return_value=ordered_proof):
+                    report = _candidate_result(Path("index"), Path("raw"),
+                        Path("fixture"), "Fixture", "KJV", source, expected,
+                        {}, {}, {}, {}, [])
+                counts = report["source_to_compiled_counts"]
+                self.assertEqual(counts["numbered_verse_nonspace_main_text_equal"], 1)
+                self.assertEqual(counts["note_body_equal_after_whitespace_folding"], 1)
+                self.assertEqual(counts["note_nonspace_anchor_equal"], 1)
+                self.assertEqual(counts["note_original_caller_label_equal"] if equal
+                                 else counts["note_original_caller_label_different"], 1)
+                self.assertEqual(report["numbered_slot_text_and_note_parity_verified"], equal)
+                self.assertNotIn("PRIVATE NOTE", str(report))
+
     def test_complete_private_raw_stream_frames_and_no_logging(self):
         with tempfile.TemporaryDirectory() as folder:
             base=Path(folder)
