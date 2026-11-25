@@ -1,0 +1,39 @@
+{
+  "editorial_approval": {
+    "approved_by": "Bible Resources project owner — explicit publication authorization (2026-11-25, conversation)",
+    "date": "2026-11-25",
+    "scope": "Exact source-attested LSG 1.0.4 layout repair and publication authorized by project owner. Actual public deployment remains subject to final CI."
+  },
+  "files": {
+    "mods.d/brlsg1910.conf": "83ef5b568a46abde30fd35e522dac3b661c7795f0876d5a341865ff345ff1ff1",
+    "modules/texts/ztext/brlsg1910/nt.bzs": "37727eba1eefb006c4049b5d2464bccbe97337c4cdc80255468a4315fac83829",
+    "modules/texts/ztext/brlsg1910/nt.bzv": "0420f60f3215ce20c2f8b6e50abad80f0ebb6f323841143d350dda55931984f4",
+    "modules/texts/ztext/brlsg1910/nt.bzz": "6b723fe057004593609a0d29a3a106d48806a585e700c95c73a82de25487d648",
+    "modules/texts/ztext/brlsg1910/ot.bzs": "f015e1c674a75cb910770682f1efe9a869c8424cd92d65e95eb5bc010648ccb9",
+    "modules/texts/ztext/brlsg1910/ot.bzv": "145c0622dd9cf40270a879d92570e045aaef36793b274db24c715a46013a712d",
+    "modules/texts/ztext/brlsg1910/ot.bzz": "c3e970aceef38d7a777e15ffea4a09cb4babd7f7719db880c5256ce30c09e94f"
+  },
+  "metadata_path": "modules/lsg-1910/metadata.json",
+  "module_id": "BRLSG1910",
+  "provenance": {
+    "empty_paragraph_receipt_sha256": "5fe06cabd8bd517d28abfa7bf147d9bb51fcf700828740faf13f02f22afef300",
+    "first_heading_receipt_sha256": "c3b9a2a9dc215f07ce1d0eefbdbf3e238d3b57c6e1af41780a9b292187a5e607",
+    "full_native_heading_audit_sha256": "2551fbfae3a3479125f8aa986562b3d4f2290082a0656a7bd3c8562ae7b43cb5",
+    "full_native_paragraph_audit_sha256": "fa5d4858ef5fccb4377b3694d8da4a1f155b6179ef006abc0df59d556207bd59",
+    "historical_1_0_0_zip_sha256": "cc3b57ab0b61476a77b42fa19004956085d7608a974724c770cc2211adc67499",
+    "historical_1_0_1_zip_sha256": "c7b7471cba433abf99c84c1a6968a7a07a1d1cb5d021ca3bf6fdb86f6f6adf63",
+    "historical_1_0_2_zip_sha256": "547d5b953c3a3720bf21bed0e48d515e1d9c581dc419bd4b0af5593286180f01",
+    "new_full_native_readback_sha256": "19bc560ae9c591a46c33c68b87aa67d79bb107cead0d2e2e70a3763e9037b837",
+    "original_usfx_zip_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+    "previous_approved_osis_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
+    "reviewed_candidate_osis_sha256": "25479903513b66c5dbb0f8eb1d9025da023a6b63df38492c35940ef65425e965",
+    "historical_1_0_3_zip_sha256": "aac34652d06ab83087a1f7aebad1ba8c21a3c5716aaad63927d08a290ae08df2",
+    "layout_repair_evidence_sha256": "19bc560ae9c591a46c33c68b87aa67d79bb107cead0d2e2e70a3763e9037b837"
+  },
+  "release_audit_sha256": "19bc560ae9c591a46c33c68b87aa67d79bb107cead0d2e2e70a3763e9037b837",
+  "release_tag": "lsg-1.0.4",
+  "release_zip_sha256": "643b33b6f8130c46ec381394169c4ff3b60575b8e7d999ba550fbaeb36f65d05",
+  "schema_version": 1,
+  "source_usfm_zip_sha256": "64c4fe2a84d92f958deb0d1add4247d126a21c8a51e5b3058338f661a42d4900",
+  "source_usfx_zip_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e"
+}
