@@ -453,7 +453,24 @@ jobs:
           # Use the established LSG release route: the generic normalizer
           # guard rejects inherited revisionDesc even on the unchanged master.
           # Official schema validity and advisory BRNP are separate.
+          set +e
+          python scripts/check_brnp.py sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml --kind bible --schema "$RUNNER_TEMP/reviewed-schema/osisCore.2.1.1-cw-latest.xsd" --report "$RUNNER_TEMP/lsg-layout-baseline-schema.json"
+          baseline_exit=$?
           python scripts/check_brnp.py "$RUNNER_TEMP/lsg-layout-candidate.osis.xml" --kind bible --schema "$RUNNER_TEMP/reviewed-schema/osisCore.2.1.1-cw-latest.xsd" --report "$RUNNER_TEMP/lsg-layout-schema.json"
+          candidate_exit=$?
+          set -e
+          test "$baseline_exit" -le 1
+          test "$candidate_exit" -le 1
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          t=Path(os.environ['RUNNER_TEMP'])
+          a=json.loads((t/'lsg-layout-baseline-schema.json').read_text())
+          b=json.loads((t/'lsg-layout-schema.json').read_text())
+          assert a['official_osis']['status']==b['official_osis']['status']=='validated'
+          assert a['finding_codes']==b['finding_codes'],(a['finding_codes'],b['finding_codes'])
+          print('LSG_SCHEMA_AND_BRNP',json.dumps({'official_osis_validated':True,'baseline_findings':a['finding_count'],'candidate_findings':b['finding_count'],'identical_finding_codes':a['finding_codes'],'candidate_source_sha256':b['sha256']},sort_keys=True),flush=True)
+          PY
           python -c 'import json,os; from pathlib import Path; p=json.loads((Path(os.environ["RUNNER_TEMP"])/"lsg-layout-schema.json").read_text()); assert p["official_osis"]["status"]=="validated"'
           timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
           timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y diatheke libsword-dev libsword-utils libxml2-utils
