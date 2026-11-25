@@ -238,7 +238,7 @@ jobs:
           assert seen==set(reviewed),"Unused/stale original-format adapter"
           assert osis_seen==set(osis_reviewed),"Unused/stale original OSIS review"
           PY
-      - name: Require original USFX verse-owned poetry and Selah fidelity
+      - name: Require original USFX poetry, Selah, tables and numbered paragraph fidelity
         run: |
           PYTHONPATH=scripts python - <<'PY'
           from collections import Counter,defaultdict
@@ -604,6 +604,134 @@ jobs:
           ):
               assert not sample_passes(corrupted),"Poetry corruption was accepted"
           print("Original poetry comparator: positive fixture and six corruption cases passed")
+          # Read-only structural checks recovered from the source-attested
+          # table/paragraph repair evidence. No patching or resource IDs.
+          def table_signature(book,source):
+              def cell_spans(cell):
+                  pos=0; spans=[]
+                  def append(value):
+                      nonlocal pos
+                      pos+=len(_no_space(value or ""))
+                  def walk(node):
+                      kind=_name(node)
+                      if not kind:return
+                      start=pos
+                      if node is cell:style=None
+                      elif source and kind in {"it","bd","ord","wj"}:
+                          style={"it":"italic","bd":"bold","ord":"super","wj":"quotation"}[kind]
+                      elif not source and kind=="hi":style=node.get("type")
+                      elif not source and kind=="q":style="quotation"
+                      else:raise ValueError("Unsupported table inline element "+kind)
+                      append(node.text)
+                      for child in node:
+                          walk(child);append(child.tail)
+                      if style:spans.append((style,start,pos))
+                  walk(cell)
+                  return spans
+              tables=[]
+              for table in book.iter("table" if source else OSIS+"table"):
+                  rows=[]
+                  for row in table:
+                      assert _name(row)==("tr" if source else "row")
+                      cells=[]
+                      for cell in row:
+                          assert _name(cell) in ({"tc","th"} if source else {"cell"})
+                          cells.append((" ".join("".join(cell.itertext()).split()),
+                              _name(cell)=="th" if source else cell.get("role")=="label",
+                              cell_spans(cell)))
+                      rows.append(cells)
+                  tables.append(rows)
+              return tables
+          def paragraph_signature(book,source):
+              # Numbered nonspace coordinates remain stable across format
+              # conversion, including in-verse paragraph openings.
+              pos=0; current=None; chapter=None; starts=[]
+              styles={"p":None,"m":"x-noindent","pi":"x-indented-1","pi1":"x-indented-1"}
+              titles={"s","s1","s2","s3","s4","r","sr","mr","ms","ms1","ms2","ms3",
+                      "mt","mt1","mt2","mt3","imt","imt1","imt2","imt3","is","is1","is2"}
+              def append(value):
+                  nonlocal pos
+                  if current is not None:pos+=len(_no_space(value or ""))
+              def walk(n):
+                  nonlocal current,chapter
+                  k=_name(n)
+                  if not k:return
+                  style=n.get("sfm") or n.get("style") or k
+                  if source and (k in {"x","f","fe","ef","ex","id","h","toc"}|titles or k=="p" and style in titles):return
+                  if not source and k in {"note","title","header"}:return
+                  container=False
+                  if source and k=="c":
+                      assert current is None;chapter=n.get("id")
+                  elif source and k=="v":
+                      assert current is None and chapter;current=n.get("id")
+                  elif source and k=="ve":
+                      assert current is not None;current=None
+                  elif not source and k=="verse":
+                      if n.get("eID"):
+                          assert current==n.get("eID");current=None
+                      else:
+                          assert current is None and n.get("osisID")
+                          current=n.get("osisID");container=not bool(n.get("sID"))
+                  if source and k=="p" and style in styles and pos>0:
+                      starts.append((pos,styles[style]))
+                  if not source and k=="p" and pos>0:
+                      assert n.get("type") in set(styles.values())
+                      starts.append((pos,n.get("type")))
+                  append(n.text)
+                  for c in n:
+                      walk(c);append(c.tail)
+                  if container:current=None
+              walk(book)
+              assert current is None
+              return starts,pos
+          def compare_original_tables_and_paragraphs(source,target,mapping):
+              old={mapping[b.get("id")]:b for b in source.iter("book")}
+              new={b.get("osisID"):b for b in target.iter(OSIS+"div") if b.get("type")=="book"}
+              assert old and list(old)==list(new)
+              counts=Counter(); findings=[]
+              for ident in old:
+                  a=table_signature(old[ident],True);b=table_signature(new[ident],False)
+                  counts["source_tables"]+=len(a);counts["candidate_tables"]+=len(b)
+                  counts["source_cells"]+=sum(len(row) for table in a for row in table)
+                  counts["candidate_cells"]+=sum(len(row) for table in b for row in table)
+                  if a!=b:findings.append((ident,"tables"))
+                  x,n=paragraph_signature(old[ident],True);y,m=paragraph_signature(new[ident],False)
+                  counts["source_numbered_paragraph_starts_after_offset_zero"]+=len(x)
+                  counts["candidate_numbered_paragraph_starts_after_offset_zero"]+=len(y)
+                  if x!=y or n!=m:findings.append((ident,"numbered_paragraph_starts"))
+              return {"books":len(old),"counts":dict(counts),"differences":findings,
+                      "supported_table_and_numbered_paragraph_parity":not findings,
+                      "scope":"ordered table rows/cell text/header roles/selected inline spans; paragraph starts and style at positive numbered offsets; not initial or intro paragraph boundaries or exact typography"}
+          # Positive fixture with a mid-verse paragraph and two distinct tables.
+          sample_layout_source=parse_usfx(b'<usfx><book id="GEN">'
+              b'<table><tr><th>A</th><tc><it>B</it>C</tc></tr></table>'
+              b'<table><tr><tc>D</tc></tr></table><c id="1"/>'
+              b'<p><v id="1"/>alpha</p><p sfm="m">beta<ve/></p>'
+              b'</book></usfx>')
+          sample_layout_target=(b'<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">'
+              b'<div type="book" osisID="Gen"><table><row><cell role="label">A</cell>'
+              b'<cell><hi type="italic">B</hi>C</cell></row></table>'
+              b'<table><row><cell>D</cell></row></table><chapter osisID="Gen.1">'
+              b'<p><verse osisID="Gen.1.1" sID="Gen.1.1"/>alpha</p>'
+              b'<p type="x-noindent">beta<verse eID="Gen.1.1"/></p>'
+              b'</chapter></div></osis>')
+          def layout_sample(raw):
+              return compare_original_tables_and_paragraphs(
+                  sample_layout_source,etree.fromstring(raw),{"GEN":"Gen"})
+          assert layout_sample(sample_layout_target)["supported_table_and_numbered_paragraph_parity"]
+          for before,after,kind in (
+              (b'role="label"',b'role="data"',"tables"),
+              (b'>A</cell>',b'>X</cell>',"tables"),
+              (b'<hi type="italic">B</hi>C',b'B<hi type="italic">C</hi>',"tables"),
+              (b'</row></table><table><row>',b'</row><row>',"tables"),
+              (b'</p><p type="x-noindent">beta',b'b</p><p type="x-noindent">eta',"numbered_paragraph_starts"),
+              (b'<p type="x-noindent">',b'<p type="x-indented-1">',"numbered_paragraph_starts"),
+              (b'</p><p type="x-noindent">',b'',"numbered_paragraph_starts"),
+          ):
+              assert sample_layout_target.count(before)==1
+              proof=layout_sample(sample_layout_target.replace(before,after))
+              assert ("Gen",kind) in proof["differences"],kind
+          print("Original layout comparator: positive fixture and seven corruption cases passed")
           # Use the same explicit, hash-pinned original member and reviewed
           # crosswalk as the preceding original numbered-content gate.
           adapters=json.loads(Path("config/original-bible-content-adapters.json").read_text())["resources"]
@@ -639,6 +767,9 @@ jobs:
               assert result["all_selah_text_and_verse_positions_verified"],resource
               # No lost/inserted line nodes even if verse-owned text matches.
               assert result["source_poetry"]==result["candidate_poetry"],resource
+              layout=compare_original_tables_and_paragraphs(root,_source_tree(xml),mapping)
+              print("ORIGINAL_USFX_TABLE_PARAGRAPH_PROOF",resource,json.dumps(layout,sort_keys=True),flush=True)
+              assert layout["supported_table_and_numbered_paragraph_parity"],(resource,layout["differences"])
           PY
       - name: Audit exact stock-reader-key Bible payloads (read-only candidate evidence)
         shell: bash
