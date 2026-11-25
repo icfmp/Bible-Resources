@@ -382,3 +382,132 @@ jobs:
               result.update({"resource":p["resource_id"],"source_zip_sha256":witness["sha256"],"approved_osis_sha256":hashlib.sha256(xml).hexdigest(),"historical_algorithm_revision":"7f675b4d621e5c0aba5fd78f0cb3cb468eb2cd26"})
               print("ORIGINAL_USFX_POETRY_DIAGNOSTIC",json.dumps(result,sort_keys=True),flush=True)
           PY
+      - name: Compare full-book numbered boundary positions and original headings, paragraphs and inline styling
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from collections import Counter,defaultdict
+          from hashlib import sha256
+          import json,re,zipfile
+          from lxml import etree
+          from pilot_preflight import inspect_archive
+          from approved_osis_sword_candidate import approved_source_for
+          from source_osis_inventory import _source_tree,OSIS
+          def local(n): return etree.QName(n).localname if isinstance(n.tag,str) else ''
+          def ns(s): return ''.join(c for c in (s or '') if not c.isspace())
+          def label(n): return ns(''.join(n.itertext()))
+          def safe_style(n):
+              return n.get('sfm') or n.get('style') or local(n)
+          TITLE={'s','s1','s2','s3','s4','r','sr','mr','ms','ms1','ms2','ms3','mt','mt1','mt2','mt3','imt','imt1','imt2','imt3','is','is1','is2'}
+          NOTE={'x','f','fe','ex','ef'}
+          def audit_book(book,source):
+              pos=0; active=None; chapter=None; rows=defaultdict(list); body=sha256(); full=sha256(); fullpos=0
+              styles=Counter(); markers=Counter(); counts=Counter()
+              def append(v):
+                  nonlocal pos,fullpos
+                  value=ns(v)
+                  if value:
+                      full.update(value.encode());fullpos+=len(value)
+                      if active:
+                          body.update(value.encode());pos+=len(value)
+              def walk(n):
+                  nonlocal active,chapter
+                  k=local(n)
+                  if not k:return
+                  style=safe_style(n) if source else ''
+                  if source and k in {'id','h','toc'}:return
+                  if source and k in NOTE or not source and k in {'note','header'}:return
+                  is_title=(source and (k=='s' or k=='p' and style in TITLE or k in TITLE)) or (not source and k=='title')
+                  if is_title:
+                      rows['titles'].append((pos,sha256(label(n).encode()).hexdigest(),len(label(n))))
+                      styles['title|'+(style if source else (n.get('type') or 'none'))]+=1
+                      return
+                  container=False
+                  if source:
+                      if k=='c':
+                          assert active is None;chapter=n.get('id')
+                      elif k=='v':
+                          assert active is None and chapter
+                          active=chapter+'.'+n.get('id')
+                      elif k=='ve':
+                          assert active is not None;active=None
+                  elif k=='verse':
+                      if n.get('eID'):
+                          assert active==n.get('eID').split('.',1)[1]
+                          active=None
+                          return
+                      assert active is None and n.get('osisID')
+                      active=n.get('osisID').split('.',1)[1]
+                      container=n.get('sID') is None
+                  start=pos; fullstart=fullpos
+                  group=None
+                  if source and k=='p' and style in {'p','m','pi1'} or not source and k=='p' and not any(local(a)=='div' and a.get('type')=='introduction' for a in n.iterancestors()):
+                      group='body_paragraphs'
+                  elif source and k=='p' and style in {'ip','ipi'} or not source and k=='p' and any(local(a)=='div' and a.get('type')=='introduction' for a in n.iterancestors()):
+                      group='intro_paragraphs'
+                  elif source and k=='wj' or not source and k=='q':
+                      group='quotation'
+                  elif source and k=='it' or not source and k=='hi' and n.get('type')=='italic':
+                      group='italic'
+                  elif source and k=='ord' or not source and k=='hi' and n.get('type')=='super':
+                      group='superscript'
+                  if group: styles[group+'|'+(style if source else '|'.join(str(n.get(a) or '') for a in ('type','subType','level')))]+=1
+                  # Record the literal cross-format shape counts separately from positional proof.
+                  if source and k in {'b','table','tr','tc','th','ior'} or not source and k in {'lb','table','row','cell','list','item','reference','milestone','lg'}:
+                      markers[k+'|'+(style if source else '|'.join(str(n.get(a) or '') for a in ('type','subType','level','role')) )]+=1
+                  append(n.text)
+                  for c in n:
+                      walk(c);append(c.tail)
+                  if group:
+                      # Numbered content is an unambiguous common coordinate system.
+                      # Intro elements are compared in the full-body coordinate separately.
+                      rows[group].append((start,pos,fullstart,fullpos))
+                  if container:active=None
+              walk(book)
+              assert active is None
+              return {"numbered_digest":body.hexdigest(),"numbered_length":pos,"full_body_digest":full.hexdigest(),"full_body_length":fullpos,"rows":rows,"styles":styles,"markers":markers}
+          mapping={x['usfm']:x['osis'] for x in json.loads(Path('config/standard_usfm_osis_66.json').read_text())['books']}
+          for manifest in sorted(Path('sources/original/bibles').glob('*/*/PROVENANCE.json')):
+              p=json.loads(manifest.read_text()); witness=p.get('additional_original_witness',{})
+              if witness.get('format')!='USFX':continue
+              archive=manifest.parent/witness['filename']; receipt=inspect_archive(archive,source_kind='authored')
+              assert receipt['archive_sha256']==witness['sha256'] and receipt['archive_bytes']==witness['size_bytes']
+              with zipfile.ZipFile(archive) as z:
+                  candidates=[m for m in z.infolist() if Path(m.filename).name.casefold().endswith('_usfx.xml')]
+                  assert len(candidates)==1
+                  raw=z.read(candidates[0])
+              assert not re.search(rb'<!DOCTYPE\b',raw,re.I)
+              source=etree.fromstring(raw,etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True,recover=False))
+              _,xml=approved_source_for(p['resource_id']);target=_source_tree(xml)
+              old={mapping[b.get('id')]:audit_book(b,True) for b in source.iter('book')}
+              new={b.get('osisID'):audit_book(b,False) for b in target.iter(OSIS+'div') if b.get('type')=='book'}
+              assert set(old)==set(new) and old
+              counts=Counter(); styles_old=Counter();styles_new=Counter();markers_old=Counter();markers_new=Counter();findings=defaultdict(list);empty_paragraphs=[]
+              for book in old:
+                  a,b=old[book],new[book]
+                  styles_old.update(a['styles']);styles_new.update(b['styles']);markers_old.update(a['markers']);markers_new.update(b['markers'])
+                  for mode in ('numbered','full_body'):
+                      same=(a[mode+'_digest'],a[mode+'_length'])==(b[mode+'_digest'],b[mode+'_length'])
+                      counts[mode+'_books_equal']+=same
+                      if not same:findings[mode].append(book)
+                  for kind in sorted(set(a['rows'])|set(b['rows'])):
+                      x,y=a['rows'][kind],b['rows'][kind]
+                      counts[kind+'_source']+=len(x);counts[kind+'_target']+=len(y)
+                      if kind=='titles':
+                          same=x==y
+                      elif kind in {'body_paragraphs','quotation','italic','superscript'}:
+                          # Report exact numbered spans as well as nonempty-span comparison.
+                          same=[r[:2] for r in x]==[r[:2] for r in y]
+                          if kind=='body_paragraphs':
+                              xx=[r[:2] for r in x if r[0]!=r[1]]; yy=[r[:2] for r in y if r[0]!=r[1]]
+                              counts['body_paragraph_nonempty_span_books_equal']+=xx==yy
+                              counts['body_paragraph_empty_source']+=sum(r[0]==r[1] for r in x)
+                              counts['body_paragraph_empty_target']+=sum(r[0]==r[1] for r in y)
+                              if xx!=yy:findings['body_paragraph_nonempty_spans'].append(book)
+                              if not same:empty_paragraphs.append({'book':book,'source_empty_offsets':[r[0] for r in x if r[0]==r[1]],'target_empty_offsets':[r[0] for r in y if r[0]==r[1]]})
+                      else:
+                          same=[r[2:] for r in x]==[r[2:] for r in y]
+                      counts[kind+'_books_equal']+=same
+                      if not same:findings[kind].append(book)
+              print('ORIGINAL_USFX_LAYOUT_DIAGNOSTIC',json.dumps({'resource':p['resource_id'],'books':len(old),'counts':dict(counts),'bounded_book_findings':{k:v[:30] for k,v in findings.items()},'source_style_counts':dict(styles_old),'target_style_counts':dict(styles_new),'source_marker_census':dict(markers_old),'target_marker_census':dict(markers_new),'empty_paragraph_book_offsets':empty_paragraphs[:20],'scope':'cross-format numbered positions, title symbol hashes and full body stream; classification diagnostic, not complete editorial or reader approval'},sort_keys=True),flush=True)
+          PY
