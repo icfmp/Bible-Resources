@@ -1,0 +1,139 @@
+name: Verify published Bible pair in independent SWORD and GTK
+on:
+  push:
+    branches: [research/published-bible-parallel]
+    paths: ['.github/workflows/published-bible-parallel-research.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: icfmp/Bible
+          ref: 3d794a2bba48c30022b64bb4faabc8be9a10f1e8
+          path: reader
+      - name: Install actual independent SWORD and native GTK reader dependencies
+        run: |
+          sudo apt-get -o Acquire::Retries=2 update -qq
+          sudo apt-get install --no-install-recommends -y adwaita-icon-theme librsvg2-common python3-yaml python3-gi python3-cairo python3-gi-cairo gir1.2-gtk-4.0 gir1.2-adw-1 python3-sword python3-babel iso-codes fonts-dejavu-core fonts-dejavu-extra xvfb xauth dbus-x11 libxtst6 xcompmgr diatheke
+      - name: Download exact immutable released packages
+        run: |
+          set -eu
+          mkdir "$RUNNER_TEMP/archives"
+          curl -fLsS --retry 3 --max-time 90 https://github.com/icfmp/Bible-Resources/releases/download/lsg-1.0.4/BRLSG1910-1.0.4.zip -o "$RUNNER_TEMP/archives/BRLSG1910.zip"
+          curl -fLsS --retry 3 --max-time 90 https://github.com/icfmp/Bible-Resources/releases/download/darby-jnd-2024-1.0.0/BRJND2024-1.0.0.zip -o "$RUNNER_TEMP/archives/BRJND2024.zip"
+          cd "$RUNNER_TEMP/archives"
+          echo '643b33b6f8130c46ec381394169c4ff3b60575b8e7d999ba550fbaeb36f65d05  BRLSG1910.zip' | sha256sum -c -
+          echo '81acdfdfbbb18135a49609c045b293ce495a200b37f667f55c190925544b9553  BRJND2024.zip' | sha256sum -c -
+      - name: Verify release installation and real bidirectional reading offline
+        working-directory: reader
+        env:
+          GTK_A11Y: none
+          PYTHONPATH: '.'
+        run: |
+          set -eu
+          export TEST_PROFILE="$RUNNER_TEMP/parallel-profile"
+          mkdir "$TEST_PROFILE"
+          export XDG_CONFIG_HOME="$TEST_PROFILE/config" XDG_DATA_HOME="$TEST_PROFILE/data" XDG_CACHE_HOME="$TEST_PROFILE/cache"
+          cat > "$RUNNER_TEMP/parallel.py" <<'PY'
+          import hashlib,json,os,stat,zipfile
+          from pathlib import Path,PurePosixPath
+          from bible.library import Library,catalogue
+          from bible.providers import BIBLE_RESOURCES,identity
+          from bible.application_settings import ApplicationSettings
+          from bible.sword_provider import Reader
+          from bible.reference_resolution import resolve_readers
+          from bible.ui import Application,Window,Gtk
+          from tests.test_ui import spin
+          from tools.check_alpha_ui import X11Input
+          from tools.check_versification_comparison import fidelity
+          root=Path(os.environ["TEST_PROFILE"])
+          archives=Path(os.environ["RUNNER_TEMP"])/"archives"
+          ApplicationSettings(root).set("automatic_catalogue_refresh",False)
+          lib=Library(root/"translations")
+          modules={"BRLSG1910":("1.0.4","Segond"),"BRJND2024":("1.0.0","Luther")}
+          report={"app_commit":"3d794a2bba48c30022b64bb4faabc8be9a10f1e8","resources":{},"native":[],"gtk":[],"scroll":[],"findings":[],"status":"INCOMPLETE"}
+          def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+          # Exercise ordinary catalogue installation and independently check every
+          # payload byte against the exact public ZIP. No generated module.
+          available={x.name:x for x in catalogue(BIBLE_RESOURCES)}
+          for name,(version,system) in modules.items():
+              resource=available[name]
+              assert resource.version==version and resource.versification==system
+              lib.install(resource)
+              folder=lib.root/resource.id
+              with zipfile.ZipFile(archives/(name+".zip")) as z:
+                  members=[i for i in z.infolist() if not i.is_dir()]
+                  assert len({i.filename for i in members})==len(members)
+                  for entry in members:
+                      path=PurePosixPath(entry.filename)
+                      assert not path.is_absolute() and ".." not in path.parts and not stat.S_ISLNK(entry.external_attr>>16)
+                      assert (folder/path).read_bytes()==z.read(entry)
+              report["resources"][name]={"id":resource.id,"version":version,"versification":system,"archive_sha256":digest(archives/(name+".zip")),"payload_members_verified":len(members)}
+          names={n:identity("bible-resources",n) for n in modules}
+          lsg,darby=names["BRLSG1910"],names["BRJND2024"]
+          readers={n:Reader(lib.root/n,n) for n in names.values()}
+          # Independent source-numbering expectations: Segond 11:8/12:16
+          # versus Luther 11:10/12:14. Verify explicitly in both directions.
+          pairs=[("Gen.1.1","Gen.1.1"),("John.3.16","John.3.16"),
+                 ("Eccl.11.8","Eccl.11.8"),("Eccl.12.1","Eccl.11.9"),
+                 ("Eccl.12.2","Eccl.11.10"),("Eccl.12.3","Eccl.12.1"),
+                 ("Eccl.12.16","Eccl.12.14"),("Acts.19.40","Acts.19.40"),
+                 ("Ps.3.2","Ps.3.2")]
+          def failure(scope,source,target,reference,exc):
+              row={"scope":scope,"source":source,"target":target,"reference":reference,"error":type(exc).__name__}
+              report["findings"].append(row);print("PARALLEL_FINDING",json.dumps(row),flush=True)
+          for a,b in pairs:
+              for source,target,ref,expected in ((lsg,darby,a,b),(darby,lsg,b,a)):
+                  try:
+                      assert readers[source].has_reference(ref) and readers[target].has_reference(expected)
+                      mapped=resolve_readers(ref,readers[source],readers[target])
+                      assert (mapped.start,mapped.end)==(expected,expected),(ref,mapped.start,mapped.end,expected)
+                      report["native"].append({"source":source,"target":target,"reference":ref,"target_reference":expected})
+                  except Exception as exc:failure("native",source,target,ref,exc)
+          app=Application();app.register();native=X11Input()
+          Gtk.Settings.get_default().set_property("gtk-enable-animations",False)
+          window=Window(app,lib);window.set_default_size(1440,1000);window.present()
+          tab=window.active_tab
+          def settled():
+              spin(lambda:not tab._restoring_scroll and not getattr(tab,"_comparison_positioning",False),duration=.2)
+          def open_pair(primary,comparison,ref,expected):
+              assert tab.navigate(primary,ref)
+              tab.state.comparison=comparison;window.sync_comparison();settled()
+              primary_proof=fidelity(tab.reader,tab._document)
+              comparison_proof=fidelity(tab._comparison_reader,tab._comparison_document)
+              assert not tab.comparison_status.get_text()
+              assert (tab.comparison_reference,tab.comparison_end_reference)==(expected,expected)
+              return {"source":primary,"target":comparison,"reference":ref,"target_reference":expected,
+                      "primary_fidelity":primary_proof,"comparison_fidelity":comparison_proof}
+          try:
+              window.appearance.reset();window.study_button.set_active(False);settled()
+              for a,b in pairs:
+                  for source,target,ref,expected in ((lsg,darby,a,b),(darby,lsg,b,a)):
+                      try:report["gtk"].append(open_pair(source,target,ref,expected))
+                      except Exception as exc:failure("gtk",source,target,ref,exc)
+              for source,target in ((lsg,darby),(darby,lsg)):
+                  try:
+                      open_pair(source,target,"John.3.1","John.3.1")
+                      history=list(tab.state.history)
+                      for side in ("primary","comparison","primary","comparison"):
+                          native.wheel(tab.text if side=="primary" else tab.comparison_text,3)
+                          spin(lambda:not tab.comparison_sync.pending and not getattr(tab,"_comparison_positioning",False),duration=.25)
+                          if side=="primary":assert tab.comparison_visible_reference()==tab.visible_reference()
+                          else:assert tab.state.reference==tab.comparison_visible_reference()
+                          assert not tab.comparison_status.get_text()
+                      assert tab.state.history==history
+                      report["scroll"].append({"source":source,"target":target,"bidirectional_native_wheel":True,"history_unchanged":True})
+                  except Exception as exc:failure("scroll",source,target,"John.3.1",exc)
+              report["status"]="PASS" if not report["findings"] else "FINDINGS"
+          finally:
+              window.close();native.close()
+              print("PUBLISHED_PARALLEL_PROOF",json.dumps(report,sort_keys=True),flush=True)
+          assert report["status"]=="PASS"
+          PY
+          dbus-run-session -- xvfb-run -a -s '-screen 0 1600x1100x24' /usr/bin/python3 -m tools.composited_x11 /usr/bin/python3 "$RUNNER_TEMP/parallel.py"
