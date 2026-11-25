@@ -5,10 +5,16 @@ from pathlib import Path
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from research.bible.usfm_source_projection import project
+from convert_usfm import work_id
 from research.bible.usfm_converter_patch import deterministic_patch, ConverterPatchError
 from test_original_authorial_content_parity import USFX, OSIS, MAP, archive
 
 class RegisteredUSFMConversionTests(unittest.TestCase):
+    def test_work_id_is_not_an_edition_slug(self):
+        self.assertEqual(work_id("Sample123"),"Bible.Sample123")
+        for invalid in ("edition-slug","Bible:work","",None):
+            with self.assertRaises(ValueError):work_id(invalid)
+
     def test_unreviewed_converter_bytes_fail_closed(self):
         with self.assertRaises(ConverterPatchError):
             deterministic_patch(b"unreviewed Python code")

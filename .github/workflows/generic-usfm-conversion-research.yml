@@ -1,8 +1,13 @@
 name: Verify registered USFM conversion
 on:
-  push:
-    branches: [research/generic-usfm-conversion, quality/registered-usfm-converter]
-    paths: ['scripts/**', 'tests/**', '.github/workflows/generic-usfm-conversion-research.yml']
+  pull_request:
+    paths:
+      - 'scripts/convert_usfm.py'
+      - 'scripts/research/bible/**'
+      - 'tests/test_registered_usfm_conversion.py'
+      - 'config/original-bible-content-adapters.json'
+      - 'config/osis-policy.json'
+      - '.github/workflows/generic-usfm-conversion-research.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -31,17 +36,3 @@ jobs:
             python scripts/convert_usfm.py --resource "$resource" --converter "$RUNNER_TEMP/u2o-original.py" --schema "$RUNNER_TEMP/schema/osisCore.2.1.1-cw-latest.xsd" --source-date-epoch "$epoch" --output "$RUNNER_TEMP/$resource.osis.xml" --report "$RUNNER_TEMP/$resource.json"
             rm "$RUNNER_TEMP/$resource.osis.xml"
           done
-      - name: Report source-bound registry delta for review
-        if: always()
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          from scripts.tool_registry import generate
-          old=json.loads(Path("reports/tooling/TOOL_REGISTRY.json").read_text())
-          new=json.loads(json.dumps(generate()))
-          prior={r["path"]:r for r in old["files"]}
-          for row in new["files"]:
-              if prior.get(row["path"])!=row:
-                  print("REGISTRY_DELTA",json.dumps(row,ensure_ascii=False,sort_keys=True),flush=True)
-          PY

@@ -105,7 +105,7 @@ def project(source_xml, xml, mapping, zfm, report):
                         edits.append((ref,end,"after"))
             if container:state["current"]=None
         visit(book)
-    report["selah_whitespace_projection"]={"edits":len(edits),"unsupported":unsupported[:20]}
+    report["selah_whitespace_projection"]={"edits":len(edits),"source_attested_offsets":[{"ref":r,"offset":o,"side":s} for r,o,s in edits],"unsupported":unsupported[:20]}
     if not unsupported:
         revised=etree.tostring(target,encoding="utf-8",xml_declaration=True)
         result=verify_numbered_content(source_xml,revised,mapping,{},zfm)
@@ -117,7 +117,7 @@ def project(source_xml, xml, mapping, zfm, report):
         # source-attested removal of leaked format controls
         # and restoration of missing table separators.
         from itertools import accumulate
-        table_edits=Counter()
+        table_edits=Counter();table_changes=[]
         old_books={mapping[n.get("id")]:n for n in source_root.iter("book")}
         new_books={n.get("osisID"):n for n in target.iter(OSIS+"div") if n.get("type")=="book"}
         assert list(old_books)==list(new_books)
@@ -127,9 +127,9 @@ def project(source_xml, xml, mapping, zfm, report):
             source_rows=[row for table in original_tables for row in table]
             candidate_rows=[row for table in candidate_tables for row in table]
             assert len(source_rows)==len(candidate_rows)
-            for sr,cr in zip(source_rows,candidate_rows,strict=True):
+            for row_index,(sr,cr) in enumerate(zip(source_rows,candidate_rows,strict=True),1):
                 assert len(sr)==len(cr)
-                for sc,cc in zip(sr,cr,strict=True):
+                for cell_index,(sc,cc) in enumerate(zip(sr,cr,strict=True),1):
                     assert (sc.tag=="th")== (cc.get("role")=="label")
                     old=" ".join("".join(sc.itertext()).split())
                     new=" ".join("".join(cc.itertext()).split())
@@ -145,6 +145,7 @@ def project(source_xml, xml, mapping, zfm, report):
                                 table_edits["removed_literal_controls"]+=val.count(r"\i")
                                 setattr(n,field,val.replace(r"\i",""))
                     assert " ".join("".join(cc.itertext()).split())==old
+                    table_changes.append({"kind":"remove_source_absent_literal_control","book":candidate_book.get("osisID"),"row":row_index,"cell":cell_index,"removed":new.count(r"\i")})
             expected=list(accumulate(len(t) for t in original_tables))
             actual=list(accumulate(len(t) for t in candidate_tables))
             assert not set(actual)-set(expected)
@@ -164,6 +165,7 @@ def project(source_xml, xml, mapping, zfm, report):
                         for row in rows[lo:hi]:new.append(row)
                         previous=new
                         table_edits["restored_table_separators"]+=1
+                        table_changes.append({"kind":"restore_source_table_boundary","book":candidate_book.get("osisID"),"after_row":offset+lo})
                     previous.tail=tail
                 offset+=len(rows)
             assert editorial.table_signature(source_book,True)==editorial.table_signature(candidate_book,False)
@@ -171,7 +173,7 @@ def project(source_xml, xml, mapping, zfm, report):
         table_revised=etree.tostring(target,encoding="utf-8",xml_declaration=True)
         checked=verify_numbered_content(source_xml,table_revised,mapping,{},zfm)
         report["table_projection"]={
-            "edits":dict(table_edits),
+            "edits":dict(table_edits),"source_attested_changes":table_changes,
             "numbered_parity":checked["all_supported_content_checks_equal"],
             "mismatch_counts":checked["mismatch_counts"],
             "layout":editorial.compare_original_tables_and_paragraphs(source_root,target,mapping),
@@ -352,6 +354,7 @@ def project(source_xml, xml, mapping, zfm, report):
         checked=verify_numbered_content(source_xml,final,mapping,{},zfm)
         report["paragraph_projection"]={
             "edits":dict(Counter(e["kind"] for e in paragraph_edits)),
+            "source_attested_changes":paragraph_edits,
             "inverse_exact":True,"nonparagraph_elements_unchanged":True,
             "numbered_parity":checked["all_supported_content_checks_equal"],
             "mismatch_counts":checked["mismatch_counts"],

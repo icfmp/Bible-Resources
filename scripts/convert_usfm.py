@@ -25,6 +25,13 @@ from research.bible.original_authorial_key_inventory import usfm, usfx, compare
 from research.bible.usfm_source_projection import project
 from research.bible.usfm_converter_patch import deterministic_patch
 
+def work_id(module_id):
+    """A work ID is an OSIS identifier, not a hyphenated repository slug."""
+    if not isinstance(module_id,str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9]*",module_id):
+        raise ValueError("A registered alphanumeric OSIS work identifier is required")
+    return "Bible."+module_id
+
+
 def run(resource, upstream, schema_path, epoch, report, *, root=ROOT):
     if sys.flags.optimize:
         raise RuntimeError("Conversion requires active validation assertions")
@@ -33,6 +40,7 @@ def run(resource, upstream, schema_path, epoch, report, *, root=ROOT):
     a=json.loads((root/"config/original-bible-content-adapters.json").read_text())["resources"][resource]
     m=json.loads((root/"modules"/resource/"metadata.json").read_text())
     language=m["language"]
+    identity=work_id(m["sword_id"])
     assert re.fullmatch(r"[A-Za-z0-9-]{1,35}",language)
     folder=root/"sources/original/bibles"/language/resource
     p=json.loads((folder/"PROVENANCE.json").read_text())
@@ -51,7 +59,7 @@ def run(resource, upstream, schema_path, epoch, report, *, root=ROOT):
     schema,schema_hash=_schema(policy,schema_path.absolute())
     raw_converter=upstream.read_bytes()
     reviewed=deterministic_patch(raw_converter)
-    report.update(resource=resource,source_usfm_sha256=a["usfm_sha256"],
+    report.update(resource=resource,osis_work_id=identity,source_usfm_sha256=a["usfm_sha256"],
         source_usfx_sha256=a["usfx_sha256"],crosswalk_sha256=sha256(crosswalk_raw).hexdigest(),
         original_converter_sha256=sha256(raw_converter).hexdigest(),
         converter_sha256=sha256(reviewed).hexdigest(),source_date_epoch=epoch,
@@ -74,7 +82,7 @@ def run(resource, upstream, schema_path, epoch, report, *, root=ROOT):
             files.append(dest)
         assert len(files)==len(left)
         candidate=directory/"candidate.osis.xml"
-        command=[sys.executable,str(converter),"Bible."+resource,"-l",language,"-x","-o",str(candidate),*map(str,sorted(files))]
+        command=[sys.executable,str(converter),identity,"-l",language,"-x","-o",str(candidate),*map(str,sorted(files))]
         environment=dict(os.environ,SOURCE_DATE_EPOCH=str(epoch),PYTHONHASHSEED="0",TZ="UTC")
         generated=[]
         for _ in range(2):
@@ -98,7 +106,8 @@ def run(resource, upstream, schema_path, epoch, report, *, root=ROOT):
         schema_valid=schema.validate(_source_tree(final))
         report["official_xsd"]={"sha256":schema_hash,"valid":schema_valid,
             "error_count":len(schema.error_log),"error_types":dict(Counter(e.type_name for e in schema.error_log)),
-            "first_error_lines":[e.line for e in list(schema.error_log)[:10]]}
+            "first_error_lines":[e.line for e in list(schema.error_log)[:10]],
+            "first_error_paths":[e.path for e in list(schema.error_log)[:10]]}
         assert schema_valid,"Converted candidate fails official XSD"
         assert sha256(fm.read_bytes()).hexdigest()==a["usfm_sha256"] and sha256(fx.read_bytes()).hexdigest()==a["usfx_sha256"]
         report["candidate_sha256"]=sha256(final).hexdigest()
