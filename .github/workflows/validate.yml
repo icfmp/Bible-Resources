@@ -702,6 +702,84 @@ jobs:
               return {"books":len(old),"counts":dict(counts),"differences":findings,
                       "supported_table_and_numbered_paragraph_parity":not findings,
                       "scope":"ordered table rows/cell text/header roles/selected inline spans; paragraph starts and style at positive numbered offsets; not initial or intro paragraph boundaries or exact typography"}
+          def editorial_signature(book,source):
+              # Compare source-authored title text at numbered coordinates,
+              # and selected body inline spans. Retain nonnumbered text and
+              # introduction paragraph offsets as a separate diagnostic.
+              pos=0; fullpos=0; current=None; chapter=None
+              titles=[]; spans=defaultdict(list); intro=[]; outside=[]
+              title_styles={"s","s1","s2","s3","s4","r","sr","mr","ms","ms1","ms2","ms3",
+                            "mt","mt1","mt2","mt3","imt","imt1","imt2","imt3","is","is1","is2"}
+              def append(value):
+                  nonlocal pos,fullpos
+                  value=_no_space(value or "")
+                  fullpos+=len(value)
+                  if current is not None:pos+=len(value)
+                  elif value:outside.append(value)
+              def walk(n):
+                  nonlocal current,chapter
+                  k=_name(n)
+                  if not k:return
+                  style=n.get("sfm") or n.get("style") or k
+                  if source and k in {"x","f","fe","ef","ex","id","h","toc"}:return
+                  if not source and k in {"note","header"}:return
+                  if source and (k in title_styles or k=="p" and style in title_styles) or not source and k=="title":
+                      value=_no_space("".join(n.itertext()))
+                      titles.append((pos,len(value),_hash(value)))
+                      return
+                  container=False
+                  if source and k=="c":assert current is None;chapter=n.get("id")
+                  elif source and k=="v":assert current is None and chapter;current=n.get("id")
+                  elif source and k=="ve":assert current is not None;current=None
+                  elif not source and k=="verse":
+                      if n.get("eID"):
+                          assert current==n.get("eID");current=None
+                          return
+                      assert current is None and n.get("osisID")
+                      current=n.get("osisID");container=not bool(n.get("sID"))
+                  start=pos; fullstart=fullpos
+                  kind=None
+                  if source and k=="wj" or not source and k=="q":kind="quotation"
+                  elif source and k=="it" or not source and k=="hi" and n.get("type")=="italic":kind="italic"
+                  elif source and k=="ord" or not source and k=="hi" and n.get("type")=="super":kind="superscript"
+                  is_intro=(source and k=="p" and style in {"ip","ipi"} or not source and k=="p" and
+                            any(_name(a)=="div" and a.get("type")=="introduction" for a in n.iterancestors()))
+                  append(n.text)
+                  for c in n:
+                      walk(c);append(c.tail)
+                  if kind:spans[kind].append((start,pos))
+                  if is_intro:intro.append((fullstart,fullpos))
+                  if container:current=None
+              walk(book)
+              assert current is None
+              return titles,dict(spans),intro,"".join(outside)
+          def editorial_diagnostic(source,target,mapping):
+              old={mapping[b.get("id")]:b for b in source.iter("book")}
+              new={b.get("osisID"):b for b in target.iter(OSIS+"div") if b.get("type")=="book"}
+              assert old and list(old)==list(new)
+              counts=Counter();findings=defaultdict(list)
+              from difflib import SequenceMatcher
+              for ident in old:
+                  t,s,i,o=editorial_signature(old[ident],True)
+                  tt,ss,ii,oo=editorial_signature(new[ident],False)
+                  for label,a,b in (("titles",t,tt),("intro_paragraphs",i,ii)):
+                      counts[label+"_source"]+=len(a);counts[label+"_target"]+=len(b)
+                      if a!=b:findings[label].append(ident)
+                  for label in sorted(set(s)|set(ss)):
+                      a,b=s.get(label,[]),ss.get(label,[])
+                      counts[label+"_source"]+=len(a);counts[label+"_target"]+=len(b)
+                      if a!=b:findings[label].append(ident)
+                  if o!=oo:
+                      # Retain only positions and hashes; do not leak text.
+                      diffs=[]
+                      for op,a,b,c,d in SequenceMatcher(None,o,oo,autojunk=False).get_opcodes():
+                          if op!="equal":
+                              diffs.append({"kind":op,"source_offset":a,"target_offset":c,
+                                  "source_length":b-a,"target_length":d-c,
+                                  "source_sha256":_hash(o[a:b]),"target_sha256":_hash(oo[c:d])})
+                      findings["unnumbered_text"].append({"book":ident,"differences":diffs[:20]})
+              return {"counts":dict(counts),"findings":dict(findings),
+                      "scope":"title text and numbered positions, selected inline numbered spans, intro paragraph offsets and nonnumbered nonspace text; diagnostic only"}
           # Positive fixture with a mid-verse paragraph and two distinct tables.
           sample_layout_source=parse_usfx(b'<usfx><book id="GEN">'
               b'<table><tr><th>A</th><tc><it>B</it>C</tc></tr></table>'
@@ -770,6 +848,8 @@ jobs:
               layout=compare_original_tables_and_paragraphs(root,_source_tree(xml),mapping)
               print("ORIGINAL_USFX_TABLE_PARAGRAPH_PROOF",resource,json.dumps(layout,sort_keys=True),flush=True)
               assert layout["supported_table_and_numbered_paragraph_parity"],(resource,layout["differences"])
+              editorial=editorial_diagnostic(root,_source_tree(xml),mapping)
+              print("ORIGINAL_USFX_EDITORIAL_DIAGNOSTIC",resource,json.dumps(editorial,sort_keys=True),flush=True)
           PY
       - name: Audit exact stock-reader-key Bible payloads (read-only candidate evidence)
         shell: bash
