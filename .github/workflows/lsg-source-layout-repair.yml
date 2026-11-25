@@ -140,3 +140,82 @@ jobs:
           name: reversible-lsg-table-repair-receipt
           path: ${{ runner.temp }}/lsg-intro-table-receipt.json
           retention-days: 30
+      - name: Locate actual source paragraph starts and candidate XML insertion boundaries
+        if: always()
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from collections import Counter,defaultdict
+          import json,zipfile
+          from lxml import etree
+          from approved_osis_sword_candidate import approved_source_for
+          from source_osis_inventory import _source_tree,OSIS
+          from research.bible.original_authorial_content_parity import parse_usfx
+          def local(n):return etree.QName(n).localname if isinstance(n.tag,str) else ''
+          def ns(s):return ''.join((s or '').split())
+          NOTE={'x','f','fe','ef','ex'}
+          TITLE={'s','s1','s2','s3','s4','r','sr','mr','ms','ms1','ms2','ms3','mt','mt1','mt2','mt3','imt','imt1','imt2','imt3','is','is1','is2'}
+          mapping={x['usfm']:x['osis'] for x in json.loads(Path('config/standard_usfm_osis_66.json').read_text())['books']}
+          with zipfile.ZipFile('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip') as z:root=parse_usfx(z.read('fraLSG_usfx.xml'))
+          _,xml=approved_source_for('lsg-1910'); target=_source_tree(xml)
+          def scan(book,source):
+              pos=0;ref=None;chapter=None;last=None
+              starts=[];spans=[];events=defaultdict(list);style_counts=Counter()
+              def append(s,owner,field):
+                  nonlocal pos
+                  if ref and ns(s):
+                      start=pos;pos+=len(ns(s))
+                      spans.append((start,pos,local(owner),field,ref,owner))
+              def walk(n):
+                  nonlocal ref,chapter,last
+                  k=local(n)
+                  if not k:return
+                  style=n.get('sfm') or n.get('style') or k
+                  if source and (k in NOTE|{'id','h','toc'}|TITLE or k=='p' and style in TITLE) or not source and k in {'note','title','header'}:return
+                  if source and k=='c':chapter=n.get('id')
+                  if source and k=='v':ref=chapter+'.'+n.get('id');last=ref
+                  if source and k=='ve':ref=None
+                  if not source and k=='verse':
+                      if n.get('eID'):ref=None
+                      else:ref=n.get('osisID').split('.',1)[1];last=ref
+                  # Include every paragraph style in the census, including non-p containers.
+                  if source and k in {'p','q','m','b','pi','pi1','li','li1'}:
+                      style_counts[k+'|'+style]+=1
+                  if source and k=='p' or not source and (k=='p' or k=='lb' and n.get('type')=='x-p'):
+                      if pos>0:
+                          starts.append((pos,last,style if source else n.get('type'),n))
+                  if pos>0 and not source:
+                      parent=n.getparent()
+                      events[pos].append({'edge':'open','tag':k,'parent':local(parent),'attributes':{a:n.get(a) for a in ('type','level','subType','sID','eID','osisID') if n.get(a) is not None}})
+                  append(n.text,n,'text')
+                  for c in n:
+                      walk(c);append(c.tail,c,'tail')
+                  if pos>0 and not source:
+                      events[pos].append({'edge':'close','tag':k,'parent':local(n.getparent()) if n.getparent() is not None else None})
+                  if not source and k=='verse' and n.get('osisID') and not n.get('sID'):ref=None
+              walk(book)
+              return starts,spans,events,style_counts
+          reports={}
+          target_books={n.get('osisID'):n for n in target.iter(OSIS+'div') if n.get('type')=='book'}
+          for book in root.iter('book'):
+              ident=mapping[book.get('id')]
+              a,_,_,styles=scan(book,True)
+              b,spans,events,_=scan(target_books[ident],False)
+              # Classify explicitly known body paragraph styles only.
+              aa=[x for x in a if x[2] in {'p','m','pi','pi1','pi2','pi3'}]
+              x=Counter(v[0] for v in aa);y=Counter(v[0] for v in b)
+              if not x-y and not y-x:continue
+              result={'source_style_counts':dict(styles),'missing':[],'extra':[]}
+              for offset,ref,style,node in aa:
+                  if offset not in x-y:continue
+                  near=[v for v in spans if v[0]<=offset<=v[1]]
+                  anchors=[]
+                  for s,e,k,field,r,n in near:
+                      anchors.append({'start':s,'end':e,'field':field,'node':k,'ref':r,'ancestors':[local(p) for p in list(n.iterancestors())[:5]],'interior':s<offset<e})
+                  result['missing'].append({'offset':offset,'ref':ref,'style':style,'source_parent':local(node.getparent()),'source_first_child':local(node[0]) if len(node) else None,'candidate_anchors':anchors[:8],'candidate_events':events[offset][:16]})
+              for offset,ref,style,node in b:
+                  if offset not in y-x:continue
+                  result['extra'].append({'offset':offset,'ref':ref,'style':style,'tag':local(node),'parent':local(node.getparent()),'preceding':local(node.getprevious()) if node.getprevious() is not None else None,'following':local(node.getnext()) if node.getnext() is not None else None})
+              reports[ident]=result
+          print('LSG_PARAGRAPH_ANCHORS',json.dumps(reports,sort_keys=True),flush=True)
+          PY
