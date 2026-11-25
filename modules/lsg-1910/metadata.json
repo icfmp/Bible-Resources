@@ -13,7 +13,7 @@
   },
   "quality": {
     "edition": "reader_optimized",
-    "reviewed_by": "Bible Resources owner — requested redundant paragraph cleanup #565; independent native and GUI checks",
+    "reviewed_by": "Bible Resources project owner — explicit publication authorization (2026-11-25, conversation); independent native, Xiphos and JSword proofs #571",
     "smoke_key": "John 3:16",
     "status": "approved"
   },
@@ -38,5 +38,5 @@
     }
   ],
   "versification": "Segond",
-  "version": "1.0.3"
+  "version": "1.0.4"
 }

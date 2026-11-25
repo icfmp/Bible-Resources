@@ -1,0 +1,1097 @@
+{
+  "schema_version": 1,
+  "run_id": 45569845095,
+  "job_id": 139053511410,
+  "table": {
+    "all_source_table_cells_and_row_boundaries_equal": true,
+    "all_word_annotations_exact": true,
+    "candidate_sha256": "3e8e81b935709e2c873756ff18530f37929faf549b0db22a964448b95e02ca8f",
+    "edits": [
+      {
+        "candidate_byte_offset": 23978611,
+        "new_utf8": "",
+        "old_utf8": "\\i",
+        "source_byte_offset": 23978611
+      },
+      {
+        "candidate_byte_offset": 29608807,
+        "new_utf8": "",
+        "old_utf8": "\\i",
+        "source_byte_offset": 29608809
+      },
+      {
+        "candidate_byte_offset": 29608842,
+        "new_utf8": "</table><table>",
+        "old_utf8": "",
+        "source_byte_offset": 29608846
+      },
+      {
+        "candidate_byte_offset": 29609510,
+        "new_utf8": "",
+        "old_utf8": "\\i",
+        "source_byte_offset": 29609499
+      }
+    ],
+    "inverse_exact": true,
+    "numbered_prose_notes_exact": true,
+    "original_usfx_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+    "scope": "isolated table candidate only; no paragraph correction, schema, native reader or publication approval",
+    "source_cell_repairs": [
+      {
+        "book": "Luke",
+        "cell": 2,
+        "controls": 1,
+        "row": 41,
+        "source_folded_sha256": "97c6b54e7daafa276d030ddb8b0bf4aaf625fa2853880f6354d53d41a9b2a98d"
+      },
+      {
+        "book": "1Pet",
+        "cell": 2,
+        "controls": 1,
+        "row": 5,
+        "source_folded_sha256": "308ea598a6d203bf173ef741a250c2108477ab703bb20c06ed7a7b6dad012360"
+      },
+      {
+        "book": "1Pet",
+        "cell": 2,
+        "controls": 1,
+        "row": 12,
+        "source_folded_sha256": "158563321a8e5e504fae376ea04ddd457d3e4bbf1a4adf9d75ddbba6c32f4240"
+      }
+    ],
+    "source_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
+    "table_splits": [
+      {
+        "after_source_row": 5,
+        "book": "1Pet",
+        "original_table_rows": 12
+      }
+    ]
+  },
+  "paragraph": {
+    "all_nonparagraph_element_openings_exact": true,
+    "all_numbered_paragraph_start_offsets_and_styles_equal": true,
+    "all_numbered_verse_text_and_notes_exact": true,
+    "boundary_changes": [
+      {
+        "book": "Ezra",
+        "kind": "remove_displaced_boundary",
+        "nonspace_offset": 10495,
+        "ref": "4.16",
+        "style": null
+      },
+      {
+        "book": "Ezra",
+        "kind": "remove_displaced_boundary",
+        "nonspace_offset": 12316,
+        "ref": "5.6",
+        "style": null
+      },
+      {
+        "anchor_kind": "hi",
+        "book": "Ezra",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 10636,
+        "ref": "4.17",
+        "style": null
+      },
+      {
+        "anchor_kind": "hi",
+        "book": "Ezra",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 12353,
+        "ref": "5.7",
+        "style": null
+      },
+      {
+        "book": "Job",
+        "kind": "remove_displaced_boundary",
+        "nonspace_offset": 3486,
+        "ref": "2.9",
+        "style": null
+      },
+      {
+        "anchor_kind": "w",
+        "book": "Job",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 3597,
+        "ref": "2.10",
+        "style": null
+      },
+      {
+        "book": "Jer",
+        "kind": "remove_displaced_boundary",
+        "nonspace_offset": 175693,
+        "ref": "51.63",
+        "style": null
+      },
+      {
+        "anchor_kind": "w",
+        "book": "Jer",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 175801,
+        "ref": "51.64",
+        "style": null
+      },
+      {
+        "book": "Luke",
+        "kind": "remove_displaced_boundary",
+        "nonspace_offset": 25266,
+        "ref": "6.20",
+        "style": null
+      },
+      {
+        "book": "Luke",
+        "kind": "remove_displaced_boundary",
+        "nonspace_offset": 25714,
+        "ref": "6.24",
+        "style": null
+      },
+      {
+        "anchor_kind": "q",
+        "book": "Luke",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 25213,
+        "ref": "6.20",
+        "style": null
+      },
+      {
+        "anchor_kind": "note",
+        "book": "Luke",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 25321,
+        "ref": "6.21",
+        "style": null
+      },
+      {
+        "anchor_kind": "q",
+        "book": "Luke",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 25760,
+        "ref": "6.25",
+        "style": null
+      },
+      {
+        "book": "John",
+        "kind": "remove_displaced_boundary",
+        "nonspace_offset": 5624,
+        "ref": "2.16",
+        "style": "x-indented-1"
+      },
+      {
+        "anchor_kind": "note",
+        "book": "John",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 5662,
+        "ref": "2.17",
+        "style": "x-indented-1"
+      },
+      {
+        "book": "Rom",
+        "kind": "remove_displaced_boundary",
+        "nonspace_offset": 35157,
+        "ref": "13.8",
+        "style": "x-indented-1"
+      },
+      {
+        "anchor_kind": "note",
+        "book": "Rom",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 35182,
+        "ref": "13.9",
+        "style": "x-indented-1"
+      },
+      {
+        "book": "Rev",
+        "kind": "remove_displaced_boundary",
+        "nonspace_offset": 11807,
+        "ref": "5.13",
+        "style": "x-noindent"
+      },
+      {
+        "anchor_kind": "q",
+        "book": "Rev",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 2452,
+        "ref": "2.1",
+        "style": null
+      },
+      {
+        "anchor_kind": "q",
+        "book": "Rev",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 3243,
+        "ref": "2.8",
+        "style": null
+      },
+      {
+        "anchor_kind": "q",
+        "book": "Rev",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 3789,
+        "ref": "2.12",
+        "style": null
+      },
+      {
+        "anchor_kind": "q",
+        "book": "Rev",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 4637,
+        "ref": "2.18",
+        "style": null
+      },
+      {
+        "anchor_kind": "q",
+        "book": "Rev",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 5918,
+        "ref": "3.1",
+        "style": null
+      },
+      {
+        "anchor_kind": "q",
+        "book": "Rev",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 6644,
+        "ref": "3.7",
+        "style": null
+      },
+      {
+        "anchor_kind": "q",
+        "book": "Rev",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 7590,
+        "ref": "3.14",
+        "style": null
+      },
+      {
+        "anchor_kind": "w",
+        "book": "Rev",
+        "kind": "restore_source_boundary",
+        "nonspace_offset": 11844,
+        "ref": "5.14",
+        "style": "x-noindent"
+      }
+    ],
+    "byte_edits": [
+      {
+        "candidate_byte_offset": 11854227,
+        "new_utf8": "",
+        "old_utf8": "</p>",
+        "source_byte_offset": 11854227
+      },
+      {
+        "candidate_byte_offset": 11854234,
+        "new_utf8": "",
+        "old_utf8": "<p>",
+        "source_byte_offset": 11854238
+      },
+      {
+        "candidate_byte_offset": 11855221,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 11855228
+      },
+      {
+        "candidate_byte_offset": 11864736,
+        "new_utf8": "",
+        "old_utf8": "</p>",
+        "source_byte_offset": 11864736
+      },
+      {
+        "candidate_byte_offset": 11864743,
+        "new_utf8": "",
+        "old_utf8": "<p>",
+        "source_byte_offset": 11864747
+      },
+      {
+        "candidate_byte_offset": 11865032,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 11865039
+      },
+      {
+        "candidate_byte_offset": 12570639,
+        "new_utf8": "",
+        "old_utf8": "</p>",
+        "source_byte_offset": 12570639
+      },
+      {
+        "candidate_byte_offset": 12570646,
+        "new_utf8": "",
+        "old_utf8": "<p>",
+        "source_byte_offset": 12570650
+      },
+      {
+        "candidate_byte_offset": 12571504,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 12571511
+      },
+      {
+        "candidate_byte_offset": 19105772,
+        "new_utf8": "",
+        "old_utf8": "</p>",
+        "source_byte_offset": 19105772
+      },
+      {
+        "candidate_byte_offset": 19105779,
+        "new_utf8": "",
+        "old_utf8": "<p>",
+        "source_byte_offset": 19105783
+      },
+      {
+        "candidate_byte_offset": 19106553,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 19106560
+      },
+      {
+        "candidate_byte_offset": 24231334,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 24231334
+      },
+      {
+        "candidate_byte_offset": 24231826,
+        "new_utf8": "",
+        "old_utf8": "</p>",
+        "source_byte_offset": 24231819
+      },
+      {
+        "candidate_byte_offset": 24231833,
+        "new_utf8": "",
+        "old_utf8": "<p>",
+        "source_byte_offset": 24231830
+      },
+      {
+        "candidate_byte_offset": 24232504,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 24232504
+      },
+      {
+        "candidate_byte_offset": 24236866,
+        "new_utf8": "",
+        "old_utf8": "</p>",
+        "source_byte_offset": 24236859
+      },
+      {
+        "candidate_byte_offset": 24236873,
+        "new_utf8": "",
+        "old_utf8": "<p>",
+        "source_byte_offset": 24236870
+      },
+      {
+        "candidate_byte_offset": 24237537,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 24237537
+      },
+      {
+        "candidate_byte_offset": 25178574,
+        "new_utf8": "",
+        "old_utf8": "</p>",
+        "source_byte_offset": 25178567
+      },
+      {
+        "candidate_byte_offset": 25178581,
+        "new_utf8": "",
+        "old_utf8": "<p type=\"x-indented-1\">",
+        "source_byte_offset": 25178578
+      },
+      {
+        "candidate_byte_offset": 25178875,
+        "new_utf8": "</p><p type=\"x-indented-1\">",
+        "old_utf8": "",
+        "source_byte_offset": 25178895
+      },
+      {
+        "candidate_byte_offset": 27359768,
+        "new_utf8": "",
+        "old_utf8": "</p>",
+        "source_byte_offset": 27359761
+      },
+      {
+        "candidate_byte_offset": 27359775,
+        "new_utf8": "",
+        "old_utf8": "<p type=\"x-indented-1\">",
+        "source_byte_offset": 27359772
+      },
+      {
+        "candidate_byte_offset": 27359963,
+        "new_utf8": "</p><p type=\"x-indented-1\">",
+        "old_utf8": "",
+        "source_byte_offset": 27359983
+      },
+      {
+        "candidate_byte_offset": 30041381,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 30041374
+      },
+      {
+        "candidate_byte_offset": 30049463,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 30049449
+      },
+      {
+        "candidate_byte_offset": 30055341,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 30055320
+      },
+      {
+        "candidate_byte_offset": 30064448,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 30064420
+      },
+      {
+        "candidate_byte_offset": 30078639,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 30078604
+      },
+      {
+        "candidate_byte_offset": 30087408,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 30087366
+      },
+      {
+        "candidate_byte_offset": 30098329,
+        "new_utf8": "</p><p>",
+        "old_utf8": "",
+        "source_byte_offset": 30098280
+      },
+      {
+        "candidate_byte_offset": 30140829,
+        "new_utf8": "",
+        "old_utf8": "</p>",
+        "source_byte_offset": 30140773
+      },
+      {
+        "candidate_byte_offset": 30140836,
+        "new_utf8": "",
+        "old_utf8": "<p type=\"x-noindent\">",
+        "source_byte_offset": 30140784
+      },
+      {
+        "candidate_byte_offset": 30141097,
+        "new_utf8": "</p><p type=\"x-noindent\">",
+        "old_utf8": "",
+        "source_byte_offset": 30141066
+      }
+    ],
+    "candidate_sha256": "25479903513b66c5dbb0f8eb1d9025da023a6b63df38492c35940ef65425e965",
+    "exact_inverse": true,
+    "scope": "source-attested numbered paragraph starts; pending schema and native reader checks",
+    "table_candidate_sha256": "3e8e81b935709e2c873756ff18530f37929faf549b0db22a964448b95e02ca8f"
+  },
+  "native": {
+    "authorial_osis_structural_census": {
+      "source_l_elements": 23991,
+      "source_lb_elements": 29,
+      "source_lg_elements": 1014,
+      "source_p_elements": 3236,
+      "source_title_elements": 4542
+    },
+    "candidate_module_id": "BRLSG1910",
+    "candidate_sha256": "25479903513b66c5dbb0f8eb1d9025da023a6b63df38492c35940ef65425e965",
+    "candidate_status": "full_numbered_text_and_note_preflight_equal_not_approved",
+    "candidate_versification": "Segond",
+    "compiled_engine_version": "1.9.0",
+    "compiled_native_driver": "zText",
+    "compiled_native_milestone_closure_metadata_only": {
+      "cross_book_pair_reference_samples_no_ids": [],
+      "different_tag_interleavings_are_diagnostic_not_nesting_defects": true,
+      "first_issue_reference_ids_no_scripture": {},
+      "native_milestone_pair_categories": {
+        "different_tag_interleaving_diagnostic": 8070,
+        "globally_non_lifo_milestone_pairs": 10703,
+        "intro_to_intro_pairs": 588,
+        "intro_to_numbered_verse_pairs": 176,
+        "numbered_to_numbered_verse_pairs": 38312,
+        "pairs_spanning_multiple_entries": 3661,
+        "pairs_with_both_ends_in_one_entry": 35415,
+        "same_tag_different_type_interleaving_review": 2633
+      },
+      "native_milestone_pairing_findings": {},
+      "native_milestone_tag_counts": {
+        "div:close": 14071,
+        "div:open": 14071,
+        "div:paired": 14071,
+        "l:close": 23991,
+        "l:open": 23991,
+        "l:paired": 23991,
+        "lg:close": 1014,
+        "lg:open": 1014,
+        "lg:paired": 1014
+      },
+      "native_numbered_intro_scan_counts": {
+        "close_events": 39076,
+        "observed_I_entries": 1255,
+        "observed_K_entries": 31169,
+        "observed_U_entries": 2,
+        "open_events": 39076,
+        "paired_matching_sID_eID": 39076,
+        "parseable_anonymous_TOP_entries": 2,
+        "parseable_numbered_or_intro_entries": 32424,
+        "unaddressable_TOP_entries_unverified": 2,
+        "unaddressable_TOP_milestone_events_unverified": 0
+      },
+      "ordered_native_event_reference_fingerprint_sha256": "64ad6874fe4a3d86cacb2bf1f818ef1eab13e9215bca6e694ae4cd3d9706aa7c",
+      "paired_div_types_allowlisted": {
+        "book": 66,
+        "other_unreviewed_type": 66,
+        "x-milestone": 10703,
+        "x-p": 3236
+      },
+      "remaining_unclosed_milestones_by_tag": {},
+      "schema_version": 1,
+      "source_editorial_or_publication_approved": false,
+      "source_generated_identifier_values_exposed": false,
+      "source_relative_word_position_coverage_verified": false,
+      "source_to_compiled_same_type_event_order_verified": false,
+      "status": "compiled_milestone_pairs_verified_only",
+      "verse_zero_and_numbered_milestones_inspected": true
+    },
+    "compiled_payload_sha256": "3874f475028ab6295437265be364fd4306c6a87888624c4c63e58474c91569b5",
+    "compiler": {
+      "compiler_log_is_private_and_discarded": true,
+      "compiler_tool": "osis2mod",
+      "diagnostic_categories": {
+        "INFO": 2,
+        "unclassified": 2
+      },
+      "first_diagnostic_locations_no_source_text": [],
+      "returncode": 0,
+      "tool_sha256": "8ceed9fe597fd7948da02170144578522acd7e07ff60a42ba9ee11ddd81b820e"
+    },
+    "explicit_note_target_index_addressability": {
+      "actual_reader_link_click_navigation_verified": false,
+      "all_original_explicit_targets_index_addressable": true,
+      "bounded_note_host_reference_samples": [],
+      "counts": {
+        "addressable_endpoint_components": 29513,
+        "all_target_components_index_addressable": 29509,
+        "explicit_target_attributes_checked": 29509,
+        "notes_checked": 9751,
+        "range_components_checked": 4,
+        "target_component_indexed_chapter": 16,
+        "target_component_indexed_ordered_full_range": 4,
+        "target_component_indexed_verse": 29489
+      },
+      "original_target_literals_or_note_text_exposed": false,
+      "publication_approved": false,
+      "source_and_native_verse_indices_equal": true,
+      "status": "all_explicit_targets_index_addressable_including_full_ranges"
+    },
+    "explicit_p_q_and_layout_structure_fidelity_verified": false,
+    "first_safe_reference_note_index_findings": [],
+    "native_compiled_structure_screen": {
+      "actual_compiled_raw_entries_scanned": 32426,
+      "editorial_layout_and_visual_signoff_deferred_to_stage_5": true,
+      "original_to_native_editorial_structure_counts": {
+        "native_l_close_elements": 23991,
+        "native_l_open_elements": 23991,
+        "native_lb_container_elements": 29,
+        "native_lg_close_elements": 1014,
+        "native_lg_open_elements": 1014,
+        "native_paragraph_close_elements": 3236,
+        "native_paragraph_open_elements": 3236,
+        "native_title_container_elements": 4542
+      },
+      "semantic_source_native_event_position_or_scope_verified": false,
+      "source_native_structural_count_equality_not_inferred": true
+    },
+    "numbered_slot_text_and_note_parity_verified": true,
+    "original_to_compiled_body_opening_order": {
+      "explicit_prechapter_book_title_styles_separately_accounted_for": false,
+      "first_mismatch_book_references_no_scripture": [],
+      "native_event_kind_order_sha256": "c76d7196fc36c331841575202bb881d1e03af7bf1e08c2bb164b5033189b8f7a",
+      "no_scripture_or_native_milestone_identifiers_in_report": true,
+      "original_to_native_book_title_match_not_verified_by_this_screen": true,
+      "originals_rewritten_or_published": false,
+      "same_order_and_kind_in_every_mapped_book": true,
+      "schema_version": 1,
+      "source_event_kind_order_sha256": "c76d7196fc36c331841575202bb881d1e03af7bf1e08c2bb164b5033189b8f7a",
+      "source_native_body_opening_kind_counts": {
+        "authorial_body_start_events": 27227,
+        "books_checked": 66,
+        "books_with_body_opening_count_difference": 0,
+        "books_with_body_opening_kind_difference": 0,
+        "books_with_equal_count_but_reordered_kinds": 0,
+        "books_with_exact_body_opening_kind_order": 66,
+        "native_body_start_events": 27227,
+        "native_paragraph_starts": 3236,
+        "native_poetry_line_starts": 23991,
+        "source_body_p_openings": 3236,
+        "source_body_q_openings": 23991
+      },
+      "source_native_exact_word_positions_or_boundary_spans_verified": false,
+      "source_native_whitespace_or_full_editorial_layout_verified": false
+    },
+    "published": false,
+    "publisher_original_note_target_navigation_verified": false,
+    "reviewed_projected_slots": 31169,
+    "source_native_body_boundary_positions": {
+      "all_book_body_nonspace_and_boundary_events_equal": true,
+      "all_title_text_and_nonspace_placement_equal": true,
+      "body_lexical_association_diagnostic": {
+        "all_book_body_word_spans_and_attributes_equal": true,
+        "bounded_book_only_findings": [],
+        "counts": {
+          "books_with_identical_word_spans_and_attributes": 66,
+          "native_body_word_elements": 705605,
+          "native_body_word_elements_with_attributes": 705605,
+          "native_excluded_note_title_header_word_elements": 123,
+          "source_body_word_elements": 705605,
+          "source_body_word_elements_with_attributes": 705605,
+          "source_excluded_note_title_header_word_elements": 123
+        },
+        "exact_attribute_values_compared": true,
+        "excluded_scopes_certified": false,
+        "mandatory_release_gate": false,
+        "native_TOP_body_word_elements": 0,
+        "native_TOP_excluded_word_elements": 0,
+        "original_publisher_to_cleaned_source_lexical_parity_verified": false,
+        "scope": "book body including addressable introductions; excludes title, note, header, outside-book source"
+      },
+      "book_editorial_inline_diagnostic": {
+        "all_compared_scopes_equal": true,
+        "bounded_findings": [],
+        "counts": {
+          "body_text_equal": 66,
+          "books": 66,
+          "matched_body_divineName": 0,
+          "matched_body_foreign": 0,
+          "matched_body_hi": 170,
+          "matched_body_lb": 29,
+          "matched_body_name": 0,
+          "matched_body_q": 2644,
+          "matched_body_reference": 178,
+          "matched_body_seg": 0,
+          "matched_body_transChange": 0,
+          "matched_intro_spans": 66,
+          "matched_note_scopes": 9751,
+          "matched_title_scopes": 4542,
+          "native_body_divineName": 0,
+          "native_body_foreign": 0,
+          "native_body_hi": 170,
+          "native_body_lb": 29,
+          "native_body_name": 0,
+          "native_body_q": 2644,
+          "native_body_reference": 178,
+          "native_body_seg": 0,
+          "native_body_transChange": 0,
+          "native_intro_spans": 66,
+          "native_note_scopes": 9751,
+          "native_note_word_elements": 0,
+          "native_title_scopes": 4542,
+          "native_title_word_elements": 123,
+          "source_body_divineName": 0,
+          "source_body_foreign": 0,
+          "source_body_hi": 170,
+          "source_body_lb": 29,
+          "source_body_name": 0,
+          "source_body_q": 2644,
+          "source_body_reference": 178,
+          "source_body_seg": 0,
+          "source_body_transChange": 0,
+          "source_intro_spans": 66,
+          "source_note_scopes": 9751,
+          "source_note_word_elements": 0,
+          "source_title_scopes": 4542,
+          "source_title_word_elements": 123
+        },
+        "exact_whitespace_or_visual_rendering_certified": false,
+        "finding_count": 0,
+        "outer_note_title_attributes_and_outside_book_scopes_certified": false,
+        "scope": "book body selected inline elements and introduction spans, anchored book note/title inner content; body word spans separately verified"
+      },
+      "bounded_reference_only_findings": [],
+      "counts": {
+        "books_compared": 66,
+        "books_with_identical_full_nonspace_body_stream": 66,
+        "boundary_event_positions_equal": 56482,
+        "native_TOP_title_events": 0,
+        "native_l_close_events": 23991,
+        "native_l_open_events": 23991,
+        "native_lg_close_events": 1014,
+        "native_lg_open_events": 1014,
+        "native_p_close_events": 3236,
+        "native_p_open_events": 3236,
+        "native_title_events": 4542,
+        "outside_book_title_text_and_order_equal": 0,
+        "source_l_close_events": 23991,
+        "source_l_open_events": 23991,
+        "source_lg_close_events": 1014,
+        "source_lg_open_events": 1014,
+        "source_outside_book_title_events": 0,
+        "source_p_close_events": 3236,
+        "source_p_open_events": 3236,
+        "source_title_events": 4542,
+        "title_prose_and_nonspace_positions_equal": 4542
+      },
+      "independent_reader_visual_signoff": false,
+      "literal_whitespace_or_exact_typography_verified": false,
+      "native_anonymous_top_nonspace_body_characters": 0,
+      "native_frame_counts": {
+        "I": 1255,
+        "K": 31169,
+        "U": 2
+      },
+      "paragraph_span_diagnostic": {
+        "bounded_reference_only_findings": [],
+        "counts": {
+          "identical_paragraph_spans": 3236
+        },
+        "scope": "books_with_identical_full_nonspace_body_stream",
+        "zero_nonspace_spans_not_automatically_waived": true
+      },
+      "published": false,
+      "source_title_prose_and_verse_zero_semantics_verified": false,
+      "status": "source_native_body_boundary_nonspace_positions_equal"
+    },
+    "source_to_compiled_counts": {
+      "native_only_references": 0,
+      "native_other_I_entries": 1255,
+      "native_other_U_entries": 2,
+      "note_body_equal_after_whitespace_folding": 9751,
+      "note_explicit_target_sequence_equal": 9751,
+      "note_nonspace_anchor_equal": 9751,
+      "note_original_caller_label_equal": 9751,
+      "note_original_type_equal": 9751,
+      "note_pairs_compared": 9751,
+      "numbered_verse_nonspace_main_text_equal": 31169,
+      "numbered_verse_note_count_matches": 31169,
+      "official_source_verse_count": 31169,
+      "populated_native_verse_count": 31169,
+      "source_only_references": 0
+    },
+    "source_verses": 31170,
+    "usable_for_publication": false,
+    "visual_reader_or_parallel_reader_verified": false
+  },
+  "schema": {
+    "baseline_findings": 311,
+    "candidate_findings": 311,
+    "candidate_source_sha256": "25479903513b66c5dbb0f8eb1d9025da023a6b63df38492c35940ef65425e965",
+    "identical_finding_codes": {
+      "UNRESOLVED_REFERENCE_TARGET": 311
+    },
+    "official_osis_validated": true
+  },
+  "xiphos": {
+    "actual_xiphos": true,
+    "all_source_prose_witnesses": true,
+    "android_gui_verified": false,
+    "candidate_sha256": "25479903513b66c5dbb0f8eb1d9025da023a6b63df38492c35940ef65425e965",
+    "comparisons": {
+      "Ezra.4.17": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Ezra.5.7": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Jer.51.64": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Job.2.10": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "John.2.17": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Luke.6.20": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Luke.6.21": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Luke.6.25": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Rev.2.1": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Rev.2.12": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Rev.2.18": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Rev.2.8": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Rev.3.1": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Rev.3.14": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Rev.3.7": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Rev.5.14": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      },
+      "Rom.13.9": {
+        "folded_clipboard_equal": true,
+        "nonspace_clipboard_equal": true
+      }
+    },
+    "published": false,
+    "references": [
+      "Ezra.4.17",
+      "Ezra.5.7",
+      "Job.2.10",
+      "Jer.51.64",
+      "Luke.6.20",
+      "Luke.6.21",
+      "Luke.6.25",
+      "John.2.17",
+      "Rom.13.9",
+      "Rev.2.1",
+      "Rev.2.8",
+      "Rev.2.12",
+      "Rev.2.18",
+      "Rev.3.1",
+      "Rev.3.7",
+      "Rev.3.14",
+      "Rev.5.14"
+    ],
+    "source_witnesses": {
+      "candidate": {
+        "Ezra.4.17": {
+          "clipboard_folded_sha256": "bd86354e0c711f7c246d7136ffbd2c1d51f92ed2dee875a16d81cdb4d4460e2c",
+          "clipboard_nonspace_sha256": "9b68ca0f9ca918ab20ca81c24b720b3da534211c438e8a802b0c4eb47761a82b",
+          "navigation": "Ezra 4:17",
+          "source_word_witness": 16
+        },
+        "Ezra.5.7": {
+          "clipboard_folded_sha256": "94d24840eaa08c5dc89bbe38d9cfa7bbcda224688a613526d064e78a1db0d893",
+          "clipboard_nonspace_sha256": "563e9510ac62721809f624034f6c6eea4d91639d315289cec229009372bd057d",
+          "navigation": "Ezra 5:7",
+          "source_word_witness": 11
+        },
+        "Jer.51.64": {
+          "clipboard_folded_sha256": "9032b35064cb3000d14fc48a2ba4a7e5cba0c2874f9508b90deed100ea6037b6",
+          "clipboard_nonspace_sha256": "dfb11bda39d0f184b213280001f58ac0a90f5cecf9dc6ffddb1a893c5aedc6f7",
+          "navigation": "Jer 51:64",
+          "source_word_witness": 16
+        },
+        "Job.2.10": {
+          "clipboard_folded_sha256": "da961c1c69af749587c9ac792c03b228214299a92b9c0ae44aadb6eba4d4891d",
+          "clipboard_nonspace_sha256": "4611772f1bb50901d309adff1a1193682f252ca03b6799222047ea29d3b2c327",
+          "navigation": "Job 2:10",
+          "source_word_witness": 16
+        },
+        "John.2.17": {
+          "clipboard_folded_sha256": "a5b4fa2942c5ab10447754f538542ce87bd84dff4a3873305e58bdeaf90edb9a",
+          "clipboard_nonspace_sha256": "27f2acc282f6930198deee7cd34662f0e1914d4588036f8a359d306dce132c85",
+          "navigation": "John 2:17",
+          "source_word_witness": 8
+        },
+        "Luke.6.20": {
+          "clipboard_folded_sha256": "b05e0cc76b0f00f49f3745ea2b0ac4960721caff4a80d96217db2dde46348cbc",
+          "clipboard_nonspace_sha256": "80b6c1444d161b04285f080cf458c2b699e4e77039a98123e213b67f0e7c31e3",
+          "navigation": "Luke 6:20",
+          "source_word_witness": 16
+        },
+        "Luke.6.21": {
+          "clipboard_folded_sha256": "b05e0cc76b0f00f49f3745ea2b0ac4960721caff4a80d96217db2dde46348cbc",
+          "clipboard_nonspace_sha256": "80b6c1444d161b04285f080cf458c2b699e4e77039a98123e213b67f0e7c31e3",
+          "navigation": "Luke 6:21",
+          "source_word_witness": 11
+        },
+        "Luke.6.25": {
+          "clipboard_folded_sha256": "b05e0cc76b0f00f49f3745ea2b0ac4960721caff4a80d96217db2dde46348cbc",
+          "clipboard_nonspace_sha256": "80b6c1444d161b04285f080cf458c2b699e4e77039a98123e213b67f0e7c31e3",
+          "navigation": "Luke 6:25",
+          "source_word_witness": 16
+        },
+        "Rev.2.1": {
+          "clipboard_folded_sha256": "c1a3215b2dc5d81d36cbf97cb76f8379765a662b4423f5f817bcf7ebe7de36ba",
+          "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+          "navigation": "Rev 2:1",
+          "source_word_witness": 16
+        },
+        "Rev.2.12": {
+          "clipboard_folded_sha256": "c1a3215b2dc5d81d36cbf97cb76f8379765a662b4423f5f817bcf7ebe7de36ba",
+          "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+          "navigation": "Rev 2:12",
+          "source_word_witness": 16
+        },
+        "Rev.2.18": {
+          "clipboard_folded_sha256": "c1a3215b2dc5d81d36cbf97cb76f8379765a662b4423f5f817bcf7ebe7de36ba",
+          "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+          "navigation": "Rev 2:18",
+          "source_word_witness": 16
+        },
+        "Rev.2.8": {
+          "clipboard_folded_sha256": "c1a3215b2dc5d81d36cbf97cb76f8379765a662b4423f5f817bcf7ebe7de36ba",
+          "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+          "navigation": "Rev 2:8",
+          "source_word_witness": 16
+        },
+        "Rev.3.1": {
+          "clipboard_folded_sha256": "985e735020b2376f85259c887bf48a9b1033bd7af18a41785f3ae757e830355f",
+          "clipboard_nonspace_sha256": "d7c2f9f34cb9d2704e915da0e516d3a75e247056727f7d7460b20f2e732f64f7",
+          "navigation": "Rev 3:1",
+          "source_word_witness": 16
+        },
+        "Rev.3.14": {
+          "clipboard_folded_sha256": "985e735020b2376f85259c887bf48a9b1033bd7af18a41785f3ae757e830355f",
+          "clipboard_nonspace_sha256": "d7c2f9f34cb9d2704e915da0e516d3a75e247056727f7d7460b20f2e732f64f7",
+          "navigation": "Rev 3:14",
+          "source_word_witness": 13
+        },
+        "Rev.3.7": {
+          "clipboard_folded_sha256": "985e735020b2376f85259c887bf48a9b1033bd7af18a41785f3ae757e830355f",
+          "clipboard_nonspace_sha256": "d7c2f9f34cb9d2704e915da0e516d3a75e247056727f7d7460b20f2e732f64f7",
+          "navigation": "Rev 3:7",
+          "source_word_witness": 16
+        },
+        "Rev.5.14": {
+          "clipboard_folded_sha256": "99fbbaeacb7b60ce894d71431c1393ed6e4332c3990c20576622a3bafa7b1618",
+          "clipboard_nonspace_sha256": "d30ce1084e57348f1dc62f0b168136746019270e61a1cafb4648202d4548543b",
+          "navigation": "Rev 5:14",
+          "source_word_witness": 14
+        },
+        "Rom.13.9": {
+          "clipboard_folded_sha256": "a27df4c17ae71f2cc2661d854f606d7b89eb17f668773a39b2137075795aca95",
+          "clipboard_nonspace_sha256": "6235d35ea537478138a9467396f772966d051089165b213593690b74716de8f2",
+          "navigation": "Rom 13:9",
+          "source_word_witness": 16
+        }
+      },
+      "published": {
+        "Ezra.4.17": {
+          "clipboard_folded_sha256": "bd86354e0c711f7c246d7136ffbd2c1d51f92ed2dee875a16d81cdb4d4460e2c",
+          "clipboard_nonspace_sha256": "9b68ca0f9ca918ab20ca81c24b720b3da534211c438e8a802b0c4eb47761a82b",
+          "navigation": "Ezra 4:17",
+          "source_word_witness": 16
+        },
+        "Ezra.5.7": {
+          "clipboard_folded_sha256": "94d24840eaa08c5dc89bbe38d9cfa7bbcda224688a613526d064e78a1db0d893",
+          "clipboard_nonspace_sha256": "563e9510ac62721809f624034f6c6eea4d91639d315289cec229009372bd057d",
+          "navigation": "Ezra 5:7",
+          "source_word_witness": 11
+        },
+        "Jer.51.64": {
+          "clipboard_folded_sha256": "9032b35064cb3000d14fc48a2ba4a7e5cba0c2874f9508b90deed100ea6037b6",
+          "clipboard_nonspace_sha256": "dfb11bda39d0f184b213280001f58ac0a90f5cecf9dc6ffddb1a893c5aedc6f7",
+          "navigation": "Jer 51:64",
+          "source_word_witness": 16
+        },
+        "Job.2.10": {
+          "clipboard_folded_sha256": "da961c1c69af749587c9ac792c03b228214299a92b9c0ae44aadb6eba4d4891d",
+          "clipboard_nonspace_sha256": "4611772f1bb50901d309adff1a1193682f252ca03b6799222047ea29d3b2c327",
+          "navigation": "Job 2:10",
+          "source_word_witness": 16
+        },
+        "John.2.17": {
+          "clipboard_folded_sha256": "a5b4fa2942c5ab10447754f538542ce87bd84dff4a3873305e58bdeaf90edb9a",
+          "clipboard_nonspace_sha256": "27f2acc282f6930198deee7cd34662f0e1914d4588036f8a359d306dce132c85",
+          "navigation": "John 2:17",
+          "source_word_witness": 8
+        },
+        "Luke.6.20": {
+          "clipboard_folded_sha256": "b05e0cc76b0f00f49f3745ea2b0ac4960721caff4a80d96217db2dde46348cbc",
+          "clipboard_nonspace_sha256": "80b6c1444d161b04285f080cf458c2b699e4e77039a98123e213b67f0e7c31e3",
+          "navigation": "Luke 6:20",
+          "source_word_witness": 16
+        },
+        "Luke.6.21": {
+          "clipboard_folded_sha256": "b05e0cc76b0f00f49f3745ea2b0ac4960721caff4a80d96217db2dde46348cbc",
+          "clipboard_nonspace_sha256": "80b6c1444d161b04285f080cf458c2b699e4e77039a98123e213b67f0e7c31e3",
+          "navigation": "Luke 6:21",
+          "source_word_witness": 11
+        },
+        "Luke.6.25": {
+          "clipboard_folded_sha256": "b05e0cc76b0f00f49f3745ea2b0ac4960721caff4a80d96217db2dde46348cbc",
+          "clipboard_nonspace_sha256": "80b6c1444d161b04285f080cf458c2b699e4e77039a98123e213b67f0e7c31e3",
+          "navigation": "Luke 6:25",
+          "source_word_witness": 16
+        },
+        "Rev.2.1": {
+          "clipboard_folded_sha256": "c1a3215b2dc5d81d36cbf97cb76f8379765a662b4423f5f817bcf7ebe7de36ba",
+          "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+          "navigation": "Rev 2:1",
+          "source_word_witness": 16
+        },
+        "Rev.2.12": {
+          "clipboard_folded_sha256": "c1a3215b2dc5d81d36cbf97cb76f8379765a662b4423f5f817bcf7ebe7de36ba",
+          "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+          "navigation": "Rev 2:12",
+          "source_word_witness": 16
+        },
+        "Rev.2.18": {
+          "clipboard_folded_sha256": "c1a3215b2dc5d81d36cbf97cb76f8379765a662b4423f5f817bcf7ebe7de36ba",
+          "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+          "navigation": "Rev 2:18",
+          "source_word_witness": 16
+        },
+        "Rev.2.8": {
+          "clipboard_folded_sha256": "c1a3215b2dc5d81d36cbf97cb76f8379765a662b4423f5f817bcf7ebe7de36ba",
+          "clipboard_nonspace_sha256": "43332814893ab31b959d7bf34bb756870c2e6d9428d97642ac89a4ebc60b057a",
+          "navigation": "Rev 2:8",
+          "source_word_witness": 16
+        },
+        "Rev.3.1": {
+          "clipboard_folded_sha256": "985e735020b2376f85259c887bf48a9b1033bd7af18a41785f3ae757e830355f",
+          "clipboard_nonspace_sha256": "d7c2f9f34cb9d2704e915da0e516d3a75e247056727f7d7460b20f2e732f64f7",
+          "navigation": "Rev 3:1",
+          "source_word_witness": 16
+        },
+        "Rev.3.14": {
+          "clipboard_folded_sha256": "985e735020b2376f85259c887bf48a9b1033bd7af18a41785f3ae757e830355f",
+          "clipboard_nonspace_sha256": "d7c2f9f34cb9d2704e915da0e516d3a75e247056727f7d7460b20f2e732f64f7",
+          "navigation": "Rev 3:14",
+          "source_word_witness": 13
+        },
+        "Rev.3.7": {
+          "clipboard_folded_sha256": "985e735020b2376f85259c887bf48a9b1033bd7af18a41785f3ae757e830355f",
+          "clipboard_nonspace_sha256": "d7c2f9f34cb9d2704e915da0e516d3a75e247056727f7d7460b20f2e732f64f7",
+          "navigation": "Rev 3:7",
+          "source_word_witness": 16
+        },
+        "Rev.5.14": {
+          "clipboard_folded_sha256": "99fbbaeacb7b60ce894d71431c1393ed6e4332c3990c20576622a3bafa7b1618",
+          "clipboard_nonspace_sha256": "d30ce1084e57348f1dc62f0b168136746019270e61a1cafb4648202d4548543b",
+          "navigation": "Rev 5:14",
+          "source_word_witness": 14
+        },
+        "Rom.13.9": {
+          "clipboard_folded_sha256": "a27df4c17ae71f2cc2661d854f606d7b89eb17f668773a39b2137075795aca95",
+          "clipboard_nonspace_sha256": "6235d35ea537478138a9467396f772966d051089165b213593690b74716de8f2",
+          "navigation": "Rom 13:9",
+          "source_word_witness": 16
+        }
+      }
+    },
+    "visual_spacing_pixel_verified": false
+  },
+  "jsword_status": "no_junit_report_in_first_attempt",
+  "publication_authorized": false
+}

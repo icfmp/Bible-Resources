@@ -1,10 +1,10 @@
 {
   "no_transformation_performed": true,
-  "note": "Official OSIS validated; eight redundant empty paragraphs removed; all 31,169 native texts, 9,751 notes, 4,542 titles and 3,228 remaining paragraph spans verified",
+  "note": "Pinned official XSD and complete native text/note/structure proof; owner authorized release pending deployment.",
   "policy_sha256": "15f875c19b94fc84ae123afad312164ca8631a302c2e03d980b934adf221a34f",
-  "provenance_audit_sha256": "fa5d4858ef5fccb4377b3694d8da4a1f155b6179ef006abc0df59d556207bd59",
+  "provenance_audit_sha256": "19bc560ae9c591a46c33c68b87aa67d79bb107cead0d2e2e70a3763e9037b837",
   "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
   "source_kind": "bible",
-  "source_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
+  "source_sha256": "25479903513b66c5dbb0f8eb1d9025da023a6b63df38492c35940ef65425e965",
   "status": "validated"
 }

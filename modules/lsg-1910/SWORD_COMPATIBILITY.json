@@ -9,9 +9,9 @@
     "Mark.10.53"
   ],
   "full_readback_chapter_count": 1189,
-  "full_readback_evidence_sha256": "fa5d4858ef5fccb4377b3694d8da4a1f155b6179ef006abc0df59d556207bd59",
+  "full_readback_evidence_sha256": "19bc560ae9c591a46c33c68b87aa67d79bb107cead0d2e2e70a3763e9037b837",
   "full_source_chapter_character_streams_verified": true,
-  "module_payload_sha256": "1c4883335fb234f87defa250b8e7e07e8af7a2235a6637e0fd313f4edca8f36e",
+  "module_payload_sha256": "37affb74eddfef86ec840bd250d6ad8cb0a17ebc85dd678b8f461af993eaca80",
   "original_publisher_document_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
   "outside_registered_versification_count": 1,
   "published": false,
@@ -19,7 +19,7 @@
   "reader_version": "1.9.0",
   "registry_source": "installed_sword_versification_mgr",
   "resolved_reader_reference_count": 31169,
-  "reviewed_by": "Source-attested redundant paragraph cleanup #565; full structural comparison",
+  "reviewed_by": "Full native source-attested layout audit #571; owner authorized release",
   "reviewed_index_compromise_verified": true,
   "reviewed_merge_count": 1,
   "reviewed_merge_policy_sha256": "dbf90275cd1bba5ff9e17b8ac73e01cbd5cf1fc606d7d6a6027881d0833df518",
@@ -29,7 +29,7 @@
       "stock_reader_osis_ref": "Mark.10.52"
     }
   ],
-  "source_osis_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
+  "source_osis_sha256": "25479903513b66c5dbb0f8eb1d9025da023a6b63df38492c35940ef65425e965",
   "source_reference_count": 31170,
   "source_references_unreachable_count": 1,
   "source_to_native_full_body_mismatch_count": 0,
