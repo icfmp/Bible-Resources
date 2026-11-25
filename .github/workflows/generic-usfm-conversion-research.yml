@@ -1,0 +1,88 @@
+name: Inspect pinned USFM conversion against original witnesses
+on:
+  push:
+    branches: [research/generic-usfm-conversion]
+    paths: ['.github/workflows/generic-usfm-conversion-research.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Recover exact reviewed converter patch and pinned upstream converter
+        run: |
+          set -eu
+          git fetch --no-tags origin c4a20de64c7ba402b3a2f32c88ba3e6133d7a958
+          git show c4a20de64c7ba402b3a2f32c88ba3e6133d7a958:scripts/patch_u2o_intro.py > "$RUNNER_TEMP/patch_u2o.py"
+          test "$(git hash-object "$RUNNER_TEMP/patch_u2o.py")" = 7a68798181413da76aa4493148e422f74bbb5004
+          curl --fail --silent --show-error --location --max-time 60 https://raw.githubusercontent.com/adyeths/u2o/dde28bc545e8d8697fa5496c243187847ec55d31/u2o.py --output "$RUNNER_TEMP/u2o-original.py"
+          python "$RUNNER_TEMP/patch_u2o.py" --original "$RUNNER_TEMP/u2o-original.py" --output "$RUNNER_TEMP/u2o-reviewed.py"
+      - name: Execute private conversion and compare original numbered content
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path, PurePosixPath
+          from hashlib import sha256
+          import json, os, subprocess, sys, tempfile, zipfile
+          from pilot_preflight import inspect_archive
+          from source_osis_inventory import source_inventory
+          from research.bible.original_authorial_content_parity import verify_numbered_content
+          adapters=json.loads(Path("config/original-bible-content-adapters.json").read_text())["resources"]
+          converter=Path(os.environ["RUNNER_TEMP"])/"u2o-reviewed.py"
+          for resource,a in sorted(adapters.items()):
+              m=json.loads((Path("modules")/resource/"metadata.json").read_text())
+              folder=Path("sources/original/bibles")/m["language"]/resource
+              p=json.loads((folder/"PROVENANCE.json").read_text())
+              w=p["additional_original_witness"]
+              fm=folder/p["original_file"]; fx=folder/w["filename"]
+              assert p["format"]=="USFM" and w["format"]=="USFX"
+              assert sha256(fm.read_bytes()).hexdigest()==p["original_sha256"]==a["usfm_sha256"]
+              assert sha256(fx.read_bytes()).hexdigest()==w["sha256"]==a["usfx_sha256"]
+              receipt=inspect_archive(fm,source_kind="authored")
+              inspect_archive(fx,source_kind="authored")
+              crosswalk=json.loads(Path(a["crosswalk"]).read_text())
+              mapping={x["usfm"]:x["osis"] for x in crosswalk["books"]}
+              with tempfile.TemporaryDirectory() as temp,zipfile.ZipFile(fm) as zfm,zipfile.ZipFile(fx) as zfx:
+                  root=Path(temp)
+                  files=[]
+                  for item in receipt["members"]:
+                      name=item["name"]
+                      if PurePosixPath(name).suffix.lower() not in {".usfm",".sfm"}:continue
+                      dest=root/PurePosixPath(name)
+                      assert dest.resolve().is_relative_to(root.resolve())
+                      dest.parent.mkdir(parents=True,exist_ok=True)
+                      with dest.open("xb") as out:out.write(zfm.read(name))
+                      files.append(dest)
+                  assert files and len(files)<=len(mapping)
+                  candidate=root/"candidate.osis.xml"
+                  command=[sys.executable,str(converter),"Bible."+resource,"-l",m["language"],"-x","-o",str(candidate),*map(str,sorted(files))]
+                  with tempfile.TemporaryFile() as log:
+                      proc=subprocess.run(command,cwd=root,stdout=log,stderr=subprocess.STDOUT,timeout=180,check=False)
+                      size=log.tell()
+                      assert size<=128*1024*1024
+                      log.seek(0);digest=sha256(log.read()).hexdigest()
+                  report={"resource":resource,"converter_sha256":sha256(converter.read_bytes()).hexdigest(),
+                          "source_usfm_sha256":a["usfm_sha256"],"source_usfx_sha256":a["usfx_sha256"],
+                          "returncode":proc.returncode,"diagnostic_bytes":size,"diagnostic_sha256":digest,
+                          "published":False,"conversion_fidelity_certified":False}
+                  if proc.returncode==0 and candidate.is_file():
+                      xml=candidate.read_bytes()
+                      report["candidate_sha256"]=sha256(xml).hexdigest()
+                      try:
+                          keys,_=source_inventory(xml)
+                          report["candidate_numbered_keys"]=len(keys)
+                          proof=verify_numbered_content(zfx.read(a["usfx_member"]),xml,mapping,{},zfm)
+                          report["numbered_content_diagnostic"]=proof
+                      except (ValueError,RuntimeError,AssertionError) as exc:
+                          report["audit_blocked_by"]=type(exc).__name__
+                      except Exception as exc:
+                          report["audit_blocked_by"]=type(exc).__name__
+                  print("GENERIC_USFM_CONVERSION_RESEARCH",json.dumps(report,sort_keys=True),flush=True)
+                  assert proc.returncode==0 and candidate.is_file(),"Converter failed; see metadata-only report"
+          PY
