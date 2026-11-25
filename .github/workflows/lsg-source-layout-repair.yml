@@ -1,0 +1,142 @@
+name: Prepare isolated source-attested LSG table repair
+on:
+  push:
+    branches: [research/lsg-source-layout-repair]
+    paths: ['.github/workflows/lsg-source-layout-repair.yml']
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Prove exact source-cell restoration and table segmentation
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          from itertools import accumulate
+          import json,re,zipfile,os
+          from lxml import etree
+          from pilot_preflight import inspect_archive
+          from approved_osis_sword_candidate import approved_source_for
+          from source_osis_inventory import _source_tree,OSIS
+          from research.bible.source_osis_verse_notes import original_osis_verses_and_notes
+          from research.bible.original_authorial_content_parity import parse_usfx
+          def folded(s):return ' '.join(s.split())
+          def local(n):return etree.QName(n).localname
+          source=Path('sources/original/bibles/fr/lsg-1910')
+          p=json.loads((source/'PROVENANCE.json').read_text())
+          w=p['additional_original_witness']
+          archive=source/w['filename']
+          proof=inspect_archive(archive,source_kind='authored')
+          assert proof['archive_sha256']==w['sha256'] and proof['archive_bytes']==w['size_bytes']
+          with zipfile.ZipFile(archive) as z: root=parse_usfx(z.read('fraLSG_usfx.xml'))
+          _,xml=approved_source_for(p['resource_id'])
+          assert sha256(xml).hexdigest()=='cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0'
+          osis=_source_tree(xml)
+          mapping={x['usfm']:x['osis'] for x in json.loads(Path('config/standard_usfm_osis_66.json').read_text())['books']}
+          src={mapping[n.get('id')]:n for n in root.iter('book')}
+          dst={n.get('osisID'):n for n in osis.iter(OSIS+'div') if n.get('type')=='book'}
+          assert set(src)==set(dst)
+          def tables(book,source):
+              result=[]
+              for table in book.iter('table' if source else OSIS+'table'):
+                  rows=[]
+                  for row in table:
+                      assert local(row)==('tr' if source else 'row')
+                      cells=[]
+                      for cell in row:
+                          assert local(cell) in ({'tc','th'} if source else {'cell'})
+                          cells.append((folded(''.join(cell.itertext())),cell))
+                      rows.append(cells)
+                  result.append((table,rows))
+              return result
+          patches=[]; repairs=[]; splits=[]
+          raw_matches=list(re.finditer(rb'<table(?=[\s>])[^>]*>.*?</table>',xml,re.S))
+          nodes=list(osis.iter(OSIS+'table'))
+          assert len(raw_matches)==len(nodes)
+          by_node=dict(zip(nodes,raw_matches,strict=True))
+          for book in src:
+              st,dt=tables(src[book],True),tables(dst[book],False)
+              sr=[row for _,rows in st for row in rows];dr=[row for _,rows in dt for row in rows]
+              assert len(sr)==len(dr),(book,'row count')
+              for i,(a,b) in enumerate(zip(sr,dr,strict=True),1):
+                  assert len(a)==len(b),(book,i,'cell count')
+                  for j,((old,on),(new,nn)) in enumerate(zip(a,b,strict=True),1):
+                      assert (local(on)=='th')==(nn.get('role')=='label'),(book,i,j,'header role')
+                      if old==new:continue
+                      assert r'\i' in new and folded(new.replace(r'\i',''))==old,(book,i,j,'unexplained source-cell difference')
+                      row=nn.getparent();table=row.getparent();raw=by_node[table]
+                      rid=list(table).index(row);cid=list(row).index(nn)
+                      rm=list(re.finditer(rb'<row(?=[\s>])[^>]*>.*?</row>',raw.group(),re.S))
+                      assert len(rm)==len(table)
+                      cm=list(re.finditer(rb'<cell(?=[\s>])[^>]*>.*?</cell>',rm[rid].group(),re.S))
+                      assert len(cm)==len(row)
+                      offsets=[]
+                      for seg in re.finditer(rb'(?<=>)[^<]+(?=<)',cm[cid].group()):
+                          offsets.extend(seg.start()+m.start() for m in re.finditer(rb'\\i',seg.group()))
+                      assert len(offsets)==new.count(r'\i')
+                      for offset in offsets:
+                          absolute=raw.start()+rm[rid].start()+cm[cid].start()+offset
+                          assert xml[absolute:absolute+2]==b'\\i'
+                          patches.append((absolute,b'\\i',b''))
+                      repairs.append({'book':book,'row':i,'cell':j,'controls':len(offsets),'source_folded_sha256':sha256(old.encode()).hexdigest()})
+              expected=list(accumulate(len(rows) for _,rows in st))
+              actual=list(accumulate(len(rows) for _,rows in dt))
+              assert not set(actual)-set(expected),(book,'unexpected table boundary')
+              for boundary in sorted(set(expected)-set(actual)):
+                  previous=0
+                  for table,rows in dt:
+                      if previous<boundary<previous+len(rows):
+                          raw=by_node[table]
+                          assert not table.attrib,'Unsupported table attributes'
+                          rm=list(re.finditer(rb'<row(?=[\s>])[^>]*>.*?</row>',raw.group(),re.S))
+                          assert len(rm)==len(rows)
+                          offset=raw.start()+rm[boundary-previous].start()
+                          patches.append((offset,b'',b'</table><table>'))
+                          splits.append({'book':book,'after_source_row':boundary,'original_table_rows':len(rows)})
+                          break
+                      previous+=len(rows)
+                  else:raise AssertionError('Unresolved source table boundary')
+          assert sum(x['controls'] for x in repairs)==3 and len(splits)==1
+          patches.sort()
+          assert len({x[0] for x in patches})==len(patches)
+          cursor=0;chunks=[];receipt=[]
+          for offset,old,new in patches:
+              assert offset>=cursor and xml[offset:offset+len(old)]==old
+              chunks.append(xml[cursor:offset]);new_offset=sum(map(len,chunks));chunks.append(new)
+              receipt.append({'source_byte_offset':offset,'candidate_byte_offset':new_offset,'old_utf8':old.decode(),'new_utf8':new.decode()})
+              cursor=offset+len(old)
+          chunks.append(xml[cursor:]);candidate=b''.join(chunks)
+          inverse=candidate
+          for edit in reversed(receipt):
+              i=edit['candidate_byte_offset'];old=edit['old_utf8'].encode();new=edit['new_utf8'].encode()
+              assert inverse[i:i+len(new)]==new
+              inverse=inverse[:i]+old+inverse[i+len(new):]
+          assert inverse==xml
+          newroot=_source_tree(candidate)
+          newbooks={n.get('osisID'):n for n in newroot.iter(OSIS+'div') if n.get('type')=='book'}
+          for book in src:
+              a,b=tables(src[book],True),tables(newbooks[book],False)
+              assert [[[(v,local(n)=='th') for v,n in row] for row in rows] for _,rows in a]==[[[(v,n.get('role')=='label') for v,n in row] for row in rows] for _,rows in b],(book,'restored table mismatch')
+          a,an,am=original_osis_verses_and_notes(xml);b,bn,bm=original_osis_verses_and_notes(candidate)
+          assert a==b and an==bn and am==bm
+          assert [(dict(n.attrib),''.join(n.itertext())) for n in osis.iter(OSIS+'w')]==[(dict(n.attrib),''.join(n.itertext())) for n in newroot.iter(OSIS+'w')]
+          result={'source_sha256':sha256(xml).hexdigest(),'candidate_sha256':sha256(candidate).hexdigest(),'original_usfx_sha256':w['sha256'],'source_cell_repairs':repairs,'table_splits':splits,'edits':receipt,'inverse_exact':True,'all_source_table_cells_and_row_boundaries_equal':True,'numbered_prose_notes_exact':True,'all_word_annotations_exact':True,'scope':'isolated table candidate only; no paragraph correction, schema, native reader or publication approval'}
+          t=Path(os.environ['RUNNER_TEMP'])
+          (t/'lsg-intro-table-candidate.osis.xml').write_bytes(candidate)
+          (t/'lsg-intro-table-receipt.json').write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')
+          print('LSG_TABLE_CANDIDATE',json.dumps(result,sort_keys=True),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: reversible-lsg-table-repair-receipt
+          path: ${{ runner.temp }}/lsg-intro-table-receipt.json
+          retention-days: 30
