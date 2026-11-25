@@ -1,0 +1,116 @@
+name: Bind intentionally unlinked reference labels to source and release evidence
+on:
+  push:
+    branches: [research/brnp-unlinked-reference-evidence]
+    paths: ['.github/workflows/brnp-unlinked-reference-research.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Retrieve exact previously approved reference review
+        run: |
+          set -eu
+          git fetch --no-tags --depth=1 origin 6832169c3a3af568d92cc4eede7cb004ae8a8cc8
+          git show 6832169c3a3af568d92cc4eede7cb004ae8a8cc8:sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml > "$RUNNER_TEMP/approved-reference-master.xml"
+      - name: Reconcile each unlinked original label without changing any source
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,zipfile
+          from pathlib import Path
+          from normalize_bible_references import _parse,_label,_one_child,_crosswalk,OSIS
+          from check_brnp import check
+          def sha(raw):return hashlib.sha256(raw).hexdigest()
+          def fingerprint(node):
+              return sha(json.dumps({"attributes":dict(node.attrib),"text":"".join(node.itertext()),"child_count":len(node)},ensure_ascii=False,sort_keys=True,separators=(",",":")).encode())
+          adapter=json.loads(Path("config/original-bible-content-adapters.json").read_text())["resources"]["lsg-1910"]
+          approval_raw=Path(adapter["approval_manifest"]).read_bytes()
+          assert hashlib.sha1(b"blob "+str(len(approval_raw)).encode()+b"\0"+approval_raw).hexdigest()==adapter["approval_manifest_git_blob_sha1"]
+          approval=json.loads(approval_raw)
+          prior=(Path(os.environ["RUNNER_TEMP"])/"approved-reference-master.xml").read_bytes()
+          assert sha(prior)==approval["provenance"]["reviewed_candidate_osis_sha256"]
+          current=Path("sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml")
+          master=current.read_bytes()
+          authorization=json.loads((current.parent/"editorial/evidence/lsg-1.0.4-owner-authorization.json").read_text())
+          assert authorization["decision"]=="publish" and sha(master)==authorization["source_sha256"]
+          folder=Path("sources/original/bibles/fr/lsg-1910")
+          provenance=json.loads((folder/"PROVENANCE.json").read_text())
+          original=folder/provenance["additional_original_witness"]["filename"]
+          original_bytes=original.read_bytes()
+          assert sha(original_bytes)==adapter["usfx_sha256"]==approval["provenance"]["original_usfx_zip_sha256"]
+          mapping=_crosswalk(Path(adapter["crosswalk"]))
+          with zipfile.ZipFile(original) as archive:src=_parse(archive.read(adapter["usfx_member"]))
+          old=_parse(prior);new=_parse(master)
+          def books(doc):
+              return [e for e in doc.iter(OSIS+"div") if e.get("type")=="book" and not e.get("sID") and not e.get("eID")]
+          def notes(book):
+              return [e for e in book.iter(OSIS+"note") if e.get("type")=="crossReference"]
+          def origin(note):
+              items=[e for e in note if e.tag==OSIS+"reference" and e.get("type")=="annotateRef" and e.get("subType")=="x-origin"]
+              assert len(items)==1
+              return items[0]
+          def destinations(note):
+              return [e for e in note if e.tag==OSIS+"reference" and e.get("type") is None and e.get("subType") is None]
+          def unlinked(note):
+              return [e for e in destinations(note) if e.get("osisRef") is None]
+          indexes={e:i for i,e in enumerate(new.iter(OSIS+"reference"))}
+          entries=[];matched=set();note_count=0
+          for sb,ob,nb in zip(list(src.iter("book")),books(old),books(new),strict=True):
+              book=mapping[sb.get("id")]
+              assert book==ob.get("osisID")==nb.get("osisID")
+              for ordinal,(sn,on,nn) in enumerate(zip(list(sb.iter("x")),notes(ob),notes(nb),strict=True),1):
+                  note_count+=1
+                  assert sn.get("caller")==on.get("n")==nn.get("n"),(book,ordinal,"caller")
+                  assert _label(_one_child(sn,"xo"))==_label(origin(on))==_label(origin(nn)),(book,ordinal,"origin")
+                  before=unlinked(on);after=unlinked(nn)
+                  assert len(before)==len(after),(book,ordinal,"unlinked_count")
+                  if not before:continue
+                  assert len(before)==len(after)==1 and len(destinations(on))==len(destinations(nn))==1
+                  left,right=before[0],after[0]
+                  assert not len(left) and not len(right) and not dict(left.attrib) and not dict(right.attrib)
+                  assert fingerprint(left)==fingerprint(right),(book,ordinal,"reference")
+                  assert _label(_one_child(sn,"xt"))==_label(right) and _label(right),(book,ordinal,"original_label")
+                  assert dict(on.attrib)==dict(nn.attrib)
+                  assert fingerprint(origin(on))==fingerprint(origin(nn))
+                  assert "".join(on.itertext())=="".join(nn.itertext()),(book,ordinal,"note_text")
+                  idx=indexes[right];assert idx not in matched;matched.add(idx)
+                  entries.append({"book":book,"cross_reference_note_ordinal":ordinal,"reference_index_zero_based":idx,
+                                  "reference_fingerprint_sha256":fingerprint(right),
+                                  "original_label_folded_sha256":sha(_label(_one_child(sn,"xt")).encode()),
+                                  "note_fingerprint_sha256":fingerprint(nn),
+                                  "origin_fingerprint_sha256":fingerprint(origin(nn)),
+                                  "decision":"preserve_printed_label_without_verified_destination"})
+          all_unlinked={i for e,i in indexes.items() if not (e.get("osisRef") or "").strip() and not (e.get("type")=="annotateRef" and e.get("subType")=="x-origin") and e.get("subType")!="x-introduction"}
+          assert matched==all_unlinked
+          advisory=check(current,"bible")
+          assert advisory["finding_codes"]=={"UNRESOLVED_REFERENCE_TARGET":len(entries)}
+          receipt={"schema_version":1,"status":"exact_reviewed_unlinked_preservation_evidence",
+                   "current_master_sha256":sha(master),"historically_reviewed_master_sha256":sha(prior),
+                   "original_usfx_archive_sha256":sha(original_bytes),
+                   "historical_approval_manifest_sha256":sha(approval_raw),
+                   "historical_review":"https://github.com/icfmp/Bible-Resources/pull/546",
+                   "current_release_review":"https://github.com/icfmp/Bible-Resources/pull/574",
+                   "source_notes_reconciled":note_count,"preserved_unlinked_groups":len(entries),
+                   "all_unlinked_reference_indices_reconciled":True,"destination_semantics_certified":False,
+                   "mandatory_gate_approved":False,"entries":entries}
+          path=Path(os.environ["RUNNER_TEMP"])/"brnp-unlinked-evidence.json"
+          path.write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n")
+          assert sha(current.read_bytes())==receipt["current_master_sha256"] and sha(original.read_bytes())==receipt["original_usfx_archive_sha256"]
+          print("BRNP_UNLINKED_EVIDENCE",json.dumps({k:v for k,v in receipt.items() if k!="entries"},sort_keys=True))
+          PY
+      - name: Retain metadata-only per-label proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: brnp-unlinked-source-bound-evidence
+          path: ${{ runner.temp }}/brnp-unlinked-evidence.json
+          if-no-files-found: error
