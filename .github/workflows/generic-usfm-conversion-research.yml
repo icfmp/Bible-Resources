@@ -130,6 +130,74 @@ jobs:
                                   if node.tag=="c":chapter=int(node.get("id"))
                                   if node.tag=="v":refs.append((book.get("id"),chapter,int(node.get("id"))))
                           report["poetry_diagnostic"]=namespace["audit_segments"](source_root,target,mapping,refs)
+                          # Reuse the other independent layout comparators
+                          # against the freshly generated, unreviewed OSIS.
+                          start=workflow.index("          def table_signature(")
+                          end=workflow.index("          sample_editorial_source=",start)
+                          exec(compile(textwrap.dedent(workflow[start:end]),"<reviewed layout comparators>","exec"),namespace)
+                          report["table_paragraph_diagnostic"]=namespace["compare_original_tables_and_paragraphs"](source_root,target,mapping)
+                          report["editorial_diagnostic"]=namespace["editorial_diagnostic"](source_root,target,mapping)
+                          # Derive missing whitespace boundaries from the
+                          # independent original witness, never from a list
+                          # of Psalms or the previously corrected master.
+                          def gaps(text):
+                              result=set();pos=0;pending=False
+                              for char in text:
+                                  if char.isspace():pending=True
+                                  else:
+                                      if pos and pending:result.add(pos)
+                                      pos+=1;pending=False
+                              return result
+                          edits=[];unsupported=[]
+                          for book in target.iter(OSIS+"div"):
+                              if book.get("type")!="book":continue
+                              def append(value):
+                                  state["position"]+=sum(not c.isspace() for c in (value or "")) if state["current"] else 0
+                              state={"current":None,"position":0}
+                              def visit(node):
+                                  if not isinstance(node.tag,str):return
+                                  kind=etree.QName(node).localname
+                                  if kind in {"note","title","header"}:return
+                                  container=False
+                                  if kind=="verse":
+                                      if node.get("eID"):
+                                          assert state["current"]==node.get("eID")
+                                          state["current"]=None;return
+                                      state["current"]=node.get("osisID");state["position"]=0
+                                      container=not bool(node.get("sID"))
+                                  ref=state["current"];start=state["position"]
+                                  append(node.text)
+                                  for child in node:
+                                      visit(child);append(child.tail)
+                                  end=state["position"]
+                                  if kind=="l" and node.get("type")=="selah" and ref in mismatch:
+                                      missing=gaps(original[ref])-gaps(converted[ref])
+                                      extra=gaps(converted[ref])-gaps(original[ref])
+                                      if extra or not missing or not missing<={start,end}:
+                                          unsupported.append({"ref":ref,"missing":sorted(missing),"extra":sorted(extra),"marker_offsets":[start,end]})
+                                      else:
+                                          if start in missing:
+                                              # Place separation outside the
+                                              # marker, in its preceding XML text slot.
+                                              prev=node.getprevious()
+                                              if prev is not None:prev.tail=(prev.tail or "")+" "
+                                              else:
+                                                  parent=node.getparent()
+                                                  parent.text=(parent.text or "")+" "
+                                              edits.append((ref,start,"before"))
+                                          if end in missing:
+                                              node.tail=" "+(node.tail or "")
+                                              edits.append((ref,end,"after"))
+                                  if container:state["current"]=None
+                              visit(book)
+                          report["selah_whitespace_projection"]={"edits":len(edits),"unsupported":unsupported[:20]}
+                          if not unsupported:
+                              revised=etree.tostring(target,encoding="utf-8",xml_declaration=True)
+                              result=verify_numbered_content(zfx.read(a["usfx_member"]),revised,mapping,{},zfm)
+                              report["selah_whitespace_projection"]["numbered_parity"]=result["all_supported_content_checks_equal"]
+                              report["selah_whitespace_projection"]["mismatch_counts"]=result["mismatch_counts"]
+                              report["selah_whitespace_projection"]["poetry_unchanged"]=namespace["audit_segments"](source_root,_source_tree(revised),mapping,refs)==report["poetry_diagnostic"]
+                              report["selah_whitespace_projection"]["candidate_sha256"]=sha256(revised).hexdigest()
                       except (ValueError,RuntimeError,AssertionError) as exc:
                           report["audit_blocked_by"]=type(exc).__name__
                       except Exception as exc:
