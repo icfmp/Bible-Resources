@@ -119,7 +119,20 @@ def deterministic_patch(source: bytes) -> bytes:
     replacement = b'datetime.fromtimestamp(int(__import__("os").environ["SOURCE_DATE_EPOCH"]), __import__("datetime").timezone.utc).strftime("%Y.%m.%dT%H.%M.%S")'
     if reviewed.count(anchor) != 1:
         raise ConverterPatchError("Unreviewed generation timestamp expression")
-    return reviewed.replace(anchor, replacement)
+    reviewed = reviewed.replace(anchor, replacement)
+    # u2o's bundled schema routine validates AND squeezes / pretty-prints
+    # the whole document, changing whitespace in mixed-content Scripture
+    # when the header happens to satisfy its embedded schema. The pinned
+    # independent official XSD is applied read-only to the final candidate.
+    old_formatting = b'''    # validate and "pretty print" our osis doc if requested.
+    if HAVELXML:
+        osisdoc2 = proc_xmlvalidate(osisdoc2)
+    else:
+        LOG.error("LXML needs to be installed for validation.")
+'''
+    if reviewed.count(old_formatting) != 1:
+        raise ConverterPatchError("Unreviewed automatic formatting call")
+    return reviewed.replace(old_formatting, b"    # Independent read-only XSD validation follows source projection.\n")
 
 
 def main(argv=None):

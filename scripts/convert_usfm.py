@@ -83,7 +83,7 @@ def run(resource, upstream, schema_path, epoch, report, *, root=ROOT):
         assert len(files)==len(left)
         candidate=directory/"candidate.osis.xml"
         command=[sys.executable,str(converter),identity,"-l",language,"-x","-o",str(candidate),*map(str,sorted(files))]
-        environment=dict(os.environ,SOURCE_DATE_EPOCH=str(epoch),PYTHONHASHSEED="0",TZ="UTC")
+        environment=dict(os.environ,SOURCE_DATE_EPOCH=str(epoch),PYTHONHASHSEED="0",TZ="UTC",LOGNAME="BibleResources",USERNAME="BibleResources")
         generated=[]
         for _ in range(2):
             with tempfile.TemporaryFile() as log:
