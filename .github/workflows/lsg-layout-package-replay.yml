@@ -197,7 +197,20 @@ jobs:
           t=Path(os.environ['RUNNER_TEMP'])
           payload=t/'private-lsg-layout/payload'
           root=t/'private-approved-bible-reader-root'
-          shutil.copytree(payload,root)
+          import zipfile
+          package=t/'BRLSG1910-1.0.4-candidate.zip'
+          plan=json.loads((t/'lsg-private-package-receipt.json').read_text())
+          assert sha256(package.read_bytes()).hexdigest()==plan['zip_sha256']
+          root.mkdir()
+          with zipfile.ZipFile(package) as z:
+              assert set(z.namelist())==set(plan['member_sha256'])
+              for name in z.namelist():
+                  data=z.read(name)
+                  assert sha256(data).hexdigest()==plan['member_sha256'][name]
+                  dst=root/name
+                  assert dst.resolve().is_relative_to(root.resolve()) and not dst.exists()
+                  dst.parent.mkdir(parents=True,exist_ok=True)
+                  dst.write_bytes(data)
           xml=(t/'lsg-layout-candidate.osis.xml').read_bytes()
           receipt=json.loads((t/'lsg-layout-native.json').read_text())
           assert sha256(xml).hexdigest()==receipt['candidate_sha256']
@@ -245,6 +258,7 @@ jobs:
           report={'junit':{k:int(root.get(k,'0')) for k in ('tests','errors','failures','skipped')},'gradle_exit_code':int(os.environ['PROBE_RC']),'reader_results':lines,'android_gui_verified':False}
           (Path(os.environ['RUNNER_TEMP'])/'lsg-layout-jsword.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')
           assert report['gradle_exit_code']==0 and report['junit']=={'tests':1,'errors':0,'failures':0,'skipped':0}
+          assert len([x for x in lines if x.startswith('BIBLE_JSWORD_RESULT BRLSG1910 expected=')])==1
           PY
       - uses: actions/upload-artifact@v4
         if: always()
