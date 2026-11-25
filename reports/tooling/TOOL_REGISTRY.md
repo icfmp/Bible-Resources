@@ -17,7 +17,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 
 - GENERALIZE: 1
 - HISTORICAL/ARCHIVE: 0
-- KEEP_GENERIC: 57
+- KEEP_GENERIC: 58
 - MERGE: 0
 - MODULE_LOCAL: 5
 - UNDECIDED: 0
@@ -63,6 +63,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/bible/native_milestone_pair_audit.py`](../../scripts/research/bible/native_milestone_pair_audit.py) | KEEP_GENERIC | named test | 6 | source/native audit |
 | [`scripts/research/bible/native_raw_main_text.py`](../../scripts/research/bible/native_raw_main_text.py) | KEEP_GENERIC | named test | 9 | not determined |
 | [`scripts/research/bible/native_sword_markup_census.py`](../../scripts/research/bible/native_sword_markup_census.py) | KEEP_GENERIC | named test | 3 | not determined |
+| [`scripts/research/bible/original_authorial_key_inventory.py`](../../scripts/research/bible/original_authorial_key_inventory.py) | KEEP_GENERIC | named test | 3 | source/native audit |
 | [`scripts/research/bible/source_native_note_positions.py`](../../scripts/research/bible/source_native_note_positions.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_ordered_body.py`](../../scripts/research/bible/source_native_ordered_body.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/research/bible/source_native_osis_boundary_positions.py`](../../scripts/research/bible/source_native_osis_boundary_positions.py) | KEEP_GENERIC | named test | 4 | not determined |

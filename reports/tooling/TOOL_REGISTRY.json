@@ -1522,6 +1522,37 @@
       "confidence": "medium",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
+        "USFM",
+        "USFX"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/research/bible/original_authorial_key_inventory.py",
+      "proposed_action": "Retain observed consumer; preserve independent source/native checks; review scope when changing the caller.",
+      "purpose_first_line": "Read-only exact raw USFM/USFX numbering inventory, not a format converter.",
+      "python_imports": [
+        "collections",
+        "lxml",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "29b4b348730e9711f3fcf135b369183dd314f2e342834900ac52f92d86ad6e57",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "source/native audit",
+      "static_reference_count": 3,
+      "static_references": [
+        "scripts/tool_registry.py",
+        "docs/workflows/BIBLE_7_STAGE_WORKFLOW.md",
+        "tests/test_original_authorial_key_inventory.py"
+      ]
+    },
+    {
+      "classification": "KEEP_GENERIC",
+      "confidence": "medium",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
         "USFX"
       ],
       "has_direct_tests_by_filename": true,
@@ -2381,7 +2412,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "1d47ce538651334dc0c969773b5f9e76232f2b4b37c66876b35cf3b4c019a2b8",
+      "sha256_at_inventory": "7bc7a8c5f906520a966f21ec3c350741188acc5025b394bea7a6f5c520b1f8d5",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
