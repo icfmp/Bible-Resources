@@ -219,3 +219,180 @@ jobs:
               reports[ident]=result
           print('LSG_PARAGRAPH_ANCHORS',json.dumps(reports,sort_keys=True),flush=True)
           PY
+      - name: Construct reversible source-attested paragraph candidate
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from collections import Counter,defaultdict
+          from hashlib import sha256
+          import json,zipfile,os
+          from xml.parsers import expat
+          from lxml import etree
+          from source_osis_inventory import _source_tree,OSIS
+          from research.bible.original_authorial_content_parity import parse_usfx
+          from research.bible.source_osis_verse_notes import original_osis_verses_and_notes
+          t=Path(os.environ['RUNNER_TEMP'])
+          raw=(t/'lsg-intro-table-candidate.osis.xml').read_bytes()
+          receipt=json.loads((t/'lsg-intro-table-receipt.json').read_text())
+          assert sha256(raw).hexdigest()==receipt['candidate_sha256']
+          assert receipt['inverse_exact'] and receipt['all_source_table_cells_and_row_boundaries_equal']
+          root=_source_tree(raw)
+          with zipfile.ZipFile('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip') as z:
+              source=parse_usfx(z.read('fraLSG_usfx.xml'))
+          mapping={x['usfm']:x['osis'] for x in json.loads(Path('config/standard_usfm_osis_66.json').read_text())['books']}
+          def local(n):return etree.QName(n).localname if isinstance(n.tag,str) else ''
+          def ns(s):return ''.join((s or '').split())
+          # Use actual XML parser byte positions, not a regular expression for nesting.
+          parser=expat.ParserCreate(namespace_separator='|')
+          begins=[];ends=[];stack=[]
+          def start(name,attrs):
+              i=len(begins);begins.append((name.split('|')[-1],parser.CurrentByteIndex));ends.append(None);stack.append(i)
+          def end(name):
+              i=stack.pop();assert begins[i][0]==name.split('|')[-1];ends[i]=parser.CurrentByteIndex
+          parser.StartElementHandler=start;parser.EndElementHandler=end
+          parser.Parse(raw,True)
+          nodes=[n for n in root.iter() if isinstance(n.tag,str)]
+          assert len(nodes)==len(begins)==len(ends) and not stack
+          positions={}
+          for node,(tag,offset),end_offset in zip(nodes,begins,ends,strict=True):
+              assert local(node)==tag
+              positions[node]=(offset,end_offset)
+          NOTE={'x','f','fe','ef','ex'}
+          TITLE={'s','s1','s2','s3','s4','r','sr','mr','ms','ms1','ms2','ms3','mt','mt1','mt2','mt3','imt','imt1','imt2','imt3','is','is1','is2'}
+          SRC_STYLE={'p':None,'m':'x-noindent','pi':'x-indented-1','pi1':'x-indented-1'}
+          def scan(book,src):
+              pos=0;ref=None;chapter=None;last=None
+              starts=[];spans=[];events=defaultdict(list)
+              def append(s,owner,field):
+                  nonlocal pos
+                  if ref and ns(s):
+                      begin=pos;pos+=len(ns(s));spans.append((begin,pos,owner,field,ref,s))
+              def walk(n):
+                  nonlocal ref,chapter,last
+                  k=local(n)
+                  if not k:return
+                  style=n.get('sfm') or n.get('style') or k
+                  if src and (k in NOTE|{'id','h','toc'}|TITLE or k=='p' and style in TITLE) or not src and k in {'note','title','header'}:
+                      if not src and k=='note' and ref:events[pos].append(n)
+                      return
+                  if src and k=='c':chapter=n.get('id')
+                  if src and k=='v':ref=chapter+'.'+n.get('id');last=ref
+                  if src and k=='ve':ref=None
+                  if not src and k=='verse':
+                      if n.get('eID'):ref=None
+                      else:ref=n.get('osisID').split('.',1)[1];last=ref
+                  if src and k=='p' and style in SRC_STYLE and pos>0:
+                      starts.append((pos,SRC_STYLE[style],n,last))
+                  if not src and k=='p' and pos>0:
+                      assert n.get('type') in set(SRC_STYLE.values())
+                      starts.append((pos,n.get('type'),n,last))
+                  if not src and pos>0:events[pos].append(n)
+                  append(n.text,n,'text')
+                  for c in n:
+                      walk(c);append(c.tail,c,'tail')
+                  if not src and k=='verse' and n.get('osisID') and not n.get('sID'):ref=None
+              walk(book)
+              return starts,spans,events
+          books={n.get('osisID'):n for n in root.iter(OSIS+'div') if n.get('type')=='book'}
+          patches=[];report=[];expected={}
+          for book in source.iter('book'):
+              ident=mapping[book.get('id')]
+              a,_,_=scan(book,True);b,spans,events=scan(books[ident],False)
+              expected[ident]=[(pos,style) for pos,style,_,_ in a]
+              x=Counter((pos,style) for pos,style,_,_ in a);y=Counter((pos,style) for pos,style,_,_ in b)
+              # Distinguish repeated equivalent positions rather than silently skipping them.
+              missing=x-y;extra=y-x
+              for offset,style,node,ref in b:
+                  key=(offset,style)
+                  if extra[key]<=0:continue
+                  extra[key]-=1
+                  prev=node.getprevious()
+                  # Moving a boundary may only remove a direct adjacent paragraph pair.
+                  assert local(prev)=='p' and prev.getparent() is node.getparent(),(ident,ref,'nonadjacent paragraph')
+                  assert set(node.attrib)<= {'type'} and set(prev.attrib)<= {'type'}
+                  op,end=positions[node];prev_end=positions[prev][1]
+                  assert raw[prev_end:prev_end+4]==b'</p>'
+                  opening=raw[op:raw.index(b'>',op)+1]
+                  assert opening in (b'<p>',b'<p type="x-noindent">',b'<p type="x-indented-1">')
+                  patches.extend([(prev_end,b'</p>',b''),(op,opening,b'')])
+                  report.append({'kind':'remove_displaced_boundary','book':ident,'ref':ref,'nonspace_offset':offset,'style':style})
+              assert not +extra
+              for offset,style,node,ref in a:
+                  key=(offset,style)
+                  if missing[key]<=0:continue
+                  missing[key]-=1
+                  first=next((n for n in node if isinstance(n.tag,str)),None)
+                  assert first is not None
+                  name=local(first)
+                  desired={'w':'w','wj':'q','it':'hi','x':'note'}.get(name)
+                  assert desired,(ident,ref,'unsupported source boundary child',name)
+                  # Prefer the exact direct child (including source-first note).
+                  candidates=[]
+                  for n in events[offset]:
+                      if local(n)!=desired or local(n.getparent())!='p':continue
+                      if desired=='note' and n.get('n')!=first.get('caller'):continue
+                      candidates.append(n)
+                  if candidates:
+                      assert len(candidates)==1,(ident,ref,'ambiguous direct-child anchor')
+                      point=positions[candidates[0]][0]
+                  else:
+                      # A paragraph start can bisect unannotated prose in a
+                      # direct child tail, without changing either text stream.
+                      tails=[(lo,hi,n,s) for lo,hi,n,field,r,s in spans if lo<offset<hi and field=='tail' and local(n.getparent())=='p']
+                      assert desired=='w' and len(tails)==1,(ident,ref,'no exact safe paragraph anchor',desired)
+                      lo,hi,n,s=tails[0]
+                      count=0;idx=0
+                      while idx<len(s) and count<offset-lo:
+                          if not s[idx].isspace():count+=1
+                          idx+=1
+                      while idx<len(s) and s[idx].isspace():idx+=1
+                      assert count==offset-lo and idx<len(s)
+                      endpos=positions[n][1]
+                      close=b'</'+local(n).encode()+b'>'
+                      assert raw[endpos:endpos+len(close)]==close
+                      tail_start=endpos+len(close)
+                      encoded=s.encode('utf-8')
+                      assert raw[tail_start:tail_start+len(encoded)]==encoded,(ident,ref,'nonliteral XML tail')
+                      point=tail_start+len(s[:idx].encode('utf-8'))
+                  opening=b'<p>' if style is None else b'<p type="'+style.encode()+b'">'
+                  patches.append((point,b'',b'</p>'+opening))
+                  report.append({'kind':'restore_source_boundary','book':ident,'ref':ref,'nonspace_offset':offset,'style':style,'anchor_kind':desired})
+              assert not +missing
+          # All edits are exact, scoped paragraph-tag insertions/deletions.
+          assert patches and len({p[0] for p in patches})==len(patches)
+          cursor=0;chunks=[];inverse_edits=[]
+          for offset,old,new in sorted(patches):
+              assert offset>=cursor and raw[offset:offset+len(old)]==old
+              chunks.append(raw[cursor:offset]);point=sum(map(len,chunks));chunks.append(new)
+              inverse_edits.append({'source_byte_offset':offset,'candidate_byte_offset':point,'old_utf8':old.decode(),'new_utf8':new.decode()})
+              cursor=offset+len(old)
+          chunks.append(raw[cursor:]);candidate=b''.join(chunks)
+          inverse=candidate
+          for row in reversed(inverse_edits):
+              i=row['candidate_byte_offset'];a=row['old_utf8'].encode();b=row['new_utf8'].encode()
+              assert inverse[i:i+len(b)]==b
+              inverse=inverse[:i]+a+inverse[i+len(b):]
+          assert inverse==raw
+          newroot=_source_tree(candidate)
+          for book in newroot.iter(OSIS+'div'):
+              if book.get('type')!='book':continue
+              result,_,_=scan(book,False)
+              assert [(p,s) for p,s,_,_ in result]==expected[book.get('osisID')],(book.get('osisID'),'remaining paragraph differences')
+          old,oldnotes,oldmeta=original_osis_verses_and_notes(raw)
+          new,newnotes,newmeta=original_osis_verses_and_notes(candidate)
+          assert old==new and oldnotes==newnotes and oldmeta==newmeta
+          # No inline element, note, verse, word, title, or table is modified.
+          def signature(doc):
+              return [(local(n),dict(n.attrib)) for n in doc.iter() if isinstance(n.tag,str) and local(n)!='p']
+          assert signature(root)==signature(newroot)
+          result={'table_candidate_sha256':sha256(raw).hexdigest(),'candidate_sha256':sha256(candidate).hexdigest(),'exact_inverse':True,'all_numbered_paragraph_start_offsets_and_styles_equal':True,'all_numbered_verse_text_and_notes_exact':True,'all_nonparagraph_element_openings_exact':True,'boundary_changes':report,'byte_edits':inverse_edits,'scope':'source-attested numbered paragraph starts; pending schema and native reader checks'}
+          (t/'lsg-layout-candidate.osis.xml').write_bytes(candidate)
+          (t/'lsg-paragraph-receipt.json').write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')
+          print('LSG_PARAGRAPH_CANDIDATE',json.dumps(result,sort_keys=True),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: reversible-lsg-paragraph-repair-receipt
+          path: ${{ runner.temp }}/lsg-paragraph-receipt.json
+          retention-days: 30
