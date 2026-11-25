@@ -8,7 +8,7 @@ permissions:
 jobs:
   replay:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -65,7 +65,10 @@ jobs:
           # Preserve the verified native payload and all other config bytes.
           conf=payload/'mods.d/brlsg1910.conf'
           b=conf.read_bytes();assert b.count(b'Version=1.0.3')==1
-          revised=b.replace(b'Version=1.0.3',b'Version=1.0.4')
+          old_about=b'Bible Resources 1.0.3 removed eight redundant empty paragraphs.'
+          new_about=b'Bible Resources 1.0.4 restores source-attested paragraph boundaries and introduction tables, removes three converter residues, and retains the eight redundant empty paragraph removals from 1.0.3.'
+          assert b.count(old_about)==1
+          revised=b.replace(b'Version=1.0.3',b'Version=1.0.4').replace(old_about,new_about)
           files={f.relative_to(payload).as_posix():f.read_bytes() for f in sorted(payload.rglob('*')) if f.is_file()}
           files['mods.d/brlsg1910.conf']=revised
           old=json.loads(Path('config/catalogue-import-lsg-1.0.3.json').read_text())
@@ -83,6 +86,107 @@ jobs:
           (t/'lsg-private-package-receipt.json').write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')
           print('LSG_PRIVATE_PACKAGE',json.dumps(result,sort_keys=True),flush=True)
           PY
+      - name: Dry-run the production catalogue in an isolated worktree (not a release approval)
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/private-promotion-preview" HEAD
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256,sha1
+          import json,os,shutil,zipfile
+          from build import build
+          from validate import validate
+          from stable_sword_refs import module_payload_digest
+          from approved_osis_sword_candidate import approved_source_for
+          from publish_reviewed_release import approved_release,ReleaseError
+          t=Path(os.environ['RUNNER_TEMP'])
+          root=t/'private-promotion-preview'
+          assert root.is_dir() and root.resolve()!=Path.cwd()
+          m=root/'modules/lsg-1910'
+          folder=root/'sources/cleaned/bibles/fr/lsg-1910'
+          editorial=folder/'editorial'
+          base=editorial/'evidence'
+          evidence=json.loads((base/'lsg-layout-candidate-571.json').read_text())
+          package=json.loads((t/'lsg-private-package-receipt.json').read_text())
+          candidate=(t/'lsg-layout-candidate.osis.xml').read_bytes()
+          old='cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0'
+          new=sha256(candidate).hexdigest()
+          assert new==package['candidate_source_sha256']==evidence['native']['candidate_sha256']
+          def load(path):return json.loads(path.read_text())
+          def save(path,value):path.write_text(json.dumps(value,sort_keys=True,indent=2,ensure_ascii=False)+'\n')
+          def sha(path):return sha256(path.read_bytes()).hexdigest()
+          def one(text,old,new):
+              assert text.count(old)==1,old
+              return text.replace(old,new,1)
+          master=folder/'lsg-1910.osis.xml'
+          assert sha(master)==old
+          master.write_bytes(candidate)
+          assert sha(master)==new
+          with zipfile.ZipFile(t/'BRLSG1910-1.0.4-candidate.zip') as z:
+              assert set(z.namelist())==set(package['member_sha256'])
+              for name in z.namelist():
+                  dst=m/'payload'/name
+                  assert dst.is_file() and dst.resolve().is_relative_to((m/'payload').resolve())
+                  data=z.read(name);assert sha256(data).hexdigest()==package['member_sha256'][name];dst.write_bytes(data)
+          # Only in this disposable preview: let the standard production builder
+          # exercise technical metadata. This is not an assertion of owner approval.
+          meta=load(m/'metadata.json');meta['version']='1.0.4'
+          meta['quality']['reviewed_by']='Technical audit #571 — isolated preview, owner publication authorization pending'
+          save(m/'metadata.json',meta)
+          ev=base/'lsg-layout-candidate-571.json'
+          proof_hash=sha(ev)
+          cleanup=load(folder/'CLEANUP_MANIFEST.json')
+          cleanup.update(previous_approved_cleaned_osis_sha256=old,cleaned_osis_sha256=new,final_candidate_osis_sha256=new,cleaned_osis_bytes=len(candidate),layout_overlay_receipt_sha256=proof_hash,status='unpublished_layout_candidate_preview',published_release_provenance='config/catalogue-import-lsg-1.0.3.json')
+          save(folder/'CLEANUP_MANIFEST.json',cleanup)
+          p=load(m/'SOURCE_VALIDATION.json');p.update(source_sha256=new,provenance_audit_sha256=proof_hash,note='Pinned official XSD and complete native text/note/structure proof; unpublished technical preview.')
+          save(m/'SOURCE_VALIDATION.json',p)
+          n=load(m/'NORMALIZATION_REPORT.json')
+          n.update(output_sha256=new,diff_sha256=proof_hash,plan_sha256=proof_hash,review_asserted_by_plan='Technical source-attested layout audit #571; owner release approval pending')
+          n['operations'].append({'operation':'restore_source_attested_paragraph_and_table_layout','old_sha256':old,'new_sha256':new,'exact_inverse_verified':True,'restored_boundaries':17,'removed_displaced_boundaries':9,'converter_controls_removed':3,'table_boundaries_restored':1})
+          save(m/'NORMALIZATION_REPORT.json',n)
+          c=load(m/'SWORD_COMPATIBILITY.json')
+          c.update(source_osis_sha256=new,module_payload_sha256=module_payload_digest(m),full_readback_evidence_sha256=proof_hash,reviewed_by='Technical full native layout audit #571; unpublished preview')
+          save(m/'SWORD_COMPATIBILITY.json',c)
+          profile=editorial/'profiles/fr-segond-1910.md'
+          text=profile.read_text()
+          # Version labels only, never a new approved description.
+          for a,b in [('**Version Bible Resources :** 1.0.3','**Version Bible Resources :** 1.0.4'),('| Version | 1.0.3 |','| Version | 1.0.4 |'),('**Édition numérique :** Bible Resources 1.0.3, novembre 2026.','**Édition numérique :** Bible Resources 1.0.4, novembre 2026.')]:text=one(text,a,b)
+          profile.write_text(text)
+          p=load(m/'profiles/fr.json')
+          p['module_version']='1.0.4';p['revision']=p['approved_at']+'.5'
+          p['evidence_urls']['curated_release']='https://github.com/icfmp/Bible-Resources/releases/tag/lsg-1.0.4'
+          data=profile.read_bytes();p['source_git_blob_sha1']=sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          save(m/'profiles/fr.json',p)
+          old_snapshot=root/'catalog/v1/catalog.json'
+          before=load(old_snapshot);old_snapshot.unlink()
+          _,errors=validate(root)
+          assert not errors,errors
+          _,reconstructed=approved_source_for('lsg-1910',root=root)
+          assert reconstructed==candidate
+          dist=t/'private-promotion-dist'
+          build(root=root,output=dist)
+          after=load(dist/'catalog/v1/catalog.json')
+          actual=dist/'sword/packages/BRLSG1910.zip'
+          assert sha(actual)==package['zip_sha256'] and actual.stat().st_size==package['zip_size_bytes']
+          a={x['id']:x for x in before['modules']};b={x['id']:x for x in after['modules']}
+          assert set(a)==set(b) and all(a[k]==b[k] for k in a if k!='lsg-1910')
+          assert b['lsg-1910']['version']=='1.0.4' and b['lsg-1910']['download']['sha256']==package['zip_sha256']
+          old_snapshot.write_bytes((dist/'catalog/v1/catalog.json').read_bytes())
+          # Verify snapshot is accepted by the production builder a second time.
+          build(root=root,output=dist)
+          assert sha(dist/'sword/packages/BRLSG1910.zip')==package['zip_sha256']
+          plan=load(base/'lsg-1.0.4-release-plan-DRAFT.json')
+          plan.update(package_sha256=package['zip_sha256'],package_size_bytes=package['zip_size_bytes'])
+          assert plan['authorization']['reviewed_by'] is None
+          draft=t/'pending-owner-plan.json';save(draft,plan)
+          try:approved_release(root,draft,dist)
+          except ReleaseError as e:
+              assert str(e)=='Explicit source-specific owner review missing',str(e)
+          else:raise AssertionError('Pending approval was not rejected')
+          report={'status':'private_production_catalogue_preview_passed','candidate_source_sha256':new,'package_sha256':package['zip_sha256'],'package_size_bytes':package['zip_size_bytes'],'catalogue_sha256':sha(old_snapshot),'other_catalogue_entries_unchanged':len(a)-1,'standard_repository_validate_passed':True,'standard_build_reproduced_exact_zip':True,'pending_owner_authorization_rejected_by_production_release_gate':True,'active_repository_unchanged':True,'publication_authorized':False}
+          (t/'lsg-production-preview.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')
+          print('LSG_PRODUCTION_PREVIEW',json.dumps(report,sort_keys=True),flush=True)
+          PY
+          git worktree remove --force "$RUNNER_TEMP/private-promotion-preview"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -267,4 +371,5 @@ jobs:
           path: |
             ${{ runner.temp }}/lsg-private-package-receipt.json
             ${{ runner.temp }}/lsg-layout-jsword.json
+            ${{ runner.temp }}/lsg-production-preview.json
           retention-days: 30
