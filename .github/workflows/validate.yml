@@ -34,7 +34,7 @@ jobs:
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
             install -y diatheke libsword-dev
-      - name: Require original numbered USFM/USFX content parity for reviewed adapters
+      - name: Audit original numbered Bible content across OSIS and reviewed USFM/USFX adapters
         run: |
           PYTHONPATH=scripts python - <<'PY'
           from pathlib import Path
@@ -61,7 +61,75 @@ jobs:
               provenance=read(original_dir/"PROVENANCE.json")
               if provenance["format"]=="OSIS":
                   assert resource not in reviewed,"Unexpected USFM adapter for OSIS original"
-                  continue # The existing independent original OSIS route is separate.
+                  # Compare the actual pinned original and approved cleaned OSIS,
+                  # using the same independent verse/note parser as native QA.
+                  # Editorial repairs may legitimately differ: inventory them
+                  # rather than requiring byte equality or silently waiving them.
+                  from approved_osis_sword_candidate import original_osis_verses_and_notes
+                  from collections import Counter
+                  original=original_dir/provenance["original_file"]
+                  assert original.is_file() and not original.is_symlink()
+                  assert original.resolve().is_relative_to(original_dir.resolve())
+                  raw=original.read_bytes()
+                  assert len(raw)==provenance["original_size_bytes"]
+                  assert sha256(raw).hexdigest()==provenance["original_sha256"]
+                  _,cleaned=approved_source_for(resource)
+                  old,old_notes,old_meta=original_osis_verses_and_notes(raw)
+                  new,new_notes,new_meta=original_osis_verses_and_notes(cleaned)
+                  counts=Counter()
+                  samples={}
+                  def delta(kind,ref,index=None):
+                      counts[kind]+=1
+                      rows=samples.setdefault(kind,[])
+                      if len(rows)<12:
+                          row={"reference":ref}
+                          if index is not None:row["note_index"]=index
+                          rows.append(row)
+                  def nonspace(value):return "".join(value.split())
+                  def folded(value):return " ".join(value.split())
+                  for ref in sorted(set(old)-set(new)):delta("missing_verse",ref)
+                  for ref in sorted(set(new)-set(old)):delta("added_verse",ref)
+                  for ref in old:
+                      if ref not in new:continue
+                      counts["verse_pairs"]+=1
+                      if nonspace(old[ref])!=nonspace(new[ref]):
+                          delta("verse_nonspace_difference",ref)
+                      if folded(old[ref])!=folded(new[ref]):
+                          delta("verse_folded_whitespace_difference",ref)
+                      if len(old_notes[ref])!=len(new_notes[ref]):
+                          delta("note_count_difference",ref)
+                          continue
+                      for i,(a_note,b_note) in enumerate(zip(old_notes[ref],new_notes[ref]),1):
+                          counts["note_pairs"]+=1
+                          for field in ("caller","type","point","targets"):
+                              if a_note[field]!=b_note[field]:delta("note_"+field+"_difference",ref,i)
+                          if nonspace(a_note["body"])!=nonspace(b_note["body"]):
+                              delta("note_body_nonspace_difference",ref,i)
+                          if folded(a_note["body"])!=folded(b_note["body"]):
+                              delta("note_body_folded_whitespace_difference",ref,i)
+                  print("ORIGINAL_OSIS_NUMBERED_DIFFERENCE_INVENTORY",resource,json.dumps({
+                      "original_sha256":sha256(raw).hexdigest(),
+                      "cleaned_sha256":sha256(cleaned).hexdigest(),
+                      "original_book_count":old_meta["publisher_book_count"],
+                      "cleaned_book_count":new_meta["publisher_book_count"],
+                      "original_verse_count":len(old),"cleaned_verse_count":len(new),
+                      "original_note_count":old_meta["publisher_numbered_note_count"],
+                      "cleaned_note_count":new_meta["publisher_numbered_note_count"],
+                      "original_outside_numbered_notes":old_meta["publisher_notes_outside_numbered_verses"],
+                      "cleaned_outside_numbered_notes":new_meta["publisher_notes_outside_numbered_verses"],
+                      "ordered_numbered_keys_equal":list(old)==list(new),
+                      "counts":dict(counts),"bounded_reference_only_differences":samples,
+                      "all_editorial_differences_approved_by_this_diagnostic":False,
+                      "full_layout_or_typography_certified":False,
+                  },sort_keys=True),flush=True)
+                  # These are required invariants for the currently supported
+                  # no-renumbering/no-note-caller-rewrite OSIS route. A future
+                  # authorized change needs an explicit reviewed transformation
+                  # policy; never a translation-specific bypass.
+                  assert list(old)==list(new),(resource,"original numbered keys differ")
+                  assert not counts["note_count_difference"] and not counts["note_caller_difference"],resource
+                  assert old_meta["publisher_notes_outside_numbered_verses"]==new_meta["publisher_notes_outside_numbered_verses"],resource
+                  continue
               assert provenance["format"]=="USFM" and resource in reviewed,("No reviewed original-format adapter",resource)
               a=reviewed[resource];seen.add(resource)
               witness=provenance["additional_original_witness"]
