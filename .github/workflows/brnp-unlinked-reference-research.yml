@@ -103,6 +103,7 @@ jobs:
                    "source_notes_reconciled":note_count,"preserved_unlinked_groups":len(entries),
                    "all_unlinked_reference_indices_reconciled":True,"destination_semantics_certified":False,
                    "mandatory_gate_approved":False,"entries":entries}
+          receipt["entries_sha256"]=sha(json.dumps(entries,ensure_ascii=False,sort_keys=True,separators=(",",":")).encode())
           path=Path(os.environ["RUNNER_TEMP"])/"brnp-unlinked-evidence.json"
           path.write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n")
           assert sha(current.read_bytes())==receipt["current_master_sha256"] and sha(original.read_bytes())==receipt["original_usfx_archive_sha256"]
