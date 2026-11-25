@@ -61,6 +61,33 @@ The generic `original_authorial_content_parity.py` compares independently decode
 
 The `config/original-bible-content-adapters.json` registry makes the supported numbered USFM/USFX route mandatory for approved non-OSIS-source Bibles in Validate. Each adapter declares immutable original hashes, the exact archive member, reviewed book crosswalk and (if applicable) the source-bound owner-approved note-repair ledger. An unknown source format or absent adapter blocks the check. The same registry's `osis_resources` entries bind intentional OSIS-to-OSIS edits to exact original and approved cleaned SHA-256 values and an owner authorization manifest. The Validate workflow uses the existing independent verse/note reader to check ordered verse keys, nonspace and whitespace-folded prose and note bodies, note counts, callers, types, nonspace anchors, and ordered explicit targets. Reviewed relocations of leading editorial division signs and contextual target corrections/removals are reconciled exactly; missing, unused or unexplained changes block validation. Editions without a reviewed OSIS adapter must preserve these numbered semantics without such edits. This gate does not certify nonnumbered notes or all original editorial layout, lexical metadata, or reader QA.
 
+### Original USFX editorial structure proof
+
+For the registered USFM/USFX route, Validate also requires the independent
+source-to-cleaned comparisons introduced in #580, #581 and #582:
+
+- Ordered verse-owned poetic line text and indentation, including lines
+  spanning verse milestones; Selah text and verse ownership; matching line
+  and marker census (LSG proof: 23,917 lines, 26 multiverse lines, 74 Selah).
+- Ordered table/row/cell boundaries, cell text after whitespace folding,
+  header roles and supported cell inline spans; ordered paragraph openings
+  at positive numbered nonspace offsets and their supported styles
+  (LSG proof: 13 tables, 329 cells, 2,654 paragraph starts).
+- Title text and numbered anchors, selected quotation/italic/superscript
+  numbered spans, introduction paragraph coordinates and nonnumbered
+  nonspace text (LSG proof: 4,542 titles, 522 intro paragraphs, 2,644
+  quotations, 159 italics, 11 superscripts). Any approved introduction text
+  correction is projected only into a private comparison tree from the
+  exact source-hash-bound owner-reviewed ledger. The original is immutable.
+
+Each gate has positive and corruption fixtures and runs on the registered
+source witness, not on hard-coded edition counts. Exact typography, all
+stanza/grouping semantics, initial paragraph anchors, unsupported grammar
+and GUI/parallel behavior remain separate review scopes. These comparisons
+do not constitute a generic USFM importer: a newly converted candidate
+must pass them independently, before compilation or release approval.
+Historical research conversion is private and not a production entry point.
+
 The same independent native corpus/index/exact-key readback now runs on every approved Bible, selected from module metadata rather than a translation name. It checks numbered, introduction and opaque TOP frames against the separate native inventory and samples raw bytes through an independent exact-key reader. This readback is separate from the original-to-cleaned and cleaned-to-native semantic comparisons. The reports bind actual payload and inspector hashes; they are not reader GUI acceptance or authorization to release.
 
 When bringing in a new edition, first use the supported existing route. Unsupported source grammar or an editorial transformation not yet represented in the registry requires a reviewed extension and regression tests, not a silent bypass. Retain evidence of reader navigation and parallel-mode behavior separately; exact typography is not implied by nonspace comparisons. The project is responsible for its own curated resources; upstream fixes are not a completion dependency.
