@@ -8,7 +8,7 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -395,4 +395,62 @@ jobs:
         with:
           name: reversible-lsg-paragraph-repair-receipt
           path: ${{ runner.temp }}/lsg-paragraph-receipt.json
+          retention-days: 30
+      - name: Validate candidate against pinned official OSIS schema and native SWORD engine
+        run: |
+          set -euo pipefail
+          python scripts/fetch_reviewed_schema.py --directory "$RUNNER_TEMP/reviewed-schema" --report "$RUNNER_TEMP/lsg-layout-schema-provenance.json"
+          python scripts/guard_osis.py "$RUNNER_TEMP/lsg-layout-candidate.osis.xml" --schema "$RUNNER_TEMP/reviewed-schema/osisCore.2.1.1-cw-latest.xsd" --report "$RUNNER_TEMP/lsg-layout-schema.json"
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y diatheke libsword-dev libxml2-utils
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o "$RUNNER_TEMP/native-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o "$RUNNER_TEMP/native-raw" -lsword
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          import json,os,shutil
+          from approved_osis_sword_candidate import (_create_candidate_layout,_compile_osis,_candidate_result,original_osis_verses_and_notes,project_reviewed_merge_slots,authorial_structures,authorial_body_opening_sequences,authorial_book_streams,authorial_outside_book_titles,_read_native_frames)
+          from stable_sword_refs import load_approved_merge_policy
+          from remove_reviewed_empty_osis_paragraphs import inspect_empty_paragraphs
+          t=Path(os.environ['RUNNER_TEMP'])
+          candidate=t/'lsg-layout-candidate.osis.xml'
+          xml=candidate.read_bytes()
+          proof=json.loads((t/'lsg-paragraph-receipt.json').read_text())
+          assert sha256(xml).hexdigest()==proof['candidate_sha256']
+          assert proof['all_numbered_paragraph_start_offsets_and_styles_equal']
+          assert inspect_empty_paragraphs(xml)['bare_empty_paragraph_count']==0
+          folder=Path('modules/lsg-1910')
+          conf=json.loads((folder/'SWORD_COMPATIBILITY.json').read_text())
+          merges,_=load_approved_merge_policy(folder/'SOURCE_REFERENCE_MERGES.json',publisher_digest=conf['original_publisher_document_sha256'],versification='Segond')
+          work=t/'private-lsg-layout';work.mkdir()
+          module='BRLSG1910'
+          payload,out=_create_candidate_layout(work,module,'Segond','fr')
+          # Reuse exact approved reader configuration; no research-only filter.
+          shutil.copyfile(folder/'payload/mods.d/brlsg1910.conf',payload/'mods.d/brlsg1910.conf')
+          compile_receipt=_compile_osis(Path(shutil.which('osis2mod')),candidate,out,'Segond',t/'lsg-layout-compile-private.log')
+          verses,notes,_=original_osis_verses_and_notes(xml)
+          projected,projected_notes=project_reviewed_merge_slots(verses,notes,merges)
+          body,counts=authorial_body_opening_sequences(xml)
+          result=_candidate_result(t/'native-index',t/'native-raw',work,module,'Segond',projected,projected_notes,authorial_structures(xml),body,counts,authorial_book_streams(xml),authorial_outside_book_titles(xml))
+          result['candidate_sha256']=sha256(xml).hexdigest()
+          result['compiler']=compile_receipt
+          result['source_verses']=len(verses)
+          result['reviewed_projected_slots']=len(projected)
+          result['published']=False
+          (t/'lsg-layout-native.json').write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')
+          print('LSG_LAYOUT_NATIVE',json.dumps(result,sort_keys=True),flush=True)
+          assert result['numbered_slot_text_and_note_parity_verified']
+          assert result['source_native_body_boundary_positions']['all_book_body_nonspace_and_boundary_events_equal']
+          assert result['original_to_compiled_body_opening_order']['same_order_and_kind_in_every_mapped_book']
+          assert result['explicit_note_target_index_addressability']['all_original_explicit_targets_index_addressable']
+          assert result['source_native_body_boundary_positions']['body_lexical_association_diagnostic']['all_book_body_word_spans_and_attributes_equal']
+          assert result['source_native_body_boundary_positions']['book_editorial_inline_diagnostic']['all_compared_scopes_equal']
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lsg-layout-schema-native-receipts
+          path: |
+            ${{ runner.temp }}/lsg-layout-schema.json
+            ${{ runner.temp }}/lsg-layout-native.json
           retention-days: 30
