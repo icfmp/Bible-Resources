@@ -1,0 +1,26 @@
+name: Refresh registry for required original content gate
+on:
+  push:
+    branches: [audit/require-original-numbered-content]
+    paths: ['.github/workflows/prepare-original-content-gate.yml']
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          python -m pip install -r requirements.txt
+          git rm .github/workflows/prepare-original-content-gate.yml
+          python scripts/tool_registry.py --write
+          git add -f reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          python scripts/tool_registry.py --check
+          python -m unittest discover -s tests -v
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Refresh registry for mandatory original source gate'
+          git push origin HEAD:refs/heads/audit/require-original-numbered-content
