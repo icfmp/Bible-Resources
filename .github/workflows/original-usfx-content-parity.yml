@@ -89,6 +89,101 @@ jobs:
                   walk(book)
                   require(key is None,'Unclosed verse at book boundary')
               return {k:''.join(v) for k,v in verses.items()},notes,outside,words
+          def usfm_numbered_content(archive,mapping):
+              marker=re.compile(r'\\(\+?[a-z][a-z0-9-]*)(\*|(?=\s|\\|$))|\\\*')
+              # USFM paragraph/poetry markers start a new logical block.
+              body_blocks={'p','m','pi1','q1','b','tr','tc1','tc2','tc3','th1','th2'}
+              apparatus={'h','toc1','toc2','imt1','imt2','imt3','io1','io2','ip','ipi','ib','ie','is1','mt1','mt2','mr','ms1','ms2','s1','r'}
+              inline={'wj','it','ord','qs','ior'}
+              texts={}; words=defaultdict(list); note_rows=defaultdict(list); books=set()
+              for member in archive.infolist():
+                  if member.is_dir() or not member.filename.lower().endswith(('.usfm','.sfm')):continue
+                  raw=archive.read(member).decode('utf-8-sig')
+                  matches=list(marker.finditer(raw))
+                  require(bool(matches) and not raw[:matches[0].start()].strip(),'USFM content before initial marker')
+                  code=None; chapter=None; key=None; enabled=False
+                  stack=[]; current_word=None; current_note=None
+                  pos=0
+                  def append(text):
+                      nonlocal pos
+                      if key and enabled:
+                          texts[key].append(text);pos+=len(ns(text))
+                  for i,m in enumerate(matches):
+                      tag=m[1]; closing=bool(m[2])
+                      tail=raw[m.end():matches[i+1].start() if i+1<len(matches) else len(raw)]
+                      require(tag is not None,'Unsupported standalone USFM milestone close')
+                      # A start marker consumes its single syntactic whitespace separator.
+                      if not closing:
+                          require(bool(tail) and tail[0].isspace(),'USFM start marker lacks separator')
+                          tail=tail[1:]
+                      if tag in {'id','c','v'}:
+                          require(not closing and not stack and current_note is None and current_word is None,'Invalid USFM numbering scope')
+                          match=re.match(r'([^\s]+)(?:[ \t]|\r?\n|$)',tail)
+                          require(match is not None,'Missing USFM numbering label')
+                          val=match[1]; rest=tail[match.end():]
+                          if tag=='id':
+                              require(code is None and val in mapping and val not in books,'Unknown or duplicate USFM book')
+                              code=val;books.add(code);enabled=False
+                          elif tag=='c':
+                              require(code and re.fullmatch(r'[1-9][0-9]*',val),'Invalid USFM chapter')
+                              chapter=val;key=None;enabled=False
+                          else:
+                              require(code and chapter and re.fullmatch(r'[0-9]+[a-z]?(?:-[0-9]+[a-z]?)?',val),'Unsupported USFM verse')
+                              key='.'.join((mapping[code],chapter,val));require(key not in texts,'Duplicate USFM verse')
+                              texts[key]=[];pos=0;enabled=True;append(rest)
+                          continue
+                      if tag in apparatus|body_blocks:
+                          require(not closing and not stack and current_word is None and current_note is None,'Block inside inline scope')
+                          # Headings/introductions end the current numbered content.
+                          if tag in apparatus:enabled=False
+                          # Tables preceding the first verse are not numbered text.
+                          elif key and enabled:append(tail)
+                          continue
+                      if tag in NOTE:
+                          require(current_word is None,'Note inside lexical word')
+                          if not closing:
+                              require(current_note is None,'Nested USFM note')
+                              caller=re.match(r'(\S+)(?:\s|$)',tail)
+                              require(caller is not None,'Missing USFM note caller')
+                              current_note=[tag,caller[1],pos,[]]
+                              if caller.end()<len(tail):current_note[3].append(caller.string[caller.end():])
+                          else:
+                              require(current_note is not None and current_note[0]==tag,'Unpaired USFM note')
+                              if key and enabled:note_rows[key].append((current_note[2],tag,current_note[1],ns(''.join(current_note[3]))))
+                              current_note=None;append(tail)
+                          continue
+                      if current_note is not None:
+                          require(tag in {'xo','xt','fr','ft','fq','fqa','fk','fl','fp','fv','fdc','xq','xot','xnt','xdc'},'Unsupported note component')
+                          current_note[3].append(tail);continue
+                      if tag in {'w','+w'}:
+                          if not closing:
+                              require(current_word is None,'Nested USFM word')
+                              parts=tail.split('|')
+                              require(len(parts)==2,'Unsupported USFM word attribute syntax')
+                              attrs=dict(re.findall(r'([a-z][a-z0-9-]*)="([^"]*)"',parts[1]))
+                              # Reject unparsed attributes, not merely ignore them.
+                              remaining=re.sub(r'[a-z][a-z0-9-]*="[^"]*"','',parts[1])
+                              require(not remaining.strip(),'Unsupported USFM word attribute')
+                              current_word=(tag,key if enabled else None,pos,parts[0],attrs)
+                              append(parts[0])
+                          else:
+                              require(current_word is not None and current_word[0]==tag,'Unpaired USFM word')
+                              _,word_key,start,surface,attrs=current_word
+                              if word_key:
+                                  require(key==word_key,'USFM word crosses verse')
+                                  ids=strong(attrs.get('strong') or attrs.get('s'))
+                                  words[key].append((start,pos,ns(surface),ids))
+                              current_word=None;append(tail)
+                          continue
+                      if tag in inline:
+                          require(current_word is None,'Inline marker inside word')
+                          if closing:
+                              require(stack and stack[-1]==tag,'Unpaired USFM inline marker');stack.pop()
+                          else:stack.append(tag)
+                          append(tail);continue
+                      raise ValueError('Unreviewed USFM marker '+tag)
+                  require(code and current_word is None and current_note is None and not stack,'Unclosed USFM structure')
+              return {k:''.join(v) for k,v in texts.items()},words,note_rows
           def osis_numbered_words(root):
               rows=defaultdict(list); keys=set()
               for book in root.iter(OSIS+'div'):
@@ -272,4 +367,22 @@ jobs:
                           link_counts['actual_linked_notes']+=bool(actual)
                           link_counts['actual_target_tokens']+=len(actual)
                   print('ORIGINAL_USFX_REFERENCE_DIAGNOSTIC',json.dumps({'resource':p['resource_id'],'counts':dict(link_counts),'bounded_findings':dict(link_findings),'alias_sha256':alias_sha,'scope':'replay of reviewed full-label citation grammar against actual linked OSIS; separate explicit source machine targets and partial grammar review'},sort_keys=True),flush=True)
+              if p['format']=='USFM':
+                  fm_path=manifest.parent/p['original_file']
+                  fm_receipt=inspect_archive(fm_path,source_kind='authored')
+                  require(fm_receipt['archive_sha256']==p['original_sha256'] and fm_receipt['archive_bytes']==p['original_size_bytes'],'USFM archive pin mismatch')
+                  with zipfile.ZipFile(fm_path) as archive:
+                      fm_text,fm_words,fm_notes=usfm_numbered_content(archive,mapping)
+                  require(set(fm_text)==set(original),'USFM and USFX verse keys differ')
+                  fm_counts=Counter(); fm_findings=defaultdict(list)
+                  def fm_check(kind,ok,ref):
+                      fm_counts[kind+'_compared']+=1
+                      fm_counts[kind+'_equal']+=bool(ok)
+                      if not ok and len(fm_findings[kind])<30:fm_findings[kind].append(ref)
+                  for ref in original:
+                      fm_check('verse_nonspace',ns(fm_text[ref])==ns(original[ref]),ref)
+                      fm_check('verse_folded_whitespace',' '.join(fm_text[ref].split())==' '.join(original[ref].split()),ref)
+                      fm_check('note_rows',fm_notes[ref]==notes[ref],ref)
+                      fm_check('word_span_and_strong_rows',fm_words[ref]==source_word_spans[ref] and all(x[3] is not None for x in fm_words[ref]),ref)
+                  print('ORIGINAL_USFM_CONTENT_DIAGNOSTIC',json.dumps({'resource':p['resource_id'],'counts':dict(fm_counts),'bounded_findings':dict(fm_findings),'numbered_usfm_words':sum(map(len,fm_words.values())),'numbered_usfx_words':sum(map(len,source_word_spans.values())),'numbered_usfm_notes':sum(map(len,fm_notes.values())),'numbered_usfx_notes':sum(map(len,notes.values())),'scope':'numbered text, note body/caller/type/anchor and Strong spans, not complete USFM grammar or outside-numbered layout'},sort_keys=True),flush=True)
           PY
