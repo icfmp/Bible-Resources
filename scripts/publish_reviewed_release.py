@@ -19,6 +19,7 @@ from zipfile import ZipFile
 
 from catalogue_release_coverage import coverage
 from check_brnp import inspect_approved_osis
+from guard_osis import StructureFailure
 
 ROOT = Path(__file__).resolve().parents[1]
 SHA = re.compile(r"[a-f0-9]{64}\Z")
@@ -259,8 +260,8 @@ def main() -> int:
     # Validate existing immutable masters read-only; no resource is rebuilt.
     try:
         inspect_approved_osis(args.root, args.brnp_schema, enforce=True)
-    except (ValueError, OSError, KeyError) as exc:
-        raise ReleaseError("BRNP structural prepublication check failed") from exc
+    except (ValueError, OSError, KeyError, StructureFailure) as exc:
+        raise ReleaseError("BRNP structural prepublication check failed") from None
     scope=coverage(args.root,built=args.built)
     verified=[approved_release(args.root,path,args.built)
               for path,_ in scope["planned"]]

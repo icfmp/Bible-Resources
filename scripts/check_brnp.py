@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only structural BRNP draft pilot; not an OSIS XSD or release gate.
+"""Read-only BRNP structural subset; separate from complete OSIS and editorial certification.
 
 No source rewriting, guessed reference mappings or published content output.
 Official schema and guard_osis/guard_commentary checks remain mandatory.
@@ -508,7 +508,7 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None,
         "publication_approved": False,
         "kind": kind, "sha256": sha256(content).hexdigest(),
         "status": ("findings_need_review" if errors else
-                   "draft_subset_no_findings" if official is not None else
+                   "structural_subset_no_findings" if official is not None else
                    "diagnostic_only_schema_not_checked"),
         "brnp_conformance_certified": False,
         "element_counts": dict(sorted(counts.items())),
@@ -541,7 +541,7 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None,
         "limitations": [
             "Official OSIS XSD is checked only when --schema is supplied; neither route proves historical/authorial fidelity",
             "NOT a complete verse hierarchy, reference target, annotation or reader validation",
-            "NOT a production or publication approval gate",
+            "Structural findings can block publication; passing does not authorize publication",
         ],
     }
 

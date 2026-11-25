@@ -41,6 +41,7 @@ python scripts/publish_reviewed_release.py \
   --built dist \
   --repository icfmp/Bible-Resources \
   --target-sha "$(git rev-parse HEAD)" \
+  --brnp-schema /path/to/reviewed-osis/osisCore.2.1.1-cw-latest.xsd \
   --verify-only
 ```
 
