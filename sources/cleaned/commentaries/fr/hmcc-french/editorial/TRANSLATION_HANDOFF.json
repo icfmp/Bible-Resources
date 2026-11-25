@@ -44,5 +44,29 @@
     ],
     "technical_validation": "not performed; simple chapter structure counts only",
     "next": "Gen.2"
+  },
+  "latest_checkpoint": {
+    "chapter": "Gen.2",
+    "translation": "complete",
+    "editorial_audit": "complete (same editor, separate comparison against classic, not independent human review)",
+    "manuscript_commit": "9ded962fec2ddb00c08ef25f8fb2b76f4d92eedf",
+    "paragraphs": 73,
+    "commentary_sections": 6,
+    "outline_rows": 7,
+    "inline_reference_destinations": [
+      "Rev.2.7",
+      "Rev.22.2",
+      "John.6.48",
+      "John.6.51",
+      "2Thess.3.10"
+    ],
+    "audit_notes": [
+      "Preserved Henry's English-Bible-specific LORD/Jehovah statement without adapting it to French Bible conventions.",
+      "Preserved the Sabbath argument, conditional promise of everlasting life, consequences of the fall and language of special grace and providence.",
+      "Retained modern source link corrections: Revelation 22:2 is linked and the classic spurious 2Cor.6.2 link on the enumeration marker is not reintroduced.",
+      "All non-chapter tags and attributes compared exactly against modern source; 73 paragraphs, six sections and five link occurrences retained."
+    ],
+    "technical_validation": "chapter-local markup equality only; no schema validation, SWORD compilation or reader tests",
+    "next": "Gen.3"
   }
 }
