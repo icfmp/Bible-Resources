@@ -49,6 +49,10 @@ jobs:
                          if before.get(field) != after.get(field)]
               if changed:
                   print(path, "drift fields:", ", ".join(changed))
+                  if after:
+                      print("REGISTRY_DELTA",json.dumps(after,ensure_ascii=False,sort_keys=True),flush=True)
+                  else:
+                      print("REGISTRY_REMOVED",path,flush=True)
                   if "python_imports" in changed:
                       print("  expected python_imports JSON:",
                             json.dumps(after.get("python_imports", ()),separators=(",",":")))

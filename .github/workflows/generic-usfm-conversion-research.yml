@@ -1,0 +1,38 @@
+name: Verify registered USFM conversion
+on:
+  pull_request:
+    paths:
+      - 'scripts/convert_usfm.py'
+      - 'scripts/research/bible/**'
+      - 'tests/test_registered_usfm_conversion.py'
+      - 'config/original-bible-content-adapters.json'
+      - 'config/osis-policy.json'
+      - '.github/workflows/generic-usfm-conversion-research.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Run synthetic conversion regressions
+        run: python -m unittest discover -s tests -p 'test_registered_usfm_conversion.py'
+      - name: Fetch pinned converter and reviewed schema
+        run: |
+          set -eu
+          curl --fail --silent --show-error --location --max-time 60 https://raw.githubusercontent.com/adyeths/u2o/dde28bc545e8d8697fa5496c243187847ec55d31/u2o.py --output "$RUNNER_TEMP/u2o-original.py"
+          python scripts/fetch_reviewed_schema.py --directory "$RUNNER_TEMP/schema"
+      - name: Convert each registered original witness pair without publication
+        run: |
+          set -eu
+          epoch="$(git show -s --format=%ct HEAD)"
+          for resource in $(python -c 'import json; print(" ".join(sorted(json.load(open("config/original-bible-content-adapters.json"))["resources"])))'); do
+            python scripts/convert_usfm.py --resource "$resource" --converter "$RUNNER_TEMP/u2o-original.py" --schema "$RUNNER_TEMP/schema/osisCore.2.1.1-cw-latest.xsd" --source-date-epoch "$epoch" --output "$RUNNER_TEMP/$resource.osis.xml" --report "$RUNNER_TEMP/$resource.json"
+            rm "$RUNNER_TEMP/$resource.osis.xml"
+          done
