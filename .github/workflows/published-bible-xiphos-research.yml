@@ -18,7 +18,7 @@ jobs:
             sudo sed -Ei 's#https?://[A-Za-z0-9.-]*ec2.archive.ubuntu.com/ubuntu#https://archive.ubuntu.com/ubuntu#g' /etc/apt/apt-mirrors.txt
           fi
           sudo apt-get -o Acquire::Retries=2 update -qq
-          sudo apt-get install -y --no-install-recommends xiphos diatheke python3-sword xvfb dbus-x11 xdotool xclip
+          sudo apt-get install -y --no-install-recommends xiphos diatheke python3-sword xvfb dbus-x11 xdotool xclip openbox
       - name: Download exact public archives
         run: |
           mkdir "$RUNNER_TEMP/archives"
@@ -94,6 +94,14 @@ jobs:
                       values=dict(re.findall(r"^(WIDTH|HEIGHT)=([0-9]+)$",dims,re.M))
                       if int(values.get("WIDTH",0))>=550 and int(values.get("HEIGHT",0))>=300:result.append((wid,title))
               return result
+          def focus(wid):
+              for _ in range(20):
+                  try:
+                      run(["xdotool","windowfocus","--sync",wid],timeout=2)
+                      return
+                  except (subprocess.CalledProcessError,subprocess.TimeoutExpired):
+                      time.sleep(.25)
+              raise RuntimeError("Reader window could not receive focus")
           def start(parallel=False):
               global app
               app=subprocess.Popen(["xiphos"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
@@ -101,8 +109,12 @@ jobs:
                   assert app.poll() is None
                   for wid,title in windows():
                       if ("Parallel" in title)==parallel:
-                          run(["xdotool","windowsize",wid,"1200","760"]);run(["xdotool","windowmove",wid,"25","25"]);time.sleep(1.5)
-                          return wid
+                          try:
+                              run(["xdotool","windowsize",wid,"1200","760"]);run(["xdotool","windowmove",wid,"25","25"]);time.sleep(1.5)
+                              focus(wid)
+                              return wid
+                          except (RuntimeError,subprocess.CalledProcessError,subprocess.TimeoutExpired):
+                              continue
                   time.sleep(.3)
               raise RuntimeError("Expected real reader window unavailable")
           def stop():
@@ -112,8 +124,9 @@ jobs:
                   try:app.wait(timeout=5)
                   except subprocess.TimeoutExpired:os.killpg(app.pid,signal.SIGKILL);app.wait(timeout=5)
               app=None
+              time.sleep(1)
           def copy(wid,x,y):
-              run(["xdotool","windowfocus","--sync",wid]);run(["xdotool","mousemove","--window",wid,str(x),str(y),"click","1"])
+              focus(wid);run(["xdotool","mousemove","--window",wid,str(x),str(y),"click","1"])
               subprocess.run(["xclip","-selection","clipboard","-i"],input=b"UNRELATED_SENTINEL",stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,timeout=8)
               run(["xdotool","key","--clearmodifiers","ctrl+a","ctrl+c"]);time.sleep(.6)
               data=run(["xclip","-selection","clipboard","-o"],False)
@@ -149,7 +162,7 @@ jobs:
               for primary,comparison in (names,names[::-1]):
                   ref="John.3.16";settings(primary,comparison,ref,False)
                   try:
-                      wid=start();run(["xdotool","windowfocus","--sync",wid]);run(["xdotool","key","--clearmodifiers","ctrl+l"]);run(["xdotool","type",reference(ref)]);run(["xdotool","key","Return"]);time.sleep(2)
+                      wid=start();focus(wid);run(["xdotool","key","--clearmodifiers","ctrl+l"]);run(["xdotool","type",reference(ref)]);run(["xdotool","key","Return"]);time.sleep(2)
                       found=False
                       for x,y in ((535,290),(680,460),(390,550)):
                           data,html=copy(wid,x,y)
@@ -179,4 +192,4 @@ jobs:
               stop();print("XIPHOS_PAIR_PROOF",json.dumps(report,sort_keys=True),flush=True)
           assert report["status"]=="PASS"
           PY
-          dbus-run-session -- xvfb-run -a -s '-screen 0 1400x1000x24' /usr/bin/python3 "$RUNNER_TEMP/xiphos-audit.py"
+          dbus-run-session -- xvfb-run -a -s '-screen 0 1400x1000x24' sh -c 'openbox >/dev/null 2>&1 & sleep 2; exec /usr/bin/python3 "$RUNNER_TEMP/xiphos-audit.py"'
