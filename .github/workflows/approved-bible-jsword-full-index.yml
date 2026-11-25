@@ -1,0 +1,215 @@
+name: Independently read all published Bible slots with pinned AndBible JSword
+on:
+  push:
+    branches: [research/approved-bible-jsword-full-index]
+    paths: ['.github/workflows/approved-bible-jsword-full-index.yml']
+permissions:
+  contents: read
+jobs:
+  engine:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+      - run: |
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o "$RUNNER_TEMP/native-raw" -lsword
+          python scripts/build.py --output "$RUNNER_TEMP/reader-dist"
+      - name: Bind exact published payload and independently read actual native key/entry evidence
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          import json,os,zipfile
+          from approved_osis_sword_candidate import approved_source_for,_read_native_frames
+          from research.bible.source_osis_verse_notes import original_osis_verses_and_notes
+          t=Path(os.environ["RUNNER_TEMP"])
+          root=t/"private-approved-bible-reader-root"
+          root.mkdir()
+          compact=lambda s: "".join(c for c in s if not c.isspace())
+          digest=lambda s: sha256(s.encode()).hexdigest()
+          plan=[]
+          for folder in sorted(Path("modules").iterdir()):
+              meta=folder/"metadata.json"
+              if not meta.is_file():continue
+              m=json.loads(meta.read_text())
+              if m.get("category")!="bible" or m.get("quality",{}).get("status")!="approved" or m.get("index_audit",{}).get("mode")!="stock_reader_keys":continue
+              # Publication manifests are explicit resource data, never a parser exception.
+              if (folder/"RELEASE_PROVENANCE.json").is_file():
+                  p=json.loads((folder/"RELEASE_PROVENANCE.json").read_text()); members=p["complete_release_member_sha256"]; source_sha=p["corrected_candidate_osis_sha256"]
+              else:
+                  candidates=[x for x in Path("config").glob("catalogue-import-*.json") if x.name.endswith("-"+m["version"]+".json")]
+                  proofs=[json.loads(x.read_text()) for x in candidates]
+                  proofs=[x for x in proofs if x.get("module_id")==m["sword_id"]]
+                  assert len(proofs)==1
+                  p=proofs[0];members=p["files"];source_sha=p["provenance"]["reviewed_candidate_osis_sha256"]
+              archive=t/"reader-dist/sword/packages"/(m["sword_id"]+".zip")
+              assert sha256(archive.read_bytes()).hexdigest()==p["release_zip_sha256"]
+              with zipfile.ZipFile(archive) as z:
+                  assert set(z.namelist())==set(members) and z.testzip() is None
+                  for name,expected in members.items():
+                      raw=z.read(name);assert sha256(raw).hexdigest()==expected
+                      dst=root/name;assert not dst.exists() and dst.resolve().is_relative_to(root.resolve())
+                      dst.parent.mkdir(parents=True,exist_ok=True);dst.write_bytes(raw)
+              _,xml=approved_source_for(m["id"]);assert sha256(xml).hexdigest()==source_sha
+              verses,notes,_=original_osis_verses_and_notes(xml)
+              merge=folder/"SOURCE_REFERENCE_MERGES.json"
+              if merge.is_file():
+                  proof=json.loads(merge.read_text())
+                  for row in proof["allowed_merges"]:
+                      assert row["source_content_preserved"] and row["reversible"]
+                      verses[row["osis_reader_key"]]+=verses.pop(row["osis_source_key"])
+              # Independent actual native entry corpus: exact and compact raw digests.
+              raw_entries={ref:raw.decode("utf-8") for kind,ref,raw in _read_native_frames(t/"native-raw",m["sword_id"],root.resolve()) if kind=="K"}
+              assert set(raw_entries)==set(verses)
+              # Source-stratified sample: first/middle/last and first of selected books.
+              refs=list(verses)
+              samples={refs[0],refs[len(refs)//2],refs[-1]}
+              for key in ("Gen.1.1","Ps.23.1","Matt.1.1","John.3.16","Acts.8.36","Rev.22.21","Mark.10.52","Eccl.11.1","Eccl.12.1"):
+                  if key in verses:samples.add(key)
+              plan_path=t/(m["sword_id"]+".tsv")
+              plan_path.write_text("".join(ref+"\t"+digest(raw_entries[ref])+"\t"+digest(compact(raw_entries[ref]))+"\t"+(digest(compact(verses[ref])) if ref in samples else "")+"\n" for ref in refs),encoding="ascii")
+              plan.append(m["sword_id"]+"\t"+m["versification"]+"\t"+str(plan_path))
+              print("BIBLE_JSWORD_INPUT",json.dumps({"resource":m["id"],"version":m["version"],"zip_sha256":p["release_zip_sha256"],"source_sha256":source_sha,"native_numbered_slots":len(refs),"sample_refs":sorted(samples)},sort_keys=True))
+          assert len(plan)>=2
+          (t/"bible-plan.tsv").write_text("\n".join(plan)+"\n",encoding="ascii")
+          PY
+      - name: Acquire exact reviewed AndBible stable JSword revision
+        run: |
+          git clone --quiet --filter=blob:none --no-checkout https://github.com/AndBible/jsword.git "$RUNNER_TEMP/jsword"
+          git -C "$RUNNER_TEMP/jsword" fetch --quiet --depth=1 origin 6ebd10a005fa7761e611c048ececea1430e22546
+          git -C "$RUNNER_TEMP/jsword" checkout --quiet --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/jsword" rev-parse HEAD)" = 6ebd10a005fa7761e611c048ececea1430e22546
+          mkdir -p "$RUNNER_TEMP/jsword/src/test/java/org/icfmp/research"
+          cat > "$RUNNER_TEMP/jsword/src/test/java/org/icfmp/research/ApprovedBibleFullIndexProbeTest.java" <<'JAVA'
+          package org.icfmp.research;
+          
+          import java.io.File;
+          import java.nio.file.Files;
+          import java.nio.file.Paths;
+          import java.nio.charset.StandardCharsets;
+          import java.security.MessageDigest;
+          import java.util.*;
+          import org.crosswire.jsword.book.Book;
+          import org.crosswire.jsword.book.BookData;
+          import org.crosswire.jsword.book.BookMetaData;
+          import org.crosswire.jsword.book.Books;
+          import org.crosswire.jsword.book.OSISUtil;
+          import org.crosswire.jsword.book.sword.SwordBookPath;
+          import org.crosswire.jsword.passage.Key;
+          import org.crosswire.jsword.passage.Verse;
+          import org.crosswire.jsword.versification.BibleBook;
+          import org.crosswire.jsword.versification.Versification;
+          import org.crosswire.jsword.versification.system.Versifications;
+          import org.junit.Test;
+          import static org.junit.Assert.*;
+          
+          public final class ApprovedBibleFullIndexProbeTest {
+              static String hash(String s) throws Exception {
+                  byte[] b=MessageDigest.getInstance("SHA-256").digest(s.getBytes(StandardCharsets.UTF_8));
+                  StringBuilder out=new StringBuilder();
+                  for(byte v:b) out.append(String.format("%02x",v&255));
+                  return out.toString();
+              }
+              static String compact(String s) {
+                  StringBuilder out=new StringBuilder();
+                  s.codePoints().filter(c -> !Character.isWhitespace(c) && !Character.isSpaceChar(c)).forEach(out::appendCodePoint);
+                  return out.toString();
+              }
+              @Test public void independentlyReadExactPublishedBibleIndexes() throws Exception {
+                  File root=new File(System.getenv("BIBLE_PROBE_ROOT")).getCanonicalFile();
+                  assertTrue(root.isDirectory() && root.getName().equals("private-approved-bible-reader-root"));
+                  SwordBookPath.setAugmentPath(new File[]{root});
+                  List<String> modules=Files.readAllLines(Paths.get(System.getenv("BIBLE_PROBE_PLAN")),StandardCharsets.US_ASCII);
+                  assertTrue(modules.size()>=2);
+                  int failures=0;
+                  for(String line:modules) {
+                      String[] spec=line.split("\t");
+                      String id=spec[0], v11n=spec[1];
+                      Book bible=Books.installed().getBook(id);
+                      if(bible==null){System.out.println("BIBLE_JSWORD_RESULT "+id+" unavailable");failures++;continue;}
+                      assertEquals(id,bible.getInitials());
+                      Versification v=Versifications.instance().getVersification(v11n);
+                      if(v==null){System.out.println("BIBLE_JSWORD_RESULT "+id+" versification_unavailable");failures++;continue;}
+                      assertEquals(v11n,bible.getBookMetaData().getProperty(BookMetaData.KEY_VERSIFICATION));
+                      Set<String> expected=new HashSet<>();
+                      int missing=0, rawExact=0, rawCompact=0, rawRead=0, badKeys=0, structured=0, structuredExpected=0, structuredExact=0;
+                      List<String> rawDiff=new ArrayList<>(),missingRefs=new ArrayList<>(),sampleDiff=new ArrayList<>();
+                      for(String row:Files.readAllLines(Paths.get(spec[2]),StandardCharsets.US_ASCII)){
+                          String[] cols=row.split("\t",-1);
+                          String ref=cols[0];assertTrue(expected.add(ref));
+                          String[] parts=ref.split("\\.");
+                          BibleBook b=BibleBook.fromExactOSIS(parts[0]);assertNotNull(b);
+                          Verse k=new Verse(v,b,Integer.parseInt(parts[1]),Integer.parseInt(parts[2]));
+                          if(!ref.equals(k.getOsisRef())){badKeys++;continue;}
+                          if(!bible.contains(k)){missing++;if(missingRefs.size()<20)missingRefs.add(ref);continue;}
+                          String raw=bible.getRawText(k);
+                          if(raw!=null){
+                              rawRead++;
+                              if(hash(raw).equals(cols[1]))rawExact++;
+                              else if(rawDiff.size()<20)rawDiff.add(ref);
+                              if(hash(compact(raw)).equals(cols[2]))rawCompact++;
+                          }
+                          if(!cols[3].isEmpty()){
+                              structuredExpected++;
+                              String prose=OSISUtil.getCanonicalText(new BookData(bible,k).getOsisFragment());
+                              if(prose!=null && !prose.trim().isEmpty()){
+                                  structured++;
+                                  if(hash(compact(prose)).equals(cols[3])) structuredExact++;
+                                  else if(sampleDiff.size()<20)sampleDiff.add(ref);
+                              }
+                          }
+                      }
+                      int extra=0;
+                      for(Key key:bible.getScope()){
+                          if(!(key instanceof Verse))continue;
+                          Verse x=(Verse)key;
+                          if(x.getChapter()>0 && x.getVerse()>0 && !expected.contains(x.getOsisRef()) && bible.contains(x))extra++;
+                      }
+                      System.out.println("BIBLE_JSWORD_RESULT "+id+" expected="+expected.size()+" missing="+missing+" extra="+extra+" changed_keys="+badKeys+" raw_read="+rawRead+" raw_exact="+rawExact+" raw_nonspace="+rawCompact+" structured_samples="+structured+" structured_expected="+structuredExpected+" structured_exact="+structuredExact);
+                      System.out.println("BIBLE_JSWORD_DIFFERENCES "+id+" missing="+missingRefs+" raw="+rawDiff+" structured="+sampleDiff);
+                      if(missing!=0 || extra!=0 || badKeys!=0 || rawRead!=expected.size() || structuredExpected<2 || structured!=structuredExpected) failures++;
+                  }
+                  assertEquals("At least one independent Bible engine retrieval/index check failed",0,failures);
+              }
+          }
+          JAVA
+      - name: Independently read both installed exact packages (engine, not GUI)
+        run: |
+          export BIBLE_PROBE_ROOT="$RUNNER_TEMP/private-approved-bible-reader-root"
+          export BIBLE_PROBE_PLAN="$RUNNER_TEMP/bible-plan.tsv"
+          export SWORD_PATH="$BIBLE_PROBE_ROOT"
+          export HOME="$RUNNER_TEMP/isolated-java-home"
+          export GRADLE_USER_HOME="$RUNNER_TEMP/isolated-gradle-home"
+          mkdir -m 700 "$HOME" "$GRADLE_USER_HOME"
+          export JAVA_TOOL_OPTIONS="-Duser.home=$HOME"
+          cd "$RUNNER_TEMP/jsword"
+          set +e
+          timeout 720 bash ./gradlew --no-daemon --console=plain test --tests org.icfmp.research.ApprovedBibleFullIndexProbeTest > "$RUNNER_TEMP/private-jsword.log" 2>&1
+          rc=$?
+          set -e
+          export PROBE_RC="$rc"
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,xml.etree.ElementTree as ET,re
+          p=Path("build/test-results/test/TEST-org.icfmp.research.ApprovedBibleFullIndexProbeTest.xml")
+          if not p.is_file():
+              log=(Path(os.environ["RUNNER_TEMP"])/"private-jsword.log").read_text(errors="replace")
+              print("JSWORD_INFRASTRUCTURE",json.dumps({"exit":int(os.environ["PROBE_RC"]),"dependency_failure":any(x in log for x in ["Could not resolve","Could not download","Could not GET"]),"compile_failure":"compileTestJava FAILED" in log,"network_failure":any(x in log for x in ["Connection timed out","UnknownHostException","Read timed out"])}))
+              raise SystemExit("No Java test evidence")
+          t=ET.parse(p).getroot()
+          for node in t.findall("system-out"):
+              for line in (node.text or "").splitlines():
+                  if re.fullmatch(r"BIBLE_JSWORD_(?:RESULT|DIFFERENCES) [A-Za-z0-9 ._\[\],=:-]+",line): print(line)
+          print("BIBLE_JSWORD_JUNIT",json.dumps({k:int(t.get(k,"0")) for k in ("tests","errors","failures","skipped")}))
+          assert int(os.environ["PROBE_RC"])==0 and int(t.get("failures","0"))==int(t.get("errors","0"))==0
+          PY
