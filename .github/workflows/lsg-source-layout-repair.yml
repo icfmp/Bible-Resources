@@ -8,7 +8,7 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -507,4 +507,244 @@ jobs:
           path: |
             ${{ runner.temp }}/lsg-layout-schema.json
             ${{ runner.temp }}/lsg-layout-native.json
+          retention-days: 30
+      - name: Read restored passages in actual Xiphos
+        run: |
+          timeout 180s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y xiphos xvfb dbus-x11 xdotool xclip
+          PYTHONPATH=scripts:modules/lsg-1910/tools python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          import json,os,subprocess,tempfile,time
+          from review_empty_paragraph_xiphos import run,main_window,copy_reader,tokenize,stop
+          from approved_osis_sword_candidate import original_osis_verses_and_notes
+          t=Path(os.environ['RUNNER_TEMP'])
+          xml=(t/'lsg-layout-candidate.osis.xml').read_bytes()
+          receipt=json.loads((t/'lsg-paragraph-receipt.json').read_text())
+          assert sha256(xml).hexdigest()==receipt['candidate_sha256']
+          verses,_,_=original_osis_verses_and_notes(xml)
+          refs=list(dict.fromkeys(row['book']+'.'+row['ref'] for row in receipt['boundary_changes'] if row['kind']=='restore_source_boundary'))
+          payloads={'published':Path('modules/lsg-1910/payload').resolve(),'candidate':(t/'private-lsg-layout/payload').resolve()}
+          results={}
+          for label,payload in payloads.items():
+              app=display=None
+              with tempfile.TemporaryDirectory(prefix='lsg-layout-reader-') as tmp:
+                  home=Path(tmp)
+                  for d in ('config','cache','data'):(home/d).mkdir()
+                  env=dict(os.environ,HOME=str(home),XDG_CONFIG_HOME=str(home/'config'),XDG_CACHE_HOME=str(home/'cache'),XDG_DATA_HOME=str(home/'data'),SWORD_PATH=str(payload),GDK_BACKEND='x11',DISPLAY=':91',NO_AT_BRIDGE='1',LC_ALL='C.UTF-8')
+                  try:
+                      display=subprocess.Popen(['Xvfb',':91','-screen','0','1280x800x24','-nolisten','tcp'],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+                      time.sleep(1.5)
+                      app=subprocess.Popen(['dbus-run-session','--','xiphos'],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+                      window=None
+                      for _ in range(90):
+                          if app.poll() is not None:raise RuntimeError('Xiphos exited')
+                          window=main_window(env)
+                          if window:break
+                          time.sleep(.5)
+                      assert window,'Missing Xiphos reader window'
+                      run(['xdotool','windowsize',window,'1216','736'],env)
+                      run(['xdotool','windowmove',window,'16','16'],env)
+                      time.sleep(1)
+                      results[label]={}
+                      for ref in refs:
+                          book,ch,v=ref.split('.')
+                          expected=tokenize(verses[ref])
+                          assert len(expected)>=4
+                          reference=book+' '+ch+':'+v
+                          accepted=None
+                          for nav in (reference,book+' '+ch):
+                              run(['xdotool','windowfocus','--sync',window],env)
+                              run(['xdotool','key','--clearmodifiers','ctrl+l'],env)
+                              run(['xdotool','type','--clearmodifiers','--delay','25',nav],env)
+                              run(['xdotool','key','Return'],env)
+                              time.sleep(2)
+                              for x,y in ((535,290),(680,460),(390,550)):
+                                  copied=copy_reader(env,window,x,y).decode('utf-8','replace')
+                                  words=tokenize(copied)
+                                  # Source words, not merely a chapter selector, witness the displayed passage.
+                                  overlap=0
+                                  for n in range(min(16,len(expected)),3,-1):
+                                      chunks={tuple(words[j:j+n]) for j in range(len(words)-n+1)}
+                                      if any(tuple(expected[i:i+n]) in chunks for i in range(len(expected)-n+1)):
+                                          overlap=n;break
+                                  if len(words)>=30 and overlap>=min(8,len(expected)):
+                                      accepted={'source_word_witness':overlap,'clipboard_nonspace_sha256':sha256(''.join(copied.split()).encode()).hexdigest(),'clipboard_folded_sha256':sha256(' '.join(copied.split()).encode()).hexdigest(),'navigation':nav}
+                                      break
+                              if accepted:break
+                          assert accepted,(label,ref,'No actual reading-pane verse witness')
+                          results[label][ref]=accepted
+                  finally:
+                      stop(app);stop(display)
+          comparisons={ref:{'nonspace_clipboard_equal':results['published'][ref]['clipboard_nonspace_sha256']==results['candidate'][ref]['clipboard_nonspace_sha256'],'folded_clipboard_equal':results['published'][ref]['clipboard_folded_sha256']==results['candidate'][ref]['clipboard_folded_sha256']} for ref in refs}
+          report={'candidate_sha256':receipt['candidate_sha256'],'actual_xiphos':True,'references':refs,'source_witnesses':results,'comparisons':comparisons,'all_source_prose_witnesses':len(results['candidate'])==len(refs) and len(results['published'])==len(refs),'visual_spacing_pixel_verified':False,'android_gui_verified':False,'published':False}
+          (t/'lsg-layout-xiphos.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')
+          print('LSG_LAYOUT_XIPHOS',json.dumps(report,sort_keys=True),flush=True)
+          assert report['all_source_prose_witnesses'] and all(x['nonspace_clipboard_equal'] for x in comparisons.values())
+          PY
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+      - name: Independent full-index JSword readback of isolated candidate
+        run: |
+          set -euo pipefail
+          git clone --quiet --filter=blob:none --no-checkout https://github.com/AndBible/jsword.git "$RUNNER_TEMP/jsword"
+          git -C "$RUNNER_TEMP/jsword" fetch --quiet --depth=1 origin 6ebd10a005fa7761e611c048ececea1430e22546
+          git -C "$RUNNER_TEMP/jsword" checkout --quiet --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/jsword" rev-parse HEAD)" = 6ebd10a005fa7761e611c048ececea1430e22546
+          mkdir -p "$RUNNER_TEMP/jsword/src/test/java/org/icfmp/research"
+          cat > "$RUNNER_TEMP/jsword/src/test/java/org/icfmp/research/ApprovedBibleFullIndexProbeTest.java" <<'JAVA'
+          package org.icfmp.research;
+          
+          import java.io.File;
+          import java.nio.file.Files;
+          import java.nio.file.Paths;
+          import java.nio.charset.StandardCharsets;
+          import java.security.MessageDigest;
+          import java.util.*;
+          import org.crosswire.jsword.book.Book;
+          import org.crosswire.jsword.book.BookData;
+          import org.crosswire.jsword.book.BookMetaData;
+          import org.crosswire.jsword.book.Books;
+          import org.crosswire.jsword.book.OSISUtil;
+          import org.crosswire.jsword.book.sword.SwordBookPath;
+          import org.crosswire.jsword.passage.Key;
+          import org.crosswire.jsword.passage.Verse;
+          import org.crosswire.jsword.versification.BibleBook;
+          import org.crosswire.jsword.versification.Versification;
+          import org.crosswire.jsword.versification.system.Versifications;
+          import org.junit.Test;
+          import static org.junit.Assert.*;
+          
+          public final class ApprovedBibleFullIndexProbeTest {
+              static String hash(String s) throws Exception {
+                  byte[] b=MessageDigest.getInstance("SHA-256").digest(s.getBytes(StandardCharsets.UTF_8));
+                  StringBuilder out=new StringBuilder();
+                  for(byte v:b) out.append(String.format("%02x",v&255));
+                  return out.toString();
+              }
+              static String compact(String s) {
+                  StringBuilder out=new StringBuilder();
+                  s.codePoints().filter(c -> !Character.isWhitespace(c) && !Character.isSpaceChar(c)).forEach(out::appendCodePoint);
+                  return out.toString();
+              }
+              @Test public void independentlyReadExactPublishedBibleIndexes() throws Exception {
+                  File root=new File(System.getenv("BIBLE_PROBE_ROOT")).getCanonicalFile();
+                  assertTrue(root.isDirectory() && root.getName().equals("private-approved-bible-reader-root"));
+                  SwordBookPath.setAugmentPath(new File[]{root});
+                  List<String> modules=Files.readAllLines(Paths.get(System.getenv("BIBLE_PROBE_PLAN")),StandardCharsets.US_ASCII);
+                  assertEquals(1,modules.size());
+                  int failures=0;
+                  for(String line:modules) {
+                      String[] spec=line.split("\t");
+                      String id=spec[0], v11n=spec[1];
+                      Book bible=Books.installed().getBook(id);
+                      if(bible==null){System.out.println("BIBLE_JSWORD_RESULT "+id+" unavailable");failures++;continue;}
+                      assertEquals(id,bible.getInitials());
+                      Versification v=Versifications.instance().getVersification(v11n);
+                      if(v==null){System.out.println("BIBLE_JSWORD_RESULT "+id+" versification_unavailable");failures++;continue;}
+                      assertEquals(v11n,bible.getBookMetaData().getProperty(BookMetaData.KEY_VERSIFICATION));
+                      Set<String> expected=new HashSet<>();
+                      int missing=0, rawExact=0, rawCompact=0, rawRead=0, badKeys=0, structured=0, structuredExpected=0, structuredExact=0;
+                      List<String> rawDiff=new ArrayList<>(),missingRefs=new ArrayList<>(),sampleDiff=new ArrayList<>();
+                      for(String row:Files.readAllLines(Paths.get(spec[2]),StandardCharsets.US_ASCII)){
+                          String[] cols=row.split("\t",-1);
+                          String ref=cols[0];assertTrue(expected.add(ref));
+                          String[] parts=ref.split("\\.");
+                          BibleBook b=BibleBook.fromExactOSIS(parts[0]);assertNotNull(b);
+                          Verse k=new Verse(v,b,Integer.parseInt(parts[1]),Integer.parseInt(parts[2]));
+                          if(!ref.equals(k.getOsisRef())){badKeys++;continue;}
+                          if(!bible.contains(k)){missing++;if(missingRefs.size()<20)missingRefs.add(ref);continue;}
+                          String raw=bible.getRawText(k);
+                          if(raw!=null){
+                              rawRead++;
+                              if(hash(raw).equals(cols[1]))rawExact++;
+                              else if(rawDiff.size()<20)rawDiff.add(ref);
+                              if(hash(compact(raw)).equals(cols[2]))rawCompact++;
+                          }
+                          if(!cols[3].isEmpty()){
+                              structuredExpected++;
+                              String prose=OSISUtil.getCanonicalText(new BookData(bible,k).getOsisFragment());
+                              if(prose!=null && !prose.trim().isEmpty()){
+                                  structured++;
+                                  if(hash(compact(prose)).equals(cols[3])) structuredExact++;
+                                  else if(sampleDiff.size()<20)sampleDiff.add(ref);
+                              }
+                          }
+                      }
+                      int extra=0;
+                      for(Key key:bible.getScope()){
+                          if(!(key instanceof Verse))continue;
+                          Verse x=(Verse)key;
+                          if(x.getChapter()>0 && x.getVerse()>0 && !expected.contains(x.getOsisRef()) && bible.contains(x))extra++;
+                      }
+                      System.out.println("BIBLE_JSWORD_RESULT "+id+" expected="+expected.size()+" missing="+missing+" extra="+extra+" changed_keys="+badKeys+" raw_read="+rawRead+" raw_exact="+rawExact+" raw_nonspace="+rawCompact+" structured_samples="+structured+" structured_expected="+structuredExpected+" structured_exact="+structuredExact);
+                      System.out.println("BIBLE_JSWORD_DIFFERENCES "+id+" missing="+missingRefs+" raw="+rawDiff+" structured="+sampleDiff);
+                      if(missing!=0 || extra!=0 || badKeys!=0 || rawRead!=expected.size() || rawCompact!=expected.size() || structuredExpected<2 || structured!=structuredExpected || structuredExact!=structuredExpected) failures++;
+                  }
+                  assertEquals("At least one independent Bible engine retrieval/index check failed",0,failures);
+              }
+          }
+          JAVA
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          import os,json,shutil
+          from approved_osis_sword_candidate import original_osis_verses_and_notes,project_reviewed_merge_slots,_read_native_frames
+          from stable_sword_refs import load_approved_merge_policy
+          t=Path(os.environ['RUNNER_TEMP'])
+          payload=t/'private-lsg-layout/payload'
+          root=t/'private-approved-bible-reader-root'
+          shutil.copytree(payload,root)
+          xml=(t/'lsg-layout-candidate.osis.xml').read_bytes()
+          receipt=json.loads((t/'lsg-layout-native.json').read_text())
+          assert sha256(xml).hexdigest()==receipt['candidate_sha256']
+          m=Path('modules/lsg-1910')
+          compat=json.loads((m/'SWORD_COMPATIBILITY.json').read_text())
+          merges,_=load_approved_merge_policy(m/'SOURCE_REFERENCE_MERGES.json',publisher_digest=compat['original_publisher_document_sha256'],versification='Segond')
+          verses,notes,_=original_osis_verses_and_notes(xml)
+          projected,_=project_reviewed_merge_slots(verses,notes,merges)
+          native={ref:raw.decode('utf-8') for kind,ref,raw in _read_native_frames(t/'native-raw','BRLSG1910',root) if kind=='K'}
+          assert set(native)==set(projected)
+          changes=json.loads((t/'lsg-paragraph-receipt.json').read_text())['boundary_changes']
+          samples={x['book']+'.'+x['ref'] for x in changes if x['kind']=='restore_source_boundary'}|{'Gen.1.1','Ps.23.1','John.3.16','Mark.10.52','Eccl.11.1','Eccl.12.1'}
+          compact=lambda s:''.join(s.split())
+          digest=lambda s:sha256(s.encode()).hexdigest()
+          path=t/'candidate-jsword.tsv'
+          path.write_text(''.join(k+'\t'+digest(native[k])+'\t'+digest(compact(native[k]))+'\t'+(digest(compact(v)) if k in samples else '')+'\n' for k,v in projected.items()),encoding='ascii')
+          (t/'bible-plan.tsv').write_text('BRLSG1910\tSegond\t'+str(path)+'\n',encoding='ascii')
+          print('LSG_JSWORD_INPUT',json.dumps({'source_sha256':receipt['candidate_sha256'],'native_slots':len(native),'samples':sorted(samples)},sort_keys=True))
+          PY
+          export BIBLE_PROBE_ROOT="$RUNNER_TEMP/private-approved-bible-reader-root"
+          export BIBLE_PROBE_PLAN="$RUNNER_TEMP/bible-plan.tsv"
+          export SWORD_PATH="$BIBLE_PROBE_ROOT"
+          export HOME="$RUNNER_TEMP/isolated-java-home"
+          export GRADLE_USER_HOME="$RUNNER_TEMP/isolated-gradle-home"
+          mkdir -m 700 "$HOME" "$GRADLE_USER_HOME"
+          export JAVA_TOOL_OPTIONS="-Duser.home=$HOME"
+          cd "$RUNNER_TEMP/jsword"
+          set +e
+          timeout 720 bash ./gradlew --no-daemon --console=plain test --tests org.icfmp.research.ApprovedBibleFullIndexProbeTest > "$RUNNER_TEMP/private-jsword.log" 2>&1
+          rc=$?
+          set -e
+          export PROBE_RC="$rc"
+          python - <<'PY'
+          import json,re,os,xml.etree.ElementTree as ET
+          from pathlib import Path
+          p=Path('build/test-results/test/TEST-org.icfmp.research.ApprovedBibleFullIndexProbeTest.xml')
+          assert p.is_file(),'No independent Java test result'
+          root=ET.parse(p).getroot()
+          lines=[line for n in root.findall('system-out') for line in (n.text or '').splitlines() if re.fullmatch(r'BIBLE_JSWORD_(?:RESULT|DIFFERENCES) [A-Za-z0-9 ._\[\],=:-]+',line)]
+          for line in lines:print(line)
+          report={'junit':{k:int(root.get(k,'0')) for k in ('tests','errors','failures','skipped')},'gradle_exit_code':int(os.environ['PROBE_RC']),'reader_results':lines,'android_gui_verified':False}
+          (Path(os.environ['RUNNER_TEMP'])/'lsg-layout-jsword.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')
+          assert report['gradle_exit_code']==0 and report['junit']=={'tests':1,'errors':0,'failures':0,'skipped':0}
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lsg-layout-independent-reader-receipts
+          path: |
+            ${{ runner.temp }}/lsg-layout-xiphos.json
+            ${{ runner.temp }}/lsg-layout-jsword.json
           retention-days: 30
