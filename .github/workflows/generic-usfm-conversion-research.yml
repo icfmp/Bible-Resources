@@ -352,6 +352,17 @@ jobs:
                                       extra[key]-=1
                                       prev=node.getprevious()
                                       # Moving a boundary may only remove a direct adjacent paragraph pair.
+                                      if not node.attrib and len(node)==0 and not ns(node.text):
+                                          op,end=positions[node]
+                                          if raw[op:op+4]==b'<p/>':
+                                              patches.append((op,b'<p/>',b''))
+                                          else:
+                                              assert raw[op:op+3]==b'<p>' and raw[end:end+4]==b'</p>'
+                                              payload=raw[op:end+4]
+                                              assert not payload[3:-4].strip()
+                                              patches.append((op,payload,payload[3:-4]))
+                                          paragraph_edits.append({"kind":"remove_surplus_empty_paragraph","book":ident,"ref":ref,"nonspace_offset":offset})
+                                          continue
                                       assert local(prev)=='p' and prev.getparent() is node.getparent(),(ident,ref,'nonadjacent paragraph')
                                       assert set(node.attrib)<= {'type'} and set(prev.attrib)<= {'type'}
                                       op,end=positions[node];prev_end=positions[prev][1]
