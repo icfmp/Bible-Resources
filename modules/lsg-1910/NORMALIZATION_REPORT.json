@@ -1,5 +1,5 @@
 {
-  "diff_sha256": "fa5d4858ef5fccb4377b3694d8da4a1f155b6179ef006abc0df59d556207bd59",
+  "diff_sha256": "19bc560ae9c591a46c33c68b87aa67d79bb107cead0d2e2e70a3763e9037b837",
   "edition": "reader_optimized",
   "full_text_exactly_preserved": true,
   "inline_semantic_tags_preserved": true,
@@ -35,12 +35,22 @@
       "new_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
       "old_sha256": "2b8342a67d8e97b433670450fe9dd9e58917a7fcfc0cb4d321882ca8219dc3bd",
       "operation": "remove_reviewed_redundant_empty_paragraphs"
+    },
+    {
+      "converter_controls_removed": 3,
+      "exact_inverse_verified": true,
+      "new_sha256": "25479903513b66c5dbb0f8eb1d9025da023a6b63df38492c35940ef65425e965",
+      "old_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
+      "operation": "restore_source_attested_paragraph_and_table_layout",
+      "removed_displaced_boundaries": 9,
+      "restored_boundaries": 17,
+      "table_boundaries_restored": 1
     }
   ],
   "original_source_unchanged": true,
-  "output_sha256": "cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0",
-  "plan_sha256": "5fe06cabd8bd517d28abfa7bf147d9bb51fcf700828740faf13f02f22afef300",
-  "review_asserted_by_plan": "Owner-requested empty paragraph cleanup #565; independent native and GUI checks",
+  "output_sha256": "25479903513b66c5dbb0f8eb1d9025da023a6b63df38492c35940ef65425e965",
+  "plan_sha256": "19bc560ae9c591a46c33c68b87aa67d79bb107cead0d2e2e70a3763e9037b837",
+  "review_asserted_by_plan": "Technical source-attested layout audit #571; owner release approval pending",
   "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
   "source_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
   "status": "structural_edit_verified_not_published"

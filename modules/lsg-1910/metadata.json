@@ -13,7 +13,7 @@
   },
   "quality": {
     "edition": "reader_optimized",
-    "reviewed_by": "Bible Resources owner — requested redundant paragraph cleanup #565; independent native and GUI checks",
+    "reviewed_by": "Technical audit #571 — staged candidate, owner publication authorization pending",
     "smoke_key": "John 3:16",
     "status": "approved"
   },
@@ -38,5 +38,5 @@
     }
   ],
   "versification": "Segond",
-  "version": "1.0.3"
+  "version": "1.0.4"
 }

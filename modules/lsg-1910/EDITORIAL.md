@@ -1,3 +1,9 @@
+# Louis Segond 1910 — Bible Resources 1.0.4 (unpublished candidate)
+
+Source-attested restoration of 17 numbered paragraph starts and removal of 9 displaced starts, 13 original introduction tables and removal of three literal converter controls. All numbered Scripture text, punctuation, notes and Strong associations preserved; exact reversible edits. Official XSD, native SWORD, actual Xiphos and independent JSword proofs in #571 and #573. Owner authorization to publish remains pending.
+
+## Previous editorial record
+
 # Louis Segond 1910 — Bible Resources 1.0.3 (unpublished candidate)
 
 Eight redundant, bare empty paragraphs removed after source USFM review. All source words, notes, titles, inline annotations and remaining paragraph and poetry positions preserved. Original publisher files remain immutable.
