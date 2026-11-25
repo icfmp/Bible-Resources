@@ -263,6 +263,159 @@ jobs:
                                   "editorial":namespace["editorial_diagnostic"](source_root,target,mapping),
                                   "poetry_unchanged":namespace["audit_segments"](source_root,target,mapping,refs)==report["poetry_diagnostic"],
                                   "candidate_sha256":sha256(table_revised).hexdigest()}
+                              # Replay the reviewed generic boundary algorithm in
+                              # disposable bytes. Obtain exact XML byte offsets
+                              # from Expat rather than regex matching nested tags.
+                              from xml.parsers import expat
+                              raw=table_revised
+                              root=_source_tree(raw)
+                              local=namespace["_name"];ns=namespace["_no_space"]
+                              NOTE={"x","f","fe","ef","ex"}
+                              TITLE={"s","s1","s2","s3","s4","r","sr","mr","ms","ms1","ms2","ms3","mt","mt1","mt2","mt3","imt","imt1","imt2","imt3","is","is1","is2"}
+                              SRC_STYLE={"p":None,"m":"x-noindent","pi":"x-indented-1","pi1":"x-indented-1"}
+                              parser=expat.ParserCreate(namespace_separator="|")
+                              begins=[];ends=[];stack=[]
+                              def begin_element(name,attrs):
+                                  i=len(begins);begins.append((name.split("|")[-1],parser.CurrentByteIndex));ends.append(None);stack.append(i)
+                              def end_element(name):
+                                  i=stack.pop();assert begins[i][0]==name.split("|")[-1];ends[i]=parser.CurrentByteIndex
+                              parser.StartElementHandler=begin_element;parser.EndElementHandler=end_element
+                              parser.Parse(raw,True)
+                              nodes=[n for n in root.iter() if isinstance(n.tag,str)]
+                              assert len(nodes)==len(begins)==len(ends) and not stack
+                              positions={}
+                              for node,(tag,offset),end_offset in zip(nodes,begins,ends,strict=True):
+                                  assert local(node)==tag
+                                  positions[node]=(offset,end_offset)
+                              def scan(book,src):
+                                  pos=0;ref=None;chapter=None;last=None
+                                  starts=[];spans=[];events=defaultdict(list)
+                                  def append(s,owner,field):
+                                      nonlocal pos
+                                      if ref and ns(s):
+                                          begin=pos;pos+=len(ns(s));spans.append((begin,pos,owner,field,ref,s))
+                                  def walk(n):
+                                      nonlocal ref,chapter,last
+                                      k=local(n)
+                                      if not k:return
+                                      style=n.get('sfm') or n.get('style') or k
+                                      if src and (k in NOTE|{'id','h','toc'}|TITLE or k=='p' and style in TITLE) or not src and k in {'note','title','header'}:
+                                          if not src and k=='note' and ref:events[pos].append(n)
+                                          return
+                                      if src and k=='c':chapter=n.get('id')
+                                      if src and k=='v':ref=chapter+'.'+n.get('id');last=ref
+                                      if src and k=='ve':ref=None
+                                      if not src and k=='verse':
+                                          if n.get('eID'):ref=None
+                                          else:ref=n.get('osisID').split('.',1)[1];last=ref
+                                      if src and k=='p' and style in SRC_STYLE and pos>0:
+                                          starts.append((pos,SRC_STYLE[style],n,last))
+                                      if not src and k=='p' and pos>0:
+                                          assert n.get('type') in set(SRC_STYLE.values())
+                                          starts.append((pos,n.get('type'),n,last))
+                                      if not src and pos>0:events[pos].append(n)
+                                      append(n.text,n,'text')
+                                      for c in n:
+                                          walk(c);append(c.tail,c,'tail')
+                                      if not src and k=='verse' and n.get('osisID') and not n.get('sID'):ref=None
+                                  walk(book)
+                                  return starts,spans,events
+                              books={n.get('osisID'):n for n in root.iter(OSIS+'div') if n.get('type')=='book'}
+                              patches=[];paragraph_edits=[];expected={}
+                              for book in source_root.iter('book'):
+                                  ident=mapping[book.get('id')]
+                                  source_starts,_,_=scan(book,True);b,spans,events=scan(books[ident],False)
+                                  expected[ident]=[(pos,style) for pos,style,_,_ in source_starts]
+                                  x=Counter((pos,style) for pos,style,_,_ in source_starts);y=Counter((pos,style) for pos,style,_,_ in b)
+                                  # Distinguish repeated equivalent positions rather than silently skipping them.
+                                  missing=x-y;extra=y-x
+                                  for offset,style,node,ref in b:
+                                      key=(offset,style)
+                                      if extra[key]<=0:continue
+                                      extra[key]-=1
+                                      prev=node.getprevious()
+                                      # Moving a boundary may only remove a direct adjacent paragraph pair.
+                                      assert local(prev)=='p' and prev.getparent() is node.getparent(),(ident,ref,'nonadjacent paragraph')
+                                      assert set(node.attrib)<= {'type'} and set(prev.attrib)<= {'type'}
+                                      op,end=positions[node];prev_end=positions[prev][1]
+                                      assert raw[prev_end:prev_end+4]==b'</p>'
+                                      opening=raw[op:raw.index(b'>',op)+1]
+                                      assert opening in (b'<p>',b'<p type="x-noindent">',b'<p type="x-indented-1">')
+                                      patches.extend([(prev_end,b'</p>',b''),(op,opening,b'')])
+                                      paragraph_edits.append({'kind':'remove_displaced_boundary','book':ident,'ref':ref,'nonspace_offset':offset,'style':style})
+                                  assert not +extra
+                                  for offset,style,node,ref in source_starts:
+                                      key=(offset,style)
+                                      if missing[key]<=0:continue
+                                      missing[key]-=1
+                                      first=next((n for n in node if isinstance(n.tag,str)),None)
+                                      assert first is not None
+                                      name=local(first)
+                                      desired={'w':'w','wj':'q','it':'hi','x':'note'}.get(name)
+                                      assert desired,(ident,ref,'unsupported source boundary child',name)
+                                      # Prefer the exact direct child (including source-first note).
+                                      candidates=[]
+                                      for n in events[offset]:
+                                          if local(n)!=desired or local(n.getparent())!='p':continue
+                                          if desired=='note' and n.get('n')!=first.get('caller'):continue
+                                          candidates.append(n)
+                                      if candidates:
+                                          assert len(candidates)==1,(ident,ref,'ambiguous direct-child anchor')
+                                          point=positions[candidates[0]][0]
+                                      else:
+                                          # A paragraph start can bisect unannotated prose in a
+                                          # direct child tail, without changing either text stream.
+                                          tails=[(lo,hi,n,s) for lo,hi,n,field,r,s in spans if lo<offset<hi and field=='tail' and local(n.getparent())=='p']
+                                          assert desired=='w' and len(tails)==1,(ident,ref,'no exact safe paragraph anchor',desired)
+                                          lo,hi,n,s=tails[0]
+                                          count=0;idx=0
+                                          while idx<len(s) and count<offset-lo:
+                                              if not s[idx].isspace():count+=1
+                                              idx+=1
+                                          while idx<len(s) and s[idx].isspace():idx+=1
+                                          assert count==offset-lo and idx<len(s)
+                                          endpos=positions[n][1]
+                                          close=b'</'+local(n).encode()+b'>'
+                                          assert raw[endpos:endpos+len(close)]==close
+                                          tail_start=endpos+len(close)
+                                          encoded=s.encode('utf-8')
+                                          assert raw[tail_start:tail_start+len(encoded)]==encoded,(ident,ref,'nonliteral XML tail')
+                                          point=tail_start+len(s[:idx].encode('utf-8'))
+                                      opening=b'<p>' if style is None else b'<p type="'+style.encode()+b'">'
+                                      patches.append((point,b'',b'</p>'+opening))
+                                      paragraph_edits.append({'kind':'restore_source_boundary','book':ident,'ref':ref,'nonspace_offset':offset,'style':style,'anchor_kind':desired})
+                                  assert not +missing
+                              # Verify nonoverlapping edits and reconstruct
+                              # the exact input from inverse edits before auditing.
+                              assert len({p[0] for p in patches})==len(patches)
+                              pieces=[];inverse=[];cursor=0;outpos=0
+                              for offset,old,new in sorted(patches):
+                                  assert offset>=cursor and raw[offset:offset+len(old)]==old
+                                  prefix=raw[cursor:offset]
+                                  pieces.extend((prefix,new));outpos+=len(prefix)
+                                  inverse.append((outpos,new,old));outpos+=len(new)
+                                  cursor=offset+len(old)
+                              pieces.append(raw[cursor:])
+                              final=b"".join(pieces)
+                              restored=final
+                              for offset,new,old in reversed(inverse):
+                                  assert restored[offset:offset+len(new)]==new
+                                  restored=restored[:offset]+old+restored[offset+len(new):]
+                              assert restored==raw
+                              final_root=_source_tree(final)
+                              def other_elements(tree):
+                                  return [(n.tag,dict(n.attrib)) for n in tree.iter() if isinstance(n.tag,str) and n.tag!=OSIS+"p"]
+                              assert other_elements(root)==other_elements(final_root)
+                              checked=verify_numbered_content(zfx.read(a["usfx_member"]),final,mapping,{},zfm)
+                              report["paragraph_projection"]={
+                                  "edits":dict(Counter(e["kind"] for e in paragraph_edits)),
+                                  "inverse_exact":True,"nonparagraph_elements_unchanged":True,
+                                  "numbered_parity":checked["all_supported_content_checks_equal"],
+                                  "mismatch_counts":checked["mismatch_counts"],
+                                  "layout":namespace["compare_original_tables_and_paragraphs"](source_root,final_root,mapping),
+                                  "editorial":namespace["editorial_diagnostic"](source_root,final_root,mapping),
+                                  "poetry_unchanged":namespace["audit_segments"](source_root,final_root,mapping,refs)==report["poetry_diagnostic"],
+                                  "candidate_sha256":sha256(final).hexdigest()}
                       except (ValueError,RuntimeError,AssertionError) as exc:
                           report["audit_blocked_by"]=type(exc).__name__
                       except Exception as exc:
