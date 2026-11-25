@@ -140,6 +140,56 @@ jobs:
           name: reversible-lsg-table-repair-receipt
           path: ${{ runner.temp }}/lsg-intro-table-receipt.json
           retention-days: 30
+      - name: Check restored table cells against source editorial inline spans
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from collections import Counter
+          import json,zipfile,os
+          from lxml import etree
+          from source_osis_inventory import _source_tree,OSIS
+          from research.bible.original_authorial_content_parity import parse_usfx
+          def local(n):return etree.QName(n).localname if isinstance(n.tag,str) else ''
+          def ns(s):return ''.join((s or '').split())
+          with zipfile.ZipFile('sources/original/bibles/fr/lsg-1910/fraLSG_usfx.zip') as z:src=parse_usfx(z.read('fraLSG_usfx.xml'))
+          dst=_source_tree((Path(os.environ['RUNNER_TEMP'])/'lsg-intro-table-candidate.osis.xml').read_bytes())
+          mapping={x['usfm']:x['osis'] for x in json.loads(Path('config/standard_usfm_osis_66.json').read_text())['books']}
+          books={n.get('osisID'):n for n in dst.iter(OSIS+'div') if n.get('type')=='book'}
+          def cell_spans(cell,source):
+              pos=0;rows=[];unknown=Counter()
+              def append(v):
+                  nonlocal pos
+                  pos+=len(ns(v))
+              def walk(n):
+                  k=local(n)
+                  if not k:return
+                  start=pos
+                  if n is cell:kind=None
+                  elif source and k in {'it','bd','ord','wj'}:kind={'it':'italic','bd':'bold','ord':'super','wj':'quotation'}[k]
+                  elif not source and k=='hi':kind=n.get('type')
+                  elif not source and k=='q':kind='quotation'
+                  else:
+                      unknown[k]+=1;kind=None
+                  append(n.text)
+                  for c in n:walk(c);append(c.tail)
+                  if kind:rows.append((kind,start,pos))
+              walk(cell)
+              return rows,unknown
+          counts=Counter();unknown_source=Counter();unknown_target=Counter();findings=[]
+          for b in src.iter('book'):
+              ident=mapping[b.get('id')]
+              sc=[c for t in b.iter('table') for row in t for c in row]
+              tc=[c for t in books[ident].iter(OSIS+'table') for row in t for c in row]
+              assert len(sc)==len(tc)
+              for i,(a,b) in enumerate(zip(sc,tc,strict=True),1):
+                  aa,au=cell_spans(a,True);bb,bu=cell_spans(b,False)
+                  counts['cells']+=1;counts['source_inline_spans']+=len(aa);counts['target_inline_spans']+=len(bb)
+                  unknown_source.update(au);unknown_target.update(bu)
+                  if aa==bb:counts['inline_spans_equal']+=1
+                  elif len(findings)<30:findings.append({'book':ident,'cell':i,'source_spans':aa,'target_spans':bb})
+          print('LSG_TABLE_INLINE_DIAGNOSTIC',json.dumps({'counts':dict(counts),'unknown_source':dict(unknown_source),'unknown_target':dict(unknown_target),'findings':findings},sort_keys=True),flush=True)
+          assert counts['cells']==counts['inline_spans_equal'] and not unknown_source and not unknown_target
+          PY
       - name: Locate actual source paragraph starts and candidate XML insertion boundaries
         if: always()
         run: |
