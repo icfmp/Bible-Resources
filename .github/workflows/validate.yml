@@ -576,6 +576,34 @@ jobs:
                                "Line grouping (<lg>), blank stanzas, headings and presentation "
                                "must still be reviewed; no original body text is exported.",
               }
+          # Exercise the actual comparator, not an unrelated mock. The same
+          # line spans two verse milestones and a Selah is separately owned.
+          sample_source=parse_usfx(b'<usfx><book id="GEN"><c id="1"/>'
+              b'<q sfm="q1"><v id="1"/>alpha<ve/><v id="2"/>beta<qs>Selah</qs><ve/></q>'
+              b'</book></usfx>')
+          sample_target=(b'<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">'
+              b'<div type="book" osisID="Gen"><chapter osisID="Gen.1"><lg>'
+              b'<l level="1"><verse osisID="Gen.1.1" sID="Gen.1.1"/>alpha'
+              b'<verse eID="Gen.1.1"/><verse osisID="Gen.1.2" sID="Gen.1.2"/>beta'
+              b'</l><l type="selah">Selah</l><verse eID="Gen.1.2"/>'
+              b'</lg></chapter></div></osis>')
+          def sample_passes(raw):
+              result=audit_segments(sample_source,etree.fromstring(raw),
+                  {"GEN":"Gen"},[("GEN",1,1),("GEN",1,2)])
+              return (result["all_poetry_segments_and_levels_verified"] and
+                      result["all_selah_text_and_verse_positions_verified"] and
+                      result["source_poetry"]==result["candidate_poetry"])
+          assert sample_passes(sample_target),"Valid multi-verse poetry fixture rejected"
+          for corrupted in (
+              sample_target.replace(b'<l level="1">',b'<l level="2">'),
+              sample_target.replace(b'alpha',b'altered'),
+              sample_target.replace(b'beta</l>',b'</l>beta'),
+              sample_target.replace(b'<l type="selah">Selah</l>',b'Selah'),
+              sample_target.replace(b'>Selah</l>',b'>Changed</l>'),
+              sample_target.replace(b'</lg>',b'<l level="1"/></lg>'),
+          ):
+              assert not sample_passes(corrupted),"Poetry corruption was accepted"
+          print("Original poetry comparator: positive fixture and six corruption cases passed")
           # Use the same explicit, hash-pinned original member and reviewed
           # crosswalk as the preceding original numbered-content gate.
           adapters=json.loads(Path("config/original-bible-content-adapters.json").read_text())["resources"]
