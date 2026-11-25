@@ -53,7 +53,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/normalize_osis.py`](../../scripts/normalize_osis.py) | KEEP_GENERIC | not established | 7 | not determined |
 | [`scripts/osis_semantic_fidelity.py`](../../scripts/osis_semantic_fidelity.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/pilot_fetch.py`](../../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 6 | not determined |
-| [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | not established | 11 | not determined |
+| [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | not established | 12 | not determined |
 | [`scripts/pilot_subprocess.py`](../../scripts/pilot_subprocess.py) | KEEP_GENERIC | not established | 4 | not determined |
 | [`scripts/publish_reviewed_release.py`](../../scripts/publish_reviewed_release.py) | KEEP_GENERIC | not established | 13 | publication/release |
 | [`scripts/published_reference_audit.py`](../../scripts/published_reference_audit.py) | KEEP_GENERIC | named test | 4 | publication/release |
@@ -63,8 +63,8 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/bible/native_milestone_pair_audit.py`](../../scripts/research/bible/native_milestone_pair_audit.py) | KEEP_GENERIC | named test | 6 | source/native audit |
 | [`scripts/research/bible/native_raw_main_text.py`](../../scripts/research/bible/native_raw_main_text.py) | KEEP_GENERIC | named test | 9 | not determined |
 | [`scripts/research/bible/native_sword_markup_census.py`](../../scripts/research/bible/native_sword_markup_census.py) | KEEP_GENERIC | named test | 3 | not determined |
-| [`scripts/research/bible/original_authorial_content_parity.py`](../../scripts/research/bible/original_authorial_content_parity.py) | KEEP_GENERIC | named test | 3 | not determined |
-| [`scripts/research/bible/original_authorial_key_inventory.py`](../../scripts/research/bible/original_authorial_key_inventory.py) | KEEP_GENERIC | named test | 3 | source/native audit |
+| [`scripts/research/bible/original_authorial_content_parity.py`](../../scripts/research/bible/original_authorial_content_parity.py) | KEEP_GENERIC | named test | 4 | not determined |
+| [`scripts/research/bible/original_authorial_key_inventory.py`](../../scripts/research/bible/original_authorial_key_inventory.py) | KEEP_GENERIC | named test | 4 | source/native audit |
 | [`scripts/research/bible/source_native_note_positions.py`](../../scripts/research/bible/source_native_note_positions.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/research/bible/source_native_ordered_body.py`](../../scripts/research/bible/source_native_ordered_body.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/research/bible/source_native_osis_boundary_positions.py`](../../scripts/research/bible/source_native_osis_boundary_positions.py) | KEEP_GENERIC | named test | 4 | not determined |

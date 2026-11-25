@@ -34,6 +34,73 @@ jobs:
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
             install -y diatheke libsword-dev
+      - name: Require original numbered USFM/USFX content parity for reviewed adapters
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          import json,zipfile
+          from hashlib import sha256
+          from pilot_preflight import inspect_archive
+          from approved_osis_sword_candidate import approved_source_for
+          from research.bible.original_authorial_content_parity import verify_numbered_content
+          from research.bible.original_authorial_key_inventory import usfm,usfx,compare
+          def read(path):
+              path=Path(path)
+              assert path.is_file() and not path.is_symlink() and path.resolve().is_relative_to(Path.cwd())
+              return json.loads(path.read_text())
+          adapters=read("config/original-bible-content-adapters.json")
+          assert adapters["schema_version"]==1
+          reviewed=adapters["resources"]
+          seen=set()
+          for folder in sorted(Path("modules").iterdir()):
+              if not (folder/"metadata.json").is_file():continue
+              m=read(folder/"metadata.json")
+              if m["category"]!="bible" or m["quality"]["status"]!="approved":continue
+              resource=m["id"]
+              original_dir=Path("sources/original/bibles")/m["language"]/resource
+              provenance=read(original_dir/"PROVENANCE.json")
+              if provenance["format"]=="OSIS":
+                  assert resource not in reviewed,"Unexpected USFM adapter for OSIS original"
+                  continue # The existing independent original OSIS route is separate.
+              assert provenance["format"]=="USFM" and resource in reviewed,("No reviewed original-format adapter",resource)
+              a=reviewed[resource];seen.add(resource)
+              witness=provenance["additional_original_witness"]
+              assert witness["format"]=="USFX"
+              fm=original_dir/provenance["original_file"];fx=original_dir/witness["filename"]
+              for archive,digest,size in [(fm,provenance["original_sha256"],provenance["original_size_bytes"]),(fx,witness["sha256"],witness["size_bytes"])]:
+                  result=inspect_archive(archive,source_kind="authored")
+                  assert result["archive_sha256"]==digest and result["archive_bytes"]==size
+              assert a["usfm_sha256"]==provenance["original_sha256"] and a["usfx_sha256"]==witness["sha256"]
+              crosswalk=read(a["crosswalk"])
+              mapping={x["usfm"]:x["osis"] for x in crosswalk["books"]}
+              assert len(mapping)==len(crosswalk["books"])==len(set(mapping.values()))
+              repairs={}
+              if a.get("note_repair_ledger"):
+                  ledger_path=Path(a["note_repair_ledger"])
+                  ledger=read(ledger_path)
+                  assert sha256(ledger_path.read_bytes()).hexdigest()==a["note_repair_ledger_sha256"]
+                  approval=read(a["approval_manifest"])
+                  from hashlib import sha1
+                  approved_bytes=Path(a["approval_manifest"]).read_bytes()
+                  assert sha1(b"blob "+str(len(approved_bytes)).encode()+b"\0"+approved_bytes).hexdigest()==a["approval_manifest_git_blob_sha1"]
+                  assert approval["editorial_approval"]["approved_by"]=="Bible Resources project owner"
+                  assert ledger["original_usfx_zip_sha256"]==witness["sha256"]==approval["source_usfx_zip_sha256"]
+                  for e in ledger["edits"]:
+                      if e["type"]!="cross_reference_fragment":continue
+                      k=(e["book"]+"."+e["source_origin"],e["source_note_caller"])
+                      assert k not in repairs
+                      repairs[k]=(e["original_label"],e["new_label"])
+              _,xml=approved_source_for(resource)
+              with zipfile.ZipFile(fm) as zfm,zipfile.ZipFile(fx) as zfx:
+                  member=a["usfx_member"]
+                  assert zfx.namelist().count(member)==1
+                  fm_keys,_=usfm(zfm);fx_keys,_=usfx(zfx,member)
+                  assert compare(fm_keys,fx_keys)["ordered_labels_within_every_book_equal"]
+                  proof=verify_numbered_content(zfx.read(member),xml,mapping,repairs,zfm)
+              print("MANDATORY_ORIGINAL_NUMBERED_CONTENT",resource,json.dumps(proof,sort_keys=True),flush=True)
+              assert proof["all_supported_content_checks_equal"],(resource,proof["mismatch_counts"])
+          assert seen==set(reviewed),"Unused/stale original-format adapter"
+          PY
       - name: Audit exact stock-reader-key Bible payloads (read-only candidate evidence)
         shell: bash
         env:

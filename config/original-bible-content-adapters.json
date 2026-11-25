@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "resources": {
+    "lsg-1910": {
+      "usfm_sha256": "64c4fe2a84d92f958deb0d1add4247d126a21c8a51e5b3058338f661a42d4900",
+      "usfx_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+      "usfx_member": "fraLSG_usfx.xml",
+      "crosswalk": "config/standard_usfm_osis_66.json",
+      "note_repair_ledger": "sources/cleaned/bibles/fr/lsg-1910/editorial/REVIEWED_REFERENCE_AND_INTRO_OVERLAY_2026-11-23.json",
+      "note_repair_ledger_sha256": "3e29ce023671fcc8ab4b85c1a639f7f52b8d89d4024d27cea6d3335e74787aa4",
+      "approval_manifest": "config/catalogue-import-lsg-1.0.0.json",
+      "approval_manifest_git_blob_sha1": "2656f5bd162f58dfb80b58f95e98d21ccfd6e7b5"
+    }
+  }
+}
