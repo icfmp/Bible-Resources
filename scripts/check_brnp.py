@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 POLICY = ROOT / "config" / "osis-policy.json"
 NS = "{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 MAX_BYTES = 128 * 1024 * 1024
-VERSION = "0.4-draft"
+VERSION = "0.4"
 # OSIS 2.1.1 constructs already encountered in independently XSD-valid
 # resources. Preserve structured tables/lists and historical source metadata.
 # This is not a supplier-specific allowlist or permission to drop content.
@@ -544,6 +544,67 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None,
             "NOT a production or publication approval gate",
         ],
     }
+
+
+def inspect_approved_osis(root: Path, schema_path: Path, *, enforce: bool = True) -> list[dict]:
+    """Check every approved Bible/commentary master, without rebuilding it.
+
+    The caller chooses advisory inspection or the owner-authorized structural
+    gate. Official XSD, exact source validation and all other release controls
+    remain independent. Dictionaries and non-OSIS categories are out of scope.
+    """
+    root = root.resolve()
+    registry = json.loads((root / "config/brnp-reviewed-unlinked.json").read_text())
+    if registry.get("schema_version") != 1 or not isinstance(registry.get("reviewed_receipts"), dict):
+        raise ValueError("BRNP_REVIEW_REGISTRY_INVALID")
+    receipts = registry["reviewed_receipts"]
+    used = set()
+    results = []
+    for metadata in sorted((root / "modules").glob("*/metadata.json")):
+        m = json.loads(metadata.read_text(encoding="utf-8"))
+        if m["quality"]["status"] != "approved" or m["category"] not in {"bible", "commentary"}:
+            continue
+        if (m["id"] != metadata.parent.name or not re.fullmatch(r"[a-z][a-z0-9-]{1,63}", m["id"])
+                or not re.fullmatch(r"[a-z]{2,3}", m["language"])):
+            raise ValueError("BRNP_MASTER_IDENTITY_INVALID")
+        category = {"bible": "bibles", "commentary": "commentaries"}[m["category"]]
+        folder = root / "sources/cleaned" / category / m["language"] / m["id"]
+        masters = list(folder.glob("*.osis.xml"))
+        if len(masters) != 1 or not masters[0].resolve().is_relative_to(root):
+            raise ValueError("BRNP_MASTER_MISSING_OR_AMBIGUOUS")
+        source = masters[0]
+        key = source.relative_to(root).as_posix()
+        options = {}
+        if key in receipts:
+            entry = receipts[key]
+            path = root / entry["receipt"]
+            if (Path(entry["receipt"]).is_absolute() or ".." in Path(entry["receipt"]).parts
+                    or not path.resolve().is_relative_to(folder.resolve())):
+                raise ValueError("BRNP_REVIEW_RECEIPT_PATH")
+            options = {"review_receipt": path, "review_receipt_sha256": entry["sha256"]}
+            used.add(key)
+        report = check(source, m["category"], schema_path=schema_path, **options)
+        # Bind the structural decision to the same approved cleaned master
+        # consumed by existing production source/native evidence.
+        proof = json.loads((metadata.parent / "SOURCE_VALIDATION.json").read_text())
+        hashes = [proof[k] for k in ("source_sha256", "candidate_source_sha256",
+                                    "source_approved_osis_sha256") if k in proof]
+        if (proof.get("status") != "validated" or not hashes
+                or any(h != report["sha256"] for h in hashes)):
+            raise ValueError("BRNP_APPROVED_SOURCE_MISMATCH")
+        result = {"resource": m["id"], "version": m["version"], **report}
+        results.append(result)
+        print("BRNP_REAL_EDITION", json.dumps({
+            "resource": m["id"], "version": m["version"],
+            "source_sha256": report["sha256"], "official_osis": report["official_osis"]["status"],
+            "findings": report["finding_count"], "finding_codes": report["finding_codes"],
+            "reviewed_unlinked": report["reviewed_unlinked_reference_count"],
+            "brnp_conformance_certified": False}, sort_keys=True), flush=True)
+    if used != set(receipts):
+        raise ValueError("BRNP_REVIEW_UNUSED_RECEIPT")
+    if enforce and any(r["finding_count"] or r["official_osis"]["status"] != "validated" for r in results):
+        raise ValueError("BRNP_PUBLICATION_BLOCKED")
+    return results
 
 
 def main() -> int:

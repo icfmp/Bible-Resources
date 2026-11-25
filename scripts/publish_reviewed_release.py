@@ -18,6 +18,7 @@ import tempfile
 from zipfile import ZipFile
 
 from catalogue_release_coverage import coverage
+from check_brnp import inspect_approved_osis
 
 ROOT = Path(__file__).resolve().parents[1]
 SHA = re.compile(r"[a-f0-9]{64}\Z")
@@ -246,12 +247,20 @@ def main() -> int:
     parser.add_argument("--repository",required=True)
     parser.add_argument("--target-sha",required=True)
     parser.add_argument("--verify-only",action="store_true")
+    parser.add_argument("--brnp-schema",type=Path,required=True,
+                        help="Pinned official OSIS schema for required BRNP structural gate")
     args=parser.parse_args()
     if (not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+",args.repository)
             or not COMMIT_SHA.fullmatch(args.target_sha)):
         raise ReleaseError("Unsafe destination or unreviewed release commit")
     # Fail closed BEFORE any release creation on a missing catalogue mapping,
     # malformed legacy exception, or uncatalogued/newly approved module.
+    # Owner-approved BRNP v0.4 subset is mandatory before any public write.
+    # Validate existing immutable masters read-only; no resource is rebuilt.
+    try:
+        inspect_approved_osis(args.root, args.brnp_schema, enforce=True)
+    except (ValueError, OSError, KeyError) as exc:
+        raise ReleaseError("BRNP structural prepublication check failed") from exc
     scope=coverage(args.root,built=args.built)
     verified=[approved_release(args.root,path,args.built)
               for path,_ in scope["planned"]]

@@ -62,3 +62,5 @@ GitHub Releases and Pages are not one atomic transaction. If release creation su
 Record versioned GitHub release link, catalogue/public package URLs, actual hashes, exact approval/rights evidence, final full-corpus and reader tests, known limitations and next action under the resource's `editorial/releases/`. Never mark a draft, release asset creation, or deployment attempt as public verification.
 
 Retired resource-specific workflows are historical **replay aids only**, not alternate publishers. The main Pages workflow remains the sole release-before-catalogue path. For client-facing schema see [catalogue integration](CATALOGUE_INTEGRATION.md) and [update protocol](CATALOGUE_UPDATE_PROTOCOL.md). For upstream changes see [updates](UPDATES.md).
+
+The owner-approved BRNP v0.4 structural subset is mandatory for the production publisher and its verify-only CI route. Fetch the pinned official schema with `python scripts/fetch_reviewed_schema.py --directory /path/to/reviewed-osis` before invoking the publisher. See [BRNP](../architecture/BRNP.md). Existing published archives remain immutable; no new publication is authorized by adopting the gate.

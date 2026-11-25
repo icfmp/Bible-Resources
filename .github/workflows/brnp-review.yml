@@ -7,6 +7,9 @@ on:
       - 'tests/test_brnp.py'
       - 'docs/architecture/BRNP.md'
       - 'config/brnp-reviewed-unlinked.json'
+      - 'scripts/publish_reviewed_release.py'
+      - 'sources/cleaned/**/*.osis.xml'
+      - 'modules/**/SOURCE_VALIDATION.json'
       - 'sources/cleaned/**/editorial/evidence/brnp-reviewed-unlinked-*.json'
       - '.github/workflows/brnp-review.yml'
 permissions:
@@ -32,41 +35,17 @@ jobs:
           python - <<'PY'
           import json, os
           from pathlib import Path
-          from check_brnp import check
+          from check_brnp import inspect_approved_osis
           out=Path(os.environ["RUNNER_TEMP"])/"brnp-reports"
           out.mkdir()
           schema=Path(os.environ["RUNNER_TEMP"])/"reviewed-osis/osisCore.2.1.1-cw-latest.xsd"
-          registry=json.loads(Path("config/brnp-reviewed-unlinked.json").read_text())
-          assert registry["schema_version"]==1
-          receipts=registry["reviewed_receipts"]
-          used=set()
-          results=[]
-          for metadata in sorted(Path("modules").glob("*/metadata.json")):
-              m=json.loads(metadata.read_text())
-              if m["quality"]["status"]!="approved" or m["category"] not in {"bible","commentary"}:continue
-              category={"bible":"bibles","commentary":"commentaries"}[m["category"]]
-              folder=Path("sources/cleaned")/category/m["language"]/m["id"]
-              masters=list(folder.glob("*.osis.xml"))
-              if len(masters)!=1:raise ValueError("Missing or ambiguous reviewed OSIS master: "+m["id"])
-              source=masters[0]
-              options={}
-              if str(source) in receipts:
-                  entry=receipts[str(source)]
-                  options={"review_receipt":Path(entry["receipt"]),"review_receipt_sha256":entry["sha256"]}
-                  used.add(str(source))
-              report=check(source,m["category"],schema_path=schema,**options)
-              (out/(m["id"]+".json")).write_text(json.dumps(report,sort_keys=True,indent=2)+"\n")
-              result={"resource":m["id"],"source_sha256":report["sha256"],"official_osis":report["official_osis"]["status"],
-                      "findings":report["finding_count"],"finding_codes":report["finding_codes"],
-                      "reviewed_unlinked":report["reviewed_unlinked_reference_count"],
-                      "brnp_conformance_certified":report["brnp_conformance_certified"]}
-              print("BRNP_REAL_EDITION",json.dumps(result,sort_keys=True),flush=True)
-              results.append(result)
-          if used!=set(receipts):raise ValueError("Unused reviewed preservation receipt")
+          results=inspect_approved_osis(Path("."),schema,enforce=False)
           if not results:raise ValueError("No approved OSIS resources inspected")
+          for r in results:
+              (out/(r["resource"]+".json")).write_text(json.dumps(r,sort_keys=True,indent=2)+"\n")
           with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as summary:
-              print("BRNP v0.4 draft: advisory only, not publication conformance",file=summary)
-              for r in results:print(f'- {r["resource"]}: {r["findings"]} open findings; {r["reviewed_unlinked"]} reviewed preserved labels; XSD {r["official_osis"]}',file=summary)
+              print("BRNP v0.4 diagnostic inventory; not editorial certification",file=summary)
+              for r in results:print(f'- {r["resource"]}: {r["finding_count"]} open findings; {r["reviewed_unlinked_reference_count"]} reviewed preserved labels',file=summary)
           PY
       - name: Upload metadata-only diagnostics
         if: always()

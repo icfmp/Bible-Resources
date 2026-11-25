@@ -9,7 +9,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from check_brnp import check, canonical_digest, unlinked_review_inventory  # noqa: E402
+from check_brnp import check, canonical_digest, unlinked_review_inventory, inspect_approved_osis  # noqa: E402
 from hashlib import sha256
 from lxml import etree
 from normalize_osis import brnp_regressions  # noqa: E402
@@ -87,7 +87,7 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         self.assertEqual(report["finding_codes"]["UNREVIEWED_ELEMENT"], 1)
         self.assertEqual(report["unreviewed_elements"]["invented"], 1)
         self.assertEqual(report["finding_examples_by_code"]["UNREVIEWED_ELEMENT"]["element"], "invented")
-        self.assertEqual(report["profile_version"], "0.4-draft")
+        self.assertEqual(report["profile_version"], "0.4")
         self.assertIn("<invented>word</invented>", self.path.read_text(encoding="utf-8"))
 
     def test_commentary_missing_reference_is_blocked(self):
@@ -530,6 +530,74 @@ class BRNPReviewedUnlinkedTests(unittest.TestCase):
             self.review["current_master_sha256"] = sha256(self.path.read_bytes()).hexdigest()
             with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_INVENTORY_CHANGED"):
                 self.inspect()
+
+
+
+class BRNPPublicationGateTests(unittest.TestCase):
+    def setUp(self):
+        from unittest.mock import patch
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        folder = self.root / "sources/cleaned/bibles/fr/synthetic"
+        folder.mkdir(parents=True)
+        self.source = folder / "synthetic.osis.xml"
+        self.source.write_text(document('<chapter osisID="Gen.1"><verse osisID="Gen.1.1">Text</verse></chapter>'))
+        mdir = self.root / "modules/synthetic"
+        mdir.mkdir(parents=True)
+        (mdir / "metadata.json").write_text(json.dumps({"id":"synthetic","category":"bible","language":"fr","version":"1.0.0","quality":{"status":"approved"}}))
+        self.proof = mdir / "SOURCE_VALIDATION.json"
+        self.proof.write_text(json.dumps({"status":"validated","source_sha256":sha256(self.source.read_bytes()).hexdigest()}))
+        (self.root / "config").mkdir()
+        (self.root / "config/brnp-reviewed-unlinked.json").write_text('{"schema_version":1,"reviewed_receipts":{}}')
+        self.schema = self.root / "pinned.xsd"
+        self.real_check = check
+        # Only the independent schema backend is stubbed in these small
+        # control-flow fixtures. Real pinned XSD is required on all editions
+        # in the integration workflow.
+        def fixture_check(source, kind, **kwargs):
+            self.assertEqual(kwargs.pop("schema_path"), self.schema)
+            report = self.real_check(source, kind, **kwargs)
+            report["official_osis"] = {"status":"validated"}
+            return report
+        self.patcher = patch("check_brnp.check", side_effect=fixture_check)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+        self.temp.cleanup()
+
+    def test_gate_accepts_exact_approved_master_without_modifying_bytes(self):
+        before = self.source.read_bytes()
+        result = inspect_approved_osis(self.root, self.schema)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["finding_count"], 0)
+        self.assertEqual(before, self.source.read_bytes())
+
+    def test_gate_rejects_unresolved_candidate_even_when_source_receipt_updated(self):
+        self.source.write_text(document('<chapter osisID="Gen.1"><verse osisID="Gen.1.1"><reference>Unknown label</reference></verse></chapter>'))
+        self.proof.write_text(json.dumps({"status":"validated","source_sha256":sha256(self.source.read_bytes()).hexdigest()}))
+        self.assertEqual(inspect_approved_osis(self.root,self.schema,enforce=False)[0]["finding_count"],1)
+        with self.assertRaisesRegex(ValueError, "BRNP_PUBLICATION_BLOCKED"):
+            inspect_approved_osis(self.root,self.schema)
+
+    def test_gate_rejects_unbound_or_missing_master(self):
+        self.source.write_text(self.source.read_text().replace("Text","Changed"))
+        with self.assertRaisesRegex(ValueError, "BRNP_APPROVED_SOURCE_MISMATCH"):
+            inspect_approved_osis(self.root,self.schema)
+        self.source.unlink()
+        with self.assertRaisesRegex(ValueError, "BRNP_MASTER_MISSING_OR_AMBIGUOUS"):
+            inspect_approved_osis(self.root,self.schema)
+
+    def test_publisher_requires_gate_before_coverage_or_public_write(self):
+        from unittest.mock import patch
+        import publish_reviewed_release as publisher
+        argv=["publisher","--root",str(self.root),"--built",str(self.root),
+              "--repository","owner/repo","--target-sha","a"*40,"--brnp-schema",str(self.schema)]
+        with patch.object(sys,"argv",argv), patch.object(publisher,"inspect_approved_osis",side_effect=ValueError("blocked")), patch.object(publisher,"coverage") as coverage, patch.object(publisher,"publish_one") as publish:
+            with self.assertRaisesRegex(publisher.ReleaseError,"BRNP structural"):
+                publisher.main()
+            coverage.assert_not_called()
+            publish.assert_not_called()
 
 
 if __name__ == "__main__":
