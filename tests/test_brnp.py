@@ -9,7 +9,9 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from check_brnp import check  # noqa: E402
+from check_brnp import check, canonical_digest, unlinked_review_inventory, inspect_approved_osis  # noqa: E402
+from hashlib import sha256
+from lxml import etree
 from normalize_osis import brnp_regressions  # noqa: E402
 
 NS = 'http://www.bibletechnologies.net/2003/OSIS/namespace'
@@ -85,7 +87,7 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         self.assertEqual(report["finding_codes"]["UNREVIEWED_ELEMENT"], 1)
         self.assertEqual(report["unreviewed_elements"]["invented"], 1)
         self.assertEqual(report["finding_examples_by_code"]["UNREVIEWED_ELEMENT"]["element"], "invented")
-        self.assertEqual(report["profile_version"], "0.3-draft")
+        self.assertEqual(report["profile_version"], "0.4")
         self.assertIn("<invented>word</invented>", self.path.read_text(encoding="utf-8"))
 
     def test_commentary_missing_reference_is_blocked(self):
@@ -443,6 +445,166 @@ class BRNPStructuralPilotTests(unittest.TestCase):
             '<reference osisRef=" Gen.1.2">Link</reference>'
             '<verse eID="v"/></p><chapter eID="ch"/>'), "commentary")
         self.assertEqual(report["finding_codes"], {"REFERENCE_TARGET_WHITESPACE": 1})
+
+
+
+class BRNPReviewedUnlinkedTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        root = Path(self.temp.name)
+        self.path = root / "source.xml"
+        self.receipt = root / "receipt.json"
+        self.xml = document('<chapter osisID="Gen.1"><verse osisID="Gen.1.1">Text'
+                            '<note type="crossReference" n="a"><reference type="annotateRef" '
+                            'subType="x-origin" osisRef="Gen.1.1">1.1</reference>'
+                            '<reference>Unresolved original label.</reference></note>'
+                            '</verse></chapter>')
+        self.path.write_text(self.xml, encoding="utf-8")
+        _, entries, count = unlinked_review_inventory(etree.fromstring(self.path.read_bytes()))
+        self.review = {
+            "schema_version": 1, "status": "exact_reviewed_unlinked_preservation_evidence",
+            "current_master_sha256": sha256(self.path.read_bytes()).hexdigest(),
+            "historically_reviewed_master_sha256": "a" * 64,
+            "original_usfx_archive_sha256": "b" * 64,
+            "historical_approval_manifest_sha256": "c" * 64,
+            "historical_review": "synthetic fixture", "current_release_review": "synthetic fixture",
+            "all_unlinked_reference_indices_reconciled": True,
+            "destination_semantics_certified": False, "mandatory_gate_approved": False,
+            "entries_sha256": canonical_digest(entries), "source_notes_reconciled": count,
+            "preserved_unlinked_groups": len(entries),
+        }
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def inspect(self):
+        self.receipt.write_text(json.dumps(self.review), encoding="utf-8")
+        return check(self.path, "bible", review_receipt=self.receipt,
+                     review_receipt_sha256=sha256(self.receipt.read_bytes()).hexdigest())
+
+    def test_unlinked_requires_explicit_receipt(self):
+        self.assertEqual(check(self.path, "bible")["finding_codes"], {"UNRESOLVED_REFERENCE_TARGET": 1})
+        before = self.path.read_bytes()
+        report = self.inspect()
+        self.assertEqual(report["finding_count"], 0)
+        self.assertEqual(report["reviewed_unlinked_reference_count"], 1)
+        self.assertFalse(report["brnp_conformance_certified"])
+        self.assertFalse(report["publication_approved"])
+        self.assertNotIn("Unresolved original label.", json.dumps(report))
+        self.assertEqual(report, self.inspect())
+        self.assertEqual(before, self.path.read_bytes())
+
+    def test_changed_source_rejects_old_receipt(self):
+        for mutation in ("Unresolved changed label.", "Unresolved original label!"):
+            self.path.write_text(self.xml.replace("Unresolved original label.", mutation))
+            with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_MASTER_CHANGED"):
+                self.inspect()
+
+    def test_new_unreviewed_label_does_not_inherit_review(self):
+        self.path.write_text(self.xml.replace("</verse>", '<reference>Another label.</reference></verse>'))
+        with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_MASTER_CHANGED"):
+            self.inspect()
+
+    def test_count_alone_cannot_approve_changed_label(self):
+        self.path.write_text(self.xml.replace("Unresolved original label.", "Different label."))
+        self.review["current_master_sha256"] = sha256(self.path.read_bytes()).hexdigest()
+        with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_INVENTORY_CHANGED"):
+            self.inspect()
+
+    def test_changed_receipt_pin_is_rejected(self):
+        self.inspect()
+        with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_RECEIPT_CHANGED"):
+            check(self.path, "bible", review_receipt=self.receipt, review_receipt_sha256="0"*64)
+
+    def test_receipt_does_not_certify_destination_or_gate(self):
+        for key in ("destination_semantics_certified", "mandatory_gate_approved"):
+            self.review[key] = True
+            with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_SCOPE"):
+                self.inspect()
+            self.review[key] = False
+
+    def test_blank_target_or_nested_markup_not_eligible(self):
+        for fragment in ('<reference osisRef="">Unresolved original label.</reference>',
+                         '<reference><hi type="italic">Unresolved original label.</hi></reference>'):
+            self.path.write_text(self.xml.replace('<reference>Unresolved original label.</reference>', fragment))
+            self.review["current_master_sha256"] = sha256(self.path.read_bytes()).hexdigest()
+            with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_INVENTORY_CHANGED"):
+                self.inspect()
+
+
+
+class BRNPPublicationGateTests(unittest.TestCase):
+    def setUp(self):
+        from unittest.mock import patch
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        folder = self.root / "sources/cleaned/bibles/fr/synthetic"
+        folder.mkdir(parents=True)
+        self.source = folder / "synthetic.osis.xml"
+        self.source.write_text(document('<chapter osisID="Gen.1"><verse osisID="Gen.1.1">Text</verse></chapter>'))
+        mdir = self.root / "modules/synthetic"
+        mdir.mkdir(parents=True)
+        (mdir / "metadata.json").write_text(json.dumps({"id":"synthetic","category":"bible","language":"fr","version":"1.0.0","quality":{"status":"approved"}}))
+        self.proof = mdir / "SOURCE_VALIDATION.json"
+        self.proof.write_text(json.dumps({"status":"validated","source_sha256":sha256(self.source.read_bytes()).hexdigest()}))
+        (self.root / "config").mkdir()
+        (self.root / "config/brnp-reviewed-unlinked.json").write_text('{"schema_version":1,"reviewed_receipts":{}}')
+        self.schema = self.root / "pinned.xsd"
+        self.real_check = check
+        # Only the independent schema backend is stubbed in these small
+        # control-flow fixtures. Real pinned XSD is required on all editions
+        # in the integration workflow.
+        def fixture_check(source, kind, **kwargs):
+            self.assertEqual(kwargs.pop("schema_path"), self.schema)
+            report = self.real_check(source, kind, **kwargs)
+            report["official_osis"] = {"status":"validated"}
+            return report
+        self.patcher = patch("check_brnp.check", side_effect=fixture_check)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+        self.temp.cleanup()
+
+    def test_gate_accepts_exact_approved_master_without_modifying_bytes(self):
+        before = self.source.read_bytes()
+        result = inspect_approved_osis(self.root, self.schema)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["finding_count"], 0)
+        self.assertEqual(before, self.source.read_bytes())
+
+    def test_gate_rejects_unresolved_candidate_even_when_source_receipt_updated(self):
+        self.source.write_text(document('<chapter osisID="Gen.1"><verse osisID="Gen.1.1"><reference>Unknown label</reference></verse></chapter>'))
+        self.proof.write_text(json.dumps({"status":"validated","source_sha256":sha256(self.source.read_bytes()).hexdigest()}))
+        self.assertEqual(inspect_approved_osis(self.root,self.schema,enforce=False)[0]["finding_count"],1)
+        with self.assertRaisesRegex(ValueError, "BRNP_PUBLICATION_BLOCKED"):
+            inspect_approved_osis(self.root,self.schema)
+
+    def test_gate_rejects_unbound_or_missing_master(self):
+        self.source.write_text(self.source.read_text().replace("Text","Changed"))
+        with self.assertRaisesRegex(ValueError, "BRNP_APPROVED_SOURCE_MISMATCH"):
+            inspect_approved_osis(self.root,self.schema)
+        self.source.unlink()
+        with self.assertRaisesRegex(ValueError, "BRNP_MASTER_MISSING_OR_AMBIGUOUS"):
+            inspect_approved_osis(self.root,self.schema)
+
+    def test_unverified_header_revision_cannot_override_approval_hash(self):
+        data = json.loads(self.proof.read_text())
+        data["header_revision"] = {"candidate_source_sha256": sha256(self.source.read_bytes()).hexdigest()}
+        self.proof.write_text(json.dumps(data))
+        with self.assertRaisesRegex(ValueError, "BRNP_HEADER_REVISION_UNSUPPORTED"):
+            inspect_approved_osis(self.root,self.schema)
+
+    def test_publisher_requires_gate_before_coverage_or_public_write(self):
+        from unittest.mock import patch
+        import publish_reviewed_release as publisher
+        argv=["publisher","--root",str(self.root),"--built",str(self.root),
+              "--repository","owner/repo","--target-sha","a"*40,"--brnp-schema",str(self.schema)]
+        with patch.object(sys,"argv",argv), patch("check_brnp.inspect_approved_osis",side_effect=ValueError("blocked")), patch.object(publisher,"coverage") as coverage, patch.object(publisher,"publish_one") as publish:
+            with self.assertRaisesRegex(publisher.ReleaseError,"BRNP structural"):
+                publisher.main()
+            coverage.assert_not_called()
+            publish.assert_not_called()
 
 
 if __name__ == "__main__":

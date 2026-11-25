@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "reviewed_receipts": {
+    "sources/cleaned/bibles/fr/lsg-1910/lsg-1910.osis.xml": {
+      "receipt": "sources/cleaned/bibles/fr/lsg-1910/editorial/evidence/brnp-reviewed-unlinked-1.0.4.json",
+      "sha256": "b273338a99c03d036f79aafe5f4bee746454ed817d954795b9376eae6ea3df0c"
+    }
+  }
+}

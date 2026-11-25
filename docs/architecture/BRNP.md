@@ -1,6 +1,6 @@
-# Bible Resources Normalization Profile (BRNP) — working specification v0.3-draft
+# Bible Resources Normalization Profile (BRNP) — specification v0.4
 
-**Status:** implementation under review in [#451](https://github.com/icfmp/Bible-Resources/issues/451). **Not a mandatory publication gate.** This document specifies conventions for reviewed *cleaned* masters, not for immutable source archives. The official OSIS 2.1.1 XSD remains authoritative for XML legality. A BRNP passing result alone never certifies an edition.
+**Status:** implementation under review in [#451](https://github.com/icfmp/Bible-Resources/issues/451). **Owner-approved mandatory structural subset for future OSIS Bible/commentary publication (2026-11-25, #451).** This document specifies conventions for reviewed *cleaned* masters, not for immutable source archives. The official OSIS 2.1.1 XSD remains authoritative for XML legality. A BRNP passing result alone never certifies an edition.
 
 ## Authority and fidelity
 
@@ -83,11 +83,11 @@ An OSIS-valid source representation may be different from the canonical cleaned 
 
 1. Pin immutable upstream data, historical edition witnesses, rights and provenance.
 2. Validate **official OSIS 2.1.1 XSD** (pinned at `config/osis-policy.json`) and XML syntax. A document cannot pass BRNP by skipping the schema.
-3. Run the independent, read-only BRNP structural checker. Its current v0.3-draft subset checks identity, reviewed element names, unique canonical IDs, book/chapter scope, compound verse membership, verse pairs, commentary reference grammar, poetry grouping and unresolved cross-reference targets; **it does not yet prove all hierarchy, target resolution or semantic conditions in this specification**.
+3. Run the independent, read-only BRNP structural checker. Its current v0.4 subset checks identity, reviewed element names, unique canonical IDs, book/chapter scope, compound verse membership, verse pairs, commentary reference grammar, poetry grouping and unresolved cross-reference targets; **it does not yet prove all hierarchy, target resolution or semantic conditions in this specification**.
 4. Review source-to-cleaned differences and, separately, historical edition-to-cleaned evidence. Record normalized markup, deleted digital-only artifacts, and every unresolved editorial case.
 5. Check clean-to-native SWORD text, notes, structure and key parity, then multiple readers; document unavoidable renderer differences.
 
-For each stage record input/output SHA-256, schema and checker version, diagnostic paths/locations (without copying copyrighted source prose), exact transformation plan and independent evidence. Failure at any mandatory existing gate blocks release. BRNP-specific enforcement requires acceptance of issue #451 and owner approval.
+For each stage record input/output SHA-256, schema and checker version, diagnostic paths/locations (without copying copyrighted source prose), exact transformation plan and independent evidence. Failure at any mandatory existing gate blocks release. The owner approved enforcement of the implemented structural subset on 2026-11-25; unknown or unimplemented semantics still require independent evidence.
 
 ## Deterministic normalizer requirements
 
@@ -102,3 +102,41 @@ Issue #451 remains open until: XSD evidence, a fully specified and independently
 ### Paired commentary scope evidence (2026-11-24)
 
 The owner approved developing the generic alternative after the [MHC scope audit](https://github.com/icfmp/Bible-Resources/actions/runs/45447586839): all 4,255 pairs cross parent boundaries, 4,254 have visible preceding material within the start parent, and none has an exclusive common-ancestor container. Direct div milestone substitution failed the official XSD. The strict paired representation validates those existing boundaries without rewriting paragraphs or poetry. This is not permission to choose milestones merely to bypass another diagnostic, nor to make BRNP mandatory. Validate real editions, including both existing annotated commentaries and the corrected milestone candidate, before adoption.
+
+## Reviewed intentionally unlinked destinations (v0.4 draft)
+
+A destination that has not been established is never converted into a guessed
+`osisRef`. A bare, nonempty, childless reference label in a source-attested
+cross-reference note with a unique explicit origin and destination may be
+classified as **reviewed unlinked preservation**, rather than an open
+normalization finding. This is an explicit reviewed decision to retain the
+label, not verification of the destination. It must have independently
+reconciled original source, prior reviewed master and exact current master
+evidence; the receipt pins these identities, a deterministic digest of the
+complete per-label inventory (book, note ordinal, reference ordinal, exact
+reference/note/origin fingerprints), and the source review and release review.
+
+The checker requires the receipt **and its separately trusted SHA-256**.
+Without them the original unresolved diagnostic remains. A stale or modified
+master or receipt, altered label, note context, missing/new entry or mismatched
+inventory blocks receipt use. Unknown markup, missing origin, blank targets
+and other reference forms do not gain an exemption. No resource ID, expected
+count alone or edition-specific logic can authorize preservation.
+
+```sh
+python scripts/check_brnp.py MASTER --kind bible --schema PINNED_XSD \
+  --reviewed-unlinked REVIEW_RECEIPT --reviewed-unlinked-sha256 TRUSTED_SHA256 \
+  --report NEW_REPORT.json
+```
+
+Reports retain each reviewed location and metadata-only fingerprint under
+`reviewed_unlinked_references`, separately from unresolved findings.
+No publication approval or destination semantics certification follows.
+A fresh source or master revision needs a fresh reviewed receipt; do not
+automatically carry the decision over to modified bytes. The implemented v0.4 structural subset is mandatory before new publication; the separate diagnostic workflow may still report findings without making a release decision.
+
+## Adoption and migration
+
+The owner approved the required implemented v0.4 gate on 2026-11-25 (issue #451). The production publisher and its read-only CI invocation require the independently pinned official XSD and a zero-open-finding check on every approved OSIS Bible/commentary master, bound to the exact existing source-validation hash. The same inventory logic powers the advisory workflow. A missing/ambiguous master, stale review receipt, source hash mismatch, XSD failure or unresolved structural finding blocks publication before any GitHub release write or Pages deployment. Current immutable packages are verified, not regenerated or republished as part of adoption. Non-OSIS dictionaries require their own applicable profile and checks. This is a necessary structural subset, **not** a blanket conformance, semantic fidelity, rights or reader certification; all other source/native/reader and editorial gates remain in force.
+
+Where an existing reviewed header-only revision retains the historical approval hash, the gate reuses the complete reversible header-only source/native evidence verifier and binds the inspection to the verified current candidate hash. A bare replacement hash does not authorize this route.

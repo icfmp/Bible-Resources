@@ -38,7 +38,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/build.py`](../../scripts/build.py) | KEEP_GENERIC | not established | 15 | publication/release |
 | [`scripts/catalogue_profiles.py`](../../scripts/catalogue_profiles.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/catalogue_release_coverage.py`](../../scripts/catalogue_release_coverage.py) | KEEP_GENERIC | named test | 12 | publication/release |
-| [`scripts/check_brnp.py`](../../scripts/check_brnp.py) | KEEP_GENERIC | not established | 8 | not determined |
+| [`scripts/check_brnp.py`](../../scripts/check_brnp.py) | KEEP_GENERIC | not established | 10 | not determined |
 | [`scripts/check_provider_parity.py`](../../scripts/check_provider_parity.py) | KEEP_GENERIC | not established | 5 | not determined |
 | [`scripts/check_updates.py`](../../scripts/check_updates.py) | KEEP_GENERIC | not established | 9 | not determined |
 | [`scripts/commentary_intake.py`](../../scripts/commentary_intake.py) | KEEP_GENERIC | named test | 6 | intake |
@@ -46,9 +46,9 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_native_raw_inventory.py`](../../scripts/commentary_native_raw_inventory.py) | KEEP_GENERIC | named test | 3 | source/native audit |
 | [`scripts/compiled_stock_commentary_proof.py`](../../scripts/compiled_stock_commentary_proof.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/convert_usfm.py`](../../scripts/convert_usfm.py) | KEEP_GENERIC | not established | 4 | not determined |
-| [`scripts/fetch_reviewed_schema.py`](../../scripts/fetch_reviewed_schema.py) | KEEP_GENERIC | not established | 11 | not determined |
+| [`scripts/fetch_reviewed_schema.py`](../../scripts/fetch_reviewed_schema.py) | KEEP_GENERIC | not established | 14 | not determined |
 | [`scripts/guard_commentary.py`](../../scripts/guard_commentary.py) | KEEP_GENERIC | not established | 7 | not determined |
-| [`scripts/guard_osis.py`](../../scripts/guard_osis.py) | KEEP_GENERIC | named test | 15 | not determined |
+| [`scripts/guard_osis.py`](../../scripts/guard_osis.py) | KEEP_GENERIC | named test | 16 | not determined |
 | [`scripts/mark_osis_preverse_section_titles.py`](../../scripts/mark_osis_preverse_section_titles.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/normalize_bible_references.py`](../../scripts/normalize_bible_references.py) | KEEP_GENERIC | named test | 7 | not determined |
 | [`scripts/normalize_osis.py`](../../scripts/normalize_osis.py) | KEEP_GENERIC | not established | 7 | not determined |
@@ -56,7 +56,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/pilot_fetch.py`](../../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 6 | not determined |
 | [`scripts/pilot_preflight.py`](../../scripts/pilot_preflight.py) | KEEP_GENERIC | not established | 14 | not determined |
 | [`scripts/pilot_subprocess.py`](../../scripts/pilot_subprocess.py) | KEEP_GENERIC | not established | 4 | not determined |
-| [`scripts/publish_reviewed_release.py`](../../scripts/publish_reviewed_release.py) | KEEP_GENERIC | not established | 13 | publication/release |
+| [`scripts/publish_reviewed_release.py`](../../scripts/publish_reviewed_release.py) | KEEP_GENERIC | not established | 15 | publication/release |
 | [`scripts/published_reference_audit.py`](../../scripts/published_reference_audit.py) | KEEP_GENERIC | named test | 4 | publication/release |
 | [`scripts/release_preflight.py`](../../scripts/release_preflight.py) | KEEP_GENERIC | named test | 10 | publication/release |
 | [`scripts/remove_reviewed_empty_osis_paragraphs.py`](../../scripts/remove_reviewed_empty_osis_paragraphs.py) | KEEP_GENERIC | named test | 3 | not determined |
@@ -76,7 +76,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/research/bible/usfm_converter_patch.py`](../../scripts/research/bible/usfm_converter_patch.py) | KEEP_GENERIC | not established | 3 | not determined |
 | [`scripts/research/bible/usfm_source_projection.py`](../../scripts/research/bible/usfm_source_projection.py) | KEEP_GENERIC | not established | 3 | not determined |
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 7 | publication/release |
-| [`scripts/reviewed_modern_commentary_rebuild.py`](../../scripts/reviewed_modern_commentary_rebuild.py) | GENERALIZE | named test | 3 | publication/release |
+| [`scripts/reviewed_modern_commentary_rebuild.py`](../../scripts/reviewed_modern_commentary_rebuild.py) | GENERALIZE | named test | 4 | publication/release |
 | [`scripts/reviewed_osis_commentary_rebuild.py`](../../scripts/reviewed_osis_commentary_rebuild.py) | KEEP_GENERIC | not established | 2 | publication/release |
 | [`scripts/reviewed_tei_dictionary.py`](../../scripts/reviewed_tei_dictionary.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/segment_osis_reference_destinations.py`](../../scripts/segment_osis_reference_destinations.py) | KEEP_GENERIC | named test | 4 | not determined |
