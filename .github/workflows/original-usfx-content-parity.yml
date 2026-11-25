@@ -1,0 +1,145 @@
+name: Compare original USFX verse text, notes and Strong word associations to approved OSIS
+on:
+  push:
+    branches: [research/original-usfx-content-parity]
+    paths: ['.github/workflows/original-usfx-content-parity.yml']
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Independent original verse and lexical comparison
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from collections import Counter,defaultdict
+          from hashlib import sha256
+          import json,re,zipfile
+          from lxml import etree
+          from pilot_preflight import inspect_archive
+          from approved_osis_sword_candidate import approved_source_for
+          from source_osis_inventory import _source_tree,OSIS
+          from research.bible.source_osis_verse_notes import original_osis_verses_and_notes
+          NOTE={'x','f','fe','ex','ef'}
+          EXCLUDED={'fig','s','r','toc','h','id'}
+          EXCLUDED_PARAGRAPH={'r','s','s1','s2','s3','s4','sr','h','toc1','toc2','toc3'}
+          def local(n): return etree.QName(n).localname if isinstance(n.tag,str) else ""
+          def ns(s): return ''.join(c for c in (s or '') if not c.isspace())
+          def require(ok,reason):
+              if not ok: raise ValueError(reason)
+          def strong(value,osis=False):
+              if not value: return ()
+              if osis:
+                  parts=value.split()
+                  if any(not x.startswith(('strong:','lemma:')) for x in parts): return None
+                  parts=[x[7:] for x in parts if x.startswith('strong:')]
+              else: parts=[x for x in re.split(r'[\s,]+',value) if x]
+              return tuple(parts) if all(re.fullmatch(r'[HG]\d+[a-z]?',x) for x in parts) else None
+          def source_verses(root,mapping):
+              verses={}; notes=defaultdict(list); outside=0; books=set()
+              for book in root.iter():
+                  if local(book)!='book': continue
+                  code=book.get('id')
+                  require(code in mapping and code not in books,'Unreviewed or duplicate book')
+                  books.add(code)
+                  chapter=None; key=None; position=0
+                  def append(value):
+                      nonlocal position
+                      if key is not None and value:
+                          verses[key].append(value)
+                          position+=len(ns(value))
+                  def walk(n):
+                      nonlocal key,chapter,position,outside
+                      kind=local(n)
+                      if not kind: return
+                      if kind=='c':
+                          require(key is None and re.fullmatch(r'[1-9][0-9]*',n.get('id','')),'Unclosed verse or invalid chapter')
+                          chapter=n.get('id')
+                      elif kind=='v':
+                          require(key is None and chapter and re.fullmatch(r'[0-9]+[a-z]?(?:-[0-9]+[a-z]?)?',n.get('id','')),'Unsupported opening')
+                          key='.'.join((mapping[code],chapter,n.get('id')))
+                          require(key not in verses,'Duplicate verse')
+                          verses[key]=[];position=0
+                      elif kind=='ve':
+                          require(key is not None,'Unexpected verse end')
+                          key=None
+                      if kind in NOTE:
+                          if key is None: outside+=1
+                          else: notes[key].append((position,kind,n.get('caller'),ns(''.join(n.itertext()))))
+                          return
+                      if kind in EXCLUDED or (kind=='p' and (n.get('sfm') or n.get('style')) in EXCLUDED_PARAGRAPH):
+                          return
+                      append(n.text)
+                      for c in n:
+                          walk(c);append(c.tail)
+                  walk(book)
+                  require(key is None,'Unclosed verse at book boundary')
+              return {k:''.join(v) for k,v in verses.items()},notes,outside
+          def scope(n,osis):
+              for a in n.iterancestors():
+                  t=local(a)
+                  if t in ({"note"} if osis else NOTE): return 'note'
+                  if osis and t=='title': return 'title'
+              return 'other'
+          def lexical(root,osis):
+              rows=[]; unknown=Counter(); fields=Counter()
+              for n in root.iter():
+                  if local(n)!='w':continue
+                  fields.update(etree.QName(a).localname for a in n.attrib)
+                  ids=strong(n.get('lemma' if osis else 's'),osis)
+                  if ids is None: unknown['unparsed_strong']+=1
+                  rows.append((ns(''.join(n.itertext())),ids))
+              return rows,unknown,fields
+          crosswalk=json.loads(Path('config/standard_usfm_osis_66.json').read_text())
+          mapping={x['usfm']:x['osis'] for x in crosswalk['books']}
+          for manifest in sorted(Path('sources/original/bibles').glob('*/*/PROVENANCE.json')):
+              p=json.loads(manifest.read_text())
+              witness=p.get('additional_original_witness',{})
+              if witness.get('format')!='USFX':continue
+              require(p.get('provider')=='eBible.org','No reviewed provider member selector')
+              b=manifest.parent/witness['filename']
+              receipt=inspect_archive(b,source_kind='authored')
+              require(receipt['archive_sha256']==witness['sha256'] and receipt['archive_bytes']==witness['size_bytes'],'Original pin mismatch')
+              with zipfile.ZipFile(b) as z:
+                  members=[m for m in z.infolist() if not m.is_dir() and Path(m.filename).name.casefold().endswith('_usfx.xml')]
+                  require(len(members)==1,'Ambiguous Scripture member')
+                  raw=z.read(members[0])
+              require(not re.search(rb'<!DOCTYPE\b',raw,re.I),'Forbidden DTD')
+              root=etree.fromstring(raw,etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True,recover=False))
+              require(local(root)=='usfx' and not any(isinstance(x,etree._Entity) for x in root.iter()),'Invalid USFX root or entity')
+              _,xml=approved_source_for(p['resource_id'])
+              original,notes,outside=source_verses(root,mapping)
+              target,target_notes,meta=original_osis_verses_and_notes(xml)
+              require(set(original)==set(target),'Numbered source and OSIS key mismatch')
+              counts=Counter(); findings=defaultdict(list)
+              def check(kind,ok,ref):
+                  counts[kind+'_compared']+=1
+                  counts[kind+'_equal']+=bool(ok)
+                  if not ok and len(findings[kind])<20: findings[kind].append(ref)
+              for ref in original:
+                  a,b=original[ref],target[ref]
+                  check('verse_nonspace',ns(a)==ns(b),ref)
+                  check('verse_folded_whitespace',' '.join(a.split())==' '.join(b.split()),ref)
+                  x,y=notes[ref],target_notes[ref]
+                  check('verse_note_count',len(x)==len(y),ref)
+                  for i,(old,new) in enumerate(zip(x,y),1):
+                      loc=ref+'#'+str(i)
+                      check('note_body_nonspace',old[3]==ns(new['body']),loc)
+                      check('note_anchor_nonspace',old[0]==new['point'],loc)
+                      check('note_caller',old[2]==new['caller'],loc)
+                      if old[1]=='x': check('cross_reference_type',new['type']=='crossReference',loc)
+                      else: counts['other_source_note_kind_unverified']+=1
+              a,au,af=lexical(root,False); b,bu,bf=lexical(_source_tree(xml),True)
+              for i,(left,right) in enumerate(zip(a,b),1):
+                  check('global_word_nonspace',left[0]==right[0],i)
+                  check('global_word_strong_association',left[0]==right[0] and left[1] is not None and right[1] is not None and left[1]==right[1],i)
+              report={'resource':p['resource_id'],'original_xml_sha256':sha256(raw).hexdigest(),'osis_sha256':sha256(xml).hexdigest(),'counts':dict(counts),'bounded_findings':dict(findings),'source_word_elements':len(a),'osis_word_elements':len(b),'source_word_attributes':dict(af),'osis_word_attributes':dict(bf),'source_unparsed_strong':dict(au),'osis_unparsed_strong':dict(bu),'source_notes_outside_verses':outside,'osis_notes_outside_verses':meta['publisher_notes_outside_numbered_verses'],'explicit_note_target_conversion_verified':False,'morphology_or_non_strong_lemma_parity_verified':False,'global_word_order_not_per_verse_position_proof':True,'scope':'USFX original vs cleaned OSIS; not independent USFM prose or complete conversion certification'}
+              print('ORIGINAL_USFX_CONTENT_DIAGNOSTIC',json.dumps(report,sort_keys=True),flush=True)
+          PY
