@@ -1,0 +1,20 @@
+{
+  "authorization": {
+    "decision": "PENDING explicit project owner approval; NOT an active publication authorization",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/571",
+    "reviewed_by": null,
+    "source_rights": "eBible fraLSG public-domain source; independently reviewed original electronic reference citations and historical printed evidence"
+  },
+  "editorial_path": "modules/lsg-1910/EDITORIAL.md",
+  "evidence_path": "modules/lsg-1910/SOURCE_VALIDATION.json",
+  "module_id": "lsg-1910",
+  "notes_path": "sources/cleaned/bibles/fr/lsg-1910/editorial/releases/LSG-1.0.4.md",
+  "package_sha256": "b5af554a731cbdc5d5c1e268025add4757a94dc4d8ee7af8fec643ad9d391a68",
+  "package_size_bytes": 4268093,
+  "schema_version": 1,
+  "sword_id": "BRLSG1910",
+  "tag": "lsg-1.0.4",
+  "title": "Louis Segond 1910 — 1.0.4",
+  "version": "1.0.4",
+  "zip_name": "BRLSG1910-1.0.4.zip"
+}

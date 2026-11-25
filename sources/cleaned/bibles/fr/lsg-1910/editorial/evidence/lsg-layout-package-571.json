@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "resource_id": "lsg-1910",
+  "status": "technical_candidate_ready_for_owner_review",
+  "public_release_created": false,
+  "publication_authorized": false,
+  "proposed_version": "1.0.4",
+  "source_layout_evidence": "lsg-layout-candidate-571.json",
+  "package": {
+    "audited_unversioned_payload_sha256": "3874f475028ab6295437265be364fd4306c6a87888624c4c63e58474c91569b5",
+    "candidate_source_sha256": "25479903513b66c5dbb0f8eb1d9025da023a6b63df38492c35940ef65425e965",
+    "compiler": {
+      "compiler_log_is_private_and_discarded": true,
+      "compiler_tool": "osis2mod",
+      "diagnostic_categories": {
+        "INFO": 2,
+        "unclassified": 2
+      },
+      "first_diagnostic_locations_no_source_text": [],
+      "returncode": 0,
+      "tool_sha256": "8ceed9fe597fd7948da02170144578522acd7e07ff60a42ba9ee11ddd81b820e"
+    },
+    "editorial_approval_pending": true,
+    "member_sha256": {
+      "mods.d/brlsg1910.conf": "d45d678ee2f1cccdd596d6156866a3812627b6587f1c70a4cbc4e412e5a2368a",
+      "modules/texts/ztext/brlsg1910/nt.bzs": "37727eba1eefb006c4049b5d2464bccbe97337c4cdc80255468a4315fac83829",
+      "modules/texts/ztext/brlsg1910/nt.bzv": "0420f60f3215ce20c2f8b6e50abad80f0ebb6f323841143d350dda55931984f4",
+      "modules/texts/ztext/brlsg1910/nt.bzz": "6b723fe057004593609a0d29a3a106d48806a585e700c95c73a82de25487d648",
+      "modules/texts/ztext/brlsg1910/ot.bzs": "f015e1c674a75cb910770682f1efe9a869c8424cd92d65e95eb5bc010648ccb9",
+      "modules/texts/ztext/brlsg1910/ot.bzv": "145c0622dd9cf40270a879d92570e045aaef36793b274db24c715a46013a712d",
+      "modules/texts/ztext/brlsg1910/ot.bzz": "c3e970aceef38d7a777e15ffea4a09cb4babd7f7719db880c5256ce30c09e94f"
+    },
+    "native_data_matches_audited_candidate": true,
+    "proposed_version": "1.0.4",
+    "public_release_created": false,
+    "zip_sha256": "b5af554a731cbdc5d5c1e268025add4757a94dc4d8ee7af8fec643ad9d391a68",
+    "zip_size_bytes": 4268093
+  },
+  "reproducibility": {
+    "runs": [
+      45572163416,
+      45572211747
+    ],
+    "identical_zip_sha256": true,
+    "identical_member_sha256": true
+  },
+  "jsword": {
+    "run_id": 45572211747,
+    "job_id": 139061370928,
+    "engine_revision": "6ebd10a005fa7761e611c048ececea1430e22546",
+    "installed_exact_versioned_zip": true,
+    "metrics": {},
+    "workflow_conclusion": "success"
+  },
+  "limitations": [
+    "Android GUI and mixed-versification parallel layout not certified",
+    "Xiphos reading-pane prose tested, not pixel-level spacing or introduction table rendering",
+    "311 previously reviewed ambiguous citation targets remain unlinked",
+    "Raw JSword markup differs in whitespace on some slots; all nonspace signatures equal",
+    "No active release plan or catalogue change until owner approval"
+  ]
+}
