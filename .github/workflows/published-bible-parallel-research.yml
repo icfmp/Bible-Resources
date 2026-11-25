@@ -41,7 +41,7 @@ jobs:
           mkdir "$TEST_PROFILE"
           export XDG_CONFIG_HOME="$TEST_PROFILE/config" XDG_DATA_HOME="$TEST_PROFILE/data" XDG_CACHE_HOME="$TEST_PROFILE/cache"
           cat > "$RUNNER_TEMP/parallel.py" <<'PY'
-          import hashlib,json,os,stat,zipfile
+          import hashlib,json,os,stat,zipfile,traceback,re
           from pathlib import Path,PurePosixPath
           from bible.library import Library,catalogue
           from bible.providers import BIBLE_RESOURCES,identity
@@ -87,6 +87,7 @@ jobs:
                  ("Ps.3.2","Ps.3.2")]
           def failure(scope,source,target,reference,exc):
               row={"scope":scope,"source":source,"target":target,"reference":reference,"error":type(exc).__name__}
+              row["frames"]=[{"function":f.name,"line":f.lineno} for f in traceback.extract_tb(exc.__traceback__)[-6:]]
               report["findings"].append(row);print("PARALLEL_FINDING",json.dumps(row),flush=True)
           for a,b in pairs:
               for source,target,ref,expected in ((lsg,darby,a,b),(darby,lsg,b,a)):
@@ -105,6 +106,29 @@ jobs:
           def open_pair(primary,comparison,ref,expected):
               assert tab.navigate(primary,ref)
               tab.state.comparison=comparison;window.sync_comparison();settled()
+              from tools.check_versification_comparison import direct
+              def inspect_document(reader,document):
+                  errors=[]
+                  for span in document.spans:
+                      source=direct(reader,span.reference)
+                      copied=document.copy(span.body,span.end)
+                      folded=lambda t:re.sub(r"\s+"," ",t).strip()
+                      if folded(source)!=folded(copied):
+                          src,dst=folded(source),folded(copied)
+                          errors.append({"reference":span.reference,
+                              "source_length":len(src),"display_length":len(dst),
+                              "source_sha256":hashlib.sha256(src.encode()).hexdigest(),
+                              "display_sha256":hashlib.sha256(dst.encode()).hexdigest(),
+                              "equal_without_whitespace":"".join(src.split())=="".join(dst.split()),
+                              "source_contains_display":dst in src,"display_contains_source":src in dst})
+                  return errors
+              state={"source":primary,"target":comparison,"reference":ref,"expected":expected,
+                     "actual_start":tab.comparison_reference,"actual_end":tab.comparison_end_reference,
+                     "status":tab.comparison_status.get_text(),
+                     "primary_mismatches":inspect_document(tab.reader,tab._document),
+                     "comparison_mismatches":inspect_document(tab._comparison_reader,tab._comparison_document)}
+              if state["primary_mismatches"] or state["comparison_mismatches"] or state["status"] or (state["actual_start"],state["actual_end"])!=(expected,expected):
+                  print("GTK_DETAIL",json.dumps(state,sort_keys=True),flush=True)
               primary_proof=fidelity(tab.reader,tab._document)
               comparison_proof=fidelity(tab._comparison_reader,tab._comparison_document)
               assert not tab.comparison_status.get_text()
