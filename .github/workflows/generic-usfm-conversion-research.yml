@@ -198,6 +198,71 @@ jobs:
                               report["selah_whitespace_projection"]["mismatch_counts"]=result["mismatch_counts"]
                               report["selah_whitespace_projection"]["poetry_unchanged"]=namespace["audit_segments"](source_root,_source_tree(revised),mapping,refs)==report["poetry_diagnostic"]
                               report["selah_whitespace_projection"]["candidate_sha256"]=sha256(revised).hexdigest()
+                              # Reconcile table rows independently, allowing only
+                              # source-attested removal of leaked format controls
+                              # and restoration of missing table separators.
+                              from itertools import accumulate
+                              table_edits=Counter()
+                              old_books={mapping[n.get("id")]:n for n in source_root.iter("book")}
+                              new_books={n.get("osisID"):n for n in target.iter(OSIS+"div") if n.get("type")=="book"}
+                              assert list(old_books)==list(new_books)
+                              def repair_tables(source_book,candidate_book):
+                                  original_tables=list(source_book.iter("table"))
+                                  candidate_tables=list(candidate_book.iter(OSIS+"table"))
+                                  source_rows=[row for table in original_tables for row in table]
+                                  candidate_rows=[row for table in candidate_tables for row in table]
+                                  assert len(source_rows)==len(candidate_rows)
+                                  for sr,cr in zip(source_rows,candidate_rows,strict=True):
+                                      assert len(sr)==len(cr)
+                                      for sc,cc in zip(sr,cr,strict=True):
+                                          assert (sc.tag=="th")== (cc.get("role")=="label")
+                                          old=" ".join("".join(sc.itertext()).split())
+                                          new=" ".join("".join(cc.itertext()).split())
+                                          if old==new:continue
+                                          assert r"\i" in new and " ".join(new.replace(r"\i","").split())==old
+                                          # No blanket cleanup: edit only the
+                                          # mismatching independently paired cell.
+                                          for n in cc.iter():
+                                              for field in ("text","tail"):
+                                                  if n is cc and field=="tail":continue
+                                                  val=getattr(n,field)
+                                                  if val and r"\i" in val:
+                                                      table_edits["removed_literal_controls"]+=val.count(r"\i")
+                                                      setattr(n,field,val.replace(r"\i",""))
+                                          assert " ".join("".join(cc.itertext()).split())==old
+                                  expected=list(accumulate(len(t) for t in original_tables))
+                                  actual=list(accumulate(len(t) for t in candidate_tables))
+                                  assert not set(actual)-set(expected)
+                                  offset=0
+                                  for table in candidate_tables:
+                                      rows=list(table)
+                                      bounds=[n-offset for n in expected if offset<n<offset+len(rows)]
+                                      if bounds:
+                                          assert not table.attrib
+                                          assert not (table.text or "").strip()
+                                          assert all(not (row.tail or "").strip() for row in rows)
+                                          tail=table.tail;table.tail=None
+                                          parent=table.getparent();previous=table
+                                          for lo,hi in zip(bounds,bounds[1:]+[len(rows)]):
+                                              new=etree.Element(OSIS+"table")
+                                              parent.insert(parent.index(previous)+1,new)
+                                              for row in rows[lo:hi]:new.append(row)
+                                              previous=new
+                                              table_edits["restored_table_separators"]+=1
+                                          previous.tail=tail
+                                      offset+=len(rows)
+                                  assert namespace["table_signature"](source_book,True)==namespace["table_signature"](candidate_book,False)
+                              for ident in old_books:repair_tables(old_books[ident],new_books[ident])
+                              table_revised=etree.tostring(target,encoding="utf-8",xml_declaration=True)
+                              checked=verify_numbered_content(zfx.read(a["usfx_member"]),table_revised,mapping,{},zfm)
+                              report["table_projection"]={
+                                  "edits":dict(table_edits),
+                                  "numbered_parity":checked["all_supported_content_checks_equal"],
+                                  "mismatch_counts":checked["mismatch_counts"],
+                                  "layout":namespace["compare_original_tables_and_paragraphs"](source_root,target,mapping),
+                                  "editorial":namespace["editorial_diagnostic"](source_root,target,mapping),
+                                  "poetry_unchanged":namespace["audit_segments"](source_root,target,mapping,refs)==report["poetry_diagnostic"],
+                                  "candidate_sha256":sha256(table_revised).hexdigest()}
                       except (ValueError,RuntimeError,AssertionError) as exc:
                           report["audit_blocked_by"]=type(exc).__name__
                       except Exception as exc:
