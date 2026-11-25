@@ -1,0 +1,221 @@
+name: Stage exact LSG 1.0.4 files without release authorization
+on:
+  push:
+    branches: [stage/lsg-1.0.4-pending-authorization]
+    paths: ['.github/workflows/stage-lsg-layout-pending.yml']
+permissions:
+  contents: write
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 update -qq
+          timeout 90s sudo apt-get -o Acquire::Retries=0 -o Acquire::http::Timeout=12 install -y libsword-dev libsword-utils diatheke
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o "$RUNNER_TEMP/native-raw" -lsword
+      - name: Reconstruct byte-exact audited candidate and compare compiler output
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          import json,os,shutil,zipfile
+          from approved_osis_sword_candidate import approved_source_for,_create_candidate_layout,_compile_osis
+          from stable_sword_refs import module_payload_digest
+          t=Path(os.environ['RUNNER_TEMP'])
+          e=json.loads(Path('sources/cleaned/bibles/fr/lsg-1910/editorial/evidence/lsg-layout-candidate-571.json').read_text())
+          _,xml=approved_source_for('lsg-1910')
+          assert e['publication_authorized'] is False
+          for stage,oldkey,editkey in [(e['table'],'source_sha256','edits'),(e['paragraph'],'table_candidate_sha256','byte_edits')]:
+              assert sha256(xml).hexdigest()==stage[oldkey]
+              previous=xml;cursor=0;chunks=[]
+              for patch in stage[editkey]:
+                  i=patch['source_byte_offset'];old=patch['old_utf8'].encode();new=patch['new_utf8'].encode()
+                  assert i>=cursor and xml[i:i+len(old)]==old
+                  chunks.append(xml[cursor:i])
+                  assert sum(map(len,chunks))==patch['candidate_byte_offset']
+                  chunks.append(new);cursor=i+len(old)
+              chunks.append(xml[cursor:]);xml=b''.join(chunks)
+              assert sha256(xml).hexdigest()==stage['candidate_sha256']
+              inverse=xml
+              for patch in reversed(stage[editkey]):
+                  i=patch['candidate_byte_offset'];old=patch['old_utf8'].encode();new=patch['new_utf8'].encode()
+                  assert inverse[i:i+len(new)]==new
+                  inverse=inverse[:i]+old+inverse[i+len(new):]
+              assert inverse==previous
+          assert sha256(xml).hexdigest()==e['native']['candidate_sha256']==e['xiphos']['candidate_sha256']
+          assert e['native']['numbered_slot_text_and_note_parity_verified']
+          assert e['native']['source_native_body_boundary_positions']['all_book_body_nonspace_and_boundary_events_equal']
+          assert e['schema']['official_osis_validated'] and e['xiphos']['all_source_prose_witnesses']
+          path=t/'lsg-layout-candidate.osis.xml';path.write_bytes(xml)
+          work=t/'private-lsg-layout';work.mkdir()
+          payload,out=_create_candidate_layout(work,'BRLSG1910','Segond','fr')
+          shutil.copyfile('modules/lsg-1910/payload/mods.d/brlsg1910.conf',payload/'mods.d/brlsg1910.conf')
+          compiler=_compile_osis(Path(shutil.which('osis2mod')),path,out,'Segond',t/'private-compile.log')
+          digest=module_payload_digest(work)
+          assert digest==e['native']['compiled_payload_sha256'],('Compiler output differs from audited candidate',digest)
+          for name,value in [('lsg-layout-native.json',e['native']),('lsg-paragraph-receipt.json',e['paragraph'])]:
+              (t/name).write_text(json.dumps(value))
+          # Version is provisional and only applied inside an isolated package.
+          # Preserve the verified native payload and all other config bytes.
+          conf=payload/'mods.d/brlsg1910.conf'
+          b=conf.read_bytes();assert b.count(b'Version=1.0.3')==1
+          old_about=b'Bible Resources 1.0.3 removed eight redundant empty paragraphs.'
+          new_about=b'Bible Resources 1.0.4 restores source-attested paragraph boundaries and introduction tables, removes three converter residues, and retains the eight redundant empty paragraph removals from 1.0.3.'
+          assert b.count(old_about)==1
+          revised=b.replace(b'Version=1.0.3',b'Version=1.0.4').replace(old_about,new_about)
+          files={f.relative_to(payload).as_posix():f.read_bytes() for f in sorted(payload.rglob('*')) if f.is_file()}
+          files['mods.d/brlsg1910.conf']=revised
+          old=json.loads(Path('config/catalogue-import-lsg-1.0.3.json').read_text())
+          assert set(files)==set(old['files'])
+          zip_path=t/'BRLSG1910-1.0.4-candidate.zip'
+          with zipfile.ZipFile(zip_path,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+              for name,content in sorted(files.items()):
+                  info=zipfile.ZipInfo(name,(1980,1,1,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=0o100644<<16
+                  z.writestr(info,content)
+          hashes={name:sha256(content).hexdigest() for name,content in files.items()}
+          with zipfile.ZipFile(zip_path) as z:
+              assert z.testzip() is None and set(z.namelist())==set(hashes)
+              assert all(sha256(z.read(name)).hexdigest()==digest for name,digest in hashes.items())
+          result={'candidate_source_sha256':sha256(xml).hexdigest(),'audited_unversioned_payload_sha256':digest,'proposed_version':'1.0.4','zip_sha256':sha256(zip_path.read_bytes()).hexdigest(),'zip_size_bytes':zip_path.stat().st_size,'member_sha256':hashes,'native_data_matches_audited_candidate':True,'public_release_created':False,'editorial_approval_pending':True,'compiler':compiler}
+          (t/'lsg-private-package-receipt.json').write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')
+          print('LSG_PRIVATE_PACKAGE',json.dumps(result,sort_keys=True),flush=True)
+          PY
+      - name: Stage the exact candidate and require pending authorization to fail closed
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256,sha1
+          import json,os,shutil,zipfile
+          from build import build
+          from validate import validate
+          from stable_sword_refs import module_payload_digest
+          from approved_osis_sword_candidate import approved_source_for
+          from publish_reviewed_release import approved_release,ReleaseError
+          t=Path(os.environ['RUNNER_TEMP'])
+          root=Path.cwd().resolve()
+          assert os.environ['GITHUB_REF']=='refs/heads/stage/lsg-1.0.4-pending-authorization'
+          m=root/'modules/lsg-1910'
+          folder=root/'sources/cleaned/bibles/fr/lsg-1910'
+          editorial=folder/'editorial'
+          base=editorial/'evidence'
+          evidence=json.loads((base/'lsg-layout-candidate-571.json').read_text())
+          package=json.loads((t/'lsg-private-package-receipt.json').read_text())
+          final=json.loads((base/'lsg-layout-package-571.json').read_text())
+          assert final['publication_authorized'] is False and final['package']==package
+          assert final['jsword']['installed_exact_versioned_zip'] and final['jsword']['workflow_conclusion']=='success'
+          assert final['production_preview']['standard_build_reproduced_exact_zip']
+          candidate=(t/'lsg-layout-candidate.osis.xml').read_bytes()
+          old='cf867c35a55208726f5e0d57c15555b2947f6e799ecbc1996204e5120f3235f0'
+          new=sha256(candidate).hexdigest()
+          assert new==package['candidate_source_sha256']==evidence['native']['candidate_sha256']
+          def load(path):return json.loads(path.read_text())
+          def save(path,value):path.write_text(json.dumps(value,sort_keys=True,indent=2,ensure_ascii=False)+'\n')
+          def sha(path):return sha256(path.read_bytes()).hexdigest()
+          def one(text,old,new):
+              assert text.count(old)==1,old
+              return text.replace(old,new,1)
+          master=folder/'lsg-1910.osis.xml'
+          assert sha(master)==old
+          master.write_bytes(candidate)
+          assert sha(master)==new
+          with zipfile.ZipFile(t/'BRLSG1910-1.0.4-candidate.zip') as z:
+              assert set(z.namelist())==set(package['member_sha256'])
+              for name in z.namelist():
+                  dst=m/'payload'/name
+                  assert dst.is_file() and dst.resolve().is_relative_to((m/'payload').resolve())
+                  data=z.read(name);assert sha256(data).hexdigest()==package['member_sha256'][name];dst.write_bytes(data)
+          # Technical review is distinct from owner authorization. The previous
+          # active release plan remains in place, blocking release coverage.
+          meta=load(m/'metadata.json');meta['version']='1.0.4'
+          meta['quality']['reviewed_by']='Technical audit #571 — staged candidate, owner publication authorization pending'
+          save(m/'metadata.json',meta)
+          ev=base/'lsg-layout-candidate-571.json'
+          proof_hash=sha(ev)
+          cleanup=load(folder/'CLEANUP_MANIFEST.json')
+          cleanup.update(previous_approved_cleaned_osis_sha256=old,cleaned_osis_sha256=new,final_candidate_osis_sha256=new,cleaned_osis_bytes=len(candidate),layout_overlay_receipt_sha256=proof_hash,status='unpublished_layout_candidate_preview',published_release_provenance='config/catalogue-import-lsg-1.0.3.json')
+          save(folder/'CLEANUP_MANIFEST.json',cleanup)
+          p=load(m/'SOURCE_VALIDATION.json');p.update(source_sha256=new,provenance_audit_sha256=proof_hash,note='Pinned official XSD and complete native text/note/structure proof; unpublished technical preview.')
+          save(m/'SOURCE_VALIDATION.json',p)
+          n=load(m/'NORMALIZATION_REPORT.json')
+          n.update(output_sha256=new,diff_sha256=proof_hash,plan_sha256=proof_hash,review_asserted_by_plan='Technical source-attested layout audit #571; owner release approval pending')
+          n['operations'].append({'operation':'restore_source_attested_paragraph_and_table_layout','old_sha256':old,'new_sha256':new,'exact_inverse_verified':True,'restored_boundaries':17,'removed_displaced_boundaries':9,'converter_controls_removed':3,'table_boundaries_restored':1})
+          save(m/'NORMALIZATION_REPORT.json',n)
+          c=load(m/'SWORD_COMPATIBILITY.json')
+          c.update(source_osis_sha256=new,module_payload_sha256=module_payload_digest(m),full_readback_evidence_sha256=proof_hash,reviewed_by='Technical full native layout audit #571; unpublished preview')
+          save(m/'SWORD_COMPATIBILITY.json',c)
+          profile=editorial/'profiles/fr-segond-1910.md'
+          text=profile.read_text()
+          # Version labels only, never a new approved description.
+          for a,b in [('**Version Bible Resources :** 1.0.3','**Version Bible Resources :** 1.0.4'),('| Version | 1.0.3 |','| Version | 1.0.4 |'),('**Édition numérique :** Bible Resources 1.0.3, novembre 2026.','**Édition numérique :** Bible Resources 1.0.4, novembre 2026.')]:text=one(text,a,b)
+          profile.write_text(text)
+          p=load(m/'profiles/fr.json')
+          p['module_version']='1.0.4';p['revision']=p['approved_at']+'.5'
+          p['evidence_urls']['curated_release']='https://github.com/icfmp/Bible-Resources/releases/tag/lsg-1.0.4'
+          data=profile.read_bytes();p['source_git_blob_sha1']=sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          save(m/'profiles/fr.json',p)
+          # Record the actual technical changes in the module changelog; no fabricated owner approval.
+          editorial_md=m/'EDITORIAL.md'
+          history=editorial_md.read_text()
+          editorial_md.write_text('# Louis Segond 1910 — Bible Resources 1.0.4 (unpublished candidate)\n\nSource-attested restoration of 17 numbered paragraph starts and removal of 9 displaced starts, 13 original introduction tables and removal of three literal converter controls. All numbered Scripture text, punctuation, notes and Strong associations preserved; exact reversible edits. Official XSD, native SWORD, actual Xiphos and independent JSword proofs in #571 and #573. Owner authorization to publish remains pending.\n\n## Previous editorial record\n\n'+history)
+          release_notes=editorial/'releases/LSG-1.0.4.md'
+          assert not release_notes.exists()
+          release_notes.write_text((base/'LSG-1.0.4-REVIEW.md').read_text())
+          old_snapshot=root/'catalog/v1/catalog.json'
+          before=load(old_snapshot);old_snapshot.unlink()
+          _,errors=validate(root)
+          assert not errors,errors
+          _,reconstructed=approved_source_for('lsg-1910',root=root)
+          assert reconstructed==candidate
+          dist=t/'private-promotion-dist'
+          build(root=root,output=dist)
+          after=load(dist/'catalog/v1/catalog.json')
+          actual=dist/'sword/packages/BRLSG1910.zip'
+          assert sha(actual)==package['zip_sha256'] and actual.stat().st_size==package['zip_size_bytes']
+          a={x['id']:x for x in before['modules']};b={x['id']:x for x in after['modules']}
+          assert set(a)==set(b) and all(a[k]==b[k] for k in a if k!='lsg-1910')
+          assert b['lsg-1910']['version']=='1.0.4' and b['lsg-1910']['download']['sha256']==package['zip_sha256']
+          old_snapshot.write_bytes((dist/'catalog/v1/catalog.json').read_bytes())
+          # Verify snapshot is accepted by the production builder a second time.
+          build(root=root,output=dist)
+          assert sha(dist/'sword/packages/BRLSG1910.zip')==package['zip_sha256']
+          plan=load(base/'lsg-1.0.4-release-plan-DRAFT.json')
+          plan.update(package_sha256=package['zip_sha256'],package_size_bytes=package['zip_size_bytes'])
+          assert plan['authorization']['reviewed_by'] is None
+          draft=t/'pending-owner-plan.json';save(draft,plan)
+          try:approved_release(root,draft,dist)
+          except ReleaseError as e:
+              assert str(e)=='Explicit source-specific owner review missing',str(e)
+          else:raise AssertionError('Pending approval was not rejected')
+          from catalogue_release_coverage import coverage,ReleaseCoverageError
+          try:coverage(root,built=dist)
+          except ReleaseCoverageError as e:
+              assert 'lsg' in str(e).lower(),str(e)
+              blocked=str(e)
+          else:raise AssertionError('Old active release plan unexpectedly accepts the new catalogue')
+          assert sha(old_snapshot)==final['production_preview']['catalogue_sha256']
+          assert load(root/'config/release-plans/lsg-1.0.3.json')['version']=='1.0.3'
+          assert not (root/'config/release-plans/lsg-1.0.4.json').exists()
+          report={'release_coverage_blocker':blocked,'status':'staged_pending_owner_authorization','candidate_source_sha256':new,'package_sha256':package['zip_sha256'],'package_size_bytes':package['zip_size_bytes'],'catalogue_sha256':sha(old_snapshot),'other_catalogue_entries_unchanged':len(a)-1,'standard_repository_validate_passed':True,'standard_build_reproduced_exact_zip':True,'pending_owner_authorization_rejected_by_production_release_gate':True,'main_repository_unchanged':True,'publication_authorized':False}
+          (t/'lsg-production-preview.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')
+          print('LSG_PRODUCTION_PREVIEW',json.dumps(report,sort_keys=True),flush=True)
+          PY
+      - name: Save exact staged files to the pending branch only
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/stage/lsg-1.0.4-pending-authorization"
+          git rm .github/workflows/stage-lsg-layout-pending.yml
+          git add -f modules/lsg-1910 sources/cleaned/bibles/fr/lsg-1910 catalog/v1/catalog.json
+          python scripts/tool_registry.py --write
+          git add -f reports/tooling/TOOL_REGISTRY.json reports/tooling/TOOL_REGISTRY.md
+          python scripts/tool_registry.py --check
+          python -m unittest discover -s tests -v
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Stage verified LSG 1.0.4 source and package pending owner authorization'
+          git push origin HEAD:refs/heads/stage/lsg-1.0.4-pending-authorization
