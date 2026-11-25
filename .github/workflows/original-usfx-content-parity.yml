@@ -119,6 +119,23 @@ jobs:
               target,target_notes,meta=original_osis_verses_and_notes(xml)
               require(set(original)==set(target),'Numbered source and OSIS key mismatch')
               counts=Counter(); findings=defaultdict(list)
+              # Reconcile only exact previously authorized source-bound repairs.
+              # A reference match alone is not permission to ignore a text change.
+              ledger_path=Path('sources/cleaned/bibles')/p['language']/p['resource_id']/'editorial'/'REVIEWED_REFERENCE_AND_INTRO_OVERLAY_2026-11-23.json'
+              approved_repairs={}
+              if ledger_path.is_file():
+                  ledger=json.loads(ledger_path.read_text())
+                  authorization=json.loads(Path('config/catalogue-import-lsg-1.0.0.json').read_text())
+                  require(ledger['original_usfx_zip_sha256']==witness['sha256']==authorization['source_usfx_zip_sha256'],'Repair source binding mismatch')
+                  require(authorization['editorial_approval']['approved_by']=='Bible Resources project owner','Missing owner authorization')
+                  for edit in ledger['edits']:
+                      if edit['type']!='cross_reference_fragment':continue
+                      k=(edit['book']+'.'+edit['source_origin'],edit['source_note_caller'])
+                      require(k not in approved_repairs,'Ambiguous reviewed note repair')
+                      old_label,new_label=ns(edit['original_label']),ns(edit['new_label'])
+                      require(old_label.count(ns(edit['old_fragment']))==1 and old_label.replace(ns(edit['old_fragment']),ns(edit['new_fragment']),1)==new_label,'Invalid exact repair ledger')
+                      approved_repairs[k]=(old_label,new_label,edit['case_id'])
+              matched_repairs=set()
               def check(kind,ok,ref):
                   counts[kind+'_compared']+=1
                   counts[kind+'_equal']+=bool(ok)
@@ -132,6 +149,14 @@ jobs:
                   for i,(old,new) in enumerate(zip(x,y),1):
                       loc=ref+'#'+str(i)
                       check('note_body_nonspace',old[3]==ns(new['body']),loc)
+                      repair_key=(ref,old[2])
+                      repair=approved_repairs.get(repair_key)
+                      if repair:
+                          a_label,b_label,case_id=repair
+                          require(old[3].count(a_label)==1 and old[3].replace(a_label,b_label,1)==ns(new['body']),'Reviewed repair does not explain exact entire note body')
+                          require(new['caller']==old[2] and repair_key not in matched_repairs,'Ambiguous repair application')
+                          matched_repairs.add(repair_key)
+                      check('note_body_equal_or_exact_reviewed_repair',old[3]==ns(new['body']) or repair_key in matched_repairs,loc)
                       check('note_anchor_nonspace',old[0]==new['point'],loc)
                       check('note_caller',old[2]==new['caller'],loc)
                       if old[1]=='x': check('cross_reference_type',new['type']=='crossReference',loc)
@@ -140,6 +165,7 @@ jobs:
               for i,(left,right) in enumerate(zip(a,b),1):
                   check('global_word_nonspace',left[0]==right[0],i)
                   check('global_word_strong_association',left[0]==right[0] and left[1] is not None and right[1] is not None and left[1]==right[1],i)
-              report={'resource':p['resource_id'],'original_xml_sha256':sha256(raw).hexdigest(),'osis_sha256':sha256(xml).hexdigest(),'counts':dict(counts),'bounded_findings':dict(findings),'source_word_elements':len(a),'osis_word_elements':len(b),'source_word_attributes':dict(af),'osis_word_attributes':dict(bf),'source_unparsed_strong':dict(au),'osis_unparsed_strong':dict(bu),'source_notes_outside_verses':outside,'osis_notes_outside_verses':meta['publisher_notes_outside_numbered_verses'],'explicit_note_target_conversion_verified':False,'morphology_or_non_strong_lemma_parity_verified':False,'global_word_order_not_per_verse_position_proof':True,'scope':'USFX original vs cleaned OSIS; not independent USFM prose or complete conversion certification'}
+              require(matched_repairs==set(approved_repairs),'Unaccounted authorized repair')
+              report={'reviewed_note_repairs_verified':len(matched_repairs),'unexplained_note_body_differences':counts['note_body_equal_or_exact_reviewed_repair_compared']-counts['note_body_equal_or_exact_reviewed_repair_equal'],'repair_ledger_sha256':sha256(ledger_path.read_bytes()).hexdigest() if ledger_path.is_file() else None,'resource':p['resource_id'],'original_xml_sha256':sha256(raw).hexdigest(),'osis_sha256':sha256(xml).hexdigest(),'counts':dict(counts),'bounded_findings':dict(findings),'source_word_elements':len(a),'osis_word_elements':len(b),'source_word_attributes':dict(af),'osis_word_attributes':dict(bf),'source_unparsed_strong':dict(au),'osis_unparsed_strong':dict(bu),'source_notes_outside_verses':outside,'osis_notes_outside_verses':meta['publisher_notes_outside_numbered_verses'],'explicit_note_target_conversion_verified':False,'morphology_or_non_strong_lemma_parity_verified':False,'global_word_order_not_per_verse_position_proof':True,'scope':'USFX original vs cleaned OSIS; not independent USFM prose or complete conversion certification'}
               print('ORIGINAL_USFX_CONTENT_DIAGNOSTIC',json.dumps(report,sort_keys=True),flush=True)
           PY
