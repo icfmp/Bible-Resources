@@ -225,11 +225,8 @@ jobs:
           names=re.findall(r'^(?:ERROR|FAIL): (\S+) \(([^)]+)\)',log,re.M)
           allowed={'test_real_repository_release_coverage_has_no_unreviewed_module'}
           assert re.search(r'Ran \d+ tests',log), 'No completed test summary'
-          print('STAGING_TEST_SUMMARY',json.dumps({'blocked_tests':names,'summary':re.findall(r'Ran \d+ tests[^\n]*|FAILED \([^\n]+\)|^OK          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Stage verified LSG 1.0.4 source and package pending owner authorization'
-          git push origin HEAD:refs/heads/stage/lsg-1.0.4-pending-authorization
-,log,re.M)},sort_keys=True))
+          summary=[line for line in log.splitlines() if line.startswith(('Ran ','FAILED (')) or line=='OK']
+          print('STAGING_TEST_SUMMARY',json.dumps({'blocked_tests':names,'summary':summary},sort_keys=True))
           assert all(name in allowed for name,_ in names), 'Unexpected test failures'
           assert not names or len(names)==1
           PY
