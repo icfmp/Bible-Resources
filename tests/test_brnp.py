@@ -9,7 +9,9 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from check_brnp import check  # noqa: E402
+from check_brnp import check, canonical_digest, unlinked_review_inventory  # noqa: E402
+from hashlib import sha256
+from lxml import etree
 from normalize_osis import brnp_regressions  # noqa: E402
 
 NS = 'http://www.bibletechnologies.net/2003/OSIS/namespace'
@@ -85,7 +87,7 @@ class BRNPStructuralPilotTests(unittest.TestCase):
         self.assertEqual(report["finding_codes"]["UNREVIEWED_ELEMENT"], 1)
         self.assertEqual(report["unreviewed_elements"]["invented"], 1)
         self.assertEqual(report["finding_examples_by_code"]["UNREVIEWED_ELEMENT"]["element"], "invented")
-        self.assertEqual(report["profile_version"], "0.3-draft")
+        self.assertEqual(report["profile_version"], "0.4-draft")
         self.assertIn("<invented>word</invented>", self.path.read_text(encoding="utf-8"))
 
     def test_commentary_missing_reference_is_blocked(self):
@@ -443,6 +445,91 @@ class BRNPStructuralPilotTests(unittest.TestCase):
             '<reference osisRef=" Gen.1.2">Link</reference>'
             '<verse eID="v"/></p><chapter eID="ch"/>'), "commentary")
         self.assertEqual(report["finding_codes"], {"REFERENCE_TARGET_WHITESPACE": 1})
+
+
+
+class BRNPReviewedUnlinkedTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        root = Path(self.temp.name)
+        self.path = root / "source.xml"
+        self.receipt = root / "receipt.json"
+        self.xml = document('<chapter osisID="Gen.1"><verse osisID="Gen.1.1">Text'
+                            '<note type="crossReference" n="a"><reference type="annotateRef" '
+                            'subType="x-origin" osisRef="Gen.1.1">1.1</reference>'
+                            '<reference>Unresolved original label.</reference></note>'
+                            '</verse></chapter>')
+        self.path.write_text(self.xml, encoding="utf-8")
+        _, entries, count = unlinked_review_inventory(etree.fromstring(self.path.read_bytes()))
+        self.review = {
+            "schema_version": 1, "status": "exact_reviewed_unlinked_preservation_evidence",
+            "current_master_sha256": sha256(self.path.read_bytes()).hexdigest(),
+            "historically_reviewed_master_sha256": "a" * 64,
+            "original_usfx_archive_sha256": "b" * 64,
+            "historical_approval_manifest_sha256": "c" * 64,
+            "historical_review": "synthetic fixture", "current_release_review": "synthetic fixture",
+            "all_unlinked_reference_indices_reconciled": True,
+            "destination_semantics_certified": False, "mandatory_gate_approved": False,
+            "entries_sha256": canonical_digest(entries), "source_notes_reconciled": count,
+            "preserved_unlinked_groups": len(entries),
+        }
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def inspect(self):
+        self.receipt.write_text(json.dumps(self.review), encoding="utf-8")
+        return check(self.path, "bible", review_receipt=self.receipt,
+                     review_receipt_sha256=sha256(self.receipt.read_bytes()).hexdigest())
+
+    def test_unlinked_requires_explicit_receipt(self):
+        self.assertEqual(check(self.path, "bible")["finding_codes"], {"UNRESOLVED_REFERENCE_TARGET": 1})
+        before = self.path.read_bytes()
+        report = self.inspect()
+        self.assertEqual(report["finding_count"], 0)
+        self.assertEqual(report["reviewed_unlinked_reference_count"], 1)
+        self.assertFalse(report["brnp_conformance_certified"])
+        self.assertFalse(report["publication_approved"])
+        self.assertNotIn("Unresolved original label.", json.dumps(report))
+        self.assertEqual(report, self.inspect())
+        self.assertEqual(before, self.path.read_bytes())
+
+    def test_changed_source_rejects_old_receipt(self):
+        for mutation in ("Unresolved changed label.", "Unresolved original label!"):
+            self.path.write_text(self.xml.replace("Unresolved original label.", mutation))
+            with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_MASTER_CHANGED"):
+                self.inspect()
+
+    def test_new_unreviewed_label_does_not_inherit_review(self):
+        self.path.write_text(self.xml.replace("</verse>", '<reference>Another label.</reference></verse>'))
+        with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_MASTER_CHANGED"):
+            self.inspect()
+
+    def test_count_alone_cannot_approve_changed_label(self):
+        self.path.write_text(self.xml.replace("Unresolved original label.", "Different label."))
+        self.review["current_master_sha256"] = sha256(self.path.read_bytes()).hexdigest()
+        with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_INVENTORY_CHANGED"):
+            self.inspect()
+
+    def test_changed_receipt_pin_is_rejected(self):
+        self.inspect()
+        with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_RECEIPT_CHANGED"):
+            check(self.path, "bible", review_receipt=self.receipt, review_receipt_sha256="0"*64)
+
+    def test_receipt_does_not_certify_destination_or_gate(self):
+        for key in ("destination_semantics_certified", "mandatory_gate_approved"):
+            self.review[key] = True
+            with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_SCOPE"):
+                self.inspect()
+            self.review[key] = False
+
+    def test_blank_target_or_nested_markup_not_eligible(self):
+        for fragment in ('<reference osisRef="">Unresolved original label.</reference>',
+                         '<reference><hi type="italic">Unresolved original label.</hi></reference>'):
+            self.path.write_text(self.xml.replace('<reference>Unresolved original label.</reference>', fragment))
+            self.review["current_master_sha256"] = sha256(self.path.read_bytes()).hexdigest()
+            with self.assertRaisesRegex(ValueError, "BRNP_REVIEW_INVENTORY_CHANGED"):
+                self.inspect()
 
 
 if __name__ == "__main__":

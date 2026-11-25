@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 POLICY = ROOT / "config" / "osis-policy.json"
 NS = "{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 MAX_BYTES = 128 * 1024 * 1024
-VERSION = "0.3-draft"
+VERSION = "0.4-draft"
 # OSIS 2.1.1 constructs already encountered in independently XSD-valid
 # resources. Preserve structured tables/lists and historical source metadata.
 # This is not a supplier-specific allowlist or permission to drop content.
@@ -133,7 +133,106 @@ def paired_commentary_scopes(root) -> tuple[int, int, list[dict]]:
     return completed, len(seen_members), errors
 
 
-def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
+def canonical_digest(value) -> str:
+    return sha256(json.dumps(value, ensure_ascii=False, sort_keys=True,
+                             separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def label_fingerprint(node) -> str:
+    return canonical_digest({"attributes": dict(node.attrib),
+                             "text": "".join(node.itertext()),
+                             "child_count": len(node)})
+
+
+def unlinked_review_inventory(root) -> tuple[dict, list[dict], int]:
+    """Exact plain, unlinked destination groups in canonical cross-reference notes.
+
+    This is only a candidate inventory; it does not itself approve anything.
+    Nonempty labels, unique note context, no attributes/children or targets,
+    and explicit original origin are required. All other forms remain findings.
+    """
+    references = {e: i for i, e in enumerate(root.iter(NS + "reference"))}
+    eligible = {}
+    entries = []
+    count = 0
+    for book in root.iter(NS + "div"):
+        if (book.get("type") != "book" or book.get("sID") or book.get("eID")
+                or not book.get("osisID") or any(a.tag == NS + "div" and
+                a.get("type") == "book" for a in book.iterancestors())):
+            continue
+        notes = [n for n in book.iter(NS + "note") if n.get("type") == "crossReference"]
+        count += len(notes)
+        for ordinal, note in enumerate(notes, 1):
+            origins = [e for e in note if e.tag == NS + "reference" and
+                       e.get("type") == "annotateRef" and e.get("subType") == "x-origin"]
+            destinations = [e for e in note if e.tag == NS + "reference" and
+                            e.get("type") is None and e.get("subType") is None]
+            if len(origins) != 1 or len(destinations) != 1:
+                continue
+            node = destinations[0]
+            label = " ".join("".join(node.itertext()).split())
+            if node.attrib or len(node) or not label:
+                continue
+            entry = {"book": book.get("osisID"), "cross_reference_note_ordinal": ordinal,
+                     "reference_index_zero_based": references[node],
+                     "reference_fingerprint_sha256": label_fingerprint(node),
+                     "original_label_folded_sha256": sha256(label.encode()).hexdigest(),
+                     "note_fingerprint_sha256": label_fingerprint(note),
+                     "origin_fingerprint_sha256": label_fingerprint(origins[0]),
+                     "decision": "preserve_printed_label_without_verified_destination"}
+            eligible[node] = entry
+            entries.append(entry)
+    return eligible, entries, count
+
+
+def reviewed_unlinked(root, content, receipt_path, expected_sha256):
+    """Verify a separately reviewed, exact-master-bound preservation receipt.
+
+    Trust the supplied receipt pin only as an explicit reviewed caller input.
+    No generic inference from an unlinked label, resource ID or count alone.
+    """
+    if receipt_path is None and expected_sha256 is None:
+        return {}, None
+    if receipt_path is None or not isinstance(expected_sha256, str) or not re.fullmatch(r"[0-9a-f]{64}", expected_sha256):
+        raise ValueError("BRNP_REVIEW_PIN_REQUIRED")
+    if receipt_path.is_symlink() or not receipt_path.is_file() or receipt_path.stat().st_size > 1024 * 1024:
+        raise ValueError("BRNP_REVIEW_UNAVAILABLE")
+    raw = receipt_path.read_bytes()
+    if sha256(raw).hexdigest() != expected_sha256:
+        raise ValueError("BRNP_REVIEW_RECEIPT_CHANGED")
+    receipt = json.loads(raw)
+    if not isinstance(receipt, dict) or receipt.get("schema_version") != 1 or receipt.get("status") != "exact_reviewed_unlinked_preservation_evidence":
+        raise ValueError("BRNP_REVIEW_FORMAT")
+    if (receipt.get("all_unlinked_reference_indices_reconciled") is not True or
+            receipt.get("destination_semantics_certified") is not False or
+            receipt.get("mandatory_gate_approved") is not False):
+        raise ValueError("BRNP_REVIEW_SCOPE")
+    if any(not isinstance(receipt.get(key), str) or not re.fullmatch(r"[0-9a-f]{64}", receipt[key])
+           for key in ("current_master_sha256", "historically_reviewed_master_sha256",
+                       "original_usfx_archive_sha256", "historical_approval_manifest_sha256",
+                       "entries_sha256")):
+        raise ValueError("BRNP_REVIEW_IDENTITIES")
+    if any(not isinstance(receipt.get(key), str) or not receipt[key].strip()
+           for key in ("historical_review", "current_release_review")):
+        raise ValueError("BRNP_REVIEW_PROVENANCE")
+    if receipt["current_master_sha256"] != sha256(content).hexdigest():
+        raise ValueError("BRNP_REVIEW_MASTER_CHANGED")
+    eligible, entries, count = unlinked_review_inventory(root)
+    if (not entries or type(receipt.get("preserved_unlinked_groups")) is not int or
+            type(receipt.get("source_notes_reconciled")) is not int or
+            receipt["preserved_unlinked_groups"] != len(entries) or
+            receipt["source_notes_reconciled"] != count or
+            receipt["entries_sha256"] != canonical_digest(entries)):
+        raise ValueError("BRNP_REVIEW_INVENTORY_CHANGED")
+    return eligible, {"receipt_sha256": expected_sha256,
+                      "entries_sha256": receipt["entries_sha256"],
+                      "source_sha256": receipt["original_usfx_archive_sha256"],
+                      "historically_reviewed_master_sha256": receipt["historically_reviewed_master_sha256"],
+                      "destination_semantics_certified": False}
+
+
+def check(path: Path, kind: str, *, schema_path: Path | None = None,
+          review_receipt: Path | None = None, review_receipt_sha256: str | None = None) -> dict:
     if path.is_symlink() or not path.is_file() or path.stat().st_size > MAX_BYTES:
         raise ValueError("input must be a regular XML file at most 128 MiB")
     # The optional official-XSD check is independent of BRNP's narrower
@@ -158,6 +257,8 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
     parser = etree.XMLParser(resolve_entities=False, load_dtd=False,
                              no_network=True, recover=False, huge_tree=False)
     root = etree.fromstring(content, parser=parser)
+    reviewed_nodes, review_binding = reviewed_unlinked(root, content, review_receipt, review_receipt_sha256)
+    preserved = []
     errors = []
     counts = Counter()
     if root.tag != NS + "osis":
@@ -362,7 +463,11 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
                     code = "UNRESOLVED_INTRODUCTION_SPAN"
                 else:
                     code = "UNRESOLVED_REFERENCE_TARGET"
-                errors.append({"code": code, "line": line})
+                if code == "UNRESOLVED_REFERENCE_TARGET" and element in reviewed_nodes:
+                    preserved.append({"code": "REVIEWED_UNLINKED_REFERENCE", "line": line,
+                                      **reviewed_nodes[element]})
+                else:
+                    errors.append({"code": code, "line": line})
             elif target != target.strip():
                 errors.append({"code": "REFERENCE_TARGET_WHITESPACE", "line": line})
         if tag == "l" and not any(
@@ -391,6 +496,8 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         errors.append({"code": "NO_COMMENTARY_ENTRIES"})
     if kind == "bible" and not verse_ids:
         errors.append({"code": "NO_NUMBERED_VERSES"})
+    if len(preserved) != len(reviewed_nodes):
+        raise ValueError("BRNP_REVIEW_UNUSED_ENTRIES")
     return {
         "profile": "BRNP", "profile_version": VERSION,
         "official_osis": ({
@@ -417,6 +524,9 @@ def check(path: Path, kind: str, *, schema_path: Path | None = None) -> dict:
         "chapter_pair_identifier_count": len(chapter_pair_ids),
         "bible_verse_member_count": len(verse_member_ids),
         "findings": errors[:100], "finding_count": len(errors),
+        "reviewed_unlinked_reference_count": len(preserved),
+        "reviewed_unlinked_references": preserved,
+        "reviewed_unlinked_binding": review_binding,
         "finding_examples_by_code": {
             code: next(item for item in errors if item["code"] == code)
             for code in sorted({item["code"] for item in errors})
@@ -443,16 +553,24 @@ def main() -> int:
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--schema", type=Path,
                         help="Run existing pinned official XSD guard before BRNP; required for joint evidence")
+    parser.add_argument("--reviewed-unlinked", type=Path,
+                        help="Exact-master-bound, previously reviewed preservation receipt")
+    parser.add_argument("--reviewed-unlinked-sha256", help="Trusted SHA-256 of that receipt")
     args = parser.parse_args()
-    if args.report.resolve() == args.source.resolve():
-        parser.error("report must not overwrite original")
+    if (args.report.resolve() == args.source.resolve() or args.report.exists() or
+            args.report.is_symlink() or (args.reviewed_unlinked and args.report.resolve() == args.reviewed_unlinked.resolve())):
+        parser.error("report must not overwrite existing inputs or output")
     try:
-        result = check(args.source, args.kind, schema_path=args.schema)
+        result = check(args.source, args.kind, schema_path=args.schema,
+                       review_receipt=args.reviewed_unlinked,
+                       review_receipt_sha256=args.reviewed_unlinked_sha256)
     except (ValueError, OSError, etree.XMLSyntaxError, StructureFailure, KeyError) as exc:
-        print(f"BRNP pilot blocked: {exc}", file=sys.stderr)
+        code = str(exc) if isinstance(exc, ValueError) and re.fullmatch(r"BRNP_[A-Z_]+", str(exc)) else getattr(exc, "code", type(exc).__name__)
+        print(f"BRNP pilot blocked: {code}", file=sys.stderr)
         return 2
     args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    with args.report.open("x", encoding="utf-8") as report_file:
+        report_file.write(json.dumps(result, indent=2, sort_keys=True) + "\n")
     print(f"BRNP v{VERSION}: {result['status']}; {result['finding_count']} findings")
     return 0 if not result["finding_count"] else 1
 

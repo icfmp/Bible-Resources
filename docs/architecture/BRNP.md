@@ -1,4 +1,4 @@
-# Bible Resources Normalization Profile (BRNP) — working specification v0.3-draft
+# Bible Resources Normalization Profile (BRNP) — working specification v0.4-draft
 
 **Status:** implementation under review in [#451](https://github.com/icfmp/Bible-Resources/issues/451). **Not a mandatory publication gate.** This document specifies conventions for reviewed *cleaned* masters, not for immutable source archives. The official OSIS 2.1.1 XSD remains authoritative for XML legality. A BRNP passing result alone never certifies an edition.
 
@@ -102,3 +102,36 @@ Issue #451 remains open until: XSD evidence, a fully specified and independently
 ### Paired commentary scope evidence (2026-11-24)
 
 The owner approved developing the generic alternative after the [MHC scope audit](https://github.com/icfmp/Bible-Resources/actions/runs/45447586839): all 4,255 pairs cross parent boundaries, 4,254 have visible preceding material within the start parent, and none has an exclusive common-ancestor container. Direct div milestone substitution failed the official XSD. The strict paired representation validates those existing boundaries without rewriting paragraphs or poetry. This is not permission to choose milestones merely to bypass another diagnostic, nor to make BRNP mandatory. Validate real editions, including both existing annotated commentaries and the corrected milestone candidate, before adoption.
+
+## Reviewed intentionally unlinked destinations (v0.4 draft)
+
+A destination that has not been established is never converted into a guessed
+`osisRef`. A bare, nonempty, childless reference label in a source-attested
+cross-reference note with a unique explicit origin and destination may be
+classified as **reviewed unlinked preservation**, rather than an open
+normalization finding. This is an explicit reviewed decision to retain the
+label, not verification of the destination. It must have independently
+reconciled original source, prior reviewed master and exact current master
+evidence; the receipt pins these identities, a deterministic digest of the
+complete per-label inventory (book, note ordinal, reference ordinal, exact
+reference/note/origin fingerprints), and the source review and release review.
+
+The checker requires the receipt **and its separately trusted SHA-256**.
+Without them the original unresolved diagnostic remains. A stale or modified
+master or receipt, altered label, note context, missing/new entry or mismatched
+inventory blocks receipt use. Unknown markup, missing origin, blank targets
+and other reference forms do not gain an exemption. No resource ID, expected
+count alone or edition-specific logic can authorize preservation.
+
+```sh
+python scripts/check_brnp.py MASTER --kind bible --schema PINNED_XSD \
+  --reviewed-unlinked REVIEW_RECEIPT --reviewed-unlinked-sha256 TRUSTED_SHA256 \
+  --report NEW_REPORT.json
+```
+
+Reports retain each reviewed location and metadata-only fingerprint under
+`reviewed_unlinked_references`, separately from unresolved findings.
+No publication approval or destination semantics certification follows.
+A fresh source or master revision needs a fresh reviewed receipt; do not
+automatically carry the decision over to modified bytes. The profile remains
+advisory pending explicit owner approval.
