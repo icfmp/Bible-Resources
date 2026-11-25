@@ -208,6 +208,9 @@ jobs:
                   lexical = (merged_result if compat["status"] == "stable_reference_index_verified_with_reviewed_merges" else result)["source_native_body_boundary_positions"]["body_lexical_association_diagnostic"]
                   assert lexical["all_book_body_word_spans_and_attributes_equal"], (m["id"], lexical)
                   print("BODY_LEXICAL_ASSOCIATIONS_VERIFIED", m["id"], json.dumps(lexical, sort_keys=True), flush=True)
+                  editorial = (merged_result if compat["status"] == "stable_reference_index_verified_with_reviewed_merges" else result)["source_native_body_boundary_positions"]["book_editorial_inline_diagnostic"]
+                  assert editorial["all_compared_scopes_equal"], (m["id"], editorial)
+                  print("BOOK_EDITORIAL_INLINE_VERIFIED", m["id"], json.dumps(editorial, sort_keys=True), flush=True)
                   # A title's book-wide position alone cannot prove verse-zero
                   # versus numbered-verse placement. Check explicitly authored
                   # first section titles after chapter-opening milestones.

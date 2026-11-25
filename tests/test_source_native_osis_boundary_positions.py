@@ -199,6 +199,43 @@ class OriginalNativeBoundaryPositionTests(unittest.TestCase):
             with self.subTest(word=word), self.assertRaises(BoundaryScreenError):
                 authorial_book_streams(OSIS.replace(b'alpha',word))
 
+    def test_editorial_scope_attributes_and_spans(self):
+        authored=OSIS.replace(b'<title>PRIVATE TITLE</title>',
+            b'<title><w lemma="strong:H1">PRIVATE TITLE</w></title>')
+        authored=authored.replace(b'<p><verse',b'<div type="introduction"><hi type="italic">intro</hi></div><p><verse')
+        authored=authored.replace(b'alpha<note>PRIVATE NOTE</note>',
+            b'<q who="Jesus" marker="">alpha</q><note><hi type="italic">PRIVATE NOTE</hi></note>')
+        good_intro=b'<title><w lemma="strong:H1">PRIVATE TITLE</w></title><div type="introduction" sID="intro"/><hi type="italic">intro</hi><div type="introduction" eID="intro"/><div type="x-p" sID="p"/>'
+        good_body=b'<q who="Jesus" marker="">alpha</q><note><hi type="italic">PRIVATE NOTE</hi></note> beta<div type="x-p" eID="p"/><lg sID="g"/><l sID="l"/>poetry<l eID="l"/><lg eID="g"/>'
+        def proof(intro,body):
+            compiled=NativeBookStreams()
+            compiled.observe("I","Gen",intro)
+            compiled.observe("K","Gen.1.1",body)
+            return compare_book_boundary_positions(authorial_book_streams(authored),compiled,[])["book_editorial_inline_diagnostic"]
+        ok=proof(good_intro,good_body)
+        self.assertTrue(ok["all_compared_scopes_equal"])
+        self.assertEqual(ok["counts"]["matched_intro_spans"],1)
+        self.assertEqual(ok["counts"]["source_title_word_elements"],1)
+        self.assertEqual(ok["counts"]["matched_body_q"],1)
+        for intro,body in (
+            (good_intro.replace(b"strong:H1",b"strong:H2"),good_body),
+            (good_intro.replace(b'<hi type="italic">intro</hi>',b'intro'),good_body),
+            (good_intro.replace(b'<div type="introduction" eID="intro"/>',b'')+b'<div type="introduction" eID="intro"/>',good_body.replace(b'who="Jesus"',b'who="other"')),
+            (good_intro,good_body.replace(b'<hi type="italic">PRIVATE NOTE</hi>',b'PRIVATE NOTE')),
+            (good_intro,good_body.replace(b'alpha</q>',b'alph</q>a')),
+        ):
+            result=proof(intro,body)
+            self.assertFalse(result["all_compared_scopes_equal"])
+            self.assertNotIn("PRIVATE",str(result))
+            self.assertNotIn("strong:H1",str(result))
+
+    def test_editorial_unpaired_intro_rejected(self):
+        compiled=NativeBookStreams()
+        compiled.observe("I","Gen",b'<div type="introduction" sID="x"/>')
+        compiled.observe("K","Gen.1.1",b'alpha')
+        with self.assertRaises(BoundaryScreenError):
+            compare_book_boundary_positions(authorial_book_streams(OSIS),compiled,[])
+
     def test_native_unbalanced_xml_fails_closed(self):
         with self.assertRaises(ValueError):
             native(second=b'<l sID="x">BROKEN')
