@@ -137,7 +137,9 @@ jobs:
                           # Headings/introductions end the current numbered content.
                           if tag in apparatus:enabled=False
                           # Tables preceding the first verse are not numbered text.
-                          elif key and enabled:append(tail)
+                          elif key:
+                              # A paragraph can resume the same verse after an intervening section heading.
+                              enabled=True;append(tail)
                           continue
                       if tag in NOTE:
                           require(current_word is None,'Note inside lexical word')
