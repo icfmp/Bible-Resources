@@ -525,11 +525,11 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "eff893582f2330d1a47e17be7e3b741e2098236ce2659b330cfe71a51e6ab79a",
+      "sha256_at_inventory": "feeb458d7476c3e57b10ab8861a325d499aec856b3f973234177d6edc4c0aeb6",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/normalize_osis.py",
         "scripts/tool_registry.py",
@@ -538,6 +538,7 @@
         ".github/workflows/lsg-reference-review.yml",
         ".github/workflows/lsg-v1-reviewed-candidate.yml",
         "docs/PRODUCTION_PIPELINE.md",
+        "docs/architecture/BRNP.md",
         "tests/test_brnp.py"
       ]
     },

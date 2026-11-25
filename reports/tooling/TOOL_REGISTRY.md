@@ -38,7 +38,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/build.py`](../../scripts/build.py) | KEEP_GENERIC | not established | 15 | publication/release |
 | [`scripts/catalogue_profiles.py`](../../scripts/catalogue_profiles.py) | KEEP_GENERIC | named test | 5 | not determined |
 | [`scripts/catalogue_release_coverage.py`](../../scripts/catalogue_release_coverage.py) | KEEP_GENERIC | named test | 12 | publication/release |
-| [`scripts/check_brnp.py`](../../scripts/check_brnp.py) | KEEP_GENERIC | not established | 8 | not determined |
+| [`scripts/check_brnp.py`](../../scripts/check_brnp.py) | KEEP_GENERIC | not established | 9 | not determined |
 | [`scripts/check_provider_parity.py`](../../scripts/check_provider_parity.py) | KEEP_GENERIC | not established | 5 | not determined |
 | [`scripts/check_updates.py`](../../scripts/check_updates.py) | KEEP_GENERIC | not established | 9 | not determined |
 | [`scripts/commentary_intake.py`](../../scripts/commentary_intake.py) | KEEP_GENERIC | named test | 6 | intake |
