@@ -15,3 +15,7 @@ Restore source-attested paragraph breaks and indentation in Ezra, Job, Jeremiah,
 ## Promotion checklist (not performed)
 
 After explicit owner approval, use the existing approved release staging path: replay the exact byte edits, rebuild the seven-member package, verify its exact SHA-256, stage cleaned source and payload with new version metadata, update source/normalization/native proofs and profile version, archive the 1.0.3 release plan, install a reviewed 1.0.4 plan and catalogue import manifest, rebuild the catalogue, run complete Validate/release preflight on the exact PR head. Only then merge the release PR and verify the live GitHub Release and Pages catalogue. Do not put the draft plan into the active config directory before approval. Existing 1.0.3 remains immutable.
+
+## Final metadata and private promotion dry-run
+
+The initial versioned package inherited a stale 1.0.3 About string. The candidate source and six compressed native members remain unchanged; the exact final package must include the corrected About string. The private production catalogue dry-run and owner-authorization rejection are implemented in [the immutable replay workflow](https://github.com/icfmp/Bible-Resources/blob/5208c58aa36250ee1901698533729c85b20b686f/.github/workflows/lsg-layout-package-replay.yml) (run 45575067478). No active release plan is introduced by this PR. The final package receipt and independent reinstall evidence must be updated to the corrected version before any promotion.
