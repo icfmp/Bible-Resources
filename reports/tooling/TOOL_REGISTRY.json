@@ -1164,7 +1164,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 11,
+      "static_reference_count": 12,
       "static_references": [
         "scripts/bible_intake.py",
         "scripts/commentary_intake.py",
@@ -1173,6 +1173,7 @@
         "scripts/pilot_fetch.py",
         "scripts/pilot_subprocess.py",
         "scripts/tool_registry.py",
+        ".github/workflows/validate.yml",
         "tests/test_bounded_sword_reader.py",
         "tests/test_commentary_intake.py",
         "tests/test_commentary_native_raw_inventory.py",
@@ -1545,9 +1546,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/tool_registry.py",
+        ".github/workflows/validate.yml",
         "docs/workflows/BIBLE_7_STAGE_WORKFLOW.md",
         "tests/test_original_authorial_content_parity.py"
       ]
@@ -1576,9 +1578,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/tool_registry.py",
+        ".github/workflows/validate.yml",
         "docs/workflows/BIBLE_7_STAGE_WORKFLOW.md",
         "tests/test_original_authorial_key_inventory.py"
       ]
