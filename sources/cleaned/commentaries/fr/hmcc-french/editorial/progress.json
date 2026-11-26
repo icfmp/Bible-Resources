@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "2Kgs.9",
+  "next": "2Chr.5",
   "batch_size": 80,
   "completed": [
     [
@@ -3215,6 +3215,506 @@
       "2 Kings",
       8,
       "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      9,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      10,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      11,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      12,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      13,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      14,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      15,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      16,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      17,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      17,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      18,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      18,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      19,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      19,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      20,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      20,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      21,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      22,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      22,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      23,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      23,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      24,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      24,
+      "Editorial audit"
+    ],
+    [
+      "2 Kings",
+      25,
+      "Translation"
+    ],
+    [
+      "2 Kings",
+      25,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      1,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      2,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      3,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      4,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      5,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      6,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      7,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      8,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      9,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      10,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      11,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      12,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      13,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      14,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      15,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      16,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      17,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      17,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      18,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      18,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      19,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      19,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      20,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      20,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      21,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      22,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      22,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      23,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      23,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      24,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      24,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      25,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      25,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      26,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      26,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      27,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      27,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      28,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      28,
+      "Editorial audit"
+    ],
+    [
+      "1 Chronicles",
+      29,
+      "Translation"
+    ],
+    [
+      "1 Chronicles",
+      29,
+      "Editorial audit"
+    ],
+    [
+      "2 Chronicles",
+      1,
+      "Translation"
+    ],
+    [
+      "2 Chronicles",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "2 Chronicles",
+      2,
+      "Translation"
+    ],
+    [
+      "2 Chronicles",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "2 Chronicles",
+      3,
+      "Translation"
+    ],
+    [
+      "2 Chronicles",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "2 Chronicles",
+      4,
+      "Translation"
+    ],
+    [
+      "2 Chronicles",
+      4,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -3230,7 +3730,9 @@
     "1_Samuel_introduction": "translated_and_audited_in_1Sam.1",
     "2_Samuel_introduction": "translated_and_audited_in_2Sam.1",
     "1_Kings_introduction": "translated_and_audited_in_1Kgs.1",
-    "2_Kings_introduction": "no separate introduction in source chapter packet"
+    "2_Kings_introduction": "no separate introduction in source chapter packet",
+    "1_Chronicles_introduction": "joint Chronicles introduction translated_and_audited_in_1Chr.1",
+    "2_Chronicles_introduction": "joint introduction in 1Chr.1; no separate introduction in 2Chr.1 source"
   },
   "batch_checkpoints": [
     {
@@ -6065,6 +6567,411 @@
           "notes": "Preserved uncertainty about Hazael's intention, warning against false security, marriage and providence."
         }
       ]
+    },
+    {
+      "range": "2Kgs.9–2Chr.4",
+      "chapters": [
+        {
+          "chapter": "2Kgs.9",
+          "paragraphs": 37,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved conditional obedience and right motives, restraint, repentance and accountability."
+        },
+        {
+          "chapter": "2Kgs.10",
+          "paragraphs": 33,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved ancient civil-law limitation, uncertainty of motives, true conversion including profitable sins."
+        },
+        {
+          "chapter": "2Kgs.11",
+          "paragraphs": 21,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved Davidic promise, covenant, unity and Christ's reign."
+        },
+        {
+          "chapter": "2Kgs.12",
+          "paragraphs": 21,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved stewardship, support of priests, spiritual decline and Christ as foundation."
+        },
+        {
+          "chapter": "2Kgs.13",
+          "paragraphs": 27,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved mercy, prayer, significance of the prophetic sign and resurrection typology."
+        },
+        {
+          "chapter": "2Kgs.14",
+          "paragraphs": 33,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved attributed chronological conjecture, inward faith, prophets and two reasons for mercy."
+        },
+        {
+          "chapter": "2Kgs.15",
+          "paragraphs": 13,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved distinction between remaining imperfection and permitted wickedness."
+        },
+        {
+          "chapter": "2Kgs.16",
+          "paragraphs": 13,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved the word and Spirit as regulators of worship, warning against pleasing neighbors."
+        },
+        {
+          "chapter": "2Kgs.17",
+          "paragraphs": 24,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved exile explanation, hidden sins, obedience springing from faith and false submission."
+        },
+        {
+          "chapter": "2Kgs.18",
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved rejection of unauthorized aids, Scripture and prayer, restraint in speech."
+        },
+        {
+          "chapter": "2Kgs.19",
+          "paragraphs": 35,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved intercession, conjectured sabbatical year, divine glory and patience."
+        },
+        {
+          "chapter": "2Kgs.20",
+          "paragraphs": 40,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved Christ's righteousness alone, appropriate treatment, miraculous sign and dual role of the Spirit; reference destination unchanged."
+        },
+        {
+          "chapter": "2Kgs.21",
+          "paragraphs": 29,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved distinguishing repentance from presumption, future return and individual believers."
+        },
+        {
+          "chapter": "2Kgs.22",
+          "paragraphs": 33,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved uncertainty over the discovered copy, law and gospel, and attributed assessment of Josiah."
+        },
+        {
+          "chapter": "2Kgs.23",
+          "paragraphs": 31,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved duty despite judgment, regeneration and perseverance, mercy toward Josiah."
+        },
+        {
+          "chapter": "2Kgs.24",
+          "paragraphs": 17,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved repentance, gradual judgment and preparation."
+        },
+        {
+          "chapter": "2Kgs.25",
+          "paragraphs": 33,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved fulfillment of two prophecies, conjecture about ark, divine judgment and hope; all reference targets unchanged."
+        },
+        {
+          "chapter": "1Chr.1",
+          "paragraphs": 24,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Included joint Chronicles introduction; preserved Jerome attribution, genealogical differences, shared origin and eternal perspective."
+        },
+        {
+          "chapter": "1Chr.2",
+          "paragraphs": 5,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved Israel's distinction and equal access to salvation through Christ."
+        },
+        {
+          "chapter": "1Chr.3",
+          "paragraphs": 5,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved Davidic genealogy and Christ's human descent."
+        },
+        {
+          "chapter": "1Chr.4",
+          "paragraphs": 21,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved all four requests of Jabez, prayer, dependence and dedication."
+        },
+        {
+          "chapter": "1Chr.5",
+          "paragraphs": 9,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved two shared events, mutual aid and danger of worldly attachment."
+        },
+        {
+          "chapter": "1Chr.6",
+          "paragraphs": 7,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved hereditary priesthood distinction, Spirit's calling and Christ's unique atonement."
+        },
+        {
+          "chapter": "1Chr.7",
+          "paragraphs": 7,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved the source's statement about Zebulun and Dan and its references without adding a corrective genealogy."
+        },
+        {
+          "chapter": "1Chr.8",
+          "paragraphs": 7,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved original-readers qualification and remembrance of righteous people."
+        },
+        {
+          "chapter": "1Chr.9",
+          "paragraphs": 11,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved restoration, responsibilities, heavenly worship and inheritance."
+        },
+        {
+          "chapter": "1Chr.10",
+          "paragraphs": 12,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved three lessons, disobedience and patient hope."
+        },
+        {
+          "chapter": "1Chr.11",
+          "paragraphs": 8,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved providential fulfillment, usefulness and Christ's kingdom."
+        },
+        {
+          "chapter": "1Chr.12",
+          "paragraphs": 12,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved allegiance, perseverance, wisdom and eternal provision."
+        },
+        {
+          "chapter": "1Chr.13",
+          "paragraphs": 11,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved proper worship, good intentions not justifying wrong acts, grace and gospel imagery."
+        },
+        {
+          "chapter": "1Chr.14",
+          "paragraphs": 4,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved all three items and reference to Samuel, messianic typology."
+        },
+        {
+          "chapter": "1Chr.15",
+          "paragraphs": 7,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved accountability, divine help and Redeemer's sacrifice."
+        },
+        {
+          "chapter": "1Chr.16",
+          "paragraphs": 18,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved daily worship, covenant, intercession and distinction between ceremonial and spiritual worship."
+        },
+        {
+          "chapter": "1Chr.17",
+          "paragraphs": 9,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved wording contrast between Samuel and Chronicles, Christ's mediation and references."
+        },
+        {
+          "chapter": "1Chr.18",
+          "paragraphs": 4,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved cross-reference, good fight of faith and eternal triumph."
+        },
+        {
+          "chapter": "1Chr.19",
+          "paragraphs": 5,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved cross-reference and warning that usefulness is not saving faith."
+        },
+        {
+          "chapter": "1Chr.20",
+          "paragraphs": 4,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved discipline without abandonment and victory through Christ."
+        },
+        {
+          "chapter": "1Chr.21",
+          "paragraphs": 10,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved temple location, atonement, reconciliation and divine presence."
+        },
+        {
+          "chapter": "1Chr.22",
+          "paragraphs": 24,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved three reasons, princes heading interpreted from obvious source typo 'prices', humble service and encouragement after death."
+        },
+        {
+          "chapter": "1Chr.23",
+          "paragraphs": 11,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved ordered service, spiritual renewal and equal value of leadership and service."
+        },
+        {
+          "chapter": "1Chr.24",
+          "paragraphs": 8,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved body imagery, priesthood of believers and equality in Christ."
+        },
+        {
+          "chapter": "1Chr.25",
+          "paragraphs": 5,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved interpretation of prophesying as praise, role of music and Spirit."
+        },
+        {
+          "chapter": "1Chr.26",
+          "paragraphs": 12,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved list of supplies, spiritual abundance, civil government and division of duties."
+        },
+        {
+          "chapter": "1Chr.27",
+          "paragraphs": 8,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved military analogy, spiritual watchfulness and preference for Scripture."
+        },
+        {
+          "chapter": "1Chr.28",
+          "paragraphs": 23,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved two aspects of piety, revelation, atonement, sanctification and three temple images."
+        },
+        {
+          "chapter": "1Chr.29",
+          "paragraphs": 23,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved willing giving, stewardship, sincere prayer, David's repentance and resurrection."
+        },
+        {
+          "chapter": "2Chr.1",
+          "paragraphs": 7,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved eternal priorities and providential provision; joint introduction already in 1 Chronicles."
+        },
+        {
+          "chapter": "2Chr.2",
+          "paragraphs": 9,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved openness of true religion, influence and God's only Son."
+        },
+        {
+          "chapter": "2Chr.3",
+          "paragraphs": 8,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved sufficiency of Scripture, Christ as temple and indwelling Spirit."
+        },
+        {
+          "chapter": "2Chr.4",
+          "paragraphs": 12,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved bronze altar, typology, Christ's sacrifice and enlargement of church."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -6144,14 +7051,26 @@
       "editorial_audit": 22,
       "introduction": "translated and audited with 1Kgs.1",
       "technical_validation": "chapter-local tag/attribute sequence equality; final corpus and native module checks pending"
+    },
+    "2 Kings": {
+      "translation": 25,
+      "editorial_audit": 25,
+      "introduction": "no separate introduction in source chapter packet",
+      "technical_validation": "chapter-local tag/attribute sequence equality; final corpus and native module checks pending"
+    },
+    "1 Chronicles": {
+      "translation": 29,
+      "editorial_audit": 29,
+      "introduction": "joint Chronicles introduction translated and audited with 1Chr.1",
+      "technical_validation": "chapter-local tag/attribute sequence equality; final corpus and native module checks pending"
     }
   },
   "current_batch": {
     "range": "1Kgs.5–1Chr.29 and 2Chr.1–8",
     "target": 80,
-    "completed": 26,
-    "paragraphs": 1007,
-    "reference_occurrences": 16,
-    "next": "2Kgs.9"
+    "completed": 76,
+    "paragraphs": 1825,
+    "reference_occurrences": 34,
+    "next": "2Chr.5"
   }
 }
