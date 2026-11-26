@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "2Sam.11",
+  "next": "2Sam.16",
   "batch_size": 70,
   "completed": [
     [
@@ -2775,6 +2775,56 @@
       "2 Samuel",
       10,
       "Editorial audit"
+    ],
+    [
+      "2 Samuel",
+      11,
+      "Translation"
+    ],
+    [
+      "2 Samuel",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "2 Samuel",
+      12,
+      "Translation"
+    ],
+    [
+      "2 Samuel",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "2 Samuel",
+      13,
+      "Translation"
+    ],
+    [
+      "2 Samuel",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "2 Samuel",
+      14,
+      "Translation"
+    ],
+    [
+      "2 Samuel",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "2 Samuel",
+      15,
+      "Translation"
+    ],
+    [
+      "2 Samuel",
+      15,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -5221,6 +5271,51 @@
           "notes": "Preserved gratitude to enemies, restraint, spiritual cooperation and fulfillment of territorial promise."
         }
       ]
+    },
+    {
+      "range": "2Sam.11–2Sam.15",
+      "chapters": [
+        {
+          "chapter": "2Sam.11",
+          "paragraphs": 32,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved progression of sin, loss of assurance versus grace, repentance and warning against presumption."
+        },
+        {
+          "chapter": "2Sam.12",
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved confession, pardon and discipline, prayer for specific blessings, infant death interpretation and critique of severity."
+        },
+        {
+          "chapter": "2Sam.13",
+          "paragraphs": 22,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved parental indulgence, responsibility of accomplices, rejection of wrongdoing and distinction from Eli."
+        },
+        {
+          "chapter": "2Sam.14",
+          "paragraphs": 24,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved justice in pardon, mediation, warning against pride and mercy to penitent sinners."
+        },
+        {
+          "chapter": "2Sam.15",
+          "paragraphs": 44,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved discipline, willing discipleship, concern for church, prayer against counsel rather than person, lawful effort."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -5293,9 +5388,9 @@
   "current_batch": {
     "range": "Judg.15–2Sam.24 and 1Kgs.1–4",
     "target": 70,
-    "completed": 52,
-    "paragraphs": 1544,
-    "reference_occurrences": 41,
-    "next": "2Sam.11"
+    "completed": 57,
+    "paragraphs": 1694,
+    "reference_occurrences": 43,
+    "next": "2Sam.16"
   }
 }
