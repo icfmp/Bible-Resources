@@ -2,7 +2,15 @@
 
 The source and review policy in [TRANSLATION_HANDOFF.json](TRANSLATION_HANDOFF.json) remains binding. Existing manuscripts are unchanged. Use `progress.json` as the compact task ledger; update it only after saving the matching manuscript and completing the relevant editorial pass. The issue is a human-facing mirror, not input for the language model.
 
-## Read only the current batch
+## Connector-accessible cache (no local execution required)
+
+The [generated chapter cache](https://github.com/icfmp/Bible-Resources/tree/work/hmcc-english-chapter-packets/sources/cleaned/commentaries/fr/hmcc-french/editorial/packets) is pinned at commit `354b145094512d69ec5649a39338a9989cd5fe0e`. It contains all 1,189 paired chapters, grouped in blocks of up to ten in JSON Lines files. Each record contains `chapter`, `modern_osis` and `classic_reading`. The index maps each chapter to its file and line. For chapter n, the filename starts at 1, 11, 21, etc. and uses a three-digit chapter number; line number is 1–10 within that book block.
+
+For the next chapter, fetch `packets/Gen.011.jsonl`, line 6 only, from the cache branch. Fetch a range of lines for a bounded batch. Read only the selected records, not the full index or issue. Use exact classic source when the plain-text projection leaves ambiguity. The cache is generated, read-only, and must never be merged into the production branch. Modern fragments are source substrings with the standalone OSIS namespace added; classic readings retain ordered text and reference destinations but are not structural witnesses. The cache was generated through GitHub connector operations from the pinned blobs; its projection is not claimed to be byte-identical to the Python extractor's output.
+
+Verified on both complete frozen blobs: balanced element boundaries, exact source substring roundtrip, 1,189 chapter containers each, identical chapter IDs and order. Verified after commit: 1,189 index entries and bounded retrieval of Gen.16 (8,111 characters). These are extraction checks, not editorial certification. Python tests and final native assembly remain unexecuted.
+
+## Local reproducible extractor
 
 Run from the repository root (the output directory must not yet exist):
 

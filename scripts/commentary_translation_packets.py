@@ -75,6 +75,8 @@ def audit_text(node):
                 yield child.tail
         if element.get("osisRef"):
             yield " [" + element.get("osisRef") + "]"
+        if element.tag == OSIS + "cell":
+            yield " | "
         if element.tag in {OSIS + "title", OSIS + "p", OSIS + "row"}:
             yield "\n"
     return "\n".join(" ".join(line.split()) for line in "".join(visit(node)).splitlines() if line.strip())
@@ -97,7 +99,11 @@ def extract(args):
     for label, root, mapping in (("modern", modern, left), ("classic", classic, right)):
         selected = set(mapping.values())
         for node in root.iter():
-            if node in selected or any(p in selected for p in node.iterancestors()):
+            if any(p in selected for p in node.iterancestors()):
+                continue
+            if node in selected:
+                if (node.tail or "").strip():
+                    outside.append({"source": label, "path": root.getroottree().getpath(node), "tail": node.tail})
                 continue
             if (node.text or "").strip() or (node.tail or "").strip():
                 outside.append({"source": label, "path": root.getroottree().getpath(node),
@@ -115,6 +121,8 @@ def check(args):
     source = chapters(root)
     parser = etree.XMLParser(resolve_entities=False, no_network=True, load_dtd=False)
     files = sorted(Path(args.manuscripts).glob("*.xml"))
+    if not files:
+        raise ValueError("No manuscript fragments found")
     for file in files:
         if file.stem not in source:
             raise ValueError(f"Unexpected manuscript: {file.name}")
