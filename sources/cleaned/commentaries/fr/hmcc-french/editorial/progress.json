@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Deut.7",
+  "next": "Deut.11",
   "batch_size": 50,
   "completed": [
     [
@@ -1595,6 +1595,46 @@
       "Deuteronomy",
       6,
       "Editorial audit"
+    ],
+    [
+      "Deuteronomy",
+      7,
+      "Translation"
+    ],
+    [
+      "Deuteronomy",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Deuteronomy",
+      8,
+      "Translation"
+    ],
+    [
+      "Deuteronomy",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Deuteronomy",
+      9,
+      "Translation"
+    ],
+    [
+      "Deuteronomy",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Deuteronomy",
+      10,
+      "Translation"
+    ],
+    [
+      "Deuteronomy",
+      10,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -2972,6 +3012,43 @@
           "notes": "Preserved moral, ceremonial and judicial distinctions, attributed Trinitarian interpretation, five qualities of love, four family practices, mediation and renewing grace."
         }
       ]
+    },
+    {
+      "range": "Deut.7–Deut.10",
+      "chapters": [
+        {
+          "chapter": "Deut.7",
+          "paragraphs": 26,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved restriction of historical command, spiritual warfare, marriage warning and gradual sanctification without excuse for negligence."
+        },
+        {
+          "chapter": "Deut.8",
+          "paragraphs": 44,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved three qualities of obedience, providence, absence of merit, warning against prosperity and Spirit's efficacy; classic duplication not restored."
+        },
+        {
+          "chapter": "Deut.9",
+          "paragraphs": 24,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved righteousness in Christ alone, exclusion of boasting, source cross-reference audit, free grace and advocacy."
+        },
+        {
+          "chapter": "Deut.10",
+          "paragraphs": 33,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved four signs of reconciliation, continuing Spirit-given ministry, original sin, duties and transformation by the Spirit."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -3014,9 +3091,9 @@
   "current_batch": {
     "range": "Lev.26–Deut.12",
     "target": 50,
-    "completed": 44,
-    "paragraphs": 1563,
-    "reference_occurrences": 50,
-    "next": "Deut.7"
+    "completed": 48,
+    "paragraphs": 1690,
+    "reference_occurrences": 54,
+    "next": "Deut.11"
   }
 }
