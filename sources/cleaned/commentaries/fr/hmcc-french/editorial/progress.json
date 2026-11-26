@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Num.6",
+  "next": "Num.11",
   "batch_size": 50,
   "completed": [
     [
@@ -1225,6 +1225,56 @@
       "Numbers",
       5,
       "Editorial audit"
+    ],
+    [
+      "Numbers",
+      6,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Numbers",
+      7,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Numbers",
+      8,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Numbers",
+      9,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Numbers",
+      10,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      10,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -2260,6 +2310,51 @@
           "notes": "Preserved church purity, confession and restitution with faith and repentance, restraints against unjust suspicion, divine judgment of hidden sins and vindication of innocence."
         }
       ]
+    },
+    {
+      "range": "Num.6–Num.10",
+      "chapters": [
+        {
+          "chapter": "Num.6",
+          "paragraphs": 41,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved Nazirite distinctions, historical confessional criticism and modern editorial qualification, Christ as Surety and example, Trinitarian reading of blessing."
+        },
+        {
+          "chapter": "Num.7",
+          "paragraphs": 21,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved priority of required worship, equal tribal offerings, repentance and Christ's sin offering, eternal Word and divine communion."
+        },
+        {
+          "chapter": "Num.8",
+          "paragraphs": 24,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved illumination through Christ and Scripture, baptism and ordination, cleansing by faith and active service."
+        },
+        {
+          "chapter": "Num.9",
+          "paragraphs": 39,
+          "reference_occurrences": 5,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved historical Passover qualification, Lord's Supper, unwilling versus voluntary absence, scriptural guidance and warning against mistaking desires for divine direction."
+        },
+        {
+          "chapter": "Num.10",
+          "paragraphs": 41,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved gospel trumpet applications, progression in holiness, practical help compatible with providence, prayer and presence of God."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -2296,9 +2391,9 @@
   "current_batch": {
     "range": "Lev.26–Deut.12",
     "target": 50,
-    "completed": 7,
-    "paragraphs": 190,
-    "reference_occurrences": 6,
-    "next": "Num.6"
+    "completed": 12,
+    "paragraphs": 356,
+    "reference_occurrences": 16,
+    "next": "Num.11"
   }
 }
