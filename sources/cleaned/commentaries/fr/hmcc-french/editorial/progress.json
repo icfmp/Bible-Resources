@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Gen.16",
+  "next": "Gen.18",
   "batch_size": 10,
   "completed": [
     [
@@ -155,10 +155,53 @@
       "Genesis",
       15,
       "Editorial audit"
+    ],
+    [
+      "Genesis",
+      16,
+      "Translation"
+    ],
+    [
+      "Genesis",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "Genesis",
+      17,
+      "Translation"
+    ],
+    [
+      "Genesis",
+      17,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
   "non_chapter": {
     "Genesis_introduction": "translated_and_audited_in_Gen.1"
-  }
+  },
+  "batch_checkpoints": [
+    {
+      "range": "Gen.16–Gen.17",
+      "chapters": [
+        {
+          "chapter": "Gen.16",
+          "paragraphs": 41,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved unbelief, providence, personal responsibility, patience in suffering, Angel as the eternal Word and Son of God; retained the historical household context and source treatment of Hagar."
+        },
+        {
+          "chapter": "Gen.17",
+          "paragraphs": 52,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved everlasting covenant of grace, distinction between visible sign and inward seal, justification by faith, parental prayer and distinct blessings of Ishmael and Isaac, regeneration and sanctification. Kept the split Romans reference anchor as in source."
+        }
+      ]
+    }
+  ]
 }
