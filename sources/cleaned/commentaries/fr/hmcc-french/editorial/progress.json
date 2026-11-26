@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Num.28",
+  "next": "Num.33",
   "batch_size": 50,
   "completed": [
     [
@@ -1445,6 +1445,56 @@
       "Numbers",
       27,
       "Editorial audit"
+    ],
+    [
+      "Numbers",
+      28,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      28,
+      "Editorial audit"
+    ],
+    [
+      "Numbers",
+      29,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      29,
+      "Editorial audit"
+    ],
+    [
+      "Numbers",
+      30,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      30,
+      "Editorial audit"
+    ],
+    [
+      "Numbers",
+      31,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      31,
+      "Editorial audit"
+    ],
+    [
+      "Numbers",
+      32,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      32,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -2681,6 +2731,51 @@
           "notes": "Preserved three qualities of daughters, concern for succession and Spirit's indispensable gifts, law versus grace."
         }
       ]
+    },
+    {
+      "range": "Num.28–Num.32",
+      "chapters": [
+        {
+          "chapter": "Num.28",
+          "paragraphs": 24,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved daily prayer, Sabbath teaching, Christ's blood, martyrdom and continued dependence on sacrifice."
+        },
+        {
+          "chapter": "Num.29",
+          "paragraphs": 20,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved source citation audit and correction, recurring worship, sin offering and doxology."
+        },
+        {
+          "chapter": "Num.30",
+          "paragraphs": 12,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved lawful vows and attributed household authority interpretation."
+        },
+        {
+          "chapter": "Num.31",
+          "paragraphs": 37,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved exceptional divine commission as historical, explicit denial of contemporary warrant, historical slavery qualification, mercy in Christ and corrected verse labels."
+        },
+        {
+          "chapter": "Num.32",
+          "paragraphs": 29,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved warning against selfishness, solidarity, repentance and spiritual welfare of others."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -2717,9 +2812,9 @@
   "current_batch": {
     "range": "Lev.26–Deut.12",
     "target": 50,
-    "completed": 29,
-    "paragraphs": 1088,
-    "reference_occurrences": 37,
-    "next": "Num.28"
+    "completed": 34,
+    "paragraphs": 1210,
+    "reference_occurrences": 42,
+    "next": "Num.33"
   }
 }
