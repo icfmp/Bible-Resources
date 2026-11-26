@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Josh.15",
+  "next": "Josh.21",
   "batch_size": 60,
   "completed": [
     [
@@ -2015,6 +2015,66 @@
       "Joshua",
       14,
       "Editorial audit"
+    ],
+    [
+      "Joshua",
+      15,
+      "Translation"
+    ],
+    [
+      "Joshua",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "Joshua",
+      16,
+      "Translation"
+    ],
+    [
+      "Joshua",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "Joshua",
+      17,
+      "Translation"
+    ],
+    [
+      "Joshua",
+      17,
+      "Editorial audit"
+    ],
+    [
+      "Joshua",
+      18,
+      "Translation"
+    ],
+    [
+      "Joshua",
+      18,
+      "Editorial audit"
+    ],
+    [
+      "Joshua",
+      19,
+      "Translation"
+    ],
+    [
+      "Joshua",
+      19,
+      "Editorial audit"
+    ],
+    [
+      "Joshua",
+      20,
+      "Translation"
+    ],
+    [
+      "Joshua",
+      20,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -3774,6 +3834,59 @@
           "notes": "Preserved divine allocation, providence, Caleb's faith and attributed name interpretation."
         }
       ]
+    },
+    {
+      "range": "Josh.15–Josh.20",
+      "chapters": [
+        {
+          "chapter": "Josh.15",
+          "paragraphs": 15,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved upper and lower springs typology, free gifts in Christ and Bethlehem's historical significance."
+        },
+        {
+          "chapter": "Josh.16",
+          "paragraphs": 7,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved joint reading, prayer against spiritual enemies and providential contentment."
+        },
+        {
+          "chapter": "Josh.17",
+          "paragraphs": 25,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved daughters' inheritance, solidarity, impartial leadership, work and reliance on Christ; retained split reference range."
+        },
+        {
+          "chapter": "Josh.18",
+          "paragraphs": 15,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved attributed Shiloh interpretation, heavenly rest, providence and willingness to surrender gifts."
+        },
+        {
+          "chapter": "Josh.19",
+          "paragraphs": 18,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved restitution, prophetic fulfillment, public service and Christ's poverty and obedience."
+        },
+        {
+          "chapter": "Josh.20",
+          "paragraphs": 16,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved refuge from law's curse, Levite ministry and attributed spiritual interpretations of six names."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -3822,9 +3935,9 @@
   "current_batch": {
     "range": "Deut.13–Judg.14",
     "target": 60,
-    "completed": 36,
-    "paragraphs": 1112,
-    "reference_occurrences": 38,
-    "next": "Josh.15"
+    "completed": 42,
+    "paragraphs": 1208,
+    "reference_occurrences": 44,
+    "next": "Josh.21"
   }
 }
