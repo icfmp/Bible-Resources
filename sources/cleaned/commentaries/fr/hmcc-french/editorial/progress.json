@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "1Kgs.9",
+  "next": "1Kgs.14",
   "batch_size": 80,
   "completed": [
     [
@@ -2995,6 +2995,56 @@
       "1 Kings",
       8,
       "Editorial audit"
+    ],
+    [
+      "1 Kings",
+      9,
+      "Translation"
+    ],
+    [
+      "1 Kings",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "1 Kings",
+      10,
+      "Translation"
+    ],
+    [
+      "1 Kings",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "1 Kings",
+      11,
+      "Translation"
+    ],
+    [
+      "1 Kings",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "1 Kings",
+      12,
+      "Translation"
+    ],
+    [
+      "1 Kings",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "1 Kings",
+      13,
+      "Translation"
+    ],
+    [
+      "1 Kings",
+      13,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -5643,6 +5693,51 @@
           "notes": "Preserved temple typology, prayer, forgiveness, inward corruption and grace; modern qualification of prayer retained."
         }
       ]
+    },
+    {
+      "range": "1Kgs.9–1Kgs.13",
+      "chapters": [
+        {
+          "chapter": "1Kgs.9",
+          "paragraphs": 23,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved unchanged standing before God, preference for correction over sin, mutual dependence and wisdom over wealth."
+        },
+        {
+          "chapter": "1Kgs.10",
+          "paragraphs": 22,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved seeking Christ, Scripture, spiritual wealth, gratitude and heavenly hope."
+        },
+        {
+          "chapter": "1Kgs.11",
+          "paragraphs": 37,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved uncertainty of Solomon's repentance and final state, providential correction and superiority of Christ."
+        },
+        {
+          "chapter": "1Kgs.12",
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved attributed interpretation of grievances, divine sovereignty, rejection of idolatry and prayer."
+        },
+        {
+          "chapter": "1Kgs.13",
+          "paragraphs": 36,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved judicial hardening, repentance versus relief, deception, discipline and warning against prosperity in sin."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -5721,9 +5816,9 @@
   "current_batch": {
     "range": "1Kgs.5–1Chr.29 and 2Chr.1–8",
     "target": 80,
-    "completed": 4,
-    "paragraphs": 123,
-    "reference_occurrences": 3,
-    "next": "1Kgs.9"
+    "completed": 9,
+    "paragraphs": 269,
+    "reference_occurrences": 6,
+    "next": "1Kgs.14"
   }
 }
