@@ -46,6 +46,26 @@
     "next": "Gen.2"
   },
   "latest_checkpoint": {
+    "chapter": "Gen.10",
+    "translation": "complete",
+    "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+    "manuscript_commit": "1fe9a575b5fe17340c5ffd1ede4233b562c14f5c",
+    "paragraphs": 41,
+    "commentary_sections": 3,
+    "outline_rows": 4,
+    "inline_reference_destinations": [
+      "Jer.25.22",
+      "Isa.42.4",
+      "Gen.6.4"
+    ],
+    "audit_notes": [
+      "Preserved qualified historical genealogy and British-island speculation as inherited from the modern edition; Nimrod's tyranny and ambition; the distinction between external prosperity and blessing; and the Eber/Hebrews connection.",
+      "The French rendering follows modern paragraph boundaries and all modern tags, attributes and inline reference occurrences were checked in sequence."
+    ],
+    "technical_validation": "chapter-local markup equality for all three chapters; no schema validation, SWORD compilation or reader tests",
+    "next": "Gen.11"
+  },
+  "previous_checkpoint": {
     "chapter": "Gen.7",
     "translation": "complete",
     "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
@@ -70,26 +90,6 @@
     ],
     "technical_validation": "chapter-local markup equality for both chapters; no schema validation, SWORD compilation or reader tests",
     "next": "Gen.8"
-  },
-  "previous_checkpoint": {
-    "chapter": "Gen.5",
-    "translation": "complete",
-    "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
-    "manuscript_commit": "f6550fb50719c1f4eb14d906fb39cf047c3c4d19",
-    "paragraphs": 47,
-    "commentary_sections": 4,
-    "outline_rows": 5,
-    "inline_reference_destinations": [
-      "Amos.3.3",
-      "Heb.11.5"
-    ],
-    "audit_notes": [
-      "Retained Henry's account of Adam's lost divine likeness, inherited sin and mortality, the provisional character of earthly life, and the promise of transformation at Christ's return.",
-      "Retained the modern edition's attribution and qualified presentation of Methuselah's name etymology, without asserting it as verified Hebrew scholarship or changing source content.",
-      "The French rendering follows modern paragraph boundaries and all modern tags, attributes and inline reference occurrences were checked in sequence."
-    ],
-    "technical_validation": "chapter-local markup equality for both chapters; no schema validation, SWORD compilation or reader tests",
-    "next": "Gen.6"
   },
   "batch_checkpoints": [
     {
@@ -125,6 +125,40 @@
       "audit_notes": [
         "Preserved the anthropomorphic language concerning God's regret and the explicit denial of divine change or unhappiness; Noah's justification by faith and subsequent holiness; the distinction between the covenant of providence and the covenant of grace; and conditional wording about benefits of parental piety.",
         "Retained the modern edition's attribution of the historical size comparison to Henry, without updating his measurement or treating it as a verified modern fact."
+      ]
+    },
+    {
+      "chapter": "Gen.8",
+      "translation": "complete",
+      "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+      "manuscript_commit": "1f7ec789278f1dacd92529ebef0f8b3ae0896f32",
+      "paragraphs": 48,
+      "commentary_sections": 4,
+      "outline_rows": 5,
+      "inline_reference_destinations": [
+        "Ps.116.7",
+        "Gen.8.13-Gen.8.19"
+      ],
+      "audit_notes": [
+        "Preserved divine justice, gradual deliverance, Christ as rest, conditional protection, typology of sacrifice and inherited sin. Retained the modern source's treatment of the classic duplicated dove sentence and the explicitly linked section heading."
+      ]
+    },
+    {
+      "chapter": "Gen.9",
+      "translation": "complete",
+      "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+      "manuscript_commit": "14180c69129b9ab08e1d874aaad0349480845501",
+      "paragraphs": 66,
+      "commentary_sections": 5,
+      "outline_rows": 6,
+      "inline_reference_destinations": [
+        "Rom.13.4",
+        "Luke.21.34",
+        "1Pet.4.8"
+      ],
+      "audit_notes": [
+        "Preserved the modern edition's attributed historical interpretation of Canaan and Africa, its explicit rejection of enslaving Black Africans and its condemnation of slaveholders. This historically dated interpretation remains Henry's claim, not an independently verified historical or theological endorsement. Do not silently rewrite the accepted modern source.",
+        "Preserved the attributed capital punishment position, fallen humanity's remaining image of God, the covenant seal, dependence on grace, Christ's human descent and Jewish/Gentile unity."
       ]
     }
   ]
