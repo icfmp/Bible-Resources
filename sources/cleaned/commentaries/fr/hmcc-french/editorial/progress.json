@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Ps.140",
+  "next": "Song.7",
   "batch_size": 60,
   "completed": [
     [
@@ -6175,6 +6175,606 @@
       "Psalms",
       119,
       "Editorial audit"
+    ],
+    [
+      "Psalms",
+      140,
+      "Translation"
+    ],
+    [
+      "Psalms",
+      140,
+      "Editorial audit"
+    ],
+    [
+      "Psalms",
+      141,
+      "Translation"
+    ],
+    [
+      "Psalms",
+      141,
+      "Editorial audit"
+    ],
+    [
+      "Psalms",
+      142,
+      "Translation"
+    ],
+    [
+      "Psalms",
+      142,
+      "Editorial audit"
+    ],
+    [
+      "Psalms",
+      143,
+      "Translation"
+    ],
+    [
+      "Psalms",
+      143,
+      "Editorial audit"
+    ],
+    [
+      "Psalms",
+      144,
+      "Translation"
+    ],
+    [
+      "Psalms",
+      144,
+      "Editorial audit"
+    ],
+    [
+      "Psalms",
+      145,
+      "Translation"
+    ],
+    [
+      "Psalms",
+      145,
+      "Editorial audit"
+    ],
+    [
+      "Psalms",
+      146,
+      "Translation"
+    ],
+    [
+      "Psalms",
+      146,
+      "Editorial audit"
+    ],
+    [
+      "Psalms",
+      147,
+      "Translation"
+    ],
+    [
+      "Psalms",
+      147,
+      "Editorial audit"
+    ],
+    [
+      "Psalms",
+      148,
+      "Translation"
+    ],
+    [
+      "Psalms",
+      148,
+      "Editorial audit"
+    ],
+    [
+      "Psalms",
+      149,
+      "Translation"
+    ],
+    [
+      "Psalms",
+      149,
+      "Editorial audit"
+    ],
+    [
+      "Psalms",
+      150,
+      "Translation"
+    ],
+    [
+      "Psalms",
+      150,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      1,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      2,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      3,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      4,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      5,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      6,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      7,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      8,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      9,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      10,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      11,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      12,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      13,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      14,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      15,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      16,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      17,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      17,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      18,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      18,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      19,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      19,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      20,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      20,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      21,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      22,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      22,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      23,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      23,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      24,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      24,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      25,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      25,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      26,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      26,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      27,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      27,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      28,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      28,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      29,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      29,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      30,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      30,
+      "Editorial audit"
+    ],
+    [
+      "Proverbs",
+      31,
+      "Translation"
+    ],
+    [
+      "Proverbs",
+      31,
+      "Editorial audit"
+    ],
+    [
+      "Ecclesiastes",
+      1,
+      "Translation"
+    ],
+    [
+      "Ecclesiastes",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Ecclesiastes",
+      2,
+      "Translation"
+    ],
+    [
+      "Ecclesiastes",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Ecclesiastes",
+      3,
+      "Translation"
+    ],
+    [
+      "Ecclesiastes",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Ecclesiastes",
+      4,
+      "Translation"
+    ],
+    [
+      "Ecclesiastes",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Ecclesiastes",
+      5,
+      "Translation"
+    ],
+    [
+      "Ecclesiastes",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Ecclesiastes",
+      6,
+      "Translation"
+    ],
+    [
+      "Ecclesiastes",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Ecclesiastes",
+      7,
+      "Translation"
+    ],
+    [
+      "Ecclesiastes",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Ecclesiastes",
+      8,
+      "Translation"
+    ],
+    [
+      "Ecclesiastes",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Ecclesiastes",
+      9,
+      "Translation"
+    ],
+    [
+      "Ecclesiastes",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Ecclesiastes",
+      10,
+      "Translation"
+    ],
+    [
+      "Ecclesiastes",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Ecclesiastes",
+      11,
+      "Translation"
+    ],
+    [
+      "Ecclesiastes",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Ecclesiastes",
+      12,
+      "Translation"
+    ],
+    [
+      "Ecclesiastes",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Song of Solomon",
+      1,
+      "Translation"
+    ],
+    [
+      "Song of Solomon",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Song of Solomon",
+      2,
+      "Translation"
+    ],
+    [
+      "Song of Solomon",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Song of Solomon",
+      3,
+      "Translation"
+    ],
+    [
+      "Song of Solomon",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Song of Solomon",
+      4,
+      "Translation"
+    ],
+    [
+      "Song of Solomon",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Song of Solomon",
+      5,
+      "Translation"
+    ],
+    [
+      "Song of Solomon",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Song of Solomon",
+      6,
+      "Translation"
+    ],
+    [
+      "Song of Solomon",
+      6,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -6195,7 +6795,11 @@
     "2_Chronicles_introduction": "joint introduction in 1Chr.1; no separate introduction in 2Chr.1 source",
     "Ezra_introduction": "translated_and_audited_in_Ezra.1",
     "Nehemiah_introduction": "translated_and_audited_in_Neh.1",
-    "Esther_introduction": "translated_and_audited_in_Esth.1"
+    "Esther_introduction": "translated_and_audited_in_Esth.1",
+    "Psalms_introduction": "translated_and_audited_in_Ps.1",
+    "Proverbs_introduction": "translated_and_audited_in_Prov.1",
+    "Ecclesiastes_introduction": "translated_and_audited_in_Eccl.1",
+    "Song_of_Solomon_introduction": "translated_and_audited_in_Song.1"
   },
   "batch_checkpoints": [
     {
@@ -11237,17 +11841,455 @@
         "Verses 169–176: modern source has 'prayers, promises and confessions' where the classic witness has 'prayers, resolutions and confessions'; retained modern wording, flagged for independent editorial review.",
         "Independent editorial review, schema validation and corpus/native tests remain pending."
       ]
+    },
+    {
+      "range": "Ps.140–Song.6",
+      "chapters": [
+        {
+          "chapter": "Ps.140",
+          "paragraphs": 15,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ps.141",
+          "paragraphs": 20,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ps.142",
+          "paragraphs": 16,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ps.143",
+          "paragraphs": 24,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ps.144",
+          "paragraphs": 24,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ps.145",
+          "paragraphs": 25,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ps.146",
+          "paragraphs": 7,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ps.147",
+          "paragraphs": 8,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ps.148",
+          "paragraphs": 8,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ps.149",
+          "paragraphs": 12,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ps.150",
+          "paragraphs": 21,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.1",
+          "paragraphs": 52,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.2",
+          "paragraphs": 26,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.3",
+          "paragraphs": 40,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.4",
+          "paragraphs": 30,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.5",
+          "paragraphs": 20,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.6",
+          "paragraphs": 32,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.7",
+          "paragraphs": 20,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.8",
+          "paragraphs": 38,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.9",
+          "paragraphs": 29,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.10",
+          "paragraphs": 29,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.11",
+          "paragraphs": 29,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.12",
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.13",
+          "paragraphs": 25,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.14",
+          "paragraphs": 33,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.15",
+          "paragraphs": 31,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.16",
+          "paragraphs": 29,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.17",
+          "paragraphs": 27,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.18",
+          "paragraphs": 22,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.19",
+          "paragraphs": 29,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.20",
+          "paragraphs": 30,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.21",
+          "paragraphs": 29,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.22",
+          "paragraphs": 21,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.23",
+          "paragraphs": 9,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.24",
+          "paragraphs": 14,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.25",
+          "paragraphs": 20,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.26",
+          "paragraphs": 19,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.27",
+          "paragraphs": 19,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.28",
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.29",
+          "paragraphs": 27,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.30",
+          "paragraphs": 42,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Prov.31",
+          "paragraphs": 29,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Eccl.1",
+          "paragraphs": 37,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Eccl.2",
+          "paragraphs": 32,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Eccl.3",
+          "paragraphs": 33,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Eccl.4",
+          "paragraphs": 37,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Eccl.5",
+          "paragraphs": 41,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Eccl.6",
+          "paragraphs": 22,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Eccl.7",
+          "paragraphs": 54,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Eccl.8",
+          "paragraphs": 29,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Eccl.9",
+          "paragraphs": 36,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Eccl.10",
+          "paragraphs": 34,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Eccl.11",
+          "paragraphs": 33,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Eccl.12",
+          "paragraphs": 39,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Song.1",
+          "paragraphs": 73,
+          "reference_occurrences": 9,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Song.2",
+          "paragraphs": 55,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Song.3",
+          "paragraphs": 20,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Song.4",
+          "paragraphs": 25,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Song.5",
+          "paragraphs": 27,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Song.6",
+          "paragraphs": 24,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        }
+      ],
+      "audit_notes": [
+        "Ps.149: Henry's explicit rejection of human violence to spread the gospel and millennial reading retained.",
+        "Ps.150: historical estimate of more than three thousand years retained as Henry's statement.",
+        "Prov.1, Eccl.1 and Song.1: book introductions translated; Prov.10 separate chapter introduction retained.",
+        "Prov.14, 16, 22: source verse groupings and lack of separate headings retained; no invented sections.",
+        "Prov.26.10: both possible interpretations retained.",
+        "Prov.30–31 and Eccl.7: modern source contextual qualifications retained.",
+        "Eccl.5: explicit corrected verse-label heading retained; Eccl.8: modern witness summarizes Henry's historical mortality estimates without their numbers; difference from classic flagged.",
+        "Eccl.10: both original erroneous citation and modern corrected citation retained as documented in source; no new correction.",
+        "Song.1: unplaced original links and corrected editorial references retained; Henry's allegorical interpretation and historical lexical explanation retained, without independent endorsement.",
+        "Song.4: Henry's warning against speculative interpretation retained; Song.6: source terminology sacraments retained.",
+        "Independent review and global/native validation remain pending."
+      ]
     }
   ],
   "latest_completed_batch": {
-    "range": "Ps.119",
-    "chapters": 1,
-    "paragraphs": 300,
-    "reference_occurrences": 2,
-    "translation": 1,
-    "editorial_audit": 1,
-    "technical_validation": "chapter-local structural checks; no full corpus tests",
-    "next": "Ps.140"
+    "range": "Ps.140–Song.6",
+    "chapters": 60,
+    "paragraphs": 1687,
+    "reference_occurrences": 17,
+    "translation": 60,
+    "editorial_audit": 60,
+    "technical_validation": "chapter-local tag/attribute sequence equality only; no full corpus tests",
+    "next": "Song.7"
   },
   "book_checkpoints": {
     "Genesis": {
@@ -11360,28 +12402,51 @@
       "technical_validation": "chapter-local tag/attribute sequence equality; global and native validation pending"
     },
     "Psalms": {
-      "translation": 139,
-      "editorial_audit": 139,
+      "translation": 150,
+      "editorial_audit": 150,
       "introduction": "Ps.1 book introduction and Ps.119 authorial introduction retained",
-      "technical_validation": "chapter-local tag/attribute sequence equality for Ps.1–139; global and native validation pending",
-      "remaining": "Ps.140–150"
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Proverbs": {
+      "translation": 31,
+      "editorial_audit": 31,
+      "introduction": "translated and compared with Prov.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Ecclesiastes": {
+      "translation": 12,
+      "editorial_audit": 12,
+      "introduction": "translated and compared with Eccl.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Song of Solomon": {
+      "translation": 6,
+      "editorial_audit": 6,
+      "introduction": "translated and compared with Song.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending",
+      "remaining": "Song.7–8"
     }
   },
   "current_batch": {
-    "range": "Ps.119",
-    "target": 1,
-    "completed": 1,
-    "paragraphs": 300,
-    "reference_occurrences": 2,
-    "next": "Ps.140",
+    "range": "Ps.140–Song.6",
+    "target": 60,
+    "completed": 60,
+    "paragraphs": 1687,
+    "reference_occurrences": 17,
+    "next": "Song.7",
     "status": "completed cohort",
     "audit_notes": [
-      "Psalm 119 deliberately handled alone, preserving the original authorial introduction outside verse-range sections and its editorial provenance note.",
-      "All 22 eight-verse commentary sections compared against the classic reading projection; source tag and attribute sequence, element balance, 523 nonempty text nodes and all section ranges checked.",
-      "Verses 1–8: classic compiled witness contains duplicated wording and a 'temper' typo; modern source is followed without reintroducing these defects.",
-      "Verses 121–128: modern source qualifies the statement about hypocrisy with conduct contradicting profession; retained as source wording.",
-      "Verses 169–176: modern source has 'prayers, promises and confessions' where the classic witness has 'prayers, resolutions and confessions'; retained modern wording, flagged for independent editorial review.",
-      "Independent editorial review, schema validation and corpus/native tests remain pending."
+      "Ps.149: Henry's explicit rejection of human violence to spread the gospel and millennial reading retained.",
+      "Ps.150: historical estimate of more than three thousand years retained as Henry's statement.",
+      "Prov.1, Eccl.1 and Song.1: book introductions translated; Prov.10 separate chapter introduction retained.",
+      "Prov.14, 16, 22: source verse groupings and lack of separate headings retained; no invented sections.",
+      "Prov.26.10: both possible interpretations retained.",
+      "Prov.30–31 and Eccl.7: modern source contextual qualifications retained.",
+      "Eccl.5: explicit corrected verse-label heading retained; Eccl.8: modern witness summarizes Henry's historical mortality estimates without their numbers; difference from classic flagged.",
+      "Eccl.10: both original erroneous citation and modern corrected citation retained as documented in source; no new correction.",
+      "Song.1: unplaced original links and corrected editorial references retained; Henry's allegorical interpretation and historical lexical explanation retained, without independent endorsement.",
+      "Song.4: Henry's warning against speculative interpretation retained; Song.6: source terminology sacraments retained.",
+      "Independent review and global/native validation remain pending."
     ]
   }
 }
