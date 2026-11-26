@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Isa.59",
+  "next": "Lam.1",
   "batch_size": 60,
   "completed": [
     [
@@ -7375,6 +7375,606 @@
       "Isaiah",
       58,
       "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      59,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      59,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      60,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      60,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      61,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      61,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      62,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      62,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      63,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      63,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      64,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      64,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      65,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      65,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      66,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      66,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      1,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      2,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      3,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      4,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      5,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      6,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      7,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      8,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      9,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      10,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      11,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      12,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      13,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      14,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      15,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      16,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      17,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      17,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      18,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      18,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      19,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      19,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      20,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      20,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      21,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      22,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      22,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      23,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      23,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      24,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      24,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      25,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      25,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      26,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      26,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      27,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      27,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      28,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      28,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      29,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      29,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      30,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      30,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      31,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      31,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      32,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      32,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      33,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      33,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      34,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      34,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      35,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      35,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      36,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      36,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      37,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      37,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      38,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      38,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      39,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      39,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      40,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      40,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      41,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      41,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      42,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      42,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      43,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      43,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      44,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      44,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      45,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      45,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      46,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      46,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      47,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      47,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      48,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      48,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      49,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      49,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      50,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      50,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      51,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      51,
+      "Editorial audit"
+    ],
+    [
+      "Jeremiah",
+      52,
+      "Translation"
+    ],
+    [
+      "Jeremiah",
+      52,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -7400,7 +8000,8 @@
     "Proverbs_introduction": "translated_and_audited_in_Prov.1",
     "Ecclesiastes_introduction": "translated_and_audited_in_Eccl.1",
     "Song_of_Solomon_introduction": "translated_and_audited_in_Song.1",
-    "Isaiah_introduction": "translated_and_audited_in_Isa.1"
+    "Isaiah_introduction": "translated_and_audited_in_Isa.1",
+    "Jeremiah_introduction": "translated_and_audited_in_Jer.1"
   },
   "batch_checkpoints": [
     {
@@ -13317,17 +13918,455 @@
         "Stylistic review pending: Isa.22 redundant expression 'nous en servir pour le servir'; Isa.40 outline 'La puissance toute-puissante de Dieu'; Isa.46 awkward phrasing 'Celui qui a commencé à faire leur bien l’achèvera'.",
         "Editorial comparison performed by the translator, not an independent reviewer. Full corpus and native module checks pending."
       ]
+    },
+    {
+      "range": "Isa.59–Jer.52",
+      "chapters": [
+        {
+          "chapter": "Isa.59",
+          "paragraphs": 32,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.60",
+          "paragraphs": 41,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.61",
+          "paragraphs": 42,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.62",
+          "paragraphs": 25,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.63",
+          "paragraphs": 35,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.64",
+          "paragraphs": 45,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.65",
+          "paragraphs": 47,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.66",
+          "paragraphs": 36,
+          "reference_occurrences": 5,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.1",
+          "paragraphs": 35,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.2",
+          "paragraphs": 46,
+          "reference_occurrences": 5,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.3",
+          "paragraphs": 44,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.4",
+          "paragraphs": 30,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.5",
+          "paragraphs": 23,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.6",
+          "paragraphs": 32,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.7",
+          "paragraphs": 30,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.8",
+          "paragraphs": 28,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.9",
+          "paragraphs": 25,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.10",
+          "paragraphs": 23,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.11",
+          "paragraphs": 29,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.12",
+          "paragraphs": 28,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.13",
+          "paragraphs": 28,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.14",
+          "paragraphs": 24,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.15",
+          "paragraphs": 23,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.16",
+          "paragraphs": 22,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.17",
+          "paragraphs": 53,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.18",
+          "paragraphs": 24,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.19",
+          "paragraphs": 18,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.20",
+          "paragraphs": 30,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.21",
+          "paragraphs": 13,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.22",
+          "paragraphs": 43,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.23",
+          "paragraphs": 48,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.24",
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.25",
+          "paragraphs": 36,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.26",
+          "paragraphs": 23,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.27",
+          "paragraphs": 28,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.28",
+          "paragraphs": 15,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.29",
+          "paragraphs": 43,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.30",
+          "paragraphs": 32,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.31",
+          "paragraphs": 60,
+          "reference_occurrences": 6,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.32",
+          "paragraphs": 34,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.33",
+          "paragraphs": 18,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.34",
+          "paragraphs": 13,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.35",
+          "paragraphs": 18,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.36",
+          "paragraphs": 19,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.37",
+          "paragraphs": 19,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.38",
+          "paragraphs": 14,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.39",
+          "paragraphs": 18,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.40",
+          "paragraphs": 19,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.41",
+          "paragraphs": 13,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.42",
+          "paragraphs": 20,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.43",
+          "paragraphs": 11,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.44",
+          "paragraphs": 27,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.45",
+          "paragraphs": 10,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.46",
+          "paragraphs": 13,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.47",
+          "paragraphs": 7,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.48",
+          "paragraphs": 17,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.49",
+          "paragraphs": 29,
+          "reference_occurrences": 5,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.50",
+          "paragraphs": 38,
+          "reference_occurrences": 8,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.51",
+          "paragraphs": 21,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jer.52",
+          "paragraphs": 18,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        }
+      ],
+      "audit_notes": [
+        "Isa.60 and 65: alternative or open prophetic fulfilment explicitly preserved.",
+        "Jer.1: Blayney's proposed reading sequence retained as a historical proposal, without changing canonical order.",
+        "Jer.13: biblical image and modern clarification preserved; Jer.15: Henry's argument concerning intercession of deceased saints; Jer.17: Sabbath interpretation.",
+        "Jer.20.7: alternative reading retained.",
+        "Jer.23: justification and sanctification distinguished; Jer.29: seventy years measured from first deportation according to Henry.",
+        "Jer.31: new covenant and Henry's restoration interpretation retained.",
+        "Jer.35: travelers' report not independently verified; Jer.40: authorial uncertainty retained.",
+        "Jer.44 and 51: theological applications attributed to Henry.",
+        "Jer.49: identification of Elamites with Persians attributed to Henry. Jer.50: noncontiguous outline and eight previously corrected editorial reference targets and labels preserved.",
+        "Review French phrasing in Jer.2 (negative coordination), Jer.20 (quotation of divine repayment), Jer.41 (bribing death) and Jer.43 (judgment through another person or nation).",
+        "Editorial comparison performed by translator; independent review and full corpus/native tests pending."
+      ]
     }
   ],
   "latest_completed_batch": {
-    "range": "Song.7–Isa.58",
+    "range": "Isa.59–Jer.52",
     "chapters": 60,
-    "paragraphs": 1890,
-    "reference_occurrences": 159,
+    "paragraphs": 1663,
+    "reference_occurrences": 181,
     "translation": 60,
     "editorial_audit": 60,
     "technical_validation": "chapter-local tag/attribute sequence equality only; no full corpus tests",
-    "next": "Isa.59"
+    "next": "Lam.1"
   },
   "book_checkpoints": {
     "Genesis": {
@@ -13464,32 +14503,38 @@
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
     },
     "Isaiah": {
-      "translation": 58,
-      "editorial_audit": 58,
+      "translation": 66,
+      "editorial_audit": 66,
       "introduction": "translated and compared with Isa.1",
-      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending",
-      "remaining": "Isa.59–66"
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Jeremiah": {
+      "translation": 52,
+      "editorial_audit": 52,
+      "introduction": "translated and compared with Jer.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
     }
   },
   "current_batch": {
-    "range": "Song.7–Isa.58",
+    "range": "Isa.59–Jer.52",
     "target": 60,
     "completed": 60,
-    "paragraphs": 1890,
-    "reference_occurrences": 159,
-    "next": "Isa.59",
+    "paragraphs": 1663,
+    "reference_occurrences": 181,
+    "next": "Lam.1",
     "status": "completed cohort",
     "audit_notes": [
-      "Isaiah introduction preserved in Isa.1.",
-      "Isa.7.10–16: tentative Shear-Jashub immediate-sign interpretation preserved distinctly from the Messianic reading.",
-      "Isa.9–12: source numbering retained; Isa.11 split citation preserved.",
-      "Isa.13.6–18: inherited guilt doctrine and contextual editorial qualification retained.",
-      "Isa.18: source uncertainty preserved; Isa.27.6–13: historical and theological interpretation attributed to Henry.",
-      "Isa.36,37,39: authorial cross-reference-only content preserved; no invented exposition.",
-      "Isa.45.5–10: calamity distinguished from moral evil; Isa.46 divine Surety rendered Garant divin.",
-      "Isa.53: substitutionary atonement and justification by faith preserved; Isa.56 and 58: Henry's Sabbath interpretation retained.",
-      "Stylistic review pending: Isa.22 redundant expression 'nous en servir pour le servir'; Isa.40 outline 'La puissance toute-puissante de Dieu'; Isa.46 awkward phrasing 'Celui qui a commencé à faire leur bien l’achèvera'.",
-      "Editorial comparison performed by the translator, not an independent reviewer. Full corpus and native module checks pending."
+      "Isa.60 and 65: alternative or open prophetic fulfilment explicitly preserved.",
+      "Jer.1: Blayney's proposed reading sequence retained as a historical proposal, without changing canonical order.",
+      "Jer.13: biblical image and modern clarification preserved; Jer.15: Henry's argument concerning intercession of deceased saints; Jer.17: Sabbath interpretation.",
+      "Jer.20.7: alternative reading retained.",
+      "Jer.23: justification and sanctification distinguished; Jer.29: seventy years measured from first deportation according to Henry.",
+      "Jer.31: new covenant and Henry's restoration interpretation retained.",
+      "Jer.35: travelers' report not independently verified; Jer.40: authorial uncertainty retained.",
+      "Jer.44 and 51: theological applications attributed to Henry.",
+      "Jer.49: identification of Elamites with Persians attributed to Henry. Jer.50: noncontiguous outline and eight previously corrected editorial reference targets and labels preserved.",
+      "Review French phrasing in Jer.2 (negative coordination), Jer.20 (quotation of divine repayment), Jer.41 (bribing death) and Jer.43 (judgment through another person or nation).",
+      "Editorial comparison performed by translator; independent review and full corpus/native tests pending."
     ]
   }
 }
