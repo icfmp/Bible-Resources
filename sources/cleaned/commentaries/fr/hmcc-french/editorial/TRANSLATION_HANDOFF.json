@@ -46,6 +46,37 @@
     "next": "Gen.2"
   },
   "latest_checkpoint": {
+    "chapter": "Gen.3",
+    "translation": "complete",
+    "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+    "manuscript_commit": "20542d9588541a554bd86acfbb7e5035059e1e0b",
+    "paragraphs": 151,
+    "commentary_sections": 7,
+    "outline_rows": 8,
+    "inline_reference_destinations": [
+      "Matt.5.28",
+      "Matt.4.6",
+      "Rom.5.19",
+      "Rom.7.11",
+      "Heb.3.13",
+      "Heb.2.11",
+      "Heb.2.14",
+      "Isa.53.11",
+      "Acts.2.24",
+      "Gal.4.4",
+      "Gal.3.13",
+      "Isa.28.20"
+    ],
+    "audit_notes": [
+      "Preserved the fall, Adam's freedom of will before the fall, responsibility of the sinner, imputed righteousness of Christ, justification and salvation by faith in the promise, and the covenant of works.",
+      "Preserved the distinction between the promised Seed and the serpent's seed, the connection of Christ's sufferings to the saints, and the qualified supposition regarding animal sacrifice.",
+      "Preserved the author's argument concerning marriage, the curse on the ground rather than Adam himself, and Christ's satisfaction without doctrinal adaptation.",
+      "All modern source tags, attributes and inline reference occurrences compared in sequence before adding the standalone namespace. The French rendering follows modern paragraph boundaries."
+    ],
+    "technical_validation": "chapter-local markup equality only; no schema validation, SWORD compilation or reader tests",
+    "next": "Gen.4"
+  },
+  "previous_checkpoint": {
     "chapter": "Gen.2",
     "translation": "complete",
     "editorial_audit": "complete (same editor, separate comparison against classic, not independent human review)",
