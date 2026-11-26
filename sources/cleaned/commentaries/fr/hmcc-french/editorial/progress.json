@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Deut.4",
+  "next": "Deut.7",
   "batch_size": 50,
   "completed": [
     [
@@ -1565,6 +1565,36 @@
       "Deuteronomy",
       3,
       "Editorial audit"
+    ],
+    [
+      "Deuteronomy",
+      4,
+      "Translation"
+    ],
+    [
+      "Deuteronomy",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Deuteronomy",
+      5,
+      "Translation"
+    ],
+    [
+      "Deuteronomy",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Deuteronomy",
+      6,
+      "Translation"
+    ],
+    [
+      "Deuteronomy",
+      6,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -2913,6 +2943,35 @@
           "notes": "Preserved mutual responsibilities, encouragement of successors, distinction between accepted prayer and granted request, submission and hope of heaven."
         }
       ]
+    },
+    {
+      "range": "Deut.4–Deut.6",
+      "chapters": [
+        {
+          "chapter": "Deut.4",
+          "paragraphs": 56,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved national covenant distinction, obedience as evidence not merit, free grace, law as mirror, and Christ's dying love."
+        },
+        {
+          "chapter": "Deut.5",
+          "paragraphs": 31,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved learning and practice, distinction in wording of parallel passages, Christian Sabbath interpretation, conviction versus cleansing and invitation through Christ."
+        },
+        {
+          "chapter": "Deut.6",
+          "paragraphs": 50,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved moral, ceremonial and judicial distinctions, attributed Trinitarian interpretation, five qualities of love, four family practices, mediation and renewing grace."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -2955,9 +3014,9 @@
   "current_batch": {
     "range": "Lev.26–Deut.12",
     "target": 50,
-    "completed": 41,
-    "paragraphs": 1426,
-    "reference_occurrences": 47,
-    "next": "Deut.4"
+    "completed": 44,
+    "paragraphs": 1563,
+    "reference_occurrences": 50,
+    "next": "Deut.7"
   }
 }
