@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Song.7",
+  "next": "Isa.59",
   "batch_size": 60,
   "completed": [
     [
@@ -6775,6 +6775,606 @@
       "Song of Solomon",
       6,
       "Editorial audit"
+    ],
+    [
+      "Song of Solomon",
+      7,
+      "Translation"
+    ],
+    [
+      "Song of Solomon",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Song of Solomon",
+      8,
+      "Translation"
+    ],
+    [
+      "Song of Solomon",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      1,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      2,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      3,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      4,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      5,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      6,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      7,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      8,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      9,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      10,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      11,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      12,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      13,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      14,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      15,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      16,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      17,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      17,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      18,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      18,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      19,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      19,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      20,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      20,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      21,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      22,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      22,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      23,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      23,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      24,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      24,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      25,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      25,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      26,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      26,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      27,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      27,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      28,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      28,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      29,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      29,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      30,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      30,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      31,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      31,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      32,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      32,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      33,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      33,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      34,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      34,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      35,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      35,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      36,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      36,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      37,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      37,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      38,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      38,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      39,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      39,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      40,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      40,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      41,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      41,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      42,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      42,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      43,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      43,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      44,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      44,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      45,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      45,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      46,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      46,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      47,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      47,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      48,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      48,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      49,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      49,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      50,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      50,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      51,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      51,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      52,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      52,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      53,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      53,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      54,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      54,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      55,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      55,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      56,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      56,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      57,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      57,
+      "Editorial audit"
+    ],
+    [
+      "Isaiah",
+      58,
+      "Translation"
+    ],
+    [
+      "Isaiah",
+      58,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -6799,7 +7399,8 @@
     "Psalms_introduction": "translated_and_audited_in_Ps.1",
     "Proverbs_introduction": "translated_and_audited_in_Prov.1",
     "Ecclesiastes_introduction": "translated_and_audited_in_Eccl.1",
-    "Song_of_Solomon_introduction": "translated_and_audited_in_Song.1"
+    "Song_of_Solomon_introduction": "translated_and_audited_in_Song.1",
+    "Isaiah_introduction": "translated_and_audited_in_Isa.1"
   },
   "batch_checkpoints": [
     {
@@ -12279,17 +12880,454 @@
         "Song.4: Henry's warning against speculative interpretation retained; Song.6: source terminology sacraments retained.",
         "Independent review and global/native validation remain pending."
       ]
+    },
+    {
+      "range": "Song.7–Isa.58",
+      "chapters": [
+        {
+          "chapter": "Song.7",
+          "paragraphs": 16,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Song.8",
+          "paragraphs": 20,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.1",
+          "paragraphs": 41,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.2",
+          "paragraphs": 25,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.3",
+          "paragraphs": 26,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.4",
+          "paragraphs": 20,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.5",
+          "paragraphs": 45,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.6",
+          "paragraphs": 28,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.7",
+          "paragraphs": 33,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.8",
+          "paragraphs": 31,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.9",
+          "paragraphs": 38,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.10",
+          "paragraphs": 40,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.11",
+          "paragraphs": 26,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.12",
+          "paragraphs": 24,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.13",
+          "paragraphs": 27,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.14",
+          "paragraphs": 40,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.15",
+          "paragraphs": 17,
+          "reference_occurrences": 5,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.16",
+          "paragraphs": 27,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.17",
+          "paragraphs": 25,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.18",
+          "paragraphs": 22,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.19",
+          "paragraphs": 23,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.20",
+          "paragraphs": 13,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.21",
+          "paragraphs": 38,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.22",
+          "paragraphs": 35,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.23",
+          "paragraphs": 14,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.24",
+          "paragraphs": 32,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.25",
+          "paragraphs": 26,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.26",
+          "paragraphs": 42,
+          "reference_occurrences": 5,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.27",
+          "paragraphs": 33,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.28",
+          "paragraphs": 46,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.29",
+          "paragraphs": 40,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.30",
+          "paragraphs": 52,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.31",
+          "paragraphs": 18,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.32",
+          "paragraphs": 24,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.33",
+          "paragraphs": 31,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.34",
+          "paragraphs": 21,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.35",
+          "paragraphs": 31,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.36",
+          "paragraphs": 4,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.37",
+          "paragraphs": 4,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.38",
+          "paragraphs": 24,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.39",
+          "paragraphs": 4,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.40",
+          "paragraphs": 51,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.41",
+          "paragraphs": 26,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.42",
+          "paragraphs": 40,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.43",
+          "paragraphs": 37,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.44",
+          "paragraphs": 47,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.45",
+          "paragraphs": 47,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.46",
+          "paragraphs": 34,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.47",
+          "paragraphs": 18,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.48",
+          "paragraphs": 43,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.49",
+          "paragraphs": 50,
+          "reference_occurrences": 5,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.50",
+          "paragraphs": 34,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.51",
+          "paragraphs": 35,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.52",
+          "paragraphs": 32,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.53",
+          "paragraphs": 47,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.54",
+          "paragraphs": 44,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.55",
+          "paragraphs": 67,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.56",
+          "paragraphs": 31,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.57",
+          "paragraphs": 48,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Isa.58",
+          "paragraphs": 33,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        }
+      ],
+      "audit_notes": [
+        "Isaiah introduction preserved in Isa.1.",
+        "Isa.7.10–16: tentative Shear-Jashub immediate-sign interpretation preserved distinctly from the Messianic reading.",
+        "Isa.9–12: source numbering retained; Isa.11 split citation preserved.",
+        "Isa.13.6–18: inherited guilt doctrine and contextual editorial qualification retained.",
+        "Isa.18: source uncertainty preserved; Isa.27.6–13: historical and theological interpretation attributed to Henry.",
+        "Isa.36,37,39: authorial cross-reference-only content preserved; no invented exposition.",
+        "Isa.45.5–10: calamity distinguished from moral evil; Isa.46 divine Surety rendered Garant divin.",
+        "Isa.53: substitutionary atonement and justification by faith preserved; Isa.56 and 58: Henry's Sabbath interpretation retained.",
+        "Stylistic review pending: Isa.22 redundant expression 'nous en servir pour le servir'; Isa.40 outline 'La puissance toute-puissante de Dieu'; Isa.46 awkward phrasing 'Celui qui a commencé à faire leur bien l’achèvera'.",
+        "Editorial comparison performed by the translator, not an independent reviewer. Full corpus and native module checks pending."
+      ]
     }
   ],
   "latest_completed_batch": {
-    "range": "Ps.140–Song.6",
+    "range": "Song.7–Isa.58",
     "chapters": 60,
-    "paragraphs": 1687,
-    "reference_occurrences": 17,
+    "paragraphs": 1890,
+    "reference_occurrences": 159,
     "translation": 60,
     "editorial_audit": 60,
     "technical_validation": "chapter-local tag/attribute sequence equality only; no full corpus tests",
-    "next": "Song.7"
+    "next": "Isa.59"
   },
   "book_checkpoints": {
     "Genesis": {
@@ -12420,33 +13458,38 @@
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
     },
     "Song of Solomon": {
-      "translation": 6,
-      "editorial_audit": 6,
+      "translation": 8,
+      "editorial_audit": 8,
       "introduction": "translated and compared with Song.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Isaiah": {
+      "translation": 58,
+      "editorial_audit": 58,
+      "introduction": "translated and compared with Isa.1",
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending",
-      "remaining": "Song.7–8"
+      "remaining": "Isa.59–66"
     }
   },
   "current_batch": {
-    "range": "Ps.140–Song.6",
+    "range": "Song.7–Isa.58",
     "target": 60,
     "completed": 60,
-    "paragraphs": 1687,
-    "reference_occurrences": 17,
-    "next": "Song.7",
+    "paragraphs": 1890,
+    "reference_occurrences": 159,
+    "next": "Isa.59",
     "status": "completed cohort",
     "audit_notes": [
-      "Ps.149: Henry's explicit rejection of human violence to spread the gospel and millennial reading retained.",
-      "Ps.150: historical estimate of more than three thousand years retained as Henry's statement.",
-      "Prov.1, Eccl.1 and Song.1: book introductions translated; Prov.10 separate chapter introduction retained.",
-      "Prov.14, 16, 22: source verse groupings and lack of separate headings retained; no invented sections.",
-      "Prov.26.10: both possible interpretations retained.",
-      "Prov.30–31 and Eccl.7: modern source contextual qualifications retained.",
-      "Eccl.5: explicit corrected verse-label heading retained; Eccl.8: modern witness summarizes Henry's historical mortality estimates without their numbers; difference from classic flagged.",
-      "Eccl.10: both original erroneous citation and modern corrected citation retained as documented in source; no new correction.",
-      "Song.1: unplaced original links and corrected editorial references retained; Henry's allegorical interpretation and historical lexical explanation retained, without independent endorsement.",
-      "Song.4: Henry's warning against speculative interpretation retained; Song.6: source terminology sacraments retained.",
-      "Independent review and global/native validation remain pending."
+      "Isaiah introduction preserved in Isa.1.",
+      "Isa.7.10–16: tentative Shear-Jashub immediate-sign interpretation preserved distinctly from the Messianic reading.",
+      "Isa.9–12: source numbering retained; Isa.11 split citation preserved.",
+      "Isa.13.6–18: inherited guilt doctrine and contextual editorial qualification retained.",
+      "Isa.18: source uncertainty preserved; Isa.27.6–13: historical and theological interpretation attributed to Henry.",
+      "Isa.36,37,39: authorial cross-reference-only content preserved; no invented exposition.",
+      "Isa.45.5–10: calamity distinguished from moral evil; Isa.46 divine Surety rendered Garant divin.",
+      "Isa.53: substitutionary atonement and justification by faith preserved; Isa.56 and 58: Henry's Sabbath interpretation retained.",
+      "Stylistic review pending: Isa.22 redundant expression 'nous en servir pour le servir'; Isa.40 outline 'La puissance toute-puissante de Dieu'; Isa.46 awkward phrasing 'Celui qui a commencé à faire leur bien l’achèvera'.",
+      "Editorial comparison performed by the translator, not an independent reviewer. Full corpus and native module checks pending."
     ]
   }
 }
