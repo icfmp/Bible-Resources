@@ -46,6 +46,26 @@
     "next": "Gen.2"
   },
   "latest_checkpoint": {
+    "chapter": "Gen.5",
+    "translation": "complete",
+    "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+    "manuscript_commit": "f6550fb50719c1f4eb14d906fb39cf047c3c4d19",
+    "paragraphs": 47,
+    "commentary_sections": 4,
+    "outline_rows": 5,
+    "inline_reference_destinations": [
+      "Amos.3.3",
+      "Heb.11.5"
+    ],
+    "audit_notes": [
+      "Retained Henry's account of Adam's lost divine likeness, inherited sin and mortality, the provisional character of earthly life, and the promise of transformation at Christ's return.",
+      "Retained the modern edition's attribution and qualified presentation of Methuselah's name etymology, without asserting it as verified Hebrew scholarship or changing source content.",
+      "The French rendering follows modern paragraph boundaries and all modern tags, attributes and inline reference occurrences were checked in sequence."
+    ],
+    "technical_validation": "chapter-local markup equality for both chapters; no schema validation, SWORD compilation or reader tests",
+    "next": "Gen.6"
+  },
+  "previous_checkpoint": {
     "chapter": "Gen.3",
     "translation": "complete",
     "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
@@ -76,28 +96,25 @@
     "technical_validation": "chapter-local markup equality only; no schema validation, SWORD compilation or reader tests",
     "next": "Gen.4"
   },
-  "previous_checkpoint": {
-    "chapter": "Gen.2",
-    "translation": "complete",
-    "editorial_audit": "complete (same editor, separate comparison against classic, not independent human review)",
-    "manuscript_commit": "9ded962fec2ddb00c08ef25f8fb2b76f4d92eedf",
-    "paragraphs": 73,
-    "commentary_sections": 6,
-    "outline_rows": 7,
-    "inline_reference_destinations": [
-      "Rev.2.7",
-      "Rev.22.2",
-      "John.6.48",
-      "John.6.51",
-      "2Thess.3.10"
-    ],
-    "audit_notes": [
-      "Preserved Henry's English-Bible-specific LORD/Jehovah statement without adapting it to French Bible conventions.",
-      "Preserved the Sabbath argument, conditional promise of everlasting life, consequences of the fall and language of special grace and providence.",
-      "Retained modern source link corrections: Revelation 22:2 is linked and the classic spurious 2Cor.6.2 link on the enumeration marker is not reintroduced.",
-      "All non-chapter tags and attributes compared exactly against modern source; 73 paragraphs, six sections and five link occurrences retained."
-    ],
-    "technical_validation": "chapter-local markup equality only; no schema validation, SWORD compilation or reader tests",
-    "next": "Gen.3"
-  }
+  "batch_checkpoints": [
+    {
+      "chapter": "Gen.4",
+      "translation": "complete",
+      "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+      "manuscript_commit": "1b8efe29131dba557e6e5f203cf16806515e982c",
+      "paragraphs": 91,
+      "commentary_sections": 5,
+      "outline_rows": 6,
+      "inline_reference_destinations": [
+        "Jer.6.16",
+        "Heb.11.4",
+        "Rev.3.20",
+        "1John.3.12"
+      ],
+      "audit_notes": [
+        "Retained the hypothetical identification of Cain as the promised Seed, possible sin-offering interpretation of Genesis 4:7, acceptance through faith, and distinction between God's mercy and the right of firstborn.",
+        "Preserved Cain's impenitence, Abel's atoning-sacrifice witness, the qualified interpretation of Nod, marriage teaching, and the distinction between public profession and profane life."
+      ]
+    }
+  ]
 }
