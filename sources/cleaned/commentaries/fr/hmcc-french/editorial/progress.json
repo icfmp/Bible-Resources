@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Exod.31",
+  "next": "Exod.35",
   "batch_size": 40,
   "completed": [
     [
@@ -805,6 +805,46 @@
       "Exodus",
       30,
       "Editorial audit"
+    ],
+    [
+      "Exodus",
+      31,
+      "Translation"
+    ],
+    [
+      "Exodus",
+      31,
+      "Editorial audit"
+    ],
+    [
+      "Exodus",
+      32,
+      "Translation"
+    ],
+    [
+      "Exodus",
+      32,
+      "Editorial audit"
+    ],
+    [
+      "Exodus",
+      33,
+      "Translation"
+    ],
+    [
+      "Exodus",
+      33,
+      "Editorial audit"
+    ],
+    [
+      "Exodus",
+      34,
+      "Translation"
+    ],
+    [
+      "Exodus",
+      34,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -1452,6 +1492,43 @@
           "notes": "Preserved Christ as sole sacrifice and intercessor, equal worth of souls, historical currency estimate, repentance and forgiveness, reverence for sacred things."
         }
       ]
+    },
+    {
+      "range": "Exod.31–Exod.34",
+      "chapters": [
+        {
+          "chapter": "Exod.31",
+          "paragraphs": 22,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved Spirit-given craftsmanship, varied gifts, Henry's attributed Sabbath obligation and divine writing of law on hearts."
+        },
+        {
+          "chapter": "Exod.32",
+          "paragraphs": 75,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved law's inability to sanctify or justify, free grace, prayer and God's outward disclosure, personal responsibility, historical judgment and Christ's sole sufficient mediation."
+        },
+        {
+          "chapter": "Exod.33",
+          "paragraphs": 40,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved grief at withdrawal of divine presence, intercession independent of merit, limited knowledge now, Christ as Rock and future vision."
+        },
+        {
+          "chapter": "Exod.34",
+          "paragraphs": 66,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved moral law versus its curse, divine attributes, pardoning and sanctifying grace, festivals and covenant of grace, attributed interpretation of the veil and prayer."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -1476,9 +1553,9 @@
   "current_batch": {
     "range": "Exod.26–Lev.25",
     "target": 40,
-    "completed": 5,
-    "paragraphs": 190,
-    "reference_occurrences": 20,
-    "next": "Exod.31"
+    "completed": 9,
+    "paragraphs": 393,
+    "reference_occurrences": 22,
+    "next": "Exod.35"
   }
 }
