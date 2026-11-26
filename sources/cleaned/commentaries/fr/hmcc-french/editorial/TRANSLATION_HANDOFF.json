@@ -46,6 +46,32 @@
     "next": "Gen.2"
   },
   "latest_checkpoint": {
+    "chapter": "Gen.7",
+    "translation": "complete",
+    "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+    "manuscript_commit": "d989b31921b1f5c242db3858a55db6528b9cc30c",
+    "paragraphs": 40,
+    "commentary_sections": 4,
+    "outline_rows": 5,
+    "inline_reference_destinations": [
+      "Heb.11.7",
+      "1Pet.3.20",
+      "1Pet.3.21",
+      "Luke.13.25",
+      "Ps.21.8",
+      "Luke.17.26",
+      "Luke.17.27",
+      "2Pet.2.5"
+    ],
+    "audit_notes": [
+      "Preserved justification by faith rather than personal righteousness, the typology of Christian baptism, the security of salvation in the Mediator's hands, and the warning against neglecting Christ's salvation.",
+      "Retained the inherited historical physical explanations and twenty-foot measurement without modernization or scientific correction.",
+      "The French rendering follows modern paragraph boundaries and all modern tags, attributes and inline reference occurrences were checked in sequence."
+    ],
+    "technical_validation": "chapter-local markup equality for both chapters; no schema validation, SWORD compilation or reader tests",
+    "next": "Gen.8"
+  },
+  "previous_checkpoint": {
     "chapter": "Gen.5",
     "translation": "complete",
     "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
@@ -65,37 +91,6 @@
     "technical_validation": "chapter-local markup equality for both chapters; no schema validation, SWORD compilation or reader tests",
     "next": "Gen.6"
   },
-  "previous_checkpoint": {
-    "chapter": "Gen.3",
-    "translation": "complete",
-    "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
-    "manuscript_commit": "20542d9588541a554bd86acfbb7e5035059e1e0b",
-    "paragraphs": 151,
-    "commentary_sections": 7,
-    "outline_rows": 8,
-    "inline_reference_destinations": [
-      "Matt.5.28",
-      "Matt.4.6",
-      "Rom.5.19",
-      "Rom.7.11",
-      "Heb.3.13",
-      "Heb.2.11",
-      "Heb.2.14",
-      "Isa.53.11",
-      "Acts.2.24",
-      "Gal.4.4",
-      "Gal.3.13",
-      "Isa.28.20"
-    ],
-    "audit_notes": [
-      "Preserved the fall, Adam's freedom of will before the fall, responsibility of the sinner, imputed righteousness of Christ, justification and salvation by faith in the promise, and the covenant of works.",
-      "Preserved the distinction between the promised Seed and the serpent's seed, the connection of Christ's sufferings to the saints, and the qualified supposition regarding animal sacrifice.",
-      "Preserved the author's argument concerning marriage, the curse on the ground rather than Adam himself, and Christ's satisfaction without doctrinal adaptation.",
-      "All modern source tags, attributes and inline reference occurrences compared in sequence before adding the standalone namespace. The French rendering follows modern paragraph boundaries."
-    ],
-    "technical_validation": "chapter-local markup equality only; no schema validation, SWORD compilation or reader tests",
-    "next": "Gen.4"
-  },
   "batch_checkpoints": [
     {
       "chapter": "Gen.4",
@@ -114,6 +109,22 @@
       "audit_notes": [
         "Retained the hypothetical identification of Cain as the promised Seed, possible sin-offering interpretation of Genesis 4:7, acceptance through faith, and distinction between God's mercy and the right of firstborn.",
         "Preserved Cain's impenitence, Abel's atoning-sacrifice witness, the qualified interpretation of Nod, marriage teaching, and the distinction between public profession and profane life."
+      ]
+    },
+    {
+      "chapter": "Gen.6",
+      "translation": "complete",
+      "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+      "manuscript_commit": "d8eb9c315a58e8337fddb20643a7d06ed291f92d",
+      "paragraphs": 91,
+      "commentary_sections": 4,
+      "outline_rows": 5,
+      "inline_reference_destinations": [
+        "Ps.25.14"
+      ],
+      "audit_notes": [
+        "Preserved the anthropomorphic language concerning God's regret and the explicit denial of divine change or unhappiness; Noah's justification by faith and subsequent holiness; the distinction between the covenant of providence and the covenant of grace; and conditional wording about benefits of parental piety.",
+        "Retained the modern edition's attribution of the historical size comparison to Henry, without updating his measurement or treating it as a verified modern fact."
       ]
     }
   ]
