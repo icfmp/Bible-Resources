@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Dan.8",
+  "next": "Zech.7",
   "batch_size": 60,
   "completed": [
     [
@@ -8575,6 +8575,606 @@
       "Daniel",
       7,
       "Editorial audit"
+    ],
+    [
+      "Daniel",
+      8,
+      "Translation"
+    ],
+    [
+      "Daniel",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Daniel",
+      9,
+      "Translation"
+    ],
+    [
+      "Daniel",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Daniel",
+      10,
+      "Translation"
+    ],
+    [
+      "Daniel",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Daniel",
+      11,
+      "Translation"
+    ],
+    [
+      "Daniel",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Daniel",
+      12,
+      "Translation"
+    ],
+    [
+      "Daniel",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      1,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      2,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      3,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      4,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      5,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      6,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      7,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      8,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      9,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      10,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      11,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      12,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      13,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "Hosea",
+      14,
+      "Translation"
+    ],
+    [
+      "Hosea",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "Joel",
+      1,
+      "Translation"
+    ],
+    [
+      "Joel",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Joel",
+      2,
+      "Translation"
+    ],
+    [
+      "Joel",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Joel",
+      3,
+      "Translation"
+    ],
+    [
+      "Joel",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Amos",
+      1,
+      "Translation"
+    ],
+    [
+      "Amos",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Amos",
+      2,
+      "Translation"
+    ],
+    [
+      "Amos",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Amos",
+      3,
+      "Translation"
+    ],
+    [
+      "Amos",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Amos",
+      4,
+      "Translation"
+    ],
+    [
+      "Amos",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Amos",
+      5,
+      "Translation"
+    ],
+    [
+      "Amos",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Amos",
+      6,
+      "Translation"
+    ],
+    [
+      "Amos",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Amos",
+      7,
+      "Translation"
+    ],
+    [
+      "Amos",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Amos",
+      8,
+      "Translation"
+    ],
+    [
+      "Amos",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Amos",
+      9,
+      "Translation"
+    ],
+    [
+      "Amos",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Obadiah",
+      1,
+      "Translation"
+    ],
+    [
+      "Obadiah",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Jonah",
+      1,
+      "Translation"
+    ],
+    [
+      "Jonah",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Jonah",
+      2,
+      "Translation"
+    ],
+    [
+      "Jonah",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Jonah",
+      3,
+      "Translation"
+    ],
+    [
+      "Jonah",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Jonah",
+      4,
+      "Translation"
+    ],
+    [
+      "Jonah",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Micah",
+      1,
+      "Translation"
+    ],
+    [
+      "Micah",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Micah",
+      2,
+      "Translation"
+    ],
+    [
+      "Micah",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Micah",
+      3,
+      "Translation"
+    ],
+    [
+      "Micah",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Micah",
+      4,
+      "Translation"
+    ],
+    [
+      "Micah",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Micah",
+      5,
+      "Translation"
+    ],
+    [
+      "Micah",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Micah",
+      6,
+      "Translation"
+    ],
+    [
+      "Micah",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Micah",
+      7,
+      "Translation"
+    ],
+    [
+      "Micah",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Nahum",
+      1,
+      "Translation"
+    ],
+    [
+      "Nahum",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Nahum",
+      2,
+      "Translation"
+    ],
+    [
+      "Nahum",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Nahum",
+      3,
+      "Translation"
+    ],
+    [
+      "Nahum",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Habakkuk",
+      1,
+      "Translation"
+    ],
+    [
+      "Habakkuk",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Habakkuk",
+      2,
+      "Translation"
+    ],
+    [
+      "Habakkuk",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Habakkuk",
+      3,
+      "Translation"
+    ],
+    [
+      "Habakkuk",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Zephaniah",
+      1,
+      "Translation"
+    ],
+    [
+      "Zephaniah",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Zephaniah",
+      2,
+      "Translation"
+    ],
+    [
+      "Zephaniah",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Zephaniah",
+      3,
+      "Translation"
+    ],
+    [
+      "Zephaniah",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Haggai",
+      1,
+      "Translation"
+    ],
+    [
+      "Haggai",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Haggai",
+      2,
+      "Translation"
+    ],
+    [
+      "Haggai",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      1,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      2,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      3,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      4,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      5,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      6,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      6,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -8604,7 +9204,18 @@
     "Jeremiah_introduction": "translated_and_audited_in_Jer.1",
     "Lamentations_introduction": "translated_and_audited_in_Lam.1",
     "Ezekiel_introduction": "translated_and_audited_in_Ezek.1",
-    "Daniel_introduction": "translated_and_audited_in_Dan.1"
+    "Daniel_introduction": "translated_and_audited_in_Dan.1",
+    "Hosea_introduction": "translated_and_audited_in_Hos.1",
+    "Joel_introduction": "translated_and_audited_in_Joel.1",
+    "Amos_introduction": "translated_and_audited_in_Amos.1",
+    "Obadiah_introduction": "translated_and_audited_in_Obad.1",
+    "Jonah_introduction": "translated_and_audited_in_Jonah.1",
+    "Micah_introduction": "translated_and_audited_in_Mic.1",
+    "Nahum_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check",
+    "Habakkuk_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check",
+    "Zephaniah_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check",
+    "Haggai_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check",
+    "Zechariah_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check"
   },
   "batch_checkpoints": [
     {
@@ -15397,17 +16008,452 @@
         "Independent review should check French phrasing and inline emphasis boundaries, especially Ezek.14 (Noah, Job, Daniel), Ezek.30 (one wicked person judging another), Dan.5 (inward terror) and Dan.7 (likeness of sinful flesh).",
         "Editorial comparison performed by translator; independent review and full corpus/native tests pending."
       ]
+    },
+    {
+      "range": "Dan.8–Zech.6",
+      "chapters": [
+        {
+          "chapter": "Dan.8",
+          "paragraphs": 32,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Dan.9",
+          "paragraphs": 45,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Dan.10",
+          "paragraphs": 27,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Dan.11",
+          "paragraphs": 23,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Dan.12",
+          "paragraphs": 32,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.1",
+          "paragraphs": 38,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.2",
+          "paragraphs": 36,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.3",
+          "paragraphs": 18,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.4",
+          "paragraphs": 33,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.5",
+          "paragraphs": 25,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.6",
+          "paragraphs": 24,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.7",
+          "paragraphs": 22,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.8",
+          "paragraphs": 22,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.9",
+          "paragraphs": 26,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.10",
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.11",
+          "paragraphs": 35,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.12",
+          "paragraphs": 23,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.13",
+          "paragraphs": 27,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hos.14",
+          "paragraphs": 56,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Joel.1",
+          "paragraphs": 33,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Joel.2",
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Joel.3",
+          "paragraphs": 20,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Amos.1",
+          "paragraphs": 12,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Amos.2",
+          "paragraphs": 20,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Amos.3",
+          "paragraphs": 22,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Amos.4",
+          "paragraphs": 18,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Amos.5",
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Amos.6",
+          "paragraphs": 18,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Amos.7",
+          "paragraphs": 23,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Amos.8",
+          "paragraphs": 34,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Amos.9",
+          "paragraphs": 20,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Obad.1",
+          "paragraphs": 34,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jonah.1",
+          "paragraphs": 58,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jonah.2",
+          "paragraphs": 30,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jonah.3",
+          "paragraphs": 36,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Jonah.4",
+          "paragraphs": 46,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mic.1",
+          "paragraphs": 27,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mic.2",
+          "paragraphs": 31,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mic.3",
+          "paragraphs": 21,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mic.4",
+          "paragraphs": 20,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mic.5",
+          "paragraphs": 24,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mic.6",
+          "paragraphs": 43,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mic.7",
+          "paragraphs": 41,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Nah.1",
+          "paragraphs": 29,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Nah.2",
+          "paragraphs": 18,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Nah.3",
+          "paragraphs": 20,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hab.1",
+          "paragraphs": 29,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hab.2",
+          "paragraphs": 45,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hab.3",
+          "paragraphs": 41,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zeph.1",
+          "paragraphs": 29,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zeph.2",
+          "paragraphs": 22,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zeph.3",
+          "paragraphs": 31,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hag.1",
+          "paragraphs": 42,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Hag.2",
+          "paragraphs": 43,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.1",
+          "paragraphs": 47,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.2",
+          "paragraphs": 33,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.3",
+          "paragraphs": 43,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.4",
+          "paragraphs": 38,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.5",
+          "paragraphs": 21,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.6",
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        }
+      ],
+      "audit_notes": [
+        "Classic introductions for Nahum, Habakkuk, Zephaniah, Haggai and Zechariah are absent from their corresponding modern chapter packets. Check standalone book-level material before deciding on restoration; no silent insertion.",
+        "Daniel 8–12: historical identifications, chronology, polemical readings and modern editorial qualifications preserved as Henry's interpretations. Daniel 12: 1260 years and Michael/Christ reading retained.",
+        "Source chapter divisions, verse labels and versification retained (including Hosea, Joel, Jonah and Zechariah).",
+        "Hosea 1: Henry's gloss of Jezreel retained; Hosea 6 resurrection and Adam covenant readings retained; Hosea 14 modern manna/dew wording differs from classic wording.",
+        "Amos 3: calamity distinguished from moral evil; Nahum 3 merchants/hired troops interpretation retained; Zephaniah 2 alternative readings retained.",
+        "Haggai 2 messianic reading and Zechariah 3 imputed and implanted righteousness preserved; Zechariah 4–6 Christological typology and modern qualifications retained.",
+        "Independent linguistic review: Daniel 11–12, Hosea 7 and 14, Amos 2 and 5, Habakkuk 1–2 (including fishing-net terminology), Jonah 4 (plant/gourd specificity), Micah 5, Haggai 1 and Zechariah 6 (hands/resources idiom).",
+        "No independent audit or full-corpus/native module tests performed in this cohort."
+      ]
     }
   ],
   "latest_completed_batch": {
-    "range": "Lam.1–Dan.7",
+    "range": "Dan.8–Zech.6",
     "chapters": 60,
-    "paragraphs": 1269,
-    "reference_occurrences": 127,
+    "paragraphs": 1818,
+    "reference_occurrences": 24,
     "translation": 60,
     "editorial_audit": 60,
     "technical_validation": "chapter-local tag/attribute sequence equality only; no full corpus tests",
-    "next": "Dan.8"
+    "next": "Zech.7"
   },
   "book_checkpoints": {
     "Genesis": {
@@ -15568,33 +16614,96 @@
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
     },
     "Daniel": {
+      "translation": 12,
+      "editorial_audit": 12,
+      "introduction": "translated and compared with Dan.1; source chronology requires review",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Hosea": {
+      "translation": 14,
+      "editorial_audit": 14,
+      "introduction": "translated and compared with Hos.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Joel": {
+      "translation": 3,
+      "editorial_audit": 3,
+      "introduction": "translated and compared with Joel.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Amos": {
+      "translation": 9,
+      "editorial_audit": 9,
+      "introduction": "translated and compared with Amos.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Obadiah": {
+      "translation": 1,
+      "editorial_audit": 1,
+      "introduction": "translated and compared with Obad.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Jonah": {
+      "translation": 4,
+      "editorial_audit": 4,
+      "introduction": "translated and compared with Jonah.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Micah": {
       "translation": 7,
       "editorial_audit": 7,
-      "introduction": "translated and compared with Dan.1; source chronology requires review",
+      "introduction": "translated and compared with Mic.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Nahum": {
+      "translation": 3,
+      "editorial_audit": 3,
+      "introduction": "classic introduction not present in modern chapter packet; book-level source check pending",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Habakkuk": {
+      "translation": 3,
+      "editorial_audit": 3,
+      "introduction": "classic introduction not present in modern chapter packet; book-level source check pending",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Zephaniah": {
+      "translation": 3,
+      "editorial_audit": 3,
+      "introduction": "classic introduction not present in modern chapter packet; book-level source check pending",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Haggai": {
+      "translation": 2,
+      "editorial_audit": 2,
+      "introduction": "classic introduction not present in modern chapter packet; book-level source check pending",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Zechariah": {
+      "translation": 6,
+      "editorial_audit": 6,
+      "introduction": "classic introduction not present in modern chapter packet; book-level source check pending",
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending",
-      "remaining": "Dan.8–12"
+      "remaining": "Zech.7–14"
     }
   },
   "current_batch": {
-    "range": "Lam.1–Dan.7",
+    "range": "Dan.8–Zech.6",
     "target": 60,
     "completed": 60,
-    "paragraphs": 1269,
-    "reference_occurrences": 127,
-    "next": "Dan.8",
+    "paragraphs": 1818,
+    "reference_occurrences": 24,
+    "next": "Zech.7",
     "status": "completed cohort",
     "audit_notes": [
-      "Lam.1: traditional authorship explicitly attributed to Henry.",
-      "Ezek.1 and 10: angelic and Christological readings preserved. Ezek.3: explicit source verse-label corrections retained.",
-      "Ezek.11: uncertainty on Pelatiah's death retained; Ezek.18: justification, conversion and apostasy distinguished; Ezek.20: Sabbath interpretation and source versification retained.",
-      "Ezek.28: historical identification of Ethbaal/Ithobal attributed to Henry; Ezek.29: historical fulfilment claim retained as author's position.",
-      "Ezek.36: sacramental terminology retained; Ezek.37–40: distinctions between restoration, resurrection, conversion, future fulfilment and interpretive uncertainty preserved.",
-      "Ezek.41–48: notes on absent authorial headings preserved; Christological readings and temple interpretation maintained.",
-      "Dan.1: source chronology 'fourth year of Jehoiachin, 606 BC' appears inconsistent with Daniel 1:1 (Jehoiakim) and requires historical/editorial review; retained with attribution, not silently corrected.",
-      "Dan.2 and 7: historicist interpretations of four empires and papal Rome retained as Henry's interpretations, including distinction from political dominion by grace.",
-      "Dan.3: original measurement thirty yards retained; identification of fourth figure attributed to Henry. Dan.4: author's conviction about Nebuchadnezzar's conversion and historical estimate retained.",
-      "Independent review should check French phrasing and inline emphasis boundaries, especially Ezek.14 (Noah, Job, Daniel), Ezek.30 (one wicked person judging another), Dan.5 (inward terror) and Dan.7 (likeness of sinful flesh).",
-      "Editorial comparison performed by translator; independent review and full corpus/native tests pending."
+      "Classic introductions for Nahum, Habakkuk, Zephaniah, Haggai and Zechariah are absent from their corresponding modern chapter packets. Check standalone book-level material before deciding on restoration; no silent insertion.",
+      "Daniel 8–12: historical identifications, chronology, polemical readings and modern editorial qualifications preserved as Henry's interpretations. Daniel 12: 1260 years and Michael/Christ reading retained.",
+      "Source chapter divisions, verse labels and versification retained (including Hosea, Joel, Jonah and Zechariah).",
+      "Hosea 1: Henry's gloss of Jezreel retained; Hosea 6 resurrection and Adam covenant readings retained; Hosea 14 modern manna/dew wording differs from classic wording.",
+      "Amos 3: calamity distinguished from moral evil; Nahum 3 merchants/hired troops interpretation retained; Zephaniah 2 alternative readings retained.",
+      "Haggai 2 messianic reading and Zechariah 3 imputed and implanted righteousness preserved; Zechariah 4–6 Christological typology and modern qualifications retained.",
+      "Independent linguistic review: Daniel 11–12, Hosea 7 and 14, Amos 2 and 5, Habakkuk 1–2 (including fishing-net terminology), Jonah 4 (plant/gourd specificity), Micah 5, Haggai 1 and Zechariah 6 (hands/resources idiom).",
+      "No independent audit or full-corpus/native module tests performed in this cohort."
     ]
   }
 }
