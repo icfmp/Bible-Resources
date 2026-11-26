@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Luke.5",
+  "next": "Luke.6",
   "batch_size": 60,
   "completed": [
     [
@@ -9775,6 +9775,16 @@
       "Luke",
       4,
       "Editorial audit"
+    ],
+    [
+      "Luke",
+      5,
+      "Translation"
+    ],
+    [
+      "Luke",
+      5,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -17745,32 +17755,23 @@
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
     },
     "Luke": {
-      "translation": 4,
-      "editorial_audit": 4,
+      "translation": 5,
+      "editorial_audit": 5,
       "introduction": "translated and compared with Luke.1",
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending",
-      "remaining": "Luke.5–24"
+      "remaining": "Luke.6–24"
     }
   },
   "current_batch": {
-    "range": "Zech.7–Luke.4",
+    "range": "Luke.5–Acts.19",
     "target": 60,
-    "completed": 60,
-    "paragraphs": 3297,
-    "reference_occurrences": 76,
-    "next": "Luke.5",
-    "status": "completed cohort",
+    "completed": 1,
+    "paragraphs": 37,
+    "reference_occurrences": 0,
+    "next": "Luke.6",
+    "status": "partial cohort checkpoint",
     "audit_notes": [
-      "Zech.8.18–23: final portion of classic witness absent from modern chapter text; no silent restoration.",
-      "Zech.9.9–17: modern split preserved; spiritual kingdom not advanced by force retained. Zech.11 staff names Grâce/Union use French biblical convention; review. Zech.14 alternative readings and figurative Tabernacles retained.",
-      "Malachi and Matthew: classic book introductions absent from modern chapter packets; inspect standalone book-level material before deciding on restoration. Malachi chapter 4 source versification retained.",
-      "Matt.3.1–6: classic closing discussion of John's lifestyle, baptism, confession, profession versus belief and Zech.13.1 absent from modern text; modern reference annotation retained, no restoration. Matt.3.7–12: classic floor image and Isa.21.10 context require source review.",
-      "Matt.4 Deut.8.3 annotation; Matt.5 unplaced 1 Cor.1.16 and editorial 1 Pet.1.16 retained; Matt.12 Gen.4.7 secondary reference; Matt.13 noncontiguous grouping; Matt.23 Deut.9/11 competing references retained.",
-      "Matt.8 one node-count discrepancy detected and corrected before tree creation; Roman celibacy discussion retained. Matt.10 cessation of signs and persistent denial, Matt.16 Peter/rock and authority, Matt.18 forgiveness, Matt.20 historic coin comparison and ransom sufficiency/efficacy retained.",
-      "Matt.24 generation and eschatological qualification; Matt.26 bread/body representation and voluntary atonement; Matt.27 historical statements and modern qualifications; Matt.28 baptism sign/seal preserved.",
-      "Mark.1 traditional introduction including Peter association and nephew wording translated. Mark.5 Jairus conjecture; Mark.13 divine/human knowledge and dating; Mark.16 long-ending commentary retained, no Bible-text change; classic 'men ran' versus modern women flagged; cessation view retained.",
-      "Luke.1 conflicting origins in introduction and cited 1 Tim.3.16 wording retained. Luke.3 Heli/Mary interpretation retained as Henry's reading. Luke.4 temptation/persecution distinction retained.",
-      "Independent stylistic pass required: Matt.4,5,11,15,16,22; Mark.12,13,14; all French manuscripts remain candidates. Global OSIS/TEI/module and independent editorial checks pending."
+      "Luke.5: restored classic explicit assurance and other meaning details (precious blood, woe, tale/message contrast, prevailing with Christ, pardon assurance) under owner clarification #587; modern correction #588. Same-editor comparison only; exact modern tag/attribute sequence retained."
     ]
   }
 }

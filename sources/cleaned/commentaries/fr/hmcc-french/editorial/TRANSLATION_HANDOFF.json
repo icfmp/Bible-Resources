@@ -20,7 +20,7 @@
   },
   "verification": "Both complete UTF-8 blob contents hashed and matched declared SHA-256 and byte lengths. Modern internal OSIS header retains historical preview wording; published identity follows manifest and metadata. Do not edit source header in translation work.",
   "rights": "Modern metadata allows derivatives; project owner requested French translation. French distribution rights and attribution must be separately recorded before release.",
-  "policy": "Natural contemporary French, complete semantic transfer, direct comparison against classic witness; preserve modern editorial structure and exact reference destinations. No silent source correction. No release approval.",
+  "policy": "Natural contemporary French, complete semantic transfer, direct comparison against classic witness; preserve modern editorial structure and exact reference destinations. No silent source correction. No release approval. Owner clarification #587: classic witness governs Henry's theology and meaning; restore documented omissions or distortions in French and link modern correction issues. Revisit earlier discrepancies before final acceptance.",
   "versification": "KJV",
   "source_unit_inventory": "pending full corpus inventory; chapter-local source structure read directly",
   "manuscript_format": "OSIS chapter fragments; introductions and outline retained at their source placement",
