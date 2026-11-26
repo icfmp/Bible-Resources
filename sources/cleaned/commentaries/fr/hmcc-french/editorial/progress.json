@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "1Kgs.19",
+  "next": "2Kgs.1",
   "batch_size": 80,
   "completed": [
     [
@@ -3095,6 +3095,46 @@
       "1 Kings",
       18,
       "Editorial audit"
+    ],
+    [
+      "1 Kings",
+      19,
+      "Translation"
+    ],
+    [
+      "1 Kings",
+      19,
+      "Editorial audit"
+    ],
+    [
+      "1 Kings",
+      20,
+      "Translation"
+    ],
+    [
+      "1 Kings",
+      20,
+      "Editorial audit"
+    ],
+    [
+      "1 Kings",
+      21,
+      "Translation"
+    ],
+    [
+      "1 Kings",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "1 Kings",
+      22,
+      "Translation"
+    ],
+    [
+      "1 Kings",
+      22,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -5833,6 +5873,43 @@
           "notes": "Preserved atonement and sanctification, Word rather than classic typographical world, prayer, rejection of bodily penances, conviction versus conversion and perseverance."
         }
       ]
+    },
+    {
+      "range": "1Kgs.19–1Kgs.22",
+      "chapters": [
+        {
+          "chapter": "1Kgs.19",
+          "paragraphs": 51,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved Elijah's weakness, quiet voice, hidden faithful and effectual calling."
+        },
+        {
+          "chapter": "1Kgs.20",
+          "paragraphs": 41,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved warning against presumption, gospel repentance and contrast between outward success and true happiness."
+        },
+        {
+          "chapter": "1Kgs.21",
+          "paragraphs": 35,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved discontent, abuse of religion and law, distinction between Paul and Ahab, and justification versus reprieve."
+        },
+        {
+          "chapter": "1Kgs.22",
+          "paragraphs": 49,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved divine sovereignty without divine authorship of sin, discernment, danger of flattery, and correction without abandonment."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -5906,14 +5983,20 @@
       "editorial_audit": 24,
       "introduction": "translated and audited with 2Sam.1",
       "technical_validation": "chapter-local tag/attribute sequence equality; final corpus and native module checks pending"
+    },
+    "1 Kings": {
+      "translation": 22,
+      "editorial_audit": 22,
+      "introduction": "translated and audited with 1Kgs.1",
+      "technical_validation": "chapter-local tag/attribute sequence equality; final corpus and native module checks pending"
     }
   },
   "current_batch": {
     "range": "1Kgs.5–1Chr.29 and 2Chr.1–8",
     "target": 80,
-    "completed": 14,
-    "paragraphs": 479,
-    "reference_occurrences": 9,
-    "next": "1Kgs.19"
+    "completed": 18,
+    "paragraphs": 655,
+    "reference_occurrences": 11,
+    "next": "2Kgs.1"
   }
 }
