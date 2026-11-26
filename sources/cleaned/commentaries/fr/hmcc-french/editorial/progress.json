@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Josh.21",
+  "next": "Judg.1",
   "batch_size": 60,
   "completed": [
     [
@@ -2075,6 +2075,46 @@
       "Joshua",
       20,
       "Editorial audit"
+    ],
+    [
+      "Joshua",
+      21,
+      "Translation"
+    ],
+    [
+      "Joshua",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "Joshua",
+      22,
+      "Translation"
+    ],
+    [
+      "Joshua",
+      22,
+      "Editorial audit"
+    ],
+    [
+      "Joshua",
+      23,
+      "Translation"
+    ],
+    [
+      "Joshua",
+      23,
+      "Editorial audit"
+    ],
+    [
+      "Joshua",
+      24,
+      "Translation"
+    ],
+    [
+      "Joshua",
+      24,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -3887,6 +3927,43 @@
           "notes": "Preserved refuge from law's curse, Levite ministry and attributed spiritual interpretations of six names."
         }
       ]
+    },
+    {
+      "range": "Josh.21–Josh.24",
+      "chapters": [
+        {
+          "chapter": "Josh.21",
+          "paragraphs": 18,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved support for ministers, distribution of teaching, fulfillment of promises and distinction between divine fidelity and Israel's later negligence."
+        },
+        {
+          "chapter": "Josh.22",
+          "paragraphs": 42,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved love and obedience, investigation before accusation, family worship, Christ as altar and peace joined to truth."
+        },
+        {
+          "chapter": "Josh.23",
+          "paragraphs": 27,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved careful obedience, warnings concerning idolatry, progressive apostasy, faithfulness and prayer."
+        },
+        {
+          "chapter": "Josh.24",
+          "paragraphs": 44,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved lifelong service, doctrine and application, new birth, willing choice, necessity of grace, covenant witness and resurrection doxology."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -3930,14 +4007,20 @@
       "editorial_audit": 34,
       "introduction": "translated and audited with Deut.1",
       "technical_validation": "chapter-local tag/attribute sequence equality; final corpus and native module checks pending"
+    },
+    "Joshua": {
+      "translation": 24,
+      "editorial_audit": 24,
+      "introduction": "translated and audited with Josh.1",
+      "technical_validation": "chapter-local tag/attribute sequence equality; final corpus and native module checks pending"
     }
   },
   "current_batch": {
     "range": "Deut.13–Judg.14",
     "target": 60,
-    "completed": 42,
-    "paragraphs": 1208,
-    "reference_occurrences": 44,
-    "next": "Josh.21"
+    "completed": 46,
+    "paragraphs": 1339,
+    "reference_occurrences": 48,
+    "next": "Judg.1"
   }
 }
