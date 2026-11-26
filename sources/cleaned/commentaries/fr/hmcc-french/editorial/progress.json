@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "1Sam.21",
+  "next": "1Sam.31",
   "batch_size": 70,
   "completed": [
     [
@@ -2565,6 +2565,106 @@
       "1 Samuel",
       20,
       "Editorial audit"
+    ],
+    [
+      "1 Samuel",
+      21,
+      "Translation"
+    ],
+    [
+      "1 Samuel",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "1 Samuel",
+      22,
+      "Translation"
+    ],
+    [
+      "1 Samuel",
+      22,
+      "Editorial audit"
+    ],
+    [
+      "1 Samuel",
+      23,
+      "Translation"
+    ],
+    [
+      "1 Samuel",
+      23,
+      "Editorial audit"
+    ],
+    [
+      "1 Samuel",
+      24,
+      "Translation"
+    ],
+    [
+      "1 Samuel",
+      24,
+      "Editorial audit"
+    ],
+    [
+      "1 Samuel",
+      25,
+      "Translation"
+    ],
+    [
+      "1 Samuel",
+      25,
+      "Editorial audit"
+    ],
+    [
+      "1 Samuel",
+      26,
+      "Translation"
+    ],
+    [
+      "1 Samuel",
+      26,
+      "Editorial audit"
+    ],
+    [
+      "1 Samuel",
+      27,
+      "Translation"
+    ],
+    [
+      "1 Samuel",
+      27,
+      "Editorial audit"
+    ],
+    [
+      "1 Samuel",
+      28,
+      "Translation"
+    ],
+    [
+      "1 Samuel",
+      28,
+      "Editorial audit"
+    ],
+    [
+      "1 Samuel",
+      29,
+      "Translation"
+    ],
+    [
+      "1 Samuel",
+      29,
+      "Editorial audit"
+    ],
+    [
+      "1 Samuel",
+      30,
+      "Translation"
+    ],
+    [
+      "1 Samuel",
+      30,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -4827,6 +4927,91 @@
           "notes": "Preserved suffering as preparation for glory, divine purpose, friendship, worship with necessary exceptions, and eternal reunion."
         }
       ]
+    },
+    {
+      "range": "1Sam.21–1Sam.30",
+      "chapters": [
+        {
+          "chapter": "1Sam.21",
+          "paragraphs": 24,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved condemnation of David's lie, mercy over ceremonial sacrifice and trust."
+        },
+        {
+          "chapter": "1Sam.22",
+          "paragraphs": 28,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved welcome of distressed sinners, care of parents, distinction between human wrongdoing and divine permission."
+        },
+        {
+          "chapter": "1Sam.23",
+          "paragraphs": 33,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved consultation of Scripture, divine knowledge of counterfactuals, friendship and providence."
+        },
+        {
+          "chapter": "1Sam.24",
+          "paragraphs": 29,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved refusal of vengeance, conviction versus conversion, and divine deliverance."
+        },
+        {
+          "chapter": "1Sam.25",
+          "paragraphs": 61,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved correction, stewardship, restraint and explicit provenance note for restored exposition, absent in classic packet."
+        },
+        {
+          "chapter": "1Sam.26",
+          "paragraphs": 24,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved refusal of sinful means, reconciliation with God and caution about empty promises."
+        },
+        {
+          "chapter": "1Sam.27",
+          "paragraphs": 20,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved condemnation of equivocation, perseverance and trust in promises."
+        },
+        {
+          "chapter": "1Sam.28",
+          "paragraphs": 45,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved prohibition of occult practices, attributed interpretation and uncertainty of Samuel's appearance, and hope for repentance."
+        },
+        {
+          "chapter": "1Sam.29",
+          "paragraphs": 9,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved providential rescue from moral compromise and good reputation."
+        },
+        {
+          "chapter": "1Sam.30",
+          "paragraphs": 39,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved consolation in God, compassion for weak, recovery and equitable distribution."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -4893,9 +5078,9 @@
   "current_batch": {
     "range": "Judg.15–2Sam.24 and 1Kgs.1–4",
     "target": 70,
-    "completed": 31,
-    "paragraphs": 913,
-    "reference_occurrences": 19,
-    "next": "1Sam.21"
+    "completed": 41,
+    "paragraphs": 1225,
+    "reference_occurrences": 27,
+    "next": "1Sam.31"
   }
 }
