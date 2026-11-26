@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Gen.40",
+  "next": "Gen.43",
   "batch_size": 10,
   "completed": [
     [
@@ -395,6 +395,36 @@
       "Genesis",
       39,
       "Editorial audit"
+    ],
+    [
+      "Genesis",
+      40,
+      "Translation"
+    ],
+    [
+      "Genesis",
+      40,
+      "Editorial audit"
+    ],
+    [
+      "Genesis",
+      41,
+      "Translation"
+    ],
+    [
+      "Genesis",
+      41,
+      "Editorial audit"
+    ],
+    [
+      "Genesis",
+      42,
+      "Translation"
+    ],
+    [
+      "Genesis",
+      42,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -641,6 +671,35 @@
           "markup": "exact source tag/attribute sequence",
           "editorial_audit": "same editor, compared to classic witness",
           "notes": "Preserved inseparability from divine presence, Joseph's slavery and unjust accusation, grace and practical flight from temptation, conscience, three arguments against sin, and Christ's suffering and exaltation."
+        }
+      ]
+    },
+    {
+      "range": "Gen.40–Gen.42",
+      "chapters": [
+        {
+          "chapter": "Gen.40",
+          "paragraphs": 32,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved compassion, faithful interpretation of God's word, defense without reproach, the Christian's expectation of eternal happiness and Christ actually accomplishing release rather than merely foretelling it."
+        },
+        {
+          "chapter": "Gen.41",
+          "paragraphs": 43,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved Henry's attributed position on dreams, providential timing and First Cause, use of opportunities, both proposed name interpretations, Christ's exaltation, free provision of spiritual food and warning against rejection."
+        },
+        {
+          "chapter": "Gen.42",
+          "paragraphs": 45,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved repentance rather than revenge, fear of God, awakened conscience, free provision in Christ, providence in suffering and loving correction even before sinners fully know Christ."
         }
       ]
     }
