@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Lam.1",
+  "next": "Dan.8",
   "batch_size": 60,
   "completed": [
     [
@@ -7975,6 +7975,606 @@
       "Jeremiah",
       52,
       "Editorial audit"
+    ],
+    [
+      "Lamentations",
+      1,
+      "Translation"
+    ],
+    [
+      "Lamentations",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Lamentations",
+      2,
+      "Translation"
+    ],
+    [
+      "Lamentations",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Lamentations",
+      3,
+      "Translation"
+    ],
+    [
+      "Lamentations",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Lamentations",
+      4,
+      "Translation"
+    ],
+    [
+      "Lamentations",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Lamentations",
+      5,
+      "Translation"
+    ],
+    [
+      "Lamentations",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      1,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      2,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      3,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      4,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      5,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      6,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      7,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      8,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      9,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      10,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      11,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      12,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      13,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      14,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      15,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      16,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      17,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      17,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      18,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      18,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      19,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      19,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      20,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      20,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      21,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      22,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      22,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      23,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      23,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      24,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      24,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      25,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      25,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      26,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      26,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      27,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      27,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      28,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      28,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      29,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      29,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      30,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      30,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      31,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      31,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      32,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      32,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      33,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      33,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      34,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      34,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      35,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      35,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      36,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      36,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      37,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      37,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      38,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      38,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      39,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      39,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      40,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      40,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      41,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      41,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      42,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      42,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      43,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      43,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      44,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      44,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      45,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      45,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      46,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      46,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      47,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      47,
+      "Editorial audit"
+    ],
+    [
+      "Ezekiel",
+      48,
+      "Translation"
+    ],
+    [
+      "Ezekiel",
+      48,
+      "Editorial audit"
+    ],
+    [
+      "Daniel",
+      1,
+      "Translation"
+    ],
+    [
+      "Daniel",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Daniel",
+      2,
+      "Translation"
+    ],
+    [
+      "Daniel",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Daniel",
+      3,
+      "Translation"
+    ],
+    [
+      "Daniel",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Daniel",
+      4,
+      "Translation"
+    ],
+    [
+      "Daniel",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Daniel",
+      5,
+      "Translation"
+    ],
+    [
+      "Daniel",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Daniel",
+      6,
+      "Translation"
+    ],
+    [
+      "Daniel",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Daniel",
+      7,
+      "Translation"
+    ],
+    [
+      "Daniel",
+      7,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -8001,7 +8601,10 @@
     "Ecclesiastes_introduction": "translated_and_audited_in_Eccl.1",
     "Song_of_Solomon_introduction": "translated_and_audited_in_Song.1",
     "Isaiah_introduction": "translated_and_audited_in_Isa.1",
-    "Jeremiah_introduction": "translated_and_audited_in_Jer.1"
+    "Jeremiah_introduction": "translated_and_audited_in_Jer.1",
+    "Lamentations_introduction": "translated_and_audited_in_Lam.1",
+    "Ezekiel_introduction": "translated_and_audited_in_Ezek.1",
+    "Daniel_introduction": "translated_and_audited_in_Dan.1"
   },
   "batch_checkpoints": [
     {
@@ -14356,17 +14959,455 @@
         "Review French phrasing in Jer.2 (negative coordination), Jer.20 (quotation of divine repayment), Jer.41 (bribing death) and Jer.43 (judgment through another person or nation).",
         "Editorial comparison performed by translator; independent review and full corpus/native tests pending."
       ]
+    },
+    {
+      "range": "Lam.1–Dan.7",
+      "chapters": [
+        {
+          "chapter": "Lam.1",
+          "paragraphs": 22,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Lam.2",
+          "paragraphs": 26,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Lam.3",
+          "paragraphs": 44,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Lam.4",
+          "paragraphs": 25,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Lam.5",
+          "paragraphs": 26,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.1",
+          "paragraphs": 69,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.2",
+          "paragraphs": 22,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.3",
+          "paragraphs": 26,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.4",
+          "paragraphs": 15,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.5",
+          "paragraphs": 15,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.6",
+          "paragraphs": 16,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.7",
+          "paragraphs": 23,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.8",
+          "paragraphs": 20,
+          "reference_occurrences": 8,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.9",
+          "paragraphs": 18,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.10",
+          "paragraphs": 12,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.11",
+          "paragraphs": 31,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.12",
+          "paragraphs": 14,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.13",
+          "paragraphs": 21,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.14",
+          "paragraphs": 18,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.15",
+          "paragraphs": 10,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.16",
+          "paragraphs": 19,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.17",
+          "paragraphs": 20,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.18",
+          "paragraphs": 36,
+          "reference_occurrences": 5,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.19",
+          "paragraphs": 14,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.20",
+          "paragraphs": 33,
+          "reference_occurrences": 6,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.21",
+          "paragraphs": 21,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.22",
+          "paragraphs": 22,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.23",
+          "paragraphs": 9,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.24",
+          "paragraphs": 16,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.25",
+          "paragraphs": 10,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.26",
+          "paragraphs": 13,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.27",
+          "paragraphs": 16,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.28",
+          "paragraphs": 17,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.29",
+          "paragraphs": 18,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.30",
+          "paragraphs": 14,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.31",
+          "paragraphs": 20,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.32",
+          "paragraphs": 28,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.33",
+          "paragraphs": 27,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.34",
+          "paragraphs": 20,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.35",
+          "paragraphs": 10,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.36",
+          "paragraphs": 18,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.37",
+          "paragraphs": 14,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.38",
+          "paragraphs": 11,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.39",
+          "paragraphs": 22,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.40",
+          "paragraphs": 11,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.41",
+          "paragraphs": 3,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.42",
+          "paragraphs": 7,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.43",
+          "paragraphs": 9,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.44",
+          "paragraphs": 8,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.45",
+          "paragraphs": 9,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.46",
+          "paragraphs": 7,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.47",
+          "paragraphs": 19,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Ezek.48",
+          "paragraphs": 13,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Dan.1",
+          "paragraphs": 37,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Dan.2",
+          "paragraphs": 45,
+          "reference_occurrences": 5,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Dan.3",
+          "paragraphs": 40,
+          "reference_occurrences": 5,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Dan.4",
+          "paragraphs": 35,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Dan.5",
+          "paragraphs": 34,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Dan.6",
+          "paragraphs": 42,
+          "reference_occurrences": 5,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Dan.7",
+          "paragraphs": 29,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        }
+      ],
+      "audit_notes": [
+        "Lam.1: traditional authorship explicitly attributed to Henry.",
+        "Ezek.1 and 10: angelic and Christological readings preserved. Ezek.3: explicit source verse-label corrections retained.",
+        "Ezek.11: uncertainty on Pelatiah's death retained; Ezek.18: justification, conversion and apostasy distinguished; Ezek.20: Sabbath interpretation and source versification retained.",
+        "Ezek.28: historical identification of Ethbaal/Ithobal attributed to Henry; Ezek.29: historical fulfilment claim retained as author's position.",
+        "Ezek.36: sacramental terminology retained; Ezek.37–40: distinctions between restoration, resurrection, conversion, future fulfilment and interpretive uncertainty preserved.",
+        "Ezek.41–48: notes on absent authorial headings preserved; Christological readings and temple interpretation maintained.",
+        "Dan.1: source chronology 'fourth year of Jehoiachin, 606 BC' appears inconsistent with Daniel 1:1 (Jehoiakim) and requires historical/editorial review; retained with attribution, not silently corrected.",
+        "Dan.2 and 7: historicist interpretations of four empires and papal Rome retained as Henry's interpretations, including distinction from political dominion by grace.",
+        "Dan.3: original measurement thirty yards retained; identification of fourth figure attributed to Henry. Dan.4: author's conviction about Nebuchadnezzar's conversion and historical estimate retained.",
+        "Independent review should check French phrasing and inline emphasis boundaries, especially Ezek.14 (Noah, Job, Daniel), Ezek.30 (one wicked person judging another), Dan.5 (inward terror) and Dan.7 (likeness of sinful flesh).",
+        "Editorial comparison performed by translator; independent review and full corpus/native tests pending."
+      ]
     }
   ],
   "latest_completed_batch": {
-    "range": "Isa.59–Jer.52",
+    "range": "Lam.1–Dan.7",
     "chapters": 60,
-    "paragraphs": 1663,
-    "reference_occurrences": 181,
+    "paragraphs": 1269,
+    "reference_occurrences": 127,
     "translation": 60,
     "editorial_audit": 60,
     "technical_validation": "chapter-local tag/attribute sequence equality only; no full corpus tests",
-    "next": "Lam.1"
+    "next": "Dan.8"
   },
   "book_checkpoints": {
     "Genesis": {
@@ -14513,27 +15554,46 @@
       "editorial_audit": 52,
       "introduction": "translated and compared with Jer.1",
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Lamentations": {
+      "translation": 5,
+      "editorial_audit": 5,
+      "introduction": "translated and compared with Lam.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Ezekiel": {
+      "translation": 48,
+      "editorial_audit": 48,
+      "introduction": "translated and compared with Ezek.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Daniel": {
+      "translation": 7,
+      "editorial_audit": 7,
+      "introduction": "translated and compared with Dan.1; source chronology requires review",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending",
+      "remaining": "Dan.8–12"
     }
   },
   "current_batch": {
-    "range": "Isa.59–Jer.52",
+    "range": "Lam.1–Dan.7",
     "target": 60,
     "completed": 60,
-    "paragraphs": 1663,
-    "reference_occurrences": 181,
-    "next": "Lam.1",
+    "paragraphs": 1269,
+    "reference_occurrences": 127,
+    "next": "Dan.8",
     "status": "completed cohort",
     "audit_notes": [
-      "Isa.60 and 65: alternative or open prophetic fulfilment explicitly preserved.",
-      "Jer.1: Blayney's proposed reading sequence retained as a historical proposal, without changing canonical order.",
-      "Jer.13: biblical image and modern clarification preserved; Jer.15: Henry's argument concerning intercession of deceased saints; Jer.17: Sabbath interpretation.",
-      "Jer.20.7: alternative reading retained.",
-      "Jer.23: justification and sanctification distinguished; Jer.29: seventy years measured from first deportation according to Henry.",
-      "Jer.31: new covenant and Henry's restoration interpretation retained.",
-      "Jer.35: travelers' report not independently verified; Jer.40: authorial uncertainty retained.",
-      "Jer.44 and 51: theological applications attributed to Henry.",
-      "Jer.49: identification of Elamites with Persians attributed to Henry. Jer.50: noncontiguous outline and eight previously corrected editorial reference targets and labels preserved.",
-      "Review French phrasing in Jer.2 (negative coordination), Jer.20 (quotation of divine repayment), Jer.41 (bribing death) and Jer.43 (judgment through another person or nation).",
+      "Lam.1: traditional authorship explicitly attributed to Henry.",
+      "Ezek.1 and 10: angelic and Christological readings preserved. Ezek.3: explicit source verse-label corrections retained.",
+      "Ezek.11: uncertainty on Pelatiah's death retained; Ezek.18: justification, conversion and apostasy distinguished; Ezek.20: Sabbath interpretation and source versification retained.",
+      "Ezek.28: historical identification of Ethbaal/Ithobal attributed to Henry; Ezek.29: historical fulfilment claim retained as author's position.",
+      "Ezek.36: sacramental terminology retained; Ezek.37–40: distinctions between restoration, resurrection, conversion, future fulfilment and interpretive uncertainty preserved.",
+      "Ezek.41–48: notes on absent authorial headings preserved; Christological readings and temple interpretation maintained.",
+      "Dan.1: source chronology 'fourth year of Jehoiachin, 606 BC' appears inconsistent with Daniel 1:1 (Jehoiakim) and requires historical/editorial review; retained with attribution, not silently corrected.",
+      "Dan.2 and 7: historicist interpretations of four empires and papal Rome retained as Henry's interpretations, including distinction from political dominion by grace.",
+      "Dan.3: original measurement thirty yards retained; identification of fourth figure attributed to Henry. Dan.4: author's conviction about Nebuchadnezzar's conversion and historical estimate retained.",
+      "Independent review should check French phrasing and inline emphasis boundaries, especially Ezek.14 (Noah, Job, Daniel), Ezek.30 (one wicked person judging another), Dan.5 (inward terror) and Dan.7 (likeness of sinful flesh).",
       "Editorial comparison performed by translator; independent review and full corpus/native tests pending."
     ]
   }
