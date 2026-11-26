@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Gen.26",
+  "next": "Gen.28",
   "batch_size": 10,
   "completed": [
     [
@@ -255,6 +255,26 @@
       "Genesis",
       25,
       "Editorial audit"
+    ],
+    [
+      "Genesis",
+      26,
+      "Translation"
+    ],
+    [
+      "Genesis",
+      26,
+      "Editorial audit"
+    ],
+    [
+      "Genesis",
+      27,
+      "Translation"
+    ],
+    [
+      "Genesis",
+      27,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -364,6 +384,27 @@
           "markup": "exact source tag/attribute sequence",
           "editorial_audit": "same editor, compared to classic witness",
           "notes": "Preserved delayed fulfillment and prayer, impartiality among children, spiritual birthright versus ordinary inheritance, condemnation of Jacob's deceit and Esau's unbelief, self-denial, and the necessity of repentance."
+        }
+      ]
+    },
+    {
+      "range": "Gen.26–Gen.27",
+      "chapters": [
+        {
+          "chapter": "Gen.26",
+          "paragraphs": 49,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved obedience as evidence of justifying faith and fruit of love, condemnation of deception, warning against envy, voluntary relinquishment of rights for peace, and historical interpretation of Noah's curse as in modern source."
+        },
+        {
+          "chapter": "Gen.27",
+          "paragraphs": 55,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved the rejection of sinful means even for divine promises, Christ bearing the curse, distinction between earthly and spiritual blessings, divine sovereignty without exonerating wrongdoing, and Jacob's election in relation to Christ."
         }
       ]
     }
