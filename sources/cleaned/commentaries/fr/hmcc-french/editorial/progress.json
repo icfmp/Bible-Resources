@@ -3,8 +3,8 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Gen.49",
-  "batch_size": 20,
+  "next": "Exod.1",
+  "batch_size": 30,
   "completed": [
     [
       "Genesis",
@@ -485,6 +485,26 @@
       "Genesis",
       48,
       "Editorial audit"
+    ],
+    [
+      "Genesis",
+      49,
+      "Translation"
+    ],
+    [
+      "Genesis",
+      49,
+      "Editorial audit"
+    ],
+    [
+      "Genesis",
+      50,
+      "Translation"
+    ],
+    [
+      "Genesis",
+      50,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -820,6 +840,27 @@
           "notes": "Preserved dying testimony and varying consolations, adoption into covenant inheritance, redemption through Christ's blood, prophetic crossed hands and sovereign distribution of grace."
         }
       ]
+    },
+    {
+      "range": "Gen.49–Gen.50",
+      "chapters": [
+        {
+          "chapter": "Gen.49",
+          "paragraphs": 104,
+          "reference_occurrences": 6,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved Spirit-inspired tribal prophecies, qualified historical claims and name interpretations attributed to Henry, Messiah in Judah's line, wine as symbol of Christ's blood received by faith, grace's ultimate victory, Joseph as type, and Jacob's peaceful death. Kept the original unusual outline label '1, 2'."
+        },
+        {
+          "chapter": "Gen.50",
+          "paragraphs": 41,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved mourning purified rather than abolished by grace, resurrection hope, Joseph's forgiveness and kindness in action and speech, faith in the promise of Canaan, perseverance and final trust in God."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -831,5 +872,22 @@
     "editorial_audit": 20,
     "technical_validation": "chapter-local tag/attribute sequence equality only; no full corpus tests",
     "next": "Gen.46"
+  },
+  "book_checkpoints": {
+    "Genesis": {
+      "chapters": 50,
+      "translation": 50,
+      "editorial_audit": 50,
+      "introduction": "completed with Gen.1",
+      "technical_validation": "final full corpus and native checks pending"
+    }
+  },
+  "current_batch": {
+    "range": "Gen.46–Exod.25",
+    "target": 30,
+    "completed": 5,
+    "paragraphs": 264,
+    "reference_occurrences": 8,
+    "next": "Exod.1"
   }
 }
