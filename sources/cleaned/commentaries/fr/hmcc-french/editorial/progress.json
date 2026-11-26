@@ -3,8 +3,8 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Lev.21",
-  "batch_size": 40,
+  "next": "Lev.26",
+  "batch_size": 50,
   "completed": [
     [
       "Genesis",
@@ -1105,6 +1105,56 @@
       "Leviticus",
       20,
       "Editorial audit"
+    ],
+    [
+      "Leviticus",
+      21,
+      "Translation"
+    ],
+    [
+      "Leviticus",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "Leviticus",
+      22,
+      "Translation"
+    ],
+    [
+      "Leviticus",
+      22,
+      "Editorial audit"
+    ],
+    [
+      "Leviticus",
+      23,
+      "Translation"
+    ],
+    [
+      "Leviticus",
+      23,
+      "Editorial audit"
+    ],
+    [
+      "Leviticus",
+      24,
+      "Translation"
+    ],
+    [
+      "Leviticus",
+      24,
+      "Editorial audit"
+    ],
+    [
+      "Leviticus",
+      25,
+      "Translation"
+    ],
+    [
+      "Leviticus",
+      25,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -2028,17 +2078,62 @@
           "notes": "Preserved warning against corrupt parental example, attributed moral continuity of filial duty, divine sanctification as encouragement to human effort and rejection of darkness."
         }
       ]
+    },
+    {
+      "range": "Lev.21–Lev.25",
+      "chapters": [
+        {
+          "chapter": "Lev.21",
+          "paragraphs": 11,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved priestly typology, ministers' example, spiritual priesthood of believers and access regardless of physical disability."
+        },
+        {
+          "chapter": "Lev.22",
+          "paragraphs": 13,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved unhindered priestly office of Christ, warning against self-righteousness and hypocrisy at the Lord's table, repentance and faith in atonement."
+        },
+        {
+          "chapter": "Lev.23",
+          "paragraphs": 42,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved Sabbath and five festival applications, attributed chronology and typologies, charity, repentance, pilgrim life and ordinary duties."
+        },
+        {
+          "chapter": "Lev.24",
+          "paragraphs": 18,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved bread and light typologies, historical penalties and equal protection, attributed religious intermarriage interpretation and warning against contempt for gospel."
+        },
+        {
+          "chapter": "Lev.25",
+          "paragraphs": 52,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved sabbatical year and jubilee typologies, grace apart from merit, economic justice, mutual dependence of rich and poor, attributed six-year service interpretation and redemption in Christ."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
-    "range": "Gen.46–Exod.25",
-    "chapters": 30,
-    "paragraphs": 1544,
-    "reference_occurrences": 63,
-    "translation": 30,
-    "editorial_audit": 30,
+    "range": "Exod.26–Lev.25",
+    "chapters": 40,
+    "paragraphs": 1212,
+    "reference_occurrences": 55,
+    "translation": 40,
+    "editorial_audit": 40,
     "technical_validation": "chapter-local tag/attribute sequence equality only; no full corpus tests",
-    "next": "Exod.26"
+    "next": "Lev.26"
   },
   "book_checkpoints": {
     "Genesis": {
@@ -2056,11 +2151,11 @@
     }
   },
   "current_batch": {
-    "range": "Exod.26–Lev.25",
-    "target": 40,
-    "completed": 35,
-    "paragraphs": 1076,
-    "reference_occurrences": 52,
-    "next": "Lev.21"
+    "range": "Lev.26–Deut.12",
+    "target": 50,
+    "completed": 0,
+    "paragraphs": 0,
+    "reference_occurrences": 0,
+    "next": "Lev.26"
   }
 }
