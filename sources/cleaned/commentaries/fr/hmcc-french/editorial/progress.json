@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Lev.9",
+  "next": "Lev.13",
   "batch_size": 40,
   "completed": [
     [
@@ -985,6 +985,46 @@
       "Leviticus",
       8,
       "Editorial audit"
+    ],
+    [
+      "Leviticus",
+      9,
+      "Translation"
+    ],
+    [
+      "Leviticus",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Leviticus",
+      10,
+      "Translation"
+    ],
+    [
+      "Leviticus",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Leviticus",
+      11,
+      "Translation"
+    ],
+    [
+      "Leviticus",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Leviticus",
+      12,
+      "Translation"
+    ],
+    [
+      "Leviticus",
+      12,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -1797,6 +1837,43 @@
           "notes": "Preserved consecration, cleansing through Christ's blood, Spirit without measure, acceptance of imperfect worship through Christ, priesthood of believers and humility toward other sinners."
         }
       ]
+    },
+    {
+      "range": "Lev.9–Lev.12",
+      "chapters": [
+        {
+          "chapter": "Lev.9",
+          "paragraphs": 27,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved substitutionary sacrifice, spiritual signs of acceptance, divine grace preceding worship, joy and reverence."
+        },
+        {
+          "chapter": "Lev.10",
+          "paragraphs": 28,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved attributed hypothesis about wine and pride, distinction between ignorance and presumption, Aaron's submission, holiness and mercy toward natural weakness."
+        },
+        {
+          "chapter": "Lev.11",
+          "paragraphs": 16,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved four purposes of ceremonial distinctions, Christian liberty and holiness, avoiding temptations and unnecessary close associations. Retained the modern witness's treatment of Adam's test."
+        },
+        {
+          "chapter": "Lev.12",
+          "paragraphs": 7,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved attributed interpretation of inherited corruption, atonement and sanctification, and gratitude following childbirth."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -1827,9 +1904,9 @@
   "current_batch": {
     "range": "Exod.26–Lev.25",
     "target": 40,
-    "completed": 23,
-    "paragraphs": 776,
-    "reference_occurrences": 42,
-    "next": "Lev.9"
+    "completed": 27,
+    "paragraphs": 854,
+    "reference_occurrences": 45,
+    "next": "Lev.13"
   }
 }
