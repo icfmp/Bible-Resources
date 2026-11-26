@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Exod.35",
+  "next": "Lev.1",
   "batch_size": 40,
   "completed": [
     [
@@ -845,6 +845,66 @@
       "Exodus",
       34,
       "Editorial audit"
+    ],
+    [
+      "Exodus",
+      35,
+      "Translation"
+    ],
+    [
+      "Exodus",
+      35,
+      "Editorial audit"
+    ],
+    [
+      "Exodus",
+      36,
+      "Translation"
+    ],
+    [
+      "Exodus",
+      36,
+      "Editorial audit"
+    ],
+    [
+      "Exodus",
+      37,
+      "Translation"
+    ],
+    [
+      "Exodus",
+      37,
+      "Editorial audit"
+    ],
+    [
+      "Exodus",
+      38,
+      "Translation"
+    ],
+    [
+      "Exodus",
+      38,
+      "Editorial audit"
+    ],
+    [
+      "Exodus",
+      39,
+      "Translation"
+    ],
+    [
+      "Exodus",
+      39,
+      "Editorial audit"
+    ],
+    [
+      "Exodus",
+      40,
+      "Translation"
+    ],
+    [
+      "Exodus",
+      40,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -1529,6 +1589,59 @@
           "notes": "Preserved moral law versus its curse, divine attributes, pardoning and sanctifying grace, festivals and covenant of grace, attributed interpretation of the veil and prayer."
         }
       ]
+    },
+    {
+      "range": "Exod.35–Exod.40",
+      "chapters": [
+        {
+          "chapter": "Exod.35",
+          "paragraphs": 35,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved Sabbath teaching, voluntary giving, mutual dependence of gifts and equal acceptance of humble service, Spirit-given skill and responsibility to teach."
+        },
+        {
+          "chapter": "Exod.36",
+          "paragraphs": 16,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved integrity in public service, restraint of excess gifts, incarnation and ministry of reconciliation, tabernacle as testimony to divine love."
+        },
+        {
+          "chapter": "Exod.37",
+          "paragraphs": 12,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved all furnishing typologies including the original's altar and manna associations; retained sacramental language and Spirit-led worship."
+        },
+        {
+          "chapter": "Exod.38",
+          "paragraphs": 18,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved voluntary surrender of lawful goods, attributed temporary Jewish church form and Gentile inclusion, sufficient offering and regeneration by Spirit."
+        },
+        {
+          "chapter": "Exod.39",
+          "paragraphs": 23,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved Christ as substance of shadows, spiritual priesthood, bodily fullness of deity, indwelling Father, church and heavenly temple typologies."
+        },
+        {
+          "chapter": "Exod.40",
+          "paragraphs": 34,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved prompt obedience, eternal priesthood of Christ, warning against mere outward godliness, visible divine presence and access through Christ."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -1548,14 +1661,20 @@
       "editorial_audit": 50,
       "introduction": "completed with Gen.1",
       "technical_validation": "final full corpus and native checks pending"
+    },
+    "Exodus": {
+      "translation": 40,
+      "editorial_audit": 40,
+      "introduction": "translated and audited with Exod.1",
+      "technical_validation": "chapter-local tag/attribute sequence equality; final corpus and native module checks pending"
     }
   },
   "current_batch": {
     "range": "Exod.26–Lev.25",
     "target": 40,
-    "completed": 9,
-    "paragraphs": 393,
-    "reference_occurrences": 22,
-    "next": "Exod.35"
+    "completed": 15,
+    "paragraphs": 531,
+    "reference_occurrences": 32,
+    "next": "Lev.1"
   }
 }
