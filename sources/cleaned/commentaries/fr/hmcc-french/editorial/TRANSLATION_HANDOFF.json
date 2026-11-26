@@ -46,6 +46,28 @@
     "next": "Gen.2"
   },
   "latest_checkpoint": {
+    "chapter": "Gen.12",
+    "translation": "complete",
+    "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+    "manuscript_commit": "cb67b3cedf987f71f6c0f9d22f5e02bf82ea4b1d",
+    "paragraphs": 70,
+    "commentary_sections": 4,
+    "outline_rows": 5,
+    "inline_reference_destinations": [
+      "Heb.11.8",
+      "Heb.11.16",
+      "Heb.11.13",
+      "Heb.11.14"
+    ],
+    "audit_notes": [
+      "Preserved the six promises, Christ as the greatest blessing, the grafting metaphor, perseverance, family worship, and the critique of Abram's deceptive conduct.",
+      "Retained the source-only quarantined Hebrews 13:14 text and both approved editorial correction links as distinct note types; translated the note labels without activating the quarantined target or rewriting the source.",
+      "The French rendering follows modern paragraph boundaries and all modern tags, attributes and reference occurrences were checked in sequence."
+    ],
+    "technical_validation": "chapter-local markup equality for both chapters; no schema validation, SWORD compilation or reader tests",
+    "next": "Gen.13"
+  },
+  "previous_checkpoint": {
     "chapter": "Gen.10",
     "translation": "complete",
     "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
@@ -64,32 +86,6 @@
     ],
     "technical_validation": "chapter-local markup equality for all three chapters; no schema validation, SWORD compilation or reader tests",
     "next": "Gen.11"
-  },
-  "previous_checkpoint": {
-    "chapter": "Gen.7",
-    "translation": "complete",
-    "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
-    "manuscript_commit": "d989b31921b1f5c242db3858a55db6528b9cc30c",
-    "paragraphs": 40,
-    "commentary_sections": 4,
-    "outline_rows": 5,
-    "inline_reference_destinations": [
-      "Heb.11.7",
-      "1Pet.3.20",
-      "1Pet.3.21",
-      "Luke.13.25",
-      "Ps.21.8",
-      "Luke.17.26",
-      "Luke.17.27",
-      "2Pet.2.5"
-    ],
-    "audit_notes": [
-      "Preserved justification by faith rather than personal righteousness, the typology of Christian baptism, the security of salvation in the Mediator's hands, and the warning against neglecting Christ's salvation.",
-      "Retained the inherited historical physical explanations and twenty-foot measurement without modernization or scientific correction.",
-      "The French rendering follows modern paragraph boundaries and all modern tags, attributes and inline reference occurrences were checked in sequence."
-    ],
-    "technical_validation": "chapter-local markup equality for both chapters; no schema validation, SWORD compilation or reader tests",
-    "next": "Gen.8"
   },
   "batch_checkpoints": [
     {
@@ -160,6 +156,29 @@
         "Preserved the modern edition's attributed historical interpretation of Canaan and Africa, its explicit rejection of enslaving Black Africans and its condemnation of slaveholders. This historically dated interpretation remains Henry's claim, not an independently verified historical or theological endorsement. Do not silently rewrite the accepted modern source.",
         "Preserved the attributed capital punishment position, fallen humanity's remaining image of God, the covenant seal, dependence on grace, Christ's human descent and Jewish/Gentile unity."
       ]
+    },
+    {
+      "chapter": "Gen.11",
+      "translation": "complete",
+      "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+      "manuscript_commit": "f3b7f63257d9e27f555e5b56c2ff6d5c56328d05",
+      "paragraphs": 54,
+      "commentary_sections": 4,
+      "outline_rows": 5,
+      "inline_reference_destinations": [],
+      "audit_notes": [
+        "Preserved the need for the sanctifying grace of the Holy Spirit, divine justice and mercy, qualified speculation about language disputes, and the contrast between reaching Haran and entering the kingdom. No new links introduced."
+      ]
     }
-  ]
+  ],
+  "completed_batch": {
+    "range": "Gen.3–Gen.12",
+    "chapters": 10,
+    "translation": 10,
+    "editorial_audit": 10,
+    "paragraphs": 699,
+    "reference_occurrences": 39,
+    "scope": "Includes heading and editorial note references. Source chapter-local markup compared; no publication or global technical validation.",
+    "next_planned_batch": "Gen.13–Gen.32 (20 chapters, save bounded subgroups as needed)"
+  }
 }
