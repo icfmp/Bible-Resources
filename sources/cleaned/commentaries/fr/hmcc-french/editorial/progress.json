@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Zech.7",
+  "next": "Luke.5",
   "batch_size": 60,
   "completed": [
     [
@@ -9175,6 +9175,606 @@
       "Zechariah",
       6,
       "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      7,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      8,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      9,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      10,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      11,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      12,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      13,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "Zechariah",
+      14,
+      "Translation"
+    ],
+    [
+      "Zechariah",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "Malachi",
+      1,
+      "Translation"
+    ],
+    [
+      "Malachi",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Malachi",
+      2,
+      "Translation"
+    ],
+    [
+      "Malachi",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Malachi",
+      3,
+      "Translation"
+    ],
+    [
+      "Malachi",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Malachi",
+      4,
+      "Translation"
+    ],
+    [
+      "Malachi",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      1,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      2,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      3,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      4,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      5,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      6,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      7,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      8,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      9,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      10,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      11,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      12,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      13,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      14,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      15,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      16,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      17,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      17,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      18,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      18,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      19,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      19,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      20,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      20,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      21,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      22,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      22,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      23,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      23,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      24,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      24,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      25,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      25,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      26,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      26,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      27,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      27,
+      "Editorial audit"
+    ],
+    [
+      "Matthew",
+      28,
+      "Translation"
+    ],
+    [
+      "Matthew",
+      28,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      1,
+      "Translation"
+    ],
+    [
+      "Mark",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      2,
+      "Translation"
+    ],
+    [
+      "Mark",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      3,
+      "Translation"
+    ],
+    [
+      "Mark",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      4,
+      "Translation"
+    ],
+    [
+      "Mark",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      5,
+      "Translation"
+    ],
+    [
+      "Mark",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      6,
+      "Translation"
+    ],
+    [
+      "Mark",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      7,
+      "Translation"
+    ],
+    [
+      "Mark",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      8,
+      "Translation"
+    ],
+    [
+      "Mark",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      9,
+      "Translation"
+    ],
+    [
+      "Mark",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      10,
+      "Translation"
+    ],
+    [
+      "Mark",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      11,
+      "Translation"
+    ],
+    [
+      "Mark",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      12,
+      "Translation"
+    ],
+    [
+      "Mark",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      13,
+      "Translation"
+    ],
+    [
+      "Mark",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      14,
+      "Translation"
+    ],
+    [
+      "Mark",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      15,
+      "Translation"
+    ],
+    [
+      "Mark",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "Mark",
+      16,
+      "Translation"
+    ],
+    [
+      "Mark",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "Luke",
+      1,
+      "Translation"
+    ],
+    [
+      "Luke",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Luke",
+      2,
+      "Translation"
+    ],
+    [
+      "Luke",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Luke",
+      3,
+      "Translation"
+    ],
+    [
+      "Luke",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Luke",
+      4,
+      "Translation"
+    ],
+    [
+      "Luke",
+      4,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -9215,7 +9815,11 @@
     "Habakkuk_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check",
     "Zephaniah_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check",
     "Haggai_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check",
-    "Zechariah_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check"
+    "Zechariah_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check",
+    "Malachi_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check",
+    "Matthew_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check",
+    "Mark_introduction": "translated_and_audited_in_Mark.1",
+    "Luke_introduction": "translated_and_audited_in_Luke.1"
   },
   "batch_checkpoints": [
     {
@@ -16443,17 +17047,454 @@
         "Independent linguistic review: Daniel 11–12, Hosea 7 and 14, Amos 2 and 5, Habakkuk 1–2 (including fishing-net terminology), Jonah 4 (plant/gourd specificity), Micah 5, Haggai 1 and Zechariah 6 (hands/resources idiom).",
         "No independent audit or full-corpus/native module tests performed in this cohort."
       ]
+    },
+    {
+      "range": "Zech.7–Luke.4",
+      "chapters": [
+        {
+          "chapter": "Zech.7",
+          "paragraphs": 23,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.8",
+          "paragraphs": 33,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.9",
+          "paragraphs": 37,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.10",
+          "paragraphs": 21,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.11",
+          "paragraphs": 34,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.12",
+          "paragraphs": 18,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.13",
+          "paragraphs": 34,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Zech.14",
+          "paragraphs": 35,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mal.1",
+          "paragraphs": 32,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mal.2",
+          "paragraphs": 32,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mal.3",
+          "paragraphs": 52,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mal.4",
+          "paragraphs": 34,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.1",
+          "paragraphs": 32,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.2",
+          "paragraphs": 51,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.3",
+          "paragraphs": 69,
+          "reference_occurrences": 9,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.4",
+          "paragraphs": 81,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.5",
+          "paragraphs": 115,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.6",
+          "paragraphs": 60,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.7",
+          "paragraphs": 59,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.8",
+          "paragraphs": 70,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.9",
+          "paragraphs": 92,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.10",
+          "paragraphs": 72,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.11",
+          "paragraphs": 71,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.12",
+          "paragraphs": 71,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.13",
+          "paragraphs": 67,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.14",
+          "paragraphs": 58,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.15",
+          "paragraphs": 61,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.16",
+          "paragraphs": 56,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.17",
+          "paragraphs": 48,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.18",
+          "paragraphs": 57,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.19",
+          "paragraphs": 75,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.20",
+          "paragraphs": 75,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.21",
+          "paragraphs": 56,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.22",
+          "paragraphs": 66,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.23",
+          "paragraphs": 48,
+          "reference_occurrences": 6,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.24",
+          "paragraphs": 69,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.25",
+          "paragraphs": 80,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.26",
+          "paragraphs": 120,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.27",
+          "paragraphs": 115,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Matt.28",
+          "paragraphs": 78,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.1",
+          "paragraphs": 77,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.2",
+          "paragraphs": 39,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.3",
+          "paragraphs": 34,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.4",
+          "paragraphs": 38,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.5",
+          "paragraphs": 42,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.6",
+          "paragraphs": 45,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.7",
+          "paragraphs": 27,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.8",
+          "paragraphs": 35,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.9",
+          "paragraphs": 42,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.10",
+          "paragraphs": 57,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.11",
+          "paragraphs": 37,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.12",
+          "paragraphs": 45,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.13",
+          "paragraphs": 39,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.14",
+          "paragraphs": 47,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.15",
+          "paragraphs": 52,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Mark.16",
+          "paragraphs": 34,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.1",
+          "paragraphs": 76,
+          "reference_occurrences": 4,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.2",
+          "paragraphs": 75,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.3",
+          "paragraphs": 48,
+          "reference_occurrences": 3,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.4",
+          "paragraphs": 51,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        }
+      ],
+      "audit_notes": [
+        "Zech.8.18–23: final portion of classic witness absent from modern chapter text; no silent restoration.",
+        "Zech.9.9–17: modern split preserved; spiritual kingdom not advanced by force retained. Zech.11 staff names Grâce/Union use French biblical convention; review. Zech.14 alternative readings and figurative Tabernacles retained.",
+        "Malachi and Matthew: classic book introductions absent from modern chapter packets; inspect standalone book-level material before deciding on restoration. Malachi chapter 4 source versification retained.",
+        "Matt.3.1–6: classic closing discussion of John's lifestyle, baptism, confession, profession versus belief and Zech.13.1 absent from modern text; modern reference annotation retained, no restoration. Matt.3.7–12: classic floor image and Isa.21.10 context require source review.",
+        "Matt.4 Deut.8.3 annotation; Matt.5 unplaced 1 Cor.1.16 and editorial 1 Pet.1.16 retained; Matt.12 Gen.4.7 secondary reference; Matt.13 noncontiguous grouping; Matt.23 Deut.9/11 competing references retained.",
+        "Matt.8 one node-count discrepancy detected and corrected before tree creation; Roman celibacy discussion retained. Matt.10 cessation of signs and persistent denial, Matt.16 Peter/rock and authority, Matt.18 forgiveness, Matt.20 historic coin comparison and ransom sufficiency/efficacy retained.",
+        "Matt.24 generation and eschatological qualification; Matt.26 bread/body representation and voluntary atonement; Matt.27 historical statements and modern qualifications; Matt.28 baptism sign/seal preserved.",
+        "Mark.1 traditional introduction including Peter association and nephew wording translated. Mark.5 Jairus conjecture; Mark.13 divine/human knowledge and dating; Mark.16 long-ending commentary retained, no Bible-text change; classic 'men ran' versus modern women flagged; cessation view retained.",
+        "Luke.1 conflicting origins in introduction and cited 1 Tim.3.16 wording retained. Luke.3 Heli/Mary interpretation retained as Henry's reading. Luke.4 temptation/persecution distinction retained.",
+        "Independent stylistic pass required: Matt.4,5,11,15,16,22; Mark.12,13,14; all French manuscripts remain candidates. Global OSIS/TEI/module and independent editorial checks pending."
+      ]
     }
   ],
   "latest_completed_batch": {
-    "range": "Dan.8–Zech.6",
+    "range": "Zech.7–Luke.4",
     "chapters": 60,
-    "paragraphs": 1818,
-    "reference_occurrences": 24,
+    "paragraphs": 3297,
+    "reference_occurrences": 76,
     "translation": 60,
     "editorial_audit": 60,
     "technical_validation": "chapter-local tag/attribute sequence equality only; no full corpus tests",
-    "next": "Zech.7"
+    "next": "Luke.5"
   },
   "book_checkpoints": {
     "Genesis": {
@@ -16680,30 +17721,56 @@
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
     },
     "Zechariah": {
-      "translation": 6,
-      "editorial_audit": 6,
+      "translation": 14,
+      "editorial_audit": 14,
       "introduction": "classic introduction not present in modern chapter packet; book-level source check pending",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Malachi": {
+      "translation": 4,
+      "editorial_audit": 4,
+      "introduction": "classic introduction not present in modern chapter packet; book-level source check pending",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Matthew": {
+      "translation": 28,
+      "editorial_audit": 28,
+      "introduction": "classic introduction not present in modern chapter packet; book-level source check pending",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Mark": {
+      "translation": 16,
+      "editorial_audit": 16,
+      "introduction": "translated and compared with Mark.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Luke": {
+      "translation": 4,
+      "editorial_audit": 4,
+      "introduction": "translated and compared with Luke.1",
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending",
-      "remaining": "Zech.7–14"
+      "remaining": "Luke.5–24"
     }
   },
   "current_batch": {
-    "range": "Dan.8–Zech.6",
+    "range": "Zech.7–Luke.4",
     "target": 60,
     "completed": 60,
-    "paragraphs": 1818,
-    "reference_occurrences": 24,
-    "next": "Zech.7",
+    "paragraphs": 3297,
+    "reference_occurrences": 76,
+    "next": "Luke.5",
     "status": "completed cohort",
     "audit_notes": [
-      "Classic introductions for Nahum, Habakkuk, Zephaniah, Haggai and Zechariah are absent from their corresponding modern chapter packets. Check standalone book-level material before deciding on restoration; no silent insertion.",
-      "Daniel 8–12: historical identifications, chronology, polemical readings and modern editorial qualifications preserved as Henry's interpretations. Daniel 12: 1260 years and Michael/Christ reading retained.",
-      "Source chapter divisions, verse labels and versification retained (including Hosea, Joel, Jonah and Zechariah).",
-      "Hosea 1: Henry's gloss of Jezreel retained; Hosea 6 resurrection and Adam covenant readings retained; Hosea 14 modern manna/dew wording differs from classic wording.",
-      "Amos 3: calamity distinguished from moral evil; Nahum 3 merchants/hired troops interpretation retained; Zephaniah 2 alternative readings retained.",
-      "Haggai 2 messianic reading and Zechariah 3 imputed and implanted righteousness preserved; Zechariah 4–6 Christological typology and modern qualifications retained.",
-      "Independent linguistic review: Daniel 11–12, Hosea 7 and 14, Amos 2 and 5, Habakkuk 1–2 (including fishing-net terminology), Jonah 4 (plant/gourd specificity), Micah 5, Haggai 1 and Zechariah 6 (hands/resources idiom).",
-      "No independent audit or full-corpus/native module tests performed in this cohort."
+      "Zech.8.18–23: final portion of classic witness absent from modern chapter text; no silent restoration.",
+      "Zech.9.9–17: modern split preserved; spiritual kingdom not advanced by force retained. Zech.11 staff names Grâce/Union use French biblical convention; review. Zech.14 alternative readings and figurative Tabernacles retained.",
+      "Malachi and Matthew: classic book introductions absent from modern chapter packets; inspect standalone book-level material before deciding on restoration. Malachi chapter 4 source versification retained.",
+      "Matt.3.1–6: classic closing discussion of John's lifestyle, baptism, confession, profession versus belief and Zech.13.1 absent from modern text; modern reference annotation retained, no restoration. Matt.3.7–12: classic floor image and Isa.21.10 context require source review.",
+      "Matt.4 Deut.8.3 annotation; Matt.5 unplaced 1 Cor.1.16 and editorial 1 Pet.1.16 retained; Matt.12 Gen.4.7 secondary reference; Matt.13 noncontiguous grouping; Matt.23 Deut.9/11 competing references retained.",
+      "Matt.8 one node-count discrepancy detected and corrected before tree creation; Roman celibacy discussion retained. Matt.10 cessation of signs and persistent denial, Matt.16 Peter/rock and authority, Matt.18 forgiveness, Matt.20 historic coin comparison and ransom sufficiency/efficacy retained.",
+      "Matt.24 generation and eschatological qualification; Matt.26 bread/body representation and voluntary atonement; Matt.27 historical statements and modern qualifications; Matt.28 baptism sign/seal preserved.",
+      "Mark.1 traditional introduction including Peter association and nephew wording translated. Mark.5 Jairus conjecture; Mark.13 divine/human knowledge and dating; Mark.16 long-ending commentary retained, no Bible-text change; classic 'men ran' versus modern women flagged; cessation view retained.",
+      "Luke.1 conflicting origins in introduction and cited 1 Tim.3.16 wording retained. Luke.3 Heli/Mary interpretation retained as Henry's reading. Luke.4 temptation/persecution distinction retained.",
+      "Independent stylistic pass required: Matt.4,5,11,15,16,22; Mark.12,13,14; all French manuscripts remain candidates. Global OSIS/TEI/module and independent editorial checks pending."
     ]
   }
 }
