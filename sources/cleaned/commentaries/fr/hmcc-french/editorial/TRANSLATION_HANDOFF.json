@@ -46,6 +46,27 @@
     "next": "Gen.2"
   },
   "latest_checkpoint": {
+    "chapter": "Gen.15",
+    "translation": "complete",
+    "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+    "manuscript_commit": "20d6c19b1a3e25e021c183ef1d0a2d7a89f32b15",
+    "paragraphs": 54,
+    "commentary_sections": 5,
+    "outline_rows": 6,
+    "inline_reference_destinations": [
+      "Rom.4.24",
+      "Jer.34.18",
+      "Jer.34.19",
+      "Ps.50.5"
+    ],
+    "audit_notes": [
+      "Preserved the contrast between complaining of God and to God, justification by faith in the person and work of Christ, forgiveness through faith in his blood, distinctions in the vision, and qualified interpretation of the sacrificial sign.",
+      "All source tags, attributes and reference occurrences checked in sequence."
+    ],
+    "technical_validation": "chapter-local markup equality for all three chapters; no schema validation, SWORD compilation or reader tests",
+    "next": "Gen.16"
+  },
+  "previous_checkpoint": {
     "chapter": "Gen.12",
     "translation": "complete",
     "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
@@ -66,26 +87,6 @@
     ],
     "technical_validation": "chapter-local markup equality for both chapters; no schema validation, SWORD compilation or reader tests",
     "next": "Gen.13"
-  },
-  "previous_checkpoint": {
-    "chapter": "Gen.10",
-    "translation": "complete",
-    "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
-    "manuscript_commit": "1fe9a575b5fe17340c5ffd1ede4233b562c14f5c",
-    "paragraphs": 41,
-    "commentary_sections": 3,
-    "outline_rows": 4,
-    "inline_reference_destinations": [
-      "Jer.25.22",
-      "Isa.42.4",
-      "Gen.6.4"
-    ],
-    "audit_notes": [
-      "Preserved qualified historical genealogy and British-island speculation as inherited from the modern edition; Nimrod's tyranny and ambition; the distinction between external prosperity and blessing; and the Eber/Hebrews connection.",
-      "The French rendering follows modern paragraph boundaries and all modern tags, attributes and inline reference occurrences were checked in sequence."
-    ],
-    "technical_validation": "chapter-local markup equality for all three chapters; no schema validation, SWORD compilation or reader tests",
-    "next": "Gen.11"
   },
   "batch_checkpoints": [
     {
@@ -169,6 +170,42 @@
       "audit_notes": [
         "Preserved the need for the sanctifying grace of the Holy Spirit, divine justice and mercy, qualified speculation about language disputes, and the contrast between reaching Haran and entering the kingdom. No new links introduced."
       ]
+    },
+    {
+      "chapter": "Gen.13",
+      "translation": "complete",
+      "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+      "manuscript_commit": "788c34eeb49debd2f743198df937e72ddbb3e258",
+      "paragraphs": 57,
+      "commentary_sections": 4,
+      "outline_rows": 5,
+      "inline_reference_destinations": [
+        "Hab.2.6",
+        "Prov.10.22",
+        "Mark.10.23",
+        "Mark.10.24",
+        "Ezek.16.49"
+      ],
+      "audit_notes": [
+        "Preserved the distinction between wealth as a burden and prosperity used wisely, Abram's initiative and humility in peace-making, the priority of the soul, and the difference between outward loss and spiritual peace."
+      ]
+    },
+    {
+      "chapter": "Gen.14",
+      "translation": "complete",
+      "editorial_audit": "complete (same editor, direct comparison with classic, not independent human review)",
+      "manuscript_commit": "a2ad85faa72ccf96f6be73b6bd800c2145d977b8",
+      "paragraphs": 43,
+      "commentary_sections": 4,
+      "outline_rows": 5,
+      "inline_reference_destinations": [
+        "2Cor.6.17",
+        "Heb.7.3",
+        "Heb.7.4"
+      ],
+      "audit_notes": [
+        "Preserved qualified identification of Salem and Melchizedek, Christ's mediation of prayer and praise, typology of bread and wine, and Abram's refusal to cast doubt on God's covenant."
+      ]
     }
   ],
   "completed_batch": {
@@ -180,5 +217,13 @@
     "reference_occurrences": 39,
     "scope": "Includes heading and editorial note references. Source chapter-local markup compared; no publication or global technical validation.",
     "next_planned_batch": "Gen.13–Gen.32 (20 chapters, save bounded subgroups as needed)"
+  },
+  "active_batch": {
+    "range": "Gen.13–Gen.32",
+    "chapters_target": 20,
+    "completed": 3,
+    "paragraphs": 154,
+    "reference_occurrences": 12,
+    "next": "Gen.16"
   }
 }
