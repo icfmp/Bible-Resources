@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Num.11",
+  "next": "Num.15",
   "batch_size": 50,
   "completed": [
     [
@@ -1275,6 +1275,46 @@
       "Numbers",
       10,
       "Editorial audit"
+    ],
+    [
+      "Numbers",
+      11,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Numbers",
+      12,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Numbers",
+      13,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "Numbers",
+      14,
+      "Translation"
+    ],
+    [
+      "Numbers",
+      14,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -2355,6 +2395,43 @@
           "notes": "Preserved gospel trumpet applications, progression in holiness, practical help compatible with providence, prayer and presence of God."
         }
       ]
+    },
+    {
+      "range": "Num.11–Num.14",
+      "chapters": [
+        {
+          "chapter": "Num.11",
+          "paragraphs": 78,
+          "reference_occurrences": 0,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved law's inability to conquer sin, discontent, divine grace for leadership, Spirit's freedom, cooperation across disagreements and judgment versus loving refusal."
+        },
+        {
+          "chapter": "Num.12",
+          "paragraphs": 32,
+          "reference_occurrences": 2,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved attributed motives of Miriam and Aaron, Christ's superiority, forgiveness and disciplinary consequences."
+        },
+        {
+          "chapter": "Num.13",
+          "paragraphs": 35,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved contrast between sight and faith, earnest of heaven, possession by divine promise and explicit qualification of promised things."
+        },
+        {
+          "chapter": "Num.14",
+          "paragraphs": 66,
+          "reference_occurrences": 1,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness",
+          "notes": "Preserved national intercession, unbelief and judgment, distinction between guilt and consequences, late presumption, mercy toward children and eternal rest."
+        }
+      ]
     }
   ],
   "latest_completed_batch": {
@@ -2391,9 +2468,9 @@
   "current_batch": {
     "range": "Lev.26–Deut.12",
     "target": 50,
-    "completed": 12,
-    "paragraphs": 356,
-    "reference_occurrences": 16,
-    "next": "Num.11"
+    "completed": 16,
+    "paragraphs": 567,
+    "reference_occurrences": 20,
+    "next": "Num.15"
   }
 }
