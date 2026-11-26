@@ -132,6 +132,40 @@ def check(args):
     print(json.dumps({"checked_fragments": len(files), "semantic_review": False}))
 
 
+def assemble(args):
+    """Assemble a complete editorial candidate, never an approved module."""
+    source = chapters(read(args.modern, args.modern_sha))
+    template = _source_tree(_read_source(Path(args.template)))
+    target = chapters(template)
+    if list(source) != list(target):
+        raise ValueError("Target template chapter order/coverage differs")
+    text = template.find(OSIS + "osisText")
+    if text is None or text.get("{http://www.w3.org/XML/1998/namespace}lang") != args.language:
+        raise ValueError("Template must carry the explicitly selected target language")
+    # The separately reviewed target template owns header and non-chapter
+    # content. This command cannot decide or certify those translations.
+    files = {p.stem: p for p in Path(args.manuscripts).glob("*.xml")}
+    if set(files) != set(source):
+        raise ValueError("Incomplete or unexpected chapter manuscript inventory")
+    parser = etree.XMLParser(resolve_entities=False, no_network=True, load_dtd=False)
+    for key, old in target.items():
+        fragment = etree.parse(str(files[key]), parser)
+        replacement = fragment.getroot()
+        if fragment.docinfo.doctype or signature(replacement) != signature(source[key]):
+            raise ValueError(f"Source structure/attributes differ: {key}")
+        if signature(old) != signature(source[key]):
+            raise ValueError(f"Template structure/attributes differ: {key}")
+        replacement.tail = old.tail
+        old.getparent().replace(old, replacement)
+    output = Path(args.output)
+    data = etree.tostring(template, encoding="UTF-8", xml_declaration=True)
+    # Exclusive output creation: no source or previously reviewed file overwritten.
+    with output.open("xb") as handle:
+        handle.write(data)
+    print(json.dumps({"assembled_chapters": len(source), "editorial_candidate": True,
+                      "semantic_review": False, "publication": False}))
+
+
 TASK = re.compile(r"^- \[([ x])\] (\d+) — (Translation|Editorial audit)$")
 HEADING = re.compile(r"^### (.+)$")
 
@@ -204,6 +238,10 @@ def main():
     for name in ("modern", "modern-sha", "manuscripts"):
         c.add_argument("--" + name, required=True)
     c.set_defaults(run=check)
+    a = subs.add_parser("assemble")
+    for name in ("modern", "modern-sha", "manuscripts", "template", "language", "output"):
+        a.add_argument("--" + name, required=True)
+    a.set_defaults(run=assemble)
     s = subs.add_parser("sync")
     s.add_argument("--progress", required=True)
     s.add_argument("--apply", action="store_true")
