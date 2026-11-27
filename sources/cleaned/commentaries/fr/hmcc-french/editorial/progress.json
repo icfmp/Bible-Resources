@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "Acts.20",
+  "next": "Eph.1",
   "batch_size": 60,
   "completed": [
     [
@@ -10375,6 +10375,606 @@
       "Acts",
       19,
       "Editorial audit"
+    ],
+    [
+      "Acts",
+      20,
+      "Translation"
+    ],
+    [
+      "Acts",
+      20,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      21,
+      "Translation"
+    ],
+    [
+      "Acts",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      22,
+      "Translation"
+    ],
+    [
+      "Acts",
+      22,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      23,
+      "Translation"
+    ],
+    [
+      "Acts",
+      23,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      24,
+      "Translation"
+    ],
+    [
+      "Acts",
+      24,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      25,
+      "Translation"
+    ],
+    [
+      "Acts",
+      25,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      26,
+      "Translation"
+    ],
+    [
+      "Acts",
+      26,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      27,
+      "Translation"
+    ],
+    [
+      "Acts",
+      27,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      28,
+      "Translation"
+    ],
+    [
+      "Acts",
+      28,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      1,
+      "Translation"
+    ],
+    [
+      "Rom",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      2,
+      "Translation"
+    ],
+    [
+      "Rom",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      3,
+      "Translation"
+    ],
+    [
+      "Rom",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      4,
+      "Translation"
+    ],
+    [
+      "Rom",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      5,
+      "Translation"
+    ],
+    [
+      "Rom",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      6,
+      "Translation"
+    ],
+    [
+      "Rom",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      7,
+      "Translation"
+    ],
+    [
+      "Rom",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      8,
+      "Translation"
+    ],
+    [
+      "Rom",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      9,
+      "Translation"
+    ],
+    [
+      "Rom",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      10,
+      "Translation"
+    ],
+    [
+      "Rom",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      11,
+      "Translation"
+    ],
+    [
+      "Rom",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      12,
+      "Translation"
+    ],
+    [
+      "Rom",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      13,
+      "Translation"
+    ],
+    [
+      "Rom",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      14,
+      "Translation"
+    ],
+    [
+      "Rom",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      15,
+      "Translation"
+    ],
+    [
+      "Rom",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "Rom",
+      16,
+      "Translation"
+    ],
+    [
+      "Rom",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      1,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      2,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      3,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      4,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      5,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      6,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      7,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      8,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      9,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      10,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      11,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      12,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      13,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      14,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      15,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "1Cor",
+      16,
+      "Translation"
+    ],
+    [
+      "1Cor",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      1,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      2,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      3,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      4,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      5,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      6,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      7,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      8,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      9,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      10,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      11,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      12,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "2Cor",
+      13,
+      "Translation"
+    ],
+    [
+      "2Cor",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "Gal",
+      1,
+      "Translation"
+    ],
+    [
+      "Gal",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Gal",
+      2,
+      "Translation"
+    ],
+    [
+      "Gal",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Gal",
+      3,
+      "Translation"
+    ],
+    [
+      "Gal",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Gal",
+      4,
+      "Translation"
+    ],
+    [
+      "Gal",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Gal",
+      5,
+      "Translation"
+    ],
+    [
+      "Gal",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Gal",
+      6,
+      "Translation"
+    ],
+    [
+      "Gal",
+      6,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -10421,7 +11021,11 @@
     "Mark_introduction": "translated_and_audited_in_Mark.1",
     "Luke_introduction": "translated_and_audited_in_Luke.1",
     "John_introduction": "translated_and_audited_in_John.1",
-    "Acts_introduction": "translated_and_audited_in_Acts.1"
+    "Acts_introduction": "translated_and_audited_in_Acts.1",
+    "Romans_introduction": "translated_and_audited_in_Rom.1",
+    "1_Corinthians_introduction": "translated_and_audited_in_1Cor.1",
+    "2_Corinthians_introduction": "translated_and_audited_in_2Cor.1",
+    "Galatians_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check"
   },
   "batch_checkpoints": [
     {
@@ -18638,19 +19242,570 @@
         "Luke.11–24 and John.1–7: same-editor comparison with the frozen classic witness; classic meaning details restored and documented for English review in #591. Exact chapter-local source tag/attribute sequence and nonblank segment counts checked. Independent audit, French typographic review, global schema and native validation pending. [{\"chapter\":\"Luke.11\",\"source_words\":753,\"paragraphs\":41,\"reference_occurrences\":0,\"segments\":95},{\"chapter\":\"Luke.12\",\"source_words\":771,\"paragraphs\":44,\"reference_occurrences\":1,\"segments\":95},{\"chapter\":\"Luke.13\",\"source_words\":714,\"paragraphs\":46,\"reference_occurrences\":0,\"segments\":94},{\"chapter\":\"Luke.14\",\"source_words\":557,\"paragraphs\":34,\"reference_occurrences\":0,\"segments\":70},{\"chapter\":\"Luke.15\",\"source_words\":792,\"paragraphs\":49,\"reference_occurrences\":0,\"segments\":106},{\"chapter\":\"Luke.16\",\"source_words\":767,\"paragraphs\":52,\"reference_occurrences\":3,\"segments\":109},{\"chapter\":\"Luke.17\",\"source_words\":397,\"paragraphs\":23,\"reference_occurrences\":0,\"segments\":61},{\"chapter\":\"Luke.18\",\"source_words\":811,\"paragraphs\":55,\"reference_occurrences\":1,\"segments\":115},{\"chapter\":\"Luke.19\",\"source_words\":658,\"paragraphs\":43,\"reference_occurrences\":2,\"segments\":92},{\"chapter\":\"Luke.20\",\"source_words\":671,\"paragraphs\":42,\"reference_occurrences\":3,\"segments\":88},{\"chapter\":\"Luke.21\",\"source_words\":689,\"paragraphs\":43,\"reference_occurrences\":0,\"segments\":87},{\"chapter\":\"Luke.22\",\"source_words\":1098,\"paragraphs\":74,\"reference_occurrences\":0,\"segments\":176},{\"chapter\":\"Luke.23\",\"source_words\":982,\"paragraphs\":65,\"reference_occurrences\":0,\"segments\":134},{\"chapter\":\"Luke.24\",\"source_words\":1100,\"paragraphs\":78,\"reference_occurrences\":0,\"segments\":149},{\"chapter\":\"John.1\",\"source_words\":1687,\"paragraphs\":101,\"reference_occurrences\":2,\"segments\":236},{\"chapter\":\"John.2\",\"source_words\":648,\"paragraphs\":47,\"reference_occurrences\":2,\"segments\":90},{\"chapter\":\"John.3\",\"source_words\":1144,\"paragraphs\":83,\"reference_occurrences\":1,\"segments\":171},{\"chapter\":\"John.4\",\"source_words\":1095,\"paragraphs\":79,\"reference_occurrences\":1,\"segments\":146},{\"chapter\":\"John.5\",\"source_words\":1095,\"paragraphs\":64,\"reference_occurrences\":0,\"segments\":135},{\"chapter\":\"John.6\",\"source_words\":1295,\"paragraphs\":79,\"reference_occurrences\":0,\"segments\":182},{\"chapter\":\"John.7\",\"source_words\":786,\"paragraphs\":50,\"reference_occurrences\":0,\"segments\":94}]",
         "John.8–21 and Acts.1–19: translated Modern English source, compared with frozen classic witness, restored identified classic meaning details. See #592 for English review and source ambiguities (John 15 incomplete outline; Acts 4 ambiguous Isaiah citation). Exact source tag/attribute sequence and nonblank segment counts checked chapter-locally. French typographic pass (inline whitespace/punctuation), independent editorial review, global schema and native module checks pending."
       ]
+    },
+    {
+      "range": "Acts.20–Gal.6",
+      "chapters": [
+        {
+          "chapter": "Acts.20",
+          "source_words": 1164,
+          "paragraphs": 77,
+          "reference_occurrences": 0,
+          "segments": 174,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.21",
+          "source_words": 748,
+          "paragraphs": 42,
+          "reference_occurrences": 0,
+          "segments": 80,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.22",
+          "source_words": 664,
+          "paragraphs": 34,
+          "reference_occurrences": 0,
+          "segments": 80,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.23",
+          "source_words": 612,
+          "paragraphs": 35,
+          "reference_occurrences": 0,
+          "segments": 65,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.24",
+          "source_words": 694,
+          "paragraphs": 44,
+          "reference_occurrences": 0,
+          "segments": 80,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.25",
+          "source_words": 478,
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "segments": 55,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.26",
+          "source_words": 930,
+          "paragraphs": 57,
+          "reference_occurrences": 0,
+          "segments": 119,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.27",
+          "source_words": 1058,
+          "paragraphs": 68,
+          "reference_occurrences": 0,
+          "segments": 124,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.28",
+          "source_words": 1048,
+          "paragraphs": 65,
+          "reference_occurrences": 2,
+          "segments": 129,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.1",
+          "source_words": 1064,
+          "paragraphs": 57,
+          "reference_occurrences": 1,
+          "segments": 144,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.2",
+          "source_words": 642,
+          "paragraphs": 40,
+          "reference_occurrences": 0,
+          "segments": 95,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.3",
+          "source_words": 835,
+          "paragraphs": 58,
+          "reference_occurrences": 0,
+          "segments": 131,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.4",
+          "source_words": 723,
+          "paragraphs": 44,
+          "reference_occurrences": 3,
+          "segments": 118,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.5",
+          "source_words": 1157,
+          "paragraphs": 69,
+          "reference_occurrences": 2,
+          "segments": 174,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.6",
+          "source_words": 845,
+          "paragraphs": 57,
+          "reference_occurrences": 0,
+          "segments": 120,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.7",
+          "source_words": 1330,
+          "paragraphs": 80,
+          "reference_occurrences": 0,
+          "segments": 163,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.8",
+          "source_words": 1645,
+          "paragraphs": 116,
+          "reference_occurrences": 1,
+          "segments": 225,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.9",
+          "source_words": 1017,
+          "paragraphs": 63,
+          "reference_occurrences": 0,
+          "segments": 137,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.10",
+          "source_words": 773,
+          "paragraphs": 47,
+          "reference_occurrences": 0,
+          "segments": 110,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.11",
+          "source_words": 982,
+          "paragraphs": 60,
+          "reference_occurrences": 1,
+          "segments": 135,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.12",
+          "source_words": 1003,
+          "paragraphs": 73,
+          "reference_occurrences": 0,
+          "segments": 142,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.13",
+          "source_words": 718,
+          "paragraphs": 52,
+          "reference_occurrences": 4,
+          "segments": 118,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.14",
+          "source_words": 905,
+          "paragraphs": 61,
+          "reference_occurrences": 0,
+          "segments": 120,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.15",
+          "source_words": 1031,
+          "paragraphs": 67,
+          "reference_occurrences": 0,
+          "segments": 149,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Rom.16",
+          "source_words": 704,
+          "paragraphs": 48,
+          "reference_occurrences": 0,
+          "segments": 111,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.1",
+          "source_words": 1208,
+          "paragraphs": 74,
+          "reference_occurrences": 1,
+          "segments": 176,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.2",
+          "source_words": 588,
+          "paragraphs": 37,
+          "reference_occurrences": 2,
+          "segments": 87,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.3",
+          "source_words": 934,
+          "paragraphs": 60,
+          "reference_occurrences": 0,
+          "segments": 129,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.4",
+          "source_words": 739,
+          "paragraphs": 33,
+          "reference_occurrences": 0,
+          "segments": 87,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.5",
+          "source_words": 308,
+          "paragraphs": 17,
+          "reference_occurrences": 0,
+          "segments": 41,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.6",
+          "source_words": 663,
+          "paragraphs": 42,
+          "reference_occurrences": 0,
+          "segments": 98,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.7",
+          "source_words": 817,
+          "paragraphs": 46,
+          "reference_occurrences": 1,
+          "segments": 112,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.8",
+          "source_words": 491,
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "segments": 73,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.9",
+          "source_words": 559,
+          "paragraphs": 32,
+          "reference_occurrences": 0,
+          "segments": 68,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.10",
+          "source_words": 793,
+          "paragraphs": 50,
+          "reference_occurrences": 0,
+          "segments": 107,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.11",
+          "source_words": 988,
+          "paragraphs": 63,
+          "reference_occurrences": 1,
+          "segments": 156,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.12",
+          "source_words": 815,
+          "paragraphs": 50,
+          "reference_occurrences": 2,
+          "segments": 114,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.13",
+          "source_words": 688,
+          "paragraphs": 44,
+          "reference_occurrences": 2,
+          "segments": 107,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.14",
+          "source_words": 704,
+          "paragraphs": 39,
+          "reference_occurrences": 0,
+          "segments": 104,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.15",
+          "source_words": 1325,
+          "paragraphs": 88,
+          "reference_occurrences": 2,
+          "segments": 188,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "1Cor.16",
+          "source_words": 757,
+          "paragraphs": 51,
+          "reference_occurrences": 5,
+          "segments": 122,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.1",
+          "source_words": 815,
+          "paragraphs": 41,
+          "reference_occurrences": 0,
+          "segments": 102,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.2",
+          "source_words": 528,
+          "paragraphs": 27,
+          "reference_occurrences": 0,
+          "segments": 61,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.3",
+          "source_words": 584,
+          "paragraphs": 33,
+          "reference_occurrences": 1,
+          "segments": 78,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.4",
+          "source_words": 711,
+          "paragraphs": 39,
+          "reference_occurrences": 0,
+          "segments": 82,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.5",
+          "source_words": 820,
+          "paragraphs": 45,
+          "reference_occurrences": 0,
+          "segments": 111,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.6",
+          "source_words": 530,
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "segments": 65,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.7",
+          "source_words": 578,
+          "paragraphs": 33,
+          "reference_occurrences": 0,
+          "segments": 83,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.8",
+          "source_words": 764,
+          "paragraphs": 42,
+          "reference_occurrences": 2,
+          "segments": 93,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.9",
+          "source_words": 481,
+          "paragraphs": 27,
+          "reference_occurrences": 0,
+          "segments": 64,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.10",
+          "source_words": 443,
+          "paragraphs": 30,
+          "reference_occurrences": 0,
+          "segments": 69,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.11",
+          "source_words": 615,
+          "paragraphs": 31,
+          "reference_occurrences": 0,
+          "segments": 75,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.12",
+          "source_words": 687,
+          "paragraphs": 42,
+          "reference_occurrences": 0,
+          "segments": 88,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "2Cor.13",
+          "source_words": 501,
+          "paragraphs": 28,
+          "reference_occurrences": 0,
+          "segments": 72,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Gal.1",
+          "source_words": 765,
+          "paragraphs": 43,
+          "reference_occurrences": 0,
+          "segments": 105,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Gal.2",
+          "source_words": 924,
+          "paragraphs": 57,
+          "reference_occurrences": 1,
+          "segments": 121,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Gal.3",
+          "source_words": 1316,
+          "paragraphs": 77,
+          "reference_occurrences": 0,
+          "segments": 192,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Gal.4",
+          "source_words": 1194,
+          "paragraphs": 71,
+          "reference_occurrences": 0,
+          "segments": 163,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Gal.5",
+          "source_words": 951,
+          "paragraphs": 57,
+          "reference_occurrences": 3,
+          "segments": 135,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Gal.6",
+          "source_words": 950,
+          "paragraphs": 57,
+          "reference_occurrences": 0,
+          "segments": 139,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        }
+      ],
+      "audit_notes": [
+        "Classic meaning restoration and review queue: #593. Same-editor comparison, not independent review.",
+        "Galatians classic book introduction absent from modern chapter packet: verify native/book-level witness before restoration; no silent insertion.",
+        "Romans 5:1–5 anomalous classic reading and Romans 13:1–7 reference discrepancy; 2 Corinthians 11 overlapping outline ranges and fragmented reference labels preserved and queued in #593.",
+        "Global and native validation, independent editorial review and French typography pass pending."
+      ]
     }
   ],
   "latest_completed_batch": {
-    "range": "Luke.5–Acts.19",
+    "range": "Acts.20–Gal.6",
     "chapters": 60,
-    "source_words": 52036,
-    "paragraphs": 3169,
+    "source_words": 49304,
+    "paragraphs": 3004,
     "reference_occurrences": 37,
-    "segments": 6746,
+    "segments": 6765,
     "translation": 60,
     "editorial_audit": 60,
     "technical_validation": "chapter-local tag/attribute sequence equality and nonblank segment count only; no full corpus tests",
-    "next": "Acts.20"
+    "next": "Eph.1"
   },
   "book_checkpoints": {
     "Genesis": {
@@ -18913,20 +20068,43 @@
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
     },
     "Acts": {
-      "translation": 19,
-      "editorial_audit": 19,
+      "translation": 28,
+      "editorial_audit": 28,
       "introduction": "translated and compared with Acts.1",
-      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending",
-      "remaining": "Acts.20–28"
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Rom": {
+      "translation": 16,
+      "editorial_audit": 16,
+      "introduction": "translated and compared with Rom.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "1Cor": {
+      "translation": 16,
+      "editorial_audit": 16,
+      "introduction": "translated and compared with 1Cor.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "2Cor": {
+      "translation": 13,
+      "editorial_audit": 13,
+      "introduction": "translated and compared with 2Cor.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Gal": {
+      "translation": 6,
+      "editorial_audit": 6,
+      "introduction": "classic introduction absent from modern chapter packet; verify book-level source; #593",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
     }
   },
   "current_batch": {
-    "range": "Acts.20–Gal.6",
+    "range": "Eph.1–2Pet.1",
     "target": 60,
     "completed": 0,
     "paragraphs": 0,
     "reference_occurrences": 0,
-    "next": "Acts.20",
+    "next": "Eph.1",
     "status": "not started",
     "audit_notes": []
   }
