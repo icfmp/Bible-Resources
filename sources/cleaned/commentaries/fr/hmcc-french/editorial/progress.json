@@ -3,7 +3,7 @@
   "repository": "icfmp/Bible-Resources",
   "issue": 587,
   "total_chapters": 1189,
-  "next": "John.8",
+  "next": "Acts.20",
   "batch_size": 60,
   "completed": [
     [
@@ -10045,6 +10045,336 @@
       "John",
       7,
       "Editorial audit"
+    ],
+    [
+      "John",
+      8,
+      "Translation"
+    ],
+    [
+      "John",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      9,
+      "Translation"
+    ],
+    [
+      "John",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      10,
+      "Translation"
+    ],
+    [
+      "John",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      11,
+      "Translation"
+    ],
+    [
+      "John",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      12,
+      "Translation"
+    ],
+    [
+      "John",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      13,
+      "Translation"
+    ],
+    [
+      "John",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      14,
+      "Translation"
+    ],
+    [
+      "John",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      15,
+      "Translation"
+    ],
+    [
+      "John",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      16,
+      "Translation"
+    ],
+    [
+      "John",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      17,
+      "Translation"
+    ],
+    [
+      "John",
+      17,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      18,
+      "Translation"
+    ],
+    [
+      "John",
+      18,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      19,
+      "Translation"
+    ],
+    [
+      "John",
+      19,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      20,
+      "Translation"
+    ],
+    [
+      "John",
+      20,
+      "Editorial audit"
+    ],
+    [
+      "John",
+      21,
+      "Translation"
+    ],
+    [
+      "John",
+      21,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      1,
+      "Translation"
+    ],
+    [
+      "Acts",
+      1,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      2,
+      "Translation"
+    ],
+    [
+      "Acts",
+      2,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      3,
+      "Translation"
+    ],
+    [
+      "Acts",
+      3,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      4,
+      "Translation"
+    ],
+    [
+      "Acts",
+      4,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      5,
+      "Translation"
+    ],
+    [
+      "Acts",
+      5,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      6,
+      "Translation"
+    ],
+    [
+      "Acts",
+      6,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      7,
+      "Translation"
+    ],
+    [
+      "Acts",
+      7,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      8,
+      "Translation"
+    ],
+    [
+      "Acts",
+      8,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      9,
+      "Translation"
+    ],
+    [
+      "Acts",
+      9,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      10,
+      "Translation"
+    ],
+    [
+      "Acts",
+      10,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      11,
+      "Translation"
+    ],
+    [
+      "Acts",
+      11,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      12,
+      "Translation"
+    ],
+    [
+      "Acts",
+      12,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      13,
+      "Translation"
+    ],
+    [
+      "Acts",
+      13,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      14,
+      "Translation"
+    ],
+    [
+      "Acts",
+      14,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      15,
+      "Translation"
+    ],
+    [
+      "Acts",
+      15,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      16,
+      "Translation"
+    ],
+    [
+      "Acts",
+      16,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      17,
+      "Translation"
+    ],
+    [
+      "Acts",
+      17,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      18,
+      "Translation"
+    ],
+    [
+      "Acts",
+      18,
+      "Editorial audit"
+    ],
+    [
+      "Acts",
+      19,
+      "Translation"
+    ],
+    [
+      "Acts",
+      19,
+      "Editorial audit"
     ]
   ],
   "evidence": "Existing issue checklist and manuscripts at 4d26c6fb6ef61bf53513335dae7f382f65d1219e; not a new editorial review.",
@@ -10089,7 +10419,9 @@
     "Malachi_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check",
     "Matthew_introduction": "classic_introduction_absent_from_modern_chapter_packet_pending_book_level_check",
     "Mark_introduction": "translated_and_audited_in_Mark.1",
-    "Luke_introduction": "translated_and_audited_in_Luke.1"
+    "Luke_introduction": "translated_and_audited_in_Luke.1",
+    "John_introduction": "translated_and_audited_in_John.1",
+    "Acts_introduction": "translated_and_audited_in_Acts.1"
   },
   "batch_checkpoints": [
     {
@@ -17754,17 +18086,571 @@
         "Luke.1 conflicting origins in introduction and cited 1 Tim.3.16 wording retained. Luke.3 Heli/Mary interpretation retained as Henry's reading. Luke.4 temptation/persecution distinction retained.",
         "Independent stylistic pass required: Matt.4,5,11,15,16,22; Mark.12,13,14; all French manuscripts remain candidates. Global OSIS/TEI/module and independent editorial checks pending."
       ]
+    },
+    {
+      "range": "Luke.5–Acts.19",
+      "chapters": [
+        {
+          "chapter": "Luke.5",
+          "source_words": 637,
+          "paragraphs": 37,
+          "reference_occurrences": 0,
+          "segments": 76,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.6",
+          "source_words": 739,
+          "paragraphs": 46,
+          "reference_occurrences": 0,
+          "segments": 91,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.7",
+          "source_words": 694,
+          "paragraphs": 41,
+          "reference_occurrences": 0,
+          "segments": 89,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.8",
+          "source_words": 671,
+          "paragraphs": 42,
+          "reference_occurrences": 0,
+          "segments": 97,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.9",
+          "source_words": 1179,
+          "paragraphs": 79,
+          "reference_occurrences": 1,
+          "segments": 154,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.10",
+          "source_words": 761,
+          "paragraphs": 53,
+          "reference_occurrences": 0,
+          "segments": 106,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.11",
+          "source_words": 753,
+          "paragraphs": 41,
+          "reference_occurrences": 0,
+          "segments": 95,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.12",
+          "source_words": 771,
+          "paragraphs": 44,
+          "reference_occurrences": 1,
+          "segments": 95,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.13",
+          "source_words": 714,
+          "paragraphs": 46,
+          "reference_occurrences": 0,
+          "segments": 94,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.14",
+          "source_words": 557,
+          "paragraphs": 34,
+          "reference_occurrences": 0,
+          "segments": 70,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.15",
+          "source_words": 792,
+          "paragraphs": 49,
+          "reference_occurrences": 0,
+          "segments": 106,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.16",
+          "source_words": 767,
+          "paragraphs": 52,
+          "reference_occurrences": 3,
+          "segments": 109,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.17",
+          "source_words": 397,
+          "paragraphs": 23,
+          "reference_occurrences": 0,
+          "segments": 61,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.18",
+          "source_words": 811,
+          "paragraphs": 55,
+          "reference_occurrences": 1,
+          "segments": 115,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.19",
+          "source_words": 658,
+          "paragraphs": 43,
+          "reference_occurrences": 2,
+          "segments": 92,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.20",
+          "source_words": 671,
+          "paragraphs": 42,
+          "reference_occurrences": 3,
+          "segments": 88,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.21",
+          "source_words": 689,
+          "paragraphs": 43,
+          "reference_occurrences": 0,
+          "segments": 87,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.22",
+          "source_words": 1098,
+          "paragraphs": 74,
+          "reference_occurrences": 0,
+          "segments": 176,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.23",
+          "source_words": 982,
+          "paragraphs": 65,
+          "reference_occurrences": 0,
+          "segments": 134,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Luke.24",
+          "source_words": 1100,
+          "paragraphs": 78,
+          "reference_occurrences": 0,
+          "segments": 149,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.1",
+          "source_words": 1687,
+          "paragraphs": 101,
+          "reference_occurrences": 2,
+          "segments": 236,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.2",
+          "source_words": 648,
+          "paragraphs": 47,
+          "reference_occurrences": 2,
+          "segments": 90,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.3",
+          "source_words": 1144,
+          "paragraphs": 83,
+          "reference_occurrences": 1,
+          "segments": 171,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.4",
+          "source_words": 1095,
+          "paragraphs": 79,
+          "reference_occurrences": 1,
+          "segments": 146,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.5",
+          "source_words": 1095,
+          "paragraphs": 64,
+          "reference_occurrences": 0,
+          "segments": 135,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.6",
+          "source_words": 1295,
+          "paragraphs": 79,
+          "reference_occurrences": 0,
+          "segments": 182,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.7",
+          "source_words": 786,
+          "paragraphs": 50,
+          "reference_occurrences": 0,
+          "segments": 94,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.8",
+          "source_words": 1350,
+          "paragraphs": 97,
+          "reference_occurrences": 7,
+          "segments": 189,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.9",
+          "source_words": 866,
+          "paragraphs": 30,
+          "reference_occurrences": 3,
+          "segments": 84,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.10",
+          "source_words": 873,
+          "paragraphs": 42,
+          "reference_occurrences": 0,
+          "segments": 104,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.11",
+          "source_words": 1150,
+          "paragraphs": 56,
+          "reference_occurrences": 0,
+          "segments": 125,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.12",
+          "source_words": 909,
+          "paragraphs": 47,
+          "reference_occurrences": 0,
+          "segments": 106,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.13",
+          "source_words": 774,
+          "paragraphs": 34,
+          "reference_occurrences": 0,
+          "segments": 79,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.14",
+          "source_words": 895,
+          "paragraphs": 49,
+          "reference_occurrences": 0,
+          "segments": 116,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.15",
+          "source_words": 644,
+          "paragraphs": 36,
+          "reference_occurrences": 0,
+          "segments": 75,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.16",
+          "source_words": 971,
+          "paragraphs": 58,
+          "reference_occurrences": 0,
+          "segments": 119,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.17",
+          "source_words": 929,
+          "paragraphs": 46,
+          "reference_occurrences": 0,
+          "segments": 112,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.18",
+          "source_words": 879,
+          "paragraphs": 49,
+          "reference_occurrences": 0,
+          "segments": 101,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.19",
+          "source_words": 899,
+          "paragraphs": 54,
+          "reference_occurrences": 3,
+          "segments": 121,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.20",
+          "source_words": 944,
+          "paragraphs": 54,
+          "reference_occurrences": 2,
+          "segments": 118,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "John.21",
+          "source_words": 940,
+          "paragraphs": 53,
+          "reference_occurrences": 1,
+          "segments": 105,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.1",
+          "source_words": 751,
+          "paragraphs": 43,
+          "reference_occurrences": 0,
+          "segments": 102,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.2",
+          "source_words": 1071,
+          "paragraphs": 65,
+          "reference_occurrences": 0,
+          "segments": 141,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.3",
+          "source_words": 616,
+          "paragraphs": 33,
+          "reference_occurrences": 0,
+          "segments": 80,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.4",
+          "source_words": 886,
+          "paragraphs": 50,
+          "reference_occurrences": 0,
+          "segments": 112,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.5",
+          "source_words": 920,
+          "paragraphs": 54,
+          "reference_occurrences": 0,
+          "segments": 112,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.6",
+          "source_words": 312,
+          "paragraphs": 17,
+          "reference_occurrences": 0,
+          "segments": 44,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.7",
+          "source_words": 1104,
+          "paragraphs": 74,
+          "reference_occurrences": 1,
+          "segments": 146,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.8",
+          "source_words": 843,
+          "paragraphs": 53,
+          "reference_occurrences": 0,
+          "segments": 108,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.9",
+          "source_words": 928,
+          "paragraphs": 61,
+          "reference_occurrences": 1,
+          "segments": 130,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.10",
+          "source_words": 933,
+          "paragraphs": 55,
+          "reference_occurrences": 0,
+          "segments": 125,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.11",
+          "source_words": 606,
+          "paragraphs": 38,
+          "reference_occurrences": 0,
+          "segments": 83,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.12",
+          "source_words": 653,
+          "paragraphs": 46,
+          "reference_occurrences": 1,
+          "segments": 89,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.13",
+          "source_words": 1071,
+          "paragraphs": 70,
+          "reference_occurrences": 1,
+          "segments": 140,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.14",
+          "source_words": 787,
+          "paragraphs": 44,
+          "reference_occurrences": 0,
+          "segments": 87,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.15",
+          "source_words": 798,
+          "paragraphs": 48,
+          "reference_occurrences": 0,
+          "segments": 104,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.16",
+          "source_words": 945,
+          "paragraphs": 62,
+          "reference_occurrences": 0,
+          "segments": 121,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.17",
+          "source_words": 807,
+          "paragraphs": 52,
+          "reference_occurrences": 0,
+          "segments": 111,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.18",
+          "source_words": 886,
+          "paragraphs": 59,
+          "reference_occurrences": 0,
+          "segments": 113,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        },
+        {
+          "chapter": "Acts.19",
+          "source_words": 905,
+          "paragraphs": 50,
+          "reference_occurrences": 0,
+          "segments": 106,
+          "markup": "exact source tag/attribute sequence",
+          "editorial_audit": "same editor, compared to classic witness"
+        }
+      ],
+      "audit_notes": [
+        "Luke.5: restored classic explicit assurance and other meaning details (precious blood, woe, tale/message contrast, prevailing with Christ, pardon assurance) under owner clarification #587; modern correction #588. Same-editor comparison only; exact modern tag/attribute sequence retained.",
+        "Luke.6–7: same-editor classic comparison; restored documented classic theological and pastoral nuances, see #589. Exact source tag/attribute sequence, all nonblank source segments mapped, no full-corpus validation. [{\"chapter\":\"Luke.6\",\"source_words\":739,\"paragraphs\":46,\"reference_occurrences\":0,\"segments\":91},{\"chapter\":\"Luke.7\",\"source_words\":694,\"paragraphs\":41,\"reference_occurrences\":0,\"segments\":89}]",
+        "Luke.8–10: same-editor classic comparison; restored meaning details documented in #590. Exact source tag/attribute sequence, all nonblank source segments mapped; full-corpus validation pending. [{\"chapter\":\"Luke.8\",\"source_words\":671,\"paragraphs\":42,\"reference_occurrences\":0,\"segments\":97},{\"chapter\":\"Luke.9\",\"source_words\":1179,\"paragraphs\":79,\"reference_occurrences\":1,\"segments\":154},{\"chapter\":\"Luke.10\",\"source_words\":761,\"paragraphs\":53,\"reference_occurrences\":0,\"segments\":106}]",
+        "Luke.11–24 and John.1–7: same-editor comparison with the frozen classic witness; classic meaning details restored and documented for English review in #591. Exact chapter-local source tag/attribute sequence and nonblank segment counts checked. Independent audit, French typographic review, global schema and native validation pending. [{\"chapter\":\"Luke.11\",\"source_words\":753,\"paragraphs\":41,\"reference_occurrences\":0,\"segments\":95},{\"chapter\":\"Luke.12\",\"source_words\":771,\"paragraphs\":44,\"reference_occurrences\":1,\"segments\":95},{\"chapter\":\"Luke.13\",\"source_words\":714,\"paragraphs\":46,\"reference_occurrences\":0,\"segments\":94},{\"chapter\":\"Luke.14\",\"source_words\":557,\"paragraphs\":34,\"reference_occurrences\":0,\"segments\":70},{\"chapter\":\"Luke.15\",\"source_words\":792,\"paragraphs\":49,\"reference_occurrences\":0,\"segments\":106},{\"chapter\":\"Luke.16\",\"source_words\":767,\"paragraphs\":52,\"reference_occurrences\":3,\"segments\":109},{\"chapter\":\"Luke.17\",\"source_words\":397,\"paragraphs\":23,\"reference_occurrences\":0,\"segments\":61},{\"chapter\":\"Luke.18\",\"source_words\":811,\"paragraphs\":55,\"reference_occurrences\":1,\"segments\":115},{\"chapter\":\"Luke.19\",\"source_words\":658,\"paragraphs\":43,\"reference_occurrences\":2,\"segments\":92},{\"chapter\":\"Luke.20\",\"source_words\":671,\"paragraphs\":42,\"reference_occurrences\":3,\"segments\":88},{\"chapter\":\"Luke.21\",\"source_words\":689,\"paragraphs\":43,\"reference_occurrences\":0,\"segments\":87},{\"chapter\":\"Luke.22\",\"source_words\":1098,\"paragraphs\":74,\"reference_occurrences\":0,\"segments\":176},{\"chapter\":\"Luke.23\",\"source_words\":982,\"paragraphs\":65,\"reference_occurrences\":0,\"segments\":134},{\"chapter\":\"Luke.24\",\"source_words\":1100,\"paragraphs\":78,\"reference_occurrences\":0,\"segments\":149},{\"chapter\":\"John.1\",\"source_words\":1687,\"paragraphs\":101,\"reference_occurrences\":2,\"segments\":236},{\"chapter\":\"John.2\",\"source_words\":648,\"paragraphs\":47,\"reference_occurrences\":2,\"segments\":90},{\"chapter\":\"John.3\",\"source_words\":1144,\"paragraphs\":83,\"reference_occurrences\":1,\"segments\":171},{\"chapter\":\"John.4\",\"source_words\":1095,\"paragraphs\":79,\"reference_occurrences\":1,\"segments\":146},{\"chapter\":\"John.5\",\"source_words\":1095,\"paragraphs\":64,\"reference_occurrences\":0,\"segments\":135},{\"chapter\":\"John.6\",\"source_words\":1295,\"paragraphs\":79,\"reference_occurrences\":0,\"segments\":182},{\"chapter\":\"John.7\",\"source_words\":786,\"paragraphs\":50,\"reference_occurrences\":0,\"segments\":94}]",
+        "John.8–21 and Acts.1–19: translated Modern English source, compared with frozen classic witness, restored identified classic meaning details. See #592 for English review and source ambiguities (John 15 incomplete outline; Acts 4 ambiguous Isaiah citation). Exact source tag/attribute sequence and nonblank segment counts checked chapter-locally. French typographic pass (inline whitespace/punctuation), independent editorial review, global schema and native module checks pending."
+      ]
     }
   ],
   "latest_completed_batch": {
-    "range": "Zech.7–Luke.4",
+    "range": "Luke.5–Acts.19",
     "chapters": 60,
-    "paragraphs": 3297,
-    "reference_occurrences": 76,
+    "source_words": 52036,
+    "paragraphs": 3169,
+    "reference_occurrences": 37,
+    "segments": 6746,
     "translation": 60,
     "editorial_audit": 60,
-    "technical_validation": "chapter-local tag/attribute sequence equality only; no full corpus tests",
-    "next": "Luke.5"
+    "technical_validation": "chapter-local tag/attribute sequence equality and nonblank segment count only; no full corpus tests",
+    "next": "Acts.20"
   },
   "book_checkpoints": {
     "Genesis": {
@@ -18021,26 +18907,27 @@
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
     },
     "John": {
-      "translation": 7,
-      "editorial_audit": 7,
+      "translation": 21,
+      "editorial_audit": 21,
       "introduction": "translated and compared with John.1",
+      "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending"
+    },
+    "Acts": {
+      "translation": 19,
+      "editorial_audit": 19,
+      "introduction": "translated and compared with Acts.1",
       "technical_validation": "chapter-local exact tag/attribute sequence; global and native validation pending",
-      "remaining": "John.8–21"
+      "remaining": "Acts.20–28"
     }
   },
   "current_batch": {
-    "range": "Luke.5–Acts.19",
+    "range": "Acts.20–Gal.6",
     "target": 60,
-    "completed": 27,
-    "paragraphs": 1490,
-    "reference_occurrences": 17,
-    "next": "John.8",
-    "status": "partial cohort checkpoint",
-    "audit_notes": [
-      "Luke.5: restored classic explicit assurance and other meaning details (precious blood, woe, tale/message contrast, prevailing with Christ, pardon assurance) under owner clarification #587; modern correction #588. Same-editor comparison only; exact modern tag/attribute sequence retained.",
-      "Luke.6–7: same-editor classic comparison; restored documented classic theological and pastoral nuances, see #589. Exact source tag/attribute sequence, all nonblank source segments mapped, no full-corpus validation. [{\"chapter\":\"Luke.6\",\"source_words\":739,\"paragraphs\":46,\"reference_occurrences\":0,\"segments\":91},{\"chapter\":\"Luke.7\",\"source_words\":694,\"paragraphs\":41,\"reference_occurrences\":0,\"segments\":89}]",
-      "Luke.8–10: same-editor classic comparison; restored meaning details documented in #590. Exact source tag/attribute sequence, all nonblank source segments mapped; full-corpus validation pending. [{\"chapter\":\"Luke.8\",\"source_words\":671,\"paragraphs\":42,\"reference_occurrences\":0,\"segments\":97},{\"chapter\":\"Luke.9\",\"source_words\":1179,\"paragraphs\":79,\"reference_occurrences\":1,\"segments\":154},{\"chapter\":\"Luke.10\",\"source_words\":761,\"paragraphs\":53,\"reference_occurrences\":0,\"segments\":106}]",
-      "Luke.11–24 and John.1–7: same-editor comparison with the frozen classic witness; classic meaning details restored and documented for English review in #591. Exact chapter-local source tag/attribute sequence and nonblank segment counts checked. Independent audit, French typographic review, global schema and native validation pending. [{\"chapter\":\"Luke.11\",\"source_words\":753,\"paragraphs\":41,\"reference_occurrences\":0,\"segments\":95},{\"chapter\":\"Luke.12\",\"source_words\":771,\"paragraphs\":44,\"reference_occurrences\":1,\"segments\":95},{\"chapter\":\"Luke.13\",\"source_words\":714,\"paragraphs\":46,\"reference_occurrences\":0,\"segments\":94},{\"chapter\":\"Luke.14\",\"source_words\":557,\"paragraphs\":34,\"reference_occurrences\":0,\"segments\":70},{\"chapter\":\"Luke.15\",\"source_words\":792,\"paragraphs\":49,\"reference_occurrences\":0,\"segments\":106},{\"chapter\":\"Luke.16\",\"source_words\":767,\"paragraphs\":52,\"reference_occurrences\":3,\"segments\":109},{\"chapter\":\"Luke.17\",\"source_words\":397,\"paragraphs\":23,\"reference_occurrences\":0,\"segments\":61},{\"chapter\":\"Luke.18\",\"source_words\":811,\"paragraphs\":55,\"reference_occurrences\":1,\"segments\":115},{\"chapter\":\"Luke.19\",\"source_words\":658,\"paragraphs\":43,\"reference_occurrences\":2,\"segments\":92},{\"chapter\":\"Luke.20\",\"source_words\":671,\"paragraphs\":42,\"reference_occurrences\":3,\"segments\":88},{\"chapter\":\"Luke.21\",\"source_words\":689,\"paragraphs\":43,\"reference_occurrences\":0,\"segments\":87},{\"chapter\":\"Luke.22\",\"source_words\":1098,\"paragraphs\":74,\"reference_occurrences\":0,\"segments\":176},{\"chapter\":\"Luke.23\",\"source_words\":982,\"paragraphs\":65,\"reference_occurrences\":0,\"segments\":134},{\"chapter\":\"Luke.24\",\"source_words\":1100,\"paragraphs\":78,\"reference_occurrences\":0,\"segments\":149},{\"chapter\":\"John.1\",\"source_words\":1687,\"paragraphs\":101,\"reference_occurrences\":2,\"segments\":236},{\"chapter\":\"John.2\",\"source_words\":648,\"paragraphs\":47,\"reference_occurrences\":2,\"segments\":90},{\"chapter\":\"John.3\",\"source_words\":1144,\"paragraphs\":83,\"reference_occurrences\":1,\"segments\":171},{\"chapter\":\"John.4\",\"source_words\":1095,\"paragraphs\":79,\"reference_occurrences\":1,\"segments\":146},{\"chapter\":\"John.5\",\"source_words\":1095,\"paragraphs\":64,\"reference_occurrences\":0,\"segments\":135},{\"chapter\":\"John.6\",\"source_words\":1295,\"paragraphs\":79,\"reference_occurrences\":0,\"segments\":182},{\"chapter\":\"John.7\",\"source_words\":786,\"paragraphs\":50,\"reference_occurrences\":0,\"segments\":94}]"
-    ]
+    "completed": 0,
+    "paragraphs": 0,
+    "reference_occurrences": 0,
+    "next": "Acts.20",
+    "status": "not started",
+    "audit_notes": []
   }
 }
