@@ -1,0 +1,675 @@
+{
+  "schema_version": 1,
+  "issue": 587,
+  "baseline_commit": "4a96c8f8270e2ebca0ed065ac013a5a6c9bcf42f",
+  "source_cache_commit": "354b145094512d69ec5649a39338a9989cd5fe0e",
+  "source_master_commit": "c157b1db2b2b1457c76aa6fdfab0c0df80eca9fa",
+  "total_chapters": 1189,
+  "cumulative_reviewed": 100,
+  "next": "Lev.11",
+  "cohorts": [
+    {
+      "id": 1,
+      "range": "Gen.1–Lev.10",
+      "chapters": [
+        {
+          "chapter": "Gen.1",
+          "segments": 98,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.2",
+          "segments": 105,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.3",
+          "segments": 230,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.4",
+          "segments": 126,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.5",
+          "segments": 73,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.6",
+          "segments": 116,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.7",
+          "segments": 71,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.8",
+          "segments": 67,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.9",
+          "segments": 92,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.10",
+          "segments": 65,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.11",
+          "segments": 69,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.12",
+          "segments": 112,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.13",
+          "segments": 88,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.14",
+          "segments": 64,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.15",
+          "segments": 88,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.16",
+          "segments": 56,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.17",
+          "segments": 77,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.18",
+          "segments": 84,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.19",
+          "segments": 45,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.20",
+          "segments": 43,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.21",
+          "segments": 87,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.22",
+          "segments": 113,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.23",
+          "segments": 49,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.24",
+          "segments": 84,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.25",
+          "segments": 91,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.26",
+          "segments": 72,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.27",
+          "segments": 75,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.28",
+          "segments": 97,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.29",
+          "segments": 93,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.30",
+          "segments": 51,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.31",
+          "segments": 67,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.32",
+          "segments": 78,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.33",
+          "segments": 45,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.34",
+          "segments": 35,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.35",
+          "segments": 87,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.36",
+          "segments": 18,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.37",
+          "segments": 61,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.38",
+          "segments": 14,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.39",
+          "segments": 66,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.40",
+          "segments": 41,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.41",
+          "segments": 66,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.42",
+          "segments": 63,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.43",
+          "segments": 51,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.44",
+          "segments": 33,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.45",
+          "segments": 63,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.46",
+          "segments": 37,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.47",
+          "segments": 80,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.48",
+          "segments": 42,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.49",
+          "segments": 143,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Gen.50",
+          "segments": 56,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.1",
+          "segments": 52,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.2",
+          "segments": 94,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.3",
+          "segments": 97,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.4",
+          "segments": 57,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.5",
+          "segments": 37,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.6",
+          "segments": 49,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.7",
+          "segments": 67,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.8",
+          "segments": 71,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.9",
+          "segments": 79,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.10",
+          "segments": 85,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.11",
+          "segments": 38,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.12",
+          "segments": 179,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.13",
+          "segments": 62,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.14",
+          "segments": 80,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.15",
+          "segments": 52,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.16",
+          "segments": 108,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.17",
+          "segments": 72,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.18",
+          "segments": 51,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.19",
+          "segments": 70,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.20",
+          "segments": 149,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.21",
+          "segments": 51,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.22",
+          "segments": 13,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.23",
+          "segments": 65,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.24",
+          "segments": 41,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.25",
+          "segments": 89,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.26",
+          "segments": 63,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.27",
+          "segments": 40,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.28",
+          "segments": 99,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.29",
+          "segments": 56,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.30",
+          "segments": 62,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.31",
+          "segments": 42,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.32",
+          "segments": 104,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.33",
+          "segments": 52,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.34",
+          "segments": 104,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.35",
+          "segments": 56,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.36",
+          "segments": 32,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.37",
+          "segments": 24,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.38",
+          "segments": 30,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.39",
+          "segments": 42,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Exod.40",
+          "segments": 50,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Lev.1",
+          "segments": 74,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Lev.2",
+          "segments": 43,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Lev.3",
+          "segments": 39,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Lev.4",
+          "segments": 80,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Lev.5",
+          "segments": 29,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Lev.6",
+          "segments": 43,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Lev.7",
+          "segments": 42,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Lev.8",
+          "segments": 31,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Lev.9",
+          "segments": 42,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "Lev.10",
+          "segments": 45,
+          "technical_screening": "tag/attribute sequence and nonempty text segment count matched source packet",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        }
+      ],
+      "technical_screening": {
+        "chapters": 100,
+        "source_text_segments": 6859,
+        "structural_failures": 0,
+        "method": "literal ordered tag/attribute equality and equal nonempty text node counts against pinned modern packet, plus narrow length/unchanged English and whitespace heuristics; not XML schema validation",
+        "observations": [
+          "Lev.2 retained intentional English lexical quotation 'meat offerings'",
+          "Exod.37–39 short chapters checked against classic projection",
+          "Corrections preserve existing XML tag sequences and text segment counts"
+        ]
+      },
+      "editorial_review": {
+        "chapters_read": 100,
+        "method": "second-pass AI comparison of French text with classic chapter projection; modern packet used to identify source of selected discrepancies; not independent human certification",
+        "corrections": 35,
+        "corrected_manuscripts": [
+          "Exod.10",
+          "Exod.12",
+          "Exod.19",
+          "Exod.20",
+          "Exod.21",
+          "Exod.28",
+          "Exod.3",
+          "Exod.30",
+          "Exod.6",
+          "Exod.9",
+          "Gen.10",
+          "Gen.12",
+          "Gen.18",
+          "Gen.22",
+          "Gen.25",
+          "Gen.31",
+          "Gen.33",
+          "Gen.48",
+          "Gen.5",
+          "Gen.6",
+          "Gen.9",
+          "Lev.1",
+          "Lev.10",
+          "Lev.2",
+          "Lev.4",
+          "Lev.7"
+        ],
+        "correction_issue": 596,
+        "decisions": [
+          "Preserve historical theological formulations and source reference decisions; restore attested nuances without changing English masters.",
+          "French-only peace offering terminology correction in Gen.31.",
+          "Keep intentionally quoted English term in Lev.2."
+        ],
+        "status": "cohort reviewed; corrected text still subject to full-corpus and independent validation"
+      }
+    }
+  ],
+  "remaining_release_checks": [
+    "Verify actual source masters and complete source inventory including introductions.",
+    "Normalize inconsistent candidate language/status in introduction titles (e.g. Exod.1, Lev.1), as part of global metadata inventory.",
+    "Resolve earlier discrepancy queues and review English QA issue #596 separately.",
+    "Independent editorial validation, full OSIS/reference/typography validation, native SWORD compilation and readback, rights, release authorization."
+  ]
+}
