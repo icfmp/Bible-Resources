@@ -5,8 +5,8 @@
   "source_cache_commit": "354b145094512d69ec5649a39338a9989cd5fe0e",
   "source_master_commit": "c157b1db2b2b1457c76aa6fdfab0c0df80eca9fa",
   "total_chapters": 1189,
-  "cumulative_reviewed": 300,
-  "next": "1Kgs.10",
+  "cumulative_reviewed": 400,
+  "next": "2Chr.34",
   "cohorts": [
     {
       "id": 1,
@@ -2112,6 +2112,716 @@
         {
           "chapter": "1Kgs.9",
           "segments": 49,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "range": "1Kgs.10–2Chr.33",
+      "technical_screening": {
+        "chapters": 100,
+        "source_text_segments": 3870,
+        "source_projection_words": 33675,
+        "paragraphs": 2155,
+        "reference_elements": 39,
+        "structural_failures": 0,
+        "method": "ordered tag/attribute and nonempty text count comparison to pinned modern packets; targeted replacements preserve tags and counts; not full XML/OSIS schema validation",
+        "observations": [
+          "All 1,189 manuscript files retained; 77 changed relative to cohort 3 commit; none added or removed."
+        ]
+      },
+      "editorial_review": {
+        "chapters_read": 100,
+        "method": "second-pass AI comparison against pinned classic reading projections; modern packets used primarily for structural checks; not independent audit",
+        "correction_operations": 168,
+        "corrected_manuscripts": [
+          "1Kgs.10",
+          "1Kgs.11",
+          "1Kgs.12",
+          "1Kgs.13",
+          "1Kgs.14",
+          "1Kgs.15",
+          "1Kgs.16",
+          "1Kgs.17",
+          "1Kgs.18",
+          "1Kgs.19",
+          "1Kgs.20",
+          "1Kgs.21",
+          "1Kgs.22",
+          "2Kgs.1",
+          "2Kgs.2",
+          "2Kgs.3",
+          "2Kgs.4",
+          "2Kgs.5",
+          "2Kgs.6",
+          "2Kgs.7",
+          "2Kgs.8",
+          "2Kgs.9",
+          "2Kgs.10",
+          "2Kgs.11",
+          "2Kgs.12",
+          "2Kgs.13",
+          "2Kgs.14",
+          "2Kgs.15",
+          "2Kgs.16",
+          "2Kgs.17",
+          "2Kgs.18",
+          "2Kgs.19",
+          "2Kgs.20",
+          "2Kgs.21",
+          "2Kgs.22",
+          "2Kgs.23",
+          "2Kgs.24",
+          "2Kgs.25",
+          "1Chr.2",
+          "1Chr.4",
+          "1Chr.5",
+          "1Chr.8",
+          "1Chr.11",
+          "1Chr.13",
+          "1Chr.15",
+          "1Chr.20",
+          "1Chr.22",
+          "1Chr.23",
+          "1Chr.28",
+          "1Chr.29",
+          "2Chr.3",
+          "2Chr.4",
+          "2Chr.5",
+          "2Chr.6",
+          "2Chr.7",
+          "2Chr.8",
+          "2Chr.9",
+          "2Chr.10",
+          "2Chr.11",
+          "2Chr.12",
+          "2Chr.13",
+          "2Chr.14",
+          "2Chr.16",
+          "2Chr.17",
+          "2Chr.18",
+          "2Chr.19",
+          "2Chr.20",
+          "2Chr.21",
+          "2Chr.22",
+          "2Chr.24",
+          "2Chr.25",
+          "2Chr.26",
+          "2Chr.28",
+          "2Chr.29",
+          "2Chr.30",
+          "2Chr.32",
+          "2Chr.33"
+        ],
+        "correction_issue": 596,
+        "decisions": [
+          "Restore original theological assertions and applications, including divine judgment, grace, repentance, perseverance, prayer and duties of believers.",
+          "Existing editorial annotations retained for a consistent corpus-wide review. No English masters modified.",
+          "Source anomalies requiring separate verification include 2Kgs.5 (Elijah/Elisha), duplicate wording at 1Chr.1, incomplete clause at 1Chr.16 and the 1Chr.22 outline typo; see issue #596.",
+          "Targeted edits retain existing ordered markup and segment counts; at 2Chr.28 existing emphasis extends to the restored introductory phrase."
+        ],
+        "status": "cohort reviewed and corrected; pending independent editorial validation and full-corpus technical validation"
+      },
+      "chapters": [
+        {
+          "chapter": "1Kgs.10",
+          "segments": 33,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Kgs.11",
+          "segments": 61,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Kgs.12",
+          "segments": 44,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Kgs.13",
+          "segments": 54,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Kgs.14",
+          "segments": 59,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Kgs.15",
+          "segments": 52,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Kgs.16",
+          "segments": 61,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Kgs.17",
+          "segments": 82,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Kgs.18",
+          "segments": 102,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Kgs.19",
+          "segments": 83,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Kgs.20",
+          "segments": 61,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Kgs.21",
+          "segments": 59,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Kgs.22",
+          "segments": 78,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.1",
+          "segments": 45,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.2",
+          "segments": 91,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.3",
+          "segments": 47,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.4",
+          "segments": 104,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.5",
+          "segments": 101,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.6",
+          "segments": 67,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.7",
+          "segments": 44,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.8",
+          "segments": 56,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.9",
+          "segments": 60,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.10",
+          "segments": 56,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.11",
+          "segments": 38,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.12",
+          "segments": 32,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.13",
+          "segments": 41,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.14",
+          "segments": 73,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.15",
+          "segments": 31,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.16",
+          "segments": 29,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.17",
+          "segments": 41,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.18",
+          "segments": 45,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.19",
+          "segments": 66,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.20",
+          "segments": 63,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.21",
+          "segments": 53,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.22",
+          "segments": 57,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.23",
+          "segments": 63,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.24",
+          "segments": 30,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Kgs.25",
+          "segments": 68,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.1",
+          "segments": 48,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.2",
+          "segments": 13,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.3",
+          "segments": 10,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.4",
+          "segments": 43,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.5",
+          "segments": 15,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.6",
+          "segments": 15,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.7",
+          "segments": 17,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.8",
+          "segments": 13,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.9",
+          "segments": 23,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.10",
+          "segments": 21,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.11",
+          "segments": 19,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.12",
+          "segments": 21,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.13",
+          "segments": 22,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.14",
+          "segments": 16,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.15",
+          "segments": 20,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.16",
+          "segments": 36,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.17",
+          "segments": 27,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.18",
+          "segments": 10,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.19",
+          "segments": 9,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.20",
+          "segments": 8,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.21",
+          "segments": 14,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.22",
+          "segments": 50,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.23",
+          "segments": 22,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.24",
+          "segments": 18,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.25",
+          "segments": 13,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.26",
+          "segments": 22,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.27",
+          "segments": 23,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.28",
+          "segments": 55,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "1Chr.29",
+          "segments": 54,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.1",
+          "segments": 11,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.2",
+          "segments": 15,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.3",
+          "segments": 16,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.4",
+          "segments": 20,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.5",
+          "segments": 27,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.6",
+          "segments": 26,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.7",
+          "segments": 27,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.8",
+          "segments": 28,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.9",
+          "segments": 45,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.10",
+          "segments": 17,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.11",
+          "segments": 20,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.12",
+          "segments": 25,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.13",
+          "segments": 29,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.14",
+          "segments": 19,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.15",
+          "segments": 24,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.16",
+          "segments": 27,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.17",
+          "segments": 24,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.18",
+          "segments": 22,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.19",
+          "segments": 21,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.20",
+          "segments": 65,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.21",
+          "segments": 37,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.22",
+          "segments": 26,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.23",
+          "segments": 13,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.24",
+          "segments": 41,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.25",
+          "segments": 55,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.26",
+          "segments": 46,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.27",
+          "segments": 10,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.28",
+          "segments": 27,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.29",
+          "segments": 48,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.30",
+          "segments": 61,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.31",
+          "segments": 19,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.32",
+          "segments": 36,
+          "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
+          "editorial_review": "French and classic chapter projection compared in second AI pass"
+        },
+        {
+          "chapter": "2Chr.33",
+          "segments": 36,
           "technical_screening": "ordered tags and nonempty text counts matched pinned modern packet; targeted edits retain tags and counts",
           "editorial_review": "French and classic chapter projection compared in second AI pass"
         }
